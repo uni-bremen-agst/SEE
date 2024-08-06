@@ -210,7 +210,7 @@ namespace SEE.UI.Menu
             }
             else
             {
-                Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
+                Debug.LogWarning("Search field must be present in the prefab for the nested menu to work properly.");
             }
             MenuManager.onCancel.AddListener(() => AscendLevel()); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
