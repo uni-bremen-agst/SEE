@@ -18,7 +18,7 @@ namespace SEE.Game.Drawable
         /// The path to the file containing the saved color presets.
         /// This is saved in a field because multiple methods of this class use it.
         /// </summary>
-        private static readonly string colorPresetsFile = DrawableConfigManager.configurationPath
+        private static readonly string colorPresetsFile = DrawableConfigManager.ConfigurationPath
             + "ColorPresets" + Filenames.ConfigExtension;
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         private static void EnsureDrawableDirectoryExists()
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
+            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
         }
 
         /// <summary>

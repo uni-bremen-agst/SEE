@@ -21,17 +21,17 @@ namespace SEE.Game.Drawable
         /// The path to the configuration folder of the saved drawables.
         /// This is saved in a field because multiple methods of this class and other classes use it.
         /// </summary>
-        public static readonly string configurationPath = ValueHolder.DrawablePath + "Configuration/";
+        public static readonly string ConfigurationPath = ValueHolder.DrawablePath + "Configuration/";
 
         /// <summary>
         /// The path to the folder of saved drawable (single).
         /// </summary>
-        public static readonly string singleConfPath = configurationPath + "1_Single_Drawable/";
+        public static readonly string SingleConfPath = ConfigurationPath + "1_Single_Drawable/";
 
         /// <summary>
         /// The path to the folder of saved drawables (multiple).
         /// </summary>
-        public static readonly string multipleConfPath = configurationPath + "2_Multiple_Drawables/";
+        public static readonly string MultipleConfPath = ConfigurationPath + "2_Multiple_Drawables/";
 
         /// <summary>
         /// This method checks whether the directory for the saved drawable exists.
@@ -116,8 +116,8 @@ namespace SEE.Game.Drawable
         /// <returns>The loaded drawable configuraion</returns>
         internal static DrawableConfig LoadDrawable(string fileName)
         {
-            EnsureDrawableDirectoryExists(singleConfPath);
-            return LoadDrawable(new DataPath(singleConfPath + fileName + Filenames.ConfigExtension));
+            EnsureDrawableDirectoryExists(SingleConfPath);
+            return LoadDrawable(new DataPath(SingleConfPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>
@@ -127,8 +127,8 @@ namespace SEE.Game.Drawable
         /// <returns>The loaded configuration of the drawables from the file.</returns>
         internal static DrawablesConfigs LoadDrawables(string fileName)
         {
-            EnsureDrawableDirectoryExists(multipleConfPath);
-            return LoadDrawables(new DataPath(multipleConfPath + fileName + Filenames.ConfigExtension));
+            EnsureDrawableDirectoryExists(MultipleConfPath);
+            return LoadDrawables(new DataPath(MultipleConfPath + fileName + Filenames.ConfigExtension));
         }
 
         /// <summary>
