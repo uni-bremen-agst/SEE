@@ -647,7 +647,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 default:
-                    Debug.LogWarning("Missing: " + settingName + ", " + value.GetType().FullName + "\n");
+                    Debug.LogWarning($"Missing: {settingName}, {value.GetType().FullName}.\n");
                     break;
             }
         }
