@@ -132,7 +132,7 @@ namespace SEE.Net
                     ulong senderId = rpcParams.Receive.SenderClientId;
                     foreach (Fragment fragment in fragments)
                     {
-                        ReceiveActionClientRpc(fragment.PacketID, fragment.PacketSize,
+                        ReceiveFragmentActionClientRpc(fragment.PacketID, fragment.PacketSize,
                             fragment.CurrentFragment, fragment.Data, RpcTarget.Not(senderId, RpcTargetUse.Temp));
                     }
                 }
@@ -141,7 +141,7 @@ namespace SEE.Net
                     using NativeArray<ulong> targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp);
                     foreach (Fragment fragment in fragments)
                     {
-                        ReceiveActionClientRpc(fragment.PacketID, fragment.PacketSize,
+                        ReceiveFragmentActionClientRpc(fragment.PacketID, fragment.PacketSize,
                             fragment.CurrentFragment, fragment.Data, RpcTarget.Group(targetClientIds, RpcTargetUse.Temp));
                     }
                 }
@@ -230,10 +230,19 @@ namespace SEE.Net
         /// <param name="packetSize">The size of fragments of the packet.</param>
         /// <param name="currentFragment">The current fragment.</param>
         /// <param name="data">The data of the fragment</param>
-        /// <param name="rpcParams">Used to define receipients.</param>
+        /// <param name="rpcParams">Used to define recipients.</param>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        public void ReceiveActionClientRpc(string id, int packetSize, int currentFragment, string data, RpcParams rpcParams = default)
+        public void ReceiveFragmentActionClientRpc(string id, int packetSize, int currentFragment, string data, RpcParams rpcParams = default)
         {
+            if (IsHost || IsServer)
+            {
+                return;
+            }
+            if (rpcParams.Receive.SenderClientId != ServerClientId)
+            {
+                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                return;
+            }
             Fragment fragment = new(id, packetSize, currentFragment, data);
             if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> fragments))
             {
@@ -247,7 +256,7 @@ namespace SEE.Net
             if (fragmentsGatherer.TryGetValue(fragment.PacketID, out List<Fragment> f)
                 && Fragment.CombineFragments(f) != "")
             {
-                ExecuteFragmentActionClientRpc(fragment.PacketID, rpcParams);
+                ExecuteFragmentAction(fragment.PacketID);
             }
         }
 
@@ -255,19 +264,9 @@ namespace SEE.Net
         /// Performs the broadcast. First, the serialized string is assembled.
         /// </summary>
         /// <param name="key">The packet id.</param>
-        /// <param name="rpcParams">Used to define receipients.</param>
-        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        private void ExecuteFragmentActionClientRpc(string key, RpcParams rpcParams = default)
+        /// <param name="rpcParams">Used to define recipients.</param>
+        private void ExecuteFragmentAction(string key)
         {
-            if (IsHost || IsServer)
-            {
-                return;
-            }
-            if (rpcParams.Receive.SenderClientId != ServerClientId)
-            {
-                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
-                return;
-            }
             if (fragmentsGatherer.TryGetValue(key, out List<Fragment> fragments))
             {
                 string serializedAction = Fragment.CombineFragments(fragments);
