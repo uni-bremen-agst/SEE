@@ -48,9 +48,8 @@ namespace SEE.Game.HolisticMetrics
             {
                 string fileName = fileInfos[i].Name;
                 // The basename of fileName, i.e, the name without the fileNameExtension
-                fileNames[i] = fileName.Substring(0, fileName.Length - Filenames.ConfigExtension.Length);
+                fileNames[i] = fileName[..^Filenames.MetricBoardConfigExtension.Length];
             }
-
             return fileNames;
         }
 
@@ -91,7 +90,7 @@ namespace SEE.Game.HolisticMetrics
             EnsureBoardsDirectoryExists();
             return LoadBoard(new DataPath()
             {
-                Path = metricsBoardsPath + fileName + Filenames.ConfigExtension
+                Path = metricsBoardsPath + fileName + Filenames.MetricBoardConfigExtension
             });
         }
 
@@ -103,7 +102,7 @@ namespace SEE.Game.HolisticMetrics
         internal static void SaveBoard(WidgetsManager widgetsManager, string fileName)
         {
             EnsureBoardsDirectoryExists();
-            string filePath = metricsBoardsPath + fileName + Filenames.ConfigExtension;
+            string filePath = metricsBoardsPath + fileName + Filenames.MetricBoardConfigExtension;
             using ConfigWriter writer = new(filePath);
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
@@ -117,7 +116,7 @@ namespace SEE.Game.HolisticMetrics
         internal static void DeleteBoard(string filename)
         {
             EnsureBoardsDirectoryExists();
-            string filePath = metricsBoardsPath + filename + Filenames.ConfigExtension;
+            string filePath = metricsBoardsPath + filename + Filenames.MetricBoardConfigExtension;
             File.Delete(filePath);
         }
 
