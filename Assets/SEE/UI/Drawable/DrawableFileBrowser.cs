@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Utils;
 using SimpleFileBrowser;
 using System.Collections;
@@ -45,7 +44,6 @@ namespace SEE.UI.Drawable
         /// <param name="loadState">The chosen load state (regular/specific)</param>
         public void LoadDrawableConfiguration(LoadState loadState)
         {
-            SEEInput.KeyboardShortcutsEnabled = false;
             StartCoroutine(ShowLoadDialogCoroutine(loadState));
         }
 
@@ -59,19 +57,21 @@ namespace SEE.UI.Drawable
             string title = "";
             switch (loadState)
             {
-                /// Block for load on a specific drawable.
+                /// Block for loading on a specific drawable.
                 case LoadState.Specific:
                     DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
                     initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load on specific Drawable";
                     break;
-                /// Block for load on the regular drawable.
+                /// Block for loading on the regular drawable.
                 case LoadState.Regular:
                     DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
                     initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load Drawable(s)";
                     break;
             }
+
+            SEEInput.KeyboardShortcutsEnabled = false;
 
             /// Ensures that only configuration files can be selected.
             FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
@@ -98,7 +98,6 @@ namespace SEE.UI.Drawable
         /// <param name="saveState">The chosen save state (one/more/all)</param>
         public void SaveDrawableConfiguration(SaveState saveState)
         {
-            SEEInput.KeyboardShortcutsEnabled = false;
             StartCoroutine(ShowSaveDialogCoroutine(saveState));
         }
 
@@ -134,6 +133,8 @@ namespace SEE.UI.Drawable
                     break;
             }
 
+            SEEInput.KeyboardShortcutsEnabled = false;
+
             /// Ensures that only configuration files can be selected.
             FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
 
@@ -158,7 +159,6 @@ namespace SEE.UI.Drawable
         /// </summary>
         public void LoadImage()
         {
-            SEEInput.KeyboardShortcutsEnabled = false;
             StartCoroutine(ShowLoadImageDialogCoroutine());
         }
 
@@ -171,6 +171,8 @@ namespace SEE.UI.Drawable
             DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.ImagePath);
             initPath = ValueHolder.ImagePath;
             string title = "Load an image";
+
+            SEEInput.KeyboardShortcutsEnabled = false;
 
             /// Ensures that only PNG or JPG files can be selected.
             FileBrowser.SetFilters(true, Filenames.PNGExtension, Filenames.JPGExtension);
