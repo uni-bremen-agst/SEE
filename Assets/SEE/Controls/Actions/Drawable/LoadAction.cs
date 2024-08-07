@@ -111,7 +111,8 @@ namespace SEE.Controls.Actions.Drawable
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
                     browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                    browser.LoadDrawableConfiguration(LoadState.Regular);
+                    // FIXME: Must await result.
+                    browser.LoadDrawableConfigurationAsync(LoadState.Regular);
                     memento = new(LoadState.Regular);
                 }
             };
@@ -123,7 +124,8 @@ namespace SEE.Controls.Actions.Drawable
                     if (selectedSurface != null)
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        browser.LoadDrawableConfiguration(LoadState.Specific);
+                        // FIXME: Must await result.
+                        browser.LoadDrawableConfigurationAsync(LoadState.Specific);
                         memento = new(LoadState.Specific);
                     }
                     else

@@ -1,8 +1,10 @@
-﻿using SEE.Controls;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.Drawable;
 using SEE.Utils;
 using SimpleFileBrowser;
 using System.Collections;
+using System.Threading.Tasks;
 using UnityEngine;
 using static SEE.Controls.Actions.Drawable.LoadAction;
 using static SEE.Controls.Actions.Drawable.SaveAction;
@@ -39,20 +41,11 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Loads a drawable configuration.
+        /// Loads a drawable configuration. Asks the user for a filename
+        /// using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific)</param>
-        public void LoadDrawableConfiguration(LoadState loadState)
-        {
-            StartCoroutine(ShowLoadDialogCoroutine(loadState));
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file for loading.
-        /// </summary>
-        /// <param name="loadState">The chosen load state (regular/specific)</param>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowLoadDialogCoroutine(LoadState loadState)
+        public async Task LoadDrawableConfigurationAsync(LoadState loadState)
         {
             string title = "";
             switch (loadState)
@@ -71,25 +64,41 @@ namespace SEE.UI.Drawable
                     break;
             }
 
-            SEEInput.KeyboardShortcutsEnabled = false;
+            string result = await GetPathAsync(title, initPath, Filenames.DrawableConfigExtension);
 
-            /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
+            if (!string.IsNullOrWhiteSpace(result))
             {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
+                SetPath(result);
             }
 
             /// Refreshes the UI canvas to prevent display issues.
             UICanvas.Refresh();
+        }
+
+        /// <summary>
+        /// Opens a <see cref="FileBrowser"/> and ask the user to pick a single file.
+        /// The picked file is returned when the user closes the <see cref="FileBrowser"/>.
+        /// If no file has been picked, the empty string is returned.
+        /// </summary>
+        /// <param name="title">title of the dialog</param>
+        /// ´<param name="buttonText">the text of the button to confirm the selection</param>
+        /// <param name="initialPath">the initial path where the <see cref="FileBrowser"/> allows
+        /// selection/param>
+        /// <param name="extensions">the file extensions; only files with one of these extensions
+        /// can be picked</param>
+        /// <returns>the name of the picked file or the empty if none was picked</returns>
+        private async UniTask<string> GetPathAsync(string title, string buttonText, string initialPath, params string[] extensions)
+        {
+            SEEInput.KeyboardShortcutsEnabled = false;
+
+            FileBrowser.SetFilters(false, extensions);
+
+            await FileBrowser.WaitForLoadDialog(pickMode: FileBrowser.PickMode.Files, allowMultiSelection: false,
+                initialPath: initialPath, initialFilename: null, title: title, loadButtonText: buttonText);
+
+            SEEInput.KeyboardShortcutsEnabled = true;
+
+            return FileBrowser.Success ? FileBrowser.Result[0] : string.Empty;
         }
 
         /// <summary>
@@ -172,10 +181,12 @@ namespace SEE.UI.Drawable
             initPath = ValueHolder.ImagePath;
             string title = "Load an image";
 
+            /// Ensures that only PNG or JPG files can be selected.
+            string[] extensions = new string[] { Filenames.PNGExtension, Filenames.JPGExtension };
+
             SEEInput.KeyboardShortcutsEnabled = false;
 
-            /// Ensures that only PNG or JPG files can be selected.
-            FileBrowser.SetFilters(true, Filenames.PNGExtension, Filenames.JPGExtension);
+            FileBrowser.SetFilters(true, extensions);
 
             /// Opens the file browser.
             yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
