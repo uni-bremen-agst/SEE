@@ -61,6 +61,18 @@ namespace SEE.Utils
         public const string ConfigExtension = ".cfg";
 
         /// <summary>
+        /// File extension of filenames for configuration files in which attributes
+        /// of metric boards are persisted.
+        /// </summary>
+        public const string MetricBoardConfigExtension = ".mbc";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
+        /// of drawables are persisted.
+        /// </summary>
+        public const string DrawableConfigExtension = ".drw";
+
+        /// <summary>
         /// File extension for Speech Recognition Grammar Specifications (SRGS).
         /// </summary>
         public const string GrammarExtension = ".grxml";
