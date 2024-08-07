@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.Window
 {
@@ -73,6 +74,18 @@ namespace SEE.UI.Window
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
 
             // TODO: Disable IDE Button if unused
+        }
+
+        /// <summary>
+        /// Disables all window dragger buttons.
+        /// </summary>dd
+        public void DisableWindowDraggerButtons()
+        {
+            Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>();
+            foreach (Button button in buttons)
+            {
+                button.gameObject.SetActive(false);
+            }
         }
 
         /// <summary>

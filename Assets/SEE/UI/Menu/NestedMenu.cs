@@ -56,7 +56,7 @@ namespace SEE.UI.Menu
         /// Whether to reset the level of the menu when clicking on the close button.
         /// Can only be changed before this component has been started.
         /// </summary>
-        public bool ResetLevelOnClose = true;
+        public bool ResetLevelOnClose = false;
 
         /// <summary>
         /// All leaf-entries of the nestedMenu.
@@ -134,8 +134,13 @@ namespace SEE.UI.Menu
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
             Icon = nestedEntry.MenuIconSprite;
             nestedEntry.InnerEntries.ForEach(AddEntry);
-            KeywordListener.Unregister(HandleKeyword);
-            KeywordListener.Register(HandleKeyword);
+            /// The null check must be performed due to the <see cref="DrawableActionBar">.
+            /// When switching to a drawable action via the bar without opening the menu, the KeywordListener is null.
+            if (KeywordListener != null)
+            {
+                KeywordListener.Unregister(HandleKeyword);
+                KeywordListener.Register(HandleKeyword);
+            }
             Tooltip.Deactivate();
         }
 
@@ -231,7 +236,6 @@ namespace SEE.UI.Menu
                     {
                         searchInput.text = string.Empty;
                     }
-                    ResetToBase();
                 }
             };
         }

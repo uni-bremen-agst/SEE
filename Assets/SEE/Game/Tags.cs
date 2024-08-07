@@ -1,4 +1,7 @@
-﻿namespace SEE.Game
+﻿using System.Collections.Generic;
+using System.Linq;
+
+namespace SEE.Game
 {
     /// <summary>
     /// The Unity tags for the graph entities represented by the GameObjects.
@@ -76,10 +79,82 @@
         /// </summary>
         public const string MainCamera = "MainCamera";
 
+        ///<summary>
+        /// For the object on which the <see cref="DrawableTypes"/> objects are displayed
+        /// </summary>
+        public const string Drawable = "Drawable";
+
+        /// <summary>
+        /// For the parent of a whiteboard surface.
+        /// </summary>
+        public const string Whiteboard = "Whiteboard";
+
+        /// <summary>
+        /// For the parent of a sticky note surface.
+        /// </summary>
+        public const string StickyNote = "Sticky Note";
+
+        /// <summary>
+        /// For the drawable type object line.
+        /// </summary>
+        public const string Line = "Line";
+
+        /// <summary>
+        /// For the drawable type object text.
+        /// </summary>
+        public const string DText = "DText";
+
+        /// <summary>
+        /// For the drawable type object image.
+        /// </summary>
+        public const string Image = "Image";
+
+        /// <summary>
+        /// For the drawable type object mind map node.
+        /// </summary>
+        public const string MindMapNode = "MindMapNode";
+
+        /// <summary>
+        /// For the object which holds all drawable type objects for a drawable.
+        /// Will needed because a drawable could be scaled.
+        /// </summary>
+        public const string AttachedObjects = "AttachedObjects";
+
+        /// <summary>
+        /// For the drawable top border.
+        /// </summary>
+        public const string Top = "Top";
+
+        /// <summary>
+        /// For the drawable bottom border.
+        /// </summary>
+        public const string Bottom = "Bottom";
+
+        /// <summary>
+        /// For the drawable left border.
+        /// </summary>
+        public const string Left = "Left";
+
+        /// <summary>
+        /// For the drawable right border.
+        /// </summary>
+        public const string Right = "Right";
+
         /// <summary>
         /// All existing tags in one.
         /// </summary>
         public static readonly string[] All = { Graph, Node, Edge, Text, Erosion, Decoration,
-              Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera};
+            Path, Runtime, FunctionCall, CullingPlane, ChartManager, MainCamera,
+            Drawable, Whiteboard, StickyNote, Line, DText, Image, AttachedObjects, MindMapNode, Top, Bottom, Left, Right};
+
+        /// <summary>
+        /// All existing <see cref="DrawableTypes"/> object tags in one.
+        /// </summary>
+        public static readonly string[] DTypes = { Line, DText, Image, MindMapNode };
+
+        /// <summary>
+        /// All existing drawable types object tags in one list.
+        /// </summary>
+        public static readonly List<string> DrawableTypes = DTypes.ToList();
     }
 }

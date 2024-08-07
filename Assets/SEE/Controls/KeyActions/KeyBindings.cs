@@ -171,12 +171,6 @@ namespace SEE.Controls.KeyActions
             Register(KeyAction.MoveDown, KeyCode.E, "Move down",
                      KeyActionCategory.Movement, "Move down.");
 
-            // Chat
-            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Open text chat",
-                     KeyActionCategory.Chat, "Opens the text chat.");
-            Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
-                     KeyActionCategory.Chat, "Toggles the voice chat.");
-
             // MetricCharts
             Register(KeyAction.ToggleCharts, KeyCode.M, "Toggle charts",
                      KeyActionCategory.MetricCharts, "Turns the metric charts on/off.");
@@ -240,6 +234,29 @@ namespace SEE.Controls.KeyActions
             // Code Viewer
             Register(KeyAction.ShowWindowMenu, KeyCode.F1, "Show window menu",
                      KeyActionCategory.CodeViewer, "Toggles the menu of the open windows.");
+            // Chat
+            Register(KeyAction.ToggleTextChat, KeyCode.F2, "Toggle text chat",
+                     KeyActionCategory.Chat, "Toggles the text chat.");
+            Register(KeyAction.ToggleVoiceChat, KeyCode.F5, "Toggle voice chat",
+                     KeyActionCategory.Chat, "Toggles the voice chat.");
+
+            // Drawable
+            Register(KeyAction.PartUndo, KeyCode.CapsLock, "Part undo",
+                     KeyActionCategory.Drawable, "Undoes a part of the currently running action.");
+            Register(KeyAction.MoveObjectUp, KeyCode.Keypad8, "Move object up",
+                     KeyActionCategory.Drawable, "Moves the object up.");
+            Register(KeyAction.MoveObjectDown, KeyCode.Keypad2, "Move object down",
+                     KeyActionCategory.Drawable, "Moves the object down.");
+            Register(KeyAction.MoveObjectLeft, KeyCode.Keypad4, "Move object left",
+                     KeyActionCategory.Drawable, "Moves the object left.");
+            Register(KeyAction.MoveObjectRight, KeyCode.Keypad6, "Move object right",
+                     KeyActionCategory.Drawable, "Moves the object right.");
+            Register(KeyAction.MoveObjectForward, KeyCode.Keypad9, "Move object forward",
+                     KeyActionCategory.Drawable, "Moves the object forward.");
+            Register(KeyAction.MoveObjectBackward, KeyCode.Keypad3, "Move object backward",
+                     KeyActionCategory.Drawable, "Moves the object backward.");
+            Register(KeyAction.DrawableManagerView, KeyCode.Keypad0, "Toggle drawable manager menu.",
+                     KeyActionCategory.Drawable, "Turns on/off the drawable manager menu.");
 
             // CameraPaths
             Register(KeyAction.SavePathPosition, KeyCode.F11, "Save position",

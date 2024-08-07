@@ -76,6 +76,16 @@ namespace SEE.Utils
         public const string CompressedExtension = ".xz";
 
         /// <summary>
+        /// File extension of PNG filenames.
+        /// </summary>
+        public const string PNGExtension = ".png";
+
+        /// <summary>
+        /// File extension of JPG filenames.
+        /// </summary>
+        public const string JPGExtension = ".jpg";
+
+        /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
         ///
