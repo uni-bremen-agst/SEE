@@ -175,6 +175,7 @@ namespace SEE.Net
             {
                 ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
             }
+            DrawableSynchronizer.Synchronize(clientId);
         }
 
         /// <summary>
