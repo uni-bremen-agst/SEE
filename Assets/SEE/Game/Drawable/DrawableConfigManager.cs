@@ -117,7 +117,7 @@ namespace SEE.Game.Drawable
         internal static DrawableConfig LoadDrawable(string fileName)
         {
             EnsureDrawableDirectoryExists(SingleConfPath);
-            return LoadDrawable(new DataPath(SingleConfPath + fileName + Filenames.ConfigExtension));
+            return LoadDrawable(new DataPath(SingleConfPath + fileName + Filenames.DrawableConfigExtension));
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace SEE.Game.Drawable
         internal static DrawablesConfigs LoadDrawables(string fileName)
         {
             EnsureDrawableDirectoryExists(MultipleConfPath);
-            return LoadDrawables(new DataPath(MultipleConfPath + fileName + Filenames.ConfigExtension));
+            return LoadDrawables(new DataPath(MultipleConfPath + fileName + Filenames.DrawableConfigExtension));
         }
 
         /// <summary>
@@ -144,11 +144,11 @@ namespace SEE.Game.Drawable
             EnsureDrawableDirectoryExists(Path.GetDirectoryName(filePath.Path));
             if (!Path.HasExtension(filePath.Path))
             {
-                filePath = new DataPath(filePath.Path + Filenames.ConfigExtension);
+                filePath = new DataPath(filePath.Path + Filenames.DrawableConfigExtension);
             }
-            else if (Path.GetExtension(filePath.Path) != Filenames.ConfigExtension)
+            else if (Path.GetExtension(filePath.Path) != Filenames.DrawableConfigExtension)
             {
-                Path.ChangeExtension(filePath.Path, Filenames.ConfigExtension);
+                Path.ChangeExtension(filePath.Path, Filenames.DrawableConfigExtension);
             }
             using ConfigWriter writer = new(filePath.Path);
             if (drawables.Length > 1)

@@ -56,9 +56,9 @@ namespace SEE.Utils
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
-        /// of AbstractSEECity instances are persisted.
+        /// of drawables are persisted.
         /// </summary>
-        public const string ConfigExtension = ".cfg";
+        public const string DrawableConfigExtension = ".drw";
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
@@ -68,9 +68,9 @@ namespace SEE.Utils
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
-        /// of drawables are persisted.
+        /// of AbstractSEECity instances are persisted.
         /// </summary>
-        public const string DrawableConfigExtension = ".drw";
+        public const string CityConfigExtension = ".cfg";
 
         /// <summary>
         /// File extension for Speech Recognition Grammar Specifications (SRGS).

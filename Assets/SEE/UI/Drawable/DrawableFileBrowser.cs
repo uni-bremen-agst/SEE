@@ -35,8 +35,8 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void Awake()
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-            initPath = DrawableConfigManager.configurationPath;
+            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+            initPath = DrawableConfigManager.ConfigurationPath;
         }
 
         /// <summary>
@@ -61,20 +61,20 @@ namespace SEE.UI.Drawable
             {
                 /// Block for load on a specific drawable.
                 case LoadState.Specific:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-                    initPath = DrawableConfigManager.configurationPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+                    initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load on specific Drawable";
                     break;
                 /// Block for load on the regular drawable.
                 case LoadState.Regular:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-                    initPath = DrawableConfigManager.configurationPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+                    initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load Drawable(s)";
                     break;
             }
 
             /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.ConfigExtension);
+            FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
 
             /// Opens the file browser.
             yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
@@ -114,28 +114,28 @@ namespace SEE.UI.Drawable
             {
                 /// Block for save only one drawable.
                 case SaveState.One:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.singleConfPath);
-                    initPath = DrawableConfigManager.singleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.SingleConfPath);
+                    initPath = DrawableConfigManager.SingleConfPath;
                     title = "Save Drawable";
                     break;
 
                 /// Block for save more drawables.
                 case SaveState.Multiple:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
-                    initPath = DrawableConfigManager.multipleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.MultipleConfPath);
+                    initPath = DrawableConfigManager.MultipleConfPath;
                     title = "Save specific Drawables";
                     break;
 
                 /// Block for save all drawables of the game world.
                 case SaveState.All:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
-                    initPath = DrawableConfigManager.multipleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.MultipleConfPath);
+                    initPath = DrawableConfigManager.MultipleConfPath;
                     title = "Save all Drawables";
                     break;
             }
 
             /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.ConfigExtension);
+            FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
 
             /// Opens the file browser.
             yield return FileBrowser.WaitForSaveDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Save");
