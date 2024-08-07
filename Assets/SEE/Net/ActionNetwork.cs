@@ -264,7 +264,6 @@ namespace SEE.Net
         /// Performs the broadcast. First, the serialized string is assembled.
         /// </summary>
         /// <param name="key">The packet id.</param>
-        /// <param name="rpcParams">Used to define recipients.</param>
         private void ExecuteFragmentAction(string key)
         {
             if (fragmentsGatherer.TryGetValue(key, out List<Fragment> fragments))
