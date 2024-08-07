@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
+using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -15,8 +16,6 @@ using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.Utils;
 using SimpleFileBrowser;
-using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -24,6 +23,7 @@ using UnityEngine.UI;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.GraphProviders;
+using Sirenix.OdinInspector;
 
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -74,7 +74,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private const string buttonPrefab = RuntimeConfigPrefabFolder + "RuntimeConfigButton";
 
         /// <summary>
-        /// Prefab for a add button.
+        /// Prefab for an add button.
         /// </summary>
         private const string addElementButtonPrefab = RuntimeConfigPrefabFolder + "RuntimeAddButton";
 
@@ -226,15 +226,16 @@ namespace SEE.UI.RuntimeConfigMenu
             // For all *public* fields of city annotated by RuntimeTab.
             // Note that Type.GetMember yields only public members.
             // A member can be a field, property, method, event, or other things.
-            IOrderedEnumerable<MemberInfo> members = city.GetType().GetMembers().Where(IsCityAttribute)
-                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested);
-            members.ForEach(memberInfo => CreateSetting(memberInfo, null, city));
+            city.GetType().GetMembers()
+                .Where(IsCityAttribute)
+                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested)
+                .ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
             // creates the buttons for methods
-            IOrderedEnumerable<MethodInfo> methods = city.GetType().GetMethods().Where(IsCityAttribute)
-                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName);
-            methods.ForEach(CreateButton);
+            city.GetType().GetMethods().Where(IsCityAttribute)
+                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName)
+                .ForEach(CreateButton);
             return;
 
             // methods used for ordering the buttons and settings
@@ -392,7 +393,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     Title: tabName,
                     Description: $"Settings for {tabName}",
                     EntryColor: GetColorForTab(),
-                    Icon: Icons.Move
+                    Icon: Icons.List
                 );
                 AddEntry(entry);
             }
@@ -472,7 +473,7 @@ namespace SEE.UI.RuntimeConfigMenu
             UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
-            Attribute[] attributeArray = attributes as Attribute[] ?? attributes?.ToArray() ?? Array.Empty<Attribute>();
+            Attribute[] attributeArray = attributes?.ToArray() ?? Array.Empty<Attribute>();
             parent ??= CreateOrGetViewGameObject(attributeArray).transform.Find("Content").gameObject;
 
             // create widget depending on the value type
@@ -646,7 +647,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 default:
-                    Debug.LogWarning("Missing: " + settingName + ", " + value.GetType().GetNiceName() + "\n");
+                    Debug.LogWarning($"Missing: {settingName}, {value.GetType().FullName}.\n");
                     break;
             }
         }
@@ -973,9 +974,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (provider.GetKind() != newKind)
                     {
-                        // TODO (#698):
-                        // We need to replace provider in the list it is contained in
-                        // by a new instance of newKind.
+                        // TODO (#698): We need to replace provider in the list it is contained in
+                        //              by a new instance of newKind.
                         Debug.LogError("Changing the type of a data provider is currently not supported.\n");
                     }
                 }
@@ -1011,9 +1011,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (provider.GetKind() != newKind)
                     {
-                        // TODO (#698):
-                        // We need to replace provider in the list it is contained in
-                        // by a new instance of newKind.
+                        // TODO (#698): We need to replace provider in the list it is contained in
+                        //              by a new instance of newKind.
                         Debug.LogError("Changing the type of a data provider is currently not supported.\n");
                     }
                 }
@@ -1312,9 +1311,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <typeparam name="T">the type of elements in <paramref name="list"/></typeparam>
         private void CreateList<T>(IList<T> list, GameObject parent, Func<T> newT) where T : class
         {
-            // TODO (#698):
-            // We want to add and remove elements anywhere, not just at the end.
-            // We want to change the order of elements.
+            // TODO (#698): We want to add and remove elements anywhere, not just at the end.
+            //              We want to change the order of elements.
 
             // init the add and remove buttons
             GameObject buttonContainer = new("ButtonContainer");
@@ -1424,7 +1422,8 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (parent.transform.Find(i.ToString()) == null)
                 {
-                    // Note: This iCopy is truly needed althought I do not understand why.
+                    // Note: This iCopy is needed because the lambda expression will otherwise evaluate i
+                    //       at the time of its execution, which could be in a future iteration.
                     int iCopy = i;
                     CreateSetting(
                         () => list[iCopy],

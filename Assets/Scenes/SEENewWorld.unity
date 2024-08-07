@@ -190,10 +190,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 175ce339391b42b1b31b4db72cbdb2ae, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PublicKey: 3082018A0282018100A302EA2CC9324FAF313D6CE3930BACF377215EA94BC7DA68FDCB9764DC912A8C8F7AD08D7C81A2185E3204DAC3C7F6B4EC938DDE7B7803B1D83586F8F47FE1A917C47DE55051D7662347891E95DB2D893B730FA32566784F3B309B8854214EB944170B1B0F0D3D11604221422CA08D434591EB3CFE21DC126FA5C13BE34CD86A2DC050EFE992C294C7E337FD7EC0CC13A92E88434CB55D6399E60FD2F21149CDA3BB9F615A124BF6F3A0F278C7D20E65671EBC4DAC737720991367A23091854F57083C4FE3DB9132D9CFCEED2C4F0B7FD0771F052ADDC65A80C5D68F08BFBEB70E1B92AF08031E964F87A82B9BA5CD6E7D77C99A3E88D5FE663B0FD67BBF9EEAC95EE08CC53CDAC861C90C0B824FBA91E6EAB562685486E0ED9849379FBD5E766B6F84DA704FAD6E8E07E673FA177595D013ED29D452464995939E4F4071E6ABFAB4B970EA30FF8628C1E1C92D14EAEEA9BAF2DAB298984E88DA7E94BD3C00BBD8E4210E018FFD17FBCF39463A5734A5161A3DA7741385F8EA96F6F2C0D12C6F0203010001
+  PublicKey: 
   BaseUrl: https://stvr2.informatik.uni-bremen.de:9443/axivion/projects/SEE/
   Token: 0.000000000000Q.2Jb6PIgB1pk4g8ss-DtnfdtDp0xlcugYQHFRcRvBRH4
   StrictMode: 0
+  TimeoutSeconds: 5
   ArchitectureViolationIssues: 1
   CloneIssues: 1
   CycleIssues: 1
@@ -3953,7 +3954,7 @@ MonoBehaviour:
     ShowInnerErosions: 0
     ShowLeafErosions: 0
     ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 0
+    ShowDashboardIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -7608,7 +7609,7 @@ MonoBehaviour:
     ShowInnerErosions: 1
     ShowLeafErosions: 1
     ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 1
+    ShowDashboardIssuesInCodeWindow: 1
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -13192,7 +13193,7 @@ MonoBehaviour:
     ShowInnerErosions: 1
     ShowLeafErosions: 1
     ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 1
+    ShowDashboardIssuesInCodeWindow: 1
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -25736,7 +25737,7 @@ MonoBehaviour:
     ShowInnerErosions: 0
     ShowLeafErosions: 0
     ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 0
+    ShowDashboardIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle
@@ -40507,7 +40508,7 @@ MonoBehaviour:
     ShowInnerErosions: 0
     ShowLeafErosions: 0
     ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 0
+    ShowDashboardIssuesInCodeWindow: 0
     ArchitectureIssue: Metric.Architecture_Violations
     CloneIssue: Metric.Clone
     CycleIssue: Metric.Cycle

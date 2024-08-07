@@ -49,6 +49,7 @@ namespace SEE.Utils
         public const char LiftedOutgoingEdge = '\uF08B';
         public const char LightBulb = '\uF0EB';
         public const char Link = '\uF0C1';
+        public const char List = '\uF03A';
         public const char Load = '\uF56F';
         public const char MagnifyingGlass = '\uF002';
         public const char MinusCheckbox = '\uF146';

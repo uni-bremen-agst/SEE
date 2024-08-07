@@ -1,4 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -73,10 +74,12 @@ namespace SEE.UI.Menu
         private void ActivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);
-            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
-            manager.buttonText = $"[{entry.Title}]";
-            manager.normalText.fontStyle = FontStyles.UpperCase;
-            manager.normalText.text = manager.buttonText;
+            if (button.TryGetComponentOrLog(out ButtonManagerBasic manager))
+            {
+                manager.buttonText = $"[{entry.Title}]";
+                manager.normalText.fontStyle = FontStyles.UpperCase;
+                manager.normalText.text = manager.buttonText;
+            }
         }
 
         /// <summary>
@@ -87,10 +90,12 @@ namespace SEE.UI.Menu
         private void DeactivateButton(T entry)
         {
             GameObject button = EntryGameObject(entry);
-            ButtonManagerBasicWithIcon manager = button.GetComponent<ButtonManagerBasicWithIcon>();
-            manager.buttonText = entry.Title;
-            manager.normalText.fontStyle = FontStyles.Normal;
-            manager.normalText.text = manager.buttonText;
+            if (button.TryGetComponentOrLog(out ButtonManagerBasic manager))
+            {
+                manager.buttonText = entry.Title;
+                manager.normalText.fontStyle = FontStyles.Normal;
+                manager.normalText.text = manager.buttonText;
+            }
         }
 
         /// <summary>
