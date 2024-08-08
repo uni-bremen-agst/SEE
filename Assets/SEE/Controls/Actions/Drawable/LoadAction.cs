@@ -16,6 +16,7 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using System.Linq;
 using SEE.UI;
+using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -106,32 +107,47 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Awake();
             /// The load button for loading onto the original drawable.
-            UnityAction loadButtonCall = () =>
+            UnityAction loadButtonCall = async () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                try
                 {
-                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                    // FIXME: Must await result.
-                    browser.LoadDrawableConfigurationAsync(LoadState.Regular);
-                    memento = new(LoadState.Regular);
-                }
-            };
-            /// The load button for loading onto a specific drawable.
-            UnityAction loadSpecificButtonCall = () =>
-            {
-                if (browser == null || (browser != null && !browser.IsOpen()))
-                {
-                    if (selectedSurface != null)
+                    if (browser == null || (browser != null && !browser.IsOpen()))
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        // FIXME: Must await result.
-                        browser.LoadDrawableConfigurationAsync(LoadState.Specific);
-                        memento = new(LoadState.Specific);
+                        await browser.LoadDrawableConfigurationAsync(LoadState.Regular);
+                        memento = new(LoadState.Regular);
                     }
-                    else
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    ShowNotification.Error("Exception occurred", e.Message);
+                }
+            };
+
+            /// The load button for loading onto a specific drawable.
+            UnityAction loadSpecificButtonCall = async () =>
+            {
+                try
+                {
+                    if (browser == null || (browser != null && !browser.IsOpen()))
                     {
-                        ShowNotification.Warn("No drawable selected.", "Select a drawable to load specifically.");
+                        if (selectedSurface != null)
+                        {
+                            browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                            await browser.LoadDrawableConfigurationAsync(LoadState.Specific);
+                            memento = new(LoadState.Specific);
+                        }
+                        else
+                        {
+                            ShowNotification.Warn("No drawable selected.", "Select a drawable to load specifically.");
+                        }
                     }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    ShowNotification.Error("Exception occurred", e.Message);
                 }
             };
 
@@ -348,7 +364,7 @@ namespace SEE.Controls.Actions.Drawable
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
-                        Object.DestroyImmediate(typeObj);
+                        Destroyer.Destroy(typeObj);
                     }
                 }
 
