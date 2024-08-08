@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
+using Assets.SEE.Tools.Playername;
 
 /// <summary>
 /// Sends and show playerName for each player
@@ -32,6 +33,18 @@ public class PlayerName : NetworkBehaviour
         }
         // Read the player's name when the script starts.
         ReadPlayerName();
+
+        // Display the local player's name as "Me".
+        if (IsOwner)
+        {
+            DisplayLocalPlayerName();
+        }
+
+        if (IsServer)
+        {
+            // Add or update the player's name in a dictionary managed by server
+            PlayerNameManager.AddOrUpdatePlayerName(OwnerClientId, playerName);
+        }
     }
 
     /// <summary>
@@ -52,10 +65,8 @@ public class PlayerName : NetworkBehaviour
 
         if (IsOwner)
         {
-            DisplayLocalPlayername();
             DisplayPlayernameOnAllOtherClients();
         }
-
     }
 
     /// <summary>
@@ -65,7 +76,11 @@ public class PlayerName : NetworkBehaviour
     [ClientRpc]
     private void SendPlayernameToClientsClientRPC(string playername)
     {
-        RenderNetworkPlayername(playername);
+        // Only update the display name if this is not the owner.
+        if (!IsOwner)
+        {
+            RenderNetworkPlayerName(playername);
+        }
     }
 
     /// <summary>
@@ -73,12 +88,19 @@ public class PlayerName : NetworkBehaviour
     /// </summary>
     /// <param name="playername">Playername that will be sent</param>
     [ServerRpc]
-    private void SendPlayernameFromClientsToServerServerRPC(string playername)
+    private void SendPlayernameFromClientsToServerServerRPC(ulong clientID, string playername)
     {
-        // The server will render this playername onto his instance of the TextMeshPro.
-        RenderNetworkPlayername(playername);
 
-        // The server will send the name to all other clients (not the owner and server)
+        // The server will render this playername onto his instance of the TextMeshPro.
+        RenderNetworkPlayerName(playername);
+
+        // Update the player's name in the dictionary
+        if (IsServer)
+        {
+            PlayerNameManager.AddOrUpdatePlayerName(clientID, playername);
+        }
+
+        // The server will send the name to all other clients
         SendPlayernameToClientsClientRPC(playername);
     }
 
@@ -86,7 +108,7 @@ public class PlayerName : NetworkBehaviour
     /// Render the player's name on the TextMeshPro component.
     /// </summary>
     /// <param name="playername">Playername that should be set</param>
-    private void RenderNetworkPlayername(string playername)
+    private void RenderNetworkPlayerName(string playername)
     {
         displayNameText.text = playername;
     }
@@ -94,7 +116,7 @@ public class PlayerName : NetworkBehaviour
     /// <summary>
     /// Display the local player's name as "Me".
     /// </summary>
-    private void DisplayLocalPlayername()
+    private void DisplayLocalPlayerName()
     {
         displayNameText.text = "Me";
     }
@@ -107,7 +129,7 @@ public class PlayerName : NetworkBehaviour
         // Send the player's name to the server for distribution to other clients.
         if (!IsServer)
         {
-            SendPlayernameFromClientsToServerServerRPC(playerName);
+            SendPlayernameFromClientsToServerServerRPC(OwnerClientId, playerName);
         }
         else
         {

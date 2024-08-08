@@ -15,24 +15,18 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Callback to be called when this dialog closes.
         /// </summary>
-        public delegate void OnClosed();
+        public Action callBack;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
         /// <param name="callBack">delegate to be called when this dialog is closed</param>
-        public UserPropertyDialog(Net.Network networkConfig, OnClosed callBack = null)
+        public UserPropertyDialog(Net.Network networkConfig, Action callBack = null)
         {
             this.networkConfig = networkConfig;
             this.callBack = callBack;
         }
-
-        /// <summary>
-        /// Delegate to be called when this dialog is closed. May be null in which case
-        /// nothing is called.
-        /// </summary>
-        private OnClosed callBack;
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -53,13 +47,13 @@ namespace SEE.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new();
+        private readonly UnityEvent OnConfirm = new();
 
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new();
+        private readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
@@ -89,6 +83,11 @@ namespace SEE.UI.PropertyDialog
             propertyDialog.Description = "Enter the user settings";
             propertyDialog.AddGroup(group);
 
+            // Because we will validate the input, we do not want the propertyDialog
+            // to be closed until the input valid. That is why we will handle the
+            // closing ourselves.
+            propertyDialog.AllowClosing(false);
+
             // Register listeners
             propertyDialog.OnConfirm.AddListener(OKButtonPressed);
             propertyDialog.OnCancel.AddListener(CancelButtonPressed);
@@ -114,28 +113,22 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private void OKButtonPressed()
         {
-            bool errorOccurred = false;
-            {
+
                 string playerName = this.playerName.Value.Trim();
 
                 if (ValidUsername(playerName))
                 {
                     networkConfig.PlayerName = playerName;
+                    propertyDialog.Close();
+                    OnConfirm.Invoke();
+                    SEEInput.KeyboardShortcutsEnabled = true;
+                    Close();
+                    callBack?.Invoke();
                 }
                 else
                 {
-                    ShowNotification.Error("Username Error", "Username needs to be at least one character long.");
-                    errorOccurred = true;
+                ShowNotification.Error("Username Error", "Username needs to be at least one character long.");
                 }
-            }
-            if (!errorOccurred)
-            {
-                propertyDialog.Close();
-                OnConfirm.Invoke();
-                SEEInput.KeyboardShortcutsEnabled = true;
-                Close();
-                callBack?.Invoke();
-            }
         }
 
         /// <summary>

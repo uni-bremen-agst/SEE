@@ -21,24 +21,18 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Callback to be called when this dialog closes.
         /// </summary>
-        public delegate void OnClosed();
+        public Action callBack;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
         /// <param name="callBack">delegate to be called when this dialog is closed</param>
-        public NetworkPropertyDialog(Net.Network networkConfig, OnClosed callBack = null)
+        public NetworkPropertyDialog(Net.Network networkConfig, Action callBack = null)
         {
             this.networkConfig = networkConfig;
             this.callBack = callBack;
         }
-
-        /// <summary>
-        /// Delegate to be called when this dialog is closed. May be null in which case
-        /// nothing is called.
-        /// </summary>
-        private OnClosed callBack;
 
         /// <summary>
         /// The maximal valid network port number.
@@ -54,12 +48,12 @@ namespace SEE.UI.PropertyDialog
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new();
+        private readonly UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new();
+        private readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// The dialog used to manipulate the node.

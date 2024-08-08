@@ -7,6 +7,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using Assets.SEE.Tools.Playername;
 using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
@@ -100,6 +101,11 @@ namespace SEE.Net
         /// Used to tell the caller whether the routine has been completed.
         /// </summary>
         private CallBack callbackToMenu = null;
+
+        /// <summary>
+        /// Playername for chat and avatar tag
+        /// </summary>
+        public string PlayerName { get; set; } = string.Empty;
 
         /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
@@ -670,7 +676,8 @@ namespace SEE.Net
         /// <param name="client">the ID of the client</param>
         private void OnClientDisconnectCallbackForServer(ulong client)
         {
-            ShowNotification.Info("Connection", $"Client {client} has disconnected.");
+            ShowNotification.Info("Connection", $"Client {client} as {PlayerNameManager.GetPlayerName(client)} has disconnected.");
+            PlayerNameManager.RemovePlayerName(client);
         }
 
         /// The IP4 address, port, and protocol.
@@ -1000,6 +1007,10 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
+        /// <summary>
+        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "playername";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1040,6 +1051,7 @@ namespace SEE.Net
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
+            writer.Save(PlayerName, playernameLabel);
         }
 
         /// <summary>
@@ -1060,6 +1072,11 @@ namespace SEE.Net
                 string value = ServerIP4Address;
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
+            }
+            {
+                string value = PlayerName;
+                ConfigIO.Restore(attributes, playernameLabel, ref value);
+                PlayerName = value;
             }
         }
 
