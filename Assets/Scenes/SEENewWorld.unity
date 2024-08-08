@@ -2506,7 +2506,7 @@ MonoBehaviour:
       Data: 0.9622642
     - Name: 
       Entry: 4
-      Data: 0.0771627054
+      Data: 0.07716271
     - Name: 
       Entry: 4
       Data: 1
@@ -2752,10 +2752,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.856840432
+      Data: 0.8568404
     - Name: 
       Entry: 4
-      Data: 0.306470275
+      Data: 0.3064703
     - Name: 
       Entry: 4
       Data: 0.9150943
@@ -3846,27 +3846,27 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 73|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 75|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 75|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 76|SEE.Utils.Paths.FilePath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /JLGExample/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -3880,14 +3880,14 @@ MonoBehaviour:
       Data: 77|SEE.GraphProviders.JaCoCoGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 78|SEE.Utils.Paths.FilePath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /JLGExample/jacoco.xml
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -3908,16 +3908,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /JLGExample/CodeFacts.cfg
-    absolutePath: 
+    RelativePath: /JLGExample/CodeFacts.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 3
-    relativePath: /JLGExample
-    absolutePath: 
+    RelativePath: /JLGExample
+    AbsolutePath: 
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
@@ -3935,8 +3935,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -3961,6 +3961,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -3972,12 +3976,12 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   JLGPath:
     Root: 3
-    relativePath: /JLGExample/CodeFacts.jlg
-    absolutePath: 
+    RelativePath: /JLGExample/CodeFacts.jlg
+    AbsolutePath: 
   BreakpointClass: classname
   BreakpointLine: 0
   DistanceAboveCity: 0.3
@@ -4008,7 +4012,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.0010153651
+  HeightOffset: 0.0010186434
 --- !u!65 &264006616
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -5119,13 +5123,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
-      Data: 0.215686277
+      Data: 0.2156863
     - Name: 
       Entry: 4
       Data: 1
@@ -7090,7 +7094,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.858823538
+      Data: 0.8588235
     - Name: 
       Entry: 4
       Data: 1
@@ -7147,7 +7151,7 @@ MonoBehaviour:
       Data: 0.9425198
     - Name: 
       Entry: 4
-      Data: 0.362095058
+      Data: 0.3620951
     - Name: 
       Entry: 4
       Data: 0.9716981
@@ -7198,7 +7202,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.224679589
+      Data: 0.2246796
     - Name: 
       Entry: 4
       Data: 0.7557063
@@ -7219,7 +7223,7 @@ MonoBehaviour:
       Data: 0.09531862
     - Name: 
       Entry: 4
-      Data: 0.741935432
+      Data: 0.7419354
     - Name: 
       Entry: 4
       Data: 0.9622642
@@ -7518,27 +7522,27 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 109|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 109|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 110|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 110|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 111|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 111|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 112|SEE.Utils.Paths.FilePath, SEE
+      Data: 112|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /SEE/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -7559,16 +7563,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /SEE/SEE.cfg
-    absolutePath: 
+    RelativePath: /SEE/SEE.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -7586,8 +7590,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 0
@@ -7612,6 +7616,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -7623,8 +7631,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &326121977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10059,118 +10067,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: dc09ca83af09d6d4b8b33c7c5c4a13ee, type: 3}
---- !u!1001 &471867952
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 0}
-    m_Modifications:
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_RootOrder
-      value: 140
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -30.14087
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0.4470662
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 13.127973
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalRotation.y
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalRotation.z
-      value: -0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -4216859302048453862, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: -927199367670048503, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_Name
-      value: Desk01
-      objectReference: {fileID: 0}
-    - target: {fileID: -927199367670048503, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_Name
-      value: VCSTable
-      objectReference: {fileID: 0}
-    - target: {fileID: 100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_StaticEditorFlags
-      value: 4294967295
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_RootOrder
-      value: 17
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: -1.6799998
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.963
-      objectReference: {fileID: 0}
-    - target: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: -0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects:
-    - targetCorrespondingSourceObject: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1770094064}
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 616cd0a1c5e06384e8441efb4837d445, type: 3}
---- !u!4 &471867953 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 400000, guid: 616cd0a1c5e06384e8441efb4837d445,
-    type: 3}
-  m_PrefabInstance: {fileID: 471867952}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &484407758
 GameObject:
   m_ObjectHideFlags: 0
@@ -13205,19 +13101,62 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: DataProvider
+      Entry: 7
+      Data: 121|SEE.GraphProviders.MultiGraphPipelineProvider, SEE
+    - Name: Pipeline
+      Entry: 7
+      Data: 122|System.Collections.Generic.List`1[[SEE.GraphProviders.MultiGraphProvider,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 123|SEE.GraphProviders.GXLEvolutionGraphProvider, SEE
+    - Name: GXLDirectory
+      Entry: 7
+      Data: 124|SEE.Utils.Paths.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 3
+    - Name: RelativePath
+      Entry: 1
+      Data: /animation-clones-SEE
+    - Name: AbsolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MaxRevisionsToLoad
+      Entry: 3
+      Data: 500
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /animation-clones-SEE/clones.cfg
-    absolutePath: 
+    RelativePath: /animation-clones-SEE/clones.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 1
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 1
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -13235,8 +13174,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -13261,6 +13200,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -13272,13 +13215,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
-  MaxRevisionsToLoad: 500
-  GXLDirectory:
-    Root: 3
-    relativePath: /animation-clones-SEE
-    absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &551406257
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18303,8 +18241,8 @@ MonoBehaviour:
   OpenAiApiKey: 
   GrammarFilePath:
     Root: 3
-    relativePath: /PersonalAssistantGrammar.grxml
-    absolutePath: 
+    RelativePath: /PersonalAssistantGrammar.grxml
+    AbsolutePath: 
 --- !u!114 &1166896208
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20435,7 +20373,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
@@ -25666,29 +25604,29 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 67|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 67|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 68|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 68|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 2
     - Name: 
       Entry: 7
-      Data: 69|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 69|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 70|SEE.Utils.Paths.FilePath, SEE
+      Data: 70|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-3-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -25700,29 +25638,29 @@ MonoBehaviour:
       Data: 71|SEE.GraphProviders.MergeDiffGraphProvider, SEE
     - Name: OldGraph
       Entry: 7
-      Data: 72|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 72|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 73|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 74|SEE.GraphProviders.GXLGraphProvider, SEE
+      Data: 74|SEE.GraphProviders.GXLSingleGraphProvider, SEE
     - Name: Path
       Entry: 7
-      Data: 75|SEE.Utils.Paths.FilePath, SEE
+      Data: 75|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /jacoco/jacoco-1-a50585b9e0770c363c56d887a8f639dc05411073.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-1-a50585b9e0770c363c56d887a8f639dc05411073.gxl
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -25735,27 +25673,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 76|SEE.GraphProviders.JaCoCoGraphProvider, SEE
-    - Name: Path
-      Entry: 7
-      Data: 77|SEE.Utils.Paths.FilePath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 3
-    - Name: relativePath
-      Entry: 1
-      Data: /jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml
-    - Name: absolutePath
-      Entry: 1
-      Data: C:/Users/koschke/develop/jacoco/SEE/jacoco-3-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml
     - Name: 
       Entry: 8
       Data: 
@@ -25774,16 +25691,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /jacoco/jacoco.cfg
-    absolutePath: C:/Users/koschke/develop/jacoco/SEE/jacoco.cfg
+    RelativePath: /jacoco/jacoco.cfg
+    AbsolutePath: C:/Users/koschke/develop/jacoco/SEE/jacoco.cfg
   sourceCodeDirectory:
     Root: 0
-    relativePath: 
-    absolutePath: C:/Users/koschke/develop/jacoco
+    RelativePath: 
+    AbsolutePath: C:/Users/koschke/develop/jacoco
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
@@ -25801,8 +25718,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -25827,6 +25744,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -25838,12 +25759,12 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   VCSPath:
     Root: 0
-    relativePath: 
-    absolutePath: C:/Users/koschke/develop/jacoco
+    RelativePath: 
+    AbsolutePath: C:/Users/koschke/develop/jacoco
   OldRevision: 35f352a95551f532da9013f3587e2591cdcef6ec
   NewRevision: f5c5b1f831903c9c2f771e467916ce9664aedb1b
 --- !u!1001 &1229256984
@@ -26354,6 +26275,72 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 1979636771}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1334775384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1334775387}
+  - component: {fileID: 1334775386}
+  - component: {fileID: 1334775385}
+  m_Layer: 0
+  m_Name: Server
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1334775385
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 45c0c906c008b5f4184014340339e5c0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &1334775386
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  GlobalObjectIdHash: 3805298196
+  InScenePlacedSourceGlobalObjectIdHash: 0
+  AlwaysReplicateAsRoot: 0
+  SynchronizeTransform: 1
+  ActiveSceneSynchronization: 0
+  SceneMigrationSynchronization: 1
+  SpawnWithObservers: 1
+  DontDestroyWithOwner: 0
+  AutoObjectParentSync: 1
+--- !u!4 &1334775387
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -31, y: 1.3999999, z: 0.13}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1336523151
 GameObject:
   m_ObjectHideFlags: 0
@@ -34179,840 +34166,6 @@ Transform:
   - {fileID: 1042245598}
   m_Father: {fileID: 1658517675}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &1770094063
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1770094064}
-  - component: {fileID: 1770094070}
-  - component: {fileID: 1770094069}
-  - component: {fileID: 1770094068}
-  - component: {fileID: 1770094067}
-  - component: {fileID: 1770094065}
-  m_Layer: 0
-  m_Name: VCSCity
-  m_TagString: Code City
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1770094064
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 45.799995, z: 0}
-  m_LocalScale: {x: 147.204, y: 0.0001859913, z: 322.03818}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 471867953}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1770094065
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 253abae38e5d8014abb73913836a3d5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  serializationData:
-    SerializedFormat: 2
-    SerializedBytes: 
-    ReferencedUnityObjects: []
-    SerializedBytesString: 
-    Prefab: {fileID: 0}
-    PrefabModificationsReferencedUnityObjects: []
-    PrefabModifications: []
-    SerializationNodes:
-    - Name: HierarchicalEdges
-      Entry: 7
-      Data: 0|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
-    - Name: 
-      Entry: 12
-      Data: 4
-    - Name: 
-      Entry: 1
-      Data: Enclosing
-    - Name: 
-      Entry: 1
-      Data: Belongs_To
-    - Name: 
-      Entry: 1
-      Data: Part_Of
-    - Name: 
-      Entry: 1
-      Data: Defined_In
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NodeTypes
-      Entry: 7
-      Data: 1|SEE.Game.City.NodeTypeVisualsMap, SEE
-    - Name: map
-      Entry: 7
-      Data: 2|SEE.Game.City.VisualNodeAttributesMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 3|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Directory
-    - Name: $v
-      Entry: 7
-      Data: 4|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: true
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 5|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 1
-      Data: 0.001
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 6|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 0
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0.784313738
-    - Name: 
-      Entry: 4
-      Data: 0.784313738
-    - Name: 
-      Entry: 4
-      Data: 0.784313738
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 7|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 8|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 9|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: File
-    - Name: $v
-      Entry: 7
-      Data: 10|SEE.Game.City.VisualNodeAttributes, SEE
-    - Name: IsRelevant
-      Entry: 5
-      Data: true
-    - Name: Shape
-      Entry: 3
-      Data: 0
-    - Name: MetricToLength
-      Entry: 7
-      Data: 11|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC
-    - Name: 
-      Entry: 1
-      Data: Metric.LOC
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ColorProperty
-      Entry: 7
-      Data: 12|SEE.Game.City.ColorProperty, SEE
-    - Name: Property
-      Entry: 3
-      Data: 1
-    - Name: TypeColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ByLevel
-      Entry: 5
-      Data: true
-    - Name: ColorMetric
-      Entry: 1
-      Data: Metric.McCabe_Complexity
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MinimalBlockLength
-      Entry: 4
-      Data: 0.001
-    - Name: MaximalBlockLength
-      Entry: 4
-      Data: 1
-    - Name: AntennaSettings
-      Entry: 7
-      Data: 13|SEE.Game.City.AntennaAttributes, SEE
-    - Name: AntennaSections
-      Entry: 7
-      Data: 14|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LabelSettings
-      Entry: 7
-      Data: 15|SEE.Game.LabelAttributes, SEE
-    - Name: Show
-      Entry: 5
-      Data: true
-    - Name: Distance
-      Entry: 4
-      Data: 0.2
-    - Name: FontSize
-      Entry: 4
-      Data: 0.4
-    - Name: AnimationFactor
-      Entry: 4
-      Data: 0.5
-    - Name: LabelAlpha
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: OutlineWidth
-      Entry: 4
-      Data: 1
-    - Name: ShowNames
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MarkerAttributes
-      Entry: 7
-      Data: 16|SEE.Game.City.MarkerAttributes, SEE
-    - Name: MarkerHeight
-      Entry: 4
-      Data: 0.2
-    - Name: MarkerWidth
-      Entry: 4
-      Data: 0.01
-    - Name: AdditionBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: ChangeBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0.921568632
-    - Name: 
-      Entry: 4
-      Data: 0.0156862754
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DeletionBeamColor
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: MetricToColor
-      Entry: 7
-      Data: 17|SEE.Game.City.ColorMap, SEE
-    - Name: map
-      Entry: 7
-      Data: 18|SEE.Game.City.ColorRangeMapping, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 3
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Metric.McCabe_Complexity
-    - Name: $v
-      Entry: 7
-      Data: SEE.Game.ColorRange, SEE
-    - Name: Lower
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Upper
-      Entry: 7
-      Data: UnityEngine.Color, UnityEngine.CoreModule
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 0
-    - Name: 
-      Entry: 4
-      Data: 1
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: NumberOfColors
-      Entry: 3
-      Data: 15
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CoseGraphSettings
-      Entry: 7
-      Data: 19|SEE.Layout.NodeLayouts.Cose.CoseGraphAttributes, SEE
-    - Name: EdgeLength
-      Entry: 3
-      Data: 20
-    - Name: UseSmartIdealEdgeCalculation
-      Entry: 5
-      Data: false
-    - Name: UseSmartMultilevelScaling
-      Entry: 5
-      Data: false
-    - Name: PerLevelIdealEdgeLengthFactor
-      Entry: 4
-      Data: 0.1
-    - Name: UseSmartRepulsionRangeCalculation
-      Entry: 5
-      Data: false
-    - Name: GravityStrength
-      Entry: 4
-      Data: 0.8
-    - Name: CompoundGravityStrength
-      Entry: 4
-      Data: 1.5
-    - Name: RepulsionStrength
-      Entry: 4
-      Data: 50
-    - Name: MultiLevelScaling
-      Entry: 5
-      Data: false
-    - Name: ListInnerNodeToggle
-      Entry: 7
-      Data: 20|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 7
-      Data: 21|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
-        mscorlib]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeLayout
-      Entry: 7
-      Data: 22|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 21
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: InnerNodeShape
-      Entry: 7
-      Data: 23|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
-        SEE]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 21
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: LoadedForNodeTypes
-      Entry: 7
-      Data: 24|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 21
-    - Name: 
-      Entry: 12
-      Data: 0
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: UseCalculationParameter
-      Entry: 5
-      Data: true
-    - Name: UseIterativeCalculation
-      Entry: 5
-      Data: false
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: DataProvider
-      Entry: 7
-      Data: 25|SEE.GraphProviders.PipelineGraphProvider, SEE
-    - Name: Pipeline
-      Entry: 7
-      Data: 26|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 27|SEE.GraphProviders.VCSGraphProvider, SEE
-    - Name: RepositoryPath
-      Entry: 7
-      Data: 28|SEE.Utils.Paths.DirectoryPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 1
-    - Name: relativePath
-      Entry: 1
-      Data: 
-    - Name: absolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: CommitID
-      Entry: 1
-      Data: 0878f91f900dc90d89c594c521ac1d3b9edd7097
-    - Name: PathGlobbing
-      Entry: 7
-      Data: 29|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
-        mscorlib]], mscorlib
-    - Name: comparer
-      Entry: 9
-      Data: 21
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: Assets/SEE/**/*.cs
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-  LODCulling: 0.001
-  ConfigurationPath:
-    Root: 3
-    relativePath: /SEE/SEEVCS.cfg
-    absolutePath: 
-  sourceCodeDirectory:
-    Root: 1
-    relativePath: 
-    absolutePath: 
-  SolutionPath:
-    Root: 1
-    relativePath: /SEEIT.sln
-    absolutePath: 
-  IgnoreSelfLoopsInLifting: 0
-  MaximalAntennaSegmentHeight: 0.5
-  AntennaWidth: 0.1
-  BaseAnimationDuration: 1
-  ProgressBar: 0
-  ZScoreScale: 0
-  ScaleOnlyLeafMetrics: 1
-  NodeLayoutSettings:
-    Kind: 3
-    IncrementalTreeMap:
-      LocalMovesDepth: 3
-      LocalMovesBranchingLimit: 4
-      pNorm: 1
-      PaddingMm: 5
-      GradientDescentPrecision: -4
-    LayoutPath:
-      Root: 2
-      relativePath: 
-      absolutePath: 
-  EdgeLayoutSettings:
-    Kind: 3
-    AnimationKind: 2
-    AnimateInnerEdges: 1
-    EdgeWidth: 0.01
-    EdgesAboveBlocks: 1
-    Tension: 0.85
-  EdgeSelectionSettings:
-    TubularSegments: 50
-    Radius: 0.005
-    RadialSegments: 8
-    AreSelectable: 1
-  ErosionSettings:
-    ShowInnerErosions: 0
-    ShowLeafErosions: 0
-    ErosionScalingFactor: 1.5
-    ShowIssuesInCodeWindow: 0
-    ArchitectureIssue: Metric.Architecture_Violations
-    CloneIssue: Metric.Clone
-    CycleIssue: Metric.Cycle
-    DeadCodeIssue: Metric.Dead_Code
-    MetricIssue: Metric.Metric
-    StyleIssue: Metric.Style
-    UniversalIssue: Metric.Universal
-    ArchitectureIssueSum: Metric.Architecture_Violations_SUM
-    CloneIssueSum: Metric.Clone_SUM
-    CycleIssueSum: Metric.Cycle_SUM
-    DeadCodeIssueSum: Metric.Dead_Code_SUM
-    MetricIssueSum: Metric.Metric_SUM
-    StyleIssueSum: Metric.Style_SUM
-    UniversalIssueSum: Metric.Universal_SUM
-  BoardSettings:
-    LoadBoardOnStartup: 0
-    BoardPath:
-      Root: 2
-      relativePath: 
-      absolutePath: 
---- !u!114 &1770094067
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7623b0249cfceff40b25a7b4ea3b89f4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &1770094068
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  HeightOffset: 0.0015009642
---- !u!65 &1770094069
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
---- !u!23 &1770094070
-MeshRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1770094063}
-  m_Enabled: 1
-  m_CastShadows: 1
-  m_ReceiveShadows: 1
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 2
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 2100000, guid: 800ec33a9c0fe564b9b72cdd97dc8d9e, type: 2}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 3
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_AdditionalVertexStreams: {fileID: 0}
 --- !u!1 &1777023170
 GameObject:
   m_ObjectHideFlags: 0
@@ -38888,7 +38041,7 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.613575935
+      Data: 0.6135759
     - Name: 
       Entry: 4
       Data: 0.9433962
@@ -39266,10 +38419,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.88886404
+      Data: 0.888864
     - Name: 
       Entry: 4
-      Data: 0.0327073857
+      Data: 0.03270739
     - Name: 
       Entry: 4
       Data: 0.990566
@@ -40414,10 +39567,10 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 73|SEE.GraphProviders.PipelineGraphProvider, SEE
+      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.GraphProvider,
+      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
@@ -40427,14 +39580,14 @@ MonoBehaviour:
       Data: 75|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 76|SEE.Utils.Paths.FilePath, SEE
+      Data: 76|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/Architecture.gxl
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -40442,14 +39595,14 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 77|SEE.Utils.Paths.FilePath, SEE
+      Data: 77|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/CodeFacts.gxl.xz
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -40457,14 +39610,14 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 78|SEE.Utils.Paths.FilePath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
-    - Name: relativePath
+    - Name: RelativePath
       Entry: 1
       Data: /reflexion/compiler/EmptyMapping.gxl
-    - Name: absolutePath
+    - Name: AbsolutePath
       Entry: 1
       Data: 
     - Name: 
@@ -40488,16 +39641,16 @@ MonoBehaviour:
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
-    relativePath: /reflexion/compiler/Reflexion.cfg
-    absolutePath: 
+    RelativePath: /reflexion/compiler/Reflexion.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
-    Root: 2
-    relativePath: 
-    absolutePath: 
+    Root: 3
+    RelativePath: /reflexion/compiler/minilax
+    AbsolutePath: 
   SolutionPath:
     Root: 2
-    relativePath: 
-    absolutePath: 
+    RelativePath: 
+    AbsolutePath: 
   IgnoreSelfLoopsInLifting: 0
   MaximalAntennaSegmentHeight: 0.1
   AntennaWidth: 0.01
@@ -40515,8 +39668,8 @@ MonoBehaviour:
       GradientDescentPrecision: -4
     LayoutPath:
       Root: 2
-      relativePath: 
-      absolutePath: 
+      RelativePath: 
+      AbsolutePath: 
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -40541,6 +39694,10 @@ MonoBehaviour:
     MetricIssue: Metric.Metric
     StyleIssue: Metric.Style
     UniversalIssue: Metric.Universal
+    LspHint: Metric.LSP_Hint
+    LspInfo: Metric.LSP_Info
+    LspWarning: Metric.LSP_Warning
+    LspError: Metric.LSP_Error
     ArchitectureIssueSum: Metric.Architecture_Violations_SUM
     CloneIssueSum: Metric.Clone_SUM
     CycleIssueSum: Metric.Cycle_SUM
@@ -40552,8 +39709,8 @@ MonoBehaviour:
     LoadBoardOnStartup: 0
     BoardPath:
       Root: 3
-      relativePath: /reflexion/compiler/ReflexionBoard.cfg
-      absolutePath: 
+      RelativePath: /reflexion/compiler/ReflexionBoard.cfg
+      AbsolutePath: 
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -41386,10 +40543,10 @@ SceneRoots:
   - {fileID: 442716585}
   - {fileID: 1003946421}
   - {fileID: 2034689789}
+  - {fileID: 1166896206}
+  - {fileID: 1334775387}
   - {fileID: 1462978785}
   - {fileID: 2134247849}
   - {fileID: 365534681}
   - {fileID: 387723966}
   - {fileID: 1706202779}
-  - {fileID: 1166896206}
-  - {fileID: 471867952}

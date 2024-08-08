@@ -56,8 +56,8 @@ namespace SEE.Controls.Actions
         [Test]
         public void TestNoAttributeNull()
         {
-            Assert.IsEmpty(allRootTypes.AllElements().Where(x => x.Description == null || x.Name == null || x.IconPath == null),
-                "No attribute of an AbstractActionStateType may be null!");
+            Assert.IsEmpty(allRootTypes.AllElements().Where(x => x.Description == null || x.Name == null || x.Icon == default),
+                "No attribute of an AbstractActionStateType may be null or default!");
         }
 
         [Test]

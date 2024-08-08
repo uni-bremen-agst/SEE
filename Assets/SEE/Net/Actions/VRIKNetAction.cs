@@ -79,9 +79,9 @@ namespace SEE.Net.Actions
         /// If executed by the remote avatar, the usual positional and rotational model
         /// connections are established.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            VRIKActions.ExecuteOnClient(IsRequester(), NetworkObjectID, animatorForVrik,
+            VRIKActions.ExecuteOnClient(NetworkObjectID, animatorForVrik,
                 RemoteHeadPosition, RemoteRightHandPosition, RemoteLeftHandPosition,
                 RemoteHeadRotation, RemoteRightHandRotation, RemoteLeftHandRotation);
         }
@@ -89,7 +89,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

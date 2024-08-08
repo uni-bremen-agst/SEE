@@ -46,7 +46,7 @@ namespace SEE.Net.Actions
         /// Things to execute on the server (none for this class). Necessary because it is abstract
         /// in the superclass.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -54,14 +54,11 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Revives the game object identified by <see cref="GameObjectIDList"/> on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
-                ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-                GameElementDeleter.Revive(gameObjects);
-            }
+            ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
+            ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
+            GameElementDeleter.Revive(gameObjects);
         }
     }
 }

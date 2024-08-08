@@ -13,8 +13,8 @@ using Network = SEE.Net.Network;
 namespace SEE.UI
 {
     /// <summary>
-    /// Implements the behaviour of the in-game menu for the selection of the general
-    /// configuration (host, server, client, network and user-settings) that is shown at the start up.
+    /// Implements the behaviour of the in-game menu for the selection of the networking
+    /// configuration (host, server, client, settings) that is shown at the start up.
     /// </summary>
     internal class OpeningDialog : MonoBehaviour
     {
@@ -30,12 +30,12 @@ namespace SEE.UI
         /// <returns>the newly created action menu component.</returns>
         private SimpleListMenu CreateMenu()
         {
-            GameObject actionMenuGO = new() { name = "Start Menu" };
+            GameObject actionMenuGO = new() { name = "Network Menu" };
             IList<MenuEntry> entries = SelectionEntries();
             SimpleListMenu actionMenu = actionMenuGO.AddComponent<SimpleListMenu>();
             actionMenu.AllowNoSelection = false; // the menu cannot be closed; user must make a decision
-            actionMenu.Title = "Configuration";
-            actionMenu.Description = "Please select the configuration you want to activate.";
+            actionMenu.Title = "Network Configuration";
+            actionMenu.Description = "Please select the network configuration you want to activate.";
             entries.ForEach(actionMenu.AddEntry);
             // We will handle the closing of the menu ourselves: we need to wait until a network
             // connection can be established.
@@ -53,46 +53,30 @@ namespace SEE.UI
 
             return new List<MenuEntry>
             {
-                new(selectAction: StartHost,
-                    unselectAction: null,
-                    title: "Host",
-                    description: "Starts a server and local client process.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Host")),
-                new(selectAction: StartClient,
-                    unselectAction: null,
-                    title: "Client",
-                    description: "Starts a local client connection to a server.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
-#if ENABLE_VR
-                new(selectAction: ToggleEnvironment,
-                    unselectAction: null,
-                    title: "Toggle Desktop/VR",
-                    description: "Toggles between desktop and VR hardware.",
-                    entryColor: NextColor(),
-                    icon: Resources.Load<Sprite>("Icons/Client")),
-#endif
-                // FIXME: Running only a server is currently not working.
-                //new (               entryAction: StartServer,
-                //                    exitAction: null,
-                //                    title: "Server",
-                //                    description: "Starts a dedicated server without local client.",
-                //                    entryColor: NextColor(),
-                //                    icon: Resources.Load<Sprite>("Icons/Server")),
-                new(selectAction: NetworkSettings,
-                    unselectAction: null,
-                    title: "Network settings",
-                    description: "Allows to set additional network settings.",
-                    entryColor: Color.gray,
-                    icon: Resources.Load<Sprite>("Icons/Settings")),
+                new(SelectAction: StartHost,
+                    Title: "Host",
+                    Description: "Starts a server and local client process.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Broadcast),
 
-                new(selectAction: UserSettings,
-                    unselectAction: null,
-                    title: "User settings",
-                    description: "Allows to set additional user settings.",
-                    entryColor: Color.gray,
-                    icon: Resources.Load<Sprite>("Icons/Settings"))
+                new(SelectAction: StartClient,
+                    Title: "Client",
+                    Description: "Starts a local client connection to a server.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Link),
+
+#if ENABLE_VR
+                new(SelectAction: ToggleEnvironment,
+                    Title: "Toggle Desktop/VR",
+                    Description: "Toggles between desktop and VR hardware.",
+                    EntryColor: NextColor(),
+                    Icon: Icons.VR),
+#endif
+                new(SelectAction: Settings,
+                    Title: "Settings",
+                    Description: "Allows to set additional network settings.",
+                    EntryColor: Color.gray,
+                    Icon: Icons.Gear)
             };
 
             Color NextColor()
@@ -157,24 +141,25 @@ namespace SEE.UI
         /// <summary>
         /// Starts a dedicated server on this machine (only server, no client).
         /// </summary>
-        //private void StartServer()
-        //{
-        //    try
-        //    {
-        //        // Hide menu while the network is about to be started so that the user
-        //        // user select any menu entry while this process is running. We do
-        //        // not want the user to start any other network setting until this
-        //        // process has come to an end.
-        //        menu.ShowMenuAsync(false);
-        //        SceneSettings.InputType = inputType;
-        //        network.StartServer(NetworkCallBack);
-        //    }
-        //    catch (Exception exception)
-        //    {
-        //        menu.ShowMenuAsync(true);
-        //        ShowNotification.Error("Server cannot be started", exception.Message);
-        //    }
-        //}
+        private void StartServer()
+        {
+            try
+            {
+                // Hide menu while the network is about to be started so that the user
+                // cannot select any menu entry while this process is running. We do
+                // not want the user to start any other network setting until this
+                // process has come to an end.
+                menu.ShowMenu = false;
+                SceneSettings.InputType = PlayerInputType.None;
+                network.StartServer(NetworkCallBack);
+            }
+            catch (Exception exception)
+            {
+                menu.ShowMenu = true;
+                ShowNotification.Error("Server cannot be started", exception.Message);
+                throw;
+            }
+        }
 
         /// <summary>
         /// If <paramref name="success"/>, the <see cref="menu"/> is turned off.
@@ -196,26 +181,13 @@ namespace SEE.UI
         /// <summary>
         /// Opens the dialog to configure the network settings.
         /// </summary>
-        private void NetworkSettings()
+        private void Settings()
         {
             /// Note: We arrive here because the user pressed one of the buttons of the
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new(network, Reactivate);
-            dialog.Open();
-        }
-
-        /// <summary>
-        /// Opens the dialog to configure the user settings.
-        /// </summary>
-        private void UserSettings()
-        {
-            /// Note: We arrive here because the user pressed one of the buttons of the
-            /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
-            /// at this time, menu is no longer visible. When the following dialog
-            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            UserPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
 

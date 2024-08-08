@@ -11,6 +11,7 @@ using SEE.UI;
 using SEE.UI.Notification;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
+using Sirenix.OdinInspector;
 
 namespace SEE.Game.Avatars
 {
@@ -30,14 +31,15 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The OpenAI API key to use for ChatGPT.
         /// </summary>
+        [ShowIf("UseChatGPT"), Tooltip("The OpenAI API key to use for ChatGPT.")]
         public string OpenAiApiKey = "";
 
         /// <summary>
         /// Path to the SRGS grammar file. The grammar is expected to define the
         /// following semantics: help, time, about.
         /// </summary>
-        [Tooltip("Path to the SRGS grammar file defining the speech input language.")]
-        public FilePath GrammarFilePath;
+        [HideIf("UseChatGPT"), ShowInInspector, Tooltip("Path to the SRGS grammar file defining the speech input language."), HideReferenceObjectPicker]
+        public DataPath GrammarFilePath;
 
         /// <summary>
         /// The grammar recognizer used to interpret the speech input.
@@ -133,7 +135,7 @@ namespace SEE.Game.Avatars
 
             if (!File.Exists(GrammarFilePath.Path))
             {
-                Debug.LogError($"Grammar file {GrammarFilePath} for speech recognition does not exist.\n");
+                Debug.LogError($"Grammar file {GrammarFilePath.Path} for speech recognition does not exist.\n");
                 return false;
             }
 

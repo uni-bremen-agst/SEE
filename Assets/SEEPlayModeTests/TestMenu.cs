@@ -74,17 +74,22 @@ namespace SEE.UI.Menu
         protected const float TimeUntilMenuIsSetup = 1f;
 
         /// <summary>
-        /// Path to a sprite we can use for testing.
+        /// An example icon.
         /// </summary>
-        private const string PathOfIcon = "Materials/Charts/MoveIcon";
+        public const char ExampleIcon = Icons.Move;
 
         /// <summary>
-        /// The icon loaded from <see cref="PathOfIcon"/>.
+        /// Path to a sprite we can use for testing.
         /// </summary>
-        /// <returns>icon loaded from <see cref="PathOfIcon"/></returns>
-        protected static Sprite GetIcon()
+        private const string PathOfIconSprite = "Materials/Charts/MoveIcon";
+
+        /// <summary>
+        /// The icon loaded from <see cref="PathOfIconSprite"/>.
+        /// </summary>
+        /// <returns>icon loaded from <see cref="PathOfIconSprite"/></returns>
+        protected static Sprite GetIconSprite()
         {
-            return Resources.Load<Sprite>(PathOfIcon);
+            return Resources.Load<Sprite>(PathOfIconSprite);
         }
 
         /// <summary>

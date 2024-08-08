@@ -22,13 +22,13 @@ namespace SEE.GraphProviders
     /// <summary>
     /// A graph provider that uses a language server to create a graph.
     /// </summary>
-    public class LSPGraphProvider : GraphProvider
+    public class LSPGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The path to the software project for which the graph shall be generated.
         /// </summary>
         [Tooltip("Root path of the project to be analyzed."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public DirectoryPath ProjectPath = new();
+        public DataPath ProjectPath = new();
 
         /// <summary>
         /// The name of the language server to be used for the analysis.
@@ -99,6 +99,20 @@ namespace SEE.GraphProviders
         public NodeKind IncludedNodeTypes = NodeKind.All;
 
         /// <summary>
+        /// The diagnostic levels to be included.
+        /// </summary>
+        [Title("Diagnostic levels"), Tooltip("The diagnostic levels to be included."), HideLabel]
+        [EnumToggleButtons, FoldoutGroup("Import Settings")]
+        public DiagnosticKind IncludedDiagnosticLevels = DiagnosticKind.All;
+
+        /// <summary>
+        /// If true, LSP functionality will be available in code windows.
+        /// </summary>
+        [Tooltip("If true, LSP functionality will be available in code windows."), RuntimeTab(GraphProviderFoldoutGroup)]
+        [LabelWidth(150)]
+        public bool UseInCodeWindows = true;
+
+        /// <summary>
         /// If true, the communication between the language server and SEE will be logged.
         /// </summary>
         [Tooltip("If true, the communication between the language server and SEE will be logged."), RuntimeTab(GraphProviderFoldoutGroup)]
@@ -132,7 +146,7 @@ namespace SEE.GraphProviders
         /// <returns>The available language servers as a dropdown list.</returns>
         private IEnumerable<string> ServerDropdown()
         {
-            return LSPLanguage.All.Select(language => (language, LSPServer.All.Where(server => server.Languages.Contains(language))))
+            return LSPLanguage.AllLspLanguages.Select(language => (language, LSPServer.All.Where(server => server.Languages.Contains(language))))
                               .SelectMany(pair => pair.Item2.Select(server => $"{pair.language}/{server}"))
                               .OrderBy(server => server);
         }
@@ -199,9 +213,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private void SetLSPServerPath() => ServerPath = GetExecutablePath();
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.LSP;
+            return SingleGraphProviderKind.LSP;
         }
 
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
@@ -241,6 +255,7 @@ namespace SEE.GraphProviders
             handler.Server = Server;
             handler.ProjectPath = ProjectPath.Path;
             handler.LogLSP = LogLSP;
+            handler.UseInCodeWindows = UseInCodeWindows;
             handler.TimeoutSpan = TimeSpan.FromSeconds(Timeout);
             await handler.InitializeAsync(executablePath: ServerPath ?? Server.ServerExecutable, token);
             if (token.IsCancellationRequested)
@@ -256,7 +271,8 @@ namespace SEE.GraphProviders
 
             try
             {
-                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths, IncludedNodeTypes,
+                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? Array.Empty<string>(),
+                                           IncludedNodeTypes, IncludedDiagnosticLevels,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
                 {
