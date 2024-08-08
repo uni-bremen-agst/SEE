@@ -14,6 +14,7 @@ using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Game.City;
+using SEE.UI.Window.NoteWindow;
 
 namespace SEE.Controls.Actions
 {
@@ -81,6 +82,7 @@ namespace SEE.Controls.Actions
                 // TODO (#666): Better properties view
                 new("Properties", ShowProperties, Icons.Info),
                 new("Show Metrics", ShowMetrics, Icons.Info),
+                new("Create Note", CreateNote, Icons.Node),
             };
 
             if (gameObject != null)
@@ -119,6 +121,11 @@ namespace SEE.Controls.Actions
             void ShowMetrics()
             {
                 ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void CreateNote()
+            {
+                ActivateWindow(CreateNoteWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
@@ -188,6 +195,24 @@ namespace SEE.Controls.Actions
                 metricMenu.GraphElement = graphElementRef.Elem;
             }
             return metricMenu;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="NoteWindow"/> where notes can be saved and loaded of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to store the note</param>
+        /// <returns>The <see cref="NoteWindow"/> object showing the notes</returns>
+        private static NoteWindow CreateNoteWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out NoteWindow noteWindow))
+            {
+                noteWindow = graphElementRef.gameObject.AddComponent<NoteWindow>();
+                noteWindow.Title = "Notes for " + graphElementRef.Elem.ToShortString();
+                noteWindow.graphElementRef = graphElementRef;
+            }
+
+            return noteWindow;
         }
 
         /// <summary>
