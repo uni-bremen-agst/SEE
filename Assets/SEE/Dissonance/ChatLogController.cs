@@ -125,7 +125,7 @@ namespace SEE.Dissonance
 
             // Decide what we're going to print.
             string msg = string.Format("{0} ({1}): {2}",
-                message.Sender[..Math.Min(8, message.Sender.Length)],
+                message.Sender[..message.Sender.Length],
                 message.RecipientType == ChannelType.Room ? message.Recipient : "Whisper",
                 message.Message
             );

@@ -4,6 +4,8 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
+using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -40,6 +42,16 @@ namespace SEE.Game.Worlds
         private DissonanceComms dissonanceComms = null;
 
         /// <summary>
+        /// Instance of the NetworkManager
+        /// </summary>
+        private NetworkManager networkManager = NetworkManager.Singleton;
+
+        /// <summary>
+        /// network config to read playername
+        /// </summary>
+        private SEE.Net.Network networkConfig;
+
+        /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
         /// </summary>
         private void OnEnable()
@@ -55,16 +67,24 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
-            NetworkManager networkManager = NetworkManager.Singleton;
+            networkConfig = FindObjectOfType<SEE.Net.Network>();
+            if (networkConfig == null)
+            {
+                Debug.LogError("Network configuration not found");
+                yield return null;
+            }
+
             while (ReferenceEquals(networkManager, null))
             {
                 networkManager = NetworkManager.Singleton;
                 yield return null;
             }
 
-            // Terminate this co-routine if not run by the server.
+            // Terminate this co-routine if not run by the server, but first set client playername for chat-function.
             if (!networkManager.IsServer)
             {
+                dissonanceComms = FindObjectOfType<DissonanceComms>();
+                dissonanceComms.LocalPlayerName = networkConfig.PlayerName;
                 yield break;
             }
 
@@ -76,6 +96,7 @@ namespace SEE.Game.Worlds
             while (ReferenceEquals(dissonanceComms, null))
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
+                dissonanceComms.LocalPlayerName = networkConfig.PlayerName;
                 yield return null;
             }
 
@@ -110,6 +131,8 @@ namespace SEE.Game.Worlds
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
+
+
 #if DEBUG
             Debug.Log($"Spawned {player.name} (network id of owner: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
 #endif
