@@ -1,4 +1,16 @@
-﻿using System;
+﻿using Assets.SEE.Tools.Playername;
+using Cysharp.Threading.Tasks;
+using Dissonance;
+using SEE.Game.City;
+using SEE.Game.Drawable;
+using SEE.GO;
+using SEE.UI.Notification;
+using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -7,16 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using Assets.SEE.Tools.Playername;
-using Dissonance;
-using SEE.Game.City;
-using SEE.GO;
-using SEE.UI.Notification;
-using SEE.Utils;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -432,7 +434,46 @@ namespace SEE.Net
         /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
         public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
-            ActionNetworkInst.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            /// TODO(#754): Replace with the exact value.
+            int maxPacketSize = 32000;
+            if (serializedAction.Length < maxPacketSize)
+            {
+                ActionNetworkInst.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            }
+            else
+            {
+                List<string> fragmentData = SplitString(serializedAction, maxPacketSize);
+                string id = Guid.NewGuid().ToString();
+                for (int i = 0; i < fragmentData.Count; i++)
+                {
+                    ActionNetworkInst.Value?.BroadcastActionServerRpc(id, fragmentData.Count, i, fragmentData[i], recipients);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Splitts a string after <paramref name="fragmentSize"/> chars.
+        /// </summary>
+        /// <param name="str">The string to be split</param>
+        /// <param name="fragmentSize">The size for the sub strings.</param>
+        /// <returns>A list with the split strings.</returns>
+        private static List<string> SplitString(string str, int fragmentSize)
+        {
+            List<string> fragments = new();
+
+            for (int i = 0; i < str.Length; i += fragmentSize)
+            {
+                if (i + fragmentSize > str.Length)
+                {
+                    fragments.Add(str.Substring(i));
+                }
+                else
+                {
+                    fragments.Add(str.Substring(i, fragmentSize));
+                }
+            }
+
+            return fragments;
         }
 
         /// <summary>

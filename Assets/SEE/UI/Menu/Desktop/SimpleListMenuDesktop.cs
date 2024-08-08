@@ -23,7 +23,7 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// Prefab for each menu entry.
-        /// Required components: ButtonManagerBasicWithIcon, PointerHelper and Image.
+        /// Required components: ButtonManagerBasic, PointerHelper and Image.
         /// </summary>
         protected virtual string EntryPrefab => $"{UIPrefabFolder}Button";
 

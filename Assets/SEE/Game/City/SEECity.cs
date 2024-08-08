@@ -156,7 +156,7 @@ namespace SEE.Game.City
 
             if (!gameObject.IsCodeCityDrawn())
             {
-                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.\n");
                 return;
             }
             LoadAsync().Forget();

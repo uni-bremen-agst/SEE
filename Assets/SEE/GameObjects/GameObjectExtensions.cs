@@ -9,6 +9,7 @@ using SEE.Utils;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 using Sirenix.Utilities;
+using SEE.DataModel.Drawable;
 
 namespace SEE.GO
 {
@@ -558,9 +559,8 @@ namespace SEE.GO
         {
             if (!gameObject.TryGetComponent(out T component))
             {
-                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.FullName()}'");
             }
-
             return component;
         }
 
@@ -618,6 +618,25 @@ namespace SEE.GO
                 node = nodeRef.Value;
             }
             return node != null;
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/> has a <see cref="DrawableSurfaceRef"/>
+        /// component attached to it that is not null.
+        /// </summary>
+        /// <param name="gameObject">the game object whose DrawableSurfaceRef is checked</param>
+        /// <param name="surface">the surface referenced by the attached DrawableSurfaceRef; defined only if this method
+        /// returns true.</param>
+        /// <returns>true if <paramref name="gameObject"/> has a <see cref="DrawableSurfaceRef"/>
+        /// component attached to it that is not null</returns>
+        public static bool TryGetDrawableSurface(this GameObject gameObject, out DrawableSurface surface)
+        {
+            surface = null;
+            if (gameObject.TryGetComponent(out DrawableSurfaceRef surfaceRef))
+            {
+                surface = surfaceRef.Surface;
+            }
+            return surface != null;
         }
 
         /// <summary>

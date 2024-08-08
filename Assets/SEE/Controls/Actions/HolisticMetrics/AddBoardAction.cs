@@ -7,6 +7,8 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
+using SEE.UI.Drawable;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -79,7 +81,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.AddBoard"/>.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             switch (progress)
@@ -90,7 +92,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         progress = ProgressState.GettingRotation;
                         memento = new Memento(new BoardConfig { Position = position });
                         GameObject slider = PrefabInstantiator.InstantiatePrefab(boardRotatorPath,
-                            GameObject.Find("UI Canvas").transform, false);
+                            UICanvas.Canvas.transform, false);
                         slider.GetComponent<AddBoardSliderController>().Setup(position);
                     }
 

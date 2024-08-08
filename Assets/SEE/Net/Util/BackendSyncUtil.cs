@@ -5,6 +5,7 @@ using System.IO.Compression;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
+using SEE.Game.Drawable;
 using SEE.Utils.Paths;
 using Unity.Netcode;
 using UnityEngine;
