@@ -106,6 +106,15 @@ namespace SEE.Controls.Actions.Drawable
         private bool editMode = false;
 
         /// <summary>
+        /// Status indicating whether the edit mode has been fully initialized.
+        /// When a <see cref="ShapePointsCalculator.Shape.Line"> is being drawn and fill out is enabled,
+        /// the fill out status will not be activated if there are fewer than three points, as the fill out functionality
+        /// is only allowed with three points or more.
+        /// When this status is set, the edit menu must be re-initialized once three points are reached.
+        /// </summary>
+        private bool needRefreshEditMode = false;
+
+        /// <summary>
         /// Status and color if a shape has activates the fill out option.
         /// </summary>
         private Color? shapeFillOut = null;
@@ -162,6 +171,17 @@ namespace SEE.Controls.Actions.Drawable
             if (Shape != null && LineMenu.IsInDrawingMode() && !editMode)
             {
                 editMode = true;
+                if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
+                    && LineMenu.GetFillOutColorForDrawing() != null
+                    && GameDrawer.DifferentPositionCounter(Shape) < 3)
+                {
+                   needRefreshEditMode = true;
+                }
+                ShapeMenu.OpenLineMenuInCorrectMode();
+            }
+            else if (needRefreshEditMode && GameDrawer.DifferentPositionCounter(Shape) > 2)
+            {
+                needRefreshEditMode = false;
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
             else if (Shape == null && LineMenu.IsInEditMode() && !editMode)
@@ -370,9 +390,6 @@ namespace SEE.Controls.Actions.Drawable
                     positions = ShapePointsCalculator.Polygon(convertedHitPoint, ShapeMenu.GetValue1(),
                         ShapeMenu.GetVertices());
                     break;
-                case ShapePointsCalculator.Shape.Test:
-                    positions = ShapePointsCalculator.Test(convertedHitPoint, 0.1f);
-                    break;
             }
         }
 
@@ -553,7 +570,7 @@ namespace SEE.Controls.Actions.Drawable
                     renderer.positionCount -= 2;
                     positions = positions.ToList().GetRange(0, positions.Length - 1).ToArray();
                     shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
-                    if (positions.Length > 2)
+                    if (positions.Length > 1)
                     {
                         GameDrawer.Drawing(Shape, positions, shapeFillOut);
                     }
@@ -563,7 +580,7 @@ namespace SEE.Controls.Actions.Drawable
                         {
                             GameObject.DestroyImmediate(GameFinder.FindChild(Shape, ValueHolder.FillOut));
                             new DeleteFillOutNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
-                            LineMenu.AssignFillOutForEditing(null, null, null);
+                            LineMenu.AssignFillOutForEditing(null, null, () => { });
                         }
                         GameDrawer.Drawing(Shape, positions);
                     }
@@ -603,7 +620,7 @@ namespace SEE.Controls.Actions.Drawable
                 newPositions[^1] = newPosition;
                 if (GameDrawer.DifferentPositionCounter(newPositions) > 2)
                 {
-                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(shape));
+                    shapeFillOut ??= LineConf.GetFillOutColor(LineConf.GetLine(Shape));
                     GameDrawer.Drawing(Shape, newPositions, shapeFillOut);
                     new DrawingNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name, newPosition, newPositions.Length - 1).Execute();
                     if (shapeFillOut != null)
@@ -681,55 +698,10 @@ namespace SEE.Controls.Actions.Drawable
             Shape.GetComponent<LineRenderer>().loop = ShapeMenu.GetLoopManager().isOn;
             Shape = GameDrawer.SetPivot(Shape, shapeFillOut);
             LineConf currentShape = LineConf.GetLine(Shape);
-            //Test(ref currentShape);
             memento = new Memento(Surface, currentShape);
             new DrawNetAction(memento.Surface.ID, memento.Surface.ParentID, currentShape).Execute();
             CurrentState = IReversibleAction.Progress.Completed;
             drawing = false;
-        }
-
-        private void Test(ref LineConf currentShape)
-        {
-            Vector3[] savedPositions = currentShape.RendererPositions;
-            if (positions.Length > 1)
-            {
-                Vector3[] newPositions = new Vector3[positions.Length];
-                shape.GetComponent<LineRenderer>().GetPositions(newPositions);
-                List<Vector3> lastPositions = newPositions.ToList().GetRange(positions.Length - 2, 2);
-                Vector3 direction = lastPositions[1] - lastPositions[0];
-                double angleInRadius = Math.Atan2(direction.y, direction.x);
-                double angleInDegrees = angleInRadius * (180 / Math.PI);
-
-                float distance = Vector3.Distance(lastPositions[0], lastPositions[1]) / 10;
-                if (distance < 0.01f)
-                {
-                    distance = 0.01f;
-                }
-                else if (distance > 0.1f)
-                {
-                    distance = 0.1f;
-                }
-                Vector3 point = new Vector3(lastPositions[1].x, lastPositions[1].y - distance/2, lastPositions[1].z);
-                Vector3[] arrowPos = ShapePointsCalculator.HalfCircle(point, distance);
-
-                GameObject arrow = GameDrawer.DrawLine(GameFinder.GetDrawableSurface(shape), "", arrowPos, currentShape.ColorKind, currentShape.PrimaryColor, currentShape.SecondaryColor, currentShape.Thickness, false, GameDrawer.LineKind.Solid, currentShape.Tiling, increaseCurrentOrder: false);
-                GameDrawer.SetPivotShape(arrow, point);
-                arrow.transform.SetParent(shape.transform);
-                GameMoveRotator.SetRotate(arrow, (float)angleInDegrees-90, false);
-                Vector3 pos = new Vector3(lastPositions[1].x, lastPositions[1].y, shape.transform.localPosition.z);
-                GameMoveRotator.SetPosition(arrow, pos, false);
-
-                /// X Value von middle pos verschieben um Aggregation / Komposition zu erzeugen
-                /// Wenn Pfeillinie durchtrennt ist, kann x von pMiddle in positiven bereich verschoben werden um andere Pfeilspitze zu erzeugen.
-                Vector3[] arrowPositions = new Vector3[arrowPos.Length];
-                arrow.GetComponent<LineRenderer>().GetPositions(arrowPositions);
-
-                Vector3 nPMiddle = shape.transform.InverseTransformPoint(arrow.transform.TransformPoint(arrowPositions[12]));
-                savedPositions[savedPositions.Length - 1] = nPMiddle;
-                GameDrawer.Drawing(shape, savedPositions);
-                GameDrawer.FinishDrawing(shape, false);
-                currentShape = LineConf.GetLine(shape);
-            }
         }
 
         /// <summary>

@@ -27,7 +27,6 @@ namespace SEE.Game.Drawable.ActionHelpers
             Parallelogram,
             Trapezoid,
             Polygon,
-            Test
         }
 
         /// <summary>
@@ -72,22 +71,6 @@ namespace SEE.Game.Drawable.ActionHelpers
             Vector3 C = new Vector3(B.x, B.y + b, 0) - ValueHolder.DistanceToDrawable;
             Vector3 D = new Vector3(A.x, A.y + b, 0) - ValueHolder.DistanceToDrawable;
             return new Vector3[] { A, B, C, D, A };
-        }
-
-        public static Vector3[] Test(Vector3 point, float radius)
-        { 
-            List<Vector3> list = new (Circle(point, radius));
-            List<Vector3> positions = new(list.GetRange(0, 26));
-            Vector3 underpoint = list[25];
-            positions.Add(new Vector3(underpoint.x, underpoint.y - radius));
-            positions.Add(new Vector3(underpoint.x, underpoint.y - radius));
-            positions.AddRange(list.GetRange(25, 26));
-            return positions.ToArray();
-        }
-
-        public static Vector3[] HalfCircle(Vector3 point, float radius)
-        {
-            return Circle(point, radius).ToList().GetRange(13, 25).ToArray();
         }
 
         /// <summary>

@@ -365,7 +365,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 if (selectedShape == Shape.Line)
                 {
-                    ShowNotification.Info("Control instructions", 
+                    ShowNotification.Info("Control instructions",
                         "Left mouse button = Adds a point to the line.\n"
                         + "Middle mouse button / mouse wheel click = Ends drawing the line without adding an additional point.\n"
                         + "Left Ctrl key + left mouse button = Ends drawing and adds a final point.");
@@ -382,7 +382,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Action for the information button. 
+        /// Action for the information button.
         /// It toggles the visibility of the information box.
         /// </summary>
         private static void ToggleInfo()
@@ -462,7 +462,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Init the config menu. 
+        /// Init the config menu.
         /// It adds the necessary Handler to the components.
         /// </summary>
         private static void InitConfigMenu()
@@ -522,7 +522,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Changes the menu for the selected shape.
         /// It displayes only the necessary values for the selected shape.
-        /// The values are renamed to match the shape appropriately, 
+        /// The values are renamed to match the shape appropriately,
         /// so that the values correspond to the explanations in the images of the information boxes.
         /// </summary>
         private static void ChangeMenu()
@@ -635,10 +635,10 @@ namespace SEE.UI.Menu.Drawable
             if (DrawShapesAction.currentShape == null)
             {
                 LineMenu.EnableForDrawing();
-            } 
+            }
             else
             {
-                LineMenu.EnableForEditing(DrawShapesAction.currentShape, 
+                LineMenu.EnableForEditing(DrawShapesAction.currentShape,
                     LineConf.Get(DrawShapesAction.currentShape));
             }
             MenuHelper.CalculateHeight(LineMenu.instance);

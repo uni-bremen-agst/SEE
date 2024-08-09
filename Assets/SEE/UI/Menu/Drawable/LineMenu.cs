@@ -1251,6 +1251,7 @@ namespace SEE.UI.Menu.Drawable
                 {
                     fillOutManager.isOn = false;
                     fillOutManager.OffEvents.Invoke();
+                    RefreshFillOut();
                 }
             }
         }

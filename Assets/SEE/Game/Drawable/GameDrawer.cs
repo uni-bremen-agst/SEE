@@ -771,7 +771,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line game object.</param>
         /// <returns>The count of different positions.</returns>
-        private static int DifferentPositionCounter(GameObject line)
+        public static int DifferentPositionCounter(GameObject line)
         {
             if (line.CompareTag(Tags.Line))
             {
