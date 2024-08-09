@@ -11,8 +11,10 @@ using UnityEngine;
 namespace SEE.UI.FilePicker
 {
     /// <summary>
-    /// Allows a user to pick a file or folder.
+    /// Allows a user to pick a file or folder for a <see cref="DataPath"/>.
     /// Implementation for the desktop environment.
+    /// The dialog consists of a dropdown menu for the <see cref="DataPath.RootKind"/> and
+    /// a button to open the <see cref="FileBrowser"/>.
     /// </summary>
     public partial class DataPathPicker
     {
