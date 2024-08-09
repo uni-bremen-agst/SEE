@@ -315,14 +315,8 @@ namespace SEE.Tools.LSP
                     string tempDir = Path.GetTempPath();
                     string outputPath = Path.Combine(tempDir, "outputLogLsp.txt");
                     string inputPath = Path.Combine(tempDir, "inputLogLsp.txt");
-                    if (File.Exists(outputPath))
-                    {
-                        File.Delete(outputPath);
-                    }
-                    if (File.Exists(inputPath))
-                    {
-                        File.Delete(inputPath);
-                    }
+                    FileIO.DeleteIfExists(outputPath);
+                    FileIO.DeleteIfExists(inputPath);
                     outputLog = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                     inputLog = new FileStream(inputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                 }

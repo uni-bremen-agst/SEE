@@ -78,7 +78,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveBoard"/>.
         /// </summary>
-        /// <returns>Whether this Action is finished</returns>
+        /// <returns>Whether this action is finished</returns>
         public override bool Update()
         {
             if (BoardsManager.TryGetMovement(out string boardName, out Vector3 oldPosition, out Vector3 newPosition,
