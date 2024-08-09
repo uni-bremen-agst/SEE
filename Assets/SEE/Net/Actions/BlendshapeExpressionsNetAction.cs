@@ -1,6 +1,8 @@
-﻿using UMA.PoseTools;
+﻿using System.Collections.Generic;
+using UMA.PoseTools;
 using Unity.Netcode;
 using UnityEngine;
+using System.Linq;
 
 namespace SEE.Net.Actions
 {
@@ -140,6 +142,19 @@ namespace SEE.Net.Actions
         public const string TongueDownLeftMorphName = "Tongue_DownLeft_Morph";
         public const string TongueDownRightMorphName = "Tongue_DownRight_Morph";
 
+        private readonly List<string> blendShapeNames = new List<string>
+        {
+            JawLeftName, JawRightName, JawForwardName, JawOpenName, MouthApeShapeName, MouthUpperLeftName, MouthUpperRightName, MouthLowerLeftName, MouthLowerRightName,
+            MouthUpperOverturnName, MouthLowerOverturnName, MouthPoutName, MouthSmileLeftName, MouthSmileRightName, MouthSadLeftName, MouthSadRightName,
+            CheekPuffLeftName, CheekPuffRightName, CheekSuckName, MouthUpperUpLeftName, MouthUpperUpRightName, MouthLowerDownLeftName, MouthLowerDownRightName,
+            MouthUpperInsideName, MouthLowerInsideName, MouthLowerOverlayName, EyeLeftBlinkName, EyeLeftWideName, EyeLeftRightName, EyeLeftLeftName, EyeLeftUpName,
+            EyeLeftDownName, EyeRightBlinkName, EyeRightWideName, EyeRightRightName, EyeRightLeftName, EyeRightUpName, EyeRightDownName, EyeFrownName, EyeLeftSqueezeName,
+            EyeRightSqueezeName, TongueLongStep1Name, TongueLongStep2Name, TongueLeftName, TongueRightName, TongueUpName, TongueDownName, TongueRollName,
+            TongueUpLeftMorphName, TongueUpRightMorphName, TongueDownLeftMorphName, TongueDownRightMorphName
+        };
+
+        private Dictionary<string, float> blendShapes;
+
         /// <summary>
         /// Initializes all variables that should be transferred to the remote avatars.
         /// </summary>
@@ -148,6 +163,8 @@ namespace SEE.Net.Actions
         public BlendshapeExpressionsNetAction(SkinnedMeshRenderer skinnedMeshRenderer, ulong networkObjectID)
         {
             NetworkObjectID = networkObjectID;
+            blendShapes = blendShapeNames.ToDictionary(name => name, name => skinnedMeshRenderer.GetBlendShapeWeight(skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(name)));
+
             JawLeft = skinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawLeftName, skinnedMeshRenderer));
             JawRight = skinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawRightName, skinnedMeshRenderer));
             JawForward = skinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawForwardName, skinnedMeshRenderer));
@@ -234,16 +251,13 @@ namespace SEE.Net.Actions
                         out NetworkObject networkObject))
                 {
                     Transform ccBaseBody = networkObject.gameObject.transform.Find("CC_Base_Body");
-                    if (networkObject.gameObject != null)
+                    if (ccBaseBody.gameObject != null)
                     {
                         if (ccBaseBody.gameObject.TryGetComponent(out SkinnedMeshRenderer skinnedMeshRenderer))
                         {
-                            skinnedMeshRenderer.SetBlendShapeWeight(
-                                BlendShapeByString(JawLeftName, skinnedMeshRenderer), JawLeft);
-                            skinnedMeshRenderer.SetBlendShapeWeight(
-                                BlendShapeByString(JawRightName, skinnedMeshRenderer), JawRight);
-                            skinnedMeshRenderer.SetBlendShapeWeight(
-                                BlendShapeByString(JawForwardName, skinnedMeshRenderer), JawForward);
+                            skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawLeftName, skinnedMeshRenderer), JawLeft);
+                            skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawRightName, skinnedMeshRenderer), JawRight);
+                            skinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawForwardName, skinnedMeshRenderer), JawForward);
                             skinnedMeshRenderer.SetBlendShapeWeight(
                                 BlendShapeByString(JawOpenName, skinnedMeshRenderer), JawOpen);
                             skinnedMeshRenderer.SetBlendShapeWeight(

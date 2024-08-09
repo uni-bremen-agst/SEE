@@ -1,8 +1,10 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using SEE.GO;
 using UnityEngine;
 using UMA.PoseTools;
+using System.Linq;
 
 namespace SEE.Game.Avatars
 {
@@ -182,6 +184,10 @@ namespace SEE.Game.Avatars
         private const string eyeRightSqueeze = "Eye_Right_squeeze";
 
         private bool waitForInit = true;
+
+        private static readonly string[] blendShapeNames;
+
+        private Dictionary<string, float> blendShapes = new Dictionary<string, float>();
 
 
         private ArrayList GetArrayListWithBlendShapeStrings()
