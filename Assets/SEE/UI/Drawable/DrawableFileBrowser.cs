@@ -64,7 +64,7 @@ namespace SEE.UI.Drawable
                     break;
             }
 
-            string result = await GetPathAsync(title, initPath, Filenames.DrawableConfigExtension);
+            string result = await GetPathAsync(title, "Load", initPath, Filenames.DrawableConfigExtension);
 
             if (!string.IsNullOrWhiteSpace(result))
             {
@@ -102,20 +102,10 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Method to save a drawable configuration
+        /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all)</param>
-        public void SaveDrawableConfiguration(SaveState saveState)
-        {
-            StartCoroutine(ShowSaveDialogCoroutine(saveState));
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file for saving.
-        /// </summary>
-        /// <param name="saveState">The chosen save state (one/more/all)</param>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowSaveDialogCoroutine(SaveState saveState)
+        public async Task SaveDrawableConfigurationAsync(SaveState saveState)
         {
             string title = "";
             switch (saveState)
@@ -142,21 +132,11 @@ namespace SEE.UI.Drawable
                     break;
             }
 
-            SEEInput.KeyboardShortcutsEnabled = false;
+            string result = await GetPathAsync(title, "Save", initPath, Filenames.DrawableConfigExtension);
 
-            /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.DrawableConfigExtension);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForSaveDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Save");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
+            if (!string.IsNullOrWhiteSpace(result))
             {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
+                SetPath(result);
             }
 
             /// Refreshes the UI canvas to prevent display issues.

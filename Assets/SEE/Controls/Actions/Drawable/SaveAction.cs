@@ -13,6 +13,7 @@ using SEE.Utils.Paths;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
+using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -103,53 +104,70 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            /// The button for save the selected drawables.
-            UnityAction saveButtonCall = () =>
+            /// The button for saving the selected drawables.
+            UnityAction saveButtonCall = async () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                try
                 {
-                    if (selectedSurfaces.Count > 0)
+                    if (browser == null || (browser != null && !browser.IsOpen()))
                     {
-                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        if (selectedSurfaces.Count == 1)
+                        if (selectedSurfaces.Count > 0)
                         {
-                            browser.SaveDrawableConfiguration(SaveState.One);
-                            memento = new Memento(new DrawableConfig[]
+                            browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                            if (selectedSurfaces.Count == 1)
                             {
+                                await browser.SaveDrawableConfigurationAsync(SaveState.One);
+                                memento = new Memento(new DrawableConfig[]
+                                {
                                 DrawableConfigManager.GetDrawableConfig(selectedSurfaces[0])
-                            }, SaveState.One);
+                                }, SaveState.One);
+                            }
+                            else
+                            {
+                                await browser.SaveDrawableConfigurationAsync(SaveState.Multiple);
+                                DrawableConfig[] configs = new DrawableConfig[selectedSurfaces.Count];
+                                for (int i = 0; i < configs.Length; i++)
+                                {
+                                    configs[i] = DrawableConfigManager.GetDrawableConfig(selectedSurfaces[i]);
+                                }
+                                memento = new Memento(configs, SaveState.Multiple);
+                            }
                         }
                         else
                         {
-                            browser.SaveDrawableConfiguration(SaveState.Multiple);
-                            DrawableConfig[] configs = new DrawableConfig[selectedSurfaces.Count];
-                            for (int i = 0; i < configs.Length; i++)
-                            {
-                                configs[i] = DrawableConfigManager.GetDrawableConfig(selectedSurfaces[i]);
-                            }
-                            memento = new Memento(configs, SaveState.Multiple);
+                            ShowNotification.Warn("No drawable selected.", "Select one or more drawables to save.");
                         }
-                    } else
-                    {
-                        ShowNotification.Warn("No drawable selected.", "Select one or more drawables to save.");
                     }
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    ShowNotification.Error("Exception occurred", e.Message);
                 }
             };
 
-            /// The button for save all drawables in the world.
-            UnityAction saveAllButtonCall = () =>
+            /// The button for saving all drawables in the world.
+            UnityAction saveAllButtonCall = async () =>
             {
-                if (browser == null || (browser != null && !browser.IsOpen()))
+                try
                 {
-                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                    browser.SaveDrawableConfiguration(SaveState.All);
-                    List<GameObject> drawables = ValueHolder.DrawableSurfaces;//new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
-                    DrawableConfig[] configs = new DrawableConfig[drawables.Count];
-                    for (int i = 0; i < configs.Length; i++)
+                    if (browser == null || (browser != null && !browser.IsOpen()))
                     {
-                        configs[i] = DrawableConfigManager.GetDrawableConfig(drawables[i]);
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        await browser.SaveDrawableConfigurationAsync(SaveState.All);
+                        List<GameObject> drawables = ValueHolder.DrawableSurfaces;
+                        DrawableConfig[] configs = new DrawableConfig[drawables.Count];
+                        for (int i = 0; i < configs.Length; i++)
+                        {
+                            configs[i] = DrawableConfigManager.GetDrawableConfig(drawables[i]);
+                        }
+                        memento = new Memento(configs, SaveState.All);
                     }
-                    memento = new Memento(configs, SaveState.All);
+                }
+                catch (Exception e)
+                {
+                    Debug.LogException(e);
+                    ShowNotification.Error("Exception occurred", e.Message);
                 }
             };
 
