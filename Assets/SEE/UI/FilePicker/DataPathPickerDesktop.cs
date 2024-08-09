@@ -14,7 +14,7 @@ namespace SEE.UI.FilePicker
     /// Allows a user to pick a file or folder.
     /// Implementation for the desktop environment.
     /// </summary>
-    public partial class FilePicker
+    public partial class DataPathPicker
     {
         /// <summary>
         ///     The menu prefab.

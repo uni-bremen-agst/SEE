@@ -7,7 +7,7 @@ namespace SEE.UI.FilePicker
     /// <summary>
     /// Allows a user to pick a file or folder.
     /// </summary>
-    public partial class FilePicker : PlatformDependentComponent
+    public partial class DataPathPicker : PlatformDependentComponent
     {
         /// <summary>
         /// The label.

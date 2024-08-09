@@ -1240,7 +1240,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private void CreateFilePicker(string settingName, DataPath dataPath, GameObject parent)
         {
             // init widget
-            FilePicker.FilePicker filePicker = parent.AddComponent<FilePicker.FilePicker>();
+            FilePicker.DataPathPicker filePicker = parent.AddComponent<FilePicker.DataPathPicker>();
             filePicker.DataPathInstance = dataPath;
             filePicker.Label = settingName;
             filePicker.PickingMode = FileBrowser.PickMode.FilesAndFolders;
