@@ -652,7 +652,6 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-
         /// <summary>
         /// Creates a container game object which contains multiple settings.
         ///
