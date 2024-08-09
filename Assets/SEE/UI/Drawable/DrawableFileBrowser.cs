@@ -1,10 +1,6 @@
-﻿using Cysharp.Threading.Tasks;
-using SEE.Controls;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
+using SEE.UI.FilePicker;
 using SEE.Utils;
-using SimpleFileBrowser;
-using System.Collections;
-using System.Threading.Tasks;
 using UnityEngine;
 using static SEE.Controls.Actions.Drawable.LoadAction;
 using static SEE.Controls.Actions.Drawable.SaveAction;
@@ -42,10 +38,10 @@ namespace SEE.UI.Drawable
 
         /// <summary>
         /// Loads a drawable configuration. Asks the user for a filename
-        /// using the <see cref="FileBrowser"/>.
+        /// using a <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific)</param>
-        public async Task LoadDrawableConfigurationAsync(LoadState loadState)
+        public void LoadDrawableConfiguration(LoadState loadState)
         {
             string title = "";
             switch (loadState)
@@ -64,48 +60,14 @@ namespace SEE.UI.Drawable
                     break;
             }
 
-            string result = await GetPathAsync(title, "Load", initPath, Filenames.DrawableConfigExtension);
-
-            if (!string.IsNullOrWhiteSpace(result))
-            {
-                SetPath(result);
-            }
-
-            /// Refreshes the UI canvas to prevent display issues.
-            UICanvas.Refresh();
-        }
-
-        /// <summary>
-        /// Opens a <see cref="FileBrowser"/> and ask the user to pick a single file.
-        /// The picked file is returned when the user closes the <see cref="FileBrowser"/>.
-        /// If no file has been picked, the empty string is returned.
-        /// </summary>
-        /// <param name="title">title of the dialog</param>
-        /// ´<param name="buttonText">the text of the button to confirm the selection</param>
-        /// <param name="initialPath">the initial path where the <see cref="FileBrowser"/> allows
-        /// selection/param>
-        /// <param name="extensions">the file extensions; only files with one of these extensions
-        /// can be picked</param>
-        /// <returns>the name of the picked file or the empty if none was picked</returns>
-        private async UniTask<string> GetPathAsync(string title, string buttonText, string initialPath, params string[] extensions)
-        {
-            SEEInput.KeyboardShortcutsEnabled = false;
-
-            FileBrowser.SetFilters(false, extensions);
-
-            await FileBrowser.WaitForLoadDialog(pickMode: FileBrowser.PickMode.Files, allowMultiSelection: false,
-                initialPath: initialPath, initialFilename: null, title: title, loadButtonText: buttonText);
-
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            return FileBrowser.Success ? FileBrowser.Result[0] : string.Empty;
+            PathPicker.GetPath(title, true, initPath, HandleFileBrowserSuccess, () => { }, Filenames.DrawableConfigExtension);
         }
 
         /// <summary>
         /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all)</param>
-        public async Task SaveDrawableConfigurationAsync(SaveState saveState)
+        public void SaveDrawableConfiguration(SaveState saveState)
         {
             string title = "";
             switch (saveState)
@@ -132,11 +94,19 @@ namespace SEE.UI.Drawable
                     break;
             }
 
-            string result = await GetPathAsync(title, "Save", initPath, Filenames.DrawableConfigExtension);
+            PathPicker.GetPath(title, false, initPath, HandleFileBrowserSuccess, () => { }, Filenames.DrawableConfigExtension);
+        }
 
-            if (!string.IsNullOrWhiteSpace(result))
+        /// <summary>
+        /// Called when the file browser has successfully chosen a file.
+        /// Sets the path to the chosen file and refreshes the UI canvas.
+        /// </summary>
+        /// <param name="path">the path the user selected</param>
+        private void HandleFileBrowserSuccess(string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
             {
-                SetPath(result);
+                SetPath(path);
             }
 
             /// Refreshes the UI canvas to prevent display issues.
@@ -144,44 +114,17 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Method to load an image
+        /// Method to load an image. The file is selected by the user by way
+        /// of the <see cref="FileBrowser"/>.
         /// </summary>
         public void LoadImage()
         {
-            StartCoroutine(ShowLoadImageDialogCoroutine());
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file.
-        /// </summary>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowLoadImageDialogCoroutine()
-        {
             DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.ImagePath);
             initPath = ValueHolder.ImagePath;
-            string title = "Load an image";
 
             /// Ensures that only PNG or JPG files can be selected.
-            string[] extensions = new string[] { Filenames.PNGExtension, Filenames.JPGExtension };
-
-            SEEInput.KeyboardShortcutsEnabled = false;
-
-            FileBrowser.SetFilters(true, extensions);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
-            {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
-            }
-
-            /// Refreshes the UI canvas to prevent display issues.
-            UICanvas.Refresh();
+            PathPicker.GetPath("Load an image", false, initPath, HandleFileBrowserSuccess, () => { },
+                                new string[] { Filenames.PNGExtension, Filenames.JPGExtension });
         }
 
         /// <summary>
@@ -190,7 +133,7 @@ namespace SEE.UI.Drawable
         /// <returns>Whether file browser is open.</returns>
         public bool IsOpen()
         {
-            return FileBrowser.IsOpen;
+            return PathPicker.IsOpen();
         }
 
         /// <summary>

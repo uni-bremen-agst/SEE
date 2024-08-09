@@ -107,14 +107,14 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Awake();
             /// The load button for loading onto the original drawable.
-            UnityAction loadButtonCall = async () =>
+            UnityAction loadButtonCall = () =>
             {
                 try
                 {
                     if (browser == null || (browser != null && !browser.IsOpen()))
                     {
                         browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        await browser.LoadDrawableConfigurationAsync(LoadState.Regular);
+                        browser.LoadDrawableConfiguration(LoadState.Regular);
                         memento = new(LoadState.Regular);
                     }
                 }
@@ -126,7 +126,7 @@ namespace SEE.Controls.Actions.Drawable
             };
 
             /// The load button for loading onto a specific drawable.
-            UnityAction loadSpecificButtonCall = async () =>
+            UnityAction loadSpecificButtonCall = () =>
             {
                 try
                 {
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions.Drawable
                         if (selectedSurface != null)
                         {
                             browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                            await browser.LoadDrawableConfigurationAsync(LoadState.Specific);
+                            browser.LoadDrawableConfiguration(LoadState.Specific);
                             memento = new(LoadState.Specific);
                         }
                         else
