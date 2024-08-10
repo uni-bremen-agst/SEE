@@ -1276,7 +1276,7 @@ namespace SEE.DataModel.DG
         /// <param name="subgraph">The graph where the attributes should be added to</param>
         /// <param name="attributes">The attributes <see cref="Dictionary{string,string}"/> to add</param>
         private void AddAttributesToSubgraph(Graph subgraph, Dictionary<string, string> attributes) =>
-            attributes.ForEach(x => subgraph.StringAttributes.Add(x.Key, x.Value));
+            attributes.ForEach(x => subgraph.StringAttributes.TryAdd(x.Key, x.Value));
 
         /// <summary>
         /// Adds int attributes to a subgraph

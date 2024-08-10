@@ -143,6 +143,7 @@ namespace SEE.Game.City
                 result.SetGraphEvolution(graphs);
             }
 
+            result.SetGraphEvolution(graphs);
             return result;
         }
 
@@ -338,22 +339,34 @@ namespace SEE.Game.City
         //[Button(ButtonSizes.Small, Name = "Start Evolution")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public async UniTask StartEvolutionAsync()
+        public void StartEvolutionAsync()
         {
             //Start();
             Reset();
-            await LoadDataAsync();
+            //await LoadDataAsync();
 
-            if (!LoadedGraphSeries.Any())
+            LoadAsync().Forget();
+            return;
+
+            async UniTaskVoid LoadAsync()
             {
-                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
-                return;
+                await LoadDataAsync();
+                evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
+                DrawGraphs(LoadedGraphSeries);
+                gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+                evolutionRenderer.ShowGraphEvolution();
             }
 
-            DrawGraphs(LoadedGraphSeries);
-            evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
-            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            evolutionRenderer.ShowGraphEvolution();
+            // if (!LoadedGraphSeries.Any())
+            // {
+            //     ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
+            //     return;
+            // }
+            //
+            // DrawGraphs(LoadedGraphSeries);
+            // evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
+            // gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+            // evolutionRenderer.ShowGraphEvolution();
         }
 
 

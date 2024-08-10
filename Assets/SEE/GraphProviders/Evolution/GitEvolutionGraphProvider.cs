@@ -136,6 +136,10 @@ namespace SEE.GraphProviders.Evolution
                     x.Value.Any(y =>
                         matcher.Match(y.Path).HasMatches)).Count();
 
+                IList<string> files = repo.Branches
+                    .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
+                    .Distinct().ToList();
+
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (var currentCommit in
                          commitChanges.Where(x =>
@@ -150,7 +154,7 @@ namespace SEE.GraphProviders.Evolution
 
                     graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
-                        repo));
+                        repo,files));
                     counter++;
                 }
             }
@@ -167,10 +171,12 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="currentCommit">The current commit to generate the graph</param>
         /// <param name="commitsInBetween">All commits in between these two points</param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range</param>
+        /// <param name="repo"></param>
+        /// <param name="files"></param>
         /// <param name="includedFiles">All included file extensions</param>
         /// <returns>The graoh of the evolution step</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, Repository repo)
+            IDictionary<Commit, Patch> commitChanges, Repository repo, IList<string> files)
         {
             Graph g = new Graph(GitRepository.RepositoryPath.Path);
             g.BasePath = GitRepository.RepositoryPath.Path;
@@ -180,7 +186,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
 
-            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing, new List<string>());
+            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing, files);
 
             foreach (var commitInBetween in commitsInBetween)
             {
