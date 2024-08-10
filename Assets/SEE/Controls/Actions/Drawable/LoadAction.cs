@@ -109,45 +109,29 @@ namespace SEE.Controls.Actions.Drawable
             /// The load button for loading onto the original drawable.
             UnityAction loadButtonCall = () =>
             {
-                try
+                if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    if (browser == null || (browser != null && !browser.IsOpen()))
-                    {
-                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                        browser.LoadDrawableConfiguration(LoadState.Regular);
-                        memento = new(LoadState.Regular);
-                    }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    ShowNotification.Error("Exception occurred", e.Message);
+                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser.LoadDrawableConfiguration(LoadState.Regular);
+                    memento = new(LoadState.Regular);
                 }
             };
 
             /// The load button for loading onto a specific drawable.
             UnityAction loadSpecificButtonCall = () =>
             {
-                try
+                if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    if (browser == null || (browser != null && !browser.IsOpen()))
+                    if (selectedSurface != null)
                     {
-                        if (selectedSurface != null)
-                        {
-                            browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
-                            browser.LoadDrawableConfiguration(LoadState.Specific);
-                            memento = new(LoadState.Specific);
-                        }
-                        else
-                        {
-                            ShowNotification.Warn("No drawable selected.", "Select a drawable to load specifically.");
-                        }
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser.LoadDrawableConfiguration(LoadState.Specific);
+                        memento = new(LoadState.Specific);
                     }
-                }
-                catch (Exception e)
-                {
-                    Debug.LogException(e);
-                    ShowNotification.Error("Exception occurred", e.Message);
+                    else
+                    {
+                        ShowNotification.Warn("No drawable selected.", "Select a drawable to load specifically.");
+                    }
                 }
             };
 
