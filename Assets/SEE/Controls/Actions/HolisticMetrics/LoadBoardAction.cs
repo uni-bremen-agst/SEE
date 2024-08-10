@@ -8,7 +8,6 @@ using SEE.Net.Actions.HolisticMetrics;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
-using SEE.UI.Drawable;
 using SEE.UI;
 
 namespace SEE.Controls.Actions.HolisticMetrics
@@ -63,7 +62,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="LoadBoardAction"/>.
         /// </summary>
-        private struct Memento
+        private readonly struct Memento
         {
             /// <summary>
             /// The config of the board that has been loaded.
@@ -76,7 +75,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="config">The config to save in this Memento</param>
             internal Memento(BoardConfig config)
             {
-                this.Config = config;
+                Config = config;
             }
         }
 
@@ -85,8 +84,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// </summary>
         public override void Start()
         {
-            button = PrefabInstantiator.InstantiatePrefab(buttonPath, UICanvas.Canvas.transform,
-                false);
+            button = PrefabInstantiator.InstantiatePrefab(buttonPath, UICanvas.Canvas.transform, false);
             buttonController = button.GetComponent<LoadBoardButtonController>();
         }
 
@@ -105,8 +103,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         loadBoardDialog.Open();
                         progress = ProgressState.WaitingForInput;
                     }
-
                     return false;
+
                 case ProgressState.WaitingForInput:
                     if (loadBoardDialog.TryGetFilename(out string filename))
                     {
@@ -129,10 +127,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         progress = ProgressState.WaitingForClick;
                     }
-
                     return false;
+
                 case ProgressState.Finished:
                     return true;
+
                 default:
                     return false;
             }
