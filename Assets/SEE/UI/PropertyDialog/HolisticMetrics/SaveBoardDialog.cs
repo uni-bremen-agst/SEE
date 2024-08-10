@@ -74,9 +74,12 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         }
 
         /// <summary>
-        /// This method gets called when the player confirms the dialog. It will save the selected board under the given
-        /// name and then closes the dialog and re-enables the keyboard shortcuts.
+        /// This method gets called when the player confirms the dialog. It will
+        /// save the name of the selected board in <see cref="filename"/> and then
+        /// close the dialog and re-enable the keyboard shortcuts.
         /// </summary>
+        /// <remarks>It does not actually save the board. This will be done
+        /// by the client.</remarks>
         private void SaveBoardConfiguration()
         {
             GotInput = true;
