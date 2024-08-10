@@ -42,7 +42,7 @@ namespace SEE.Game.HolisticMetrics
         {
             EnsureBoardsDirectoryExists();
             DirectoryInfo directoryInfo = new(metricsBoardsPath);
-            FileInfo[] fileInfos = directoryInfo.GetFiles($".{Filenames.MetricBoardConfigExtension}");
+            FileInfo[] fileInfos = directoryInfo.GetFiles($"*{Filenames.MetricBoardConfigExtension}");
             string[] fileNames = new string[fileInfos.Length];
             for (int i = 0; i < fileInfos.Length; i++)
             {
@@ -93,7 +93,7 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Persist a metrics board to a file.
+        /// Persists a metrics board to a file.
         /// </summary>
         /// <param name="widgetsManager">The metrics board to save.</param>
         /// <param name="fileName">The file name for the configuration.</param>
