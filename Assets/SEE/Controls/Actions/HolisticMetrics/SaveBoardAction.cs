@@ -73,8 +73,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="widgetsManager">The WidgetsManager to save into this file</param>
             internal Memento(string filename, WidgetsManager widgetsManager)
             {
-                this.Filename = filename;
-                this.WidgetsManager = widgetsManager;
+                Filename = filename;
+                WidgetsManager = widgetsManager;
             }
         }
 
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         if (BoardsManager.GetNames().Length == 0)
                         {
                             ShowNotification.Info("No boards in the scene",
-                                "There are no boards in the scene that could be saved");
+                                "There are no boards in the scene that could be saved.");
                             return false;
                         }
                         saveBoardDialog = new SaveBoardDialog();
@@ -114,7 +114,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
 
                 case ProgressState.WaitingForInput:
                     if (saveBoardDialog.GetUserInput(out string filename,
-                            out WidgetsManager widgetsManager))
+                                                     out WidgetsManager widgetsManager))
                     {
                         memento = new Memento(filename, widgetsManager);
                         ConfigManager.SaveBoard(memento.WidgetsManager, memento.Filename);
