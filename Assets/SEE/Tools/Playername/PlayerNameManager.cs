@@ -20,9 +20,9 @@ namespace Assets.SEE.Tools.Playername
         private static Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();
 
         /// <summary>
-        /// Adds all clients in the dictonary
+        /// Sets the name of the given <paramref name="clientId"/> to <paramref name="playerName"/>.
         /// </summary>
-        /// <param name="clientId"> client id of the connected client</param>
+        /// <param name="clientId">client id of the connected client</param>
         /// <param name="playerName">corresponding playerName</param>
         public static void AddOrUpdatePlayerName(ulong clientId, string playerName)
         {
