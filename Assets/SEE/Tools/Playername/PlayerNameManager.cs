@@ -61,7 +61,5 @@ namespace Assets.SEE.Tools.Playername
                 playerNames.Remove(clientId);
             }
         }
-
     }
-
 }
