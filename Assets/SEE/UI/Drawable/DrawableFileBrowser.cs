@@ -124,7 +124,7 @@ namespace SEE.UI.Drawable
 
             /// Ensures that only PNG or JPG files can be selected.
             PathPicker.GetPath("Load an image", false, initPath, HandleFileBrowserSuccess, () => { },
-                                new string[] { Filenames.PNGExtension, Filenames.JPGExtension });
+                                new string[] { Filenames.PNGExtension, Filenames.JPGExtension, Filenames.JPEGExtension });
         }
 
         /// <summary>

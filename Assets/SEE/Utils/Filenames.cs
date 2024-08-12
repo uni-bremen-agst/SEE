@@ -98,6 +98,11 @@ namespace SEE.Utils
         public const string JPGExtension = ".jpg";
 
         /// <summary>
+        /// Alternative file extension of JPG filenames.
+        /// </summary>
+        public const string JPEGExtension = ".jpeg";
+
+        /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
         /// without the period.
         ///
