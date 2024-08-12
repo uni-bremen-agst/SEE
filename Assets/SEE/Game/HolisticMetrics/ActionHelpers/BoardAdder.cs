@@ -72,7 +72,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
             GameObject floor = GameObject.Find(floorPath);
             if (floor == null)
             {
-                throw new System.Exception($"Could not find the floor in the scene. Please make sure the floor is named '{floor}'.");
+                throw new System.Exception($"Could not find the floor in the scene. Please make sure the floor is at '{floorPath}'.");
             }
             floor.AddComponent<BoardAdder>();
         }
