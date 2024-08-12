@@ -56,10 +56,7 @@ namespace Assets.SEE.Tools.Playername
         /// <param name="clientId">clientId as key</param>
         public static void RemovePlayerName(ulong clientId)
         {
-            if (playerNames.ContainsKey(clientId))
-            {
-                playerNames.Remove(clientId);
-            }
+            playerNames.Remove(clientId);
         }
     }
 }
