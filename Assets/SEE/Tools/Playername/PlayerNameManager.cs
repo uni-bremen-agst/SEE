@@ -38,7 +38,6 @@ namespace Assets.SEE.Tools.Playername
             {
                 playerNames[clientId] = playerName;
             }
-
         }
 
         /// <summary>
