@@ -41,7 +41,7 @@ namespace Assets.SEE.Tools.Playername
         }
 
         /// <summary>
-        /// Method to recievce a playerName by its key
+        /// Returns the playerName for the given <paramref name="clientId"/>.
         /// </summary>
         /// <param name="clientId">key in dictionary</param>
         /// <returns>corresponding playerName</returns>
