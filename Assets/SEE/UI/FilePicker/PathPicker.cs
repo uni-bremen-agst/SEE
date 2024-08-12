@@ -70,9 +70,9 @@ namespace SEE.UI.FilePicker
         }
 
         /// <summary>
-        /// Returns true if the <see cref=">FileBrowser"/> is open.
+        /// Returns true if the <see cref="FileBrowser"/> is open.
         /// </summary>
-        /// <returns>Whether the <see cref=">FileBrowser"/> is open.</returns>
+        /// <returns>Whether the <see cref="FileBrowser"/> is open.</returns>
         public static bool IsOpen()
         {
             return FileBrowser.IsOpen;
