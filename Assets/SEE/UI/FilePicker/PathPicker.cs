@@ -20,7 +20,7 @@ namespace SEE.UI.FilePicker
         /// for saving a file</param>
         /// <param name="initialPath">the initial path where the <see cref="FileBrowser"/> allows
         /// selection/param>
-        /// <paramref name="onSuccess"/> the callback that is called when the user closes
+        /// <param name="onSuccess">the callback that is called when the user closes
         /// the <see cref="FileBrowser"/> confirming the selection</param>
         /// <param name="onCancel">the callback that is called when the user closes the
         /// dialog using the cancel button</param>
