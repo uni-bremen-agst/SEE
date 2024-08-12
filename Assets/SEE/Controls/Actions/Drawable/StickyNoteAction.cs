@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            StickyNoteMenu.Enable();
+            StickyNoteMenu.Instance.Enable();
         }
 
         /// <summary>
@@ -124,11 +124,11 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            StickyNoteMenu.Disable();
-            StickyNoteRotationMenu.Disable();
-            StickyNoteEditMenu.Disable();
-            StickyNoteMoveMenu.Disable();
-            ScaleMenu.Disable();
+            StickyNoteMenu.Instance.Destroy();
+            StickyNoteRotationMenu.Destroy();
+            StickyNoteEditMenu.Instance.Destroy();
+            StickyNoteMoveMenu.Instance.Destroy();
+            ScaleMenu.Instance.Destroy();
             stickyNote?.Destroy<HighlightEffect>();
 
             if (selectedAction == Operation.Move && stickyNote != null)
@@ -215,10 +215,10 @@ namespace SEE.Controls.Actions.Drawable
                 && SEEInput.Cancel())
             {
                 ShowNotification.Info("Canceled", "The action was canceled by the user.");
-                StickyNoteRotationMenu.Disable();
-                StickyNoteEditMenu.Disable();
-                StickyNoteMoveMenu.Disable();
-                ScaleMenu.Disable();
+                StickyNoteRotationMenu.Destroy();
+                StickyNoteEditMenu.Instance.Destroy();
+                StickyNoteMoveMenu.Instance.Destroy();
+                ScaleMenu.Instance.Destroy();
                 stickyNote?.Destroy<HighlightEffect>();
 
                 if (selectedAction == Operation.Move
@@ -259,7 +259,7 @@ namespace SEE.Controls.Actions.Drawable
                             break;
                     }
                 }
-                StickyNoteMenu.Enable();
+                StickyNoteMenu.Instance.Enable();
                 stickyNote = null;
                 stickyNoteHolder = null;
                 inProgress = false;
@@ -321,7 +321,7 @@ namespace SEE.Controls.Actions.Drawable
                 else
                 {
                     /// Block for selecting the rotation and the right position.
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
                     StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
                 }
@@ -339,7 +339,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 finish = isFinished;
             }
-            else if (stickyNote != null && StickyNoteMoveMenu.IsActive())
+            else if (stickyNote != null && StickyNoteMoveMenu.Instance.IsOpen())
             {
                 MoveByKey(stickyNote, spawnMode);
             }
@@ -387,8 +387,8 @@ namespace SEE.Controls.Actions.Drawable
             /// And save the position and rotation in memento, because they could be changed with the menu's.
             if (finish)
             {
-                StickyNoteMoveMenu.Disable();
-                StickyNoteRotationMenu.Disable();
+                StickyNoteMoveMenu.Instance.Destroy();
+                StickyNoteRotationMenu.Destroy();
                 memento.ChangedConfig.Position = stickyNoteHolder.transform.position;
                 memento.ChangedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
                 stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
@@ -429,7 +429,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
                     };
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     surface.GetComponent<Collider>().enabled = false;
                     stickyNote = surface.transform.parent.gameObject;
                     stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
@@ -653,9 +653,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (stickyNote != null)
             {
-                StickyNoteEditMenu.Disable();
-                StickyNoteRotationMenu.Disable();
-                ScaleMenu.Disable();
+                StickyNoteEditMenu.Instance.Destroy();
+                StickyNoteRotationMenu.Destroy();
+                ScaleMenu.Instance.Destroy();
                 stickyNote.Destroy<HighlightEffect>();
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;
                 memento.ChangedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
@@ -704,7 +704,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         ChangedConfig = DrawableConfigManager.GetDrawableConfig(surface)
                     };
-                    StickyNoteMenu.Disable();
+                    StickyNoteMenu.Instance.Destroy();
                     StickyNoteEditMenu.Enable(surface.transform.parent.gameObject, memento.ChangedConfig);
                 }
                 else
@@ -718,7 +718,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         stickyNote = null;
                         selectedAction = Operation.None;
-                        StickyNoteMenu.Enable();
+                        StickyNoteMenu.Instance.Enable();
                     }
                 }
             }
@@ -736,7 +736,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     stickyNote = null;
                     selectedAction = Operation.None;
-                    StickyNoteMenu.Enable();
+                    StickyNoteMenu.Instance.Enable();
                 }
             }
             return EditReturnState.None;
@@ -764,7 +764,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 finish = isScaleFinished;
             }
-            else if (ScaleMenu.IsActive())
+            else if (ScaleMenu.Instance.IsOpen())
             {
                 ScaleByWheel();
             }

@@ -10,7 +10,7 @@ using UnityEngine;
 namespace SEE.UI.Drawable
 {
     /// <summary>
-    /// Creates the drawable action bar if the user opens a drawable action. 
+    /// Creates the drawable action bar if the user opens a drawable action.
     /// </summary>
     public class DrawableActionBar : MonoBehaviour
     {
@@ -50,7 +50,7 @@ namespace SEE.UI.Drawable
         void Start()
         {
             actionBar = PrefabInstantiator.InstantiatePrefab(actionBarWithTogglerPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+                                                             UICanvas.Canvas.transform, false);
             barInstance = actionBar.transform.Find("DrawableActionBar").gameObject;
             togglerInstance = actionBar.transform.Find("DrawableActionBarToggler").gameObject;
             Init();
@@ -203,7 +203,7 @@ namespace SEE.UI.Drawable
             layerChanger.AddComponent<ButtonHoverTooltip>().SetMessage("Change The Sorting Layer.");
             layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
-                GlobalActionHistory.Execute(ActionStateTypes.MindMap);
+                GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
                 menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
             });
 

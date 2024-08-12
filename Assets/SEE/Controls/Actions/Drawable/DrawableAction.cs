@@ -9,27 +9,6 @@ namespace SEE.Controls.Actions.Drawable
     public abstract class DrawableAction : AbstractPlayerAction
     {
         /// <summary>
-        ///  The canvas on which the drawable menus are displayed.
-        ///  Set by lazy initialization.
-        /// </summary>
-        private static GameObject canvas;
-
-        /// <summary>
-        /// The canvas on which the drawable menus are displayed.
-        /// </summary>
-        protected static GameObject Canvas
-        {
-            get
-            {
-                if (canvas == null)
-                {
-                    canvas = GameObject.Find("UI Canvas");
-                }
-                return canvas;
-            }
-        }
-
-        /// <summary>
         /// The surface on which the drawables are displayed.
         /// </summary>
         protected GameObject Surface { get; set; }

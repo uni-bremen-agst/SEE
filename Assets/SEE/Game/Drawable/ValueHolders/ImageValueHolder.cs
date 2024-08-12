@@ -15,11 +15,11 @@ namespace SEE.Game.Drawable.ValueHolders
         /// <summary>
         /// The path property.
         /// </summary>
-        public string Path { get; set; }
+        public string Path { get; set; } = string.Empty;
 
         /// <summary>
         /// The url property.
         /// </summary>
-        public string URL { get; set; }
+        public string URL { get; set; } = string.Empty;
     }
 }

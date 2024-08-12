@@ -6,6 +6,7 @@ using SEE.UI.Window.CodeWindow;
 using SEE.Utils;
 using System.IO;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using StackFrame = Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages.StackFrame;
 
 namespace SEE.UI.DebugAdapterProtocol
@@ -87,7 +88,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 codeWindow = Canvas.AddComponent<CodeWindow>();
                 codeWindow.Title = Path.GetFileName(lastCodePath);
-                codeWindow.EnterFromFile(lastCodePath);
+                codeWindow.EnterFromFileAsync(lastCodePath).Forget();
                 manager.AddWindow(codeWindow);
                 codeWindow.OnComponentInitialized += Mark;
                 codeWindow.OnComponentInitialized += MakeActive;

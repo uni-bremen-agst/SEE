@@ -168,7 +168,7 @@ namespace SEE.Controls.Actions.Drawable
             /// Disables the preview if the user selects <see cref="ShapePointsCalculator.Shape.Line"/>
             DisableShapePreview();
 
-            if (Shape != null && LineMenu.IsInDrawingMode() && !editMode)
+            if (Shape != null && LineMenu.Instance.IsInDrawingMode() && !editMode)
             {
                 editMode = true;
                 if (ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
@@ -184,7 +184,7 @@ namespace SEE.Controls.Actions.Drawable
                 needRefreshEditMode = false;
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
-            else if (Shape == null && LineMenu.IsInEditMode() && !editMode)
+            else if (Shape == null && LineMenu.Instance.IsInEditMode() && !editMode)
             {
                 ShapeMenu.OpenLineMenuInCorrectMode();
             }
@@ -288,9 +288,9 @@ namespace SEE.Controls.Actions.Drawable
                 Shape = null;
                 editMode = false;
                 shapeFillOut = null;
-                if (LineMenu.IsInEditMode())
+                if (LineMenu.Instance.IsInEditMode())
                 {
-                    LineMenu.DisableLineMenu();
+                    LineMenu.Instance.Disable();
                     ShapeMenu.OpenLineMenuInCorrectMode();
                 }
             }

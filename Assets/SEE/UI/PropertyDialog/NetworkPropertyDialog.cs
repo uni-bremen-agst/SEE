@@ -227,7 +227,7 @@ namespace SEE.UI.PropertyDialog
             {
                 // Room Password
                 networkConfig.RoomPassword = roomPassword.Value.ToString();
-                ShowNotification.Info("Password Set", $"You have set the password to {roomPassword.Value}.");
+                // ShowNotification.Info("Password Set", $"You have set the password to {roomPassword.Value}.");
             }
             {
                 // Voice Chat

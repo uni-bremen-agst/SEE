@@ -1,5 +1,4 @@
-﻿using Assets.SEE.UI.Window.DrawableManagerWindow;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -11,12 +10,12 @@ namespace SEE.UI.Window.DrawableManagerWindow
     public class DrawableWindowGrouper
     {
         /// <summary>
-        /// Whether the group is active or not. 
+        /// Whether the group is active or not.
         /// </summary>
         public bool IsActive = false;
 
         /// <summary>
-        /// Resets the grouper.
+        /// Resets the grouper to inactive.
         /// </summary>
         public void Reset()
         {

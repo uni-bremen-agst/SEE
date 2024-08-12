@@ -4,6 +4,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Net.Actions.Drawable;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -192,8 +193,8 @@ namespace SEE.Controls.Actions.Drawable
                         oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                 }
             }
-            RotationMenu.Disable();
-            MoveMenu.Disable();
+            RotationMenu.Instance.Destroy();
+            MoveMenu.Instance.Destroy();
             if (switchMenu != null)
             {
                 Destroyer.Destroy(switchMenu);
@@ -268,8 +269,8 @@ namespace SEE.Controls.Actions.Drawable
                             oldObjectLocalEulerAngles.z, RotationMenu.includeChildren).Execute();
                     }
                 }
-                RotationMenu.Disable();
-                MoveMenu.Disable();
+                RotationMenu.Instance.Destroy();
+                MoveMenu.Instance.Destroy();
                 if (switchMenu != null)
                 {
                     Destroyer.Destroy(switchMenu);
@@ -286,7 +287,7 @@ namespace SEE.Controls.Actions.Drawable
         private void InitSwitchMenu()
         {
             switchMenu = PrefabInstantiator.InstantiatePrefab(switchMenuPrefab,
-                                                     Canvas.transform, false);
+                                                              UICanvas.Canvas.transform, false);
             /// Adds the functionality to the move button
             GameFinder.FindChild(switchMenu, "Move").GetComponent<ButtonManagerBasic>().clickEvent
                 .AddListener(() =>
@@ -315,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, Canvas,
+            if (Selector.SelectObject(ref selectedObject, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
                 true, false, true))
             {
                 oldObjectPosition = selectedObject.transform.localPosition;
@@ -652,8 +653,8 @@ namespace SEE.Controls.Actions.Drawable
                     GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(selectedObject);
                     new RbAndCCDestroyerNetAction(memento.Surface.ID, memento.Surface.ParentID,
                         memento.SelectedObject.name).Execute();
-                    RotationMenu.Disable();
-                    MoveMenu.Disable();
+                    RotationMenu.Instance.Destroy();
+                    MoveMenu.Instance.Destroy();
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 } else
@@ -663,7 +664,7 @@ namespace SEE.Controls.Actions.Drawable
                         /// This code is needed because occasionally a trigger exit is not registered during rotation.
                         /// This block attempts to set the isInCollision value of the Collision Controller to false.
                         /// However, if the object is still in a collision, it will be set back to true by its OnStayCollision method.
-                        selectedObject.GetComponent<CollisionController>().TrySetCollisionToFalse();
+                        selectedObject.GetComponent<CollisionController>().SetCollisionToFalse();
                     }
                 }
             }
@@ -676,8 +677,8 @@ namespace SEE.Controls.Actions.Drawable
                 new RbAndCCDestroyerNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     selectedObject.name).Execute();
                 selectedObject = null;
-                RotationMenu.Disable();
-                MoveMenu.Disable();
+                RotationMenu.Instance.Destroy();
+                MoveMenu.Instance.Destroy();
                 progressState = ProgressState.SelectObject;
             }
             return false;

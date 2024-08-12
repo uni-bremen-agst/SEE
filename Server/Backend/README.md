@@ -1,49 +1,49 @@
 # SEE Managed Server Backend
 
-This is the backend for managing running and managing SEE server instances.
+This is the backend for running and managing SEE server instances.
 
 --------------------------------------------------------------------------------
 ## Overview
 
 The project provides a REST API based on Spring Boot with the following features:
 
-- Manage users and roles (`UserService`)
-- Manage SEE game server configurations (`ServerService`)
-- Manage SEE game server instances via Docker containers (`ContainerService`)
-- Manage file storage (`FileService`)
+- Manage users and roles (`UserController`, `UserService`)
+- Manage SEE game servers (`ServerController`, `ServerService`)
+  - Server instances are managed in containers (`ContainerService`)
+- Manage file storage for shared Code Cities (`FileController`, `FileService`)
+
+The REST API is defined in the controllers while business logic is implemented in the services.
+
+Please read the JavaDoc documentation for additional details.
 
 ### User Service
 
-Manages users and their passwords along with other metadata like role assignment.
+Manages users and their passwords along with other metadata like role assignment.<br>
 Data is stored in the relational database.
 
 ### Server Service
 
-Manages metadata on SEE game server instances.
+Manages metadata on SEE game server instances and controls them using `ContainerService`.<br>
 Data is stored in the relational database.
 
 ### Container Service
 
-Manages SEE game server instances that are launched via Docker containers.
+Manages SEE game server instances that are launched via Docker/Podman containers.
 
 ### File Service
 
-The file service allows for storing and retrieving files that are required to render Code Cities in SEE clients.
-Metadata to identify and retrieve files are stored in the relational database.
+The file service allows for storing and retrieving files that are required to render Code Cities in SEE clients.<br>
+Metadata to identify and retrieve files are stored in the relational database, while the actual files are stored in the backend-local file system.
 
 
 --------------------------------------------------------------------------------
 ## Dependencies
 
-This backend requires additional services during runtime:
+This backend requires a container runtime to manage SEE game server instances.
+Refer to the README in the parent directory for additional considerations.
 
-- Docker containerization framework
-
-The original authors intended these services to be run using Docker Compose.
-A `compose.yaml` file is provided to be used during backend development.
-The complete stack, including back- and frontend, is configured in the parent directory.
-
-The backend container itself is built using `Dockerfile`.
+The backend container image is configured in the `Dockerfile`.<br>
+The complete stack, including back- and frontend, is configured vie `compose.yaml` in the parent directory.
 
 
 --------------------------------------------------------------------------------
@@ -82,6 +82,8 @@ If you are using Eclipse and know how to fix it, please do so and update this se
 
 #### Lombok
 
+**Heads up:** This did not make it work after all. Please update this section if you can resolve the issue!
+
 Install Project Lombok integration to allow Eclipse to see auto-generated getter/setter functions.
 
 Check the [official manual](https://projectlombok.org/setup/eclipse) on the project website.
@@ -93,4 +95,56 @@ The process should boil down to this:
 3. Select and install Lombok.
 4. Quit and open Eclipse again. Don't use the restart option.
 
-**Note:** This did not make it work after all. Please update this section if you can resolve the issue!
+
+--------------------------------------------------------------------------------
+## Security Considerations
+
+There are a few things to keep in mind while using the app.
+In this section you will find a non-exhaustive list of security considerations.
+
+Please also read the parent README for additional information.
+
+
+### Passwords
+
+There are two types of passwords at the time of writing:
+
+#### 1. Passwords for users registered in the backend application:
+
+Passwords are **transmitted in plaintext** during registration, sign-in, password change, and similar operations.
+After logging in to the backend (either using the frontend or via SEE client), a token (JWT) is transmitted to the client that is henceforth used for authentication of requests (see below).
+
+User passwords are stored in the database as a salted bcrypt hashes, which is a state-of-the-art method to secure passwords at rest.
+
+**However,** server passwords (also called *room passwords*) are stored in plaintext in the database. Read on…
+
+#### 2. *Server* or *room passwords*:
+
+These passwords are auto-generated whenever a server instance is created.
+Along with the server data, a user is created with this password.
+This user is associated with the server so that SEE clients can access the server-related data using the generated password.
+During API requests, this password is handled exactly as a usual password for registered users (using JWT after log-in, etc.).
+Although this is much less secure, these passwords are additionally kept in the database as plain text to allow admins controlling the management server to retrieve server passwords.
+
+Rationale:
+- Server instances are frequently created and destroyed, thus passwords are usually only used for a short time.
+- Server passwords are only used on certain API end-points and do not grant full access to control the backend.
+- Passwords are auto-generated: no user-defined passwords are jeopardized.
+- Passwords are displayed in the front-end for convenience: Users with access to the management server can retrieve the passwords at any time during server life-time for their convenience.
+
+However:
+- Room passwords are used to secure access to user-provided Code City configurations, often including source code and potentially other data that is not intended for the public.
+
+
+### JSON Web Token (JWT)
+
+As mentioned above, JWTs are used to authenticate users while accessing the API after log-in.
+
+JWT rely on a secret configured by the server. If this secret is uncovered, the security measures are completely useless.
+Remember to configure an individual secret for your server instance and take measures to keep it a secret.
+
+#### Tokens are never invalidated
+
+At the time of writing, tokens are never invalidated.
+While they are generated with a TTL (max age) of 24 hours during login, they are not invalidated on logout.
+They are merely removed from the client by replacing the cookie with an empty one.

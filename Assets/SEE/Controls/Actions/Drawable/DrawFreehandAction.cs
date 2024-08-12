@@ -104,7 +104,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            LineMenu.EnableForDrawing();
+            LineMenu.Instance.EnableForDrawing();
         }
 
         /// <summary>
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             if (progressState != ProgressState.FinishDrawing)
             {
                 Destroyer.Destroy(line);

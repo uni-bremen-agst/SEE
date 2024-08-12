@@ -1,9 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using SEE.DataModel.DG;
+using SEE.UI.Window.CodeWindow;
+using UnityEngine;
+using Range = SEE.DataModel.DG.Range;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -11,7 +16,7 @@ namespace SEE.Net.Dashboard.Model.Issues
     /// Contains information about an issue in the source code.
     /// </summary>
     [Serializable]
-    public abstract class Issue
+    public abstract class Issue : IDisplayableIssue
     {
         // A note: Due to how the JSON serializer works with inheritance, fields in here can't be readonly.
 
@@ -24,22 +29,22 @@ namespace SEE.Net.Dashboard.Model.Issues
         }
 
         /// <summary>
-        /// A kind-wide Id identifying the issue across analysis versions
+        /// A kind-wide ID identifying the issue across analysis versions
         /// </summary>
         [JsonProperty(PropertyName = "id", Required = Required.Always)]
         public int ID;
 
         /// <summary>
         /// In diff-queries, this indicates whether the issue is “Removed”,
-        /// i.e. contained in the base-version but not any more in the current version or “Added”,
-        /// i.e. it was not contained in the base-version but is contained in the current version
+        /// i.e. contained in the base-version but not anymore in the current version or “Added”,
+        /// that is, it was not contained in the base-version but is contained in the current version.
         /// </summary>
         [JsonConverter(typeof(StringEnumConverter))]
         [JsonProperty(PropertyName = "state", Required = Required.Default)]
         public IssueState State;
 
         /// <summary>
-        /// Whether or not the issue is suppressed or disabled via a control comment.
+        /// Whether the issue is suppressed or disabled via a control comment.
         /// </summary>
         /// <remarks>
         /// This column is only available for projects where importing of suppressed issues is configured
@@ -71,7 +76,7 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         /// <summary>
         /// The dashboard users associated with the issue via VCS blaming, CI path mapping,
-        /// CI user name mapping and dashboard user name mapping.
+        /// CI username mapping and dashboard username mapping.
         /// </summary>
         [JsonProperty(PropertyName = "owners", Required = Required.Always)]
         public IList<UserRef> Owners;
@@ -81,8 +86,8 @@ namespace SEE.Net.Dashboard.Model.Issues
             // Necessary for inheritance with Newtonsoft.Json to work properly
         }
 
-        public Issue(int id, IssueState state, bool suppressed, string justification,
-                     IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
+        protected Issue(int id, IssueState state, bool suppressed, string justification,
+                        IList<IssueTag> tag, IList<IssueComment> comments, IList<UserRef> owners)
         {
             ID = id;
             State = state;
@@ -126,7 +131,7 @@ namespace SEE.Net.Dashboard.Model.Issues
         public readonly struct IssueComment
         {
             /// <summary>
-            /// The loginname of the user that created the comment.
+            /// The login name of the user that created the comment.
             /// </summary>
             [JsonProperty(PropertyName = "username", Required = Required.Always)]
             public readonly string Username;
@@ -207,5 +212,47 @@ namespace SEE.Net.Dashboard.Model.Issues
         /// May be empty if all referenced entities don't have a path.
         /// </summary>
         public abstract IEnumerable<SourceCodeEntity> Entities { get; }
+
+        /// <summary>
+        /// The color to use when marking this issue in code windows.
+        /// </summary>
+        public Color Color => DashboardRetriever.Instance.GetIssueColor(this);
+
+        public IList<string> RichTags => new List<string>
+        {
+            // Use a transparency value of 0x33
+            $"<mark=#{ColorUtility.ToHtmlStringRGB(Color)}33>"
+        };
+
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Source"/>.
+        /// </summary>
+        public string Source => "Axivion Dashboard";
+
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.Occurrences"/>.
+        /// </summary>
+        public IEnumerable<(string Path, Range Range)> Occurrences => Entities.Select(e => (e.Path, new Range(e.Line, (e.EndLine ?? e.Line) + 1)));
+
+        /// <summary>
+        /// Implements <see cref="IDisplayableIssue.GetCharacterRangeForLine"/>.
+        /// </summary>
+        public (int startCharacter, int endCharacter)? GetCharacterRangeForLine(string path, int lineNumber, string line)
+        {
+            // Axivion Dashboard doesn't provide character ranges for issues, so we have to calculate them ourselves.
+            SourceCodeEntity entity = Entities.FirstOrDefault(e => e.Path == path && e.Line == lineNumber);
+            if (entity != null)
+            {
+                MatchCollection matches = Regex.Matches(line, Regex.Escape(entity.Content));
+                // We return null if we found more than one occurence too, because in that case
+                // we have no way to determine which of the occurrences is the right one.
+                if (matches.Count == 1)
+                {
+                    Match match = matches[0];
+                    return (match.Index, match.Index + match.Length);
+                }
+            }
+            return null;
+        }
     }
 }

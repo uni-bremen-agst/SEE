@@ -4,7 +4,6 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -13,7 +12,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// This class provides the node kind selection menu for the mind map.
     /// </summary>
-    public static class MindMapChangeNodeKindMenu
+    public class MindMapChangeNodeKindMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -21,9 +20,19 @@ namespace SEE.UI.Menu.Drawable
         private const string nodeKindSelectionMenuPrefab = "Prefabs/UI/Drawable/MMChangeNodeKind";
 
         /// <summary>
-        /// The instance for the menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private MindMapChangeNodeKindMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static MindMapChangeNodeKindMenu Instance { get; private set; }
+
+        static MindMapChangeNodeKindMenu()
+        {
+            Instance = new MindMapChangeNodeKindMenu();
+        }
 
         /// <summary>
         /// The instance for the node kind selector.
@@ -41,16 +50,15 @@ namespace SEE.UI.Menu.Drawable
         {
             if (valueHolder is MindMapNodeConf newConf)
             {
-                /// Instantiates the menu.
-                instance = PrefabInstantiator.InstantiatePrefab(nodeKindSelectionMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                Instance = new MindMapChangeNodeKindMenu();
+                Instance.Instantiate(nodeKindSelectionMenuPrefab);
 
                 /// Adds the return call to the return button, to return to the parent menu.
-                GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                GameFinder.FindChild(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                     .clickEvent.AddListener(returnCall);
 
                 /// Initialize the node kind selector.
-                nodeKindSelector = GameFinder.FindChild(instance, "Selection").GetComponent<HorizontalSelector>();
+                nodeKindSelector = GameFinder.FindChild(Instance.gameObject, "Selection").GetComponent<HorizontalSelector>();
 
                 /// Creates the items for them.
                 foreach (GameMindMap.NodeKind kind in GameMindMap.GetNodeKinds())
@@ -103,16 +111,16 @@ namespace SEE.UI.Menu.Drawable
                         newConf.BranchLineToParent = "";
                     }
 
-                    /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/> 
+                    /// If the new one is not a <see cref="GameMindMap.NodeKind.Theme"/>
                     /// and the node has no parent, initiate the parent selection.
                     if (newNodeKind != GameMindMap.NodeKind.Theme
                         && addedNode.GetComponent<MMNodeValueHolder>().GetParent() == null)
                     {
-                        MindMapParentSelectionMenu.Disable();
+                        MindMapParentSelectionMenu.Instance.Destroy();
                         GameObject pMenu = MindMapParentSelectionMenu.EnableForEditing(
                             GameFinder.GetAttachedObjectsObject(surface), addedNode, newConf, null);
                         GameFinder.FindChild(pMenu, "Dragger").GetComponent<WindowDragger>().enabled = false;
-                        pMenu.transform.SetParent(GameFinder.FindChild(instance, "Content").transform);
+                        pMenu.transform.SetParent(GameFinder.FindChild(Instance.gameObject, "Content").transform);
 
                         /// Restore the appearance of the previous branch line, if there was one.
                         if (addedNode.GetComponent<MMNodeValueHolder>().GetParentBranchLine() != null
@@ -126,36 +134,25 @@ namespace SEE.UI.Menu.Drawable
                     }
                     else
                     {
-                        MindMapParentSelectionMenu.Disable();
+                        MindMapParentSelectionMenu.Instance.Destroy();
 
                     }
                 }
                 else
                 {
-                    ShowNotification.Warn("Can't transform", "The new chosen node kind can't apply to this node.");
+                    ShowNotification.Warn("Cannot transform", "The newly chosen node kind cannot be applied to this node.");
                 }
 
             });
         }
 
         /// <summary>
-        /// Get the current selected node kind.
+        /// Get the currently selected node kind.
         /// </summary>
         /// <returns>The selected node kind.</returns>
         public static GameMindMap.NodeKind GetSelectedNodeKind()
         {
             return GameMindMap.GetNodeKinds()[nodeKindSelector.index];
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
         }
     }
 }

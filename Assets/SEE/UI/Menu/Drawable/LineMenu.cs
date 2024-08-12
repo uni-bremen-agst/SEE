@@ -15,20 +15,30 @@ using static SEE.Game.Drawable.GameDrawer;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class holds the instance for the line menu.
+    /// This class provides a line menu.
     /// </summary>
-    public static class LineMenu
+    public class LineMenu : SingletonMenu
     {
-        #region variables
+        #region attributes
         /// <summary>
         /// The location where the line menu prefeb is placed.
         /// </summary>
         private const string lineMenuPrefab = "Prefabs/UI/Drawable/LineMenu";
 
         /// <summary>
-        /// The instance of the line menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        public static readonly GameObject instance;
+        private LineMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static LineMenu Instance { get; private set; }
+
+        /// <summary>
+        /// Returns the associated game object of the line menu.
+        /// </summary>
+        public GameObject GameObject => Instance.gameObject;
 
         /// <summary>
         /// The color action to be executed additionally during the onChangeValue of the HSV Color Picker.
@@ -58,7 +68,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The transform of the content object.
         /// </summary>
-        private static Transform content;
+        private static readonly Transform content;
 
         /// <summary>
         /// Holds the current selected line kind.
@@ -73,7 +83,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The controller for the tiling slider.
         /// </summary>
-        private static FloatValueSliderController tilingSlider;
+        private static readonly FloatValueSliderController tilingSlider;
 
         /// <summary>
         /// The selector for the line kind.
@@ -88,7 +98,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// The switch manager for the loop.
         /// </summary>
-        private static SwitchManager loopManager;
+        private static readonly SwitchManager loopManager;
 
         /// <summary>
         /// Button manager for chose primary color.
@@ -98,12 +108,12 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Button manager for chose secondary color.
         /// </summary>
-        private static ButtonManagerBasic secondaryColorBMB;
+        private static readonly ButtonManagerBasic secondaryColorBMB;
 
         /// <summary>
         /// The HSVPicker ColorPicker component of the line menu.
         /// </summary>
-        private static HSVPicker.ColorPicker picker;
+        private static readonly HSVPicker.ColorPicker picker;
 
         /// <summary>
         /// Button manager for chose color kind area.
@@ -121,7 +131,7 @@ namespace SEE.UI.Menu.Drawable
         private static SwitchManager fillOutManager;
 
         /// <summary>
-        /// The modes in which the menu can be opened.
+        /// The mode of manipulating.
         /// </summary>
         private enum Mode
         {
@@ -131,15 +141,15 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The current mode.
+        /// The current mode of the line menu.
         /// </summary>
         private static Mode mode;
         #endregion
 
         /// <summary>
-        /// An enum with the menu points that can be hide.
+        /// An enum with the menu points that can be disabled.
         /// </summary>
-        public enum MenuLayer
+        private enum MenuLayer
         {
             LineKind,
             Thickness,
@@ -150,57 +160,58 @@ namespace SEE.UI.Menu.Drawable
 
         /// <summary>
         /// The constructor. It creates the instance for the line menu and
-        /// adds the menu layer to the corresponding game object's.
+        /// adds the menu layer to the corresponding game objects.
         /// By default, the menu is hidden.
         /// </summary>
         static LineMenu()
         {
+            Instance = new LineMenu();
+
             /// Instantiates the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(lineMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
+            Instance.Instantiate(lineMenuPrefab);
 
             /// Initialize the content area
-            content = instance.transform.Find("Content");
+            content = Instance.gameObject.transform.Find("Content");
 
             /// Disables the ability to return to the previous menu.
             /// Intended only for editing MindMap nodes.
-            DisableReturn();
+            Instance.DisableReturn();
 
             /// Initialize and sets up the line kind selector.
-            InitLineKindSelectorConstructor();
+            Instance.InitLineKindSelectorConstructor();
 
             /// Initialize and sets up the color kind selector.
-            InitColorKindSelectorConstructor();
+            Instance.InitColorKindSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
-            loopManager = GameFinder.FindChild(instance, "Loop").GetComponentInChildren<SwitchManager>();
-            primaryColorBMB = GameFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
-            primaryColorBMB.buttonVar = GameFinder.FindChild(instance, "PrimaryColorBtn").GetComponent<Button>();
+            loopManager = GameFinder.FindChild(Instance.gameObject, "Loop").GetComponentInChildren<SwitchManager>();
+            primaryColorBMB = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<ButtonManagerBasic>();
+            primaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "PrimaryColorBtn").GetComponent<Button>();
             primaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             primaryColorBMB.buttonVar.interactable = false;
-            secondaryColorBMB = GameFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
-            secondaryColorBMB.buttonVar = GameFinder.FindChild(instance, "SecondaryColorBtn").GetComponent<Button>();
+            secondaryColorBMB = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<ButtonManagerBasic>();
+            secondaryColorBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "SecondaryColorBtn").GetComponent<Button>();
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
-            tilingSlider = GameFinder.FindChild(instance, "Tiling").GetComponentInChildren<FloatValueSliderController>();
-            picker = instance.GetComponentInChildren<HSVPicker.ColorPicker>();
-            colorKindBMB = GameFinder.FindChild(instance, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
-            colorKindBMB.buttonVar = GameFinder.FindChild(instance, "ColorKindBtn").GetComponent<Button>();
+            tilingSlider = GameFinder.FindChild(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
+            picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
+            colorKindBMB = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
+            colorKindBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
             colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
             colorKindBMB.buttonVar.interactable = false;
-            fillOutBMB = GameFinder.FindChild(instance, "FillOutBtn").GetComponent<ButtonManagerBasic>();
-            fillOutBMB.buttonVar = GameFinder.FindChild(instance, "FillOutBtn").GetComponent<Button>();
+            fillOutBMB = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
+            fillOutBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
             fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
-            fillOutManager = GameFinder.FindChild(instance, "FillOut").GetComponentInChildren<SwitchManager>();
+            fillOutManager = GameFinder.FindChild(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
-            instance.SetActive(false);
+            Instance.Disable();
         }
 
         /// <summary>
-        /// Initialize the default line kind selector for the constructor.
+        /// Initializes the default line kind selector for the constructor.
         /// </summary>
-        private static void InitLineKindSelectorConstructor()
+        private void InitLineKindSelectorConstructor()
         {
-            lineKindSelector = GameFinder.FindChild(instance, "LineKindSelection")
+            lineKindSelector = GameFinder.FindChild(Instance.gameObject, "LineKindSelection")
                 .GetComponent<HorizontalSelector>();
 
             /// Creates the items for the line kind selector.
@@ -240,11 +251,11 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initialize the default color kind selector for the constructor.
+        /// Initializes the default color kind selector for the constructor.
         /// </summary>
-        private static void InitColorKindSelectorConstructor()
+        private void InitColorKindSelectorConstructor()
         {
-            colorKindSelector = GameFinder.FindChild(instance, "ColorKindSelection")
+            colorKindSelector = GameFinder.FindChild(Instance.gameObject, "ColorKindSelection")
                 .GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != LineKind.Solid;
 
@@ -285,22 +296,30 @@ namespace SEE.UI.Menu.Drawable
 
         #region IsOpen
         /// <summary>
-        /// Gets the state if the menu is already opened.
+        /// True if the menu is already open.
         /// </summary>
-        /// <returns>true, if the menu is alreay opened. Otherwise false.</returns>
-        public static bool IsOpen()
+        /// <returns>True, if the menu is already open. Otherwise false.</returns>
+        public override bool IsOpen()
         {
-            return instance.activeInHierarchy;
+            return gameObject.activeInHierarchy;
         }
 
-        public static bool IsInDrawingMode()
+        /// <summary>
+        /// Returns true if the line menu is in drawing mode.
+        /// </summary>
+        /// <returns>true if in drawing mode</returns>
+        public bool IsInDrawingMode()
         {
-            return instance.activeInHierarchy && mode == Mode.Drawing;
+            return gameObject.activeInHierarchy && mode == Mode.Drawing;
         }
 
-        public static bool IsInEditMode()
+        /// <summary>
+        /// Returns true if the line menu is in edit mode.
+        /// </summary>
+        /// <returns>true if in edit mode</returns>
+        public bool IsInEditMode()
         {
-            return instance.activeInHierarchy && mode == Mode.Edit;
+            return gameObject.activeInHierarchy && mode == Mode.Edit;
         }
         #endregion
 
@@ -310,26 +329,26 @@ namespace SEE.UI.Menu.Drawable
         /// and then hides the line menu.
         /// The parent of the line menu can be switched through the <see cref="DrawShapesAction"/>
         /// </summary>
-        public static void DisableLineMenu()
+        public override void Disable()
         {
+            base.Disable();
             EnableLineMenuLayers();
-            instance.transform.SetParent(GameObject.Find("UI Canvas").transform);
-            GameFinder.FindChild(instance, "Dragger").GetComponent<WindowDragger>().enabled = true;
+            gameObject.transform.SetParent(UICanvas.Canvas.transform);
+            GameFinder.FindChild(gameObject, "Dragger").GetComponent<WindowDragger>().enabled = true;
             DisableReturn();
             mode = Mode.None;
-            instance.SetActive(false);
         }
 
         #region Enable Line Menu
         /// <summary>
-        /// Enables the line menu. And resets the additional Handler if the parameter for that is true.
-        /// Also it can hide some menu layer.
+        /// Enables the line menu and resets the additional handlers if <paramref name="removeListeners"/> is true.
+        /// It can also hide some menu layer.
         /// </summary>
-        /// <param name="removeListeners">The bool, if the Handler should be reset.</param>
-        /// <param name="withoutMenuLayer">An array of menu layers that should hide.</param>
-        public static void EnableLineMenu(bool removeListeners = true, MenuLayer[] withoutMenuLayer = null)
+        /// <param name="removeListeners">Whether the handler should be reset.</param>
+        /// <param name="withoutMenuLayer">An array of menu layers that should hidden.</param>
+        private void EnableLineMenu(bool removeListeners = true, MenuLayer[] withoutMenuLayer = null)
         {
-            /// Removes the listeners of the GUI elements, if the <paramref name="removeListeners"/> is true.
+            /// Removes the listeners of the GUI elements if the <paramref name="removeListeners"/> is true.
             if (removeListeners)
             {
                 RemoveListeners();
@@ -364,48 +383,41 @@ namespace SEE.UI.Menu.Drawable
                 }
             }
 
-            /// Disables the tiling, if the line has a <see cref="LineKind.Solid"/>.
             if (selectedLineKind != LineKind.Dashed)
             {
                 DisableTilingFromLineMenu();
             }
 
-            /// Enables the menu.
-            instance.SetActive(true);
+            Enable();
 
-            /// Calculates the height of the menu.
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         #region Drawing
         /// <summary>
         /// Enables the line menu for drawing.
         /// </summary>
-        public static void EnableForDrawing()
+        public void EnableForDrawing()
         {
             EnableLineMenu(withoutMenuLayer: new MenuLayer[] { MenuLayer.Layer, MenuLayer.Loop });
             InitDrawing();
             mode = Mode.Drawing;
-            /// Calculates the height of the menu.
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
-        /// Init the Handlers for the Drawing.
+        /// Initializes the handlers for the drawing.
         /// </summary>
-        private static void InitDrawing()
+        private void InitDrawing()
         {
-            /// Initialize the tiling slider and
-            /// save the changes in the global value for the tiling <see cref="ValueHolder.CurrentTiling"/>.
+            /// Initializes the tiling slider and
+            /// saves the changes in the global value for the tiling <see cref="ValueHolder.CurrentTiling"/>.
             tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
             {
                 ValueHolder.CurrentTiling = tiling;
             });
 
-            /// Sets up the line kind selector.
             SetUpLineKindSelectorForDrawing();
-
-            /// Sets up the color kind selector.
             SetUpColorKindSelectorForDrawing();
 
             /// Sets up the primary color button.
@@ -430,15 +442,15 @@ namespace SEE.UI.Menu.Drawable
             picker.AssignColor(ValueHolder.CurrentPrimaryColor);
             picker.onValueChanged.AddListener(colorAction = color => ValueHolder.CurrentPrimaryColor = color);
 
-            /// At least re-calculate the menu heigt.
-            MenuHelper.CalculateHeight(instance, true);
+            /// At last re-calculate the menu height.
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
-        /// Sets up the line kind selector with the current selected <see cref="LineKind"/> and
+        /// Sets up the line kind selector with the currently selected <see cref="LineKind"/> and
         /// saves the changes in the global value for it. <see cref="ValueHolder.CurrentLineKind"/>.
         /// </summary>
-        private static void SetUpLineKindSelectorForDrawing()
+        private void SetUpLineKindSelectorForDrawing()
         {
             /// Assigns the current chosen line kind to the menu variable.
             AssignLineKind(ValueHolder.CurrentLineKind);
@@ -463,8 +475,8 @@ namespace SEE.UI.Menu.Drawable
                 /// If you want to switch to <see cref="LineKind.Solid"/> but
                 /// previously a Dashed LineKind with <see cref="ColorKind.TwoDashed"/> was active,
                 /// you need also to switch the <see cref="ColorKind"/> to <see cref="ColorKind.Monochrome"/>.
-                if (ValueHolder.CurrentLineKind == LineKind.Solid &&
-                    ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
+                if (ValueHolder.CurrentLineKind == LineKind.Solid
+                    && ValueHolder.CurrentColorKind == ColorKind.TwoDashed)
                 {
                     ValueHolder.CurrentColorKind = ColorKind.Monochrome;
                 }
@@ -475,10 +487,10 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind selector with the current selected <see cref="ColorKind"/> and
+        /// Sets up the color kind selector with the currently selected <see cref="ColorKind"/> and
         /// saves the changes global value for it. <see cref="ValueHolder.CurrentColorKind"/>.
         /// </summary>
-        private static void SetUpColorKindSelectorForDrawing()
+        private void SetUpColorKindSelectorForDrawing()
         {
             /// Assigns the current chosen color kind to the menu variable.
             AssignColorKind(ValueHolder.CurrentColorKind);
@@ -500,7 +512,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 ValueHolder.CurrentColorKind = GetColorKinds(true)[index];
 
-                /// Set the secondary color when it is transparent.
+                /// Sets the secondary color if it is transparent.
                 if (ValueHolder.CurrentColorKind != ColorKind.Monochrome
                     && ValueHolder.CurrentSecondaryColor == Color.clear)
                 {
@@ -513,7 +525,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the primary color button for drawing mode.
+        /// Sets up the primary color button for drawing mode.
         /// They mutually exclude each other with the secondary button. This means only one can be activated at a time.
         /// It saves the changes in the global value for the primary color <see cref="ValueHolder.CurrentPrimaryColor"/>.
         /// </summary>
@@ -533,7 +545,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the secondary color button for drawing mode.
+        /// Sets up the secondary color button for the drawing mode.
         /// They mutually exclude each other with the primary button. This means only one can be activated at a time.
         /// It saves the changes in the global value for the secondary color <see cref="ValueHolder.CurrentSecondaryColor"/>.
         /// </summary>
@@ -547,7 +559,7 @@ namespace SEE.UI.Menu.Drawable
             secondaryColorBMB.clickEvent.AddListener(() =>
             {
                 /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before,
-                /// the secondary color is clear.
+                /// the secondary color is cleared.
                 /// Therefore, a random color is added first,
                 /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
                 if (ValueHolder.CurrentSecondaryColor == Color.clear)
@@ -565,12 +577,12 @@ namespace SEE.UI.Menu.Drawable
             secondaryColorBMB.buttonVar.interactable = true;
         }
         /// <summary>
-        /// Set up the outline thickness slider for drawing mode.
+        /// Sets up the outline thickness slider for drawing mode.
         /// The changes will be saved in the global value <see cref="ValueHolder.CurrentThickness"/>.
         /// </summary>
-        private static void SetUpOutlineThicknessSliderForDrawing()
+        private void SetUpOutlineThicknessSliderForDrawing()
         {
-            ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
+            ThicknessSliderController thicknessSlider = gameObject.GetComponentInChildren<ThicknessSliderController>();
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(ValueHolder.CurrentThickness);
             /// Add the handler.
@@ -581,7 +593,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the color kind type area for drawing mode.
+        /// Sets up the color kind type area for drawing mode.
         /// </summary>
         private static void SetUpColorKindTypeButtonForDrawing()
         {
@@ -591,7 +603,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 DisableFillOut();
                 EnableColorKind();
-                MenuHelper.CalculateHeight(instance, true);
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
                 if (!primaryColorBMB.buttonVar.interactable)
                 {
                     AssignColorArea(color => { ValueHolder.CurrentPrimaryColor = color; }, ValueHolder.CurrentPrimaryColor);
@@ -624,7 +636,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 DisableColorKind();
                 EnableFillOut();
-                MenuHelper.CalculateHeight(instance, true);
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
                 if (ValueHolder.CurrentTertiaryColor == Color.clear)
                 {
                     ValueHolder.CurrentTertiaryColor = ValueHolder.CurrentPrimaryColor;
@@ -666,31 +678,28 @@ namespace SEE.UI.Menu.Drawable
 
         #region Editing
         /// <summary>
-        /// This method provides the line menu for editing, adding the necessary Handler to the respective components.
+        /// Provides the line menu for editing, adding the necessary handlers to the respective components.
         /// </summary>
         /// <param name="selectedLine">The selected line object for editing.</param>
-        public static void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder, UnityAction returnCall = null)
+        public void EnableForEditing(GameObject selectedLine, DrawableType newValueHolder, UnityAction returnCall = null)
         {
             if (newValueHolder is LineConf lineHolder)
             {
-                /// Enables the line menu.
                 EnableLineMenu();
-
-                /// Set up the return button.
                 SetUpReturnButtonForEditing(returnCall);
 
                 LineRenderer renderer = selectedLine.GetComponent<LineRenderer>();
                 GameObject surface = GameFinder.GetDrawableSurface(selectedLine);
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
 
-                /// Set up the line kind selector.
+                /// Sets up the line kind selector.
                 SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-                /// Set up the color kind selector.
+                /// Sets up the color kind selector.
                 SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Adds the action that should be executed if the tiling silder changed.
-                /// It only is available for <see cref="LineKind.Dashed"/>.
+                /// It is only is available for <see cref="LineKind.Dashed"/>.
                 tilingSlider.onValueChanged.AddListener(tilingAction = tiling =>
                 {
                     ChangeLineKind(selectedLine, LineKind.Dashed, tiling);
@@ -700,22 +709,12 @@ namespace SEE.UI.Menu.Drawable
                             LineKind.Dashed, tiling).Execute();
                 });
 
-                /// Sets up the primary color button.
+                /// Sets up the components.
                 SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
-                /// Sets up the secondary color button.
                 SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
-                /// Set up the outline thickness slider.
                 SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
-
-                /// Set up the order in layer slider.
                 SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
-                /// Set up the loop switch.
                 SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
-                /// Set up the <see cref="HSVPicker.ColorPicker"/>.
                 SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 SetUpColorKindTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
@@ -727,39 +726,39 @@ namespace SEE.UI.Menu.Drawable
                 mode = Mode.Edit;
 
                 /// Re-calculates the menu height.
-                MenuHelper.CalculateHeight(instance, true);
+                MenuHelper.CalculateHeight(gameObject, true);
             }
         }
 
         /// <summary>
-        /// Set up the return button.
-        /// If the return call action is not null,
-        /// activate the return button and add the action to it.
-        /// This only occurs when editing mind map nodes.
-        /// In this case, the layer slider is set to inactive, as the order of a mind map node must be changed directly on the node.
+        /// Sets up the return button.
+        /// If the return call action is not null, activates the return button and
+        /// adds the action to it. This occurs only if editing mind map nodes.
+        /// In this case, the layer slider is set to inactive, as the order of a mind map node
+        /// must be changed directly on the node.
         /// </summary>
         /// <param name="returnCall">The return call back to the parent menu.</param>
-        private static void SetUpReturnButtonForEditing(UnityAction returnCall)
+        private void SetUpReturnButtonForEditing(UnityAction returnCall)
         {
             if (returnCall != null)
             {
                 EnableReturn();
-                ButtonManagerBasic returnBtn = GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>();
+                ButtonManagerBasic returnBtn = GameFinder.FindChild(gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>();
                 returnBtn.clickEvent.RemoveAllListeners();
                 returnBtn.clickEvent.AddListener(returnCall);
-                GameFinder.FindChild(instance, "Layer").GetComponentInChildren<Slider>().interactable = false;
+                GameFinder.FindChild(gameObject, "Layer").GetComponentInChildren<Slider>().interactable = false;
             }
         }
 
         /// <summary>
-        /// Set ups the line kind selector for editing mode.
+        /// Sets up the line kind selector for editing mode.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpLineKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
+        private void SetUpLineKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             /// Assigns the current <see cref="LineKind"/> of the selected line to the menu variable.
@@ -810,14 +809,14 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set ups the color kind selector for editing mode.
+        /// Sets up the color kind selector for editing mode.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpColorKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
+        private void SetUpColorKindSelectorForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
             /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
@@ -856,7 +855,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the primary color button for editing mode.
+        /// Sets up the primary color button for editing mode.
         /// They mutually exclude each other with the secondary button. This means only one can be activated at a time.
         /// Furthermore, the action that should be executed on a color change is added.
         /// </summary>
@@ -886,7 +885,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the secondary color button for editing mode.
+        /// Sets up the secondary color button for editing mode.
         /// They mutually exclude each other with the primary button. This means only one can be activated at a time.
         /// Furthermore, the action that should be executed on a color change is added.
         /// </summary>
@@ -931,7 +930,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the outline thickness slider for editing mode
+        /// Sets up the outline thickness slider for editing mode
         /// with the current thickness of the selected line.
         /// Furthermore, the action that should be executed on a thickness change is added.
         /// </summary>
@@ -940,10 +939,10 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
+        private void SetUpOutlineThicknessSliderForEditing(GameObject selectedLine, LineRenderer renderer,
             LineConf lineHolder, GameObject surface, string surfaceParentName)
         {
-            ThicknessSliderController thicknessSlider = instance.GetComponentInChildren<ThicknessSliderController>();
+            ThicknessSliderController thicknessSlider = gameObject.GetComponentInChildren<ThicknessSliderController>();
             /// Assigns the current value to the slider.
             thicknessSlider.AssignValue(renderer.startWidth);
             /// Adds the handler for changing.
@@ -963,16 +962,16 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Sets up the order in layer slider for editing mode
         /// with the current order of the selected line.
-        /// Furthermore, the action that should be executed on a order change is added.
+        /// Furthermore, the action that should be executed on an order change is added.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
         /// <param name="surface">The drawable surface on which the line is displayed.</param>
         /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
-        private static void SetUpOrderInLayerSliderForEditing(GameObject selectedLine, LineConf lineHolder,
+        private void SetUpOrderInLayerSliderForEditing(GameObject selectedLine, LineConf lineHolder,
             GameObject surface, string surfaceParentName)
         {
-            LayerSliderController layerSlider = instance.GetComponentInChildren<LayerSliderController>();
+            LayerSliderController layerSlider = gameObject.GetComponentInChildren<LayerSliderController>();
             layerSlider.AssignMaxOrder(surface.GetComponent<DrawableHolder>().OrderInLayer);
             /// Assigns the current value to the slider.
             layerSlider.AssignValue(lineHolder.OrderInLayer);
@@ -1026,7 +1025,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Set up the color picker for editing mode.
+        /// Sets up the color picker for editing mode.
         /// It assigns the current primary line color and adds the initial handler.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
@@ -1079,7 +1078,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 DisableFillOut();
                 EnableColorKind();
-                MenuHelper.CalculateHeight(instance, true);
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
                 if (!primaryColorBMB.buttonVar.interactable)
                 {
                     AssignColorArea(color =>
@@ -1149,7 +1148,7 @@ namespace SEE.UI.Menu.Drawable
                         selectedLine.name, color).Execute();
                 }, lineHolder.FillOutColor);
 
-                MenuHelper.CalculateHeight(instance, true);
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
             });
             fillOutBMB.buttonVar.interactable = true;
         }
@@ -1226,7 +1225,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="clearFillOutAction">Action to clear the value.</param>
         public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
-            if (IsInEditMode() && !fillOutBMB.buttonVar.interactable)
+            if (Instance.IsInEditMode() && !fillOutBMB.buttonVar.interactable)
             {
                 if (fillOut != null && setFillOutAction != null)
                 {
@@ -1259,14 +1258,12 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
-        /// This method removes the handler of the
-        /// line kind selector, the color kind selector,
-        /// the primary and secondary color buttons,
-        /// the tiling slider controller,
-        /// the thickness slider controller, order in layer slider controller,
-        /// the loop switch and the additional color action for the hsv color picker.
+        /// Removes the handler of the line kind selector, the color kind selector,
+        /// the primary and secondary color buttons, the tiling slider controller,
+        /// the thickness slider controller, order-in-layer slider controller,
+        /// the loop switch and the additional color action for the HSV color picker.
         /// </summary>
-        private static void RemoveListeners()
+        private void RemoveListeners()
         {
             /// Ensures that all menu items are enabled for removing the handlers.
             EnableLineMenuLayers();
@@ -1287,12 +1284,12 @@ namespace SEE.UI.Menu.Drawable
                 {
                     tilingSlider.ResetToMin();
                 }
-                instance.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
+                gameObject.GetComponentInChildren<FloatValueSliderController>().onValueChanged.RemoveListener(tilingAction);
             }
             primaryColorBMB.clickEvent.RemoveAllListeners();
             secondaryColorBMB.clickEvent.RemoveAllListeners();
-            instance.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
-            instance.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
+            gameObject.GetComponentInChildren<ThicknessSliderController>().OnValueChanged.RemoveAllListeners();
+            gameObject.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
             fillOutManager.OffEvents.RemoveAllListeners();
@@ -1302,14 +1299,14 @@ namespace SEE.UI.Menu.Drawable
 
             if (colorAction != null)
             {
-                instance.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
+                gameObject.GetComponentInChildren<HSVPicker.ColorPicker>().onValueChanged.RemoveListener(colorAction);
             }
         }
 
         /// <summary>
         /// Assigns an action and a color to the HSV Color Picker.
         /// </summary>
-        /// <param name="colorAction">The color action that should be assigned</param>
+        /// <param name="newColorAction">The color action that should be assigned</param>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
@@ -1323,6 +1320,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         #region LineKind
+
         /// <summary>
         /// Returns the index of the current selected line kind.
         /// </summary>
@@ -1336,18 +1334,18 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns a line kind to the line kind selection.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned</param>
-        public static void AssignLineKind(LineKind kind)
+        public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
 
         /// <summary>
-        /// Assign a line kind and a tiling to the line kind selection and tiling slider controller.
+        /// Assigns a line kind and a tiling to the line kind selection and tiling slider controller.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned.</param>
-        /// <param name="tiling"></param>
-        public static void AssignLineKind(LineKind kind, float tiling)
+        /// <param name="tiling">The tiling to be assigned</param>
+        public void AssignLineKind(LineKind kind, float tiling)
         {
             selectedLineKind = kind;
 
@@ -1362,13 +1360,13 @@ namespace SEE.UI.Menu.Drawable
             { /// In all other cases the tiling layer will disabled.
                 DisableTilingFromLineMenu();
             }
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
         #endregion
 
         #region ColorKind
         /// <summary>
-        /// Returns the index of the current selected color kind.
+        /// Returns the index of the currently selected color kind.
         /// </summary>
         /// <returns>Index of selected color kind</returns>
         private static int GetIndexOfSelectedColorKind()
@@ -1380,7 +1378,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns a color kind to the color kind selection.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned</param>
-        public static void AssignColorKind(ColorKind kind)
+        public void AssignColorKind(ColorKind kind)
         {
             selectedColorKind = kind;
 
@@ -1395,7 +1393,7 @@ namespace SEE.UI.Menu.Drawable
                 /// For all other <see cref="ColorKind"/> enable the color area.
                 EnableColorAreaFromLineMenu();
             }
-            MenuHelper.CalculateHeight(instance, true);
+            MenuHelper.CalculateHeight(gameObject, true);
         }
         #endregion
 
@@ -1423,7 +1421,7 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
-        /// Refreshes the horizontal selectors of this.
+        ///Refrehes the horizontal selectors <see cref="lineKindSelector"/> and <see cref="colorKindSelector"/>".
         /// </summary>
         public static void RefreshHorizontalSelectors()
         {
@@ -1574,17 +1572,17 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Hides the return button.
         /// </summary>
-        private static void DisableReturn()
+        private void DisableReturn()
         {
-            instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
+            gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
         }
 
         /// <summary>
         /// Enables the return button
         /// </summary>
-        private static void EnableReturn()
+        private void EnableReturn()
         {
-            instance.transform.Find("ReturnBtn").gameObject.SetActive(true);
+            gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
         }
 
         /// <summary>

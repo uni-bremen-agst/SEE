@@ -559,9 +559,8 @@ namespace SEE.GO
         {
             if (!gameObject.TryGetComponent(out T component))
             {
-                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.name}'");
+                throw new InvalidOperationException($"Couldn't find component '{typeof(T).GetNiceName()}' on game object '{gameObject.FullName()}'");
             }
-
             return component;
         }
 

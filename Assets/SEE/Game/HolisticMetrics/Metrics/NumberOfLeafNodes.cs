@@ -16,6 +16,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>The leaf count of the given <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             Graph graph = city.LoadedGraph;
             int leafCount = graph.Nodes().Count(node => node.IsLeaf());
             return new MetricValueRange

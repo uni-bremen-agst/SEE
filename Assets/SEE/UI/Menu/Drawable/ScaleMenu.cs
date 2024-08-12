@@ -2,17 +2,16 @@
 using SEE.Game.Drawable;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// The class for the scale menu. It delievers a instance.
-    /// Use ScaleMenu.Enable(GameObject objectToScale) and ScaleMenu().Disable()
+    /// The class for the scale menu. It delivers an instance.
+    /// Use ScaleMenu.Enable(GameObject objectToScale) and ScaleMenu().Destroy()
     /// </summary>
-    public static class ScaleMenu
+    public class ScaleMenu : SingletonMenu
     {
         /// <summary>
         /// The prefab for the scale menu.
@@ -30,7 +29,7 @@ namespace SEE.UI.Menu.Drawable
         private static InputFieldWithButtons yScale;
 
         /// <summary>
-        /// The switch for scale proportional or unproportional.
+        /// The switch for scaling proportionally or unproportionally.
         /// </summary>
         private static SwitchManager switchManager;
 
@@ -40,32 +39,40 @@ namespace SEE.UI.Menu.Drawable
         private static GameObject doneObject;
 
         /// <summary>
-        /// Holds the scale menu instance
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private ScaleMenu() { }
 
         /// <summary>
-        /// Whether this class has a finished rotation in store that wasn't yet fetched.
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ScaleMenu Instance { get; private set; }
+
+        static ScaleMenu()
+        {
+            Instance = new ScaleMenu();
+        }
+
+        /// <summary>
+        /// Whether this class has a finished rotation in store that hasn't been fetched yet.
         /// </summary>
         private static bool isFinish;
 
         /// <summary>
-        /// Enables the scale menu and set ups the handler for the menu components.
+        /// Enables the scale menu and sets up the handler for the menu components.
         /// </summary>
         /// <param name="objToScale">Is the drawable type object that should be scaled.</param>
         /// <param name="stickyNoteMode">Enables the menu for the sticky notes.</param>
         /// <param name="returnCall"></param>
         public static void Enable(GameObject objToScale, bool stickyNoteMode = false, UnityAction returnCall = null)
         {
-            /// Instantiate the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(drawableScalePrefab,
-                        GameObject.Find("UI Canvas").transform, false);
+            Instance.Instantiate(drawableScalePrefab);
 
             /// Initialize the GUI elements of the menu.
-            xScale = GameFinder.FindChild(instance, "XScale").GetComponent<InputFieldWithButtons>();
-            yScale = GameFinder.FindChild(instance, "YScale").GetComponent<InputFieldWithButtons>();
-            switchManager = GameFinder.FindChild(instance, "Switch").GetComponent<SwitchManager>();
-            doneObject = GameFinder.FindChild(instance, "Done");
+            xScale = GameFinder.FindChild(Instance.gameObject, "XScale").GetComponent<InputFieldWithButtons>();
+            yScale = GameFinder.FindChild(Instance.gameObject, "YScale").GetComponent<InputFieldWithButtons>();
+            switchManager = GameFinder.FindChild(Instance.gameObject, "Switch").GetComponent<SwitchManager>();
+            doneObject = GameFinder.FindChild(Instance.gameObject, "Done");
 
             /// Sets up the x scale component.
             XScale(objToScale);
@@ -85,7 +92,7 @@ namespace SEE.UI.Menu.Drawable
             /// Sets up the return button.
             SetUpReturn(returnCall);
 
-            instance.SetActive(true);
+            Instance.Enable();
         }
 
         /// <summary>
@@ -173,7 +180,7 @@ namespace SEE.UI.Menu.Drawable
                 doneObject.GetComponent<ButtonManagerBasic>().clickEvent.RemoveAllListeners();
                 doneObject.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
                 {
-                    Disable();
+                    Instance.Destroy();
                     isFinish = true;
                 });
             }
@@ -192,24 +199,13 @@ namespace SEE.UI.Menu.Drawable
         {
             if (returnCall != null)
             {
-                instance.transform.Find("ReturnBtn").gameObject.SetActive(true);
-                GameFinder.FindChild(instance, "ReturnBtn").GetComponent<ButtonManagerBasic>()
+                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
+                GameFinder.FindChild(Instance.gameObject, "ReturnBtn").GetComponent<ButtonManagerBasic>()
                     .clickEvent.AddListener(returnCall);
             }
             else
             {
-                instance.transform.Find("ReturnBtn").gameObject.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// Destroyes the scale menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
+                Instance.gameObject.transform.Find("ReturnBtn").gameObject.SetActive(false);
             }
         }
 
@@ -224,7 +220,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state. Otherwise it will be false.
+        /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state.
+        /// Otherwise it will be false.
         /// </summary>
         /// <param name="finish">The finish state</param>
         /// <returns><see cref="isFinish"/></returns>
@@ -239,15 +236,6 @@ namespace SEE.UI.Menu.Drawable
 
             finish = false;
             return false;
-        }
-
-        /// <summary>
-        /// Gets the state if the menu is active.
-        /// </summary>
-        /// <returns>true, if the menu is enabled.</returns>
-        public static bool IsActive()
-        {
-            return instance != null;
         }
     }
 }

@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {
+    /// <summary>
+    /// A class that sorts a list of GameObjects based on a set of attributes.
+    /// </summary>
     public class DrawableSurfaceSorter
     {
         /// <summary>
-        /// The attributes to sort by along with whether to sort descending, in the order of precedence.
+        /// The attributes to sort by, along with whether to sort descending, in the order of precedence.
         /// </summary>
         private readonly List<(string Name, Func<GameObject, object> GetKey, bool Descending)> sortAttributes = new();
 
@@ -52,7 +54,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Applies the sort and transform it to a list.
+        /// Applies the sort and transforms it to a list.
         /// </summary>
         /// <param name="list">The list to be sorted.</param>
         /// <returns>The sorted list.</returns>
@@ -73,24 +75,17 @@ namespace SEE.UI.Window.DrawableManagerWindow
         public bool? IsAttributeDescending(string attributeName)
         {
             (string, Func<GameObject, object>, bool Descending) result = sortAttributes.FirstOrDefault(a => a.Name == attributeName);
-            if (result == default)
-            {
-                return null;
-            }
-            else
-            {
-                return result.Descending;
-            }
+            return result == default ? null : result.Descending;
         }
 
         /// <summary>
-        /// Query if the sorter is active.
+        /// Returns true if the sorter is active.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if sorter is active (has more than one sorting attribute)</returns>
         public bool IsActive() => sortAttributes.Count > 0;
 
         /// <summary>
-        /// Resets the sorter to default.
+        /// Resets the sorter to its default (no sorting attribute).
         /// </summary>
         public void Reset() => sortAttributes.Clear();
     }

@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Controls.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.Drawable
@@ -19,16 +20,16 @@ namespace SEE.UI.Drawable
         {
             if (GlobalActionHistory.Current() != ActionStateTypes.ColorPicker)
             {
-                Destroy(gameObject.GetComponent<ColorPickerMenuDisabler>());
+                gameObject.Destroy<ColorPickerMenuDisabler>();
             }
         }
 
         /// <summary>
-        /// If this component will be destroyed, it disables the color picker menu.
+        /// If this component will be destroyed, it destroys the color picker menu.
         /// </summary>
         private void OnDestroy()
         {
-            ColorPickerMenu.Disable();
+            ColorPickerMenu.Instance.Destroy();
         }
     }
 }

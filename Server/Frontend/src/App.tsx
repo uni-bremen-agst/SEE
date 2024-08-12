@@ -3,6 +3,7 @@ import { createTheme } from '@mui/material'
 import { blueGrey } from '@mui/material/colors'
 import { AuthProvider } from './contexts/AuthContext'
 import Router from './Router'
+import { SnackbarProvider } from 'notistack'
 
 const theme = createTheme(
   {
@@ -20,7 +21,9 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <AuthProvider>
-        <Router/>
+        <SnackbarProvider>
+          <Router />
+        </SnackbarProvider>
       </AuthProvider>
     </ThemeProvider>
   )

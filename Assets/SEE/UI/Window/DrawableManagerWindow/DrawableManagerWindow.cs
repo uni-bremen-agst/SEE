@@ -3,11 +3,8 @@ using SEE.DataModel;
 using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.GO;
 using SEE.UI.Menu.Drawable;
-using SEE.UI.Window;
-using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -54,29 +51,29 @@ namespace SEE.UI.Window.DrawableManagerWindow
         private DrawableWindowContextMenu contextMenu;
 
         /// <summary>
-        ///
+        /// All disposables that need to be disposed when the window is destroyed (see <see cref="OnDestroy"/>).
         /// </summary>
-        private List<IDisposable> subscriptions = new();
+        private readonly List<IDisposable> subscriptions = new();
 
         /// <summary>
         /// Adds the drawable surfaces of the visualization to the drawable manager view.
         /// </summary>
-        /// <param name="surfaces">The surfaces to be added, if it is not set all surfaces of the scene will be added.</param>
+        /// <param name="surfaces">The surfaces to be added; if it is not set, all surfaces of the scene will be added.</param>
         private void AddDrawableSurfaces(List<GameObject> surfaces = null)
         {
             /// Case group is active.
-            if (contextMenu.grouper.IsActive)
+            if (contextMenu.Grouper.IsActive)
             {
                 AddGroup("Whiteboards", Icons.Whiteboard,
-                    OrderList(contextMenu.grouper.GetWhiteboards(contextMenu.filter)),
+                    OrderList(contextMenu.Grouper.GetWhiteboards(contextMenu.Filter)),
                     WhiteboardColor);
                 AddGroup("Sticky Notes", Icons.StickyNote,
-                    OrderList(contextMenu.grouper.GetStickyNotes(contextMenu.filter)),
+                    OrderList(contextMenu.Grouper.GetStickyNotes(contextMenu.Filter)),
                     StickyNoteColor);
             }
             else /// Group is not active.
             {
-                surfaces ??= contextMenu.filter.GetFilteredSurfaces();
+                surfaces ??= contextMenu.Filter.GetFilteredSurfaces();
                 foreach (GameObject surface in Sort(surfaces))
                 {
                     if (surface.CompareTag(Tags.Drawable))
@@ -94,9 +91,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <returns>The sorted surfaces</returns>
         private List<GameObject> Sort(List<GameObject> surfaces)
         {
-            return contextMenu.sorter.IsActive() ? contextMenu.sorter.ApplySort(surfaces) : OrderList(surfaces);
+            return contextMenu.Sorter.IsActive() ? contextMenu.Sorter.ApplySort(surfaces) : OrderList(surfaces);
         }
-
 
         /// <summary>
         /// Orders a list by type of surface and then by the unqiue id.
@@ -127,9 +123,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// Register the observer.
-        /// First, an observer ti detect when surfaces are added or removed.
-        /// Then, an observer for each existing surface.
+        /// Adds all <see cref="DrawableSurface"/>s attached to the <see cref="LocalPlayer"/>
+        /// or contained in <see cref="ValueHolder.DrawableSurfaces"/> to <see cref="subscriptions"/>.
         /// </summary>
         protected override void Start()
         {
@@ -145,7 +140,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         }
 
         /// <summary>
-        /// If the menu is destroyed, dispose the observers and close any open <see cref="SurfaceColorMenu"/>
+        /// If the menu is destroyed, disposes the observers and closes any open <see cref="SurfaceColorMenu"/>
         /// if necessary.
         /// </summary>
         private void OnDestroy()
@@ -155,9 +150,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 subscription.Dispose();
             }
 
-            if (SurfaceColorMenu.IsOpen())
+            if (SurfaceColorMenu.Instance.IsOpen())
             {
-                SurfaceColorMenu.Disable();
+                SurfaceColorMenu.Instance.Destroy();
             }
         }
 
@@ -202,7 +197,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             switch(value)
             {
                 case DescriptionChangeEvent:
-                    Rebuild(contextMenu.filter.GetFilteredSurfaces());
+                    Rebuild(contextMenu.Filter.GetFilteredSurfaces());
                     break;
                 case ColorChangeEvent e:
                     if (surfaceItems.TryGetValue(GameFinder.GetUniqueID(e.Surface.CurrentObject), out GameObject item))
@@ -219,8 +214,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                         TextMeshProUGUI lightMesh = foreground.Find("LightingBtn").gameObject.GetComponentInChildren<TextMeshProUGUI>();
                         lightMesh.color = GetLightColor(e.Surface.Lighting);
 
-                        if (e.Surface.Lighting && !contextMenu.filter.IncludeHaveLighting
-                        || !e.Surface.Lighting && !contextMenu.filter.IncludeHaveNoLighting)
+                        if (e.Surface.Lighting && !contextMenu.Filter.IncludeHaveLighting
+                        || !e.Surface.Lighting && !contextMenu.Filter.IncludeHaveNoLighting)
                         {
                             RemoveItem(itemObj);
                         }
@@ -234,8 +229,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                         visibilityMesh.text = GetVisibilityText(e.Surface.Visibility);
                         visibilityMesh.color = GetVisibilityColor(e.Surface.Visibility);
 
-                        if (e.Surface.Visibility && !contextMenu.filter.IncludeIsVisible
-                        || !e.Surface.Visibility && !contextMenu.filter.IncludeIsInvisibile)
+                        if (e.Surface.Visibility && !contextMenu.Filter.IncludeIsVisible
+                        || !e.Surface.Visibility && !contextMenu.Filter.IncludeIsInvisibile)
                         {
                             RemoveItem(itemV);
                         }
@@ -289,7 +284,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 subscriptions.Add(surface.Subscribe(this));
             }
             Rebuild();
-            Refresher.UICanvas();
+            UICanvas.Refresh();
         }
 
         #endregion

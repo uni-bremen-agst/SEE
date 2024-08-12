@@ -14,6 +14,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>The number of node types of the given <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             MetricValueRange metricValueRange = new MetricValueRange
             {
                 Name = "Number of node types",

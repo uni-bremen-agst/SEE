@@ -3,6 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.Utils;
@@ -82,7 +83,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
                 if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right))
-                        && isInAction && !waitForHelperMenu)
+                    && isInAction && !waitForHelperMenu)
                     || finishChosingColor)
                 {
                     if (!ColorPickerMenu.GetSwitchStatus())
@@ -182,8 +183,8 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void PickingSecondaryColor()
         {
-            if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, false)
-                && !isInAction)
+            if (!isInAction
+                && Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, false))
             {
                 isInAction = true;
                 GameObject hitObject = raycastHit.collider.gameObject;
@@ -246,17 +247,31 @@ namespace SEE.Controls.Actions.Drawable
 
             oldChosenPrimaryColor = ValueHolder.CurrentPrimaryColor;
             oldChosenSecondColor = ValueHolder.CurrentSecondaryColor;
-            Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
-            ColorPickerMenu.Enable();
+            UICanvas.Canvas.AddOrGetComponent<ColorPickerMenuDisabler>();
         }
 
         /// <summary>
-        /// Destroys the mind map color picker menu on action stop.
+        /// Enables the color picker menu on action start.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+            ColorPickerMenu.Instance.Enable();
+        }
+
+        /// <summary>
+        /// Disables the color picker menu on action stop.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
-            ColorPickerMindMapMenu.Disable();
+            ColorPickerMenu.Instance.Disable();
+            ColorPickerMindMapMenu.Instance.Destroy();
+        }
+
+        ~ColorPickerAction()
+        {
+            ColorPickerMenu.Instance.Destroy();
         }
 
         /// <summary>

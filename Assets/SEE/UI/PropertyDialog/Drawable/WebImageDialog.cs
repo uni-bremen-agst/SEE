@@ -5,27 +5,28 @@ using UnityEngine;
 namespace SEE.UI.PropertyDialog.Drawable
 {
     /// <summary>
-    /// This class manages the dialog for adding and downloading an image from web.
+    /// This class manages the dialog for adding and downloading an image from the web.
     /// </summary>
     internal class WebImageDialog : HolisticMetricsDialog
     {
         /// <summary>
-        /// The in the dialog written url.
+        /// The URL contained in the dialog.
         /// </summary>
         private string url = "";
 
         /// <summary>
-        /// The in the dialog written file name.
+        /// The filename contained in the dialog.
         /// </summary>
-        private string fileName = "";
+        private string filename = "";
 
         /// <summary>
-        /// The input field where the player can enter a link for an url adress.
+        /// The input field where the player can enter a URL.
         /// </summary>
         private StringProperty urlTextProperty;
 
         /// <summary>
-        /// The input field where the player can enter a file name for saving the downloaded image.
+        /// The input field where the player can enter a filename for saving the
+        /// downloaded image.
         /// </summary>
         private StringProperty fileNameTextProperty;
 
@@ -40,7 +41,7 @@ namespace SEE.UI.PropertyDialog.Drawable
 
             urlTextProperty = Dialog.AddComponent<StringProperty>();
             urlTextProperty.Name = "URL";
-            urlTextProperty.Description = "Insert the url adress of the image";
+            urlTextProperty.Description = "Insert the URL of the image";
 
             group.AddProperty(urlTextProperty);
 
@@ -52,9 +53,9 @@ namespace SEE.UI.PropertyDialog.Drawable
             group.AddProperty(fileNameTextProperty);
 
             PropertyDialog = Dialog.AddComponent<PropertyDialog>();
-            PropertyDialog.Title = "Download an image from web";
-            PropertyDialog.Description = "Insert the url adress of the image and a desired filename; " +
-                "then hit OK button.";
+            PropertyDialog.Title = "Download an image from the web";
+            PropertyDialog.Description = "Insert the URL of the image and a desired filename; " +
+                "then hit the OK button.";
             PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             PropertyDialog.AddGroup(group);
 
@@ -66,34 +67,36 @@ namespace SEE.UI.PropertyDialog.Drawable
         }
 
         /// <summary>
-        /// This method gets called when the player confirms the dialog. It will transmit the written text
-        /// and then closes the dialog and re-enables the keyboard shortcuts.
+        /// This method gets called when the player confirms the dialog. It will transmit
+        /// the written text and then closes the dialog and re-enables the keyboard shortcuts.
         /// </summary>
         private void TransmitText()
         {
             GotInput = true;
             url = urlTextProperty.Value;
-            fileName = fileNameTextProperty.Value;
+            filename = fileNameTextProperty.Value;
             Close();
         }
 
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
-        /// <param name="httpOut">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
-        /// <see cref="textOut"/>. Otherwise it's empty.</param>
+        /// <param name="url">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// URL the user provided. Otherwise it is empty.</param>
+        /// <param name="filename">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// filename the user provided. Otherwise it is empty.</param>
         /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
-        internal bool GetUserInput(out string httpOut, out string fileNameOut)
+        internal bool TryGetUserInput(out string url, out string filename)
         {
             if (GotInput)
             {
                 GotInput = false;
-                httpOut = url;
-                fileNameOut = fileName;
+                url = this.url;
+                filename = this.filename;
                 return true;
             }
-            httpOut = "";
-            fileNameOut = "";
+            url = "";
+            filename = "";
             return false;
         }
     }

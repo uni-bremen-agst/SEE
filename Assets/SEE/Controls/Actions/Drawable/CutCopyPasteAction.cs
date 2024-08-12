@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -310,7 +311,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SelectObject()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas,
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
                 false, true, false, GetActionStateType()))
             {
                 oldSurface = GameFinder.GetDrawableSurface(selectedObj);
@@ -321,7 +322,7 @@ namespace SEE.Controls.Actions.Drawable
                     newNodesBranchLineHolder = GameMindMap.SummarizeSelectedNodeIncChildren(selectedObj);
                 }
                 cutCopyPasteMenu = PrefabInstantiator.InstantiatePrefab(cutCopyPasteMenuPrefab,
-                                                                        Canvas.transform, false);
+                                                                        UICanvas.Canvas.transform, false);
                 SetupButtons(cutCopyPasteMenu);
             }
 
@@ -523,6 +524,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (MindMapParentSelectionMenu.TryGetParent(out GameObject parent))
             {
+                MindMapParentSelectionMenu.Instance.Destroy();
                 /// Block for the case when the node can be added.
                 if (newValueHolder is MindMapNodeConf conf)
                 {
@@ -539,7 +541,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 progressState = ProgressState.Finish;
             }
-            else if (!MindMapParentSelectionMenu.IsActive())
+            else if (!MindMapParentSelectionMenu.Instance.IsOpen())
             { /// Block for the case when the node cannot be added.
               /// The previous changes are reverted.
               /// This means the clone nodes are deleted, and the original nodes are restored if they were deleted (cut).

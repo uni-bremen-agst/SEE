@@ -30,6 +30,11 @@ namespace SEE.UI.Drawable
             }
         }
 
+        /// <summary>
+        /// Is executed as long as the objects are colliding.
+        /// Ensures that the variable remains true.
+        /// </summary>
+        /// <param name="other">The object that causes the collision.</param>
         private void OnTriggerStay(Collider other)
         {
             if (GameFinder.GetHighestParent(gameObject).
@@ -64,11 +69,11 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Trys to set the <see cref="isInCollision"/> to false.
+        /// Sets the <see cref="isInCollision"/> to false.
         /// It is necessary if a trigger exit was not properly registered.
         /// If, nevertheless, they are still involved in a collision, <see cref="OnTriggerStay"/> will set this to true again.
         /// </summary>
-        public void TrySetCollisionToFalse()
+        public void SetCollisionToFalse()
         {
             isInCollision = false;
         }

@@ -14,6 +14,7 @@ using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.GO;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -106,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            ImageSourceMenu.Disable();
+            ImageSourceMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -142,13 +143,13 @@ namespace SEE.Controls.Actions.Drawable
         private void SelectPosition()
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit)
-                && !ImageSourceMenu.IsOpen()
-                && (browser == null || (browser != null && !browser.IsOpen())) 
+                && !ImageSourceMenu.Instance.IsOpen()
+                && (browser == null || (browser != null && !browser.IsOpen()))
                 && (webImageDialog == null || (webImageDialog != null && !isDialogOpen)))
             {
                 Surface = GameFinder.GetDrawableSurface(raycastHit.collider.gameObject);
                 position = raycastHit.point;
-                ImageSourceMenu.Enable();
+                ImageSourceMenu.EnableMenu();
             }
         }
 
@@ -164,7 +165,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (source)
                 {
                     case ImageSourceMenu.Source.Local:
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadImage();
                         break;
                     case ImageSourceMenu.Source.Web:
@@ -190,7 +191,7 @@ namespace SEE.Controls.Actions.Drawable
                 isDialogOpen = false;
             }
 
-            if (webImageDialog != null && webImageDialog.GetUserInput(out string url, out string fileNameOut))
+            if (webImageDialog != null && webImageDialog.TryGetUserInput(out string url, out string fileNameOut))
             {
                 isDialogOpen = false;
                 download = Surface.AddComponent<DownloadImage>();

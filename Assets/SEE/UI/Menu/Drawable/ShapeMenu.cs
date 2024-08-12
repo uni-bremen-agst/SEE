@@ -6,7 +6,6 @@ using SEE.UI.Drawable;
 using SEE.UI.Notification;
 using SEE.Utils;
 using TMPro;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -15,7 +14,7 @@ using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// The class for the shape menu. It delievers a instance.
+    /// The class for the shape menu. It delivers an instance.
     /// Use ShapeMenu.Enable() and ShapeMenu.Disable()
     /// There are Getters for the necessary values:
     /// GetSelectedShape() for the selected shape type.
@@ -249,31 +248,31 @@ namespace SEE.UI.Menu.Drawable
             else
             {
                 shapeMenu.SetActive(false);
-                LineMenu.EnableForDrawing();
+                LineMenu.Instance.EnableForDrawing();
                 BindLineMenu();
             }
         }
 
         /// <summary>
-        /// Disables the menu's.
+        /// Disables the menus.
         /// </summary>
         public static void Disable()
         {
             DisablePartUndo();
             shapeMenu.SetActive(false);
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             drawableSwitch.SetActive(false);
         }
 
         /// <summary>
-        /// Init the switch menu. It adds the Handler for the shape menu and for the config menu.
+        /// Initializes the switch menu. It adds the handlers for the shape menu and for the config menu.
         /// By default, the shape menu is selected.
         /// </summary>
         private static void InitSwitchMenu()
         {
             /// Instantiate the switch menu.
             drawableSwitch = PrefabInstantiator.InstantiatePrefab(drawableSwitchPrefab,
-                                    GameObject.Find("UI Canvas").transform, false);
+                                                                  UICanvas.Canvas.transform, false);
 
             /// Initialize the button for calling the shape menu.
             shapeBtn = drawableSwitch.GetComponentsInChildren<Button>()[0];
@@ -288,14 +287,14 @@ namespace SEE.UI.Menu.Drawable
             shapeBMB.enabled = false;
         }
         /// <summary>
-        /// Init the shape menu.
-        /// It adds the necessary Handler to the components and sets the selected shape to line.
+        /// Initializes the shape menu.
+        /// It adds the necessary handlers to the components and sets the selected shape to line.
         /// </summary>
         private static void InitShapeMenu()
         {
             /// Instantiate the shape menu.
             shapeMenu = PrefabInstantiator.InstantiatePrefab(drawableShapePrefab,
-                                GameObject.Find("UI Canvas").transform, false);
+                                                             UICanvas.Canvas.transform, false);
 
             /// Initialize a selector for the shape kind.
             selector = shapeMenu.GetComponentInChildren<HorizontalSelector>();
@@ -399,7 +398,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Activate the visibility of the part undo button and
+        /// Activates the visibility of the part undo button and
         /// assigns an action to it.
         /// </summary>
         /// <param name="action">The action that should be assigned</param>
@@ -410,9 +409,8 @@ namespace SEE.UI.Menu.Drawable
             partUndoBMB.clickEvent.AddListener(action);
         }
 
-
         /// <summary>
-        /// Disable the visibility of the part undo button.
+        /// Disables the visibility of the part undo button.
         /// </summary>
         public static void DisablePartUndo()
         {
@@ -420,7 +418,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// This method loads the image of the selected shape into the information image.
+        /// Loads the image of the selected shape into the information image.
         /// </summary>
         private static void LoadImage()
         {
@@ -462,17 +460,17 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Init the config menu.
-        /// It adds the necessary Handler to the components.
+        /// Initializes the config menu.
+        /// It adds the necessary handlers to the components.
         /// </summary>
         private static void InitConfigMenu()
         {
-            LineMenu.EnableForDrawing();
-            LineMenu.instance.SetActive(false);
+            LineMenu.Instance.EnableForDrawing();
+            LineMenu.Instance.Enable();
         }
 
         /// <summary>
-        /// This method sets the selected shape type.
+        /// Sets the selected shape type.
         /// The name will be displayed in the shape label.
         /// </summary>
         /// <param name="shape">The selected shape type.</param>
@@ -483,7 +481,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Resets all the values for the shape's to their minimum.
+        /// Resets all the values for the shapes to their minimum.
         /// </summary>
         private static void AllValuesReset()
         {
@@ -521,7 +519,7 @@ namespace SEE.UI.Menu.Drawable
         }
         /// <summary>
         /// Changes the menu for the selected shape.
-        /// It displayes only the necessary values for the selected shape.
+        /// It displays only the necessary values for the selected shape.
         /// The values are renamed to match the shape appropriately,
         /// so that the values correspond to the explanations in the images of the information boxes.
         /// </summary>
@@ -624,7 +622,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the config menu (line menu) and it ensures that the menus (shape and config) are mutually exclusive.
+        /// Enables the config menu (line menu) and ensures that the menus (shape and config)
+        /// are mutually exclusive.
         /// </summary>
         private static void ConfigOnClick()
         {
@@ -634,14 +633,14 @@ namespace SEE.UI.Menu.Drawable
             shapeBtn.interactable = true;
             if (DrawShapesAction.currentShape == null)
             {
-                LineMenu.EnableForDrawing();
+                LineMenu.Instance.EnableForDrawing();
             }
             else
             {
-                LineMenu.EnableForEditing(DrawShapesAction.currentShape,
+                LineMenu.Instance.EnableForEditing(DrawShapesAction.currentShape,
                     LineConf.Get(DrawShapesAction.currentShape));
             }
-            MenuHelper.CalculateHeight(LineMenu.instance);
+            MenuHelper.CalculateHeight(LineMenu.Instance.GameObject);
             /// Binds the config menu to the switch menu.
             BindLineMenu();
             shapeMenu.SetActive(false);
@@ -652,8 +651,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         private static void BindLineMenu()
         {
-            LineMenu.instance.transform.SetParent(drawableSwitch.transform.Find("Content"));
-            GameFinder.FindChild(LineMenu.instance, "Dragger").GetComponent<WindowDragger>().enabled = false;
+            LineMenu.Instance.GameObject.transform.SetParent(drawableSwitch.transform.Find("Content"));
+            GameFinder.FindChild(LineMenu.Instance.GameObject, "Dragger").GetComponent<WindowDragger>().enabled = false;
         }
 
         /// <summary>
@@ -666,7 +665,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the shape and it ensures that the menus (shape and config) are mutually exclusive.
+        /// Enables the shape and ensures that the menus (shape and config) are mutually exclusive.
         /// </summary>
         private static void ShapeOnClick()
         {
@@ -674,7 +673,7 @@ namespace SEE.UI.Menu.Drawable
             shapeBMB.enabled = false;
             configBtn.interactable = true;
             configBMB.enabled = true;
-            LineMenu.DisableLineMenu();
+            LineMenu.Instance.Disable();
             BindShapeMenu();
             shapeMenu.SetActive(true);
         }

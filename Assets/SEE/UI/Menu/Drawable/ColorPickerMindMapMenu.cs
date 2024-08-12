@@ -1,16 +1,15 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
-using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu for the color picking of mind map nodes.
+    /// This singleton class provides a menu for the color picking of mind-map nodes.
     /// </summary>
-    public static class ColorPickerMindMapMenu
+    public class ColorPickerMindMapMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -18,12 +17,22 @@ namespace SEE.UI.Menu.Drawable
         private const string menuPrefab = "Prefabs/UI/Drawable/ColorPickerMindMap";
 
         /// <summary>
-        /// The instance for the mind map menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private ColorPickerMindMapMenu() { }
 
         /// <summary>
-        /// Whether this class has an color in store that wasn't yet fetched.
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ColorPickerMindMapMenu Instance { get; set; }
+
+        static ColorPickerMindMapMenu()
+        {
+            Instance = new ColorPickerMindMapMenu();
+        }
+
+        /// <summary>
+        /// Whether this class has a color in store that has not been fetched yet.
         /// </summary>
         private static bool gotColor;
 
@@ -33,17 +42,16 @@ namespace SEE.UI.Menu.Drawable
         private static Color chosenColor;
 
         /// <summary>
-        /// Creates the menu and register the needed handler.
+        /// Creates the menu and registers the needed handler.
         /// </summary>
         /// <param name="node">The selected node</param>
         /// <param name="primaryColor">Indicates whether the primary or secondary color should be chosen</param>
         public static void Enable(GameObject node, bool primaryColor)
         {
-            if (instance == null)
+            if (Instance.gameObject == null)
             {
                 MindMapNodeConf conf = MindMapNodeConf.GetNodeConf(node);
-                instance = PrefabInstantiator.InstantiatePrefab(menuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                Instance.Instantiate(menuPrefab);
 
                 /// Initialize the button to obtain the color of the border.
                 InitializeColorOfBorderButton(conf, primaryColor);
@@ -68,7 +76,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
         private static void InitializeColorOfBorderButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic border = GameFinder.FindChild(instance, "Border").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic border = GameFinder.FindChild(Instance.gameObject, "Border").GetComponent<ButtonManagerBasic>();
             border.clickEvent.AddListener(() =>
             {
                 if (primaryColor)
@@ -99,7 +107,7 @@ namespace SEE.UI.Menu.Drawable
         /// <param name="primaryColor">Option whether the primary color is being sought.</param>
         private static void InitializeColorOfTextButton(MindMapNodeConf conf, bool primaryColor)
         {
-            ButtonManagerBasic text = GameFinder.FindChild(instance, "NodeText").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic text = GameFinder.FindChild(Instance.gameObject, "NodeText").GetComponent<ButtonManagerBasic>();
             text.clickEvent.AddListener(() =>
             {
                 if (primaryColor)
@@ -126,7 +134,7 @@ namespace SEE.UI.Menu.Drawable
         private static void InitializeColorOfBranchLine(MindMapNodeConf conf, bool primaryColor)
         {
             /// Checks if the node has a parent. If not this area will be disabled.
-            GameObject branchLineButtonArea = GameFinder.FindChild(instance, "BranchLine");
+            GameObject branchLineButtonArea = GameFinder.FindChild(Instance.gameObject, "BranchLine");
             if (conf.BranchLineToParent != "")
             {
                 ButtonManagerBasic branchButton = branchLineButtonArea.GetComponent<ButtonManagerBasic>();
@@ -159,17 +167,6 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
-        }
-
-        /// <summary>
         /// If <see cref="gotColor"/> is true, the <paramref name="color"/> will be the chosen color by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
@@ -181,7 +178,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 color = chosenColor;
                 gotColor = false;
-                Disable();
+                Instance.Destroy();
                 return true;
             }
 

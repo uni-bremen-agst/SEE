@@ -1,9 +1,6 @@
-﻿using SEE.Controls;
-using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
+﻿using SEE.Game.Drawable;
+using SEE.UI.FilePicker;
 using SEE.Utils;
-using SimpleFileBrowser;
-using System.Collections;
 using UnityEngine;
 using static SEE.Controls.Actions.Drawable.LoadAction;
 using static SEE.Controls.Actions.Drawable.SaveAction;
@@ -35,160 +32,99 @@ namespace SEE.UI.Drawable
         /// </summary>
         private void Awake()
         {
-            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-            initPath = DrawableConfigManager.configurationPath;
+            DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+            initPath = DrawableConfigManager.ConfigurationPath;
         }
 
         /// <summary>
-        /// Loads a drawable configuration.
+        /// Loads a drawable configuration. Asks the user for a filename
+        /// using a <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="loadState">The chosen load state (regular/specific)</param>
         public void LoadDrawableConfiguration(LoadState loadState)
         {
-            SEEInput.KeyboardShortcutsEnabled = false;
-            StartCoroutine(ShowLoadDialogCoroutine(loadState));
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file for loading.
-        /// </summary>
-        /// <param name="loadState">The chosen load state (regular/specific)</param>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowLoadDialogCoroutine(LoadState loadState)
-        {
             string title = "";
             switch (loadState)
             {
-                /// Block for load on a specific drawable.
+                /// Block for loading on a specific drawable.
                 case LoadState.Specific:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-                    initPath = DrawableConfigManager.configurationPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+                    initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load on specific Drawable";
                     break;
-                /// Block for load on the regular drawable.
+                /// Block for loading on the regular drawable.
                 case LoadState.Regular:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.configurationPath);
-                    initPath = DrawableConfigManager.configurationPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.ConfigurationPath);
+                    initPath = DrawableConfigManager.ConfigurationPath;
                     title = "Load Drawable(s)";
                     break;
             }
 
-            /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.ConfigExtension);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
-            {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
-            }
-
-            /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            PathPicker.GetPath(title, true, initPath, HandleFileBrowserSuccess, () => { }, Filenames.DrawableConfigExtension);
         }
 
         /// <summary>
-        /// Method to save a drawable configuration
+        /// Saves a drawable configuration. Asks the user for a filename using the <see cref="FileBrowser"/>.
         /// </summary>
         /// <param name="saveState">The chosen save state (one/more/all)</param>
         public void SaveDrawableConfiguration(SaveState saveState)
-        {
-            SEEInput.KeyboardShortcutsEnabled = false;
-            StartCoroutine(ShowSaveDialogCoroutine(saveState));
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file for saving.
-        /// </summary>
-        /// <param name="saveState">The chosen save state (one/more/all)</param>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowSaveDialogCoroutine(SaveState saveState)
         {
             string title = "";
             switch (saveState)
             {
                 /// Block for save only one drawable.
                 case SaveState.One:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.singleConfPath);
-                    initPath = DrawableConfigManager.singleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.SingleConfPath);
+                    initPath = DrawableConfigManager.SingleConfPath;
                     title = "Save Drawable";
                     break;
 
                 /// Block for save more drawables.
                 case SaveState.Multiple:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
-                    initPath = DrawableConfigManager.multipleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.MultipleConfPath);
+                    initPath = DrawableConfigManager.MultipleConfPath;
                     title = "Save specific Drawables";
                     break;
 
                 /// Block for save all drawables of the game world.
                 case SaveState.All:
-                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.multipleConfPath);
-                    initPath = DrawableConfigManager.multipleConfPath;
+                    DrawableConfigManager.EnsureDrawableDirectoryExists(DrawableConfigManager.MultipleConfPath);
+                    initPath = DrawableConfigManager.MultipleConfPath;
                     title = "Save all Drawables";
                     break;
             }
 
-            /// Ensures that only configuration files can be selected.
-            FileBrowser.SetFilters(false, Filenames.ConfigExtension);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForSaveDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Save");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
-            {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
-            }
-
-            /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            PathPicker.GetPath(title, false, initPath, HandleFileBrowserSuccess, () => { }, Filenames.DrawableConfigExtension);
         }
 
         /// <summary>
-        /// Method to load an image
+        /// Called when the file browser has successfully chosen a file.
+        /// Sets the path to the chosen file and refreshes the UI canvas.
+        /// </summary>
+        /// <param name="path">the path the user selected</param>
+        private void HandleFileBrowserSuccess(string path)
+        {
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                SetPath(path);
+            }
+
+            /// Refreshes the UI canvas to prevent display issues.
+            UICanvas.Refresh();
+        }
+
+        /// <summary>
+        /// Method to load an image. The file is selected by the user by way
+        /// of the <see cref="FileBrowser"/>.
         /// </summary>
         public void LoadImage()
         {
-            SEEInput.KeyboardShortcutsEnabled = false;
-            StartCoroutine(ShowLoadImageDialogCoroutine());
-        }
-
-        /// <summary>
-        /// Coroutine that enables the file browser to chose a file.
-        /// </summary>
-        /// <returns>nothing</returns>
-        private IEnumerator ShowLoadImageDialogCoroutine()
-        {
             DrawableConfigManager.EnsureDrawableDirectoryExists(ValueHolder.ImagePath);
             initPath = ValueHolder.ImagePath;
-            string title = "Load an image";
 
             /// Ensures that only PNG or JPG files can be selected.
-            FileBrowser.SetFilters(true, Filenames.PNGExtension, Filenames.JPGExtension);
-
-            /// Opens the file browser.
-            yield return FileBrowser.WaitForLoadDialog(FileBrowser.PickMode.Files, false, initPath, null, title, "Load");
-
-            /// Enables the short cuts again.
-            SEEInput.KeyboardShortcutsEnabled = true;
-
-            if (FileBrowser.Success)
-            {
-                /// Sets the file path upon success.
-                SetPath(FileBrowser.Result[0]);
-            }
-
-            /// Refreshes the UI canvas to prevent display issues.
-            Refresher.UICanvas();
+            PathPicker.GetPath("Load an image", false, initPath, HandleFileBrowserSuccess, () => { },
+                                new string[] { Filenames.PNGExtension, Filenames.JPGExtension, Filenames.JPEGExtension });
         }
 
         /// <summary>
@@ -197,7 +133,7 @@ namespace SEE.UI.Drawable
         /// <returns>Whether file browser is open.</returns>
         public bool IsOpen()
         {
-            return FileBrowser.IsOpen;
+            return PathPicker.IsOpen();
         }
 
         /// <summary>

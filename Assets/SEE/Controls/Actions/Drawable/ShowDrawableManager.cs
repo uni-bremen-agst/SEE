@@ -1,5 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.GO;
+using SEE.UI;
+using SEE.UI.Drawable;
 using SEE.UI.Window;
 using SEE.UI.Window.DrawableManagerWindow;
 using UnityEngine;
@@ -33,7 +35,7 @@ namespace SEE.Controls.Actions.Drawable
         internal void ShowDrawableManagerWindow()
         {
             isOpen = true;
-            window = GameObject.Find("UI Canvas").AddOrGetComponent<DrawableManagerWindow>();
+            window = UICanvas.Canvas.AddOrGetComponent<DrawableManagerWindow>();
             SetupManager().Forget();
             return;
 

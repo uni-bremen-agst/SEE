@@ -12,6 +12,8 @@ using SEE.UI.Menu.Drawable;
 using SEE.Utils.Paths;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
+using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -93,7 +95,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 surface.Destroy<HighlightEffect>();
             }
-            SaveMenu.Disable();
+            SaveMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -102,14 +104,14 @@ namespace SEE.Controls.Actions.Drawable
         public override void Awake()
         {
             base.Awake();
-            /// The button for save the selected drawables.
+            /// The button for saving the selected drawables.
             UnityAction saveButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
                     if (selectedSurfaces.Count > 0)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         if (selectedSurfaces.Count == 1)
                         {
                             browser.SaveDrawableConfiguration(SaveState.One);
@@ -128,21 +130,22 @@ namespace SEE.Controls.Actions.Drawable
                             }
                             memento = new Memento(configs, SaveState.Multiple);
                         }
-                    } else
+                    }
+                    else
                     {
                         ShowNotification.Warn("No drawable selected.", "Select one or more drawables to save.");
                     }
                 }
             };
 
-            /// The button for save all drawables in the world.
+            /// The button for saving all drawables in the world.
             UnityAction saveAllButtonCall = () =>
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.SaveDrawableConfiguration(SaveState.All);
-                    List<GameObject> drawables = ValueHolder.DrawableSurfaces;//new(GameObject.FindGameObjectsWithTag(Tags.Drawable));
+                    List<GameObject> drawables = ValueHolder.DrawableSurfaces;
                     DrawableConfig[] configs = new DrawableConfig[drawables.Count];
                     for (int i = 0; i < configs.Length; i++)
                     {

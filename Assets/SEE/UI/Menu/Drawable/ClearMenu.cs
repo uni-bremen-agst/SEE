@@ -1,27 +1,19 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Utils;
-using System.Collections;
 using TMPro;
-using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// this class provides a menu, with which the player can
-    /// configurate the clear action.
+    /// This class provides a menu, with which the player can
+    /// configure the clear action.
     /// </summary>
-    public class ClearMenu
+    public class ClearMenu : Menu
     {
         /// <summary>
         /// The location where the menu prefeb is placed.
         /// </summary>
-        private string clearMenuPrefab = "Prefabs/UI/Drawable/ClearMenu";
-
-        /// <summary>
-        /// The instance for the menu.
-        /// </summary>
-        private readonly GameObject instance;
+        private const string clearMenuPrefab = "Prefabs/UI/Drawable/ClearMenu";
 
         /// <summary>
         /// The types of clearing.
@@ -33,73 +25,49 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// The current selected clearing type.
-        /// </summary>
-        private Type currentType;
-
-        /// <summary>
-        /// The current selected state for deleting.
-        /// </summary>
-        private bool shouldDeletePage;
-
-        /// <summary>
         /// Constructor.
         /// </summary>
         public ClearMenu()
         {
-            instance = PrefabInstantiator.InstantiatePrefab(clearMenuPrefab,
-                GameObject.Find("UI Canvas").transform, false);
-            TextMeshProUGUI text = GameFinder.FindChild(instance, "DeleteText")
+            Instantiate(clearMenuPrefab);
+            TextMeshProUGUI text = GameFinder.FindChild(gameObject, "DeleteText")
                 .GetComponent<TextMeshProUGUI>();
 
-            SwitchManager typeManager = GameFinder.FindChild(instance, "TypeSwitch")
+            SwitchManager typeManager = GameFinder.FindChild(gameObject, "TypeSwitch")
                 .GetComponent<SwitchManager>();
 
-            typeManager.OnEvents.AddListener(() => 
-            { 
-                currentType = Type.All;
+            typeManager.OnEvents.AddListener(() =>
+            {
+                CurrentType = Type.All;
                 text.text = "Delete Pages";
             });
 
             typeManager.OffEvents.AddListener(() =>
             {
-                currentType = Type.Current;
+                CurrentType = Type.Current;
                 text.text = "Delete Page";
             });
 
-            SwitchManager deleteManager = GameFinder.FindChild(instance, "DeleteSwitch")
+            SwitchManager deleteManager = GameFinder.FindChild(gameObject, "DeleteSwitch")
                 .GetComponent<SwitchManager>();
-            deleteManager.OnEvents.AddListener(() => shouldDeletePage = true);
-            deleteManager.OffEvents.AddListener(() => shouldDeletePage = false);
-
-            
+            deleteManager.OnEvents.AddListener(() => ShouldDeletePage = true);
+            deleteManager.OffEvents.AddListener(() => ShouldDeletePage = false);
         }
 
         /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
-        }
-
-        /// <summary>
-        /// Property for the current selected <see cref="Type"/>.
+        /// The currently selected <see cref="Type"/>.
         /// </summary>
         internal Type CurrentType
         {
-            get { return currentType; }
+            get; private set;
         }
 
         /// <summary>
-        /// Property for the current selected deleting state.
+        /// The currently selected deleting state.
         /// </summary>
         public bool ShouldDeletePage
         {
-            get { return shouldDeletePage; }
+            get; private set;
         }
     }
 }

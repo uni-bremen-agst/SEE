@@ -8,6 +8,11 @@ namespace SEE.Net.Actions.Drawable
     public class SynchronizeCurrentOrderInLayer : AbstractNetAction
     {
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// The current order in layer of the host.
         /// </summary>
         public int OrderInLayer;

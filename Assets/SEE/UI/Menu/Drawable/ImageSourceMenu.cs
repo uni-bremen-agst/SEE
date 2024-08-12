@@ -1,28 +1,36 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Utils;
-using UnityEngine;
 
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu, with which the player can select 
-    /// from which source an image should be load.
+    /// This class provides a menu, with which the player can select
+    /// from which source an image should be loaded.
     /// </summary>
-    public static class ImageSourceMenu
+    public class ImageSourceMenu : SingletonMenu
     {
         /// <summary>
-        /// The location where the menu prefeb is placed.
+        /// The location where the menu prefab is placed.
         /// </summary>
         private const string imageSourceMenuPrefab = "Prefabs/UI/Drawable/ImageSource";
 
         /// <summary>
-        /// The instance for the image source menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private ImageSourceMenu() { }
 
         /// <summary>
-        /// Whether this class has a source in store that wasn't yet fetched.
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static ImageSourceMenu Instance { get; private set; }
+
+        static ImageSourceMenu()
+        {
+            Instance = new ImageSourceMenu();
+        }
+
+        /// <summary>
+        /// Whether this class has a source in store that hasn't been fetched yet.
         /// </summary>
         private static bool gotSource;
 
@@ -42,63 +50,42 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the image source menu and register the needed Handler to the button's.
+        /// Enables the image source menu and registers the needed handler to the buttons.
         /// </summary>
-        public static void Enable()
+        public static void EnableMenu()
         {
-            if (instance == null)
+            if (Instance.gameObject == null)
             {
-                instance = PrefabInstantiator.InstantiatePrefab(imageSourceMenuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                Instance.Instantiate(imageSourceMenuPrefab);
 
-                /// Initialize the button for load the image from local disk.
-                ButtonManagerBasic local = GameFinder.FindChild(instance, "Local")
+                /// Initialize the button for loading the image from local disk.
+                ButtonManagerBasic local = GameFinder.FindChild(Instance.gameObject, "Local")
                     .GetComponent<ButtonManagerBasic>();
                 local.clickEvent.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Local;
-                    Disable();
+                    Instance.Destroy();
                 });
 
-                /// Initialize the button for load the image from web.
-                ButtonManagerBasic web = GameFinder.FindChild(instance, "Web")
+                /// Initialize the button for loading the image from the web.
+                ButtonManagerBasic web = GameFinder.FindChild(Instance.gameObject, "Web")
                     .GetComponent<ButtonManagerBasic>();
                 web.clickEvent.AddListener(() =>
                 {
                     gotSource = true;
                     chosenSource = Source.Web;
-                    Disable();
+                    Instance.Destroy();
                 });
 
                 /// Initialize the button for canceling the menu.
-                ButtonManagerBasic cancelBtn = GameFinder.FindChild(instance, "Cancel")
+                ButtonManagerBasic cancelBtn = GameFinder.FindChild(Instance.gameObject, "Cancel")
                     .GetComponent<ButtonManagerBasic>();
                 cancelBtn.clickEvent.AddListener(() =>
                 {
-                    Disable();
+                    Instance.Destroy();
                 });
             }
-        }
-
-        /// <summary>
-        /// Destroy's the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            if (instance != null)
-            {
-                Destroyer.Destroy(instance);
-            }
-        }
-
-        /// <summary>
-        /// Gets the state, if the menu is opened.
-        /// </summary>
-        /// <returns>The respective status of whether the menu is open.</returns>
-        public static bool IsOpen()
-        {
-            return instance != null;
         }
 
         /// <summary>
@@ -113,7 +100,7 @@ namespace SEE.UI.Menu.Drawable
             {
                 source = chosenSource;
                 gotSource = false;
-                Disable();
+                Instance.Destroy();
                 return true;
             }
 

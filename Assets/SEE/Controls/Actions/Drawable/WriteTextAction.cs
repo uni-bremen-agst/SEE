@@ -11,6 +11,7 @@ using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -104,7 +105,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Awake();
             if (firstStart)
             {
-                Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
+                UICanvas.Canvas.AddComponent<ValueResetter>().SetAllowedState(GetActionStateType());
                 TextMenu.EnableForWriting();
                 firstStart = false;
             }
@@ -168,14 +169,14 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>Whatever the success of creating is.</returns>
         private bool GettingText()
         {
-            if (writeTextDialog.GetUserInput(out string textOut))
+            if (writeTextDialog.TryGetUserInput(out string textOut))
             {
                 if (textOut != null && textOut != "")
                 {
                     DrawableHolder holder = Surface.GetComponent<DrawableHolder>();
                     textObj = GameTexter.WriteText(Surface, textOut, position,
                         ValueHolder.CurrentPrimaryColor, ValueHolder.CurrentSecondaryColor,
-                        TextMenu.GetOutlineStatus(),
+                        TextMenu.IsOutlineEnabled(),
                         ValueHolder.CurrentOutlineThickness, ValueHolder.CurrentFontSize,
                         holder.OrderInLayer, TextMenu.GetFontStyle());
                     new WriteTextNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface),
@@ -207,7 +208,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         public override void Stop()
         {
-            TextMenu.Disable();
+            TextMenu.Instance.Disable();
         }
 
         /// <summary>

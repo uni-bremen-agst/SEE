@@ -7,7 +7,6 @@ using FuzzySharp;
 using SEE.Controls;
 using SEE.DataModel.DG.GraphSearch;
 using SEE.GO;
-using SEE.UI.Drawable;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Windows.Speech;
@@ -133,9 +132,9 @@ namespace SEE.UI.Menu
             // as the title is technically the last element in the breadcrumb)
             string breadcrumb = withBreadcrumb ? GetBreadcrumb() : string.Empty;
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
-            Icon = nestedEntry.Icon;
+            Icon = nestedEntry.MenuIconSprite;
             nestedEntry.InnerEntries.ForEach(AddEntry);
-            /// The null check must be performed due to the <see cref="DrawableActionBar">. 
+            /// The null check must be performed due to the <see cref="DrawableActionBar">.
             /// When switching to a drawable action via the bar without opening the menu, the KeywordListener is null.
             if (KeywordListener != null)
             {
@@ -216,7 +215,7 @@ namespace SEE.UI.Menu
             }
             else
             {
-                Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
+                Debug.LogWarning("Search field must be present in the prefab for the nested menu to work properly.");
             }
             MenuManager.onCancel.AddListener(() => AscendLevel()); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
@@ -237,7 +236,6 @@ namespace SEE.UI.Menu
                     {
                         searchInput.text = string.Empty;
                     }
-                    //ResetToBase();
                 }
             };
         }
@@ -317,8 +315,7 @@ namespace SEE.UI.Menu
                                                 .Select(x => allEntries[x.Value])
                                                 .ToList();
 
-                NestedMenuEntry<T> resultEntry = new(results, Title, Description,
-                                                     default, default, Icon);
+                NestedMenuEntry<T> resultEntry = new(results, Title, Description, menuIconSprite: Icon);
                 DescendLevel(resultEntry, withBreadcrumb: false);
             }
             finally

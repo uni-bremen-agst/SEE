@@ -12,6 +12,11 @@ namespace SEE.Net.Actions.Drawable
     public abstract class DrawableNetAction : AbstractNetAction
     {
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// The drawable object that should be manipulated by this action.
         /// Will be set in the constructor.
         /// </summary>
@@ -21,6 +26,7 @@ namespace SEE.Net.Actions.Drawable
         /// The id of the drawable on which the object is located
         /// </summary>
         public string SurfaceID;
+
         /// <summary>
         /// The id of the drawable surface parent
         /// </summary>

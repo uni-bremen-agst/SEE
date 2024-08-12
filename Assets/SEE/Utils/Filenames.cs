@@ -56,9 +56,21 @@ namespace SEE.Utils
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
+        /// of drawables are persisted.
+        /// </summary>
+        public const string DrawableConfigExtension = ".drw";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
+        /// of metric boards are persisted.
+        /// </summary>
+        public const string MetricBoardConfigExtension = ".mbc";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
         /// of AbstractSEECity instances are persisted.
         /// </summary>
-        public const string ConfigExtension = ".cfg";
+        public const string CityConfigExtension = ".cfg";
 
         /// <summary>
         /// File extension for Speech Recognition Grammar Specifications (SRGS).
@@ -84,6 +96,11 @@ namespace SEE.Utils
         /// File extension of JPG filenames.
         /// </summary>
         public const string JPGExtension = ".jpg";
+
+        /// <summary>
+        /// Alternative file extension of JPG filenames.
+        /// </summary>
+        public const string JPEGExtension = ".jpeg";
 
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>

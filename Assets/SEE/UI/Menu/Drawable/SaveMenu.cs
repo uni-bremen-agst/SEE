@@ -9,7 +9,7 @@ namespace SEE.UI.Menu.Drawable
     /// <summary>
     /// The save menu for drawable type objects
     /// </summary>
-    public static class SaveMenu
+    public class SaveMenu : SingletonMenu
     {
         /// <summary>
         /// The location where the save menu prefeb is placed.
@@ -17,9 +17,19 @@ namespace SEE.UI.Menu.Drawable
         private const string saveMenuPrefab = "Prefabs/UI/Drawable/SaveMenu";
 
         /// <summary>
-        /// The instance for the save menu.
+        /// We do not want to create an instance of this singleton class outside of this class.
         /// </summary>
-        private static GameObject instance;
+        private SaveMenu() { }
+
+        /// <summary>
+        /// The only instance of this singleton class.
+        /// </summary>
+        public static SaveMenu Instance { get; private set; }
+
+        static SaveMenu()
+        {
+            Instance = new SaveMenu();
+        }
 
         /// <summary>
         /// The instance for the save single or more drawable button.
@@ -39,23 +49,14 @@ namespace SEE.UI.Menu.Drawable
         public static void Enable(UnityAction saveButtonCall, UnityAction saveAllButtonCall)
         {
             /// Instantiate the menu.
-            instance = PrefabInstantiator.InstantiatePrefab(saveMenuPrefab,
-                 GameObject.Find("UI Canvas").transform, false);
-            saveButton = GameFinder.FindChild(instance, "Save").GetComponent<ButtonManagerBasic>();
-            saveAllButton = GameFinder.FindChild(instance, "SaveAll").GetComponent<ButtonManagerBasic>();
+            Instance.Instantiate(saveMenuPrefab);
+            saveButton = GameFinder.FindChild(Instance.gameObject, "Save").GetComponent<ButtonManagerBasic>();
+            saveAllButton = GameFinder.FindChild(Instance.gameObject, "SaveAll").GetComponent<ButtonManagerBasic>();
 
             /// Adds a handler for the <paramref name="saveButtonCall"/>.
             saveButton.clickEvent.AddListener(saveButtonCall);
             /// Adds a handler for the <paramref name="saveAllButtonCall"/>.
             saveAllButton.clickEvent.AddListener(saveAllButtonCall);
-        }
-
-        /// <summary>
-        /// Destroys the menu.
-        /// </summary>
-        public static void Disable()
-        {
-            Destroyer.Destroy(instance);
         }
     }
 }

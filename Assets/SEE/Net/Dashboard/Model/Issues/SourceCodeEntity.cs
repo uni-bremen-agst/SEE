@@ -35,10 +35,10 @@ namespace SEE.Net.Dashboard.Model.Issues
 
         public SourceCodeEntity(string path, int line, int? endLine = null, string content = null)
         {
-            this.Path = path ?? throw new ArgumentNullException(nameof(path));
-            this.Line = line;
-            this.EndLine = endLine;
-            this.Content = string.IsNullOrEmpty(content) ? null : content;
+            Path = path ?? throw new ArgumentNullException(nameof(path));
+            Line = line;
+            EndLine = endLine;
+            Content = string.IsNullOrEmpty(content) ? null : content;
         }
     }
 }

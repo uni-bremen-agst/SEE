@@ -39,6 +39,11 @@ namespace SEE.Net
         public static Network Instance { get; private set; }
 
         /// <summary>
+        /// The <see cref="ActionNetwork"/> instance for communication between the clients and the server.
+        /// </summary>
+        public static readonly Lazy<ActionNetwork> ActionNetworkInst = new(InitActionNetworkInst);
+
+        /// <summary>
         /// The maximal port number.
         /// </summary>
         private const int maxServerPort = 65535;
@@ -55,11 +60,11 @@ namespace SEE.Net
         /// <summary>
         /// Base URL of the backend server where the files are stored
         /// </summary>
-        public static string BackendDomain = "localhost";
+        public static string BackendDomain = "localhost:8080";
         /// <summary>
         /// REST resource path, i.e., the URL part identifying the client REST API.
         /// </summary>
-        public static string ClientAPI = "/api/v1/file/client/";
+        public static string ClientAPI = "/api/v1/";
         /// <summary>
         /// The complete URL of the Client REST API.
         /// </summary>
@@ -111,7 +116,7 @@ namespace SEE.Net
             NetworkConfig networkConfig = networkManager.NetworkConfig;
             if (networkConfig == null)
             {
-                Debug.LogError("NetworkManager.Singleton has no valid NetworkConfig.\n");
+                Debug.LogError($"NetworkManager.Singleton has no valid {nameof(NetworkConfig)}.\n");
                 return null;
             }
             return networkConfig.NetworkTransport as UnityTransport;
@@ -299,7 +304,11 @@ namespace SEE.Net
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+#if UNITY_EDITOR
+            Debug.Log("Skipping parsing command-line parameters in Editor mode.\n");
+#else
             ProcessCommandLineArguments();
+#endif
         }
 
         /// <summary>
@@ -316,50 +325,66 @@ namespace SEE.Net
 
             bool launchAsServer = false;
 
+            // Commented out because it logs the plaintext password!
+            Debug.Log($"Parsing {arguments.Length} command-line parameters.\n"); //:\n{string.Join("; ", arguments)}");
+
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
             // If the file name is not available, the first element is equal to String.Empty.
             for (int i = 1; i < arguments.Length; i++)
             {
-                if (arguments[i] == portArgument)
+                switch (arguments[i])
                 {
-                    CheckArgumentValue(arguments, i, portArgument);
-                    ServerPort = Int32.Parse(arguments[i + 1]);
-                    i++;
-                }
-                else if (arguments[i] == passwordArgument)
-                {
-                    CheckArgumentValue(arguments, i, passwordArgument);
-                    RoomPassword = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == domainArgument)
-                {
-                    CheckArgumentValue(arguments, i, domainArgument);
-                    BackendDomain = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == serverIdArgument)
-                {
-                    CheckArgumentValue(arguments, i, serverIdArgument);
-                    ServerId = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == launchAsServerArgument)
-                {
-                    // This argument does not have a value. It works as a flag.
-                    launchAsServer = true;
-                    i++;
-                }
-                else
-                {
-                    Debug.LogWarning($"Unknown command-line parameter {arguments[i]} will be ignored.\n");
+                    case portArgument:
+                        Debug.Log($"Found {portArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, portArgument);
+                        ServerPort = Int32.Parse(arguments[i + 1]);
+                        i++; // skip one parameter
+                        break;
+                    case passwordArgument:
+                        Debug.Log($"Found {passwordArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, passwordArgument);
+                        RoomPassword = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case domainArgument:
+                        Debug.Log($"Found {domainArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, domainArgument);
+                        BackendDomain = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case serverIdArgument:
+                        Debug.Log($"Found {serverIdArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, serverIdArgument);
+                        ServerId = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case launchAsServerArgument:
+                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}.\n");
+                        // This argument does not have a value. It works as a flag.
+                        launchAsServer = true;
+                        break;
+                    default:
+                        Debug.LogWarning($"Unknown command-line parameter {i} will be ignored: {arguments[i]}.\n");
+                        break;
                 }
             }
 
             if (launchAsServer)
             {
-                StartServer(null);
+                CallBack serverCallback = (success, message) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log($"Server started successfully: {message}.\n");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Starting server failed: {message}.\n");
+                    }
+                };
+                Debug.LogWarning("Starting server...\n");
+                StartServer(serverCallback);
             }
 
             return;
@@ -378,20 +403,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The gateway to the server.
+        /// Yields the <see cref="ActionNetwork"/> component attached to the Server game object.
         /// </summary>
-        public static readonly Lazy<ServerActionNetwork> ServerNetwork = new(InitServerNetwork);
-
-        /// <summary>
-        /// Yields the <see cref="ServerActionNetwork"/> component attached to the Server game object.
-        /// </summary>
-        private static ServerActionNetwork InitServerNetwork()
+        private static ActionNetwork InitActionNetworkInst()
         {
             const string serverName = "Server";
             GameObject server = GameObject.Find(serverName);
             if (server != null)
             {
-                server.TryGetComponentOrLog(out ServerActionNetwork serverNetwork);
+                server.TryGetComponentOrLog(out ActionNetwork serverNetwork);
                 return serverNetwork;
             }
             else
@@ -405,13 +425,14 @@ namespace SEE.Net
         /// Broadcasts a serialized action.
         /// </summary>
         /// <param name="serializedAction">Serialized action to be broadcast</param>
-        /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
-        public static void BroadcastAction(String serializedAction, ulong[] recipients)
+        /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
+        public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
-            int maxPacketSize = 32000; /// TODO: Replace with the exact value
+            /// TODO(#754): Replace with the exact value.
+            int maxPacketSize = 32000;
             if (serializedAction.Length < maxPacketSize)
             {
-                ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+                ActionNetworkInst.Value?.BroadcastActionServerRpc(serializedAction, recipients);
             }
             else
             {
@@ -419,7 +440,7 @@ namespace SEE.Net
                 string id = Guid.NewGuid().ToString();
                 for (int i = 0; i < fragmentData.Count; i++)
                 {
-                    ServerNetwork.Value?.BroadcastActionServerRpc(id, fragmentData.Count, i, fragmentData[i], recipients);
+                    ActionNetworkInst.Value?.BroadcastActionServerRpc(id, fragmentData.Count, i, fragmentData[i], recipients);
                 }
             }
         }
@@ -681,24 +702,6 @@ namespace SEE.Net
         private void OnClientConnectedCallbackForServer(ulong client)
         {
             ShowNotification.Info("Connection", $"Client {client} has connected.");
-            SynchronizerAsync(client).Forget();
-        }
-
-        /// <summary>
-        /// When a client has connected to the server the drawables must be synchronized.
-        /// </summary>
-        /// <param name="client">the ID of the client</param>
-        private async UniTask SynchronizerAsync(ulong client)
-        {
-            NetworkClient cl = NetworkManager.Singleton.ConnectedClientsList.First(c => c.ClientId == client);
-            while (cl.PlayerObject == null || cl.PlayerObject.GetComponent<ClientActionNetwork>() == null
-                /// Is necessary to ensure that the client player is sufficiently initialized before synchronization can begin. 
-                /// If the local camera on the client is not yet initialized, errors may occur when synchronizing <see cref="DrawableType"> objects.
-                || cl.PlayerObject.GetComponentInChildren<SkinnedMeshRenderer>() == null) 
-            {
-                await UniTask.Yield();
-            }
-            DrawableSynchronizer.Synchronize(client);
         }
 
         /// <summary>
@@ -768,7 +771,7 @@ namespace SEE.Net
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
-                Debug.Log($"Client {request.ClientNetworkId} has sent right room password.\n");
+                Debug.Log($"Client {request.ClientNetworkId} has sent correct room password.\n");
                 response.Approved = true;
 
             }
@@ -776,7 +779,7 @@ namespace SEE.Net
             {
                 response.Approved = false;
                 response.Reason = "Invalid password";
-                Debug.LogWarning($"Client {request.ClientNetworkId} has sent wrong room password.\n");
+                Debug.LogWarning($"Client {request.ClientNetworkId} has sent incorrect room password.\n");
             }
         }
 
@@ -788,7 +791,7 @@ namespace SEE.Net
         /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientConnectedCallback(ulong owner)
         {
-            callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.\n");
+            callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
         }
 

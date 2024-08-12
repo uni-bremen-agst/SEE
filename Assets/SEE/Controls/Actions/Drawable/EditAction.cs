@@ -10,6 +10,7 @@ using UnityEngine;
 using TextConf = SEE.Game.Drawable.Configurations.TextConf;
 using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
+using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -189,10 +190,10 @@ namespace SEE.Controls.Actions.Drawable
                 GameObject surface = GameFinder.GetDrawableSurface(selectedObj);
                 DrawableType.Edit(selectedObj, oldValueHolder, surface);
             }
-            TextMenu.Disable();
-            LineMenu.DisableLineMenu();
-            ImageMenu.Disable();
-            MindMapEditMenu.Disable();
+            TextMenu.Instance.Disable();
+            LineMenu.Instance.Disable();
+            ImageMenu.Instance.Destroy();
+            MindMapEditMenu.Instance.Destroy();
         }
 
         /// <summary>
@@ -243,10 +244,10 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
-                TextMenu.Disable();
-                LineMenu.DisableLineMenu();
-                ImageMenu.Disable();
-                MindMapEditMenu.Disable();
+                TextMenu.Instance.Disable();
+                LineMenu.Instance.Disable();
+                ImageMenu.Instance.Destroy();
+                MindMapEditMenu.Instance.Destroy();
             }
         }
 
@@ -262,7 +263,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Selection()
         {
-            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, Canvas,
+            if (Selector.SelectObject(ref selectedObj, ref oldSelectedObj, ref mouseWasReleased, UICanvas.Canvas,
                 false, true, false, GetActionStateType()))
             {
                 oldValueHolder = DrawableType.Get(selectedObj);
@@ -285,25 +286,25 @@ namespace SEE.Controls.Actions.Drawable
             switch (selectedObj.tag)
             {
                 case Tags.Line:
-                    if (!LineMenu.IsOpen())
+                    if (!LineMenu.Instance.IsOpen())
                     {
-                        LineMenu.EnableForEditing(selectedObj, newValueHolder);
+                        LineMenu.Instance.EnableForEditing(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.DText:
-                    if (!TextMenu.IsOpen())
+                    if (!TextMenu.Instance.IsOpen())
                     {
                         TextMenu.EnableForEditing(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.Image:
-                    if (!ImageMenu.IsOpen())
+                    if (!ImageMenu.Instance.IsOpen())
                     {
                         ImageMenu.Enable(selectedObj, newValueHolder);
                     }
                     break;
                 case Tags.MindMapNode:
-                    if (!MindMapEditMenu.IsOpen())
+                    if (!MindMapEditMenu.Instance.IsOpen())
                     {
                         MindMapEditMenu.Enable(selectedObj, newValueHolder);
                     }
@@ -354,10 +355,10 @@ namespace SEE.Controls.Actions.Drawable
             {
                 selectedObj = null;
                 progressState = ProgressState.SelectObject;
-                LineMenu.DisableLineMenu();
-                TextMenu.Disable();
-                ImageMenu.Disable();
-                MindMapEditMenu.Disable();
+                LineMenu.Instance.Disable();
+                TextMenu.Instance.Disable();
+                ImageMenu.Instance.Destroy();
+                MindMapEditMenu.Instance.Destroy();
                 return false;
             }
         }

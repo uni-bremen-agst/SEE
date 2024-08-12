@@ -151,9 +151,9 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="item">The item to be removed.</param>
         private void RemoveItem(GameObject item)
         {
-            Destroyer.Destroy(item);
             string key = surfaceItems.FirstOrDefault(x=>x.Value == item).Key;
             surfaceItems.Remove(key);
+            Destroyer.Destroy(item);
         }
 
         /// <summary>
@@ -325,7 +325,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     GameDrawableManager.ChangeDescription(surface, textOut);
                     new DrawableChangeDescriptionNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                    Rebuild(contextMenu.filter.GetFilteredSurfaces());
+                    Rebuild(contextMenu.Filter.GetFilteredSurfaces());
                 };
 
                 writeTextDialog.Open(stringAction);
@@ -337,13 +337,13 @@ namespace SEE.UI.Window.DrawableManagerWindow
             colorMesh.color = config.Color;
             colorBtn.clickEvent.AddListener(() =>
             {
-                if (!SurfaceColorMenu.IsOpen())
+                if (!SurfaceColorMenu.Instance.IsOpen())
                 {
                     UnityAction<Color> colorAction = colorOut =>
                     {
                         colorMesh.color = colorOut;
                     };
-                    SurfaceColorMenu.Enable(surface, colorAction);
+                    SurfaceColorMenu.Instance.Enable(surface, colorAction);
                 }
             });
 
@@ -366,8 +366,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 new DrawableChangeLightingNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                 lightMesh.color = GetLightColor(light);
 
-                if (light && !contextMenu.filter.IncludeHaveLighting
-                || !light && !contextMenu.filter.IncludeHaveNoLighting)
+                if (light && !contextMenu.Filter.IncludeHaveLighting
+                || !light && !contextMenu.Filter.IncludeHaveNoLighting)
                 {
                     RemoveItem(item);
                 }
@@ -386,8 +386,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 visibilityMesh.text = GetVisibilityText(visibility);
                 visibilityMesh.color = GetVisibilityColor(visibility);
 
-                if (visibility && !contextMenu.filter.IncludeIsVisible
-                || !visibility && !contextMenu.filter.IncludeIsInvisibile)
+                if (visibility && !contextMenu.Filter.IncludeIsVisible
+                || !visibility && !contextMenu.Filter.IncludeIsInvisibile)
                 {
                     RemoveItem(item);
                 }

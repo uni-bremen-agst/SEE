@@ -15,6 +15,8 @@ using SEE.Utils.History;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using System.Linq;
+using SEE.UI;
+using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -109,11 +111,12 @@ namespace SEE.Controls.Actions.Drawable
             {
                 if (browser == null || (browser != null && !browser.IsOpen()))
                 {
-                    browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                    browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                     browser.LoadDrawableConfiguration(LoadState.Regular);
                     memento = new(LoadState.Regular);
                 }
             };
+
             /// The load button for loading onto a specific drawable.
             UnityAction loadSpecificButtonCall = () =>
             {
@@ -121,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     if (selectedSurface != null)
                     {
-                        browser = Canvas.AddOrGetComponent<DrawableFileBrowser>();
+                        browser = UICanvas.Canvas.AddOrGetComponent<DrawableFileBrowser>();
                         browser.LoadDrawableConfiguration(LoadState.Specific);
                         memento = new(LoadState.Specific);
                     }
@@ -143,7 +146,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Stop()
         {
             base.Stop();
-            LoadMenu.Disable();
+            LoadMenu.Instance.Destroy();
             selectedSurface?.Destroy<HighlightEffect>();
         }
 
@@ -345,7 +348,7 @@ namespace SEE.Controls.Actions.Drawable
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
-                        Object.DestroyImmediate(typeObj);
+                        Destroyer.Destroy(typeObj);
                     }
                 }
 

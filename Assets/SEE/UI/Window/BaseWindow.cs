@@ -77,7 +77,7 @@ namespace SEE.UI.Window
         }
 
         /// <summary>
-        /// Disables the window dragger buttons if they are unused.
+        /// Disables all window dragger buttons.
         /// </summary>dd
         public void DisableWindowDraggerButtons()
         {
