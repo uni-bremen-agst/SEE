@@ -10,7 +10,7 @@ namespace Assets.SEE.Tools.Playername
 {
 
     /// <summary>
-    /// Manger for Server to store playernames of the connected clients
+    /// Manager for Server to store playernames of the connected clients
     /// </summary>
     public static class PlayerNameManager
     {
