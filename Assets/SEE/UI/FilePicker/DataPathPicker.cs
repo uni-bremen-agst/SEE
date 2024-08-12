@@ -5,9 +5,9 @@ using UnityEngine.Events;
 namespace SEE.UI.FilePicker
 {
     /// <summary>
-    /// Allows a user to pick a file or folder.
+    /// Allows a user to pick a file or folder for a <see cref="DataPath"/>.
     /// </summary>
-    public partial class FilePicker : PlatformDependentComponent
+    public partial class DataPathPicker : PlatformDependentComponent
     {
         /// <summary>
         /// The label.
