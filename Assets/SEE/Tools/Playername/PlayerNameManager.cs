@@ -14,7 +14,9 @@ namespace Assets.SEE.Tools.Playername
     /// </summary>
     public static class PlayerNameManager
     {
-        // Dictionary to store player names with their client IDs as keys
+        /// <summary>
+        /// Dictionary to store player names with their client IDs as keys.
+        /// </summary>
         private static Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();
 
         /// <summary>
