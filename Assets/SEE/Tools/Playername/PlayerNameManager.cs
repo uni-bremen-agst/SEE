@@ -51,7 +51,7 @@ namespace Assets.SEE.Tools.Playername
         }
 
         /// <summary>
-        /// Removes dictionary entry by its key
+        /// Removes dictionary entry for the given <paramref name="clientId"/>.
         /// </summary>
         /// <param name="clientId">clientId as key</param>
         public static void RemovePlayerName(ulong clientId)
