@@ -26,7 +26,6 @@ namespace Assets.SEE.Tools.Playername
         /// <param name="playerName">corresponding playerName</param>
         public static void AddOrUpdatePlayerName(ulong clientId, string playerName)
         {
-
             if (playerNames.TryGetValue(clientId, out string currentName))
             {
                 if (currentName != playerName)
