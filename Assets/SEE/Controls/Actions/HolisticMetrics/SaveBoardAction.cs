@@ -1,13 +1,11 @@
 using System.Collections.Generic;
 using SEE.Game.HolisticMetrics;
 using SEE.UI;
-using SEE.UI.Drawable;
 using SEE.UI.HolisticMetrics;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using SEE.Utils.History;
-using UnityEngine;
 
 namespace SEE.Controls.Actions.HolisticMetrics
 {
@@ -34,11 +32,6 @@ namespace SEE.Controls.Actions.HolisticMetrics
         private LoadBoardButtonController buttonController;
 
         /// <summary>
-        /// Whether or not the button has been clicked (if so, the player should see a dialog).
-        /// </summary>
-        private bool buttonClicked;
-
-        /// <summary>
         /// Stores the current progress of this action.
         /// </summary>
         private ProgressState progress = ProgressState.WaitingForClick;
@@ -61,7 +54,7 @@ namespace SEE.Controls.Actions.HolisticMetrics
         /// <summary>
         /// This struct can store all the information needed to revert or repeat a <see cref="SaveBoardAction"/>.
         /// </summary>
-        private struct Memento
+        private readonly struct Memento
         {
             /// <summary>
             /// The name of the file in which the board's config has been written.
@@ -80,8 +73,8 @@ namespace SEE.Controls.Actions.HolisticMetrics
             /// <param name="widgetsManager">The WidgetsManager to save into this file</param>
             internal Memento(string filename, WidgetsManager widgetsManager)
             {
-                this.Filename = filename;
-                this.WidgetsManager = widgetsManager;
+                Filename = filename;
+                WidgetsManager = widgetsManager;
             }
         }
 
@@ -110,18 +103,18 @@ namespace SEE.Controls.Actions.HolisticMetrics
                         if (BoardsManager.GetNames().Length == 0)
                         {
                             ShowNotification.Info("No boards in the scene",
-                                "There are no boards in the scene that could be saved");
+                                "There are no boards in the scene that could be saved.");
                             return false;
                         }
                         saveBoardDialog = new SaveBoardDialog();
                         saveBoardDialog.Open();
                         progress = ProgressState.WaitingForInput;
                     }
-
                     return false;
+
                 case ProgressState.WaitingForInput:
                     if (saveBoardDialog.GetUserInput(out string filename,
-                            out WidgetsManager widgetsManager))
+                                                     out WidgetsManager widgetsManager))
                     {
                         memento = new Memento(filename, widgetsManager);
                         ConfigManager.SaveBoard(memento.WidgetsManager, memento.Filename);
@@ -134,10 +127,11 @@ namespace SEE.Controls.Actions.HolisticMetrics
                     {
                         progress = ProgressState.WaitingForClick;
                     }
-
                     return false;
+
                 case ProgressState.Finished:
                     return true;
+
                 default:
                     return false;
             }

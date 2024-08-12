@@ -35,22 +35,19 @@ namespace SEE.Game.HolisticMetrics
         }
 
         /// <summary>
-        /// Returns the file names of all saved metrics displays.
+        /// Returns the file names (excluding their extension) of all saved metric-board configuration files.
         /// </summary>
         /// <returns>The file names of all saved metrics displays</returns>
         internal static string[] GetSavedFileNames()
         {
             EnsureBoardsDirectoryExists();
             DirectoryInfo directoryInfo = new(metricsBoardsPath);
-            FileInfo[] fileInfos = directoryInfo.GetFiles();
+            FileInfo[] fileInfos = directoryInfo.GetFiles($"*{Filenames.MetricBoardConfigExtension}");
             string[] fileNames = new string[fileInfos.Length];
             for (int i = 0; i < fileInfos.Length; i++)
             {
-                string fileName = fileInfos[i].Name;
-                // The basename of fileName, i.e, the name without the fileNameExtension
-                fileNames[i] = fileName.Substring(0, fileName.Length - Filenames.ConfigExtension.Length);
+                fileNames[i] = Path.GetFileNameWithoutExtension(fileInfos[i].Name);
             }
-
             return fileNames;
         }
 
@@ -91,19 +88,19 @@ namespace SEE.Game.HolisticMetrics
             EnsureBoardsDirectoryExists();
             return LoadBoard(new DataPath()
             {
-                Path = metricsBoardsPath + fileName + Filenames.ConfigExtension
+                Path = metricsBoardsPath + fileName + Filenames.MetricBoardConfigExtension
             });
         }
 
         /// <summary>
-        /// Persist a metrics board to a file.
+        /// Persists a metrics board to a file.
         /// </summary>
         /// <param name="widgetsManager">The metrics board to save.</param>
         /// <param name="fileName">The file name for the configuration.</param>
         internal static void SaveBoard(WidgetsManager widgetsManager, string fileName)
         {
             EnsureBoardsDirectoryExists();
-            string filePath = metricsBoardsPath + fileName + Filenames.ConfigExtension;
+            string filePath = metricsBoardsPath + fileName + Filenames.MetricBoardConfigExtension;
             using ConfigWriter writer = new(filePath);
             BoardConfig config = GetBoardConfig(widgetsManager);
             config.Save(writer);
@@ -117,8 +114,7 @@ namespace SEE.Game.HolisticMetrics
         internal static void DeleteBoard(string filename)
         {
             EnsureBoardsDirectoryExists();
-            string filePath = metricsBoardsPath + filename + Filenames.ConfigExtension;
-            File.Delete(filePath);
+            File.Delete(metricsBoardsPath + filename + Filenames.MetricBoardConfigExtension);
         }
 
         /// <summary>
