@@ -2,7 +2,6 @@
 using Cysharp.Threading.Tasks;
 using Dissonance;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -105,7 +104,7 @@ namespace SEE.Net
         private CallBack callbackToMenu = null;
 
         /// <summary>
-        /// Playername for chat and avatar tag
+        /// Name of the local player; used for the text chat and the avatar badge.
         /// </summary>
         public string PlayerName { get; set; } = string.Empty;
 
