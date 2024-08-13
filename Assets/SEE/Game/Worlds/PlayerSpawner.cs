@@ -1,11 +1,8 @@
 ﻿using Dissonance;
-using SEE.Game.Drawable;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using TMPro;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -24,8 +21,10 @@ namespace SEE.Game.Worlds
         {
             [Tooltip("Avatar game object used as prefab")]
             public GameObject PlayerPrefab;
+
             [Tooltip("World-space position at which to spawn")]
             public Vector3 Position;
+
             [Tooltip("Rotation in degree along the y axis")]
             public float Rotation;
         }
@@ -49,7 +48,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// network config to read playername
         /// </summary>
-        private SEE.Net.Network networkConfig;
+        private Net.Network networkConfig;
 
         /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
@@ -67,10 +66,10 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
-            networkConfig = FindObjectOfType<SEE.Net.Network>();
+            networkConfig = FindObjectOfType<Net.Network>();
             if (networkConfig == null)
             {
-                Debug.LogError("Network configuration not found");
+                Debug.LogError("Network configuration not found.\n");
                 yield return null;
             }
 
@@ -80,7 +79,8 @@ namespace SEE.Game.Worlds
                 yield return null;
             }
 
-            // Terminate this co-routine if not run by the server, but first set client playername for chat-function.
+            // Terminate this co-routine if not run by the server, but first set client
+            // playername for chat-function.
             if (!networkManager.IsServer)
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
