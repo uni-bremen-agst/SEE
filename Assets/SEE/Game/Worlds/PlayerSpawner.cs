@@ -41,12 +41,12 @@ namespace SEE.Game.Worlds
         private DissonanceComms dissonanceComms = null;
 
         /// <summary>
-        /// Instance of the NetworkManager
+        /// Instance of the NetworkManager.
         /// </summary>
         private NetworkManager networkManager = NetworkManager.Singleton;
 
         /// <summary>
-        /// network config to read playername
+        /// Network config to read playername from.
         /// </summary>
         private Net.Network networkConfig;
 
