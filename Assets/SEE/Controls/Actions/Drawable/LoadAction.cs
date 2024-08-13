@@ -16,6 +16,7 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.Game.Drawable.ActionHelpers;
 using System.Linq;
 using SEE.UI;
+using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -115,6 +116,7 @@ namespace SEE.Controls.Actions.Drawable
                     memento = new(LoadState.Regular);
                 }
             };
+
             /// The load button for loading onto a specific drawable.
             UnityAction loadSpecificButtonCall = () =>
             {
@@ -346,7 +348,7 @@ namespace SEE.Controls.Actions.Drawable
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
-                        Object.DestroyImmediate(typeObj);
+                        Destroyer.Destroy(typeObj);
                     }
                 }
 
