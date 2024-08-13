@@ -52,15 +52,20 @@ namespace SEE.DataModel.DG.IO.Git
         /// </summary>
         private const float TruckFactorCoreDevRatio = 0.8f;
 
-
-        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> PathGlobbing,
+        /// <summary>
+        /// Creates a new instance of <see cref="GitFileMetricRepository"/>
+        /// </summary>
+        /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
+        /// <param name="pathGlobbing">A dictionary of path glob patterns you want to include or exclude</param>
+        /// <param name="repositoryFiles">A list of a files which should be displayed in the code-city</param>
+        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
             IEnumerable<string> repositoryFiles)
         {
             this.gitRepository = gitRepository;
-            this.pathGlobbing = PathGlobbing;
+            this.pathGlobbing = pathGlobbing;
             this.matcher = new();
 
-            foreach (KeyValuePair<string, bool> pattern in pathGlobbing)
+            foreach (KeyValuePair<string, bool> pattern in this.pathGlobbing)
             {
                 if (pattern.Value)
                 {
@@ -132,6 +137,11 @@ namespace SEE.DataModel.DG.IO.Git
             return coreDevs.Count;
         }
 
+        /// <summary>
+        /// Processes a commit and calculates the metrics.
+        /// </summary>
+        /// <param name="commit">The commit that should be processed</param>
+        /// <param name="commitChanges">The changes the commit has made. This will be most likely the changes between this commit and its parent</param>
         public void ProcessCommit(Commit commit, [CanBeNull] Patch commitChanges)
         {
             if (commitChanges == null || commit == null)

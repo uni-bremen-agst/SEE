@@ -55,7 +55,10 @@ namespace SEE.GameObjects
         /// </summary>
         private MarkerFactory markerFactory;
 
-
+        /// <summary>
+        /// Specifies that the poller should not run curently.
+        /// This is set to true when git fetch is in progress.
+        /// </summary>
         private bool doNotPool = false;
 
         /// <summary>

@@ -5,6 +5,9 @@ using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO.Git
 {
+    /// <summary>
+    /// Generates a <see cref="Graph"/> from the metrics of a <see cref="GitFileMetricRepository"/> instance.
+    /// </summary>
     public static class GitFileMetricsGraphGenerator
     {
         #region Constants
@@ -31,12 +34,29 @@ namespace SEE.DataModel.DG.IO.Git
 
         #endregion
 
+        /// <summary>
+        /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
+        /// 
+        /// </summary>
+        /// <param name="metricRepository">The metrics to add</param>
+        /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
+        /// <param name="repositoryName">The name of the repository</param>
+        /// <param name="simplifyGraph">If the final graph should be simplified</param>
         public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
             string repositoryName, bool simplifyGraph)
         {
             FillGraphWithGitMetrics(metricRepository, initialGraph, repositoryName, simplifyGraph, "");
         }
 
+        /// <summary>
+        /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
+        /// 
+        /// </summary>
+        /// <param name="metricRepository">The metrics to add</param>
+        /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
+        /// <param name="repositoryName">The name of the repository</param>
+        /// <param name="simplifyGraph">If the final graph should be simplified</param>
+        /// <param name="idSuffix">A suffix </param>
         public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
             string repositoryName, bool simplifyGraph, string idSuffix)
         {
@@ -58,6 +78,7 @@ namespace SEE.DataModel.DG.IO.Git
                 {
                     n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
                 }
+
                 foreach (var authorChurn in file.Value.AuthorsChurn)
                 {
                     n.SetInt(NumberOfFileChurnMetricName + ":" + authorChurn.Key, authorChurn.Value);
