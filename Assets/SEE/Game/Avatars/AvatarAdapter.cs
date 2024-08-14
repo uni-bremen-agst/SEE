@@ -387,6 +387,7 @@ namespace SEE.Game.Avatars
                     //    }
                     //}
                 }
+                PrefabInstantiator.InstantiatePrefab("Prefabs/UI/XRTabletCanvas");
             }
 
             /// <summary>
