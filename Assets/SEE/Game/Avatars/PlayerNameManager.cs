@@ -4,14 +4,15 @@ using System.Collections.Generic;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Manager for Server to store playernames of the connected clients
+    /// Provides a mapping of client IDs onto player names.
     /// </summary>
+    /// <remarks>This class is used only by the server.</remarks>
     public static class PlayerNameManager
     {
         /// <summary>
         /// Dictionary to store player names with their client IDs as keys.
         /// </summary>
-        private static Dictionary<ulong, string> playerNames = new Dictionary<ulong, string>();
+        private static readonly Dictionary<ulong, string> playerNames = new();
 
         /// <summary>
         /// Sets the name of the given <paramref name="clientId"/> to <paramref name="playerName"/>.
@@ -41,7 +42,7 @@ namespace SEE.Game.Avatars
         /// <returns>corresponding playerName</returns>
         public static string GetPlayerName(ulong clientId)
         {
-            return playerNames.ContainsKey(clientId) ? playerNames[clientId] : "UnknownPlayerName";
+            return playerNames.ContainsKey(clientId) ? playerNames[clientId] : "Unknown";
         }
 
         /// <summary>
