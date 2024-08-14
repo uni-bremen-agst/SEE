@@ -19,13 +19,13 @@ namespace SEE.Game.Worlds
         [Serializable]
         private class SpawnInfo
         {
-            [Tooltip("Avatar game object used as prefab")]
+            [Tooltip("Avatar game object used as prefab.")]
             public GameObject PlayerPrefab;
 
-            [Tooltip("World-space position at which to spawn")]
+            [Tooltip("World-space position at which to spawn.")]
             public Vector3 Position;
 
-            [Tooltip("Rotation in degree along the y axis")]
+            [Tooltip("Rotation in degree along the y axis.")]
             public float Rotation;
         }
 
