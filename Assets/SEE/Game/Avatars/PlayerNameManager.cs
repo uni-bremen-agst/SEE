@@ -1,14 +1,8 @@
 ﻿using SEE.UI.Notification;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Unity.Netcode;
 
-namespace Assets.SEE.Tools.Playername
+namespace SEE.Game.Avatars
 {
-
     /// <summary>
     /// Manager for Server to store playernames of the connected clients
     /// </summary>

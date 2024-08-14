@@ -1,6 +1,6 @@
-﻿using Assets.SEE.Tools.Playername;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using Dissonance;
+using SEE.Game.Avatars;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Notification;
