@@ -41,16 +41,6 @@ namespace SEE.Game.Worlds
         private DissonanceComms dissonanceComms = null;
 
         /// <summary>
-        /// Instance of the NetworkManager.
-        /// </summary>
-        private NetworkManager networkManager = NetworkManager.Singleton;
-
-        /// <summary>
-        /// Network config to read playername from.
-        /// </summary>
-        private Net.Network networkConfig;
-
-        /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
         /// </summary>
         private void OnEnable()
@@ -66,39 +56,34 @@ namespace SEE.Game.Worlds
         /// <returns>enumerator as to how to continue this co-routine</returns>
         private IEnumerator SpawnPlayerCoroutine()
         {
-            networkConfig = FindObjectOfType<Net.Network>();
-            if (networkConfig == null)
-            {
-                Debug.LogError("Network configuration not found.\n");
-                yield return null;
-            }
+            Net.Network networkConfig = FindObjectOfType<Net.Network>()
+                ?? throw new Exception("Network configuration not found.\n");
 
-            while (ReferenceEquals(networkManager, null))
-            {
-                networkManager = NetworkManager.Singleton;
-                yield return null;
-            }
-
-            // Terminate this co-routine if not run by the server, but first set client
-            // playername for chat-function.
-            if (!networkManager.IsServer)
+            // Wait until Dissonance is created.
+            while (ReferenceEquals(dissonanceComms, null))
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
+                if (ReferenceEquals(dissonanceComms, null))
+                {
+                    yield return null;
+                }
+                // We need to set the local player name in DissonanceComms
+                // before Dissonance is started. That is why we cannot afford
+                // to wait until the next frame.
                 dissonanceComms.LocalPlayerName = networkConfig.PlayerName;
+            }
+
+            NetworkManager networkManager = NetworkManager.Singleton;
+
+            // Terminate this co-routine if not run by the server.
+            if (!networkManager.IsServer)
+            {
                 yield break;
             }
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             // The following code will be executed only on the server.
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-            // Wait until Dissonance is created
-            while (ReferenceEquals(dissonanceComms, null))
-            {
-                dissonanceComms = FindObjectOfType<DissonanceComms>();
-                dissonanceComms.LocalPlayerName = networkConfig.PlayerName;
-                yield return null;
-            }
 
             // The callback to invoke once a client connects. This callback is only
             // ran on the server and on the local client that connects. We want
@@ -121,7 +106,8 @@ namespace SEE.Game.Worlds
         /// <remarks>This code can be executed only on the server.</remarks>
         private void Spawn(ulong owner)
         {
-            if (owner == NetworkManager.Singleton.LocalClientId && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
+            if (owner == NetworkManager.Singleton.LocalClientId
+                && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
             {
                 return;
             }
@@ -134,7 +120,8 @@ namespace SEE.Game.Worlds
 
 
 #if DEBUG
-            Debug.Log($"Spawned {player.name} (network id of owner: {owner}, local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+            Debug.Log($"Spawned {player.name} (network id of owner: {owner}, "
+                + "local: {IsLocal(owner)}) at position {player.transform.position}.\n");
 #endif
             if (player.TryGetComponent(out NetworkObject net))
             {
@@ -142,7 +129,8 @@ namespace SEE.Game.Worlds
                 // unless otherwise specified.
                 net.SpawnAsPlayerObject(owner, destroyWithScene: true);
 #if DEBUG
-                Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+                Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
+                    + "is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
 #endif
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
