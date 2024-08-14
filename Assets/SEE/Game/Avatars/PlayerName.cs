@@ -73,6 +73,7 @@ namespace SEE.Game.Avatars
         /// RPC method to receive the player's name from a client and distribute it to all clients.
         /// </summary>
         /// <param name="playername">Playername that will be sent</param>
+        /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [ServerRpc]
         private void SendPlayernameFromClientsToServerServerRPC(ulong clientID, string playername)
         {
