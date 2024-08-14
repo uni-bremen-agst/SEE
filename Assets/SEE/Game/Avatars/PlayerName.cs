@@ -59,8 +59,9 @@ namespace SEE.Game.Avatars
         /// RPC method to send the player's name to all clients for rendering.
         /// </summary>
         /// <param name="playername">Playername that will be sent</param>
-        [ClientRpc]
-        private void SendPlayernameToClientsClientRPC(string playername)
+        /// <remarks>This method is called by the server, but executed on all clients.</remarks>
+        [Rpc(SendTo.NotServer)]
+        private void SendPlayernameToClientsRpc(string playername)
         {
             // Only update the display name if this is not the owner.
             if (!IsOwner)
@@ -74,8 +75,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         /// <param name="playername">Playername that will be sent</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
-        [ServerRpc]
-        private void SendPlayernameFromClientsToServerServerRPC(ulong clientID, string playername)
+        [Rpc(SendTo.Server)]
+        private void SendPlayernameFromClientsToServerRpc(ulong clientID, string playername)
         {
             // The server will render this playername onto his instance of the TextMeshPro.
             RenderNetworkPlayerName(playername);
@@ -87,7 +88,7 @@ namespace SEE.Game.Avatars
             }
 
             // The server will send the name to all other clients
-            SendPlayernameToClientsClientRPC(playername);
+            SendPlayernameToClientsRpc(playername);
         }
 
         /// <summary>
@@ -107,12 +108,12 @@ namespace SEE.Game.Avatars
             // Send the player's name to the server for distribution to other clients.
             if (!IsServer)
             {
-                SendPlayernameFromClientsToServerServerRPC(OwnerClientId, playerName);
+                SendPlayernameFromClientsToServerRpc(OwnerClientId, playerName);
             }
             else
             {
                 // Send the player's name to all clients for rendering.
-                SendPlayernameToClientsClientRPC(playerName);
+                SendPlayernameToClientsRpc(playerName);
             }
         }
     }
