@@ -40,7 +40,7 @@ namespace SEE.UI.Window
         protected override void StartVR()
         {
             Canvas.MustGetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
-            Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas").transform, false);
+            Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas").transform.Find("Screen").transform, false);
             Canvas.AddComponent<TrackedDeviceGraphicRaycaster>();
             Canvas.GetComponent<RectTransform>().localScale = new Vector3(0.001f, 0.001f, 0.001f);
             Canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(950, 950);

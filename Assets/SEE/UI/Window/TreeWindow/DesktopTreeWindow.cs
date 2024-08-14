@@ -700,7 +700,10 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            items.position = items.position.WithXYZ(y: 0);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                items.position = items.position.WithXYZ(y: 0);
+            }
         }
 
         /// <summary>

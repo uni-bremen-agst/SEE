@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -80,16 +81,26 @@ namespace SEE.UI.PopupMenu
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/ModePanel/XRCanvas/PopupMenu").transform;
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/ModePanel/XRCanvas/PopupMenu").transform;
+            }
+            else
+            {
+                menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
+            }
             contentSizeFitter = menu.gameObject.MustGetComponent<ContentSizeFitter>();
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
             scrollView = (RectTransform)menu.Find("Scroll View");
-            RectTransform background = (RectTransform)menu.Find("Background");
-            RectTransform shadow = (RectTransform)menu.Find("Shadow");
-            shadow.localScale = new Vector3(0.1f, 0.1f, 0.1f);
-            background.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             actionList = (RectTransform)scrollView.Find("Viewport/Action List");
-            scrollView.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                RectTransform background = (RectTransform)menu.Find("Background");
+                RectTransform shadow = (RectTransform)menu.Find("Shadow");
+                shadow.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                background.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                scrollView.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            }
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
             pointerHelper.ExitEvent.AddListener(x =>
@@ -308,7 +319,10 @@ namespace SEE.UI.PopupMenu
             }
             if (position.HasValue)
             {
-                MoveTo(position.Value);
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                {
+                    MoveTo(position.Value);
+                }
             }
             ShowMenuAsync().Forget();
         }
