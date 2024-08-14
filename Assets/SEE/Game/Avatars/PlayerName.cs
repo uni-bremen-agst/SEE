@@ -1,40 +1,31 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using Assets.SEE.Tools.Playername;
 
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Sends and show playerName for each player
+    /// Sends and shows playerName for each player.
     /// </summary>
     public class PlayerName : NetworkBehaviour
     {
         /// <summary>
         /// Reference to the TextMeshPro component to display the player's name.
         /// </summary>
-        [SerializeField] private TMP_Text displayNameText;
+        [SerializeField]
+        private TMP_Text displayNameText;
 
         /// <summary>
         /// Variable to store the player's name.
         /// </summary>
         private string playerName;
 
-        /// <summary>
-        /// network config to read playername
-        /// </summary>
-        private Net.Network networkConfig;
 
         private void Start()
         {
-            networkConfig = FindObjectOfType<Net.Network>();
-            if (networkConfig == null)
-            {
-                Debug.LogError("Network configuration not found");
-                return;
-            }
-            // Read the player's name when the script starts.
-            ReadPlayerName();
+            Net.Network networkConfig = FindObjectOfType<Net.Network>() ?? throw new("Network configuration not found");
+
+            playerName = string.IsNullOrEmpty(networkConfig.PlayerName) ? "Unknown" : networkConfig.PlayerName;
 
             // Display the local player's name as "Me".
             if (IsOwner)
@@ -44,17 +35,9 @@ namespace SEE.Game.Avatars
 
             if (IsServer)
             {
-                // Add or update the player's name in a dictionary managed by server
+                // Add or update the player's name in a dictionary managed by server.
                 PlayerNameManager.AddOrUpdatePlayerName(OwnerClientId, playerName);
             }
-        }
-
-        /// <summary>
-        /// Read the player's name from networkconfig.
-        /// </summary>
-        private void ReadPlayerName()
-        {
-            playerName = string.IsNullOrEmpty(networkConfig.PlayerName) ? "Unknown player name" : networkConfig.PlayerName;
         }
 
         private void Update()
@@ -92,7 +75,6 @@ namespace SEE.Game.Avatars
         [ServerRpc]
         private void SendPlayernameFromClientsToServerServerRPC(ulong clientID, string playername)
         {
-
             // The server will render this playername onto his instance of the TextMeshPro.
             RenderNetworkPlayerName(playername);
 
