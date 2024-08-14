@@ -1,14 +1,22 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.Avatars
 {
     /// <summary>
     /// Sends and shows playerName for each player.
     /// </summary>
-    /// <remarks>This behaviour is attached to the player prefabs. It will be executed
-    /// by both server and clients.</remarks>
+    /// <remarks>This behaviour is attached to all player prefabs.
+    /// A player prefab will be instantiated for remote players and
+    /// local players. That is, for instance, if there are three clients,
+    /// we have altogether nine player instances, three for each client,
+    /// where one of the three is the local player and the other two are
+    /// remote players. Whether a player is local or remote is determined
+    /// by the <see cref="NetworkObject.IsOwner"/> property (if true,
+    /// it is the local player).
+    /// </remarks>
     public class PlayerName : NetworkBehaviour
     {
         /// <summary>
@@ -17,42 +25,40 @@ namespace SEE.Game.Avatars
         [SerializeField]
         private TMP_Text displayNameText;
 
-        /// <summary>
-        /// Variable to store the player's name.
-        /// </summary>
-        private string playerName;
 
         private void Start()
         {
             Net.Network networkConfig = FindObjectOfType<Net.Network>() ?? throw new("Network configuration not found");
 
-            playerName = string.IsNullOrEmpty(networkConfig.PlayerName) ? "Unknown" : networkConfig.PlayerName;
+            // Player name that is set in the network configuration or a default name.
+            string playerName = string.IsNullOrEmpty(networkConfig.PlayerName) ? "N.N." : networkConfig.PlayerName;
 
-            // Display the local player's name as "Me".
             if (IsOwner)
             {
-                displayNameText.text = "Me";
+                // If this player is the local player, we can use the player name from the network configuration.
+                SendPlayerNameFromClientToServerRpc(OwnerClientId, playerName);
             }
-
-            if (IsServer)
+            else
             {
-                // Add or update the player's name in a dictionary managed by server.
-                PlayerNameManager.AddOrUpdatePlayerName(OwnerClientId, playerName);
+                // In the case of a remote player, we need to request the player name from the server.
+                RequestPlayerNameFromServerRpc();
             }
         }
 
-        private void Update()
+        /// <summary>
+        /// RPC method to receive the player's name from a client and distribute it to all clients.
+        /// </summary>
+        /// <param name="clientID">ClientID of the owner of the player</param>
+        /// <param name="playername">Playername that will be sent</param>
+        /// <remarks>This method is called by clients, but executed on the server.</remarks>
+        [Rpc(SendTo.Server)]
+        private void SendPlayerNameFromClientToServerRpc(ulong clientID, string playername)
         {
-            // If the NetworkObject is not yet spawned, exit early.
-            if (!IsSpawned)
-            {
-                return;
-            }
+            PlayerNameManager.AddOrUpdatePlayerName(clientID, playername);
 
-            if (IsOwner)
-            {
-                DisplayPlayernameOnAllOtherClients();
-            }
+            // The server will send the name to all other clients, including the client
+            // that sent the name.
+            SendPlayerNameToClientsRpc(playername);
         }
 
         /// <summary>
@@ -61,34 +67,28 @@ namespace SEE.Game.Avatars
         /// <param name="playername">Playername that will be sent</param>
         /// <remarks>This method is called by the server, but executed on all clients.</remarks>
         [Rpc(SendTo.NotServer)]
-        private void SendPlayernameToClientsRpc(string playername)
+        private void SendPlayerNameToClientsRpc(string playername)
         {
-            // Only update the display name if this is not the owner.
-            if (!IsOwner)
-            {
-                RenderNetworkPlayerName(playername);
-            }
+            RenderNetworkPlayerName(playername);
         }
 
-        /// <summary>
-        /// RPC method to receive the player's name from a client and distribute it to all clients.
-        /// </summary>
-        /// <param name="playername">Playername that will be sent</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
-        private void SendPlayernameFromClientsToServerRpc(ulong clientID, string playername)
+        private void RequestPlayerNameFromServerRpc(RpcParams rpcParams = default)
         {
-            // The server will render this playername onto his instance of the TextMeshPro.
-            RenderNetworkPlayerName(playername);
+            ulong clientId = rpcParams.Receive.SenderClientId;
+            string playerName = PlayerNameManager.GetPlayerName(clientId);
+            Debug.Log($"RequestPlayerNameFromServerRpc(clientId={clientId}) => playerName={playerName}\n");
+            SendPlayerNameToClientRpc(playerName, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+        }
 
-            // Update the player's name in the dictionary
-            if (IsServer)
-            {
-                PlayerNameManager.AddOrUpdatePlayerName(clientID, playername);
-            }
-
-            // The server will send the name to all other clients
-            SendPlayernameToClientsRpc(playername);
+        /// <remarks>This method is called by the server, but executed on the client which
+        /// called <see cref="RequestPlayerNameFromServerRpc"/>.</remarks>
+        [Rpc(SendTo.SpecifiedInParams)]
+        void SendPlayerNameToClientRpc(string playerName, RpcParams _)
+        {
+            Debug.Log($"SendPlayerNameToClientRpc({playerName})\n");
+            RenderNetworkPlayerName(playerName);
         }
 
         /// <summary>
@@ -100,6 +100,7 @@ namespace SEE.Game.Avatars
             displayNameText.text = playername;
         }
 
+        /*
         /// <summary>
         /// Display the player's name on all other clients.
         /// </summary>
@@ -108,7 +109,7 @@ namespace SEE.Game.Avatars
             // Send the player's name to the server for distribution to other clients.
             if (!IsServer)
             {
-                SendPlayernameFromClientsToServerRpc(OwnerClientId, playerName);
+                SendPlayernameFromClientToServerRpc(OwnerClientId, playerName);
             }
             else
             {
@@ -116,5 +117,6 @@ namespace SEE.Game.Avatars
                 SendPlayernameToClientsRpc(playerName);
             }
         }
+        */
     }
 }
