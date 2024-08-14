@@ -7,6 +7,8 @@ namespace SEE.Game.Avatars
     /// <summary>
     /// Sends and shows playerName for each player.
     /// </summary>
+    /// <remarks>This behaviour is attached to the player prefabs. It will be executed
+    /// by both server and clients.</remarks>
     public class PlayerName : NetworkBehaviour
     {
         /// <summary>
@@ -20,7 +22,6 @@ namespace SEE.Game.Avatars
         /// </summary>
         private string playerName;
 
-
         private void Start()
         {
             Net.Network networkConfig = FindObjectOfType<Net.Network>() ?? throw new("Network configuration not found");
@@ -30,7 +31,7 @@ namespace SEE.Game.Avatars
             // Display the local player's name as "Me".
             if (IsOwner)
             {
-                DisplayLocalPlayerName();
+                displayNameText.text = "Me";
             }
 
             if (IsServer)
@@ -95,14 +96,6 @@ namespace SEE.Game.Avatars
         private void RenderNetworkPlayerName(string playername)
         {
             displayNameText.text = playername;
-        }
-
-        /// <summary>
-        /// Display the local player's name as "Me".
-        /// </summary>
-        private void DisplayLocalPlayerName()
-        {
-            displayNameText.text = "Me";
         }
 
         /// <summary>
