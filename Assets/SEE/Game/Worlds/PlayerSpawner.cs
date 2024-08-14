@@ -118,7 +118,6 @@ namespace SEE.Game.Worlds
             numberOfSpawnedPlayers++;
             player.name = "Player " + numberOfSpawnedPlayers;
 
-
 #if DEBUG
             Debug.Log($"Spawned {player.name} (network id of owner: {owner}, "
                 + "local: {IsLocal(owner)}) at position {player.transform.position}.\n");
