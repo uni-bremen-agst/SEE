@@ -1,5 +1,7 @@
 ﻿using SEE.UI.Notification;
+using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Game.Avatars
 {
@@ -42,7 +44,24 @@ namespace SEE.Game.Avatars
         /// <returns>corresponding playerName</returns>
         public static string GetPlayerName(ulong clientId)
         {
-            return playerNames.ContainsKey(clientId) ? playerNames[clientId] : "Unknown";
+            if (playerNames.TryGetValue(clientId, out string playerName))
+            {
+                return playerName;
+            }
+            else
+            {
+                Debug.LogError($"Player name of client {clientId} is unknown.\n");
+                Dump();
+                return "Unknown";
+            }
+        }
+
+        private static void Dump()
+        {
+            foreach (var entry in playerNames)
+            {
+                Debug.Log($"PlayerNameManager: {entry.Key} => {entry.Value}\n");
+            }
         }
 
         /// <summary>
