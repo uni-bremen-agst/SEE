@@ -4132,6 +4132,7 @@ GameObject:
   - component: {fileID: 6273225552245144852}
   - component: {fileID: 2832998011441903611}
   - component: {fileID: 6414529331699477336}
+  - component: {fileID: 2529167183598849621}
   m_Layer: 0
   m_Name: XRTabletCanvas
   m_TagString: Untagged
@@ -4322,6 +4323,27 @@ MonoBehaviour:
   spaceButton: {fileID: 292362367710146856}
   enterButton: {fileID: 8763907132438060759}
   inputField: {fileID: 0}
+--- !u!65 &2529167183598849621
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3241565406219365233}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 0.05, y: 0.5, z: 0.7}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &3273956358917248303
 GameObject:
   m_ObjectHideFlags: 0
