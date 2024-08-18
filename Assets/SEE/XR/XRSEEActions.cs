@@ -2,11 +2,13 @@ using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.GO;
+using SEE.Utils;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Inputs;
@@ -154,9 +156,19 @@ public class XRSEEActions : MonoBehaviour
 
     public static bool OnSelectToggle { get; set; }
 
+    public static bool OnTreeViewToggle { get; set; }
+
+    public static GameObject TreeViewEntry { get; set; }
+
     private void Tooltip(InputAction.CallbackContext context)
     {
-        if (hovering)
+        if (OnTreeViewToggle)
+        {
+            TooltipToggle = true;
+            TreeViewEntry.TryGetComponentOrLog(out PointerHelper pointerHelper);
+            pointerHelper.ThumbstickEvent.Invoke(new PointerEventData(EventSystem.current));
+        }
+        else if (hovering && !OnTreeViewToggle)
         {
             TooltipToggle = true;
         }

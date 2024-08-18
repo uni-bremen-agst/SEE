@@ -103,15 +103,18 @@ namespace SEE.UI.PopupMenu
             }
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
-            pointerHelper.ExitEvent.AddListener(x =>
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
-                // If the mouse is not moving, this may indicate that the trigger has just been
-                // menu entries being rebuilt instead of the mouse moving outside of the menu.
-                if (x.IsPointerMoving())
+                pointerHelper.ExitEvent.AddListener(x =>
                 {
-                    HideMenuAsync().Forget();
-                }
-            });
+                    // If the mouse is not moving, this may indicate that the trigger has just been
+                    // menu entries being rebuilt instead of the mouse moving outside of the menu.
+                    if (x.IsPointerMoving())
+                    {
+                        HideMenuAsync().Forget();
+                    }
+                });
+            }
 
             // We add all entries that were added before the menu was started.
             while (entriesBeforeStart.Count > 0)
@@ -187,6 +190,7 @@ namespace SEE.UI.PopupMenu
                 action.Action();
                 if (action.CloseAfterClick)
                 {
+                    XRSEEActions.OnSelectToggle = false;
                     HideMenuAsync().Forget();
                 }
             }

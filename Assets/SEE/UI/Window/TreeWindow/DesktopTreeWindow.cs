@@ -392,10 +392,43 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    {
+                        pointerHelper.EnterEvent.AddListener(e => { XRSEEActions.OnTreeViewToggle = true; XRSEEActions.TreeViewEntry = item; });
+                        pointerHelper.ExitEvent.AddListener(e => XRSEEActions.OnTreeViewToggle = false);
+                        pointerHelper.ThumbstickEvent.AddListener(e =>
+                        {
+                            if (XRSEEActions.TooltipToggle)
+                            {
+                                if (representedGraphElement == null)
+                                {
+                                    // There are no applicable actions for this item.
+                                    return;
+                                }
+
+                                // We want all applicable actions for the element, except ones where the element
+                                // element is shown in the TreeWindow, since we are already in the TreeWindow.
+                                IEnumerable<PopupMenuAction> actions = ContextMenuAction
+                                                                       .GetApplicableOptions(representedGraphElement,
+                                                                                             representedGameObject)
+                                                                       .Where(x => !x.Name.Contains("TreeWindow"));
+                                actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
+                                {
+                                    searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                    Rebuild();
+                                }, Icons.Hide));
+                                XRSEEActions.TooltipToggle = false;
+                                XRSEEActions.OnSelectToggle = true;
+                                XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray);
+                                contextMenu.ShowWith(actions, ray.point);
+                            }
+                        });
+                    }
+
                     // Right click opens the context menu, left/middle click expands/collapses the item.
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        if (e.button == PointerEventData.InputButton.Right || XRSEEActions.ContextMenu)
+                        if (e.button == PointerEventData.InputButton.Right)
                         {
                             if (representedGraphElement == null)
                             {

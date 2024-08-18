@@ -115,6 +115,11 @@ namespace SEE.UI.DebugAdapterProtocol
             pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Starts a debug session.
         /// </summary>

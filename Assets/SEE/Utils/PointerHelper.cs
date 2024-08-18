@@ -31,6 +31,8 @@ namespace SEE.Utils
         /// </summary>
         public readonly UnityEvent<PointerEventData> ClickEvent = new();
 
+        public readonly UnityEvent<PointerEventData> ThumbstickEvent = new();
+
         /// <summary>
         /// Invokes the <see cref="ExitEvent"/>.
         /// </summary>
