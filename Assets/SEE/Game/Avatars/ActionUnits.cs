@@ -17,149 +17,107 @@ namespace SEE.Game.Avatars
         // Brow strings.
         private const string BrowRaiseInnerL = "Brow_Raise_Inner_L";
         private const string BrowRaiseInnerR = "Brow_Raise_Inner_R";
-
         private const string BrowRaiseOuterL = "Brow_Raise_Outer_L";
         private const string BrowRaiseOuterR = "Brow_Raise_Outer_R";
-
         private const string BrowCompressL = "Brow_Compress_L";
         private const string BrowCompressR = "Brow_Compress_R";
-
         private const string BrowDropL = "Brow_Drop_L";
         private const string BrowDropR = "Brow_Drop_R";
 
         // Eye strings.
         private const string EyeWideL = "Eye_Wide_L";
         private const string EyeWideR = "Eye_Wide_R";
-
         private const string EyeSquintL = "Eye_Squint_L";
         private const string EyeSquintR = "Eye_Squint_R";
-
         private const string EyeBlinkL = "Eye_Blink_L";
         private const string EyeBlinkR = "Eye_Blink_R";
 
         // Cheek strings.
         private const string CheekRaiseL = "Cheek_Raise_L";
         private const string CheekRaiseR = "Cheek_Raise_R";
-
         private const string CheekPuffL = "Cheek_Puff_L";
         private const string CheekPuffR = "Cheek_Puff_R";
-
         private const string CheekSuckL = "Cheek_Suck_L";
         private const string CheekSuckR = "Cheek_Suck_R";
 
         // Mouth strings.
         private const string MouthSmileL = "Mouth_Smile_L";
         private const string MouthSmileR = "Mouth_Smile_R";
-
         private const string MouthClose = "Mouth_Close";
         private const string Mouth_Contract = "Mouth_Contract";
-
         private const string MouthUpUpperL = "Mouth_Up_Upper_L";
         private const string MouthUpUpperR = "Mouth_Up_Upper_R";
-
         private const string MouthSmileSharpL = "Mouth_Smile_Sharp_L";
         private const string MouthSmileSharpR = "Mouth_Smile_Sharp_R";
-
         private const string MouthDimpleL = "Mouth_Dimple_L";
         private const string MouthDimpleR = "Mouth_Dimple_R";
-
         private const string MouthFrownL = "Mouth_Frown_L";
         private const string MouthFrownR = "Mouth_Frown_R";
-
         private const string MouthDownLowerL = "Mouth_Down_Lower_L";
         private const string MouthDownLowerR = "Mouth_Down_Lower_R";
-
         private const string MouthChinUp = "Mouth_Chin_Up";
-
         private const string MouthPuckerUpL = "Mouth_Pucker_Up_L";
         private const string MouthPuckerUpR = "Mouth_Pucker_Up_R";
-
         private const string MouthPuckerDownL = "Mouth_Pucker_Down_L";
         private const string MouthPuckerDownR = "Mouth_Pucker_Down_R";
-
         private const string MouthStretchL = "Mouth_Stretch_L";
         private const string MouthStretchR = "Mouth_Stretch_R";
-
         private const string MouthFunnelUpL = "Mouth_Funnel_Up_L";
         private const string MouthFunnelUpR = "Mouth_Funnel_Up_R";
-
         private const string MouthFunnelDownL = "Mouth_Funnel_Down_L";
         private const string MouthFunnelDownR = "Mouth_Funnel_Down_R";
-
         private const string MouthTightenL = "Mouth_Tighten_L";
         private const string MouthTightenR = "Mouth_Tighten_R";
-
         private const string MouthPressL = "Mouth_Press_L";
         private const string MouthPressR = "Mouth_Press_R";
-
         private const string MouthShrugUpper = "Mouth_Shrug_Upper";
         private const string MouthShrugLower = "Mouth_Shrug_Lower";
-
         private const string MouthRollInUpperL = "Mouth_Roll_In_Upper_L";
         private const string MouthRollInUpperR = "Mouth_Roll_In_Upper_R";
-
         private const string MouthRollInLowerL = "Mouth_Roll_In_Lower_L";
         private const string MouthRollInLowerR = "Mouth_Roll_In_Lower_R";
-
         private const string MouthBlowL = "Mouth_Blow_L";
         private const string MouthBlowR = "Mouth_Blow_R";
-
         private const string MouthUpLowerR = "Mouth_Up_Lower_R";
-
         private const string MouthRollOutUpperL = "Mouth_Roll_Out_Upper_L";
         private const string MouthRollOutUpperR = "Mouth_Roll_Out_Upper_R";
-
         private const string MouthRollOutLowerL = "Mouth_Roll_Out_Lower_L";
         private const string MouthRollOutLowerR = "Mouth_Roll_Out_Lower_R";
-
         private const string MouthPushUpperL = "Mouth_Push_Upper_L";
         private const string MouthPushUpperR = "Mouth_Push_Upper_R";
-
         private const string MouthPushLowerL = "Mouth_Push_Lower_L";
         private const string MouthPushLowerR = "Mouth_Push_Lower_R";
-
         private const string MouthLowerL = "Mouth_Lower_L";
         private const string MouthLowerR = "Mouth_Lower_R";
-
         private const string MouthUp = "Mouth_Up";
 
         // Jaw strings.
         private const string JawOpen = "Jaw_Open";
         private const string JawDown = "Jaw_Down";
         private const string JawForward = "Jaw_Forward";
-
         private const string JawL = "Jaw_L";
         private const string JawUp = "Jaw_Up";
 
         // Nose strings.
         private const string NoseSneerL = "Nose_Sneer_L";
         private const string NoseSneerR = "Nose_Sneer_R";
-
         private const string NoseCreaseL = "Nose_Crease_L";
         private const string NoseCreaseR = "Nose_Crease_R";
-
         private const string NoseNostrilDilateL = "Nose_Nostril_Dilate_L";
         private const string NoseNostrilDilateR = "Nose_Nostril_Dilate_R";
-
         private const string NoseNostrilInL = "Nose_Nostril_In_L";
         private const string NoseNostrilInR = "Nose_Nostril_In_R";
-
         private const string NoseNostrilRaiseL = "Nose_Nostril_Raise_L";
         private const string NoseNostrilRaiseR = "Nose_Nostril_Raise_R";
-
         private const string NoseTipUp = "Nose_Tip_Up";
 
         // Tongue strings.
         private const string TongueOut = "Tongue_Out";
         private const string TongueUp = "Tongue_Up";
-
         private const string TongueWide = "Tongue_Wide";
-
         private const string TongueR = "Tongue_R";
-
         private const string TongueTipDown = "Tongue_Tip_Down";
         private const string TongueNarrow = "Tongue_Narrow";
-
         private const string TongueBulgeL = "Tongue_Bulge_L";
 
         // Neck strings.
@@ -636,7 +594,7 @@ namespace SEE.Game.Avatars
         public float Neck_Tighten_R_Value;
 
         /// <summary>
-        /// Get and set the SkinnedMeshRenderer at the start.
+        /// Get and set the SkinnedMeshRenderer of the cc4 avatar at start.
         /// </summary>
         void Start()
         {
@@ -821,6 +779,9 @@ namespace SEE.Game.Avatars
                 SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(BrowRaiseOuterL));
         }
 
+        /// <summary>
+        /// Performs ActionUnit03.
+        /// </summary>
         private void PerformActionUnit03()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(BrowRaiseInnerL), AU_03);
@@ -838,6 +799,9 @@ namespace SEE.Game.Avatars
                 SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(BrowRaiseOuterR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit04.
+        /// </summary>
         private void PerformActionUnit04()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(BrowDropL), ConvertNumberMaintainingRange(0f, 115f, AU_04));
@@ -865,6 +829,9 @@ namespace SEE.Game.Avatars
             */
         }
 
+        /// <summary>
+        /// Performs ActionUnit05.
+        /// </summary>
         private void PerformActionUnit05()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeWideL), AU_05);
@@ -874,6 +841,9 @@ namespace SEE.Game.Avatars
             Eye_Wide_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(EyeWideR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit06.
+        /// </summary>
         private void PerformActionUnit06()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekRaiseL),
@@ -901,6 +871,9 @@ namespace SEE.Game.Avatars
                 SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(BrowRaiseOuterR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit07.
+        /// </summary>
         private void PerformActionUnit07()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeSquintL), AU_07);
@@ -910,6 +883,9 @@ namespace SEE.Game.Avatars
             Eye_Squint_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(EyeSquintR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit08.
+        /// </summary>
         private void PerformActionUnit08()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthClose), ConvertNumberMaintainingRange(0f, 10f, AU_08));
@@ -921,6 +897,9 @@ namespace SEE.Game.Avatars
             Jaw_Open_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawOpen));
         }
 
+        /// <summary>
+        /// Performs ActionUnit09.
+        /// </summary>
         private void PerformActionUnit09()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NoseSneerL), ConvertNumberMaintainingRange(0f, 20f, AU_09));
@@ -948,7 +927,6 @@ namespace SEE.Game.Avatars
 
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NoseTipUp), ConvertNumberMaintainingRange(0f, 50f, AU_09));
 
-
             Nose_Tip_Up_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseTipUp));
 
             Brow_Raise_Outer_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(BrowRaiseOuterL));
@@ -973,9 +951,11 @@ namespace SEE.Game.Avatars
 
             Nose_Raise_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseNostrilRaiseL));
             Nose_Raise_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseNostrilRaiseR));
-
         }
 
+        /// <summary>
+        /// Performs ActionUnit10.
+        /// </summary>
         private void PerformActionUnit10()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpUpperL), AU_10);
@@ -985,6 +965,9 @@ namespace SEE.Game.Avatars
             Mouth_Up_Upper_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthUpUpperR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit11.
+        /// </summary>
         private void PerformActionUnit11()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NoseCreaseL), AU_11);
@@ -994,6 +977,9 @@ namespace SEE.Game.Avatars
             Nose_Crease_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseCreaseR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit12.
+        /// </summary>
         private void PerformActionUnit12()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSmileL), ConvertNumberMaintainingRange(0f, 75f, AU_12));
@@ -1015,6 +1001,9 @@ namespace SEE.Game.Avatars
             //Mouth_Frown_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthFrownR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit13.
+        /// </summary>
         private void PerformActionUnit13()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthSmileSharpL), AU_13);
@@ -1024,6 +1013,9 @@ namespace SEE.Game.Avatars
             Mouth_Smile_Sharp_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthSmileSharpR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit14.
+        /// </summary>
         private void PerformActionUnit14()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthDimpleL), AU_14);
@@ -1033,6 +1025,9 @@ namespace SEE.Game.Avatars
             Mouth_Dimple_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthDimpleR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit15.
+        /// </summary>
         private void PerformActionUnit15()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthFrownL), AU_15);
@@ -1042,6 +1037,9 @@ namespace SEE.Game.Avatars
             Mouth_Frown_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthFrownR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit16.
+        /// </summary>
         private void PerformActionUnit16()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthDownLowerL), AU_16);
@@ -1051,6 +1049,9 @@ namespace SEE.Game.Avatars
             Mouth_Down_Lower_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthDownLowerR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit17.
+        /// </summary>
         private void PerformActionUnit17()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthChinUp), ConvertNumberMaintainingRange(0f, 125f, AU_17));
@@ -1066,7 +1067,6 @@ namespace SEE.Game.Avatars
 
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthRollInLowerL), ConvertNumberMaintainingRange(0f, 40f, AU_17));
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthRollInLowerR), ConvertNumberMaintainingRange(0f, 40f, AU_17));
-
 
             Mouth_Chin_Up_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthChinUp));
 
@@ -1084,6 +1084,9 @@ namespace SEE.Game.Avatars
             Mouth_Roll_In_Lower_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthRollInLowerR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit18.
+        /// </summary>
         private void PerformActionUnit18()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthPuckerUpL), AU_18);
@@ -1097,8 +1100,9 @@ namespace SEE.Game.Avatars
             Mouth_Pucker_Down_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthPuckerDownR));
         }
 
-
-        // TODO: Tongue Blendshapes non existent but under CC_Base_Tongue
+        /// <summary>
+        /// Performs ActionUnit19.
+        /// </summary>
         private void PerformActionUnit19()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthDownLowerL), ConvertNumberMaintainingRange(0f, 20f, AU_19));
@@ -1118,6 +1122,9 @@ namespace SEE.Game.Avatars
             Jaw_Open_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawOpen));
         }
 
+        /// <summary>
+        /// Performs ActionUnit20.
+        /// </summary>
         private void PerformActionUnit20()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthStretchL), ConvertNumberMaintainingRange(0f, 75f, AU_20));
@@ -1135,7 +1142,6 @@ namespace SEE.Game.Avatars
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NeckTightenL), ConvertNumberMaintainingRange(0f, 50f, AU_20));
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NeckTightenR), ConvertNumberMaintainingRange(0f, 50f, AU_20));
 
-
             Mouth_Stretch_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthStretchL));
             Mouth_Stretch_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthStretchR));
 
@@ -1150,9 +1156,11 @@ namespace SEE.Game.Avatars
 
             Neck_Tighten_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NeckTightenL));
             Neck_Tighten_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NeckTightenR));
-
         }
 
+        /// <summary>
+        /// Performs ActionUnit21.
+        /// </summary>
         private void PerformActionUnit21()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NeckTightenL), AU_21);
@@ -1162,6 +1170,9 @@ namespace SEE.Game.Avatars
             Neck_Tighten_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NeckTightenR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit21.
+        /// </summary>
         private void PerformActionUnit22()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthFunnelUpL), AU_22);
@@ -1175,6 +1186,9 @@ namespace SEE.Game.Avatars
             Mouth_Funnel_Down_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthFunnelDownR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit23.
+        /// </summary>
         private void PerformActionUnit23()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthTightenL), AU_23);
@@ -1184,6 +1198,9 @@ namespace SEE.Game.Avatars
             Mouth_Tighten_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthTightenR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit24.
+        /// </summary>
         private void PerformActionUnit24()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthPressL), AU_24);
@@ -1241,6 +1258,9 @@ namespace SEE.Game.Avatars
             Mouth_Blow_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthBlowR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit25.
+        /// </summary>
         private void PerformActionUnit25()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthShrugUpper), ConvertNumberMaintainingRange(0f, 60f, AU_25));
@@ -1250,6 +1270,9 @@ namespace SEE.Game.Avatars
             Mouth_Shrug_Lower_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthShrugLower));
         }
 
+        /// <summary>
+        /// Performs ActionUnit26.
+        /// </summary>
         private void PerformActionUnit26()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawDown), AU_26);
@@ -1257,6 +1280,9 @@ namespace SEE.Game.Avatars
             Jaw_Down_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawDown));
         }
 
+        /// <summary>
+        /// Performs ActionUnit27.
+        /// </summary>
         private void PerformActionUnit27()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawOpen), AU_27);
@@ -1264,6 +1290,9 @@ namespace SEE.Game.Avatars
             Jaw_Open_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawOpen));
         }
 
+        /// <summary>
+        /// Performs ActionUnit28.
+        /// </summary>
         private void PerformActionUnit28()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthRollInUpperL), AU_28);
@@ -1277,6 +1306,9 @@ namespace SEE.Game.Avatars
             Mouth_Roll_In_Lower_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthRollInLowerR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit29.
+        /// </summary>
         private void PerformActionUnit29()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawForward), AU_29);
@@ -1284,6 +1316,9 @@ namespace SEE.Game.Avatars
             Jaw_Forward_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawForward));
         }
 
+        /// <summary>
+        /// Performs ActionUnit30.
+        /// </summary>
         private void PerformActionUnit30()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawL), AU_30);
@@ -1291,6 +1326,9 @@ namespace SEE.Game.Avatars
             Jaw_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawL));
         }
 
+        /// <summary>
+        /// Performs ActionUnit31.
+        /// </summary>
         private void PerformActionUnit31()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(JawUp), AU_31);
@@ -1298,7 +1336,9 @@ namespace SEE.Game.Avatars
             Jaw_Up_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawUp));
         }
 
-        // TODO Abhängigkeiten
+        /// <summary>
+        /// Performs ActionUnit32.
+        /// </summary>
         private void PerformActionUnit32()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthRollInLowerL), ConvertNumberMaintainingRange(0f, 50f, AU_32));
@@ -1314,6 +1354,9 @@ namespace SEE.Game.Avatars
             Jaw_Open_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawOpen));
         }
 
+        /// <summary>
+        /// Performs ActionUnit33.
+        /// </summary>
         private void PerformActionUnit33()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthBlowL), AU_33);
@@ -1323,6 +1366,9 @@ namespace SEE.Game.Avatars
             Mouth_Blow_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthBlowR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit34.
+        /// </summary>
         private void PerformActionUnit34()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekPuffL), AU_34);
@@ -1332,6 +1378,9 @@ namespace SEE.Game.Avatars
             Cheek_Puff_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(CheekPuffR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit35.
+        /// </summary>
         private void PerformActionUnit35()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(CheekSuckL), AU_35);
@@ -1341,6 +1390,9 @@ namespace SEE.Game.Avatars
             Cheek_Suck_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(CheekSuckR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit36.
+        /// </summary>
         private void PerformActionUnit36()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(TongueBulgeL), AU_36);
@@ -1348,6 +1400,9 @@ namespace SEE.Game.Avatars
             Tongue_Bulge_L_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(TongueBulgeL));
         }
 
+        /// <summary>
+        /// Performs ActionUnit37.
+        /// </summary>
         private void PerformActionUnit37()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(MouthUpUpperR), ConvertNumberMaintainingRange(0f, 20f, AU_37));
@@ -1367,6 +1422,9 @@ namespace SEE.Game.Avatars
             Jaw_Open_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(JawOpen));
         }
 
+        /// <summary>
+        /// Performs ActionUnit38.
+        /// </summary>
         private void PerformActionUnit38()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NoseNostrilDilateL), AU_38);
@@ -1376,6 +1434,9 @@ namespace SEE.Game.Avatars
             Nose_Nostril_Dilate_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseNostrilDilateR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit39.
+        /// </summary>
         private void PerformActionUnit39()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(NoseNostrilInL), AU_39);
@@ -1385,7 +1446,9 @@ namespace SEE.Game.Avatars
             Nose_Nostril_In_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(NoseNostrilInR));
         }
 
-        // TODO Negativ values in CC4 - how to present in unity??
+        /// <summary>
+        /// Performs ActionUnit43.
+        /// </summary>
         private void PerformActionUnit43()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(BrowRaiseOuterL), NoValue);
@@ -1411,6 +1474,9 @@ namespace SEE.Game.Avatars
             Mouth_Smile_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(MouthSmileR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit45.
+        /// </summary>
         private void PerformActionUnit45()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeBlinkL), AU_45);
@@ -1420,6 +1486,9 @@ namespace SEE.Game.Avatars
             Eye_Blink_R_Value = SkinnedMeshRenderer.GetBlendShapeWeight(BlendShapeByString(EyeBlinkR));
         }
 
+        /// <summary>
+        /// Performs ActionUnit46.
+        /// </summary>
         private void PerformActionUnit46()
         {
             SkinnedMeshRenderer.SetBlendShapeWeight(BlendShapeByString(EyeBlinkL), ConvertNumberMaintainingRange(0f, 90f, AU_46));
