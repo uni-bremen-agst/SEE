@@ -159,6 +159,11 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
+        /// <summary>
+        /// Defines if node type may be manually resized by users.
+        /// </summary>
+        [Tooltip("May users resize this type of node?.")]
+        public bool AllowManualResize = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -178,6 +183,7 @@ namespace SEE.Game.City
             AntennaSettings.Save(writer, antennaSettingsLabel);
             writer.Save(OutlineWidth, outlineWidthLabel);
             writer.Save(ShowNames, showNamesLabel);
+            writer.Save(AllowManualResize, allowManualResizeLabel);
             writer.EndGroup();
         }
 
@@ -213,6 +219,7 @@ namespace SEE.Game.City
             AntennaSettings.Restore(values, antennaSettingsLabel);
             ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
             ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
+            ConfigIO.Restore(values, allowManualResizeLabel, ref AllowManualResize);
         }
 
         /// <summary>
@@ -255,5 +262,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="ShowNames"/>.
         /// </summary>
         private const string showNamesLabel = "ShowNames";
+
+        /// <summary>
+        /// Label in the configuration file for <see cref="AllowManualResize"/>.
+        /// </summary>
+        private const string allowManualResizeLabel = "AllowManualResize";
     }
 }

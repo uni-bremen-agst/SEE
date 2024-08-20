@@ -50,65 +50,67 @@ namespace SEE.Game
             }
 
             // The mapping is only possible if mapping target is actually a node.
-            if (mappingTarget.TryGetNode(out Node target))
+            if (!mappingTarget.TryGetNode(out Node target))
             {
-                // The source of the mapping
-                Node source = mappingSource.GetNode();
+                return;
+            }
 
-                if (source.ItsGraph != target.ItsGraph)
-                {
-                    throw new Exception("For a mapping, both nodes must be in the same graph.");
-                }
+            // The source of the mapping
+            Node source = mappingSource.GetNode();
 
-                // implementation -> architecture
-                if (source.IsInImplementation() && target.IsInArchitecture())
-                {
-                    // If there is a previous mapping that already mapped the node
-                    // on the current target, nothing needs to be done.
-                    // If there is a previous mapping that mapped the node onto
-                    // another target, the previous mapping must be reverted and the
-                    // node must be mapped onto the new target.
+            if (source.ItsGraph != target.ItsGraph)
+            {
+                throw new Exception("For a mapping, both nodes must be in the same graph.");
+            }
 
-                    reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
-                    mappingSource.transform.SetParent(mappingTarget.transform);
-                }
-                // implementation -> implementation
-                else if (source.IsInImplementation() && target.IsInImplementation())
+            // implementation -> architecture
+            if (source.IsInImplementation() && target.IsInArchitecture())
+            {
+                // If there is a previous mapping that already mapped the node
+                // on the current target, nothing needs to be done.
+                // If there is a previous mapping that mapped the node onto
+                // another target, the previous mapping must be reverted and the
+                // node must be mapped onto the new target.
+
+                reflexionCity.ReflexionGraph.AddToMapping(source, target, overrideMapping: true);
+                mappingSource.transform.SetParent(mappingTarget.transform);
+            }
+            // implementation -> implementation
+            else if (source.IsInImplementation() && target.IsInImplementation())
+            {
+                if (reflexionCity.ReflexionGraph.IsExplicitlyMapped(source))
                 {
-                    if (reflexionCity.ReflexionGraph.IsExplicitlyMapped(source))
-                    {
-                        reflexionCity.ReflexionGraph.RemoveFromMapping(source);
-                    }
-                    // TODO (falko17): This branch and the next branch can be merged as soon
-                    // as the general Unparent and AddChild methods are implemented.
-                    // This changes the node hierarchy in the implementation only.
-                    if (source.Parent != null)
-                    {
-                        // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
-                        // TODO: Implement a proper transaction model for the reflexion analysis.
-                        reflexionCity.ReflexionGraph.UnparentInImplementation(source);
-                    }
-                    reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
-                    mappingSource.transform.SetParent(mappingTarget.transform);
+                    reflexionCity.ReflexionGraph.RemoveFromMapping(source);
                 }
-                // architecture -> architecture
-                else if (source.IsInArchitecture() && target.IsInArchitecture())
+                // TODO (falko17): This branch and the next branch can be merged as soon
+                // as the general Unparent and AddChild methods are implemented.
+                // This changes the node hierarchy in the implementation only.
+                if (source.Parent != null)
                 {
-                    // TODO (falko17): This branch and the previous branch can be merged as soon
-                    // as the general Unparent and AddChild methods are implemented.
-                    // This changes the node hierarchy in the architecture only.
-                    if (source.Parent != null)
-                    {
-                        reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
-                    }
-                    reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
-                    mappingSource.transform.SetParent(mappingTarget.transform);
+                    // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
+                    // TODO: Implement a proper transaction model for the reflexion analysis.
+                    reflexionCity.ReflexionGraph.UnparentInImplementation(source);
                 }
-                // architecture -> implementation: forbidden
-                else
+                reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
+                mappingSource.transform.SetParent(mappingTarget.transform);
+            }
+            // architecture -> architecture
+            else if (source.IsInArchitecture() && target.IsInArchitecture())
+            {
+                // TODO (falko17): This branch and the previous branch can be merged as soon
+                // as the general Unparent and AddChild methods are implemented.
+                // This changes the node hierarchy in the architecture only.
+                if (source.Parent != null)
                 {
-                    // Nothing to be done.
+                    reflexionCity.ReflexionGraph.UnparentInArchitecture(source);
                 }
+                reflexionCity.ReflexionGraph.AddChildInArchitecture(source, target);
+                mappingSource.transform.SetParent(mappingTarget.transform);
+            }
+            // architecture -> implementation: forbidden
+            else
+            {
+                // Nothing to be done.
             }
         }
 

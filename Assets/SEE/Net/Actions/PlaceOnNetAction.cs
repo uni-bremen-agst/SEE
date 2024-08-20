@@ -1,13 +1,14 @@
-﻿using SEE.Game;
+﻿using System;
+using SEE.Game;
 using SEE.Game.SceneManipulation;
 using UnityEngine;
 
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Propagates <see cref="GameNodeMover.PutOnAndFit"/> through the network.
+    /// Propagates <see cref="GameNodeMover.PlaceOn"/> through the network.
     /// </summary>
-    internal class PutOnAndFitNetAction : AbstractNetAction
+    internal class PlaceOnNetAction : AbstractNetAction
     {
         /// <summary>
         /// The unique name of the child gameObject that needs to be put onto a new parent.
@@ -20,17 +21,6 @@ namespace SEE.Net.Actions
         /// Must be known to <see cref="GraphElementIDMap"/>.
         /// </summary>
         public string NewParentID;
-
-        /// <summary>
-        /// The unique name of the gameObject that was the original parent of the child.
-        /// Must be known to <see cref="GraphElementIDMap"/>.
-        /// </summary>
-        public string OriginalParentID;
-
-        /// <summary>
-        /// The original scale of the child relative to its original parent (local scale).
-        /// </summary>
-        public Vector3 OriginalLocalScale;
 
         /// <summary>
         /// Constructor.
@@ -46,12 +36,10 @@ namespace SEE.Net.Actions
         /// must be known to <see cref="GraphElementIDMap"/>.</param>
         /// <param name="originalLocalScale">the original local scale of <paramref name="childID"/>
         /// relative to <paramref name="originalParentID"/></param>
-        public PutOnAndFitNetAction(string childID, string newParentID, string originalParentID, Vector3 originalLocalScale)
+        public PlaceOnNetAction(string childID, string newParentID)
         {
             ChildID = childID;
             NewParentID = newParentID;
-            OriginalParentID = originalParentID;
-            OriginalLocalScale = originalLocalScale;
         }
 
         /// <summary>
@@ -61,8 +49,7 @@ namespace SEE.Net.Actions
         {
             GameObject child = Find(ChildID);
             GameObject newParent = Find(NewParentID);
-            GameObject originalParent = Find(OriginalParentID);
-            GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
+            GameNodeMover.PlaceOn(child.transform, newParent);
         }
 
         /// <summary>
