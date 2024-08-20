@@ -96,6 +96,15 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Gets the current executed action.
+        /// </summary>
+        /// <returns>The current executed action.</returns>
+        public static IReversibleAction CurrentAction()
+        {
+            return history.CurrentAction;
+        }
+
+        /// <summary>
         /// True if the action history is empty.
         /// </summary>
         /// <returns>true if the action history is empty</returns>

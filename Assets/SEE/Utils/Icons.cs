@@ -10,6 +10,8 @@ namespace SEE.Utils
     /// </summary>
     public static class Icons
     {
+        public const char ArrowLeft = '\uF060';
+        public const char ArrowRight = '\uF061';
         public const char ArrowRotateLeft = '\uF0E2';
         public const char Bars = '\uF0C9';
         public const char Broadcast = '\uF519';

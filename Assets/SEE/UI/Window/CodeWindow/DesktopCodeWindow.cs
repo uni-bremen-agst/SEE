@@ -50,6 +50,7 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             base.StartDesktop();
+            ActivateWindowDraggerButtons();
 
             scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";

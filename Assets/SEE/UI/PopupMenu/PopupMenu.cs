@@ -1,9 +1,9 @@
-using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -70,12 +70,36 @@ namespace SEE.UI.PopupMenu
         /// <summary>
         /// The height of the menu.
         /// </summary>
-        private float MenuHeight => menu.sizeDelta.y;
+        private float MenuHeight => GetHeight();
+
+        /// <summary>
+        /// The width of the menu.
+        /// </summary>
+        private float MenuWidth => menu.sizeDelta.x;
 
         /// <summary>
         /// Duration of the animation that is used to show or hide the menu.
         /// </summary>
         private const float animationDuration = 0.5f;
+
+        /// <summary>
+        /// The popup entries.
+        /// </summary>
+        private readonly List<GameObject> entries = new();
+
+        /// <summary>
+        /// Gets the height of the menu.
+        /// </summary>
+        /// <returns>The current height.</returns>
+        private float GetHeight()
+        {
+            float height = 0;
+            foreach (GameObject obj in entries)
+            {
+                height += ((RectTransform)obj.transform).rect.height;
+            }
+            return height;
+        }
 
         protected override void StartDesktop()
         {
@@ -122,6 +146,9 @@ namespace SEE.UI.PopupMenu
 
             switch (entry)
             {
+                case PopupMenuActionDoubleIcon doubleIconAction:
+                    AddDoubleIconAction(doubleIconAction);
+                    break;
                 case PopupMenuAction action:
                     AddAction(action);
                     break;
@@ -139,9 +166,10 @@ namespace SEE.UI.PopupMenu
         /// Adds a new <paramref name="action"/> to the menu.
         /// </summary>
         /// <param name="action">The action to be added.</param>
-        private void AddAction(PopupMenuAction action)
+        /// <param name="actionItem">Whether the standard item for the action entry should be used.</param>
+        private void AddAction(PopupMenuAction action, GameObject actionItem = null)
         {
-            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", actionList, false);
+            actionItem ??= PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", actionList, false);
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
 
@@ -150,6 +178,7 @@ namespace SEE.UI.PopupMenu
             {
                 actionItem.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>().text = action.IconGlyph.ToString();
             }
+            entries.Add(actionItem);
             return;
 
             void OnClick()
@@ -163,6 +192,22 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
+        /// Adds a new <paramref name="doubleIconAction"/> to the menu.
+        /// It can be used for sub popup menu's.
+        /// </summary>
+        /// <param name="doubleIconAction">The sub menu to be added.</param>
+        private void AddDoubleIconAction(PopupMenuActionDoubleIcon doubleIconAction)
+        {
+            GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuSubMenuButton", actionList, false);
+            if (doubleIconAction.RightIconGlyph != default)
+            {
+                actionItem.transform.Find("RightIcon").gameObject.MustGetComponent<TextMeshProUGUI>()
+                    .text = doubleIconAction.RightIconGlyph.ToString();
+            }
+            AddAction(doubleIconAction, actionItem);
+        }
+
+        /// <summary>
         /// Adds a new <paramref name="heading"/> to the menu.
         /// </summary>
         /// <param name="heading">The heading to be added.</param>
@@ -171,6 +216,7 @@ namespace SEE.UI.PopupMenu
             GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", actionList, false);
             TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
             text.text = heading.Text;
+            entries.Add(headingItem);
         }
 
         /// <summary>
@@ -195,11 +241,11 @@ namespace SEE.UI.PopupMenu
                 entriesBeforeStart.Clear();
                 return;
             }
-
-            foreach (Transform child in actionList)
+            foreach (GameObject entry in entries)
             {
-                Destroyer.Destroy(child.gameObject);
+                DestroyImmediate(entry);
             }
+            entries.Clear();
         }
 
         /// <summary>
@@ -209,15 +255,19 @@ namespace SEE.UI.PopupMenu
         public void MoveTo(Vector2 position)
         {
             AdjustMenuHeight();
+            bool moved = false;
             if (position.y < MenuHeight * ScaleFactor)
             {
                 // If the menu is too close to the bottom of the screen, expand it upwards instead.
-                position.y += MenuHeight * ScaleFactor;
-                // The mouse should hover over the first menu item already rather than being just outside of it,
-                // so we move the menu down and to the left a bit.
-                position += new Vector2(-5, -5);
+                position.y = MenuHeight * ScaleFactor;
+                moved = true;
             }
-            else
+            if (Screen.width < position.x + MenuWidth * ScaleFactor)
+            {
+                position.x = Screen.width - MenuWidth * ScaleFactor;
+                moved = true;
+            }
+            if(!moved)
             {
                 // The mouse should hover over the first menu item already rather than being just outside of it,
                 // so we move the menu up and to the left a bit.
@@ -233,7 +283,7 @@ namespace SEE.UI.PopupMenu
         private void AdjustMenuHeight()
         {
             // Menu should not take up more than 40% of the screen.
-            float height = Mathf.Clamp(actionList.sizeDelta.y, 100f, Screen.height / (2.5f*ScaleFactor));
+            float height = Mathf.Clamp(MenuHeight, 100f, Screen.height / (2.5f * ScaleFactor));
             scrollView.sizeDelta = new Vector2(scrollView.sizeDelta.x, height);
         }
 

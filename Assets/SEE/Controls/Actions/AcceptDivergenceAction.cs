@@ -1,16 +1,16 @@
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.GO;
-using SEE.Utils.History;
-using UnityEngine;
-using System;
-using SEE.Game.SceneManipulation;
-using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.SceneManipulation;
+using SEE.GO;
+using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -158,6 +158,12 @@ namespace SEE.Controls.Actions
                     ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                 }
             }
+            if (ExecuteViaContextMenu)
+            {
+                bool divergenceSolved = createdEdge != null;
+                CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                return true;
+            }
             return false;
         }
 
@@ -223,13 +229,15 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="divergence">the edge representing the divergence</param>
         /// <returns>the new edge</returns>
-        public static Edge CreateConvergentEdge(Edge divergence)
+        public Edge CreateConvergentEdge(Edge divergence)
         {
+            ExecuteViaContextMenu = true;
             ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;
             Node source = graph.MapsTo(divergence.Source);
             Node target = graph.MapsTo(divergence.Target);
-            Memento memento = new(source, target, Edge.SourceDependency);
-            return CreateConvergentEdge(memento);
+            memento = new(source, target, Edge.SourceDependency);
+            createdEdge = CreateConvergentEdge(memento);
+            return createdEdge;
         }
 
         /// <summary>

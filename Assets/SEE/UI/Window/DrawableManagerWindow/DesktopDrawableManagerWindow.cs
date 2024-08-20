@@ -86,7 +86,6 @@ namespace SEE.UI.Window.DrawableManagerWindow
         {
             Title = "Drawable Surface Manager";
             base.StartDesktop();
-            DisableWindowDraggerButtons();
             Transform root = PrefabInstantiator.InstantiatePrefab(dmWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");
             scrollRect = root.gameObject.MustGetComponent<ScrollRect>();

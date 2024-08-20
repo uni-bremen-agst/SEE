@@ -22,7 +22,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu.PopupMenu contextMenu;
+        public readonly PopupMenu.PopupMenu contextMenu;
 
         /// <summary>
         /// The graph search associated with the tree window.
