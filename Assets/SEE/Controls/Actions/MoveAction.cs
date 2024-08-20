@@ -71,6 +71,11 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
+            /// </summary>
+            private Vector3 CursorOffset;
+
+            /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
             /// This needs to be known to interpret the re-parenting of a node properly.
             /// </summary>
@@ -81,11 +86,12 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
             /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObject"/> is null</exception>
-            public void Grab(GameObject gameObject)
+            public void Grab(GameObject gameObject, Vector3 cursorOffset)
             {
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
+                    CursorOffset = cursorOffset;
                     originalParent = gameObject.transform.parent;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
@@ -295,8 +301,8 @@ namespace SEE.Controls.Actions
             {
                 if (GrabbedGameObject)
                 {
-                    currentPositionOfGrabbedObject = targetPosition;
-                    MoveTo(GrabbedGameObject, targetPosition, 0);
+                    currentPositionOfGrabbedObject = targetPosition - CursorOffset;
+                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
                 }
             }
 
@@ -580,24 +586,35 @@ namespace SEE.Controls.Actions
                     {
                         return false;
                     }
+
+                    Vector3 cursorOffset = Vector3.zero;
+                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _) == HitGraphElement.Node)
+                    {
+                        cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
+                    }
+
                     // An object to be grabbed must be representing a node that is not the root.
                     if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
-                        grabbedObject.Grab(hoveredObject.gameObject);
+                        grabbedObject.Grab(hoveredObject.gameObject, cursorOffset);
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         CurrentState = IReversibleAction.Progress.InProgress;
                     }
+                    else
+                    {
+                        return false;
+                    }
                 }
 
-                Raycasting.RaycastLowestNode(out RaycastHit? raycastHit, out Node _, grabbedObject.Node);
-                if (raycastHit.HasValue)
+                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
+                if (targetObjectHit.HasValue)
                 {
-                    grabbedObject.MoveTo(raycastHit.Value.point);
+                    grabbedObject.MoveTo(targetObjectHit.Value.point);
                     // The grabbed node is not yet at its final destination. The user is still moving
                     // it. We will run a what-if reflexion analysis to give immediate feedback on the
                     // consequences if the user were putting the grabbed node onto the node the user
                     // is currently aiming at.
-                    grabbedObject.Reparent(raycastHit.Value.transform.gameObject);
+                    grabbedObject.Reparent(targetObjectHit.Value.transform.gameObject);
                 }
             }
             else if (grabbedObject.IsGrabbed) // dragging has ended
