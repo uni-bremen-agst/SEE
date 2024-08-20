@@ -251,6 +251,15 @@ namespace SEE.Controls
             return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
 
+        /// <summary>
+        /// True if the user wants to start the opening of the context menu.
+        /// </summary>
+        /// <returns>True if the user wants to start the opening of the context menu.</returns>
+        internal static bool StartOpenContextMenu()
+        {
+            return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+        }
+
         #endregion
 
         //-----------------------------------------------------

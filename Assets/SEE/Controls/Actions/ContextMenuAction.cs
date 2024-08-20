@@ -34,6 +34,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private Vector3 position;
 
+        /// <summary>
+        /// The interactable object during the start must be the same as when
+        /// the right mouse button is released in order for the context menu to open.
+        /// </summary>
+        private InteractableObject startObject;
+
         private void Start()
         {
             popupMenu = gameObject.AddComponent<PopupMenu>();
@@ -41,6 +47,11 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
+            if (SEEInput.StartOpenContextMenu())
+            {
+                Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
+                startObject = o;
+            }
             if (SEEInput.OpenContextMenu())
             {
                 // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
@@ -49,9 +60,12 @@ namespace SEE.Controls.Actions
                 {
                     return;
                 }
-                position = Input.mousePosition;
-                IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, o.GraphElemRef.Elem, o.gameObject);
-                popupMenu.ShowWith(entries, position);
+                if (o == startObject)
+                {
+                    position = Input.mousePosition;
+                    IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, o.GraphElemRef.Elem, o.gameObject);
+                    popupMenu.ShowWith(entries, position);
+                }
             }
         }
 
