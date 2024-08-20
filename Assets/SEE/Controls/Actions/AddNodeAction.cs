@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions
                 // The position at which the parent was hit will be the center point of the addedGameNode.
                 addedGameNode.transform.position = raycastHit.point;
                 // PutOn makes sure addedGameNode fits into parent.
-                GameNodeMover.PutOn(child: addedGameNode.transform, parent: parent, true);
+                GameNodeMover.PlaceOn(child: addedGameNode.transform, parent: parent);
                 memento = new Memento(child: addedGameNode, parent: parent);
                 memento.NodeID = addedGameNode.name;
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
