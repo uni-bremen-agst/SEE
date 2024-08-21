@@ -563,14 +563,6 @@ namespace SEE.Controls.Actions
                 await UniTask.Yield();
             }
             GlobalActionHistory.Execute(previousAction);
-            UpdatePlayerMenu();
-        }
-
-        /// <summary>
-        /// Updates the <see cref="PlayerMenu"/>.
-        /// </summary>
-        private static void UpdatePlayerMenu()
-        {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             menu.UpdateActiveEntry();
         }
