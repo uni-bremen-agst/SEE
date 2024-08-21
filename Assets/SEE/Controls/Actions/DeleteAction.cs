@@ -121,18 +121,42 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the one to be deleted
                 hitGraphElement = raycastHit.collider.gameObject;
-                Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
-                InteractableObject.UnselectAll(true);
-                (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
-                new DeleteNetAction(hitGraphElement.name).Execute();
-                CurrentState = IReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-                return true; // the selected objects are deleted and this action is done now
+                return Delete(); // the selected objects are deleted and this action is done now
+            }
+            else if(ExecuteViaContextMenu)
+            {
+                return Delete();
             }
             else
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Executes the deletion.
+        /// </summary>
+        /// <returns>true if the deletion can be executed.</returns>
+        private bool Delete()
+        {
+            Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
+            InteractableObject.UnselectAll(true);
+            (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
+            new DeleteNetAction(hitGraphElement.name).Execute();
+            CurrentState = IReversibleAction.Progress.Completed;
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+            return true;
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="DeleteAction"> from the context menu.
+        /// It sets the object to be deleted and ensures that the <see cref="Update"/> method performs the external execution.
+        /// </summary>
+        /// <param name="toDelete">The object to be deleted.</param>
+        public void ContextMenuExecution(GameObject toDelete)
+        {
+            ExecuteViaContextMenu = true;
+            hitGraphElement = toDelete;
         }
 
         /// <summary>

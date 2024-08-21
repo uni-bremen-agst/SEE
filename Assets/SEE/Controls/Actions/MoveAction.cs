@@ -78,7 +78,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
             /// </summary>
-            private Vector3 CursorOffset;
+            private Vector3 cursorOffset;
 
             /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
