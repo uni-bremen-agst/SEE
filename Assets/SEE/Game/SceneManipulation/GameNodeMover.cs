@@ -44,68 +44,55 @@ namespace SEE.Game.SceneManipulation
         }
 
         /// <summary>
-        /// Places <paramref name="child"/> on top of the roof of <paramref name="parent"/>.
-        ///
-        /// This method will NOT make sure that <paramref name="child"/> fits completely into the
-        /// roof rectangle of <paramref name="parent"/>.
-        ///
-        /// The <paramref name="child"/> will be an immediate child of <paramref name="parent"/> in the
-        /// game-object hierarchy afterwards.
-        ///
-        /// Precondition: <paramref name="parent"/> is not null.
+        /// Returns the new world coordinates based on <paramref name="childPosition"/> so that the child
+        /// node with a size of <paramref name="childLossyScale"/> would appear on top of
+        /// <paramref name="target"/> if moved there.
         /// </summary>
-        /// <param name="child">child to be put on <paramref name="parent"/></param>
-        /// <param name="parent">parent the <paramref name="child"/> is put on</param>
-        /// <param name="topPadding">Additional amount of empty space on the Y-axis that should be between
-        /// <paramref name="parent"/> and <paramref name="child"/> in absolute world-space terms</param>
+        /// <remarks>
+        /// Keep in mind that <paramref name="child"/> might be hanging over if it is too big.
+        /// </remarks>
+        /// <param name="childLossyScale">the world scale of a node</param>
+        /// <param name="childPosition">the world position of a node</param>
+        /// <param name="target">the target node's <c>GameObject</c></param>
+        /// <param name="topPadding">additional amount of empty space on the Y-axis that should be between
+        /// <paramref name="parent"/> and <paramref name="child"/> in absolute world-space units</param>
+        /// <returns>the new world position after the correction</returns>
         ///
-        public static void PlaceOn(Transform child, GameObject parent, float topPadding = 0.0001f)
+        public static Vector3 GetCoordinatesOn(Vector3 childLossyScale, Vector3 childPosition, GameObject target, float topPadding = 0.0001f)
         {
-            // This assignment must take place before we set the parent of child to null
-            // because a newly created node operator attempts to derive its code city.
-            NodeOperator nodeOperator = child.gameObject.NodeOperator();
-
-            // Release child from its current parent so that local position and scale
-            // and world-space position and scale are the same, respectively.
-            // The child will receive its new parent at the very end of this method.
-            child.SetParent(null);
-
-            // Where to move the child.
-            Vector3 targetWorldPosition = child.position;
-            Vector3 childWorldExtent = child.lossyScale / 2;
-            targetWorldPosition.y = parent.GetRoof() + childWorldExtent.y + topPadding;
+            Vector3 childWorldExtent = childLossyScale / 2;
+            childPosition.y = target.GetRoof() + childWorldExtent.y + topPadding;
 
             // Make sure mappingTarget stays within the roof of parent.
             {
-                Vector3 parentWorldExtent = parent.transform.lossyScale / 2;
+                Vector3 parentWorldExtent = target.transform.lossyScale / 2;
 
                 // Fit child into x range of parent.
-                if (targetWorldPosition.x + childWorldExtent.x > parent.transform.position.x + parentWorldExtent.x)
+                if (childPosition.x + childWorldExtent.x > target.transform.position.x + parentWorldExtent.x)
                 {
                     // Right corner of child must not be farther than right corner of parent.
-                    targetWorldPosition.x = parent.transform.position.x + parentWorldExtent.x - childWorldExtent.x;
+                    childPosition.x = target.transform.position.x + parentWorldExtent.x - childWorldExtent.x;
                 }
-                else if (targetWorldPosition.x - childWorldExtent.x < parent.transform.position.x - parentWorldExtent.x)
+                else if (childPosition.x - childWorldExtent.x < target.transform.position.x - parentWorldExtent.x)
                 {
                     // Left corner of child must be right from right corner of parent.
-                    targetWorldPosition.x = parent.transform.position.x - parentWorldExtent.x + childWorldExtent.x;
+                    childPosition.x = target.transform.position.x - parentWorldExtent.x + childWorldExtent.x;
                 }
 
                 // Fit child into z range of parent.
-                if (targetWorldPosition.z + childWorldExtent.z > parent.transform.position.z + parentWorldExtent.z)
+                if (childPosition.z + childWorldExtent.z > target.transform.position.z + parentWorldExtent.z)
                 {
                     // Front edge of child must not be farther than back edge of parent.
-                    targetWorldPosition.z = parent.transform.position.z + parentWorldExtent.z - childWorldExtent.z;
+                    childPosition.z = target.transform.position.z + parentWorldExtent.z - childWorldExtent.z;
                 }
-                else if (targetWorldPosition.z - childWorldExtent.z < parent.transform.position.z - parentWorldExtent.z)
+                else if (childPosition.z - childWorldExtent.z < target.transform.position.z - parentWorldExtent.z)
                 {
                     // Front edge of child must not be before front edge of parent.
-                    targetWorldPosition.z = parent.transform.position.z - parentWorldExtent.z + childWorldExtent.z;
+                    childPosition.z = target.transform.position.z - parentWorldExtent.z + childWorldExtent.z;
                 }
             }
 
-            nodeOperator.MoveTo(targetWorldPosition, 0);
-            child.SetParent(parent.transform);
+            return childPosition;
         }
 
         /// <summary>

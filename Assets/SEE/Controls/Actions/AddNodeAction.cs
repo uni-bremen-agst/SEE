@@ -33,9 +33,10 @@ namespace SEE.Controls.Actions
                 addedGameNode = GameNodeAdder.AddChild(parent);
                 // addedGameNode has the scale and position of parent.
                 // The position at which the parent was hit will be the center point of the addedGameNode.
-                addedGameNode.transform.position = raycastHit.point;
-                // PutOn makes sure addedGameNode fits into parent.
-                GameNodeMover.PlaceOn(child: addedGameNode.transform, parent: parent);
+                // The node is scaled down and placed on top of its parent.
+                addedGameNode.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
+                addedGameNode.transform.position = GameNodeMover.GetCoordinatesOn(addedGameNode.transform.lossyScale, raycastHit.point, parent);
+                // TODO The new node is scaled down arbitrarily and might overlap with its siblings.
                 memento = new Memento(child: addedGameNode, parent: parent);
                 memento.NodeID = addedGameNode.name;
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();

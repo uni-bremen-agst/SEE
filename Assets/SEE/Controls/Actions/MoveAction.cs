@@ -23,6 +23,11 @@ namespace SEE.Controls.Actions
     internal class MoveAction : AbstractPlayerAction
     {
         /// <summary>
+        /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
+        /// </summary>
+        private Vector3 cursorOffset = Vector3.zero;
+
+        /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
         /// </summary>
         /// <returns>new instance of <see cref="MoveAction"/></returns>
@@ -86,12 +91,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="gameObject">object to be grabbed</param>
             /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObject"/> is null</exception>
-            public void Grab(GameObject gameObject, Vector3 cursorOffset)
+            public void Grab(GameObject gameObject)
             {
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
-                    CursorOffset = cursorOffset;
                     originalParent = gameObject.transform.parent;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
@@ -272,10 +276,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             private readonly void MoveToOrigin()
             {
-                if (GrabbedGameObject)
+                if (GrabbedGameObject == null)
                 {
-                    MoveTo(GrabbedGameObject, originalWorldPosition);
+                    return;
                 }
+                MoveTo(GrabbedGameObject, originalWorldPosition);
             }
 
             /// <summary>
@@ -283,27 +288,39 @@ namespace SEE.Controls.Actions
             /// to its origin via <see cref="MoveToOrigin"/>.
             /// This method will be called for Redo.
             /// </summary>
-            private readonly void MoveToLastUserRequestedPosition()
+            private readonly void MoveToNewPosition()
             {
-                if (GrabbedGameObject)
+                if (GrabbedGameObject == null)
                 {
-                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject);
+                    return;
                 }
+                MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 1);
             }
 
             /// <summary>
-            /// Moves the grabbed object to <paramref name="targetPosition"/> in world space
-            /// immediately, that is, without any animation.
+            /// Moves the grabbed game object onto <paramref name="targetGameObject"/> at the approximate position
+            /// of <paramref name="targetPosition"/> in world space coordinates.
+            /// The placement is immediate and without any animation.
+            /// <para>
+            /// The <paramref name="targetPosition"/> is adapted so that the grabbed node will appear on top of the
+            /// <paramref name="targetGameObject"/>.
+            /// </para><para>
+            /// The <see cref="currentPositionOfGrabbedObject"/> will be updated to reflect the actual target
+            /// world-space position after the move operation.
+            /// </para><para>
+            /// The <see cref="GrabbedGameObject"/> will NOT be reparented to the <paramref name="targetGameObject"/>.
+            /// </para>
             /// </summary>
-            /// <param name="targetPosition">the position where the grabbed object
-            /// should be moved in world space</param>
-            internal void MoveTo(Vector3 targetPosition)
+            /// <param name="targetGameObject">the game object to place the grabbed node on</param>
+            /// <param name="targetPosition">the world-space position where the grabbed node should be moved</param>
+            internal void MoveToTarget(GameObject targetGameObject, Vector3 targetPosition)
             {
-                if (GrabbedGameObject)
+                if (GrabbedGameObject == null)
                 {
-                    currentPositionOfGrabbedObject = targetPosition - CursorOffset;
-                    MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
+                    return;
                 }
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.transform.lossyScale, targetPosition, targetGameObject);
+                MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
             }
 
             #region HitColor
@@ -399,32 +416,43 @@ namespace SEE.Controls.Actions
             /// </remarks>
             internal void Redo()
             {
-                MoveToLastUserRequestedPosition();
-                Reparent(NewParent);
+                MoveToNewPosition();
+                if (NewParent != originalParent)
+                {
+                    Reparent(NewParent, false);
+                }
             }
 
             /// <summary>
-            /// Moves <see cref="grabbedObject"/> onto the roof of <paramref name="target"/>
-            /// visually and marks it as target (the previously marked object is unmarked).
+            /// Reparents the grabbed object to <paramref name="target"/>.
+            /// <para>
+            /// If the placement <paramref name="isProvisional"/>, the target node will be highlighted
+            /// as well as the grabbed node. The color of the grabbed node's outline indicates if a
+            /// placement is possible at the current position based available space on <paramref name="target"/>.
+            /// </para><para>
             /// Also re-parents <see cref="grabbedObject"/> onto <paramref name="target"/> semantically.
             /// If <see cref="withinReflexionCity"/>, the exact semantics of the re-parenting
             /// is determined by <see cref="ReflexionMapper.SetParent"/>;
             /// otherwise by <see cref="GameNodeMover.SetParent"/>.
-            ///
+            /// </para>
             /// The <paramref name="grabbedObject"/> will be an immediate child of <paramref name="target"/> in the
             /// game-object hierarchy afterwards.
             /// </summary>
             /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
-            internal void Reparent(GameObject target)
+            /// <param name="isProvisional">if <c>true</c>, the new target is considered temporary</param>
+            internal void Reparent(GameObject target, bool isProvisional)
             {
                 // Note: If target is a descendant of the grabbed node something must be wrong with the raycast!
                 bool targetChanged = NewParent != target;
-                PlaceOn(GrabbedGameObject, target);
                 NewParent = target;
-                HighlightTarget();
-                if (GrabbedGameObject.TryGetComponent(out Outline outline))
+
+                if (isProvisional)
                 {
-                    outline.OutlineColor = CanBePlaced() ? Color.green : Color.red;
+                    HighlightTarget();
+                    if (GrabbedGameObject.TryGetComponent(out Outline outline))
+                    {
+                        outline.OutlineColor = CanBePlaced() ? Color.green : Color.red;
+                    }
                 }
 
                 if (!targetChanged)
@@ -459,7 +487,7 @@ namespace SEE.Controls.Actions
                 UnHighlightTarget();
                 if (GrabbedGameObject.transform.parent.gameObject != originalParent.gameObject)
                 {
-                    Reparent(originalParent.gameObject);
+                    Reparent(originalParent.gameObject, false);
                 }
                 RestoreOriginalAppearance();
             }
@@ -479,28 +507,13 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Moves the grabbed object to <paramref name="targetPosition"/> in world space.
             /// </summary>
-            /// <param name="targetPosition">the position where the grabbed object
-            /// should be moved in world space</param>
+            /// <param name="targetPosition">the world-space position the grabbed object should be moved to</param>
             /// <param name="factor">the factor of the animation for moving the grabbed object</param>
             /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
             private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
             {
                 GameNodeMover.MoveTo(grabbedObject, targetPosition, factor);
                 new MoveNetAction(grabbedObject.name, targetPosition, factor).Execute();
-            }
-
-            /// <summary>
-            /// Runs <see cref="GameNodeMover.PlaceOn"/> and propagates it to all clients.
-            ///
-            /// The <paramref name="child"/> will be an immediate child of <paramref name="newParent"/> in the
-            /// game-object hierarchy afterwards.
-            /// </summary>
-            /// <param name="child">the child to be put on <paramref name="newParent"/></param>
-            /// <param name="newParent">new parent of <paramref name="child"/></param>
-            private static void PlaceOn(GameObject child, GameObject newParent)
-            {
-                GameNodeMover.PlaceOn(child.transform, newParent);
-                new PlaceOnNetAction(child.name, newParent.name).Execute();
             }
 
             /// <summary>
@@ -587,7 +600,6 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    Vector3 cursorOffset = Vector3.zero;
                     if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
                         cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
@@ -596,7 +608,7 @@ namespace SEE.Controls.Actions
                     // An object to be grabbed must be representing a node that is not the root.
                     if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
-                        grabbedObject.Grab(hoveredObject.gameObject, cursorOffset);
+                        grabbedObject.Grab(hoveredObject.gameObject);
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         CurrentState = IReversibleAction.Progress.InProgress;
                     }
@@ -609,12 +621,13 @@ namespace SEE.Controls.Actions
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)
                 {
-                    grabbedObject.MoveTo(targetObjectHit.Value.point);
+                    GameObject newTarget = targetObjectHit.Value.transform.gameObject;
+                    grabbedObject.MoveToTarget(newTarget, targetObjectHit.Value.point - cursorOffset);
                     // The grabbed node is not yet at its final destination. The user is still moving
                     // it. We will run a what-if reflexion analysis to give immediate feedback on the
                     // consequences if the user were putting the grabbed node onto the node the user
                     // is currently aiming at.
-                    grabbedObject.Reparent(targetObjectHit.Value.transform.gameObject);
+                    grabbedObject.Reparent(newTarget, true);
                 }
             }
             else if (grabbedObject.IsGrabbed) // dragging has ended
