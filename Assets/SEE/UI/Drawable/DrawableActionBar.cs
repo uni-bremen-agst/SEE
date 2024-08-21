@@ -65,7 +65,8 @@ namespace SEE.UI.Drawable
         /// </summary>
         void Update()
         {
-            if (GlobalActionHistory.Current().Parent == ActionStateTypes.Drawable)
+            if (GlobalActionHistory.Current() != null
+                && GlobalActionHistory.Current().Parent == ActionStateTypes.Drawable)
             {
                 barInstance.SetActive(true);
                 togglerInstance.SetActive(false);

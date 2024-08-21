@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
             /// </summary>
-            private Vector3 CursorOffset;
+            private Vector3 cursorOffset;
 
             /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
-                    CursorOffset = cursorOffset;
+                    this.cursorOffset = cursorOffset;
                     originalParent = gameObject.transform.parent;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
@@ -301,7 +301,7 @@ namespace SEE.Controls.Actions
             {
                 if (GrabbedGameObject)
                 {
-                    currentPositionOfGrabbedObject = targetPosition - CursorOffset;
+                    currentPositionOfGrabbedObject = targetPosition - cursorOffset;
                     MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
                 }
             }

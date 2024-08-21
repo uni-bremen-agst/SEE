@@ -214,7 +214,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>the new edge</returns>
-        private static Edge CreateConvergentEdge(Memento memento)
+        private Edge CreateConvergentEdge(Memento memento)
         {
             Edge newEdge = AcceptDivergence.Accept(memento.From, memento.To, memento.Type);
 
@@ -225,11 +225,13 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>.
+        /// Used to execute the <see cref="AcceptDivergenceAction"/> from the context menu.
+        /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>
+        /// and ensures that the <see cref="Update"/> method performs the external execution.
         /// </summary>
         /// <param name="divergence">the edge representing the divergence</param>
         /// <returns>the new edge</returns>
-        public Edge CreateConvergentEdge(Edge divergence)
+        public Edge ContextMenuExecution(Edge divergence)
         {
             ExecuteViaContextMenu = true;
             ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;

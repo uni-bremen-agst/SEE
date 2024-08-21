@@ -132,6 +132,19 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Used to execute the <see cref="EditNodeAction"/> from the context menu.
+        /// Opens the edit dialog for the <paramref name="node"/>
+        /// and ensures that the <see cref="Update"/> method performs the external execution.
+        /// </summary>
+        /// <param name="node">The node to be edit.</param>
+        public void ContextMenuExecution(Node node)
+        {
+            progress = ProgressState.WaitingForInput;
+            memento = new Memento(node);
+            OpenDialog();
+        }
+
+        /// <summary>
         /// Sends an EditNodeNetAction to all clients with the given <paramref name="node"/>'s
         /// ID, SourceName and Type.
         /// </summary>

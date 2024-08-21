@@ -140,7 +140,7 @@ namespace SEE.Controls.Actions
             // TODO (#665): Ask for confirmation or allow undo.
             entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash));
 
-            entries.Add(new PopupMenuActionDoubleIcon("Show Actions", () =>
+            entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
                 List<PopupMenuEntry> subMenuEntries = new()
                     {
@@ -193,7 +193,11 @@ namespace SEE.Controls.Actions
             {
                 if (gameObject != null)
                 {
-                    GameElementDeleter.Delete(gameObject);
+                    ActionStateType previousAction = GlobalActionHistory.Current();
+                    GlobalActionHistory.Execute(ActionStateTypes.Delete);
+                    DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
+                    action.ContextMenuExecution(gameObject);
+                    ExcecutePreviousAction(action, previousAction);
                 }
                 else
                 {
@@ -369,11 +373,11 @@ namespace SEE.Controls.Actions
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
             {
                 new PopupMenuAction("Move", MoveNode, Icons.Move),
-                new PopupMenuAction("Rotate", RotateNode, Icons.Rotate),
+                //new PopupMenuAction("Rotate", RotateNode, Icons.Rotate),
                 new PopupMenuAction("New Node", NewNode, '+'),
                 new PopupMenuAction("New Edge", NewEdge, Icons.Edge),
                 new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare),
-                new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale),
+                //new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale),
             };
             return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
 
@@ -389,17 +393,29 @@ namespace SEE.Controls.Actions
 
             void NewNode()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.NewNode);
+                AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject, position);
+                ExcecutePreviousAction(action, previousAction);
             }
 
             void NewEdge()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.NewEdge);
+                AddEdgeAction action = (AddEdgeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExcecutePreviousAction(action, previousAction);
             }
 
             void EditNode()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.EditNode);
+                EditNodeAction action = (EditNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(node);
+                ExcecutePreviousAction(action, previousAction);
             }
 
             void ScaleNode()
@@ -503,7 +519,7 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
             {
-                new PopupMenuAction("Edit Edge", EditEdge, Icons.PenToSquare)
+                //new PopupMenuAction("Edit Edge", EditEdge, Icons.PenToSquare)
             };
 
             if (edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge))
@@ -511,20 +527,26 @@ namespace SEE.Controls.Actions
                 actions.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark));
             }
 
-            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, "Edge Options", Icons.Node, actions, edge, gameObject, appendActions) };
+            List<PopupMenuEntry> entries = new();
+            if (actions.Count > 0)
+            {
+                entries.Add(CreateSubMenu(popupMenu, position, "Edge Options", Icons.Node, actions, edge, gameObject, appendActions));
+            }
+            return entries;
 
             void AcceptDivergence()
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
-                action.CreateConvergentEdge(edge);
+                action.ContextMenuExecution(edge);
                 ExcecutePreviousAction(action, previousAction);
             }
 
             void EditEdge()
             {
-
+                // TODO: Useful?
+                ShowNotification.Info("Not implemented", "The action is not implemented yet.");
             }
         }
 
@@ -541,6 +563,14 @@ namespace SEE.Controls.Actions
                 await UniTask.Yield();
             }
             GlobalActionHistory.Execute(previousAction);
+            UpdatePlayerMenu();
+        }
+
+        /// <summary>
+        /// Updates the <see cref="PlayerMenu"/>.
+        /// </summary>
+        private static void UpdatePlayerMenu()
+        {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             menu.UpdateActiveEntry();
         }

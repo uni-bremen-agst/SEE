@@ -30,20 +30,47 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the parent in which to create the new node
                 GameObject parent = raycastHit.collider.gameObject;
-                addedGameNode = GameNodeAdder.AddChild(parent);
-                // addedGameNode has the scale and position of parent.
-                // The position at which the parent was hit will be the center point of the addedGameNode.
-                addedGameNode.transform.position = raycastHit.point;
-                // PutOn makes sure addedGameNode fits into parent.
-                GameNodeMover.PlaceOn(child: addedGameNode.transform, parent: parent);
-                memento = new Memento(child: addedGameNode, parent: parent);
-                memento.NodeID = addedGameNode.name;
-                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                AddNode(raycastHit.collider.gameObject, raycastHit.point);
                 result = true;
-                CurrentState = IReversibleAction.Progress.Completed;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
+            } else if (ExecuteViaContextMenu)
+            {
+                result = true;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Adds a node on the chosen <paramref name="parent"/> on the
+        /// chosen <paramref name="position"/>.
+        /// </summary>
+        /// <param name="parent">The node parent.</param>
+        /// <param name="position">The position where the node should be placed.</param>
+        private void AddNode(GameObject parent, Vector3 position)
+        {
+            addedGameNode = GameNodeAdder.AddChild(parent);
+            // addedGameNode has the scale and position of parent.
+            // The position at which the parent was hit will be the center point of the addedGameNode.
+            addedGameNode.transform.position = position;
+            // PutOn makes sure addedGameNode fits into parent.
+            GameNodeMover.PlaceOn(child: addedGameNode.transform, parent: parent);
+            memento = new Memento(child: addedGameNode, parent: parent);
+            memento.NodeID = addedGameNode.name;
+            new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+            CurrentState = IReversibleAction.Progress.Completed;
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="AddNodeAction"/> from the context menu.
+        /// Calls <see cref="AddNode"/> and ensures that the <see cref="Update"/> method
+        /// performs the external execution.
+        /// </summary>
+        /// <param name="parent">The parent node.</param>
+        /// <param name="position">The position where the node should be placed.</param>
+        public void ContextMenuExecution(GameObject parent, Vector3 position)
+        {
+            ExecuteViaContextMenu = true;
+            AddNode(parent, position);
         }
 
         /// <summary>
