@@ -639,7 +639,7 @@ namespace SEE.Controls.Actions
                 }
                 bool wasMoved = grabbedObject.UnGrab();
                 // Action is finished.
-                CurrentState = IReversibleAction.Progress.Completed;
+                CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
                 return wasMoved;
             }
             return false;
