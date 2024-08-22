@@ -3,7 +3,9 @@ using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -173,6 +175,9 @@ namespace SEE.UI.PopupMenu
             ButtonManagerBasic button = actionItem.MustGetComponent<ButtonManagerBasic>();
             button.buttonText = action.Name;
 
+            PriorityHolder priorityHolder = actionItem.AddComponent<PriorityHolder>();
+            priorityHolder.Priority = action.Priority;
+
             button.clickEvent.AddListener(OnClick);
             if (action.IconGlyph != default)
             {
@@ -216,6 +221,8 @@ namespace SEE.UI.PopupMenu
             GameObject headingItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuHeading", actionList, false);
             TextMeshProUGUI text = headingItem.MustGetComponent<TextMeshProUGUI>();
             text.text = heading.Text;
+            PriorityHolder priorityHolder = headingItem.AddComponent<PriorityHolder>();
+            priorityHolder.Priority = heading.Priority;
             entries.Add(headingItem);
         }
 
@@ -288,6 +295,28 @@ namespace SEE.UI.PopupMenu
         }
 
         /// <summary>
+        /// Sorts the entries by their priority.
+        /// Keep in mind: A higher priority is displayed first.
+        /// </summary>
+        private void SortEntries()
+        {
+            entries.Sort((a, b) =>
+            {
+                PriorityHolder aHolder = a.GetComponent<PriorityHolder>();
+                PriorityHolder bHolder = b.GetComponent<PriorityHolder>();
+                if (aHolder == null || bHolder == null)
+                {
+                    return 0;
+                }
+                return bHolder.Priority.CompareTo(aHolder.Priority);
+            });
+            for (int i = 0; i < entries.Count; i++)
+            {
+                entries[i].transform.SetSiblingIndex(i);
+            }
+        }
+
+        /// <summary>
         /// Activates the menu and fades it in.
         /// This asynchronous method will return once the menu is fully shown.
         /// </summary>
@@ -303,6 +332,7 @@ namespace SEE.UI.PopupMenu
             await UniTask.WaitForEndOfFrame();
             contentSizeFitter.enabled = true;
             AdjustMenuHeight();
+            SortEntries();
             await UniTask.WhenAll(menu.DOScale(1, animationDuration).AsyncWaitForCompletion().AsUniTask(),
                                   menuCanvasGroup.DOFade(1, animationDuration / 2).AsyncWaitForCompletion().AsUniTask());
         }

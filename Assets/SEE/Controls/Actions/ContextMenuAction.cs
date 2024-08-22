@@ -380,19 +380,26 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
             {
-                new PopupMenuAction("Move", MoveNode, Icons.Move),
                 //new PopupMenuAction("Rotate", RotateNode, Icons.Rotate),
                 new PopupMenuAction("New Node", NewNode, '+'),
                 new PopupMenuAction("New Edge", NewEdge, Icons.Edge),
                 new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare),
                 //new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale),
             };
+            if (!node.IsRoot())
+            {
+                actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 1));
+            }
             return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
                 "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
 
             void MoveNode()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.Move);
+                MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExcecutePreviousAction(action, previousAction);
             }
 
             void RotateNode()
@@ -470,7 +477,7 @@ namespace SEE.Controls.Actions
                                 UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
                             }
                         },
-                        Icons.ArrowLeft, CloseAfterClick: false)
+                        Icons.ArrowLeft, CloseAfterClick: false, Priority: int.MaxValue)
                     };
                 entries.AddRange(actions);
                 UpdateEntries(popupMenu, position, entries);
