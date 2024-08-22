@@ -16,6 +16,7 @@ using UnityEngine;
 using SEE.Game.City;
 using SEE.Utils.History;
 using SEE.GO.Menu;
+using SEE.UI.Menu.Drawable;
 
 namespace SEE.Controls.Actions
 {
@@ -204,7 +205,10 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    graphElement.ItsGraph.RemoveElement(graphElement);
+                    // TODO: Test the case. I'm not sure when this case would be triggered.
+                    // It should be better documented how this case could occur.
+                    ConfirmDialogMenu confirm = new ($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
+                    confirm.ExecuteAfterConfirmAsync(() => graphElement.ItsGraph.RemoveElement(graphElement)).Forget();
                 }
             }
 
