@@ -589,7 +589,7 @@ namespace SEE.Controls.Actions
         /// <returns><c>true</c> if completed</returns>
         public override bool Update()
         {
-            if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
+            if (UserIsGrabbing() ^ ExecuteViaContextMenu) // start to grab the object or continue to move the grabbed object
             {
                 if (!grabbedObject.IsGrabbed)
                 {
@@ -630,7 +630,7 @@ namespace SEE.Controls.Actions
                     grabbedObject.Reparent(newTarget, true);
                 }
             }
-            else if (grabbedObject.IsGrabbed) // dragging has ended
+            else if (grabbedObject.IsGrabbed && (!ExecuteViaContextMenu || UserIsGrabbing())) // dragging has ended
             {
                 // Finalize the action with the grabbed object.
                 if (grabbedObject.GrabbedGameObject != null)
@@ -643,6 +643,21 @@ namespace SEE.Controls.Actions
                 return wasMoved;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="MoveAction"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// the selected game object <paramref name="objToMove"/>.
+        /// </summary>
+        /// <param name="objToMove">The object to be moved.</param>
+        /// <param name="raycastHitPosition">The hit position of the object</param>
+        public void ContextMenuExecution(GameObject objToMove, Vector3 raycastHitPosition)
+        {
+            ExecuteViaContextMenu = true;
+            cursorOffset = raycastHitPosition - objToMove.transform.position;
+            CurrentState = IReversibleAction.Progress.InProgress;
+            grabbedObject.Grab(objToMove);
         }
 
         /// <summary>

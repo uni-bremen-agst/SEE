@@ -398,7 +398,7 @@ namespace SEE.Controls.Actions
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.Move);
                 MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(gameObject);
+                action.ContextMenuExecution(gameObject, raycastHitPosition);
                 ExcecutePreviousAction(action, previousAction);
             }
 
@@ -465,12 +465,12 @@ namespace SEE.Controls.Actions
                         {
                             if (appendActions != null)
                             {
-                                List<PopupMenuAction> actions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                                List<PopupMenuAction> treeViewActions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
                                                                         graphElement, gameObject, appendActions)
                                                                     .OfType<PopupMenuAction>()
                                                                     .Where(x=>!x.Name.Contains("TreeWindow")));
-                                actions.AddRange(appendActions);
-                                UpdateEntries(popupMenu, position, actions);
+                                treeViewActions.AddRange(appendActions);
+                                UpdateEntries(popupMenu, position, treeViewActions);
                             }
                             else
                             {
