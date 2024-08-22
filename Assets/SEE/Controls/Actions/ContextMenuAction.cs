@@ -55,7 +55,7 @@ namespace SEE.Controls.Actions
             if (SEEInput.OpenContextMenu())
             {
                 // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
-                HitGraphElement hit = Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
+                HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
                 if (hit == HitGraphElement.None)
                 {
                     return;
@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions
                 if (o == startObject)
                 {
                     position = Input.mousePosition;
-                    IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, o.GraphElemRef.Elem, o.gameObject);
+                    IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
                     popupMenu.ShowWith(entries, position);
                 }
             }
@@ -84,20 +84,21 @@ namespace SEE.Controls.Actions
         /// Returns the options available for the given graph element.
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
-        /// <param name="position"></param>
+        /// <param name="position">The context menu position.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
         /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
-        public static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position, GraphElement graphElement,
-            GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        public static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
-            IEnumerable<PopupMenuEntry> options = GetCommonOptions(popupMenu, position, graphElement, gameObject, appendActions);
+            IEnumerable<PopupMenuEntry> options = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
             return options.Concat(graphElement switch
             {
-                Node node => GetNodeOptions(popupMenu, position, node, gameObject, appendActions),
-                Edge edge => GetEdgeOptions(popupMenu, position, edge, gameObject, appendActions),
+                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions),
+                Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
                 _ => throw new ArgumentOutOfRangeException()
             });
         }
@@ -107,12 +108,13 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>Common options available for all graph elements</returns>
-        private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position, GraphElement graphElement,
-            GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
             string name = graphElement.ID;
             string target, source = target = null;
@@ -148,7 +150,8 @@ namespace SEE.Controls.Actions
                         {
                             if (appendActions != null)
                             {
-                                List<PopupMenuAction> actions = new (GetApplicableOptions(popupMenu, position, graphElement, gameObject, appendActions)
+                                List<PopupMenuAction> actions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                                                                        graphElement, gameObject, appendActions)
                                                                     .OfType<PopupMenuAction>()
                                                                     .Where(x=>!x.Name.Contains("TreeWindow")));
                                 actions.AddRange(appendActions);
@@ -156,7 +159,7 @@ namespace SEE.Controls.Actions
                             }
                             else
                             {
-                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, graphElement, gameObject));
+                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
                             }
                         },
                             Icons.ArrowLeft, CloseAfterClick: false),
@@ -363,11 +366,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="node">The node to get the options for</param>
         /// <param name="gameObject">The game object that the node is attached to</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>Options available for the given node</returns>
-        private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position,
+        private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
@@ -379,7 +383,8 @@ namespace SEE.Controls.Actions
                 new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare),
                 //new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale),
             };
-            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
+            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
+                "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
 
             void MoveNode()
             {
@@ -396,7 +401,7 @@ namespace SEE.Controls.Actions
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.NewNode);
                 AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(gameObject, position);
+                action.ContextMenuExecution(gameObject, raycastHitPosition);
                 ExcecutePreviousAction(action, previousAction);
             }
 
@@ -429,6 +434,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="name">The name for the sub menu.</param>
         /// <param name="icon">The icon for the sub menu.</param>
         /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
@@ -436,7 +442,8 @@ namespace SEE.Controls.Actions
         /// <param name="gameObject">The game object that the graph element is attached to</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>The created sub menu.</returns>
-        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, string name, char icon, IEnumerable<PopupMenuEntry> actions,
+        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+            string name, char icon, IEnumerable<PopupMenuEntry> actions,
             GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
             return new(name, () =>
@@ -447,7 +454,8 @@ namespace SEE.Controls.Actions
                         {
                             if (appendActions != null)
                             {
-                                List<PopupMenuAction> actions = new (GetApplicableOptions(popupMenu, position, graphElement, gameObject, appendActions)
+                                List<PopupMenuAction> actions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                                                                        graphElement, gameObject, appendActions)
                                                                     .OfType<PopupMenuAction>()
                                                                     .Where(x=>!x.Name.Contains("TreeWindow")));
                                 actions.AddRange(appendActions);
@@ -455,7 +463,7 @@ namespace SEE.Controls.Actions
                             }
                             else
                             {
-                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, graphElement, gameObject));
+                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
                             }
                         },
                         Icons.ArrowLeft, CloseAfterClick: false)
@@ -509,12 +517,13 @@ namespace SEE.Controls.Actions
         /// Returns the options available for the given edge.
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
-        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="edge">The edge to get the options for</param>
         /// <param name="gameObject">The game object that the edge is attached to</param>
         /// <param name="appendActions">Options to be append at the end of the entries.</param>
         /// <returns>Options available for the given edge</returns>
-        private static IEnumerable<PopupMenuEntry> GetEdgeOptions(PopupMenu popupMenu, Vector3 position,
+        private static IEnumerable<PopupMenuEntry> GetEdgeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Edge edge, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions = null)
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
@@ -530,7 +539,8 @@ namespace SEE.Controls.Actions
             List<PopupMenuEntry> entries = new();
             if (actions.Count > 0)
             {
-                entries.Add(CreateSubMenu(popupMenu, position, "Edge Options", Icons.Node, actions, edge, gameObject, appendActions));
+                entries.Add(CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Edge Options", Icons.Node, actions, edge, gameObject, appendActions));
             }
             return entries;
 

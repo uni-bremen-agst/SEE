@@ -15,6 +15,18 @@ namespace SEE.Controls.Actions
     internal class AddNodeAction : AbstractPlayerAction
     {
         /// <summary>
+        /// The chosen parent for the new node.
+        /// Will be used for context menu execution.
+        /// </summary>
+        private GameObject parent;
+
+        /// <summary>
+        /// The chosen position for the new node.
+        /// Will be used for context menu execution.
+        /// </summary>
+        private Vector3 position;
+
+        /// <summary>
         /// If the user clicks with the mouse hitting a game object representing a graph node,
         /// this graph node is a parent to which a new node is created and added as a child.
         /// <see cref="IReversibleAction.Update"/>.
@@ -34,6 +46,7 @@ namespace SEE.Controls.Actions
                 result = true;
             } else if (ExecuteViaContextMenu)
             {
+                AddNode(parent, position);
                 result = true;
             }
             return result;
@@ -70,8 +83,9 @@ namespace SEE.Controls.Actions
         /// <param name="position">The position where the node should be placed.</param>
         public void ContextMenuExecution(GameObject parent, Vector3 position)
         {
+            this.parent = parent;
+            this.position = position;
             ExecuteViaContextMenu = true;
-            AddNode(parent, position);
         }
 
         /// <summary>
