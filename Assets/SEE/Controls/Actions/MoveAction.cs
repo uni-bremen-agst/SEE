@@ -591,9 +591,9 @@ namespace SEE.Controls.Actions
         /// <returns><c>true</c> if completed</returns>
         public override bool Update()
         {
-            if (UserIsGrabbing() ^ ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left)) // start to grab the object or continue to move the grabbed object
+            if (!grabbedObject.IsGrabbed) // start to grab the object
             {
-                if (!grabbedObject.IsGrabbed && !ExecuteViaContextMenu)
+                if (Queries.LeftMouseDown())
                 {
                     // User is starting dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
@@ -618,14 +618,16 @@ namespace SEE.Controls.Actions
                     {
                         return false;
                     }
-                } else if (!grabbedObject.IsGrabbed && ExecuteViaContextMenu)
+
+                } else if (ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))
                 {
                     /// The calculation of the <see cref="cursorOffset"/>
                     /// and setting the <see cref="CurrentState"/> to <see cref="IReversibleAction.Progress.InProgress"/>
                     /// will be done in <see cref="ContextMenuExecution"/>.
                     grabbedObject.Grab(contextMenuObjectToMove);
                 }
-
+            } else if (grabbedObject.IsGrabbed && (UserIsGrabbing() ^ ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))) // continue to move the grabbed object
+            {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)
                 {
