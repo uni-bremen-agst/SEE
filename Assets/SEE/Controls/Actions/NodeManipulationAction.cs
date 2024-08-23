@@ -195,18 +195,6 @@ namespace SEE.Controls.Actions
         /// <param name="gameNode">game node to start the manipulation with</param>
         protected void StartAction(GameObject gameNode)
         {
-            if (!gameNode.TryGetNodeRef(out NodeRef nodeRef))
-            {
-                return;
-            }
-            VisualNodeAttributes gameNodeAttributes = gameNode.ContainingCity().NodeTypes[nodeRef.Value.Type];
-            if (!gameNodeAttributes.AllowManualResize)
-            {
-                ShowNotification.Info("Resize Forbidden", "This node type cannot be resized!", 2, false);
-                return;
-            }
-
-
             GameNodeSelected = gameNode;
             GameNodeMemento = CreateMemento(GameNodeSelected);
             UsedGizmo.Enable(GameNodeSelected);
