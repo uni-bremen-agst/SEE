@@ -419,7 +419,7 @@ namespace SEE.Controls.Actions
                 MoveToNewPosition();
                 if (NewParent != originalParent)
                 {
-                    Reparent(NewParent, false);
+                    Reparent(NewParent, false, true);
                 }
             }
 
@@ -440,11 +440,12 @@ namespace SEE.Controls.Actions
             /// </summary>
             /// <param name="target">the target node of the re-parenting, i.e., the new parent</param>
             /// <param name="isProvisional">if <c>true</c>, the new target is considered temporary</param>
-            internal void Reparent(GameObject target, bool isProvisional)
+            /// <param name="isUnOrRedo">if <c>true</c>, the method is executed as part of undo or redo</param>
+            internal void Reparent(GameObject target, bool isProvisional, bool isUnOrRedo = false)
             {
                 // Note: If target is a descendant of the grabbed node something must be wrong with the raycast!
                 bool targetChanged = NewParent != target;
-                NewParent = target;
+                NewParent = isUnOrRedo ? NewParent : target; // continue working with target!
 
                 if (isProvisional)
                 {
@@ -455,7 +456,7 @@ namespace SEE.Controls.Actions
                     }
                 }
 
-                if (!targetChanged)
+                if (!targetChanged && !isUnOrRedo)
                 {
                     return;
                 }
@@ -485,10 +486,7 @@ namespace SEE.Controls.Actions
             internal void UnReparent()
             {
                 UnHighlightTarget();
-                if (GrabbedGameObject.transform.parent.gameObject != originalParent.gameObject)
-                {
-                    Reparent(originalParent.gameObject, false);
-                }
+                Reparent(originalParent.gameObject, false, true);
                 RestoreOriginalAppearance();
             }
 

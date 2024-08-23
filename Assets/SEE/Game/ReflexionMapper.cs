@@ -20,17 +20,28 @@ namespace SEE.Game
         /// Maps <paramref name="mappingSource"/> onto <paramref name="mappingTarget"/> distinguishing
         /// the following four cases regarding to which domains <paramref name="mappingSource"/>
         /// and <paramref name="mappingTarget"/> belong to:
-        /// (1) implementation -> architecture: interpreted as an architecture mapping,
-        /// i.e., <paramref name="mappingSource"/> is mapped onto <paramref name="mappingTarget"/>
-        /// in the architecture.
-        /// (2) implementation -> implementation: interpreted as a restructuring in the implementation
-        /// (3) architecture -> architecture: interpreted as a restructuring in the architecture
-        /// (4) architecture -> implementation: makes no sense; will be ignored
-        ///
-        /// In cases (2)-(3), <paramref name="mappingSource"/> becomes a child graph node of
+        /// <list type="number">
+        /// <item><description>
+        ///   implementation -> architecture: interpreted as an architecture mapping,
+        ///   i.e., <paramref name="mappingSource"/> is mapped onto <paramref name="mappingTarget"/>
+        ///   in the architecture.
+        /// </description></item>
+        /// <item><description>
+        ///   implementation -> implementation: interpreted as a restructuring in the implementation
+        /// </description></item>
+        /// <item><description>
+        ///   architecture -> architecture: interpreted as a restructuring in the architecture
+        /// </description></item>
+        /// <item><description>
+        ///   architecture -> implementation: makes no sense; will be ignored
+        /// </description></item>
+        /// </list>
+        /// In cases 2–3, <paramref name="mappingSource"/> becomes a child graph node of
         /// <paramref name="mappingTarget"/> in the underlying graph.
-        /// In cases (1)-(3), <paramref name="mappingSource"/> becomes a child game object of
+        /// <para>
+        /// In cases 1–3, <paramref name="mappingSource"/> becomes a child game object of
         /// <paramref name="mappingTarget"/>. In all theses cases, the reflexion data is updated.
+        /// </para>
         /// </summary>
         /// <param name="mappingSource">the node to be mapped</param>
         /// <param name="mappingTarget">the target which <paramref name="mappingSource"/> is mapped onto</param>
