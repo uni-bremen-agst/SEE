@@ -76,9 +76,28 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="position">The position to be displayed the popup menu.</param>
         /// <param name="entries">The new entries for the context menu.</param>
-        public static void UpdateEntries(PopupMenu popupMenu, Vector3 position, IEnumerable<PopupMenuEntry> entries)
+        private static void UpdateEntries(PopupMenu popupMenu, Vector3 position, IEnumerable<PopupMenuEntry> entries)
         {
             popupMenu.ShowWith(entries, position);
+        }
+
+        /// <summary>
+        /// Returns the options available for the given graph element.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The context menu position.</param>
+        /// <param name="graphElement">The graph element to get the options for</param>
+        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <returns>Options available for the given graph element</returns>
+        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
+        public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position, GraphElement graphElement,
+            GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            List<PopupMenuAction> actions = new ();
+            actions.AddRange(GetApplicableOptions(popupMenu, position, position, graphElement, gameObject, appendActions).OfType<PopupMenuAction>());
+
+            return actions;
         }
 
         /// <summary>
@@ -139,15 +158,13 @@ namespace SEE.Controls.Actions
                 entries.Add(new PopupMenuHeading("Source: " + source));
                 entries.Add(new PopupMenuHeading("Target: " + target));
             }
-
-            // TODO (#665): Ask for confirmation or allow undo.
             entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
                 List<PopupMenuEntry> subMenuEntries = new()
                     {
-                        new PopupMenuAction("Show Actions", () =>
+                        new PopupMenuAction("Inspect", () =>
                         {
                             if (appendActions != null)
                             {
@@ -183,7 +200,7 @@ namespace SEE.Controls.Actions
                 }
                 subMenuEntries.AddRange(graphElement switch
                 {
-                    Node node => GetNodeShowOptions(node, gameObject),
+                    Node node => GetNodeShowOptions(node, gameObject, appendActions != null),
                     Edge edge => GetEdgeShowOptions(edge, gameObject),
                     _ => throw new ArgumentOutOfRangeException()
                 });
@@ -310,11 +327,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="node">The node to get the show options for</param>
         /// <param name="gameObject">The game object that the node is attached to</param>
+        /// <param name="openViaTreeView">Whether the popup menu was opened via context menu.</param>
         /// <returns>Show options available for the given node</returns>
-        private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject)
+        private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject, bool openViaTreeView)
         {
-            IList<PopupMenuEntry> actions = new List<PopupMenuEntry> { new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView), };
-
+            List<PopupMenuEntry> actions = new();
+            if (!openViaTreeView) {
+                actions.Add(new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView));
+            }
             if (node.OutgoingsOfType(LSP.Reference).Any())
             {
                 actions.Add(new PopupMenuAction("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
@@ -380,16 +400,28 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
             {
-                //new PopupMenuAction("Rotate", RotateNode, Icons.Rotate),
-                new PopupMenuAction("New Node", NewNode, '+'),
-                new PopupMenuAction("New Edge", NewEdge, Icons.Edge),
-                new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare),
-                //new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale),
+                new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1),
             };
-            if (!node.IsRoot())
+            if (appendActions == null)
             {
-                actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 1));
+                if (!node.IsRoot())
+                {
+                    actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                }
+                actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
+                actions.Add(new PopupMenuAction("New Edge", NewEdge, Icons.Edge, Priority: 2));
+
+                if (gameObject != null)
+                {
+                    VisualNodeAttributes gameNodeAttributes = gameObject.ContainingCity().NodeTypes[node.Type];
+                    if (gameNodeAttributes.AllowManualResize)
+                    {
+                        actions.Add(new PopupMenuAction("Rotate", RotateNode, Icons.Rotate, Priority: 4));
+                        actions.Add(new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale));
+                    }
+                }
             }
+
             return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
                 "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
 
@@ -493,10 +525,10 @@ namespace SEE.Controls.Actions
         /// <returns>Show options available for the given edge</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeShowOptions(Edge edge, GameObject gameObject)
         {
-            IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
-            {
+            Debug.Log("Parent: " + gameObject.transform.parent);
+            List<PopupMenuEntry> entries = new () {
                 new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
-                new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView),
+                new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
             };
 
             if (edge.Type == "Clone")

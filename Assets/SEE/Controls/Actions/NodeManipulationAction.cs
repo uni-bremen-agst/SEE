@@ -202,7 +202,7 @@ namespace SEE.Controls.Actions
             VisualNodeAttributes gameNodeAttributes = gameNode.ContainingCity().NodeTypes[nodeRef.Value.Type];
             if (!gameNodeAttributes.AllowManualResize)
             {
-                ShowNotification.Info("Action Forbidden", "The selected action cannot be applied to this node type!", 5, false);
+                ShowNotification.Info("Manipulation Forbidden", "The node cannot be manipulated!", 5, false);
                 return;
             }
 

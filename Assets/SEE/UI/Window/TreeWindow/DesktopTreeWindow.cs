@@ -414,14 +414,11 @@ namespace SEE.UI.Window.TreeWindow
                                     }, Icons.Hide)
                             };
                             IEnumerable<PopupMenuEntry> actions = ContextMenuAction
-                                                                   .GetApplicableOptions(contextMenu.contextMenu, // TODO: implement other method to
-                                                                                         e.position,              // get the entries without move etc.
+                                                                   .GetOptionsForTreeView(contextMenu.contextMenu,
                                                                                          e.position,
                                                                                          representedGraphElement,
                                                                                          representedGameObject,
-                                                                                         appends)
-                                                                   .OfType<PopupMenuAction>()
-                                                                   .Where(x => !x.Name.Contains("TreeWindow"));
+                                                                                         appends);
                             actions = actions.Concat(appends);
                             contextMenu.ShowWith(actions, e.position);
                         }
