@@ -231,7 +231,8 @@ namespace SEE.Controls.Actions
 
             void ShowProperties()
             {
-                ShowNotification.Info("Node Properties", graphElement.ToString(), log: false);
+                string type = graphElement is Node ? "Node" : "Edge";
+                ShowNotification.Info(type +" Properties", graphElement.ToString(), log: false);
             }
 
             void ShowMetrics()
