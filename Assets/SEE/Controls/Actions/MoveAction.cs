@@ -176,37 +176,12 @@ namespace SEE.Controls.Actions
                     return false;
                 }
 
-                if (OverlapsWithSiblings())
+                if (GrabbedGameObject.OverlapsWithSiblings())
                 {
                     return false;
                 }
 
                 return true;
-            }
-
-            ///<summary>
-            /// Checks if <see cref="grabbedObject"/> overlaps with any other direct child node of <see cref="NewParent"/>.
-            ///</summary>
-            /// <returns><c>true</c> if <see cref="grabbedObject"/> does not overlap with its new siblings in <see cref="NewParent"/></returns>
-            private readonly bool OverlapsWithSiblings()
-            {
-                Collider grabbedObjectCollider = GrabbedGameObject.GetComponent<Collider>();
-                int childCount = NewParent.transform.childCount;
-                for (int i = 0; i < childCount; i++)
-                {
-                    GameObject sibling = NewParent.transform.GetChild(i).gameObject;
-                    if (sibling == GrabbedGameObject || !sibling.HasNodeRef() || !sibling.TryGetComponent(out Collider siblingCollider))
-                    {
-                        continue;
-                    }
-
-                    if (grabbedObjectCollider.bounds.Intersects(siblingCollider.bounds))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
             }
 
             /// <summary>

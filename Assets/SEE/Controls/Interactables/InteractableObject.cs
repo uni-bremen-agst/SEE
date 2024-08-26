@@ -78,6 +78,11 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> GrabbedObjects = new();
 
         /// <summary>
+        /// If multiple objects should be selectable at the same time.
+        /// </summary>
+        public static bool MultiSelectionAllowed = true;
+
+        /// <summary>
         /// The selected objects per graph.
         /// </summary>
         private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
@@ -353,6 +358,11 @@ namespace SEE.Controls
         public void SetSelect(bool select, bool isInitiator)
         {
             Assert.IsTrue(IsSelected != select);
+
+            if (select && !MultiSelectionAllowed && SelectedObjects.Count > 0)
+            {
+                return;
+            }
 
             IsSelected = select;
 

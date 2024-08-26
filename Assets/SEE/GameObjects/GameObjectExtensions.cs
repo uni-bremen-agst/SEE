@@ -588,8 +588,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it.
+        /// Retrieves the node reference component, if possible.
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <param name="nodeRef">the attached NodeRef; defined only if this method
@@ -955,6 +954,52 @@ namespace SEE.GO
                                                         + $"{gameObject.name} because it is neither a node nor an edge.");
                 }
             }
+        }
+
+        /// <summary>
+        /// Checks if <paramref name="gameObject"/> overlaps with any other direct child node of its parent.
+        /// <para>
+        /// Overlap is checked based on the <c>Collider</c> components. Objects with no <c>Collider</c>
+        /// component are ignored.
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="gameObject"/> must be a node, i.e., coantain a <c>NodeRef</c> component.
+        /// </remarks>
+        /// <param name="gameObject">The game object whose operator to retrieve.</param>
+        /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <c>Collider</c> component,
+        /// or does not overlap with its siblings</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the object the method is called on is not a node, i.e., has no <c>NodeRef</c>
+        /// component.
+        /// </exception>
+        public static bool OverlapsWithSiblings(this GameObject gameObject)
+        {
+            if (!gameObject.HasNodeRef())
+            {
+                throw new InvalidOperationException("GameObject must be a node!");
+            }
+            if (!gameObject.TryGetComponent(out Collider collider))
+            {
+                return false;
+            }
+            Transform parent = gameObject.transform.parent;
+            int childCount = parent.childCount;
+            for (int i = 0; i < childCount; i++)
+            {
+                GameObject sibling = parent.GetChild(i).gameObject;
+                if (sibling == gameObject || !sibling.HasNodeRef() || !sibling.TryGetComponent(out Collider siblingCollider))
+                {
+                    continue;
+                }
+
+                if (collider.bounds.Intersects(siblingCollider.bounds))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

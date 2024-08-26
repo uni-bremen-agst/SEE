@@ -63,6 +63,7 @@ namespace SEE.Utils
         /// respectively, is returned. Otherwise if a GUI element is hit or if the
         /// hit game object has neither a <see cref="NodeRef"/> nor an <see cref="EdgeRef"/>
         /// attached, <see cref="HitGraphElement.None"/> is returned.
+        /// </returns>
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
             if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))

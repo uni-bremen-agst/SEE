@@ -63,6 +63,7 @@ namespace SEE.Utils
         public const char PenToSquare = '\uF044';
         public const char Pencil = '\uF303';
         public const char QuestionMark = '?';
+        public const char Resize = '\uF065';
         public const char Rotate = '\uF2F1';
         public const char Save = '\uF0C7';
         public const char Scale = '\uF424';
