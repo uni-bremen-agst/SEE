@@ -233,6 +233,18 @@ namespace SEE.Controls.Actions
         /// <returns>true if <see cref="GameNodeSelected"/> has had a change</returns>
         protected abstract bool HasChanges();
 
+        /// <summary>
+        /// Used to execute the <see cref="NodeManipulationAction{T}"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// the selected game object <paramref name="obj"/>.
+        /// </summary>
+        /// <param name="obj">The object to be modify.</param>
+        public void ContextMenuExecution(GameObject obj)
+        {
+            ExecuteViaContextMenu = true;
+            StartAction(obj);
+        }
+
         #endregion Update
 
         #region Memento

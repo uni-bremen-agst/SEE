@@ -436,7 +436,11 @@ namespace SEE.Controls.Actions
 
             void RotateNode()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.Rotate);
+                RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExcecutePreviousAction(action, previousAction);
             }
 
             void NewNode()
@@ -468,7 +472,11 @@ namespace SEE.Controls.Actions
 
             void ScaleNode()
             {
-
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.ScaleNode);
+                ScaleNodeAction action = (ScaleNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
+                ExcecutePreviousAction(action, previousAction);
             }
         }
 
@@ -526,7 +534,6 @@ namespace SEE.Controls.Actions
         /// <returns>Show options available for the given edge</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeShowOptions(Edge edge, GameObject gameObject)
         {
-            Debug.Log("Parent: " + gameObject.transform.parent);
             List<PopupMenuEntry> entries = new () {
                 new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
                 new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
