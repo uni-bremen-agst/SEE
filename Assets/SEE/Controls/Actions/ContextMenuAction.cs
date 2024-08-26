@@ -151,14 +151,14 @@ namespace SEE.Controls.Actions
             }
             IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
             {
-                new PopupMenuHeading(name)
+                new PopupMenuHeading(name, Priority: int.MaxValue)
             };
             if (source != null && target != null)
             {
-                entries.Add(new PopupMenuHeading("Source: " + source));
-                entries.Add(new PopupMenuHeading("Target: " + target));
+                entries.Add(new PopupMenuHeading("Source: " + source, Priority: int.MaxValue));
+                entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
             }
-            entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash));
+            entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash, Priority: 0));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
@@ -206,7 +206,7 @@ namespace SEE.Controls.Actions
                 });
                 UpdateEntries(popupMenu, position, subMenuEntries);
 
-            }, Icons.Info, Icons.ArrowRight, CloseAfterClick: false));
+            }, Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 1));
 
             return entries;
 
@@ -423,7 +423,7 @@ namespace SEE.Controls.Actions
             }
 
             return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
-                "Node Options", Icons.Node, actions, node, gameObject, appendActions) };
+                "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
 
             void MoveNode()
             {
@@ -483,11 +483,12 @@ namespace SEE.Controls.Actions
         /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="priority">The priority for this sub menu.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>The created sub menu.</returns>
         private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             string name, char icon, IEnumerable<PopupMenuEntry> actions,
-            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+            GraphElement graphElement, GameObject gameObject = null, int priority = 0, IEnumerable<PopupMenuAction> appendActions = null)
         {
             return new(name, () =>
             {
@@ -514,7 +515,7 @@ namespace SEE.Controls.Actions
                 entries.AddRange(actions);
                 UpdateEntries(popupMenu, position, entries);
 
-            }, icon, Icons.ArrowRight, CloseAfterClick: false);
+            }, icon, Icons.ArrowRight, CloseAfterClick: false, priority);
         }
 
         /// <summary>
@@ -583,7 +584,7 @@ namespace SEE.Controls.Actions
             if (actions.Count > 0)
             {
                 entries.Add(CreateSubMenu(popupMenu, position, raycastHitPosition,
-                    "Edge Options", Icons.Node, actions, edge, gameObject, appendActions));
+                    "Edge Options", Icons.Node, actions, edge, gameObject, 2, appendActions));
             }
             return entries;
 
