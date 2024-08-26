@@ -13,6 +13,7 @@ using SEE.Utils;
 using UnityEngine;
 using Node = SEE.DataModel.DG.Node;
 using SEE.Utils.History;
+using SEE.Game.Drawable.ActionHelpers;
 
 
 namespace SEE.Controls.Actions
@@ -135,7 +136,7 @@ namespace SEE.Controls.Actions
                     throw new InvalidOperationException("No object is being grabbed.");
                 }
 
-                bool wasMoved = true;
+                bool wasMoved = originalWorldPosition != currentPositionOfGrabbedObject;
                 if (!CanBePlaced())
                 {
                     // Debug.Log("Node does not fit, resetting…");
@@ -149,7 +150,7 @@ namespace SEE.Controls.Actions
 
                 if (GrabbedGameObject.TryGetComponent(out InteractableObject interactableObject))
                 {
-                    interactableObject.SetGrab(grab: false, isInitiator: true) ;
+                    interactableObject.SetGrab(grab: false, isInitiator: true);
                 }
                 ShowLabel.Off(GrabbedGameObject);
                 IsGrabbed = false;
@@ -171,7 +172,8 @@ namespace SEE.Controls.Actions
             /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
             public readonly bool CanBePlaced()
             {
-                if (GrabbedGameObject.transform.lossyScale.x > NewParent.transform.lossyScale.x || GrabbedGameObject.transform.lossyScale.z > NewParent.transform.lossyScale.z)
+                if (GrabbedGameObject.transform.lossyScale.x > NewParent.transform.lossyScale.x
+                    || GrabbedGameObject.transform.lossyScale.z > NewParent.transform.lossyScale.z)
                 {
                     return false;
                 }
@@ -562,9 +564,9 @@ namespace SEE.Controls.Actions
         /// <returns><c>true</c> if completed</returns>
         public override bool Update()
         {
-            if (UserIsGrabbing()) // start to grab the object or continue to move the grabbed object
+            if (!grabbedObject.IsGrabbed) // start to grab the object
             {
-                if (!grabbedObject.IsGrabbed)
+                if (Queries.LeftMouseDown())
                 {
                     // User is starting dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
@@ -589,8 +591,16 @@ namespace SEE.Controls.Actions
                     {
                         return false;
                     }
-                }
 
+                } else if (ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))
+                {
+                    /// The calculation of the <see cref="cursorOffset"/>
+                    /// and setting the <see cref="CurrentState"/> to <see cref="IReversibleAction.Progress.InProgress"/>
+                    /// will be done in <see cref="ContextMenuExecution"/>.
+                    grabbedObject.Grab(contextMenuObjectToMove);
+                }
+            } else if (grabbedObject.IsGrabbed && (UserIsGrabbing() ^ ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))) // continue to move the grabbed object
+            {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)
                 {
@@ -603,7 +613,7 @@ namespace SEE.Controls.Actions
                     grabbedObject.Reparent(newTarget, true);
                 }
             }
-            else if (grabbedObject.IsGrabbed) // dragging has ended
+            else if (grabbedObject.IsGrabbed && (!ExecuteViaContextMenu || Queries.MouseUp(MouseButton.Left))) // dragging has ended
             {
                 // Finalize the action with the grabbed object.
                 if (grabbedObject.GrabbedGameObject != null)
@@ -616,6 +626,26 @@ namespace SEE.Controls.Actions
                 return wasMoved;
             }
             return false;
+        }
+
+        /// <summary>
+        /// The object to move which was selected via context menu.
+        /// </summary>
+        private GameObject contextMenuObjectToMove;
+
+        /// <summary>
+        /// Used to execute the <see cref="MoveAction"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// the selected game object <paramref name="objToMove"/>.
+        /// </summary>
+        /// <param name="objToMove">The object to be moved.</param>
+        /// <param name="raycastHitPosition">The hit position of the object</param>
+        public void ContextMenuExecution(GameObject objToMove, Vector3 raycastHitPosition)
+        {
+            ExecuteViaContextMenu = true;
+            cursorOffset = raycastHitPosition - objToMove.transform.position;
+            CurrentState = IReversibleAction.Progress.InProgress;
+            contextMenuObjectToMove = objToMove;
         }
 
         /// <summary>

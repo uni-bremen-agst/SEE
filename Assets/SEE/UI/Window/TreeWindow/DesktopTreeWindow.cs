@@ -405,7 +405,7 @@ namespace SEE.UI.Window.TreeWindow
 
                             // We want all applicable actions for the element, except ones where the element
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
-                            List<PopupMenuAction> appends = new List<PopupMenuAction>()
+                            List<PopupMenuAction> appends = new ()
                             {
                                 new ("Hide in TreeWindow", () =>
                                     {
@@ -414,13 +414,11 @@ namespace SEE.UI.Window.TreeWindow
                                     }, Icons.Hide)
                             };
                             IEnumerable<PopupMenuEntry> actions = ContextMenuAction
-                                                                   .GetApplicableOptions(contextMenu.contextMenu,
+                                                                   .GetOptionsForTreeView(contextMenu.contextMenu,
                                                                                          e.position,
                                                                                          representedGraphElement,
                                                                                          representedGameObject,
-                                                                                         appends)
-                                                                   .OfType<PopupMenuAction>()
-                                                                   .Where(x => !x.Name.Contains("TreeWindow"));
+                                                                                         appends);
                             actions = actions.Concat(appends);
                             contextMenu.ShowWith(actions, e.position);
                         }
