@@ -87,7 +87,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void RemovePlayerNameFromServerRpc(ulong networkObjectId)
         {
-            PlayerNameManager.RemovePlayerName(networkObjectId);
+            PlayerNameMap.RemovePlayerName(networkObjectId);
         }
 
         /// <summary>
@@ -101,7 +101,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void SendPlayerNameToServerRpc(ulong networkObjectId, string playername)
         {
-            PlayerNameManager.AddOrUpdatePlayerName(networkObjectId, playername);
+            PlayerNameMap.AddOrUpdatePlayerName(networkObjectId, playername);
 
             // The server will send the name to all other clients, including the client
             // that sent the name. Actually, this call goes to all player instances on
@@ -133,7 +133,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId)
         {
-            string playerName = PlayerNameManager.GetPlayerName(networkObjectId);
+            string playerName = PlayerNameMap.GetPlayerName(networkObjectId);
             SendPlayerNameToClientRpc(networkObjectId, playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
         }
 

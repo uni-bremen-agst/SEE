@@ -8,7 +8,7 @@ namespace SEE.Game.Avatars
     /// Provides a mapping of <see cref="NetworkBehaviour.NetworkObjectId"/>s onto player names.
     /// </summary>
     /// <remarks>This class is used only by the server.</remarks>
-    public static class PlayerNameManager
+    public static class PlayerNameMap
     {
         /// <summary>
         /// Stores names with their <see cref="NetworkBehaviour.NetworkObjectId"/> as a key.
