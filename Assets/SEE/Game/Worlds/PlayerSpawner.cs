@@ -49,7 +49,7 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="Spawn(ulong)"/>
+        /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="ClientConnects(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
         /// the first local client.
         /// </summary>
@@ -88,10 +88,10 @@ namespace SEE.Game.Worlds
             // The callback to invoke once a client connects. This callback is only
             // ran on the server and on the local client that connects. We want
             // to spawn a player whenever a client connects.
-            networkManager.OnClientConnectedCallback += Spawn;
+            networkManager.OnClientConnectedCallback += ClientConnects;
             networkManager.OnClientDisconnectCallback += ClientDisconnects;
             // Spawn the local player. This code is executed by the server.
-            Spawn(networkManager.LocalClientId);
+            ClientConnects(networkManager.LocalClientId);
         }
 
         /// <summary>
@@ -99,16 +99,26 @@ namespace SEE.Game.Worlds
         /// </summary>
         private int numberOfSpawnedPlayers = 0;
 
+        private static void LogRPC(string message)
+        {
+            Debug.Log($"[RPC] {message}\n");
+        }
+
         /// <summary>
         /// Spawns a player using the <see cref="playerSpawns"/>.
         /// </summary>
-        /// <param name="owner">the network ID of the owner</param>
+        /// <param name="clientID">the network ID of the client</param>
         /// <remarks>This code can be executed only on the server.</remarks>
-        private void Spawn(ulong owner)
+        /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
+        private void ClientConnects(ulong clientID)
         {
-            if (owner == NetworkManager.Singleton.LocalClientId
+            LogRPC($"Player with owner {clientID} connects.\n");
+
+            // A pure server, that is, one that is not also a host, does not need to spawn a player.
+            if (clientID == NetworkManager.Singleton.LocalClientId
                 && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
             {
+                LogRPC($"Nothing to be done. LocalClientId={NetworkManager.Singleton.LocalClientId} IsServer={NetworkManager.Singleton.IsServer} IsHost={NetworkManager.Singleton.IsHost}\n");
                 return;
             }
             int index = numberOfSpawnedPlayers % playerSpawns.Count;
@@ -116,20 +126,22 @@ namespace SEE.Game.Worlds
                                             playerSpawns[index].Position,
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
-            player.name = "Player " + numberOfSpawnedPlayers;
 
 #if DEBUG
-            Debug.Log($"Spawned {player.name} (network id of owner: {owner}, "
-                + "local: {IsLocal(owner)}) at position {player.transform.position}.\n");
+            LogRPC($"Spawned {player.name} (network id of owner: {clientID}, "
+                + $"local: {IsLocal(clientID)}) at position {player.transform.position}.\n");
 #endif
             if (player.TryGetComponent(out NetworkObject net))
             {
                 // By default a newly spawned network Prefab instance is owned by the server
-                // unless otherwise specified.
-                net.SpawnAsPlayerObject(owner, destroyWithScene: true);
+                // unless otherwise specified. However, in case of SpawnAsPlayerObject, if
+                // the player already had a prefab instance assigned, then the client owns
+                // the NetworkObject of that prefab instance unless there's additional
+                // server-side specific user code that removes or changes the ownership.
+                net.SpawnAsPlayerObject(clientID, destroyWithScene: true);
 #if DEBUG
-                Debug.Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
-                    + "is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+                LogRPC($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
+                    + $"is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
 #endif
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
@@ -171,23 +183,24 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// Emits that the client with given <paramref name="networkID"/> has disconnected.
+        /// Emits that the client with given <paramref name="clientId"/> has disconnected.
         /// </summary>
-        /// <param name="networkID">the network ID of the disconnecting client</param>
-        private static void ClientDisconnects(ulong networkID)
+        /// <param name="clientId">the network ID of the disconnecting client</param>
+        /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
+        private static void ClientDisconnects(ulong clientId)
         {
-            Debug.Log($"Player with ID {networkID} (local: {IsLocal(networkID)}) disconnects.\n");
+            LogRPC($"Player with ID {clientId} (local: {IsLocal(clientId)}) disconnects.\n");
         }
 
         /// <summary>
-        /// True if <paramref name="owner"/> identifies the local player.
+        /// True if <paramref name="clientId"/> identifies the local player.
         /// </summary>
-        /// <param name="owner">the network ID of the owner</param>
-        /// <returns>true iff <paramref name="owner"/> identifies
+        /// <param name="clientId">the network ID of the owner</param>
+        /// <returns>true iff <paramref name="clientId"/> identifies
         /// <see cref="NetworkManager.Singleton.LocalClientId"/></returns>
-        private static bool IsLocal(ulong owner)
+        private static bool IsLocal(ulong clientId)
         {
-            return owner == NetworkManager.Singleton.LocalClientId;
+            return clientId == NetworkManager.Singleton.LocalClientId;
         }
     }
 }
