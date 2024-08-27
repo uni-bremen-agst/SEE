@@ -55,16 +55,7 @@ namespace SEE.Game.Avatars
             else
             {
                 Debug.LogError($"Player name for player {networkObjectId} is unknown.\n");
-                Dump();
                 return "Unknown";
-            }
-        }
-
-        private static void Dump()
-        {
-            foreach (var entry in playerNames)
-            {
-                Debug.Log($"PlayerNameManager: {entry.Key} => {entry.Value}\n");
             }
         }
 
