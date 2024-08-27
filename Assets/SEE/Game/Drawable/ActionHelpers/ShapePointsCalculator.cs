@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.ActionHelpers
@@ -25,7 +26,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             Ellipse,
             Parallelogram,
             Trapezoid,
-            Polygon
+            Polygon,
         }
 
         /// <summary>
@@ -150,7 +151,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>The positions of the ellipse</returns>
         public static Vector3[] Ellipse(Vector3 point, float xScale, float yScale)
         {
-            const int vertices = 50;
+            int vertices = 50;
             return Polygon(point, xScale, yScale, vertices);
         }
 

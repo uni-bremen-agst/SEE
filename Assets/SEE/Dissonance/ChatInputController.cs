@@ -2,6 +2,7 @@
 using SEE.GO;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 namespace SEE.Dissonance
@@ -52,7 +53,7 @@ namespace SEE.Dissonance
         /// Registers <see cref="OnInputEndEdit(string)"/> to be called when the user
         /// has ended his/her input.
         /// </summary>
-        protected override void Start ()
+        protected override void Start()
         {
             base.Start();
 
@@ -107,7 +108,7 @@ namespace SEE.Dissonance
         /// <summary>
         /// If the user requests to open the text chat, we will do so.
         /// </summary>
-        private void Update ()
+        private void Update()
         {
             if (SEEInput.OpenTextChat())
             {
@@ -126,6 +127,7 @@ namespace SEE.Dissonance
             inputField.gameObject.SetActive(true);
             inputField.ActivateInputField();
             EnableCanvas(true);
+            EventSystem.current.SetSelectedGameObject(inputField.gameObject);
 
             // Force the chat log to show
             chatLog.ForceShow = true;
