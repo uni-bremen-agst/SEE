@@ -58,7 +58,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
         /// </summary>
-        private Net.Network networkConfig;
+        private readonly Net.Network networkConfig;
 
         /// <summary>
         /// Creates and opens the dialog.
