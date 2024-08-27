@@ -99,9 +99,9 @@ namespace SEE.Game.Worlds
         /// </summary>
         private int numberOfSpawnedPlayers = 0;
 
-        private static void LogRPC(string message)
+        private static void Log(string message)
         {
-            Debug.Log($"[RPC] {message}\n");
+            Debug.Log($"[Client/Server] {message}\n");
         }
 
         /// <summary>
@@ -112,13 +112,13 @@ namespace SEE.Game.Worlds
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
         private void ClientConnects(ulong clientID)
         {
-            LogRPC($"Player with owner {clientID} connects.\n");
-
+#if DEBUG
+            Log($"Player with owner {clientID} connects.\n");
+#endif
             // A pure server, that is, one that is not also a host, does not need to spawn a player.
             if (clientID == NetworkManager.Singleton.LocalClientId
                 && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
             {
-                LogRPC($"Nothing to be done. LocalClientId={NetworkManager.Singleton.LocalClientId} IsServer={NetworkManager.Singleton.IsServer} IsHost={NetworkManager.Singleton.IsHost}\n");
                 return;
             }
             int index = numberOfSpawnedPlayers % playerSpawns.Count;
@@ -128,7 +128,7 @@ namespace SEE.Game.Worlds
             numberOfSpawnedPlayers++;
 
 #if DEBUG
-            LogRPC($"Spawned {player.name} (network id of owner: {clientID}, "
+            Log($"Spawned {player.name} (network id of owner: {clientID}, "
                 + $"local: {IsLocal(clientID)}) at position {player.transform.position}.\n");
 #endif
             if (player.TryGetComponent(out NetworkObject net))
@@ -140,7 +140,7 @@ namespace SEE.Game.Worlds
                 // server-side specific user code that removes or changes the ownership.
                 net.SpawnAsPlayerObject(clientID, destroyWithScene: true);
 #if DEBUG
-                LogRPC($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
+                Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
                     + $"is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
 #endif
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
@@ -189,7 +189,7 @@ namespace SEE.Game.Worlds
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
         private static void ClientDisconnects(ulong clientId)
         {
-            LogRPC($"Player with ID {clientId} (local: {IsLocal(clientId)}) disconnects.\n");
+            Log($"Player with ID {clientId} disconnects.\n");
         }
 
         /// <summary>
