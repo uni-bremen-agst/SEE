@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Dissonance;
-using SEE.Game.Avatars;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Notification;
@@ -106,7 +105,8 @@ namespace SEE.Net
         /// <summary>
         /// Name of the local player; used for the text chat and the avatar badge.
         /// </summary>
-        public string PlayerName { get; set; } = string.Empty;
+        [Tooltip("The name of the player."), ShowInInspector]
+        public string PlayerName { get; set; } = "Me";
 
         /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
@@ -716,8 +716,7 @@ namespace SEE.Net
         /// <param name="client">the ID of the client</param>
         private void OnClientDisconnectCallbackForServer(ulong client)
         {
-            ShowNotification.Info("Connection", $"Client {client} as {PlayerNameManager.GetPlayerName(client)} has disconnected.");
-            PlayerNameManager.RemovePlayerName(client);
+            ShowNotification.Info("Connection", $"Client {client} has disconnected.");
         }
 
         /// The IP4 address, port, and protocol.
