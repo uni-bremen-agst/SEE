@@ -557,7 +557,8 @@ namespace SEE.Controls.Actions.Drawable
         /// Press the caps lock key for this action.
         /// If the line does not have enough points to remove, it will be deleted.
         /// </summary>
-        /// <param name="ignorePartUndoButton">True if the key input should be ignored. Will used for the part undo button of the <see cref="ShapeMenu"/>.</param>
+        /// <param name="ignorePartUndoButton">True if the key input should be ignored.
+        /// Will be used for the part undo button of the <see cref="ShapeMenu"/>.</param>
         private void RemoveLastPoint(bool ignorePartUndoButton = false)
         {
             if (drawing && (SEEInput.PartUndo() || ignorePartUndoButton))
@@ -588,8 +589,8 @@ namespace SEE.Controls.Actions.Drawable
                 }
                 else
                 {
-                    ShowNotification.Info("Line-Shape drawing canceled.",
-                        "The drawing of the shape art line has been canceled.");
+                    ShowNotification.Info("Line-shape drawing canceled.",
+                        "The drawing of the shape-art line has been canceled.");
                     new EraseNetAction(Surface.name, GameFinder.GetDrawableSurfaceParentName(Surface), Shape.name).Execute();
                     Destroyer.Destroy(Shape);
                     ShapeMenu.DisablePartUndo();

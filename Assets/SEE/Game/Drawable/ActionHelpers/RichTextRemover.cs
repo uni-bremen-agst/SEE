@@ -15,7 +15,7 @@
         };
 
         /// <summary>
-        /// The dynamic tags, whcih can be assigned properties.
+        /// The dynamic tags, wich can be assigned properties.
         /// </summary>
         private static readonly string[] Dynamic = new string[]
         {

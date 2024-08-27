@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace SEE.UI.Menu.Drawable
 {
     /// <summary>
-    /// This class provides a menu for the color picking of line.
+    /// This class provides a menu for the color picking of lines.
     /// </summary>
     public static class ColorPickerLineMenu
     {
@@ -43,8 +43,7 @@ namespace SEE.UI.Menu.Drawable
             if (instance == null)
             {
                 LineConf conf = LineConf.GetLine(line);
-                instance = PrefabInstantiator.InstantiatePrefab(menuPrefab,
-                    GameObject.Find("UI Canvas").transform, false);
+                instance = PrefabInstantiator.InstantiatePrefab(menuPrefab, UICanvas.Canvas.transform, false);
                 /// Initializes the buttons.
                 InitializePrimaryButton(conf);
                 InitializeSecondaryButton(conf);
@@ -69,7 +68,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the primary button.
+        /// Initializes the secondary button.
         /// </summary>
         /// <param name="conf">The line configuration.</param>
         private static void InitializeSecondaryButton(LineConf conf)
@@ -85,7 +84,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the primary button.
+        /// Initializes the fill-out button.
         /// </summary>
         /// <param name="conf">The line configuration.</param>
         private static void InitializeFillOutButton(LineConf conf)
@@ -101,7 +100,8 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets the buttons background color and use the complementary color for the button text.
+        /// Sets the <paramref name="buttonHolder"/>'s background color to <paramref name="color"/>
+        /// and button text's color to the complementary color of <paramref name="color"/>.
         /// </summary>
         /// <param name="buttonHolder">The object which holds the button.</param>
         /// <param name="color">The background color.</param>
@@ -126,7 +126,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="gotColor"/> is true, the <paramref name="color"/> will be the chosen color by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="color">The chosen color the player confirmed, if that doesn't exist, some dummy value</param>
+        /// <param name="color">The chosen color the player confirmed; if that doesn't exist,
+        /// some dummy value <see cref="Color.clear"/> is used instead</param>
         /// <returns><see cref="gotColor"/></returns>
         public static bool TryGetColor(out Color color)
         {

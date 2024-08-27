@@ -60,7 +60,7 @@ namespace SEE.Game.Drawable.Configurations
         public float Tiling;
 
         /// <summary>
-        /// Wheter the fill out is active or not.
+        /// Whether the fill out is active or not.
         /// </summary>
         public bool FillOutStatus;
 

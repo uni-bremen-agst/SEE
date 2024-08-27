@@ -21,7 +21,7 @@ namespace SEE.Net.Actions.Drawable
         public bool Loop;
 
         /// <summary>
-        /// The filled out color, if the line should be filled out.
+        /// The fill-out color if the line should be filled out.
         /// </summary>
         public Color FillOutColor;
 
@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.Drawable
         public bool FillOutStatus;
 
         /// <summary>
-        /// The constructor of this action. All it does is assign the value you pass it to a field.
+        /// The constructor of this action. All it does is to assign the value you pass to its fields.
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
@@ -47,7 +47,8 @@ namespace SEE.Net.Actions.Drawable
             {
                 FillOutStatus = true;
                 FillOutColor = fillOutColor.Value;
-            } else
+            }
+            else
             {
                 FillOutStatus = false;
                 FillOutColor = Color.clear;
@@ -61,12 +62,13 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (LineID != null && LineID != "")
+            if (!string.IsNullOrWhiteSpace(LineID))
             {
                 if (FillOutStatus)
                 {
                     GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
-                } else
+                }
+                else
                 {
                     GameDrawer.FinishDrawing(FindChild(LineID), Loop, null);
                 }

@@ -279,7 +279,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line for which drawing is to be finished.</param>
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
-        /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
+        /// <param name="fillOutColor">The color to fill out the line; null if the line should not filled out.</param>
         /// <param name="showInfo">Whether the information of the fill out should be shown.</param>
         public static void FinishDrawing(GameObject line, bool loop, Color? fillOutColor = null, bool showInfo = true)
         {
@@ -778,7 +778,8 @@ namespace SEE.Game.Drawable
                 Vector3[] positions = new Vector3[GetRenderer(line).positionCount];
                 line.GetComponent<LineRenderer>().GetPositions(positions);
                 return DifferentPositionCounter(positions);
-            } else
+            }
+            else
             {
                 return 0;
             }
@@ -798,7 +799,8 @@ namespace SEE.Game.Drawable
                 Mesh mesh = new();
                 renderer.BakeMesh(mesh);
                 return mesh.vertices.Distinct().ToList().Count;
-            } else
+            }
+            else
             {
                 return 0;
             }
@@ -859,7 +861,7 @@ namespace SEE.Game.Drawable
         /// <param name="line">The line that is to be filled out.</param>
         /// <param name="color">The fill out color.</param>
         /// <param name="showInfo">Whether the info should showed if the fill out is not possible.</param>
-        /// <returns>True if the fill out was successfully, false if not.</returns>
+        /// <returns>True if the fill out was successful, false if not.</returns>
         public static bool FillOut(GameObject line, Color? color = null, bool showInfo = false)
         {
             if (line.CompareTag(Tags.Line)
@@ -885,7 +887,8 @@ namespace SEE.Game.Drawable
                     {
                         meshRenderer.sharedMaterial = GetMaterial(fillColor, LineKind.Solid);
                     }
-                } else
+                }
+                else
                 {
                     fillOut = GameFinder.FindChild(line, ValueHolder.FillOut);
                     meshFilter = fillOut.GetComponent<MeshFilter>();
@@ -920,7 +923,8 @@ namespace SEE.Game.Drawable
                     collider.sharedMesh = mesh;
                     GameScaler.SetScale(fillOut, Vector3.one);
                     return true;
-                } else
+                }
+                else
                 {
                     GameObject.DestroyImmediate(fillOut);
                     return false;

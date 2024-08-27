@@ -3,7 +3,7 @@
 namespace SEE.Game.Drawable.ActionHelpers
 {
     /// <summary>
-    /// This class provides an method to calculate the complementary color.
+    /// This class provides a method to calculate the complementary color.
     /// </summary>
     public static class ColorConverter
     {

@@ -3,7 +3,6 @@ using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -60,30 +59,9 @@ namespace SEE.Game.Drawable
                 else if (renderers != null)
                 {
                     /// Makes the renderers blink.
-                    foreach (Renderer renderer in renderers)
-                    {
-                        if (renderer != null)
-                        {
-                            renderer.enabled = false;
-                        }
-                        else
-                        {
-                            renderers.Remove(renderer);
-                            break;
-                        }
-                    }
+                    EnableRenderers(false);
                     yield return new WaitForSeconds(0.2f);
-                    foreach (Renderer renderer in renderers)
-                    {
-                        if (renderer != null)
-                        {
-                            renderer.enabled = true;
-                        } else
-                        {
-                            renderers.Remove(renderer);
-                            break;
-                        }
-                    }
+                    EnableRenderers(true);
                     yield return new WaitForSeconds(0.5f);
                 }
                 else if (canvas != null)
@@ -101,6 +79,22 @@ namespace SEE.Game.Drawable
                     yield return new WaitForSeconds(0.2f);
                     highlight.enabled = true;
                     yield return new WaitForSeconds(0.5f);
+                }
+            }
+
+            void EnableRenderers(bool enable)
+            {
+                foreach (Renderer renderer in renderers)
+                {
+                    if (renderer != null)
+                    {
+                        renderer.enabled = enable;
+                    }
+                    else
+                    {
+                        renderers.Remove(renderer);
+                        break;
+                    }
                 }
             }
         }
@@ -237,7 +231,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Checks if the effect contains the fill out renderer.
+        /// Returns true if the effect contains the fill out renderer.
         /// </summary>
         /// <param name="obj">The object which has a fill out.</param>
         /// <returns>True if the blink effect is active for the fill out, otherwise false.</returns>

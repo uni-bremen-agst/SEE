@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -20,7 +19,7 @@ namespace SEE.Net.Actions.Drawable
         public Color FillOutColor;
 
         /// <summary>
-        /// The constructor of this action. All it does is assign the value you pass it to a field.
+        /// The constructor of this action. All it does is to assign the value you pass to its fields.
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
@@ -36,11 +35,12 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Draws the line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="Line"/> don't exists.</exception>
+        /// <exception cref="System.Exception">will be thrown, if the <see cref="LineID"/> is empty or
+        /// null or does not exist.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (LineID != null && LineID != "")
+            if (!string.IsNullOrWhiteSpace(LineID))
             {
                 GameDrawer.FillOut(FindChild(LineID), FillOutColor);
             }

@@ -1,7 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
-using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -102,7 +101,7 @@ namespace SEE.Game.Drawable
         /// Changes the fill out object.
         /// </summary>
         /// <param name="obj">The line object.</param>
-        /// <param name="status">Whether the fill out is activ.</param>
+        /// <param name="status">Whether the fill out is active.</param>
         /// <param name="color">The color of the fill out</param>
         private static void ChangeFillOut(GameObject obj, bool status, Color color)
         {
@@ -111,7 +110,8 @@ namespace SEE.Game.Drawable
                 if (!status)
                 {
                     GameObject.DestroyImmediate(GameFinder.FindChild(obj, ValueHolder.FillOut));
-                } else
+                }
+                else
                 {
                     GameDrawer.FillOut(obj, color);
                 }

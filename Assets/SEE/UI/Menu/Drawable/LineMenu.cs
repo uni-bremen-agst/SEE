@@ -9,7 +9,6 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using static SEE.Game.Drawable.ActionHelpers.ShapePointsCalculator;
 using static SEE.Game.Drawable.GameDrawer;
 
 namespace SEE.UI.Menu.Drawable
@@ -56,12 +55,12 @@ namespace SEE.UI.Menu.Drawable
         private static UnityAction<int> lineKindAction;
 
         /// <summary>
-        /// The additionally action for the color kind selector.
+        /// The additionally action for the color-kind selector.
         /// </summary>
         private static UnityAction<int> colorKindAction;
 
         /// <summary>
-        /// The additionally clear fill out color action.
+        /// The additionally clear fill-out color action.
         /// </summary>
         private static UnityAction clearFillOutColorAction;
 
@@ -101,12 +100,12 @@ namespace SEE.UI.Menu.Drawable
         private static readonly SwitchManager loopManager;
 
         /// <summary>
-        /// Button manager for chose primary color.
+        /// Button manager for chosing the primary color.
         /// </summary>
-        private static ButtonManagerBasic primaryColorBMB;
+        private static readonly ButtonManagerBasic primaryColorBMB;
 
         /// <summary>
-        /// Button manager for chose secondary color.
+        /// Button manager for chosing the secondary color.
         /// </summary>
         private static readonly ButtonManagerBasic secondaryColorBMB;
 
@@ -116,19 +115,19 @@ namespace SEE.UI.Menu.Drawable
         private static readonly HSVPicker.ColorPicker picker;
 
         /// <summary>
-        /// Button manager for chose color kind area.
+        /// Button manager for chosing the color-kind area.
         /// </summary>
-        private static ButtonManagerBasic colorKindBMB;
+        private static readonly ButtonManagerBasic colorKindBMB;
 
         /// <summary>
-        /// Button manager for chose fill out area.
+        /// Button manager for chosing the fill-out area.
         /// </summary>
-        private static ButtonManagerBasic fillOutBMB;
+        private static readonly ButtonManagerBasic fillOutBMB;
 
         /// <summary>
-        /// The switch manager for the fill out status.
+        /// The switch manager for the fill-out status.
         /// </summary>
-        private static SwitchManager fillOutManager;
+        private static readonly SwitchManager fillOutManager;
 
         /// <summary>
         /// The mode of manipulating.
@@ -180,7 +179,7 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize and sets up the line kind selector.
             Instance.InitLineKindSelectorConstructor();
 
-            /// Initialize and sets up the color kind selector.
+            /// Initialize and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
@@ -251,7 +250,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the default color kind selector for the constructor.
+        /// Initializes the default color-kind selector for the constructor.
         /// </summary>
         private void InitColorKindSelectorConstructor()
         {
@@ -259,7 +258,7 @@ namespace SEE.UI.Menu.Drawable
                 .GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != LineKind.Solid;
 
-            /// Creates the items for the color kind selector.
+            /// Creates the items for the color-kind selector.
             foreach (ColorKind kind in GetColorKinds(true))
             {
                 colorKindSelector.CreateNewItem(kind.ToString());
@@ -419,23 +418,11 @@ namespace SEE.UI.Menu.Drawable
 
             SetUpLineKindSelectorForDrawing();
             SetUpColorKindSelectorForDrawing();
-
-            /// Sets up the primary color button.
             SetUpPrimaryColorButtonForDrawing();
-
-            /// Sets up the secondary color button.
             SetUpSecondaryColorButtonForDrawing();
-
-            /// Sets up the thickness slider.
             SetUpOutlineThicknessSliderForDrawing();
-
-            /// Sets up the color kind type button.
             SetUpColorKindTypeButtonForDrawing();
-
-            /// Sets up the fill out type button.
             SetUpFillOutTypeButtonForDrawing();
-
-            /// Sets up the fill out switch.
             SetUpFillOutTypeSwitchForDrawing();
 
             /// Assigns the current primary color to the <see cref="HSVPicker.ColorPicker"/>.
@@ -487,7 +474,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind selector with the currently selected <see cref="ColorKind"/> and
+        /// Sets up the color-kind selector with the currently selected <see cref="ColorKind"/> and
         /// saves the changes global value for it. <see cref="ValueHolder.CurrentColorKind"/>.
         /// </summary>
         private void SetUpColorKindSelectorForDrawing()
@@ -593,7 +580,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind type area for drawing mode.
+        /// Sets up the color-kind type area for the drawing mode.
         /// </summary>
         private static void SetUpColorKindTypeButtonForDrawing()
         {
@@ -626,7 +613,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the fill out type area for drawing mode.
+        /// Sets up the fill-out type area for the drawing mode.
         /// </summary>
         private static void SetUpFillOutTypeButtonForDrawing()
         {
@@ -647,7 +634,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the fill out type switch for drawing mode.
+        /// Sets up the fill-out type switch for the drawing mode.
         /// </summary>
         private static void SetUpFillOutTypeSwitchForDrawing()
         {
@@ -660,9 +647,9 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Gets the fill out color for the drawing mode.
+        /// Gets the fill-out color for the drawing mode.
         /// </summary>
-        /// <returns>null or the current selected fill out color.</returns>
+        /// <returns>null or the currently selected fill-out color.</returns>
         public static Color? GetFillOutColorForDrawing()
         {
             if (fillOutManager.isOn)
@@ -695,7 +682,7 @@ namespace SEE.UI.Menu.Drawable
                 /// Sets up the line kind selector.
                 SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-                /// Sets up the color kind selector.
+                /// Sets up the color-kind selector.
                 SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Adds the action that should be executed if the tiling silder changed.
@@ -716,11 +703,8 @@ namespace SEE.UI.Menu.Drawable
                 SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
-
                 SetUpColorKindTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
                 SetUpFillOutTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
-
                 SetUpFillOutSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 mode = Mode.Edit;
@@ -809,7 +793,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind selector for editing mode.
+        /// Sets up the color-kind selector for editing mode.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
@@ -821,18 +805,18 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
             AssignColorKind(lineHolder.ColorKind);
-            /// Gets and sets the current selected color kind index.
+            /// Gets and sets the current selected color-kind index.
             colorKindSelector.index = GetIndexOfSelectedColorKind();
             /// Updates the selector.
             colorKindSelector.UpdateUI();
 
-            /// Removes the current color kind action of the color kind selector.
+            /// Removes the current color-kind action of the color-kind selector.
             if (colorKindAction != null)
             {
                 colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
             }
 
-            /// Creates a new color kind selector action
+            /// Creates a new color-kind selector action
             colorKindAction = index =>
             {
                 lineHolder.ColorKind = GetColorKinds(true)[index];
@@ -850,7 +834,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             };
 
-            /// Adds the color kind selector action.
+            /// Adds the color-kind selector action.
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
         }
 
@@ -1063,7 +1047,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind type button for editing.
+        /// Sets up the color-kind type button for editing.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
@@ -1116,7 +1100,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the fill out type button for editing.
+        /// Sets up the fill-out type button for editing.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
@@ -1154,7 +1138,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the fill out switch for editing.
+        /// Sets up the fill-out switch for editing.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="lineHolder">The configuration which holds the changes.</param>
@@ -1218,10 +1202,10 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns a fill out status and color to the edit mode.
+        /// Assigns a fill-out status and color to the edit mode.
         /// </summary>
         /// <param name="fillOut">The status and color.</param>
-        /// <param name="setFillOutAction">fill out color change action.</param>
+        /// <param name="setFillOutAction">fill-out color change action.</param>
         /// <param name="clearFillOutAction">Action to clear the value.</param>
         public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
@@ -1258,7 +1242,7 @@ namespace SEE.UI.Menu.Drawable
         #endregion
 
         /// <summary>
-        /// Removes the handler of the line kind selector, the color kind selector,
+        /// Removes the handler of the line kind selector, the color-kind selector,
         /// the primary and secondary color buttons, the tiling slider controller,
         /// the thickness slider controller, order-in-layer slider controller,
         /// the loop switch and the additional color action for the HSV color picker.
@@ -1375,7 +1359,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns a color kind to the color kind selection.
+        /// Assigns a color kind to the color-kind selection.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned</param>
         public void AssignColorKind(ColorKind kind)
@@ -1543,7 +1527,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Refreshes the fill out switch layer.
+        /// Refreshes the fill-out switch layer.
         /// Will be needed for the switchting the editing of lines.
         /// </summary>
         private static void RefreshFillOut()
@@ -1586,7 +1570,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the fill out area.
+        /// Enables the fill-out area.
         /// </summary>
         private static void EnableFillOut()
         {
@@ -1594,7 +1578,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Hides the fill out area.
+        /// Hides the fill-out area.
         /// </summary>
         private static void DisableFillOut()
         {
@@ -1602,7 +1586,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Enables the color kind area.
+        /// Enables the color-kind area.
         /// </summary>
         private static void EnableColorKind()
         {
@@ -1614,7 +1598,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Hides the color kind area.
+        /// Hides the color-kind area.
         /// </summary>
         private static void DisableColorKind()
         {
