@@ -5,6 +5,7 @@ using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -54,9 +55,14 @@ namespace SEE.UI.Menu.Drawable
         private static UnityAction<int> lineKindAction;
 
         /// <summary>
-        /// The additionally action for the color kind selector.
+        /// The additionally action for the color-kind selector.
         /// </summary>
         private static UnityAction<int> colorKindAction;
+
+        /// <summary>
+        /// The additionally clear fill-out color action.
+        /// </summary>
+        private static UnityAction clearFillOutColorAction;
 
         /// <summary>
         /// The transform of the content object.
@@ -94,12 +100,12 @@ namespace SEE.UI.Menu.Drawable
         private static readonly SwitchManager loopManager;
 
         /// <summary>
-        /// Button manager for chose primary color.
+        /// Button manager for chosing the primary color.
         /// </summary>
-        private static ButtonManagerBasic primaryColorBMB;
+        private static readonly ButtonManagerBasic primaryColorBMB;
 
         /// <summary>
-        /// Button manager for chose secondary color.
+        /// Button manager for chosing the secondary color.
         /// </summary>
         private static readonly ButtonManagerBasic secondaryColorBMB;
 
@@ -107,6 +113,21 @@ namespace SEE.UI.Menu.Drawable
         /// The HSVPicker ColorPicker component of the line menu.
         /// </summary>
         private static readonly HSVPicker.ColorPicker picker;
+
+        /// <summary>
+        /// Button manager for chosing the color-kind area.
+        /// </summary>
+        private static readonly ButtonManagerBasic colorKindBMB;
+
+        /// <summary>
+        /// Button manager for chosing the fill-out area.
+        /// </summary>
+        private static readonly ButtonManagerBasic fillOutBMB;
+
+        /// <summary>
+        /// The switch manager for the fill-out status.
+        /// </summary>
+        private static readonly SwitchManager fillOutManager;
 
         /// <summary>
         /// The mode of manipulating.
@@ -158,7 +179,7 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize and sets up the line kind selector.
             Instance.InitLineKindSelectorConstructor();
 
-            /// Initialize and sets up the color kind selector.
+            /// Initialize and sets up the color-kind selector.
             Instance.InitColorKindSelectorConstructor();
 
             /// Initialize the remaining GUI elements.
@@ -172,6 +193,14 @@ namespace SEE.UI.Menu.Drawable
             secondaryColorBMB.clickEvent.AddListener(MutuallyExclusiveColorButtons);
             tilingSlider = GameFinder.FindChild(Instance.gameObject, "Tiling").GetComponentInChildren<FloatValueSliderController>();
             picker = Instance.gameObject.GetComponentInChildren<HSVPicker.ColorPicker>();
+            colorKindBMB = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<ButtonManagerBasic>();
+            colorKindBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "ColorKindBtn").GetComponent<Button>();
+            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.buttonVar.interactable = false;
+            fillOutBMB = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<ButtonManagerBasic>();
+            fillOutBMB.buttonVar = GameFinder.FindChild(Instance.gameObject, "FillOutBtn").GetComponent<Button>();
+            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutManager = GameFinder.FindChild(Instance.gameObject, "FillOut").GetComponentInChildren<SwitchManager>();
             mode = Mode.None;
             Instance.Disable();
         }
@@ -221,7 +250,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Initializes the default color kind selector for the constructor.
+        /// Initializes the default color-kind selector for the constructor.
         /// </summary>
         private void InitColorKindSelectorConstructor()
         {
@@ -229,7 +258,7 @@ namespace SEE.UI.Menu.Drawable
                 .GetComponent<HorizontalSelector>();
             bool isDashed = selectedLineKind != LineKind.Solid;
 
-            /// Creates the items for the color kind selector.
+            /// Creates the items for the color-kind selector.
             foreach (ColorKind kind in GetColorKinds(true))
             {
                 colorKindSelector.CreateNewItem(kind.ToString());
@@ -264,6 +293,7 @@ namespace SEE.UI.Menu.Drawable
             colorKindSelector.defaultIndex = 0;
         }
 
+        #region IsOpen
         /// <summary>
         /// True if the menu is already open.
         /// </summary>
@@ -290,6 +320,7 @@ namespace SEE.UI.Menu.Drawable
         {
             return gameObject.activeInHierarchy && mode == Mode.Edit;
         }
+        #endregion
 
         /// <summary>
         /// Enables all line menu layers,
@@ -361,6 +392,7 @@ namespace SEE.UI.Menu.Drawable
             MenuHelper.CalculateHeight(gameObject, true);
         }
 
+        #region Drawing
         /// <summary>
         /// Enables the line menu for drawing.
         /// </summary>
@@ -389,6 +421,9 @@ namespace SEE.UI.Menu.Drawable
             SetUpPrimaryColorButtonForDrawing();
             SetUpSecondaryColorButtonForDrawing();
             SetUpOutlineThicknessSliderForDrawing();
+            SetUpColorKindTypeButtonForDrawing();
+            SetUpFillOutTypeButtonForDrawing();
+            SetUpFillOutTypeSwitchForDrawing();
 
             /// Assigns the current primary color to the <see cref="HSVPicker.ColorPicker"/>.
             picker.AssignColor(ValueHolder.CurrentPrimaryColor);
@@ -439,7 +474,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind selector with the currently selected <see cref="ColorKind"/> and
+        /// Sets up the color-kind selector with the currently selected <see cref="ColorKind"/> and
         /// saves the changes global value for it. <see cref="ValueHolder.CurrentColorKind"/>.
         /// </summary>
         private void SetUpColorKindSelectorForDrawing()
@@ -545,6 +580,91 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Sets up the color-kind type area for the drawing mode.
+        /// </summary>
+        private static void SetUpColorKindTypeButtonForDrawing()
+        {
+            colorKindBMB.clickEvent.RemoveAllListeners();
+            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.clickEvent.AddListener(() =>
+            {
+                DisableFillOut();
+                EnableColorKind();
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+                if (!primaryColorBMB.buttonVar.interactable)
+                {
+                    AssignColorArea(color => { ValueHolder.CurrentPrimaryColor = color; }, ValueHolder.CurrentPrimaryColor);
+                }
+                else
+                {
+                    if (ValueHolder.CurrentSecondaryColor == Color.clear)
+                    {
+                        ValueHolder.CurrentSecondaryColor = Random.ColorHSV();
+                    }
+                    if (ValueHolder.CurrentSecondaryColor.a == 0)
+                    {
+                        ValueHolder.CurrentSecondaryColor = new Color(ValueHolder.CurrentSecondaryColor.r,
+                            ValueHolder.CurrentSecondaryColor.g, ValueHolder.CurrentSecondaryColor.b, 255);
+                    }
+                    AssignColorArea(color => { ValueHolder.CurrentSecondaryColor = color; }, ValueHolder.CurrentSecondaryColor);
+                }
+            });
+            colorKindBMB.buttonVar.interactable = false;
+        }
+
+        /// <summary>
+        /// Sets up the fill-out type area for the drawing mode.
+        /// </summary>
+        private static void SetUpFillOutTypeButtonForDrawing()
+        {
+            fillOutBMB.clickEvent.RemoveAllListeners();
+            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.clickEvent.AddListener(() =>
+            {
+                DisableColorKind();
+                EnableFillOut();
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+                if (ValueHolder.CurrentTertiaryColor == Color.clear)
+                {
+                    ValueHolder.CurrentTertiaryColor = ValueHolder.CurrentPrimaryColor;
+                }
+                AssignColorArea(color => { ValueHolder.CurrentTertiaryColor = color; }, ValueHolder.CurrentTertiaryColor);
+            });
+            fillOutBMB.buttonVar.interactable = true;
+        }
+
+        /// <summary>
+        /// Sets up the fill-out type switch for the drawing mode.
+        /// </summary>
+        private static void SetUpFillOutTypeSwitchForDrawing()
+        {
+            fillOutManager.OnEvents.RemoveAllListeners();
+            fillOutManager.OnEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = true);
+            fillOutManager.OffEvents.RemoveAllListeners();
+            fillOutManager.OffEvents.AddListener(() => ValueHolder.CurrentFillOutStatus = true);
+            fillOutManager.isOn = ValueHolder.CurrentFillOutStatus;
+            RefreshFillOut();
+        }
+
+        /// <summary>
+        /// Gets the fill-out color for the drawing mode.
+        /// </summary>
+        /// <returns>null or the currently selected fill-out color.</returns>
+        public static Color? GetFillOutColorForDrawing()
+        {
+            if (fillOutManager.isOn)
+            {
+                return ValueHolder.CurrentTertiaryColor;
+            }
+            else
+            {
+                return null;
+            }
+        }
+        #endregion
+
+        #region Editing
+        /// <summary>
         /// Provides the line menu for editing, adding the necessary handlers to the respective components.
         /// </summary>
         /// <param name="selectedLine">The selected line object for editing.</param>
@@ -562,7 +682,7 @@ namespace SEE.UI.Menu.Drawable
                 /// Sets up the line kind selector.
                 SetUpLineKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
-                /// Sets up the color kind selector.
+                /// Sets up the color-kind selector.
                 SetUpColorKindSelectorForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
 
                 /// Adds the action that should be executed if the tiling silder changed.
@@ -576,12 +696,16 @@ namespace SEE.UI.Menu.Drawable
                             LineKind.Dashed, tiling).Execute();
                 });
 
+                /// Sets up the components.
                 SetUpPrimaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpSecondaryColorButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpOutlineThicknessSliderForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
                 SetUpOrderInLayerSliderForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpLoopSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
                 SetUpColorPickerForEditing(selectedLine, renderer, lineHolder, surface, surfaceParentName);
+                SetUpColorKindTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                SetUpFillOutTypeButtonForEditing(selectedLine, lineHolder, surface, surfaceParentName);
+                SetUpFillOutSwitchForEditing(selectedLine, lineHolder, surface, surfaceParentName);
 
                 mode = Mode.Edit;
 
@@ -669,7 +793,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Sets up the color kind selector for editing mode.
+        /// Sets up the color-kind selector for editing mode.
         /// </summary>
         /// <param name="selectedLine">The selected line.</param>
         /// <param name="renderer">The line renderer of the selected line.</param>
@@ -681,18 +805,18 @@ namespace SEE.UI.Menu.Drawable
         {
             /// Assigns the current <see cref="ColorKind"/> of the selected line to the menu variable.
             AssignColorKind(lineHolder.ColorKind);
-            /// Gets and sets the current selected color kind index.
+            /// Gets and sets the current selected color-kind index.
             colorKindSelector.index = GetIndexOfSelectedColorKind();
             /// Updates the selector.
             colorKindSelector.UpdateUI();
 
-            /// Removes the current color kind action of the color kind selector.
+            /// Removes the current color-kind action of the color-kind selector.
             if (colorKindAction != null)
             {
                 colorKindSelector.selectorEvent.RemoveListener(colorKindAction);
             }
 
-            /// Creates a new color kind selector action
+            /// Creates a new color-kind selector action
             colorKindAction = index =>
             {
                 lineHolder.ColorKind = GetColorKinds(true)[index];
@@ -710,7 +834,7 @@ namespace SEE.UI.Menu.Drawable
                 }
             };
 
-            /// Adds the color kind selector action.
+            /// Adds the color-kind selector action.
             colorKindSelector.selectorEvent.AddListener(colorKindAction);
         }
 
@@ -921,10 +1045,204 @@ namespace SEE.UI.Menu.Drawable
                     selectedLine.name, color).Execute();
             });
         }
+
+        /// <summary>
+        /// Sets up the color-kind type button for editing.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The configuration which holds the changes.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
+        private static void SetUpColorKindTypeButtonForEditing(GameObject selectedLine, LineConf lineHolder,
+            GameObject surface, string surfaceParentName)
+        {
+            colorKindBMB.clickEvent.RemoveAllListeners();
+            colorKindBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            colorKindBMB.clickEvent.AddListener(() =>
+            {
+                DisableFillOut();
+                EnableColorKind();
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+                if (!primaryColorBMB.buttonVar.interactable)
+                {
+                    AssignColorArea(color =>
+                    {
+                        GameEdit.ChangePrimaryColor(selectedLine, color);
+                        lineHolder.PrimaryColor = color;
+                        new EditLinePrimaryColorNetAction(surface.name, surfaceParentName, selectedLine.name, color).Execute();
+                    }, lineHolder.PrimaryColor);
+                }
+                else
+                {
+                    /// If the <see cref="LineKind"/> was <see cref="LineKind.Solid"/> before,
+                    /// the secondary color is clear.
+                    /// Therefore, a random color is added first,
+                    /// and if the color's alpha is 0, it is set to 255 to ensure the color is not transparent.
+                    if (lineHolder.SecondaryColor == Color.clear)
+                    {
+                        lineHolder.SecondaryColor = Random.ColorHSV();
+                    }
+                    if (lineHolder.SecondaryColor.a == 0)
+                    {
+                        lineHolder.SecondaryColor = new Color(lineHolder.SecondaryColor.r,
+                            lineHolder.SecondaryColor.g, lineHolder.SecondaryColor.b, 255);
+                    }
+                    AssignColorArea(color =>
+                    {
+                        GameEdit.ChangeSecondaryColor(selectedLine, color);
+                        lineHolder.SecondaryColor = color;
+                        new EditLineSecondaryColorNetAction(surface.name, surfaceParentName,
+                            selectedLine.name, color).Execute();
+                    }, lineHolder.SecondaryColor);
+                }
+            });
+            colorKindBMB.buttonVar.interactable = false;
+        }
+
+        /// <summary>
+        /// Sets up the fill-out type button for editing.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The configuration which holds the changes.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
+        private static void SetUpFillOutTypeButtonForEditing(GameObject selectedLine, LineConf lineHolder,
+            GameObject surface, string surfaceParentName)
+        {
+            fillOutBMB.clickEvent.RemoveAllListeners();
+            fillOutBMB.clickEvent.AddListener(MutuallyExclusiveColorTypeButtons);
+            fillOutBMB.clickEvent.AddListener(() =>
+            {
+                DisableColorKind();
+                EnableFillOut();
+
+                if (lineHolder.FillOutStatus && !GameFinder.FindChild(selectedLine, ValueHolder.FillOut))
+                {
+                    if (FillOut(selectedLine, lineHolder.FillOutColor))
+                    {
+                        new DrawingFillOutNetAction(surface.name, surfaceParentName, selectedLine.name, lineHolder.FillOutColor).Execute();
+                        BlinkEffect.AddFillOutToEffect(selectedLine);
+                    }
+                }
+                AssignColorArea(color =>
+                {
+                    GameEdit.ChangeFillOutColor(selectedLine, color);
+                    lineHolder.FillOutColor = color;
+                    new EditLineFillOutColorNetAction(surface.name, surfaceParentName,
+                        selectedLine.name, color).Execute();
+                }, lineHolder.FillOutColor);
+
+                MenuHelper.CalculateHeight(Instance.gameObject, true);
+            });
+            fillOutBMB.buttonVar.interactable = true;
+        }
+
+        /// <summary>
+        /// Sets up the fill-out switch for editing.
+        /// </summary>
+        /// <param name="selectedLine">The selected line.</param>
+        /// <param name="lineHolder">The configuration which holds the changes.</param>
+        /// <param name="surface">The drawable surface on which the line is displayed.</param>
+        /// <param name="surfaceParentName">The parent id of the drawable surface.</param>
+        private static void SetUpFillOutSwitchForEditing(GameObject selectedLine, LineConf lineHolder,
+            GameObject surface, string surfaceParentName)
+        {
+            fillOutManager.OnEvents.RemoveAllListeners();
+            fillOutManager.OnEvents.AddListener(() =>
+            {
+                lineHolder.FillOutStatus = true;
+                if (lineHolder.FillOutColor == Color.clear)
+                {
+                    lineHolder.FillOutColor = lineHolder.PrimaryColor;
+                    picker.AssignColor(lineHolder.FillOutColor);
+                }
+                else if (lineHolder.FillOutColor != picker.CurrentColor)
+                {
+                    lineHolder.FillOutColor = picker.CurrentColor.WithAlpha(255);
+                }
+
+                if (FillOut(selectedLine, lineHolder.FillOutColor))
+                {
+                    new DrawingFillOutNetAction(surface.name, surfaceParentName, selectedLine.name,
+                        lineHolder.FillOutColor).Execute();
+                    if (BlinkEffect.CanFillOutBeAdded(selectedLine))
+                    {
+                        BlinkEffect.AddFillOutToEffect(selectedLine);
+                    }
+                }
+
+                AssignColorArea(color =>
+                {
+                    GameEdit.ChangeFillOutColor(selectedLine, color);
+                    lineHolder.FillOutColor = color;
+                    new EditLineFillOutColorNetAction(surface.name, surfaceParentName,
+                        selectedLine.name, color).Execute();
+                }, lineHolder.FillOutColor);
+            });
+
+            fillOutManager.OffEvents.RemoveAllListeners();
+            fillOutManager.OffEvents.AddListener(() =>
+            {
+                lineHolder.FillOutStatus = false;
+                if (colorAction != null)
+                {
+                    picker.onValueChanged.RemoveListener(colorAction);
+                }
+                if (clearFillOutColorAction != null)
+                {
+                    clearFillOutColorAction.Invoke();
+                }
+                BlinkEffect.RemoveFillOutFromEffect(selectedLine);
+                GameObject.DestroyImmediate(GameFinder.FindChild(selectedLine, ValueHolder.FillOut));
+                new DeleteFillOutNetAction(surface.name, surfaceParentName, selectedLine.name).Execute();
+            });
+
+            fillOutManager.isOn = lineHolder.FillOutStatus;
+            RefreshFillOut();
+        }
+
+        /// <summary>
+        /// Assigns a fill-out status and color to the edit mode.
+        /// </summary>
+        /// <param name="fillOut">The status and color.</param>
+        /// <param name="setFillOutAction">fill-out color change action.</param>
+        /// <param name="clearFillOutAction">Action to clear the value.</param>
+        public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
+        {
+            if (Instance.IsInEditMode() && !fillOutBMB.buttonVar.interactable)
+            {
+                if (fillOut != null && setFillOutAction != null)
+                {
+                    fillOutManager.isOn = true;
+                    if (FillOut(DrawShapesAction.currentShape, fillOut))
+                    {
+                        GameObject surface = GameFinder.GetDrawableSurface(DrawShapesAction.currentShape);
+                        new DrawingFillOutNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
+                            DrawShapesAction.currentShape.name, LineConf.GetLine(DrawShapesAction.currentShape).FillOutColor).Execute();
+                        if (BlinkEffect.CanFillOutBeAdded(DrawShapesAction.currentShape))
+                        {
+                            BlinkEffect.AddFillOutToEffect(DrawShapesAction.currentShape);
+                        }
+                    }
+                    if (colorAction != setFillOutAction)
+                    {
+                        AssignColorArea(setFillOutAction, fillOut.Value);
+                    }
+                    clearFillOutColorAction = clearFillOutAction;
+                }
+                else
+                {
+                    fillOutManager.isOn = false;
+                    fillOutManager.OffEvents.Invoke();
+                    RefreshFillOut();
+                }
+            }
+        }
+        #endregion
         #endregion
 
         /// <summary>
-        /// Removes the handler of the line kind selector, the color kind selector,
+        /// Removes the handler of the line kind selector, the color-kind selector,
         /// the primary and secondary color buttons, the tiling slider controller,
         /// the thickness slider controller, order-in-layer slider controller,
         /// the loop switch and the additional color action for the HSV color picker.
@@ -958,6 +1276,10 @@ namespace SEE.UI.Menu.Drawable
             gameObject.GetComponentInChildren<LayerSliderController>().OnValueChanged.RemoveAllListeners();
             loopManager.OffEvents.RemoveAllListeners();
             loopManager.OnEvents.RemoveAllListeners();
+            fillOutManager.OffEvents.RemoveAllListeners();
+            fillOutManager.OnEvents.RemoveAllListeners();
+            colorKindBMB.clickEvent.RemoveAllListeners();
+            fillOutBMB.clickEvent.RemoveAllListeners();
 
             if (colorAction != null)
             {
@@ -1037,7 +1359,7 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
-        /// Assigns a color kind to the color kind selection.
+        /// Assigns a color kind to the color-kind selection.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned</param>
         public void AssignColorKind(ColorKind kind)
@@ -1059,6 +1381,7 @@ namespace SEE.UI.Menu.Drawable
         }
         #endregion
 
+        #region Button Mutally Exclusive
         /// <summary>
         /// This method will be used as an action for the handler of the color buttons (primary/secondary).
         /// This allows only one color to be active at a time.
@@ -1068,6 +1391,18 @@ namespace SEE.UI.Menu.Drawable
             primaryColorBMB.buttonVar.interactable = !primaryColorBMB.buttonVar.IsInteractable();
             secondaryColorBMB.buttonVar.interactable = !secondaryColorBMB.buttonVar.IsInteractable();
         }
+
+
+        /// <summary>
+        /// This method will be used as an action for the handler of the color type buttons (color kind/fill out).
+        /// This allows only one color type to be active at a time.
+        /// </summary>
+        private static void MutuallyExclusiveColorTypeButtons()
+        {
+            colorKindBMB.buttonVar.interactable = !colorKindBMB.buttonVar.IsInteractable();
+            fillOutBMB.buttonVar.interactable = !fillOutBMB.buttonVar.IsInteractable();
+        }
+        #endregion
 
         /// <summary>
         ///Refrehes the horizontal selectors <see cref="lineKindSelector"/> and <see cref="colorKindSelector"/>".
@@ -1091,6 +1426,8 @@ namespace SEE.UI.Menu.Drawable
             EnableLoopFromLineMenu();
             EnableLayerFromLineMenu();
             EnableThicknessFromLineMenu();
+            EnableColorKind();
+            DisableFillOut();
         }
 
         /// <summary>
@@ -1190,6 +1527,17 @@ namespace SEE.UI.Menu.Drawable
         }
 
         /// <summary>
+        /// Refreshes the fill-out switch layer.
+        /// Will be needed for the switchting the editing of lines.
+        /// </summary>
+        private static void RefreshFillOut()
+        {
+            GameObject fillout = content.Find("FillOut").gameObject;
+            fillout.SetActive(!fillout.activeInHierarchy);
+            fillout.SetActive(!fillout.activeInHierarchy);
+        }
+
+        /// <summary>
         /// Hides the color area selector layer.
         /// </summary>
         private static void DisableColorAreaFromLineMenu()
@@ -1219,6 +1567,43 @@ namespace SEE.UI.Menu.Drawable
         private void EnableReturn()
         {
             gameObject.transform.Find("ReturnBtn").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Enables the fill-out area.
+        /// </summary>
+        private static void EnableFillOut()
+        {
+            content.transform.Find("FillOut").gameObject.SetActive(true);
+        }
+
+        /// <summary>
+        /// Hides the fill-out area.
+        /// </summary>
+        private static void DisableFillOut()
+        {
+            content.transform.Find("FillOut").gameObject.SetActive(false);
+        }
+
+        /// <summary>
+        /// Enables the color-kind area.
+        /// </summary>
+        private static void EnableColorKind()
+        {
+            content.transform.Find("ColorKindSelection").gameObject.SetActive(true);
+            if (selectedColorKind != ColorKind.Monochrome)
+            {
+                EnableColorAreaFromLineMenu();
+            }
+        }
+
+        /// <summary>
+        /// Hides the color-kind area.
+        /// </summary>
+        private static void DisableColorKind()
+        {
+            content.transform.Find("ColorKindSelection").gameObject.SetActive(false);
+            DisableColorAreaFromLineMenu();
         }
         #endregion
     }

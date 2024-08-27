@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -235,13 +236,18 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line to be updated.</param>
         /// <param name="positions">The new positions for the line.</param>
-        public static void Drawing(GameObject line, Vector3[] positions)
+        public static void Drawing(GameObject line, Vector3[] positions, Color? fillOutColor = null)
         {
             LineRenderer renderer = GetRenderer(line);
             renderer.positionCount = positions.Length;
             /// Ensure that all points of the line have a z-axis value of 0.
             UpdateZPositions(ref positions);
             renderer.SetPositions(positions);
+
+            if (fillOutColor != null && FillOut(line, fillOutColor))
+            {
+                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = false;
+            }
         }
 
         /// <summary>
@@ -273,7 +279,9 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The line for which drawing is to be finished.</param>
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
-        public static void FinishDrawing(GameObject line, bool loop)
+        /// <param name="fillOutColor">The color to fill out the line; null if the line should not filled out.</param>
+        /// <param name="showInfo">Whether the information of the fill out should be shown.</param>
+        public static void FinishDrawing(GameObject line, bool loop, Color? fillOutColor = null, bool showInfo = true)
         {
             LineRenderer renderer = GetRenderer(line);
             MeshCollider meshCollider = GetMeshCollider(line);
@@ -283,6 +291,10 @@ namespace SEE.Game.Drawable
             if (mesh.vertices.Distinct().Count() >= 3)
             {
                 meshCollider.sharedMesh = mesh;
+            }
+            if (fillOutColor != null && FillOut(line, fillOutColor.Value, showInfo))
+            {
+                GameFinder.FindChild(line, ValueHolder.FillOut).GetComponent<MeshCollider>().enabled = true;
             }
         }
 
@@ -308,10 +320,11 @@ namespace SEE.Game.Drawable
         /// <param name="tiling">The tiling for a dashed line kind</param>
         /// <param name="increaseCurrentOrder">Option to increase the current order in the layer value.
         /// By default, it is set to true.</param>
+        /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The created or updated line.</returns>
         public static GameObject DrawLine(GameObject surface, string name, Vector3[] positions, ColorKind colorKind,
             Color primaryColor, Color secondaryColor, float thickness, bool loop, LineKind lineKind,
-            float tiling, bool increaseCurrentOrder = true)
+            float tiling, bool increaseCurrentOrder = true, Color? fillOutColor = null)
         {
             GameObject lineObject;
             /// Updates the z axis values of the positions to 0.
@@ -321,7 +334,7 @@ namespace SEE.Game.Drawable
             {
                 lineObject = GameFinder.FindChild(surface, name);
                 Drawing(lineObject, positions);
-                FinishDrawing(lineObject, loop);
+                FinishDrawing(lineObject, loop, fillOutColor);
             }
             else
             {
@@ -337,7 +350,7 @@ namespace SEE.Game.Drawable
                     holder.Inc();
                     ValueHolder.MaxOrderInLayer++;
                 }
-                FinishDrawing(line, loop);
+                FinishDrawing(line, loop, fillOutColor);
             }
             return lineObject;
         }
@@ -366,11 +379,13 @@ namespace SEE.Game.Drawable
         /// <param name="loop">Option to connect the line endpoint with the starting point.</param>
         /// <param name="lineKind">The line kind for the line.</param>
         /// <param name="tiling">The tiling for a dashed line kind</param>
+        /// <param name="associatedPage">The associated page of the line</param>
+        /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The recreated or updated line.</returns>
         public static GameObject ReDrawLine(GameObject surface, string name, Vector3[] positions,
             ColorKind colorKind, Color primaryColor, Color secondaryColor, float thickness,
             int orderInLayer, Vector3 position, Vector3 eulerAngles, Vector3 scale, bool loop,
-            LineKind lineKind, float tiling, int associatedPage)
+            LineKind lineKind, float tiling, int associatedPage, Color? fillOutColor)
         {
             /// Updates the z axis values of the positions to 0.
             UpdateZPositions(ref positions);
@@ -401,7 +416,7 @@ namespace SEE.Game.Drawable
                 line.GetComponent<OrderInLayerValueHolder>().OrderInLayer = orderInLayer;
                 line.GetComponent<AssociatedPageHolder>().AssociatedPage = associatedPage;
                 Drawing(line, positions);
-                FinishDrawing(line, loop);
+                FinishDrawing(line, loop, fillOutColor, false);
 
                 return line;
             }
@@ -416,7 +431,7 @@ namespace SEE.Game.Drawable
                 line.transform.localPosition = position;
 
                 renderer.SetPositions(positions);
-                FinishDrawing(line, loop);
+                FinishDrawing(line, loop, fillOutColor, false);
 
                 return line;
             }
@@ -446,7 +461,8 @@ namespace SEE.Game.Drawable
                  lineToRedraw.Loop,
                  lineToRedraw.LineKind,
                  lineToRedraw.Tiling,
-                 lineToRedraw.AssociatedPage);
+                 lineToRedraw.AssociatedPage,
+                 LineConf.GetFillOutColor(lineToRedraw));
             return line;
         }
 
@@ -463,8 +479,9 @@ namespace SEE.Game.Drawable
         /// the pivot is shifted.
         /// </summary>
         /// <param name="line">The line in which the pivot should be set</param>
+        /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns>The line with the pivot in the middle</returns>
-        public static GameObject SetPivot(GameObject line)
+        public static GameObject SetPivot(GameObject line, Color? fillOutColor = null)
         {
             if (line.CompareTag(Tags.Line))
             {
@@ -499,7 +516,7 @@ namespace SEE.Game.Drawable
                 /// Update the new line positions.
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
-                FinishDrawing(line, renderer.loop);
+                FinishDrawing(line, renderer.loop, fillOutColor);
             }
             return line;
         }
@@ -554,8 +571,9 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="line">The shape for which the pivot point should be set.</param>
         /// <param name="middlePos">The center position for the shape.</param>
+        /// <param name="fillOutColor">The color for fill out the line; null if the line should not filled out.</param>
         /// <returns></returns>
-        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos)
+        public static GameObject SetPivotShape(GameObject line, Vector3 middlePos, Color? fillOutColor = null)
         {
             if (line.CompareTag(Tags.Line))
             {
@@ -576,7 +594,7 @@ namespace SEE.Game.Drawable
                 /// Updates the new line positions.
                 Drawing(line, convertedPositions);
                 /// Update the mesh collider.
-                FinishDrawing(line, renderer.loop);
+                FinishDrawing(line, renderer.loop, fillOutColor);
             }
             return line;
         }
@@ -749,6 +767,25 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Counts the different positions of an line game object.
+        /// </summary>
+        /// <param name="line">The line game object.</param>
+        /// <returns>The count of different positions.</returns>
+        public static int DifferentPositionCounter(GameObject line)
+        {
+            if (line.CompareTag(Tags.Line))
+            {
+                Vector3[] positions = new Vector3[GetRenderer(line).positionCount];
+                line.GetComponent<LineRenderer>().GetPositions(positions);
+                return DifferentPositionCounter(positions);
+            }
+            else
+            {
+                return 0;
+            }
+        }
+
+        /// <summary>
         /// Calculates the various vertices of a mesh that has been computed
         /// from the line points of the line renderer.
         /// </summary>
@@ -762,7 +799,8 @@ namespace SEE.Game.Drawable
                 Mesh mesh = new();
                 renderer.BakeMesh(mesh);
                 return mesh.vertices.Distinct().ToList().Count;
-            } else
+            }
+            else
             {
                 return 0;
             }
@@ -813,6 +851,97 @@ namespace SEE.Game.Drawable
             convertedPosition = line.transform.InverseTransformPoint(position) - ValueHolder.DistanceToDrawable;
             Destroyer.Destroy(line);
             return convertedPosition;
+        }
+
+        /// <summary>
+        /// Fills out a line object.
+        /// Be careful, this is intended for shapes and lines with an activated loop function.
+        /// It also works for freehand drawing, but the result may differ from what is expected.
+        /// </summary>
+        /// <param name="line">The line that is to be filled out.</param>
+        /// <param name="color">The fill out color.</param>
+        /// <param name="showInfo">Whether the info should showed if the fill out is not possible.</param>
+        /// <returns>True if the fill out was successful, false if not.</returns>
+        public static bool FillOut(GameObject line, Color? color = null, bool showInfo = false)
+        {
+            if (line.CompareTag(Tags.Line)
+                && DifferentPositionCounter(line) > 2)
+            {
+                GameObject fillOut;
+                MeshFilter meshFilter;
+                MeshCollider collider;
+                if (!GameFinder.FindChild(line, ValueHolder.FillOut))
+                {
+                    fillOut = new(ValueHolder.FillOut);
+                    fillOut.transform.SetParent(line.transform);
+                    fillOut.transform.rotation = line.transform.rotation;
+                    Vector3 pos = line.transform.position;
+                    /// To avoid an overlapping issue, position the fill slightly behind the line.
+                    fillOut.transform.position = new Vector3(pos.x, pos.y, pos.z + 0.00001f);
+                    meshFilter = fillOut.AddComponent<MeshFilter>();
+                    MeshRenderer meshRenderer = fillOut.AddComponent<MeshRenderer>();
+                    collider = fillOut.AddComponent<MeshCollider>();
+                    Color fillColor = color ?? line.GetColor();
+                    /// Set a default material if none is assigned
+                    if (meshRenderer.sharedMaterial == null)
+                    {
+                        meshRenderer.sharedMaterial = GetMaterial(fillColor, LineKind.Solid);
+                    }
+                }
+                else
+                {
+                    fillOut = GameFinder.FindChild(line, ValueHolder.FillOut);
+                    meshFilter = fillOut.GetComponent<MeshFilter>();
+                    collider = fillOut.GetComponent <MeshCollider>();
+                    GameEdit.ChangeFillOutColor(line, color ?? line.GetColor());
+                }
+                Vector3[] worldPos = new Vector3[line.GetComponent<LineRenderer>().positionCount];
+                line.GetComponent<LineRenderer>().GetPositions(worldPos);
+                /// Creates the mesh for the fill out area.
+                int numPos = line.GetComponent<LineRenderer>().positionCount;
+                Vector3[] vertices = new Vector3[numPos];
+                int[] triangles = new int[(numPos - 2) * 3];
+                for (int i = 0; i < numPos; i++)
+                {
+                    vertices[i] = worldPos[i];
+                }
+                int t = 0;
+                for (int i = 1; i < numPos - 1; i++)
+                {
+                    triangles[t] = 0;
+                    triangles[t + 1] = i;
+                    triangles[t + 2] = i + 1;
+                    t += 3;
+                }
+                Mesh mesh = new() { vertices = vertices, triangles = triangles };
+
+                mesh.RecalculateNormals();
+                mesh.RecalculateBounds();
+                meshFilter.mesh = mesh;
+                if (mesh.vertices.Distinct().ToList().Count > 2)
+                {
+                    collider.sharedMesh = mesh;
+                    GameScaler.SetScale(fillOut, Vector3.one);
+                    return true;
+                }
+                else
+                {
+                    GameObject.DestroyImmediate(fillOut);
+                    return false;
+                }
+            } else
+            {
+                if (showInfo)
+                {
+                    ShowNotification.Info("Fill out cannot be applied.",
+                        "The fill out cannot be applied because the selected object either is no line or has too few points.");
+                }
+                if (GameFinder.FindChild(line, ValueHolder.FillOut))
+                {
+                    Destroyer.Destroy(GameFinder.FindChild(line, ValueHolder.FillOut));
+                }
+                return false;
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -59,6 +60,16 @@ namespace SEE.Game.Drawable.Configurations
         public float Tiling;
 
         /// <summary>
+        /// Whether the fill out is active or not.
+        /// </summary>
+        public bool FillOutStatus;
+
+        /// <summary>
+        /// The fill out color; null if the line has no fill out.
+        /// </summary>
+        public Color FillOutColor;
+
+        /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
         /// </summary>
         /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component</param>
@@ -69,6 +80,7 @@ namespace SEE.Game.Drawable.Configurations
             if (lineGameObject != null && lineGameObject.CompareTag(Tags.Line))
             {
                 LineRenderer renderer = lineGameObject.GetComponent<LineRenderer>();
+                GameObject fillout = GameFinder.FindChild(lineGameObject, ValueHolder.FillOut);
                 line = new()
                 {
                     Id = lineGameObject.name,
@@ -82,7 +94,9 @@ namespace SEE.Game.Drawable.Configurations
                     Loop = renderer.loop,
                     EulerAngles = lineGameObject.transform.localEulerAngles,
                     ColorKind = lineGameObject.GetComponent<LineValueHolder>().ColorKind,
-                    RendererPositions = new Vector3[renderer.positionCount]
+                    RendererPositions = new Vector3[renderer.positionCount],
+                    FillOutStatus = fillout != null,
+                    FillOutColor = fillout != null ? GameFinder.FindChild(lineGameObject, ValueHolder.FillOut).GetColor() : Color.clear
                 };
                 renderer.GetPositions(line.RendererPositions);
                 switch (line.ColorKind)
@@ -119,6 +133,16 @@ namespace SEE.Game.Drawable.Configurations
         }
 
         /// <summary>
+        /// Gets the fill out of the <see cref="LineConf"/>
+        /// </summary>
+        /// <param name="conf">The line conf</param>
+        /// <returns>The fill out color or null.</returns>
+        public static Color? GetFillOutColor(LineConf conf)
+        {
+            return conf.FillOutStatus ? conf.FillOutColor : null;
+        }
+
+        /// <summary>
         /// Clones this line object.
         /// </summary>
         /// <returns>A copy of this line object.</returns>
@@ -140,6 +164,8 @@ namespace SEE.Game.Drawable.Configurations
                 Scale = this.Scale,
                 LineKind = this.LineKind,
                 Tiling = this.Tiling,
+                FillOutStatus = this.FillOutStatus,
+                FillOutColor = this.FillOutColor,
             };
         }
 
@@ -186,6 +212,16 @@ namespace SEE.Game.Drawable.Configurations
         private const string tilingLabel = "TilingLabel";
 
         /// <summary>
+        /// Label in the configuration file for the fill out status of a line.
+        /// </summary>
+        private const string fillOutStatusLabel = "FillOutStatus";
+
+        /// <summary>
+        /// Label in the configuration file for the fill out color of a line.
+        /// </summary>
+        private const string fillOutColorLabel = "FillOutColorLabel";
+
+        /// <summary>
         /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
@@ -194,6 +230,8 @@ namespace SEE.Game.Drawable.Configurations
             writer.Save(ColorKind.ToString(), colorKindLabel);
             writer.Save(PrimaryColor, primaryColorLabel);
             writer.Save(SecondaryColor, secondaryColorLabel);
+            writer.Save(FillOutStatus, fillOutStatusLabel);
+            writer.Save(FillOutColor, fillOutColorLabel);
             writer.Save(Thickness, thicknessLabel);
             writer.Save(Loop, loopLabel);
             writer.Save(LineKind.ToString(), lineKindLabel);
@@ -251,6 +289,29 @@ namespace SEE.Game.Drawable.Configurations
             else
             {
                 SecondaryColor = Color.black;
+                errors = true;
+            }
+
+            /// Try to restore the fill out status.
+            if (attributes.TryGetValue(fillOutStatusLabel, out object loadedFillOutStatus))
+            {
+                FillOutStatus = (bool)loadedFillOutStatus;
+            }
+            else
+            {
+                FillOutStatus = false;
+                errors = true;
+            }
+
+            /// Try to restore the fill out color.
+            Color loadedFOColor = Color.black;
+            if (ConfigIO.Restore(attributes, fillOutColorLabel, ref loadedFOColor))
+            {
+                FillOutColor = loadedFOColor;
+            }
+            else
+            {
+                FillOutColor = Color.black;
                 errors = true;
             }
 

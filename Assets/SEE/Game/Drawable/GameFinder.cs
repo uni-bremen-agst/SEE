@@ -15,8 +15,8 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="surfaceID">the drawable surface id.</param>
         /// <param name="surfaceParentID">the parent id of the drawable surface.</param>
-        /// <param name="useFindWithTagList">Option to select which list should be searched. 
-        /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used. 
+        /// <param name="useFindWithTagList">Option to select which list should be searched.
+        /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used.
         /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
         /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
         /// <remarks>This method will iterate over all game objects in the
@@ -60,7 +60,7 @@ namespace SEE.Game.Drawable
                     }
                 }
             }
-            /// If the search with the <see cref="ValueHolder.DrawableSurfaces"> list is unsuccessful, 
+            /// If the search with the <see cref="ValueHolder.DrawableSurfaces"> list is unsuccessful,
             /// initiate a search using the <see cref="GameObject.FindGameObjectsWithTag(string)"/> method.
             if (!useFindWithTagList && searchedSurface == null)
             {
@@ -276,6 +276,33 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Returns the next higher <see cref="DrawableType"/> object.
+        /// It will be needed if a child object of the <see cref="DrawableType"/> object was selected.
+        /// </summary>
+        /// <param name="obj">The currently selected obj.</param>
+        /// <returns>The next higher <see cref="DrawableType"/> object or null.</returns>
+        public static GameObject GetDrawableTypObject(GameObject obj)
+        {
+            if (Tags.DrawableTypes.Contains(obj.tag))
+            {
+                return obj;
+            }
+            else if (obj.transform.parent != null
+                && Tags.DrawableTypes.Contains(obj.transform.parent.tag))
+            {
+                return obj.transform.parent.gameObject;
+            }
+            else if (obj.transform.parent != null)
+            {
+                return GetDrawableTypObject(obj.transform.parent.gameObject);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets the parent name of the drawable surface.
         /// </summary>
         /// <param name="surface">The drawable surface</param>
@@ -299,7 +326,7 @@ namespace SEE.Game.Drawable
         /// <returns>The unique ID.</returns>
         public static string GetUniqueID(GameObject surface)
         {
-            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface))? 
+            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface))?
                 GetDrawableSurfaceParentName(surface): surface.name;
         }
 

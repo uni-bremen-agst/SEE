@@ -1,6 +1,8 @@
 ﻿using HighlightPlus;
 using SEE.Utils;
 using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Drawable
@@ -24,7 +26,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// The renderers of the attached game object (for mind map nodes)
         /// </summary>
-        private Renderer[] renderers;
+        private List<Renderer> renderers;
 
         /// <summary>
         /// The canvas of the attached game object.
@@ -57,15 +59,9 @@ namespace SEE.Game.Drawable
                 else if (renderers != null)
                 {
                     /// Makes the renderers blink.
-                    foreach (Renderer renderer in renderers)
-                    {
-                        renderer.enabled = false;
-                    }
+                    EnableRenderers(false);
                     yield return new WaitForSeconds(0.2f);
-                    foreach (Renderer renderer in renderers)
-                    {
-                        renderer.enabled = true;
-                    }
+                    EnableRenderers(true);
                     yield return new WaitForSeconds(0.5f);
                 }
                 else if (canvas != null)
@@ -83,6 +79,22 @@ namespace SEE.Game.Drawable
                     yield return new WaitForSeconds(0.2f);
                     highlight.enabled = true;
                     yield return new WaitForSeconds(0.5f);
+                }
+            }
+
+            void EnableRenderers(bool enable)
+            {
+                foreach (Renderer renderer in renderers)
+                {
+                    if (renderer != null)
+                    {
+                        renderer.enabled = enable;
+                    }
+                    else
+                    {
+                        renderers.Remove(renderer);
+                        break;
+                    }
                 }
             }
         }
@@ -105,7 +117,10 @@ namespace SEE.Game.Drawable
             {
                 foreach (Renderer renderer in renderers)
                 {
-                    renderer.enabled = true;
+                    if (renderer != null)
+                    {
+                        renderer.enabled = true;
+                    }
                 }
             }
             else if (canvas != null)
@@ -141,7 +156,8 @@ namespace SEE.Game.Drawable
         {
             GameObject obj = gameObject;
 
-            if (renderer == null && obj.GetComponent<Renderer>() != null)
+            if (renderer == null && obj.GetComponent<Renderer>() != null
+                && obj.GetComponentsInChildren<Renderer>().Length == 1)
             {
                 /// Sets the renderer if available.
                 renderer = obj.GetComponent<Renderer>();
@@ -149,9 +165,7 @@ namespace SEE.Game.Drawable
             else if (obj.GetComponentsInChildren<Renderer>().Length > 0)
             {
                 /// Sets the renderers if available.
-                /// Only for mind map nodes, it takes the border (line render)
-                /// and the text (mesh renderer)
-                renderers = obj.GetComponentsInChildren<Renderer>();
+                renderers = obj.GetComponentsInChildren<Renderer>().ToList();
             }
             else if (obj.GetComponent<Canvas>() != null)
             {
@@ -171,6 +185,75 @@ namespace SEE.Game.Drawable
             }
             loopOn = true;
             StartCoroutine(Blink());
+        }
+
+        /// <summary>
+        /// Removes the renderer of the fill out.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        public static void RemoveFillOutFromEffect(GameObject obj)
+        {
+            if (obj != null && obj.GetComponent<BlinkEffect>() != null)
+            {
+                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                BlinkEffect effect = obj.GetComponent<BlinkEffect>();
+                if (fillOut != null)
+                {
+                    effect.renderers.Remove(fillOut.GetComponent<Renderer>());
+                }
+            }
+        }
+
+        /// <summary>
+        /// Adds the renderer of the fill out.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        public static void AddFillOutToEffect(GameObject obj)
+        {
+            if (obj != null && (obj.GetComponent<BlinkEffect>() != null
+                    || obj.GetComponentInParent<BlinkEffect>() != null))
+            {
+                GameObject fillOut = GameFinder.FindChild(obj, ValueHolder.FillOut);
+                BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
+                if (fillOut != null && fillOut.GetComponent<Renderer>() != null)
+                {
+                    if (effect.renderers != null)
+                    {
+                        effect.renderers.Add(fillOut.GetComponent<Renderer>());
+                    }
+                    else if (effect.renderer != null)
+                    {
+                        effect.Deactivate();
+                        obj.AddComponent<BlinkEffect>();
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns true if the effect contains the fill out renderer.
+        /// </summary>
+        /// <param name="obj">The object which has a fill out.</param>
+        /// <returns>True if the blink effect is active for the fill out, otherwise false.</returns>
+        public static bool CanFillOutBeAdded(GameObject obj)
+        {
+            BlinkEffect effect = obj.GetComponent<BlinkEffect>() ?? obj.GetComponentInParent<BlinkEffect>();
+            if (obj != null && effect != null
+                && effect.renderers != null
+                && GameFinder.FindChild(obj, ValueHolder.FillOut) != null)
+            {
+                return !effect.renderers.Contains(GameFinder.FindChild(obj,
+                    ValueHolder.FillOut).GetComponent<Renderer>());
+            }
+            else if (obj != null && effect != null
+                && effect.renderer != null)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
