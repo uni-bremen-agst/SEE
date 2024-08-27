@@ -7,7 +7,6 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using Sirenix.Utilities;
-using UnityEditor.Rendering;
 using UnityEngine;
 using Network = SEE.Net.Network;
 
@@ -78,12 +77,6 @@ namespace SEE.UI
                     Description: "Allows to set additional network settings.",
                     EntryColor: Color.gray,
                     Icon: Icons.Gear),
-
-                new(SelectAction: UserSettings,
-                    Title: "User settings",
-                    Description: "Allows to set additional user settings.",
-                    EntryColor: Color.gray,
-                    Icon: Icons.Gear)
             };
 
             Color NextColor()
@@ -195,19 +188,6 @@ namespace SEE.UI
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             NetworkPropertyDialog dialog = new(network, Reactivate);
-            dialog.Open();
-        }
-
-        /// <summary>
-        /// Opens the dialog to configure the user settings.
-        /// </summary>
-        private void UserSettings()
-        {
-            /// Note: We arrive here because the user pressed one of the buttons of the
-            /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
-            /// at this time, menu is no longer visible. When the following dialog
-            /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            UserPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
 
