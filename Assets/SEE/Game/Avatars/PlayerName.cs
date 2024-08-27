@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
-using SEE.GO;
 
 namespace SEE.Game.Avatars
 {
@@ -27,11 +26,6 @@ namespace SEE.Game.Avatars
         [SerializeField]
         private TMP_Text displayNameText;
 
-        private string Me => $"[Player name={gameObject.FullName()} IsLocalPlayer={IsLocalPlayer} "
-            + $"IsServer={IsServer} IsHost={IsHost} IsClient={IsClient} ServerIsHost ={ServerIsHost} "
-            + $"IsOwner={IsOwner} IsOwnedByServer={IsOwnedByServer} "
-            + $"NetworkObjectId ={NetworkObjectId} OwnerClientId={OwnerClientId}]";
-
         /// <summary>
         /// If this is executed by the local player, the player name is retrieved from the
         /// user configuration in <see cref="Net.Network.PlayerName"/> and sent to the server.
@@ -47,7 +41,6 @@ namespace SEE.Game.Avatars
         /// </remarks>
         public override void OnNetworkSpawn()
         {
-            LogRPC($"{Me} PlayerName.OnNetworkSpawn()\n");
             base.OnNetworkSpawn();
             Net.Network networkConfig = FindObjectOfType<Net.Network>() ?? throw new("Network configuration not found");
 
@@ -94,13 +87,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void RemovePlayerNameFromServerRpc(ulong networkObjectId)
         {
-            LogRPC($"{Me} PlayerName.RemovePlayerNameFromServerRpc(networkObjectId={networkObjectId})\n");
             PlayerNameManager.RemovePlayerName(networkObjectId);
-        }
-
-        private static void LogRPC(string message)
-        {
-            Debug.Log($"[RPC] {message}\n");
         }
 
         /// <summary>
@@ -114,7 +101,6 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void SendPlayerNameToServerRpc(ulong networkObjectId, string playername)
         {
-            LogRPC($"{Me} PlayerName.SendPlayerNameToServerRpc(networkObjectId={networkObjectId}, playername={playername})\n");
             PlayerNameManager.AddOrUpdatePlayerName(networkObjectId, playername);
 
             // The server will send the name to all other clients, including the client
@@ -135,7 +121,6 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.ClientsAndHost)]
         private void SendPlayerNameToAllClientsRpc(ulong networkObjectId, string playername)
         {
-            LogRPC($"{Me} PlayerName.SendPlayerNameToAllClients(networkObjectId={networkObjectId}, playername ={playername})\n");
             RenderNetworkPlayerName(networkObjectId, playername);
         }
 
@@ -149,7 +134,6 @@ namespace SEE.Game.Avatars
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId)
         {
             string playerName = PlayerNameManager.GetPlayerName(networkObjectId);
-            LogRPC($"{Me} RequestPlayerNameFromServerRpc(networkObjectId={networkObjectId}) => playerName={playerName}\n");
             SendPlayerNameToClientRpc(networkObjectId, playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
         }
 
@@ -164,7 +148,6 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.SpecifiedInParams)]
         void SendPlayerNameToClientRpc(ulong networkObjectId, string playerName, RpcParams _)
         {
-            LogRPC($"{Me} SendPlayerNameToClientRpc(playerName={playerName})\n");
             RenderNetworkPlayerName(networkObjectId, playerName);
         }
 
