@@ -1,56 +1,60 @@
 ﻿using SEE.UI.Notification;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Provides a mapping of client IDs onto player names.
+    /// Provides a mapping of <see cref="NetworkBehaviour.NetworkObjectId"/>s onto player names.
     /// </summary>
     /// <remarks>This class is used only by the server.</remarks>
     public static class PlayerNameManager
     {
         /// <summary>
-        /// Dictionary to store player names with their client IDs as keys.
+        /// Stores names with their <see cref="NetworkBehaviour.NetworkObjectId"/> as a key.
         /// </summary>
         private static readonly Dictionary<ulong, string> playerNames = new();
 
         /// <summary>
-        /// Sets the name of the given <paramref name="clientId"/> to <paramref name="playerName"/>.
+        /// Sets the name of the given <paramref name="networkObjectId"/> to <paramref name="playerName"/>.
         /// </summary>
-        /// <param name="clientId">client id of the connected client</param>
+        /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the
+        /// player network object</param>
         /// <param name="playerName">corresponding playerName</param>
-        public static void AddOrUpdatePlayerName(ulong clientId, string playerName)
+        public static void AddOrUpdatePlayerName(ulong networkObjectId, string playerName)
         {
-            if (playerNames.TryGetValue(clientId, out string currentName))
+            if (playerNames.TryGetValue(networkObjectId, out string currentName))
             {
+                // Only if there is a new player name, we need to update the dictionary.
                 if (currentName != playerName)
                 {
-                    playerNames[clientId] = playerName;
-                    ShowNotification.Info("Connection", $"Client {clientId} is now named {playerName}.");
+                    playerNames[networkObjectId] = playerName;
+                    ShowNotification.Info("Connection", $"Client {networkObjectId} is now named {playerName}.");
                 }
             }
             else
             {
-                playerNames[clientId] = playerName;
+                playerNames[networkObjectId] = playerName;
             }
         }
 
         /// <summary>
-        /// Returns the playerName for the given <paramref name="clientId"/>.
+        /// Returns the playerName for the given <paramref name="networkObjectId"/>.
+        /// If there is no entry for the given <paramref name="networkObjectId"/>,
+        /// "Unknown" is returned.
         /// </summary>
-        /// <param name="clientId">key in dictionary</param>
-        /// <returns>corresponding playerName</returns>
-        public static string GetPlayerName(ulong clientId)
+        /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the
+        /// player whose name is to be retrieved</param>
+        /// <returns>corresponding playerName or "Unknown"</returns>
+        public static string GetPlayerName(ulong networkObjectId)
         {
-            if (playerNames.TryGetValue(clientId, out string playerName))
+            if (playerNames.TryGetValue(networkObjectId, out string playerName))
             {
                 return playerName;
             }
             else
             {
-                Debug.LogError($"Player name of client {clientId} is unknown.\n");
+                Debug.LogError($"Player name for player {networkObjectId} is unknown.\n");
                 Dump();
                 return "Unknown";
             }
@@ -65,12 +69,14 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Removes dictionary entry for the given <paramref name="clientId"/>.
+        /// Removes the name of the player identified by <paramref name="networkObjectId"/>
+        /// from the dictionary.
         /// </summary>
-        /// <param name="clientId">clientId as key</param>
-        public static void RemovePlayerName(ulong clientId)
+        /// <param name="networkObjectId"><see cref="NetworkBehaviour.NetworkObjectId"/> of the player
+        /// to be removed</param>
+        public static void RemovePlayerName(ulong networkObjectId)
         {
-            playerNames.Remove(clientId);
+            playerNames.Remove(networkObjectId);
         }
     }
 }
