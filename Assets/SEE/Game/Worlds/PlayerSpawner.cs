@@ -99,6 +99,11 @@ namespace SEE.Game.Worlds
         /// </summary>
         private int numberOfSpawnedPlayers = 0;
 
+        /// <summary>
+        /// Logs given <paramref name="message"/> to the console.
+        /// </summary>
+        /// <param name="message">message to be logged</param>
+        [System.Diagnostics.Conditional("ENABLE_LOGS")]
         private static void Log(string message)
         {
             Debug.Log($"[Client/Server] {message}\n");
@@ -112,9 +117,7 @@ namespace SEE.Game.Worlds
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
         private void ClientConnects(ulong clientID)
         {
-#if DEBUG
             Log($"Player with owner {clientID} connects.\n");
-#endif
             // A pure server, that is, one that is not also a host, does not need to spawn a player.
             if (clientID == NetworkManager.Singleton.LocalClientId
                 && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
@@ -127,10 +130,9 @@ namespace SEE.Game.Worlds
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
             numberOfSpawnedPlayers++;
 
-#if DEBUG
             Log($"Spawned {player.name} (network id of owner: {clientID}, "
                 + $"local: {IsLocal(clientID)}) at position {player.transform.position}.\n");
-#endif
+
             if (player.TryGetComponent(out NetworkObject net))
             {
                 // By default a newly spawned network Prefab instance is owned by the server
@@ -139,10 +141,9 @@ namespace SEE.Game.Worlds
                 // the NetworkObject of that prefab instance unless there's additional
                 // server-side specific user code that removes or changes the ownership.
                 net.SpawnAsPlayerObject(clientID, destroyWithScene: true);
-#if DEBUG
+
                 Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
                     + $"is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
-#endif
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
@@ -178,7 +179,7 @@ namespace SEE.Game.Worlds
             }
             else
             {
-                Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
+                UnityEngine.Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
             }
         }
 
