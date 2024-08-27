@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using SEE.Utils.History;
-using System;
-using UnityEngine.Assertions;
 
 namespace SEE.Controls.Actions
 {
@@ -15,11 +15,6 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class ResizeNodeAction : AbstractPlayerAction
     {
-        /// <summary>
-        /// The object that is being resized.
-        /// </summary>
-        private InteractableObject selectedObject;
-
         /// <summary>
         /// The memento holding the information for <see cref="Undo"/> and <see cref="Redo"/>.
         /// </summary>
@@ -70,39 +65,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (selectedObject == null)
-            {
-                // Start resizing
-                if (InteractableObject.SelectedObjects.Count == 1)
-                {
-                    selectedObject = InteractableObject.SelectedObjects.First();
-                    memento = new Memento(selectedObject.gameObject);
-
-                    gizmo = memento.GameObject.AddComponent<ResizeGizmo>();
-                    gizmo.OnSizeChanged += OnSizeChanged;
-
-                    InteractableObject.MultiSelectionAllowed = false;
-                }
-                return false;
-            }
-
-            // FIXME Object is deselected when a handle is clicked
-            if (InteractableObject.SelectedObjects.Count > 0 && !InteractableObject.SelectedObjects.Contains(selectedObject))
-            {
-                Stop();
-
-                bool wasChanged = CurrentState == IReversibleAction.Progress.InProgress;
-                if (wasChanged)
-                {
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    memento.NewLocalScale = memento.GameObject.transform.localScale;
-                    memento.NewPosition = memento.GameObject.transform.position;
-                }
-
-                return wasChanged;
-            }
-
-            return false;
+            return CurrentState == IReversibleAction.Progress.Completed;
         }
 
         /// <summary>
@@ -117,6 +80,8 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject.UnselectAll(true);
             }
+            InteractableObject.LocalAnySelectIn += OnSelectionChanged;
+            InteractableObject.LocalAnySelectOut += OnSelectionChanged;
         }
 
         /// <summary>
@@ -136,24 +101,15 @@ namespace SEE.Controls.Actions
                 gizmo.OnSizeChanged -= OnSizeChanged;
                 GameObject.Destroy(gizmo);
             }
-            selectedObject = null;
 
             if (CurrentState == IReversibleAction.Progress.NoEffect)
             {
                 memento = new Memento();
             }
 
+            InteractableObject.LocalAnySelectIn -= OnSelectionChanged;
+            InteractableObject.LocalAnySelectOut -= OnSelectionChanged;
             InteractableObject.MultiSelectionAllowed = true;
-        }
-
-        /// <summary>
-        /// Used to execute the <see cref="ResizeNodeAction"/> from the context menu.
-        /// </summary>
-        /// <param name="go">The object to be resize</param>
-        public void ContextMenuExecution(GameObject go)
-        {
-            ExecuteViaContextMenu = true;
-            memento = new Memento(go);
         }
 
         /// <summary>
@@ -189,6 +145,58 @@ namespace SEE.Controls.Actions
         }
 
         #endregion ReversibleAction
+
+        /// <summary>
+        /// Used to execute the <see cref="ResizeNodeAction"/> from the context menu.
+        /// </summary>
+        /// <param name="go">The object to be resize</param>
+        /// <remarks>
+        /// This method does not check if the object's type has
+        /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
+        /// </remarks>
+        public void ContextMenuExecution(GameObject go)
+        {
+            ExecuteViaContextMenu = true;
+            memento = new Memento(go);
+        }
+
+        /// <summary>
+        /// Event handler that is called every time the node selection in <see cref="InteractableObject"/> changes.
+        /// </summary>
+        private void OnSelectionChanged(InteractableObject interactableObject)
+        {
+            // FIXME Interactable object is deselected when a handle is clicked, so we cannot stop here…
+            if (!interactableObject.IsSelected || InteractableObject.SelectedObjects.Count != 1)
+            {
+                return;
+            }
+
+            // New selection
+            if (memento.GameObject != null && interactableObject.gameObject != memento.GameObject)
+            {
+                Stop();
+
+                if (CurrentState == IReversibleAction.Progress.InProgress)
+                {
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    memento.NewLocalScale = memento.GameObject.transform.localScale;
+                    memento.NewPosition = memento.GameObject.transform.position;
+                }
+                return;
+            }
+
+            // Incompatible type
+            GameObject selectedGameObject = interactableObject.gameObject;
+            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef) || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualResize)
+            {
+                return;
+            }
+
+            // Start resizing
+            memento = new Memento(selectedGameObject);
+            gizmo = memento.GameObject.AddComponent<ResizeGizmo>();
+            gizmo.OnSizeChanged += OnSizeChanged;
+        }
 
         /// <summary>
         /// Event handler that is called once (!) when the size has been initally changed.
