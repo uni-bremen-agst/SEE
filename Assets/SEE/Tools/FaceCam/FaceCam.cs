@@ -340,8 +340,6 @@ namespace SEE.Tools.FaceCam
             // Cache the material of the FaceCam to change its texture later. (Display a default
             // picture or the face of the user).
             mainMaterial = meshRenderer.material;
-
-            Debug.Log($"[FaceCam.Start] Owner of player {NetworkManager.LocalClient.PlayerObject.name} is server: {NetworkManager.LocalClient.PlayerObject.IsOwnedByServer} or is local client: {NetworkManager.LocalClient.PlayerObject.IsOwner}\n");
         }
 
         /// <summary>
