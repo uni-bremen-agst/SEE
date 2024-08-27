@@ -121,7 +121,7 @@ namespace SEE.Tools.FaceCam
         /// The relative path to the bone of the face/nose of the player.
         /// This will be used to position the FaceCam.
         /// </summary>
-        private const string faceCamOrientationBone = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head/CC_Base_FacialBone/CC_Base_R_Eye";
+        private const string faceCamOrientationBone = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
 
         /// <summary>
         /// The webcam texture to mat helper from the WebCamTextureToMatHelperExample.
@@ -621,7 +621,7 @@ namespace SEE.Tools.FaceCam
 
         /// <summary>
         /// Refresh the position of the FaceCam.
-        /// The position can be toggled with the Key 'O'.
+        /// The position can be toggled with <see cref="SEEInput.ToggleFaceCamPosition"/>.
         /// This means switching the position between above the avatars face and in front of it.
         /// </summary>
         private void RefreshFaceCamPosition()
@@ -636,20 +636,18 @@ namespace SEE.Tools.FaceCam
             if (playersFace != null) // Sometimes the playersFace seems to be null, i can't find out why.
                                      // Seems to have nothing to do with this class.
             {
-                // Put it where the players face is.
+                // Put it where the player's face is.
                 transform.SetPositionAndRotation(playersFace.position, playersFace.rotation);
                 if (faceCamOnFront)
                 {
-                    // Rotate and move it a bit up and a bit forward.
-                    transform.Rotate(0, -90, -90); // To face away from the avatars face.
-                    transform.position += transform.forward * 0.025f;
-                    transform.position += transform.up * 0.03f;
+                    // Move it a bit up and a bit forward.
+                    transform.position += transform.forward * 0.15f;
+                    transform.position += transform.up * 0.06f;
                 }
                 else
                 {
-                    // Rotate and move it a up and a bit forward.
-                    transform.Rotate(0, -90, -90); // To face away from the avatars face.
-                    transform.position -= transform.forward * 0.08f;
+                    // Move it a bit up and a bit forward.
+                    transform.position += transform.forward * 0.1f;
                     transform.position += transform.up * 0.3f;
                     if (!IsOwner) // If this is the owner the FaceCam should just face forward and
                                   // not down to the own camera.
