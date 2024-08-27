@@ -5,6 +5,7 @@ using UnityEngine.Assertions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
 
@@ -98,7 +99,7 @@ namespace SEE.Controls.Actions
 
             if (gizmo != null)
             {
-                gizmo.OnSizeChanged -= OnSizeChanged;
+                gizmo.OnSizeChanged -= OnResizeStep;
                 GameObject.Destroy(gizmo);
             }
 
@@ -126,6 +127,8 @@ namespace SEE.Controls.Actions
 
             memento.GameObject.transform.localScale = memento.OriginalLocalScale;
             memento.GameObject.transform.position = memento.OriginalPosition;
+            // FIXME update edges
+            new ResizeNodeNetAction(memento.GameObject.name, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         /// <summary>
@@ -142,6 +145,8 @@ namespace SEE.Controls.Actions
 
             memento.GameObject.transform.localScale = memento.NewLocalScale;
             memento.GameObject.transform.position = memento.NewPosition;
+            // FIXME update edges
+            new ResizeNodeNetAction(memento.GameObject.name, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
         #endregion ReversibleAction
@@ -179,8 +184,6 @@ namespace SEE.Controls.Actions
                 if (CurrentState == IReversibleAction.Progress.InProgress)
                 {
                     CurrentState = IReversibleAction.Progress.Completed;
-                    memento.NewLocalScale = memento.GameObject.transform.localScale;
-                    memento.NewPosition = memento.GameObject.transform.position;
                 }
                 return;
             }
@@ -195,15 +198,24 @@ namespace SEE.Controls.Actions
             // Start resizing
             memento = new Memento(selectedGameObject);
             gizmo = memento.GameObject.AddComponent<ResizeGizmo>();
-            gizmo.OnSizeChanged += OnSizeChanged;
+            gizmo.OnSizeChanged += OnResizeStep;
         }
 
         /// <summary>
-        /// Event handler that is called once (!) when the size has been initally changed.
+        /// Event handler that is called by <see cref="ResizeGizmo"/> each time a resize step is finished.
+        /// <para>
+        /// One resize step is finished each time a handle is released. This, however, does not finish the
+        /// <see cref="ResizeNodeAction"/>.
+        /// </para>
         /// </summary>
-        private void OnSizeChanged()
+        private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
             CurrentState = IReversibleAction.Progress.InProgress;
+
+            memento.NewLocalScale = newLocalScale;
+            memento.NewPosition = newPosition;
+            // FIXME update edges
+            new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
 
@@ -213,30 +225,33 @@ namespace SEE.Controls.Actions
         private struct Memento
         {
             /// <summary>
-            /// The <c>GameObject</c> of the <c>Node</c>.
+            /// The <c>GameObject</c> of the game object.
             /// </summary>
             public readonly GameObject GameObject;
 
             /// <summary>
-            /// The original world position of the <c>Node</c>.
+            /// The original world position of the game object.
             /// </summary>
             public readonly Vector3 OriginalPosition;
 
             /// <summary>
-            /// The original scale of the <c>Node</c>.
+            /// The original scale of the game object.
             /// </summary>
             public readonly Vector3 OriginalLocalScale;
 
             /// <summary>
-            /// The new world position of the <c>Node</c>.
+            /// The new world position of the game object.
             /// </summary>
             public Vector3 NewPosition;
 
             /// <summary>
-            /// The new scale of the <c>Node</c>.
+            /// The new scale of the game object.
             /// </summary>
             public Vector3 NewLocalScale;
 
+            /// <summary>
+            /// Constructs a <see cref="Memento"/>.
+            /// </summary>
             public Memento(GameObject go)
             {
                 GameObject = go;
@@ -287,17 +302,12 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Delegate for signalling change.
             /// </summary>
-            public delegate void ResizeNodeEvent();
+            public delegate void ResizeNodeEvent(Vector3 newLocalScale, Vector3 newPosition);
 
             /// <summary>
-            /// The event is emitted at most once if and when the size has been changed for the first time.
+            /// The event is emitted each time a resize step has finished.
             /// </summary>
             public event ResizeNodeEvent OnSizeChanged;
-
-            /// <summary>
-            /// Has a change already been signalled?
-            /// </summary>
-            private bool changeSignalled = false;
 
             #endregion Change Event
 
@@ -358,6 +368,7 @@ namespace SEE.Controls.Actions
                 {
                     clicked = false;
                     currentResizeStep = null;
+                    OnSizeChanged(transform.localScale, transform.position);
                 }
 
                 if (newClick)
@@ -448,11 +459,6 @@ namespace SEE.Controls.Actions
                     transform.localScale = lastScale;
                     transform.position = lastPosition;
                     return;
-                }
-                else if (!changeSignalled)
-                {
-                    OnSizeChanged();
-                    changeSignalled = true;
                 }
 
                 foreach (GameObject handle in handles.Keys)
