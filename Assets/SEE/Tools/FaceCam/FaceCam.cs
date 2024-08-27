@@ -118,6 +118,12 @@ namespace SEE.Tools.FaceCam
         private const int maximumNetworkByteSize = 32768;
 
         /// <summary>
+        /// The relative path to the bone of the face/nose of the player.
+        /// This will be used to position the FaceCam.
+        /// </summary>
+        private const string faceCamOrientationBone = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head/CC_Base_FacialBone/CC_Base_R_Eye";
+
+        /// <summary>
         /// The webcam texture to mat helper from the WebCamTextureToMatHelperExample.
         /// </summary>
         private WebCamTextureToMatHelper webCamTextureToMatHelper;
@@ -304,9 +310,15 @@ namespace SEE.Tools.FaceCam
             // This is the size of the FaceCam at the start
             transform.localScale = new Vector3(0.2f, 0.2f, -1); // z = -1 to face away from the player.
 
-            // For the location of the face of the player we use his nose. This makes
+            // For the location of the face of the player we use his right eye. This makes
             // the FaceCam also aprox. centered to his face.
-            playersFace = transform.parent.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/NoseBase");
+            playersFace = transform.parent.Find(faceCamOrientationBone);
+            if (playersFace == null)
+            {
+                Debug.LogError($"[FaceCam.Start] Could not find the bone {faceCamOrientationBone}.\n");
+                enabled = false;
+                return;
+            }
 
             Initialize();
 
