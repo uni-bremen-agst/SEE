@@ -1,5 +1,7 @@
-﻿using SEE.Game.Drawable.Configurations;
+﻿using SEE.Game.Drawable.ActionHelpers;
+using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -22,39 +24,6 @@ namespace SEE.Game.Drawable
         public static readonly string OutlineKeyWord = "OUTLINE_ON";
 
         /// <summary>
-        /// Removes HTML tags from string using char array.
-        /// @by Sam Allen, 10.10.2023 https://www.dotnetperls.com/remove-html-tags
-        /// </summary>
-        /// <param name="source">The string which contains the HTML tags.</param>
-        public static string StripTagsCharArray(string source)
-        {
-            char[] array = new char[source.Length];
-            int arrayIndex = 0;
-            bool inside = false;
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                char let = source[i];
-                if (let == '<')
-                {
-                    inside = true;
-                    continue;
-                }
-                if (let == '>')
-                {
-                    inside = false;
-                    continue;
-                }
-                if (!inside)
-                {
-                    array[arrayIndex] = let;
-                    arrayIndex++;
-                }
-            }
-            return new string(array, 0, arrayIndex);
-        }
-
-        /// <summary>
         /// Calculates the text width based on the first line.
         /// For the calculation it removes the HTML Tags and checks if there are active font styles for bold, upper case or small caps.
         /// This font styles affects the width.
@@ -70,7 +39,7 @@ namespace SEE.Game.Drawable
         private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles style)
         {
-            string result = StripTagsCharArray(text);
+            string result = RichTextRemover.RemoveRichText(text);
 
             text = text.ToLower();
             /// The text characters are widened by bold, uppercase, or small caps.
@@ -111,9 +80,8 @@ namespace SEE.Game.Drawable
 
         /// <summary>
         /// This method calculates the width and height of the text.
-        /// The width depends on the first line of the text.
-        /// The height is approximated by dividing the number of characters in the text by
-        /// the number of characters in the first line multiplied by 0.1f and the fontSize.
+        /// The width depends on the longest line of the text.
+        /// The height is approximated by the number of lines multiplied by 0.1f and the fontSize.
         /// </summary>
         /// <param name="text">The written text.</param>
         /// <param name="fontAsset">The font asset of the text</param>
@@ -123,18 +91,9 @@ namespace SEE.Game.Drawable
         public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles styles)
         {
-            /// Calculates the text width based on the first line.
-            string firstLine = text.Split("\n")[0];
-            int lengthToFirstLineBreak = firstLine.Length;
-            float x = TextWidthApproximation(firstLine, fontAsset, fontSize, styles);
-
-            /// Approximates the height of the text
-            /// by dividing the length of the text by the length of the first line,
-            /// multiplied by the font size and a buffer of 0.1.
-            /// Since the width was calculated by the first line, the subsequent lines break
-            /// when reaching the width.
-            float height = text.Length / lengthToFirstLineBreak;
-            float y = height * 0.1f * fontSize;
+            string[] split = text.Split(new string[]{ "\n", "<br>"}, System.StringSplitOptions.None);
+            float x = split.ToList().Max(s => TextWidthApproximation(s, fontAsset, fontSize, styles));
+            float y = split.Count() * 0.1f * fontSize;
             return new Vector2(x, y);
         }
 

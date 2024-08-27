@@ -1,5 +1,6 @@
 ﻿using SEE.Controls.Actions.Drawable;
 using SEE.Game.Drawable;
+using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
 {
@@ -20,16 +21,38 @@ namespace SEE.Net.Actions.Drawable
         public bool Loop;
 
         /// <summary>
-        /// The constructor of this action. All it does is assign the value you pass it to a field.
+        /// The fill-out color if the line should be filled out.
+        /// </summary>
+        public Color FillOutColor;
+
+        /// <summary>
+        /// Whether the fill out should be set or not.
+        /// </summary>
+        public bool FillOutStatus;
+
+        /// <summary>
+        /// The constructor of this action. All it does is to assign the value you pass to its fields.
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="lineID">The name of the line.</param>
-        public DrawingFinishNetAction(string drawableID, string parentDrawableID, string lineID, bool loop)
+        /// <param name="loop">Whether the line should activate the loop functionality.</param>
+        /// <param name="fillOutColor">The fill out color of the line; null if the line should not filled out.</param>
+        public DrawingFinishNetAction(string drawableID, string parentDrawableID, string lineID, bool loop, Color? fillOutColor)
             : base(drawableID, parentDrawableID)
         {
             LineID = lineID;
             Loop = loop;
+            if (fillOutColor != null)
+            {
+                FillOutStatus = true;
+                FillOutColor = fillOutColor.Value;
+            }
+            else
+            {
+                FillOutStatus = false;
+                FillOutColor = Color.clear;
+            }
         }
 
         /// <summary>
@@ -39,9 +62,16 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (LineID != null && LineID != "")
+            if (!string.IsNullOrWhiteSpace(LineID))
             {
-                GameDrawer.FinishDrawing(FindChild(LineID), Loop);
+                if (FillOutStatus)
+                {
+                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, FillOutColor);
+                }
+                else
+                {
+                    GameDrawer.FinishDrawing(FindChild(LineID), Loop, null);
+                }
             }
             else
             {
