@@ -61,7 +61,7 @@ namespace SEE.UI
 
                 new(SelectAction: StartClient,
                     Title: "Client",
-                    Description: "Starts a local client connection to a server.",
+                    Description: "Starts a local client connecting to a server.",
                     EntryColor: NextColor(),
                     Icon: Icons.Link),
 
@@ -73,8 +73,8 @@ namespace SEE.UI
                     Icon: Icons.VR),
 #endif
                 new(SelectAction: NetworkSettings,
-                    Title: "Network settings",
-                    Description: "Allows to set additional network settings.",
+                    Title: "Settings",
+                    Description: "Allows to set additional network and user settings.",
                     EntryColor: Color.gray,
                     Icon: Icons.Gear),
             };
