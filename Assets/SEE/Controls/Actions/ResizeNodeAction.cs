@@ -454,7 +454,8 @@ namespace SEE.Controls.Actions
                 transform.localScale = currentResizeStep.Value.InitialLocalScale - Vector3.Scale(currentResizeStep.Value.ScaleFactor, cursorMovement);
                 transform.position = currentResizeStep.Value.InitialPosition - 0.5f * Vector3.Scale(cursorMovement, currentResizeStep.Value.Direction);
 
-                if (gameObject.OverlapsWithSiblings())
+                if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0
+                    || gameObject.OverlapsWithSiblings())
                 {
                     transform.localScale = lastScale;
                     transform.position = lastPosition;
@@ -496,7 +497,7 @@ namespace SEE.Controls.Actions
                 public readonly Vector3 ScaleFactor;
 
                 /// <summary>
-                /// Initialized the struct.
+                /// Initializes the struct.
                 /// </summary>
                 public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Vector3 initialPosition, Vector3 initialLocalScale, Vector3 initialLossyScale)
                 {
