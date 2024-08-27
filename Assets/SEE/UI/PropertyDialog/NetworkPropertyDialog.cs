@@ -42,7 +42,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
         /// </summary>
-        private Net.Network networkConfig;
+        private readonly Net.Network networkConfig;
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
@@ -71,14 +71,14 @@ namespace SEE.UI.PropertyDialog
         private StringProperty serverPort;
 
         /// <summary>
-        /// The server port for SEE's action traffic.
-        /// </summary>
-        private StringProperty serverActionPort;
-
-        /// <summary>
         /// The password to protect the server from unauthorised clients
         /// </summary>
         private StringProperty roomPassword;
+
+        /// <summary>
+        /// The player name to be shown to others.
+        /// </summary>
+        private StringProperty playerName;
 
         /// <summary>
         /// The selector for the voice chat system.
@@ -122,6 +122,13 @@ namespace SEE.UI.PropertyDialog
                 roomPassword.Value = networkConfig.RoomPassword.ToString();
                 roomPassword.Description = "Password for a meeting room";
                 group.AddProperty(roomPassword);
+            }
+            {
+                playerName = dialog.AddComponent<StringProperty>();
+                playerName.Name = "User name";
+                playerName.Value = networkConfig.PlayerName.ToString();
+                playerName.Description = "Name of the player to be shown to others";
+                group.AddProperty(playerName);
             }
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
@@ -217,9 +224,21 @@ namespace SEE.UI.PropertyDialog
                 }
             }
             {
+                // Player Name
+                string playerNameValue = playerName.Value.Trim();
+                if (!string.IsNullOrWhiteSpace(playerNameValue))
+                {
+                    networkConfig.PlayerName = playerNameValue;
+                }
+                else
+                {
+                    ShowNotification.Error("Invalid User Name", "User name needs to be at least one character long and must not consist of whitespace only.");
+                    errorOccurred = true;
+                }
+            }
+            {
                 // Room Password
                 networkConfig.RoomPassword = roomPassword.Value.ToString();
-                // ShowNotification.Info("Password Set", $"You have set the password to {roomPassword.Value}.");
             }
             {
                 // Voice Chat
