@@ -71,7 +71,7 @@ namespace SEE.UI.PropertyDialog
         private StringProperty serverPort;
 
         /// <summary>
-        /// The password to protect the server from unauthorised clients
+        /// The password to protect the server from unauthorized clients
         /// </summary>
         private StringProperty roomPassword;
 
