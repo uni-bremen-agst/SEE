@@ -1,8 +1,5 @@
-﻿using System.Collections.Generic;
-using UMA.PoseTools;
-using Unity.Netcode;
+﻿using Unity.Netcode;
 using UnityEngine;
-using System.Linq;
 
 namespace SEE.Net.Actions
 {
@@ -416,7 +413,6 @@ namespace SEE.Net.Actions
             TongueEnlargeValue = skinnedMeshRenderer.GetBlendShapeWeight(skinnedMeshRenderer.sharedMesh.GetBlendShapeIndex(ccTongueEnlarge));
         }
 
-
         /// <summary>
         /// If executed by the initiating client, nothing happens. Otherwise the values of the
         /// <see cref="SkinnedMeshRenderer"/> are transmitted.
@@ -569,14 +565,6 @@ namespace SEE.Net.Actions
             {
                 Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
-        }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }
