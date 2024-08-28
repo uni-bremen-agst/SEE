@@ -1,4 +1,5 @@
 ﻿using Dissonance;
+using SEE.UI.Notification;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -11,7 +12,7 @@ namespace SEE.Game.Worlds
     /// <summary>
     /// Spawns players in multi-player mode.
     /// </summary>
-    public class PlayerSpawner : MonoBehaviour
+    public class PlayerSpawner : NetworkBehaviour
     {
         /// <summary>
         /// Information needed to spawn a player avatar.
@@ -27,6 +28,14 @@ namespace SEE.Game.Worlds
 
             [Tooltip("Rotation in degree along the y axis.")]
             public float Rotation;
+
+
+            public SpawnInfo(string v1, Vector3 vector3, int v2)
+            {
+                //PlayerPrefab = v1;
+                //Position
+            }
+
         }
 
         /// <summary>
@@ -34,7 +43,15 @@ namespace SEE.Game.Worlds
         /// </summary>
         /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
-        private List<SpawnInfo> playerSpawns = new();
+        private List<SpawnInfo> playerSpawns = new()
+        {
+            new SpawnInfo("Male1", new Vector3(0.4f, 0f, -5.8f), 270),
+            new SpawnInfo("Female1", new Vector3(0.4f, 0f, -6.6f), 270),
+            new SpawnInfo("Male2", new Vector3(0.4f, 0f, -7.8f), 270),
+            new SpawnInfo("Female2", new Vector3(0.4f, 0f, -5.8f), 270),
+            new SpawnInfo("Male3", new Vector3(0.4f, 0f, -6.8f), 270),
+            new SpawnInfo("Female3", new Vector3(0.4f, 0f, -7.8f), 270),
+        };
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
@@ -47,6 +64,20 @@ namespace SEE.Game.Worlds
         private void OnEnable()
         {
             StartCoroutine(SpawnPlayerCoroutine());
+        }
+
+        private void FindServer()
+        {
+            const string serverName = "/Server";
+            GameObject server = GameObject.Find(serverName);
+            if (server == null)
+            {
+                ShowNotification.Error("Internal Error", $"No game object named {serverName} found.");
+            }
+            else
+            {
+                ShowNotification.Info("All good", $"Game object named {serverName} found.");
+            }
         }
 
         /// <summary>
