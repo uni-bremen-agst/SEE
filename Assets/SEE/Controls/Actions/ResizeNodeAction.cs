@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.DataModel.DG;
@@ -77,10 +78,6 @@ namespace SEE.Controls.Actions
             base.Start();
 
             InteractableObject.MultiSelectionAllowed = false;
-            if (InteractableObject.SelectedObjects.Count > 1)
-            {
-                InteractableObject.UnselectAll(true);
-            }
             InteractableObject.LocalAnySelectIn += OnSelectionChanged;
             InteractableObject.LocalAnySelectOut += OnSelectionChanged;
         }
@@ -272,7 +269,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The parent node.
             /// </summary>
-            private Node parent;
+            private Node parentNode;
             /// <summary>
             /// Stores the directional vectors that belong to the individual handles.
             /// </summary>
@@ -295,7 +292,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The data of the resize step that is in action.
             /// </summary>
-            private ResizeStepData? currentResizeStep;
+            private ResizeStepData currentResizeStep;
 
             #region Change Event
 
@@ -326,8 +323,8 @@ namespace SEE.Controls.Actions
                 }
 
                 this.nodeRef = nodeRef;
-                parent = nodeRef.Value.Parent;
-                Assert.IsNotNull(parent);
+                parentNode = nodeRef.Value.Parent;
+                Assert.IsNotNull(parentNode);
                 InitHandles();
             }
 
@@ -367,7 +364,7 @@ namespace SEE.Controls.Actions
                 else if (clicked)
                 {
                     clicked = false;
-                    currentResizeStep = null;
+                    currentResizeStep = new();
                     OnSizeChanged(transform.localScale, transform.position);
                 }
 
@@ -376,7 +373,7 @@ namespace SEE.Controls.Actions
                     StartResizing();
                 }
 
-                if (currentResizeStep != null)
+                if (currentResizeStep.IsSet)
                 {
                     UpdateSize();
                 }
@@ -432,7 +429,7 @@ namespace SEE.Controls.Actions
                     return;
                 }
 
-                currentResizeStep = new (hit.point, resizeDirection.Value, transform.position, transform.localScale, transform.lossyScale);
+                currentResizeStep = new (hit.point, resizeDirection.Value, transform.localPosition, transform.localScale, transform.lossyScale);
             }
 
             /// <summary>
@@ -441,27 +438,66 @@ namespace SEE.Controls.Actions
             void UpdateSize()
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node hitNode, nodeRef);
-                if (!targetObjectHit.HasValue || !hitNode.IsDescendantOf(parent))
+                if (!targetObjectHit.HasValue || !hitNode.IsDescendantOf(parentNode))
                 {
                     return;
                 }
+
+                // Collect siblings
+                Transform parent = transform.parent;
+                // We use an initial size of the list so that the memory does not need to get
+                // reallocated each time an item is added.
+                List<Transform> siblings = new (parent.childCount);
+                foreach (Transform sibling in parent)
+                {
+                    if (sibling != transform && sibling.gameObject.HasNodeRef())
+                    {
+                        siblings.Add(sibling);
+                    }
+                }
+
+                // Collect children
+                List<Transform> children = new (transform.childCount);
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.HasNodeRef())
+                    {
+                        children.Add(child);
+                    }
+                }
+
+                // Calculate new scale and position
                 Vector3 hitPoint = targetObjectHit.Value.point;
+                Vector3 cursorMovement = Vector3.Scale(currentResizeStep.InitialHitPoint - hitPoint, currentResizeStep.Direction);
+                Vector3 newLocalScale = currentResizeStep.InitialLocalScale - Vector3.Scale(currentResizeStep.ScaleFactor, cursorMovement);
+                Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition - 0.5f * Vector3.Scale(currentResizeStep.ScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
 
-                Vector3 lastScale = transform.localScale;
-                Vector3 lastPosition = transform.position;
-
-                Vector3 cursorMovement = Vector3.Scale(currentResizeStep.Value.InitialHitPoint - hitPoint, currentResizeStep.Value.Direction);
-                transform.localScale = currentResizeStep.Value.InitialLocalScale - Vector3.Scale(currentResizeStep.Value.ScaleFactor, cursorMovement);
-                transform.position = currentResizeStep.Value.InitialPosition - 0.5f * Vector3.Scale(cursorMovement, currentResizeStep.Value.Direction);
-
-                if (transform.localScale.x < 0 || transform.localScale.y < 0 || transform.localScale.z < 0
-                    || gameObject.OverlapsWithSiblings())
+                // Is this resize allowed?
+                if (RectTooSmall(newLocalScale)
+                        || siblings.Any(sibling => RectsOverlap(newLocalPosition, newLocalScale, sibling.localPosition, sibling.localScale))
+                        || !children.All(child => ContainedInRect(Vector3.zero, newLocalScale, Vector3.Scale(child.localPosition, transform.localScale), Vector3.Scale(child.localScale, transform.localScale))))
                 {
-                    transform.localScale = lastScale;
-                    transform.position = lastPosition;
                     return;
                 }
 
+                // Prevent child nodes from getting scaled
+                Transform tempParent = transform.parent;
+                foreach (Transform childNode in children)
+                {
+                    childNode.SetParent(tempParent);
+                }
+
+                // Apply new scale and position
+                transform.localScale = newLocalScale;
+                transform.localPosition = newLocalPosition;
+
+                // Reparent children
+                foreach (Transform child in children)
+                {
+                    child.SetParent(transform);
+                }
+
+                // Restore handle scale
                 foreach (GameObject handle in handles.Keys)
                 {
                     handle.transform.SetParent(null);
@@ -471,10 +507,87 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// Checks if <paramref name="localScale"/>'s 2D rectangle is too small.
+            /// </summary>
+            /// <remarks>
+            /// Uses <see cref="currentResizeStep.Value.ScaleFactor"/> to scale <paramref name="minSize"/>.
+            /// </remarks>
+            /// <param name="localScale">The (local) scale to check.</param>
+            /// <param name="minSize">The minimal world-space size.</param>
+            private bool RectTooSmall(Vector3 localScale, float minSize = 0.04f)
+            {
+                return localScale.x < minSize * currentResizeStep.ScaleFactor.x
+                        || localScale.z < minSize * currentResizeStep.ScaleFactor.z;
+            }
+
+            /// <summary>
+            /// Checks if inner transform is contained in the 2D rectangle of outer transform, ignoring the y-axis.
+            /// <para>
+            /// We don't pass the transforms here so that we can use calculated or reuse cached values for a performance benefit.
+            /// </para>
+            /// </summary>
+            /// <remarks>
+            /// Make sure to use either all local attributes if they share the same parent, or else all lossy.
+            /// </remarks>
+            /// <param name="outerPos">The position of the outer transform that should contain the inner.</param>
+            /// <param name="outerScale">The scale of the outer transform that should contain the inner.</param>
+            /// <param name="innerPos">The position of the inner transform that should be contained in the outer.</param>
+            /// <param name="innerScale">The scale of the inner transform that should be contained in the outer.</param>
+            private bool ContainedInRect(Vector3 outerPos, Vector3 outerScale, Vector3 innerPos, Vector3 innerScale)
+            {
+                float outerLeft = outerPos.x - outerScale.x / 2;
+                float outerRight = outerPos.x + outerScale.x / 2;
+                float outerBottom = outerPos.z - outerScale.z / 2;
+                float outerTop = outerPos.z + outerScale.z / 2;
+
+                float innerLeft = innerPos.x - innerScale.x / 2;
+                float innerRight = innerPos.x + innerScale.x / 2;
+                float innerBottom = innerPos.z - innerScale.z / 2;
+                float innerTop = innerPos.z + innerScale.z / 2;
+
+                return innerLeft >= outerLeft && innerRight <= outerRight
+                        && innerBottom >= outerBottom && innerTop <= outerTop;
+            }
+
+            /// <summary>
+            /// Checks if first transform overlaps with the other in terms of 2D rectangles, ignoring the y-axis.
+            /// <para>
+            /// We don't pass the transforms here so that we can use calculated or reuse cached values for a performance benefit.
+            /// </para>
+            /// </summary>
+            /// <remarks>
+            /// Make sure to use either all local attributes if they share the same parent, or else all lossy.
+            /// </remarks>
+            /// <param name="firstPos">The position of the first transform that should be checked.</param>
+            /// <param name="firstScale">The scale of the outer transform that should be checked.</param>
+            /// <param name="otherPos">The position of the other transform that should be checked.</param>
+            /// <param name="otherScale">The scale of the other transform that should be checked.</param>
+            private bool RectsOverlap(Vector3 firstPos, Vector3 firstScale, Vector3 otherPos, Vector3 otherScale)
+            {
+                float firstLeft = firstPos.x - firstScale.x / 2;
+                float firstRight = firstPos.x + firstScale.x / 2;
+                float firstBottom = firstPos.z - firstScale.z / 2;
+                float firstTop = firstPos.z + firstScale.z / 2;
+
+                float otherLeft = otherPos.x - otherScale.x / 2;
+                float otherRight = otherPos.x + otherScale.x / 2;
+                float otherBottom = otherPos.z - otherScale.z / 2;
+                float otherTop = otherPos.z + otherScale.z / 2;
+
+                return !(firstLeft > otherRight || firstRight < otherLeft
+                        || firstBottom > otherTop || firstTop < otherBottom);
+            }
+
+
+            /// <summary>
             /// Data structure for the individual resize steps.
             /// </summary>
             private readonly struct ResizeStepData
             {
+                /// <summary>
+                /// Whether the struct has been explicitly initialized with values.
+                /// </summary>
+                public readonly bool IsSet;
                 /// <summary>
                 /// The initial raycast hit from which the resize step is started.
                 /// </summary>
@@ -486,7 +599,7 @@ namespace SEE.Controls.Actions
                 /// <summary>
                 /// The position right before the resize step is started.
                 /// </summary>
-                public readonly Vector3 InitialPosition;
+                public readonly Vector3 InitialLocalPosition;
                 /// <summary>
                 /// The local scale right before the resize step is started.
                 /// </summary>
@@ -499,17 +612,18 @@ namespace SEE.Controls.Actions
                 /// <summary>
                 /// Initializes the struct.
                 /// </summary>
-                public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Vector3 initialPosition, Vector3 initialLocalScale, Vector3 initialLossyScale)
+                public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Vector3 initialLocalPosition, Vector3 initialLocalScale, Vector3 initialLossyScale)
                 {
                     InitialHitPoint = initialHitPoint;
                     Direction = direction;
-                    InitialPosition = initialPosition;
+                    InitialLocalPosition = initialLocalPosition;
                     InitialLocalScale = initialLocalScale;
                     ScaleFactor = new (
                         initialLocalScale.x / initialLossyScale.x,
                         initialLocalScale.y / initialLossyScale.y,
                         initialLocalScale.z / initialLossyScale.z
                     );
+                    IsSet = true;
                 }
             }
         }
