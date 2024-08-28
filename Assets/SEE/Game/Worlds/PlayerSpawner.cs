@@ -32,6 +32,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
+        /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
         private List<SpawnInfo> playerSpawns = new();
 
@@ -140,6 +141,7 @@ namespace SEE.Game.Worlds
                 // the player already had a prefab instance assigned, then the client owns
                 // the NetworkObject of that prefab instance unless there's additional
                 // server-side specific user code that removes or changes the ownership.
+                // Note: The following method can only be called by a server.
                 net.SpawnAsPlayerObject(clientID, destroyWithScene: true);
 
                 Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
