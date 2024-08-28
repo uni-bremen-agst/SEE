@@ -151,31 +151,31 @@ namespace SEE.UI.HelpSystem
 
             playerMenuEntries = new List<MenuEntry>
             {
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Assets/SEE/Videos/AddEdge.mp4", addEdge, entry),
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Assets/SEE/Videos/EditNode.mp4", editNode, entry),
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Hide Node", "How to hide node(s)", Color.magenta, "Assets/SEE/Videos/hideNode.mp4", hideNode, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Add Edge", "How to add a new edge", Color.magenta, "Videos/AddEdge.mp4", addEdge, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Edit Node", "How to edit an existing node", Color.magenta, "Videos/EditNode.mp4", editNode, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Hide Node", "How to hide node(s)", Color.magenta, "Videos/hideNode.mp4", hideNode, entry),
             };
 
             architectureEntries = new List<MenuEntry>
             {
                 HelpSystemBuilder.CreateNewRefEntry(playerMenuEntries, "Player Menu", "Player Menu use cases", Color.magenta),
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Assets/SEE/Videos/searchNode.mp4", searchNode, entry)
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Search for a node", "How to search for a node by source-name", Color.magenta, "Videos/searchNode.mp4", searchNode, entry)
             };
 
             evolutionEntries = new List<MenuEntry>
             {
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Navigation bar", "How to navigate between versions of evolution", Color.red, "Assets/SEE/Videos/evolution.mp4", playEvolution, entry)
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Navigation bar", "How to navigate between versions of evolution", Color.red, "Videos/evolution.mp4", playEvolution, entry)
             };
 
             playerNavigationEntries = new List<MenuEntry>
             {
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Assets/SEE/Videos/toggleFocus.mp4", switchTable, entry),
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Assets/SEE/Videos/navigation.mp4", simpleNavigation, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Switch table", "How to switch between tables", Color.green, "Videos/toggleFocus.mp4", switchTable, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Simple navigation", "How to edit an existing node", Color.green, "Videos/navigation.mp4", simpleNavigation, entry),
             };
 
             cityNavigationEntries = new List<MenuEntry>
             {
-                HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Assets/SEE/Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
+                HelpSystemBuilder.CreateNewHelpSystemEntry("Zoom into Code-Cities", "How to zoom into code-cities", Color.green, "Videos/zoomIntoCodeCity.mp4", zoomIntoCity, entry),
             };
 
             navigationEntries = new List<MenuEntry>
