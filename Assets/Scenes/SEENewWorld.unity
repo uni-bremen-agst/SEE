@@ -15096,14 +15096,13 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1117715341}
-  - component: {fileID: 1117715342}
   m_Layer: 0
   m_Name: PlayerSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1117715341
 Transform:
   m_ObjectHideFlags: 0
@@ -15119,43 +15118,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1117715342
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1117715340}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d774210f68c92ba42a39ab95f8b89946, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  playerSpawns:
-  - PlayerPrefab: {fileID: 7186232649610525698, guid: 1b7bbee6746ca7948a6829faa7b7f683,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -5.8}
-    Rotation: 270
-  - PlayerPrefab: {fileID: 4309846963091504957, guid: cd997918b70142e44bb15e96c5ef5e7a,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -6.6}
-    Rotation: 270
-  - PlayerPrefab: {fileID: 1283346712484947928, guid: 97add1dad51fe534ab34b388f3388548,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -7.8}
-    Rotation: 270
-  - PlayerPrefab: {fileID: 2841092660008823558, guid: 283268a2909ab4246bf504705cd0a948,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -5.8}
-    Rotation: 270
-  - PlayerPrefab: {fileID: 142392709680122044, guid: 95c6ff9f2ac109e4993687447283a763,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -6.8}
-    Rotation: 270
-  - PlayerPrefab: {fileID: 7806484720916316157, guid: f2fecbcfe443af14aa12dee85fc42f4a,
-      type: 3}
-    Position: {x: 0.4, y: 0, z: -7.8}
-    Rotation: 270
 --- !u!1 &1137182440
 GameObject:
   m_ObjectHideFlags: 0
@@ -17957,6 +17919,7 @@ GameObject:
   - component: {fileID: 1334775387}
   - component: {fileID: 1334775386}
   - component: {fileID: 1334775385}
+  - component: {fileID: 1334775388}
   m_Layer: 0
   m_Name: Server
   m_TagString: Untagged
@@ -18012,6 +17975,43 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1334775388
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d774210f68c92ba42a39ab95f8b89946, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerSpawns:
+  - PlayerPrefab: {fileID: 7186232649610525698, guid: 1b7bbee6746ca7948a6829faa7b7f683,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -5.8}
+    Rotation: 270
+  - PlayerPrefab: {fileID: 4309846963091504957, guid: cd997918b70142e44bb15e96c5ef5e7a,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -6.6}
+    Rotation: 270
+  - PlayerPrefab: {fileID: 1283346712484947928, guid: 97add1dad51fe534ab34b388f3388548,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -7.8}
+    Rotation: 270
+  - PlayerPrefab: {fileID: 2841092660008823558, guid: 283268a2909ab4246bf504705cd0a948,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -5.8}
+    Rotation: 270
+  - PlayerPrefab: {fileID: 142392709680122044, guid: 95c6ff9f2ac109e4993687447283a763,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -6.8}
+    Rotation: 270
+  - PlayerPrefab: {fileID: 7806484720916316157, guid: f2fecbcfe443af14aa12dee85fc42f4a,
+      type: 3}
+    Position: {x: 0.4, y: 0, z: -7.8}
+    Rotation: 270
 --- !u!1001 &1339535448
 PrefabInstance:
   m_ObjectHideFlags: 0
