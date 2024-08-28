@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using SEE.Net.Actions;
-using UMA.PoseTools;
 using UnityEngine;
 
 namespace SEE.Game.Avatars

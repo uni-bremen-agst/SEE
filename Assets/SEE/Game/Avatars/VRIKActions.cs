@@ -1,7 +1,6 @@
 ﻿using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Utils;
-using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;

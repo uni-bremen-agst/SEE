@@ -9,11 +9,6 @@ namespace SEE.Net.Actions.Drawable
     public class DrawableChangeLightingNetAction : SurfaceNetAction
     {
         /// <summary>
-        /// The drawable that should be changed.
-        /// </summary>
-        public DrawableConfig DrawableConf;
-
-        /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
         public DrawableChangeLightingNetAction(DrawableConfig config) : base(config)
