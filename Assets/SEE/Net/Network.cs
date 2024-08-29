@@ -1020,7 +1020,22 @@ namespace SEE.Net
             Load(ConfigPath.Path);
         }
 
-#region ConfigIO
+        /// <summary>
+        /// Retrieves the name of the local player from the network configuration or a default name.
+        /// </summary>
+        /// <returns>name of local player</returns>
+        public static string GetLocalPlayerName()
+        {
+            if (Instance == null)
+            {
+                throw new("Network configuration not found");
+            }
+
+            // Player name that is set in the network configuration or a default name.
+            return string.IsNullOrEmpty(Instance.PlayerName) ? "N.N." : Instance.PlayerName;
+        }
+
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
