@@ -42,6 +42,7 @@ namespace SEE.Game.Avatars
         /// </remarks>
         private void Start()
         {
+            Log($"{nameof(Start)}(IsLocalPlayer={IsLocalPlayer})\n");
             // If this player is the local player, its name was already sent to the server during spawning.
             // Only in the case of a remote player, we need to request the player name from the server.
             if (IsLocalPlayer)
@@ -83,6 +84,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.Server)]
         private void RemovePlayerNameFromServerRpc(ulong networkObjectId)
         {
+            Log($"{nameof(RemovePlayerNameFromServerRpc)}(networkObjectId={networkObjectId})\n");
             PlayerNameMap.RemovePlayerName(networkObjectId);
         }
 
@@ -96,6 +98,7 @@ namespace SEE.Game.Avatars
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId)
         {
             string playerName = PlayerNameMap.GetPlayerName(networkObjectId);
+            Log($"{nameof(RequestPlayerNameFromServerRpc)}(networkObjectId={networkObjectId}) => playerName={playerName}\n");
             SendPlayerNameToClientRpc(playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
         }
 
@@ -109,6 +112,7 @@ namespace SEE.Game.Avatars
         [Rpc(SendTo.SpecifiedInParams)]
         void SendPlayerNameToClientRpc(string playerName, RpcParams _)
         {
+            Log($"{nameof(SendPlayerNameToClientRpc)}(playername={playerName})\n");
             SetPlayerName(playerName);
         }
 
@@ -116,11 +120,13 @@ namespace SEE.Game.Avatars
         /// Renders the player's name on the TextMeshPro component <see cref="displayNameText"/>
         /// (and also renames the top-most game object this component is attached to accordingly).
         /// </summary>
-        /// <param name="playername">Player name that should be set</param>
-        private void SetPlayerName(string playername)
+        /// <param name="playerName">Player name that should be set</param>
+        private void SetPlayerName(string playerName)
         {
-            displayNameText.text = playername;
-            gameObject.transform.root.name = playername;
+            Log($"{nameof(SetPlayerName)}(playername={playerName})\n");
+
+            displayNameText.text = playerName;
+            gameObject.transform.root.name = playerName;
         }
 
         /// <summary>
@@ -134,6 +140,8 @@ namespace SEE.Game.Avatars
         /// <param name="nameOfPlayer">Player name that should be set</param>
         internal static void SetPlayerName(GameObject player, string nameOfPlayer)
         {
+            Log($"{nameof(SetPlayerName)}(player={player.FullName()}, nameOfPlayer={nameOfPlayer})\n");
+
             const string playerNameGameObjectName = "Playername";
 
             GameObject child = player.transform.Find(playerNameGameObjectName)?.gameObject;
@@ -146,6 +154,16 @@ namespace SEE.Game.Avatars
             {
                 playerName.SetPlayerName(nameOfPlayer);
             }
+        }
+
+        /// <summary>
+        /// Logs given <paramref name="message"/> to the console.
+        /// </summary>
+        /// <param name="message">message to be logged</param>
+        [System.Diagnostics.Conditional("DEBUG")]
+        private static void Log(string message)
+        {
+            Debug.Log($"[{nameof(PlayerName)}] {message}\n");
         }
     }
 }
