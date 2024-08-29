@@ -28,15 +28,15 @@ namespace SEE.Game.Avatars
         private TMP_Text displayNameText;
 
         /// <summary>
-        /// Sets the name for the local player.
+        /// Sets the name of this player.
         /// If this is executed by the local player, the player's name is retrieved from the config.
         /// If this is executed by a remote player, the player name is requested from the server.
         /// </summary>
         /// <remarks>
-        /// Note: This code must be executed in Start(); it would not work within OnNetworkSpawn.
-        /// OnNetworkSpawn is invoked on each NetworkBehaviour associated with a NetworkObject
+        /// Note: This code must be executed in Start(); it would not work within OnNetworkSpawn().
+        /// OnNetworkSpawn() is invoked on each NetworkBehaviour associated with a NetworkObject
         /// when it's spawned. For dynamically spawned objects such as this one, Start() is called
-        /// after OnNetworkSpawn. During OnNetworkSpawn, the server has not yet put the player's
+        /// *after* OnNetworkSpawn(). During OnNetworkSpawn(), the server has not yet put the player's
         /// name into <see cref="PlayerNameMap"/>. That is why, we need to wait a little longer;
         /// hence, we use Start().
         /// </remarks>
@@ -92,9 +92,11 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Called by a client to request its player name from the server. The server response is
-        /// not immediate, but will be sent by the server to the client via <see cref="SendPlayerNameToClientRpc"/>.
+        /// not immediate, but will be sent by the server to the requesting client via
+        /// <see cref="SendPlayerNameToClientRpc"/>.
         /// </summary>
-        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its player name</param>
+        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its
+        /// player name</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams = default)
@@ -107,15 +109,18 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Called by the server to send the player's name to the specific client requesting it
-        /// (<seealso cref="RequestPlayerNameFromServerRpc"/>).
+        /// (<seealso cref="RequestPlayerNameFromServerRpc"/>) but only if its <see cref="NetworkObjectId"/>
+        /// matches the given <paramref name="networkObjectId"/>.
         /// </summary>
+        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player whose player name
+        /// was requested</param>
         /// <param name="playerName">New player name for <paramref name="networkObjectId"/></param>
         /// <remarks>This method is called by the server, but executed on the client which
         /// called <see cref="RequestPlayerNameFromServerRpc"/>.</remarks>
         [Rpc(SendTo.SpecifiedInParams)]
         void SendPlayerNameToClientRpc(ulong networkObjectId, string playerName, RpcParams _)
         {
-            Log($"{nameof(SendPlayerNameToClientRpc)}(networkObjectId={networkObjectId}, playername ={playerName})\n");
+            Log($"{nameof(SendPlayerNameToClientRpc)}(networkObjectId={networkObjectId}, playername={playerName})\n");
             if (NetworkObjectId == networkObjectId)
             {
                 SetPlayerName(playerName);
@@ -137,9 +142,8 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Renders the player's name on the TextMeshPro component <see cref="displayNameText"/>
-        /// of the child game object representing the player's name
+        /// of the child game object of <paramref name="player"/> representing the player's name
         /// (and also renames the top-most game object this component is attached to accordingly).
-        /// Retrieves the child of given <paramref name="player"/> and
         /// </summary>
         /// <param name="player">game object representing the player and having a child
         /// for rendering the player's name</param>
@@ -148,6 +152,8 @@ namespace SEE.Game.Avatars
         {
             Log($"{nameof(SetPlayerName)}(player={player.FullName()}, nameOfPlayer={nameOfPlayer})\n");
 
+            // Name of the immediate child of player representing the player's name.
+            // See the prefabs for players for the structure.
             const string playerNameGameObjectName = "Playername";
 
             GameObject child = player.transform.Find(playerNameGameObjectName)?.gameObject;
