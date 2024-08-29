@@ -1,5 +1,4 @@
-﻿using SEE.Game.Worlds;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Avatars
