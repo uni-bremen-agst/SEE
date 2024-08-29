@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using TMPro;
 using Unity.Netcode;
+using SEE.GO;
 
 namespace SEE.Game.Avatars
 {
@@ -27,34 +28,28 @@ namespace SEE.Game.Avatars
         private TMP_Text displayNameText;
 
         /// <summary>
-        /// If this is executed by the local player, the player name is retrieved from the
-        /// user configuration in <see cref="Net.Network.PlayerName"/> and sent to the server.
+        /// Sets the name for the local player.
+        /// If this is executed by the local player, the player's name is retrieved from the config.
         /// If this is executed by a remote player, the player name is requested from the server.
         /// </summary>
         /// <remarks>
+        /// Note: This code must be executed in Start(); it would not work within OnNetworkSpawn.
         /// OnNetworkSpawn is invoked on each NetworkBehaviour associated with a NetworkObject
-        /// when it's spawned. This is where all netcode-related initialization should occur.
-        /// You can still use Awake and Start to do things like finding components and assigning
-        /// them to local properties, but if NetworkBehaviour.IsSpawned is false then don't
-        /// expect netcode-distinguishing properties (like IsClient, IsServer, IsHost,
-        /// for example) to be accurate within Awake and Start methods.
+        /// when it's spawned. For dynamically spawned objects such as this one, Start() is called
+        /// after OnNetworkSpawn. During OnNetworkSpawn, the server has not yet put the player's
+        /// name into <see cref="PlayerNameMap"/>. That is why, we need to wait a little longer;
+        /// hence, we use Start().
         /// </remarks>
-        public override void OnNetworkSpawn()
+        private void Start()
         {
-            base.OnNetworkSpawn();
-            Net.Network networkConfig = FindObjectOfType<Net.Network>() ?? throw new("Network configuration not found");
-
-            // Player name that is set in the network configuration or a default name.
-            string playerName = string.IsNullOrEmpty(networkConfig.PlayerName) ? "N.N." : networkConfig.PlayerName;
-
+            // If this player is the local player, its name was already sent to the server during spawning.
+            // Only in the case of a remote player, we need to request the player name from the server.
             if (IsLocalPlayer)
             {
-                // If this player is the local player, we can use the player name from the network configuration.
-                SendPlayerNameToServerRpc(NetworkObjectId, playerName);
+                SetPlayerName(Net.Network.GetLocalPlayerName());
             }
             else
             {
-                // In the case of a remote player, we need to request the player name from the server.
                 RequestPlayerNameFromServerRpc(NetworkObjectId);
             }
         }
@@ -76,6 +71,7 @@ namespace SEE.Game.Avatars
                 // We let the local player do this.
                 RemovePlayerNameFromServerRpc(NetworkObjectId);
             }
+            base.OnNetworkSpawn();
         }
 
         /// <summary>
@@ -91,40 +87,6 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// RPC method to send the player's name from a client to the server, which in turn
-        /// distributes it to all clients.
-        /// </summary>
-        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player receiving given
-        /// <paramref name="playername"/></param>
-        /// <param name="playername">Player name that will be sent</param>
-        /// <remarks>This method is called by clients, but executed on the server.</remarks>
-        [Rpc(SendTo.Server)]
-        private void SendPlayerNameToServerRpc(ulong networkObjectId, string playername)
-        {
-            PlayerNameMap.AddOrUpdatePlayerName(networkObjectId, playername);
-
-            // The server will send the name to all other clients, including the client
-            // that sent the name. Actually, this call goes to all player instances on
-            // all clients. Thus, if there are three clients, each client will receive
-            // this call three times, once for each player.
-            SendPlayerNameToAllClientsRpc(networkObjectId, playername);
-        }
-
-        /// <summary>
-        /// RPC method to send a player's new name from the server to all clients for rendering.
-        /// </summary>
-        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player receiving
-        /// given <paramref name="playername"/></param>
-        /// <param name="playername">Playername that will be sent</param>
-        /// <remarks>This method is called by the server, but executed on all clients including
-        /// the client who is possibly acting as a server, too (i.e., the host).</remarks>
-        [Rpc(SendTo.ClientsAndHost)]
-        private void SendPlayerNameToAllClientsRpc(ulong networkObjectId, string playername)
-        {
-            RenderNetworkPlayerName(networkObjectId, playername);
-        }
-
-        /// <summary>
         /// Called by a client to request its player name from the server. The server response is
         /// not immediate, but will be sent by the server to the client via <see cref="SendPlayerNameToClientRpc"/>.
         /// </summary>
@@ -134,38 +96,55 @@ namespace SEE.Game.Avatars
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId)
         {
             string playerName = PlayerNameMap.GetPlayerName(networkObjectId);
-            SendPlayerNameToClientRpc(networkObjectId, playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
+            SendPlayerNameToClientRpc(playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
         }
 
         /// <summary>
         /// Called by the server to send the player's name to the specific client requesting it
         /// (<seealso cref="RequestPlayerNameFromServerRpc"/>).
         /// </summary>
-        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player receiving the player name</param>
         /// <param name="playerName">New player name for <paramref name="networkObjectId"/></param>
         /// <remarks>This method is called by the server, but executed on the client which
         /// called <see cref="RequestPlayerNameFromServerRpc"/>.</remarks>
         [Rpc(SendTo.SpecifiedInParams)]
-        void SendPlayerNameToClientRpc(ulong networkObjectId, string playerName, RpcParams _)
+        void SendPlayerNameToClientRpc(string playerName, RpcParams _)
         {
-            RenderNetworkPlayerName(networkObjectId, playerName);
+            SetPlayerName(playerName);
         }
 
         /// <summary>
-        /// Render the player's name on the TextMeshPro component <see cref="displayNameText"/>
-        /// (and also renames the top-most game object this component is attached to accordingly),
-        /// yet only if the given <paramref name="networkObjectId"/> matches the <see cref="NetworkObjectId"/> of
-        /// this player. Otherwise the player name is for another player (name changes are
-        /// broadcasted to all clients).
+        /// Renders the player's name on the TextMeshPro component <see cref="displayNameText"/>
+        /// (and also renames the top-most game object this component is attached to accordingly).
         /// </summary>
-        /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player receiving the player name</param>
         /// <param name="playername">Player name that should be set</param>
-        private void RenderNetworkPlayerName(ulong networkObjectId, string playername)
+        private void SetPlayerName(string playername)
         {
-            if (NetworkObjectId == networkObjectId)
+            displayNameText.text = playername;
+            gameObject.transform.root.name = playername;
+        }
+
+        /// <summary>
+        /// Renders the player's name on the TextMeshPro component <see cref="displayNameText"/>
+        /// of the child game object representing the player's name
+        /// (and also renames the top-most game object this component is attached to accordingly).
+        /// Retrieves the child of given <paramref name="player"/> and
+        /// </summary>
+        /// <param name="player">game object representing the player and having a child
+        /// for rendering the player's name</param>
+        /// <param name="nameOfPlayer">Player name that should be set</param>
+        internal static void SetPlayerName(GameObject player, string nameOfPlayer)
+        {
+            const string playerNameGameObjectName = "Playername";
+
+            GameObject child = player.transform.Find(playerNameGameObjectName)?.gameObject;
+
+            if (child == null)
             {
-                displayNameText.text = playername;
-                gameObject.transform.root.name = playername;
+                throw new ($"Player game object {player.FullName()} does not have a child named {playerNameGameObjectName}.");
+            }
+            if (child.TryGetComponentOrLog(out PlayerName playerName))
+            {
+                playerName.SetPlayerName(nameOfPlayer);
             }
         }
     }
