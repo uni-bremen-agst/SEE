@@ -97,7 +97,7 @@ namespace SEE.Game.Avatars
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its player name</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
-        private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams)
+        private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams = default)
         {
             ulong senderClientId = rpcParams.Receive.SenderClientId;
             string playerName = PlayerNameMap.GetPlayerName(networkObjectId);
