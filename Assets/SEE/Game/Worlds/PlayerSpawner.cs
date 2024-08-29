@@ -1,5 +1,6 @@
 ﻿using Dissonance;
-using SEE.UI.Notification;
+using SEE.Game.Avatars;
+using SEE.GO;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -10,53 +11,69 @@ using UnityEngine;
 namespace SEE.Game.Worlds
 {
     /// <summary>
+    /// Information needed to spawn a player avatar.
+    /// </summary>
+    [Serializable]
+    class SpawnInfo
+    {
+        [Tooltip("Avatar game object used as prefab.")]
+        public GameObject PlayerPrefab;
+
+        [Tooltip("World-space position at which to spawn.")]
+        public Vector3 Position;
+
+        [Tooltip("Rotation in degree along the y axis.")]
+        public float Rotation;
+
+        public SpawnInfo(string prefabName, Vector3 position, int rotation)
+        {
+            PlayerPrefab = Resources.Load<GameObject>(Path(prefabName));
+            if (PlayerPrefab == null)
+            {
+                throw new Exception($"Player prefab {Path(prefabName)} not found.\n");
+            }
+
+            Position = position;
+            Rotation = rotation;
+
+            return;
+
+            string Path(string prefabName) => $"Prefabs/Players/CC4/{prefabName}";
+        }
+    }
+
+    /// <summary>
     /// Spawns players in multi-player mode.
     /// </summary>
     public class PlayerSpawner : NetworkBehaviour
     {
         /// <summary>
-        /// Information needed to spawn a player avatar.
-        /// </summary>
-        [Serializable]
-        private class SpawnInfo
-        {
-            [Tooltip("Avatar game object used as prefab.")]
-            public GameObject PlayerPrefab;
-
-            [Tooltip("World-space position at which to spawn.")]
-            public Vector3 Position;
-
-            [Tooltip("Rotation in degree along the y axis.")]
-            public float Rotation;
-
-
-            public SpawnInfo(string v1, Vector3 vector3, int v2)
-            {
-                //PlayerPrefab = v1;
-                //Position
-            }
-
-        }
-
-        /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
         /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
-        private List<SpawnInfo> playerSpawns = new()
-        {
-            new SpawnInfo("Male1", new Vector3(0.4f, 0f, -5.8f), 270),
-            new SpawnInfo("Female1", new Vector3(0.4f, 0f, -6.6f), 270),
-            new SpawnInfo("Male2", new Vector3(0.4f, 0f, -7.8f), 270),
-            new SpawnInfo("Female2", new Vector3(0.4f, 0f, -5.8f), 270),
-            new SpawnInfo("Male3", new Vector3(0.4f, 0f, -6.8f), 270),
-            new SpawnInfo("Female3", new Vector3(0.4f, 0f, -7.8f), 270),
-        };
+        private List<SpawnInfo> playerSpawns;
 
         /// <summary>
         /// The dissonance communication. Its game object holds the remote players as its children.
         /// </summary>
         private DissonanceComms dissonanceComms = null;
+
+        private void Awake()
+        {
+            if (playerSpawns == null || playerSpawns.Count == 0)
+            {
+                playerSpawns = new()
+                {
+                    new SpawnInfo("Male1", new Vector3(0.4f, 0f, -5.8f), 270),
+                    new SpawnInfo("Female1", new Vector3(0.4f, 0f, -6.6f), 270),
+                    new SpawnInfo("Male2", new Vector3(0.4f, 0f, -7.8f), 270),
+                    new SpawnInfo("Female2", new Vector3(0.4f, 0f, -5.8f), 270),
+                    new SpawnInfo("Male3", new Vector3(0.4f, 0f, -6.8f), 270),
+                    new SpawnInfo("Female3", new Vector3(0.4f, 0f, -7.8f), 270),
+                };
+            }
+        }
 
         /// <summary>
         /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
@@ -66,18 +83,17 @@ namespace SEE.Game.Worlds
             StartCoroutine(SpawnPlayerCoroutine());
         }
 
-        private void FindServer()
+        /// <summary>
+        /// RPC method to spawn a player on the server.
+        /// </summary>
+        /// <param name="clientId">the network ID of the client who is requesting to spawn a local player</param>
+        /// <param name="avatarIndex">the index of the avatar to spawn</param>
+        /// <remarks>This method is called by clients, but executed on the server.</remarks>
+        [Rpc(SendTo.Server)]
+        private void SpawnOnServerRpc(ulong clientId, string playerName, int avatarIndex)
         {
-            const string serverName = "/Server";
-            GameObject server = GameObject.Find(serverName);
-            if (server == null)
-            {
-                ShowNotification.Error("Internal Error", $"No game object named {serverName} found.");
-            }
-            else
-            {
-                ShowNotification.Info("All good", $"Game object named {serverName} found.");
-            }
+
+            Spawn(clientId, playerName, avatarIndex);
         }
 
         /// <summary>
@@ -107,15 +123,21 @@ namespace SEE.Game.Worlds
 
             NetworkManager networkManager = NetworkManager.Singleton;
 
-            // Terminate this co-routine if not run by the server.
+            // Terminate this co-routine if not run by the server (or host).
             if (!networkManager.IsServer)
             {
+                // Note: A connection is established only from a "pure" client
+                // - that is, one that is neither server nor host time. A
+                // client who is server at the same time (i.e., a host) does
+                // not establish a connection with the OnClientConnectedCallback
+                // being triggered.
+                networkManager.OnClientConnectedCallback += OnClientIsConnected;
                 yield break;
             }
 
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            // The following code will be executed only on the server.
-            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            // The following code will be executed only on the server (host).
+            // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
             // The callback to invoke once a client connects. This callback is only
             // ran on the server and on the local client that connects. We want
@@ -123,49 +145,56 @@ namespace SEE.Game.Worlds
             networkManager.OnClientConnectedCallback += ClientConnects;
             networkManager.OnClientDisconnectCallback += ClientDisconnects;
             // Spawn the local player. This code is executed by the server.
-            ClientConnects(networkManager.LocalClientId);
+            // "Pure" servers (i.e., those that are not hosts) must not spawn a player.
+            if (networkManager.IsHost)
+            {
+                // Spawn the local player for this host.
+                Spawn(networkManager.LocalClientId, Net.Network.GetLocalPlayerName(), 0);
+            }
         }
-
-        /// <summary>
-        /// The number of players spawned so far.
-        /// </summary>
-        private int numberOfSpawnedPlayers = 0;
 
         /// <summary>
         /// Logs given <paramref name="message"/> to the console.
         /// </summary>
         /// <param name="message">message to be logged</param>
-        [System.Diagnostics.Conditional("ENABLE_LOGS")]
+        [System.Diagnostics.Conditional("DEBUG")]
         private static void Log(string message)
         {
-            Debug.Log($"[Client/Server] {message}\n");
+            Debug.Log($"[{nameof(PlayerSpawner)}] {message}\n");
         }
 
         /// <summary>
         /// Spawns a player using the <see cref="playerSpawns"/>.
         /// </summary>
-        /// <param name="clientID">the network ID of the client</param>
+        /// <param name="clientId">the network ID of the client</param>
         /// <remarks>This code can be executed only on the server.</remarks>
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
-        private void ClientConnects(ulong clientID)
+        private void ClientConnects(ulong clientId)
         {
-            Log($"Player with owner {clientID} connects.\n");
-            // A pure server, that is, one that is not also a host, does not need to spawn a player.
-            if (clientID == NetworkManager.Singleton.LocalClientId
-                && NetworkManager.Singleton.IsServer && !NetworkManager.Singleton.IsHost)
-            {
-                return;
-            }
-            int index = numberOfSpawnedPlayers % playerSpawns.Count;
+            Log($"Player with client id {clientId} connects with server (server side).\n");
+        }
+
+        private void OnClientIsConnected(ulong clientId)
+        {
+            Log($"Player with client {clientId} is connected with server (client side).\n");
+            SpawnOnServerRpc(clientId, Net.Network.GetLocalPlayerName(), 0);
+        }
+
+        private void Spawn(ulong clientId, string nameOfPlayer, int avatarIndex)
+        {
+            Log($"Player with client {clientId} named {nameOfPlayer} requests to spawn an avatar with index {avatarIndex}.\n");
+
+            // Make sure the index is within the bounds of the playerSpawns list.
+            int index = avatarIndex % playerSpawns.Count;
             GameObject player = Instantiate(playerSpawns[index].PlayerPrefab,
                                             playerSpawns[index].Position,
                                             Quaternion.Euler(new Vector3(0, playerSpawns[index].Rotation, 0)));
-            numberOfSpawnedPlayers++;
+            player.name = nameOfPlayer;
 
-            Log($"Spawned {player.name} (network id of owner: {clientID}, "
-                + $"local: {IsLocal(clientID)}) at position {player.transform.position}.\n");
+            Log($"Spawned {player.name} (network id of owner: {clientId}, "
+                + $"local: {IsLocal(clientId)}) at position {player.transform.position}.\n");
 
-            if (player.TryGetComponent(out NetworkObject net))
+            if (player.TryGetComponentOrLog(out NetworkObject net))
             {
                 // By default a newly spawned network Prefab instance is owned by the server
                 // unless otherwise specified. However, in case of SpawnAsPlayerObject, if
@@ -173,10 +202,10 @@ namespace SEE.Game.Worlds
                 // the NetworkObject of that prefab instance unless there's additional
                 // server-side specific user code that removes or changes the ownership.
                 // Note: The following method can only be called by a server.
-                net.SpawnAsPlayerObject(clientID, destroyWithScene: true);
+                net.SpawnAsPlayerObject(clientId, destroyWithScene: true);
 
-                Log($"Is local player: {net.IsLocalPlayer}. Owner of player {player.name} "
-                    + $"is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+                PlayerNameMap.AddOrUpdatePlayerName(net.NetworkObjectId, nameOfPlayer);
+
                 // A network Prefab is any unity Prefab asset that has one NetworkObject
                 // component attached to a GameObject within the prefab.
                 // player is a network Prefab, i.e., it has a NetworkObject attached to it.
@@ -210,10 +239,8 @@ namespace SEE.Game.Worlds
 #endif
 #endif
             }
-            else
-            {
-                UnityEngine.Debug.LogError($"Spawned player {player.name} does not have a {typeof(NetworkObject)} component.\n");
-            }
+
+            PlayerName.SetPlayerName(player, nameOfPlayer);
         }
 
         /// <summary>
