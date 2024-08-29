@@ -47,10 +47,12 @@ namespace SEE.Game.Avatars
             // Only in the case of a remote player, we need to request the player name from the server.
             if (IsLocalPlayer)
             {
+                Log($"{nameof(Start)}() uses GetLocalPlayerName()\n");
                 SetPlayerName(Net.Network.GetLocalPlayerName());
             }
             else
             {
+                Log($"{nameof(Start)}() uses {nameof(RequestPlayerNameFromServerRpc)}(NetworkObjectId={NetworkObjectId})\n");
                 RequestPlayerNameFromServerRpc(NetworkObjectId);
             }
         }
@@ -95,11 +97,12 @@ namespace SEE.Game.Avatars
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its player name</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
-        private void RequestPlayerNameFromServerRpc(ulong networkObjectId)
+        private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams)
         {
+            ulong senderClientId = rpcParams.Receive.SenderClientId;
             string playerName = PlayerNameMap.GetPlayerName(networkObjectId);
-            Log($"{nameof(RequestPlayerNameFromServerRpc)}(networkObjectId={networkObjectId}) => playerName={playerName}\n");
-            SendPlayerNameToClientRpc(playerName, RpcTarget.Single(networkObjectId, RpcTargetUse.Temp));
+            Log($"{nameof(RequestPlayerNameFromServerRpc)}(networkObjectId={networkObjectId}, senderClientId={senderClientId}) => playerName={playerName}\n");
+            SendPlayerNameToClientRpc(networkObjectId, playerName, RpcTarget.Single(senderClientId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -110,10 +113,13 @@ namespace SEE.Game.Avatars
         /// <remarks>This method is called by the server, but executed on the client which
         /// called <see cref="RequestPlayerNameFromServerRpc"/>.</remarks>
         [Rpc(SendTo.SpecifiedInParams)]
-        void SendPlayerNameToClientRpc(string playerName, RpcParams _)
+        void SendPlayerNameToClientRpc(ulong networkObjectId, string playerName, RpcParams _)
         {
-            Log($"{nameof(SendPlayerNameToClientRpc)}(playername={playerName})\n");
-            SetPlayerName(playerName);
+            Log($"{nameof(SendPlayerNameToClientRpc)}(networkObjectId={networkObjectId}, playername ={playerName})\n");
+            if (NetworkObjectId == networkObjectId)
+            {
+                SetPlayerName(playerName);
+            }
         }
 
         /// <summary>
