@@ -97,6 +97,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         /// <param name="networkObjectId"><see cref="NetworkObjectId"/> of the player requesting its
         /// player name</param>
+        /// <param name="rpcParams">additional RPC parameters managed by NetCode; used to retrieve
+        /// the sender client id</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
         private void RequestPlayerNameFromServerRpc(ulong networkObjectId, RpcParams rpcParams = default)
