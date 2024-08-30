@@ -48,7 +48,7 @@ namespace SEE.Game.Avatars
             if (IsLocalPlayer)
             {
                 Log($"{nameof(Start)}() uses GetLocalPlayerName()\n");
-                SetPlayerName(Net.Network.GetLocalPlayerName());
+                SetPlayerName(Net.Network.Instance.PlayerName);
             }
             else
             {
