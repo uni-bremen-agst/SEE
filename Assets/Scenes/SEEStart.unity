@@ -375,7 +375,7 @@ MonoBehaviour:
   ConnectionData:
     Address: 192.168.178.82
     Port: 7777
-    ServerListenAddress: 192.168.178.82
+    ServerListenAddress: 127.0.0.1
   DebugSimulator:
     PacketDelayMS: 0
     PacketJitterMS: 0
