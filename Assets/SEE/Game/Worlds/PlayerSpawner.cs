@@ -44,7 +44,7 @@ namespace SEE.Game.Worlds
         /// </summary>
         /// <param name="prefabName">name of the prefab file for the avatar; must be located in <see cref="playerPrefabFolder"/></param>
         /// <param name="position">world-space position at which to spawn a player</param>
-        /// <param name="rotation">rotation of the avatar in degree along the y axis when the avatar is spawned</param>
+        /// <param name="rotation">rotation of the avatar in degrees along the y axis when the avatar is spawned</param>
         /// <exception cref="Exception">thrown in case the <paramref name="prefabName"/> cannot be loaded</exception>
         public SpawnInfo(string prefabName, Vector3 position, int rotation)
         {
