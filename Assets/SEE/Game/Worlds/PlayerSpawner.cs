@@ -29,9 +29,9 @@ namespace SEE.Game.Worlds
         public Vector3 Position;
 
         /// <summary>
-        /// Rotation of the avatar in degree along the y axis when the avatar is spawned.
+        /// Rotation of the avatar in degrees along the y axis when the avatar is spawned.
         /// </summary>
-        [Tooltip("Rotation in degree along the y axis.")]
+        [Tooltip("Rotation in degrees along the y axis.")]
         public float Rotation;
 
         /// <summary>
