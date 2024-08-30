@@ -1,5 +1,4 @@
-﻿using SEE.UI.Notification;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.Avatars
@@ -23,13 +22,14 @@ namespace SEE.Game.Avatars
         /// <param name="playerName">corresponding playerName</param>
         public static void AddOrUpdatePlayerName(ulong networkObjectId, string playerName)
         {
+            Log($"{nameof(AddOrUpdatePlayerName)}(networkObjectId={networkObjectId}, playerName={playerName})\n");
+
             if (playerNames.TryGetValue(networkObjectId, out string currentName))
             {
                 // Only if there is a new player name, we need to update the dictionary.
                 if (currentName != playerName)
                 {
                     playerNames[networkObjectId] = playerName;
-                    ShowNotification.Info("Connection", $"Client {networkObjectId} is now named {playerName}.");
                 }
             }
             else
@@ -48,6 +48,8 @@ namespace SEE.Game.Avatars
         /// <returns>corresponding playerName or "Unknown"</returns>
         public static string GetPlayerName(ulong networkObjectId)
         {
+            Log($"{nameof(GetPlayerName)}(networkObjectId={networkObjectId})\n");
+
             if (playerNames.TryGetValue(networkObjectId, out string playerName))
             {
                 return playerName;
@@ -55,7 +57,17 @@ namespace SEE.Game.Avatars
             else
             {
                 Debug.LogError($"Player name for player {networkObjectId} is unknown.\n");
+                Dump();
                 return "Unknown";
+            }
+
+            void Dump()
+            {
+                Log("Content:\n");
+                foreach (var kvp in playerNames)
+                {
+                    Log($"  {kvp.Key} => {kvp.Value}\n");
+                }
             }
         }
 
@@ -67,7 +79,18 @@ namespace SEE.Game.Avatars
         /// to be removed</param>
         public static void RemovePlayerName(ulong networkObjectId)
         {
+            Log($"{nameof(RemovePlayerName)}(networkObjectId={networkObjectId})\n");
             playerNames.Remove(networkObjectId);
+        }
+
+        /// <summary>
+        /// Logs given <paramref name="message"/> to the console.
+        /// </summary>
+        /// <param name="message">message to be logged</param>
+        [System.Diagnostics.Conditional("DEBUG")]
+        private static void Log(string message)
+        {
+            Debug.Log($"[{nameof(PlayerNameMap)}] {message}\n");
         }
     }
 }
