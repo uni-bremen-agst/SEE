@@ -109,6 +109,12 @@ namespace SEE.Net
         public string PlayerName { get; set; } = "Me";
 
         /// <summary>
+        /// The index of the player's avatar.
+        /// </summary>
+        [Tooltip("The index of the player's avatar"), ShowInInspector]
+        public uint AvatarIndex { get; set; } = 0;
+
+        /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
@@ -1020,21 +1026,6 @@ namespace SEE.Net
             Load(ConfigPath.Path);
         }
 
-        /// <summary>
-        /// Retrieves the name of the local player from the network configuration or a default name.
-        /// </summary>
-        /// <returns>name of local player</returns>
-        public static string GetLocalPlayerName()
-        {
-            if (Instance == null)
-            {
-                throw new("Network configuration not found");
-            }
-
-            // Player name that is set in the network configuration or a default name.
-            return string.IsNullOrEmpty(Instance.PlayerName) ? "N.N." : Instance.PlayerName;
-        }
-
         #region ConfigIO
 
         //--------------------------------
@@ -1065,6 +1056,10 @@ namespace SEE.Net
         /// Label of attribute <see cref="PlayerName"/> in the configuration file.
         /// </summary>
         private const string playernameLabel = "playername";
+        /// <summary>
+        /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
+        /// </summary>
+        private const string avatarIndexLabel = "avatarIndex";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1106,6 +1101,9 @@ namespace SEE.Net
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
             writer.Save(PlayerName, playernameLabel);
+            // The following cast from uint to int is necessary because otherwise the value
+            // would be saved as a float.
+            writer.Save((int)AvatarIndex, avatarIndexLabel);
         }
 
         /// <summary>
@@ -1132,6 +1130,14 @@ namespace SEE.Net
                 ConfigIO.Restore(attributes, playernameLabel, ref value);
                 PlayerName = value;
             }
+            {
+                int value = (int)AvatarIndex;
+                if (ConfigIO.Restore(attributes, avatarIndexLabel, ref value))
+                {
+                    AvatarIndex = (uint)value;
+                }
+            }
+
         }
 
 #endregion
