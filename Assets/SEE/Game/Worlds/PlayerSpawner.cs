@@ -14,7 +14,7 @@ namespace SEE.Game.Worlds
     /// Information needed to spawn a player avatar.
     /// </summary>
     [Serializable]
-    class SpawnInfo
+    internal class SpawnInfo
     {
         /// <summary>
         /// Avatar game object used as prefab.
