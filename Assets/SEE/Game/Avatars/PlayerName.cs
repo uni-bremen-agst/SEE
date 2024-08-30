@@ -160,7 +160,7 @@ namespace SEE.Game.Avatars
 
             if (child == null)
             {
-                throw new ($"Player game object {player.FullName()} does not have a child named {playerNameGameObjectName}.");
+                throw new($"Player game object {player.FullName()} does not have a child named {playerNameGameObjectName}.");
             }
             if (child.TryGetComponentOrLog(out PlayerName playerName))
             {
