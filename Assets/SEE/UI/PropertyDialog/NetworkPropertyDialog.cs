@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
+using SEE.Game.Worlds;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -81,6 +82,11 @@ namespace SEE.UI.PropertyDialog
         private StringProperty playerName;
 
         /// <summary>
+        /// The selector for the avatar index
+        /// </summary>
+        private SelectionProperty avatarSelector;
+
+        /// <summary>
         /// The selector for the voice chat system.
         /// </summary>
         private SelectionProperty voiceChatSelector;
@@ -129,6 +135,14 @@ namespace SEE.UI.PropertyDialog
                 playerName.Value = networkConfig.PlayerName.ToString();
                 playerName.Description = "Name of the player to be shown to others";
                 group.AddProperty(playerName);
+            }
+            {
+                avatarSelector = dialog.AddComponent<SelectionProperty>();
+                avatarSelector.Name = "Avatar";
+                avatarSelector.Description = "Select an avatar";
+                avatarSelector.AddOptions(PlayerSpawner.Prefabs);
+                avatarSelector.Value = PlayerSpawner.Prefabs[(int)networkConfig.AvatarIndex % PlayerSpawner.Prefabs.Count];
+                group.AddProperty(avatarSelector);
             }
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
@@ -235,6 +249,11 @@ namespace SEE.UI.PropertyDialog
                     ShowNotification.Error("Invalid User Name", "User name needs to be at least one character long and must not consist of whitespace only.");
                     errorOccurred = true;
                 }
+            }
+            {
+                // Avatar
+                string value = avatarSelector.Value.Trim();
+                networkConfig.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
             }
             {
                 // Room Password
