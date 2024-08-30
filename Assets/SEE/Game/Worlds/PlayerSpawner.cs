@@ -11,63 +11,63 @@ using UnityEngine;
 namespace SEE.Game.Worlds
 {
     /// <summary>
-    /// Information needed to spawn a player avatar.
-    /// </summary>
-    [Serializable]
-    internal class SpawnInfo
-    {
-        /// <summary>
-        /// Avatar game object used as prefab.
-        /// </summary>
-        [Tooltip("Avatar game object used as prefab.")]
-        public GameObject PlayerPrefab;
-
-        /// <summary>
-        /// World-space position at which to spawn a player.
-        /// </summary>
-        [Tooltip("World-space position at which to spawn the avatar.")]
-        public Vector3 Position;
-
-        /// <summary>
-        /// Rotation of the avatar in degrees along the y axis when the avatar is spawned.
-        /// </summary>
-        [Tooltip("Rotation in degrees along the y axis.")]
-        public float Rotation;
-
-        /// <summary>
-        /// The folder where the player prefabs are located.
-        /// </summary>
-        private const string playerPrefabFolder = "Prefabs/Players/CC4";
-
-        /// <summary>
-        /// Constructor to create a spawn-information object.
-        /// </summary>
-        /// <param name="prefabName">name of the prefab file for the avatar; must be located in <see cref="playerPrefabFolder"/></param>
-        /// <param name="position">world-space position at which to spawn a player</param>
-        /// <param name="rotation">rotation of the avatar in degrees along the y axis when the avatar is spawned</param>
-        /// <exception cref="Exception">thrown in case the <paramref name="prefabName"/> cannot be loaded</exception>
-        public SpawnInfo(string prefabName, Vector3 position, int rotation)
-        {
-            PlayerPrefab = Resources.Load<GameObject>(Path(prefabName));
-            if (PlayerPrefab == null)
-            {
-                throw new Exception($"Player prefab {Path(prefabName)} not found.\n");
-            }
-
-            Position = position;
-            Rotation = rotation;
-
-            return;
-
-            static string Path(string prefabName) => $"{playerPrefabFolder}/{prefabName}";
-        }
-    }
-
-    /// <summary>
     /// Spawns players in multi-player mode.
     /// </summary>
     public class PlayerSpawner : NetworkBehaviour
     {
+        /// <summary>
+        /// Information needed to spawn a player avatar.
+        /// </summary>
+        [Serializable]
+        private class SpawnInfo
+        {
+            /// <summary>
+            /// Avatar game object used as prefab.
+            /// </summary>
+            [Tooltip("Avatar game object used as prefab.")]
+            public GameObject PlayerPrefab;
+
+            /// <summary>
+            /// World-space position at which to spawn a player.
+            /// </summary>
+            [Tooltip("World-space position at which to spawn the avatar.")]
+            public Vector3 Position;
+
+            /// <summary>
+            /// Rotation of the avatar in degrees along the y axis when the avatar is spawned.
+            /// </summary>
+            [Tooltip("Rotation in degrees along the y axis.")]
+            public float Rotation;
+
+            /// <summary>
+            /// The folder where the player prefabs are located.
+            /// </summary>
+            private const string playerPrefabFolder = "Prefabs/Players/CC4";
+
+            /// <summary>
+            /// Constructor to create a spawn-information object.
+            /// </summary>
+            /// <param name="prefabName">name of the prefab file for the avatar; must be located in <see cref="playerPrefabFolder"/></param>
+            /// <param name="position">world-space position at which to spawn a player</param>
+            /// <param name="rotation">rotation of the avatar in degrees along the y axis when the avatar is spawned</param>
+            /// <exception cref="Exception">thrown in case the <paramref name="prefabName"/> cannot be loaded</exception>
+            public SpawnInfo(string prefabName, Vector3 position, int rotation)
+            {
+                PlayerPrefab = Resources.Load<GameObject>(Path(prefabName));
+                if (PlayerPrefab == null)
+                {
+                    throw new Exception($"Player prefab {Path(prefabName)} not found.\n");
+                }
+
+                Position = position;
+                Rotation = rotation;
+
+                return;
+
+                static string Path(string prefabName) => $"{playerPrefabFolder}/{prefabName}";
+            }
+        }
+
         /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
@@ -106,9 +106,9 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[0], new Vector3(0.4f, 0f, -5.8f), 270),
                     new SpawnInfo(Prefabs[1], new Vector3(0.4f, 0f, -6.6f), 270),
                     new SpawnInfo(Prefabs[2], new Vector3(0.4f, 0f, -7.8f), 270),
-                    new SpawnInfo(Prefabs[3], new Vector3(0.4f, 0f, -5.8f), 270),
-                    new SpawnInfo(Prefabs[4], new Vector3(0.4f, 0f, -6.8f), 270),
-                    new SpawnInfo(Prefabs[5], new Vector3(0.4f, 0f, -7.8f), 270),
+                    new SpawnInfo(Prefabs[3], new Vector3(-3.5f, 0f, -5.8f), 90),
+                    new SpawnInfo(Prefabs[4], new Vector3(-3.5f, 0f, -6.8f), 90),
+                    new SpawnInfo(Prefabs[5], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
