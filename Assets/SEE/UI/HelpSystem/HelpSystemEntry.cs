@@ -381,18 +381,34 @@ namespace SEE.UI.HelpSystem
             Destroyer.Destroy(helpSystemSpace);
         }
 
+        private Sprite playIcon;
+        private Sprite pauseIcon;
+
+        /// <summary>
+        /// Initializes the sprites to avoid loading them multiple times.
+        /// </summary>
+        private void InitializeIcons()
+        {
+            playIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+            pauseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+        }
+
         /// <summary>
         /// Toggles the "IsPlaying" state. If the entry is running, it will be paused; if it is paused,
         /// it will be played on.
         /// </summary>
         public void TogglePlaying()
         {
+            if (playIcon == null || pauseIcon == null)
+            {
+                InitializeIcons();
+            }
+
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             if (!IsPlaying)
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+                pauseButton.buttonIcon = pauseIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
                 Speaker.Instance.PauseOrUnPause();
@@ -400,8 +416,7 @@ namespace SEE.UI.HelpSystem
             }
             else
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+                pauseButton.buttonIcon = playIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();
