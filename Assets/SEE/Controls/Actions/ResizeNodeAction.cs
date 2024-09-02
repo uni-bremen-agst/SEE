@@ -267,10 +267,6 @@ namespace SEE.Controls.Actions
             /// </summary>
             private NodeRef nodeRef;
             /// <summary>
-            /// The parent node.
-            /// </summary>
-            private Node parentNode;
-            /// <summary>
             /// Stores the directional vectors that belong to the individual handles.
             /// </summary>
             private Dictionary<GameObject, Vector3> handles;
@@ -293,6 +289,15 @@ namespace SEE.Controls.Actions
             /// The data of the resize step that is in action.
             /// </summary>
             private ResizeStepData currentResizeStep;
+
+            /// <summary>
+            /// The minimal size of a node in world space.
+            /// </summary>
+            private static readonly float minSize = 0.04f;
+            /// <summary>
+            /// The minimal world-space distance between nodes while resizing.
+            /// </summary>
+            private static readonly float padding = 0.004f;
 
             #region Change Event
 
@@ -323,8 +328,6 @@ namespace SEE.Controls.Actions
                 }
 
                 this.nodeRef = nodeRef;
-                parentNode = nodeRef.Value.Parent;
-                Assert.IsNotNull(parentNode);
                 InitHandles();
             }
 
@@ -406,6 +409,7 @@ namespace SEE.Controls.Actions
                 handle.GetComponent<Renderer>().material.color = handleColor;
                 handle.transform.localScale = handleScale;
                 handle.transform.localPosition = transform.position + 0.5f * Vector3.Scale(transform.lossyScale, direction);
+                handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                 handle.transform.SetParent(transform);
                 return handle;
             }
@@ -438,7 +442,7 @@ namespace SEE.Controls.Actions
             void UpdateSize()
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node hitNode, nodeRef);
-                if (!targetObjectHit.HasValue || !hitNode.IsDescendantOf(parentNode))
+                if (!targetObjectHit.HasValue)
                 {
                     return;
                 }
@@ -450,21 +454,23 @@ namespace SEE.Controls.Actions
                 List<Transform> siblings = new (parent.childCount);
                 foreach (Transform sibling in parent)
                 {
-                    if (sibling != transform && sibling.gameObject.HasNodeRef())
+                    if (sibling != transform && sibling.gameObject.IsNodeAndActiveSelf())
                     {
                         siblings.Add(sibling);
                     }
                 }
+                // Debug.Log("Siblings: " + string.Join(", ", siblings.Select(item => item.name)));
 
                 // Collect children
                 List<Transform> children = new (transform.childCount);
                 foreach (Transform child in transform)
                 {
-                    if (child.gameObject.HasNodeRef())
+                    if (child.gameObject.IsNodeAndActiveSelf())
                     {
                         children.Add(child);
                     }
                 }
+                // Debug.Log("Children: " + string.Join(", ", children.Select(item => item.name)));
 
                 // Calculate new scale and position
                 Vector3 hitPoint = targetObjectHit.Value.point;
@@ -472,10 +478,137 @@ namespace SEE.Controls.Actions
                 Vector3 newLocalScale = currentResizeStep.InitialLocalScale - Vector3.Scale(currentResizeStep.ScaleFactor, cursorMovement);
                 Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition - 0.5f * Vector3.Scale(currentResizeStep.ScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
 
-                // Is this resize allowed?
-                if (RectTooSmall(newLocalScale)
-                        || siblings.Any(sibling => RectsOverlap(newLocalPosition, newLocalScale, sibling.localPosition, sibling.localScale))
-                        || !children.All(child => ContainedInRect(Vector3.zero, newLocalScale, Vector3.Scale(child.localPosition, transform.localScale), Vector3.Scale(child.localScale, transform.localScale))))
+                // Contain in parent
+                Bounds2D bounds = new(
+                        newLocalPosition.x - newLocalScale.x / 2,
+                        newLocalPosition.x + newLocalScale.x / 2,
+                        newLocalPosition.z - newLocalScale.z / 2,
+                        newLocalPosition.z + newLocalScale.z / 2
+                );
+                // Parent scale in its own context is always 1
+                Bounds2D otherBounds = new(
+                        -0.5f + currentResizeStep.LocalPadding.x,
+                         0.5f - currentResizeStep.LocalPadding.x,
+                        -0.5f + currentResizeStep.LocalPadding.z,
+                         0.5f - currentResizeStep.LocalPadding.z
+                );
+                if (currentResizeStep.Left && bounds.Left < otherBounds.Left)
+                {
+                    bounds.Left = otherBounds.Left;
+                }
+                if (currentResizeStep.Right && bounds.Right > otherBounds.Right)
+                {
+                    bounds.Right = otherBounds.Right;
+                }
+                if (currentResizeStep.Back && bounds.Back < otherBounds.Back)
+                {
+                    bounds.Back = otherBounds.Back;
+                }
+                if (currentResizeStep.Forward && bounds.Front > otherBounds.Front)
+                {
+                    bounds.Front = otherBounds.Front;
+                }
+
+                // Correct sibling overlap
+                foreach (Transform sibling in siblings)
+                {
+                    otherBounds.Left  = sibling.localPosition.x - sibling.localScale.x / 2 - currentResizeStep.LocalPadding.x;
+                    otherBounds.Right = sibling.localPosition.x + sibling.localScale.x / 2 + currentResizeStep.LocalPadding.x;
+                    otherBounds.Back  = sibling.localPosition.z - sibling.localScale.z / 2 - currentResizeStep.LocalPadding.z;
+                    otherBounds.Front = sibling.localPosition.z + sibling.localScale.z / 2 + currentResizeStep.LocalPadding.z;
+
+                    if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
+                            || bounds.Left > otherBounds.Right || bounds.Right < otherBounds.Left)
+                    {
+                        // No overlap detected
+                        continue;
+                    }
+
+                    // Calculate overlap
+                    float[] overlap = { float.MaxValue, float.MaxValue };
+                    if (currentResizeStep.Right)
+                    {
+                        overlap[0] = bounds.Right - otherBounds.Left;
+                    }
+                    if (currentResizeStep.Left)
+                    {
+                        overlap[0] = otherBounds.Right - bounds.Left;
+                    }
+                    if (currentResizeStep.Forward)
+                    {
+                        overlap[1] = bounds.Front - otherBounds.Back;
+                    }
+                    if (currentResizeStep.Back)
+                    {
+                        overlap[1] = otherBounds.Front - bounds.Back;
+                    }
+
+
+                    // Pick correction direction
+                    if (overlap[0] < overlap[1] && newLocalScale.x - overlap[0] > currentResizeStep.MinLocalSize.x)
+                    {
+                        if (currentResizeStep.Right)
+                        {
+                            bounds.Right = otherBounds.Left;
+                        }
+                        else
+                        {
+                            bounds.Left = otherBounds.Right;
+                        }
+                    }
+                    else if (newLocalScale.z - overlap[1] > currentResizeStep.MinLocalSize.z)
+                    {
+                        if (currentResizeStep.Forward)
+                        {
+                            bounds.Front = otherBounds.Back;
+                        }
+                        else
+                        {
+                            bounds.Back = otherBounds.Front;
+                        }
+                    }
+                }
+
+                // Contain all children
+                foreach (Transform child in children)
+                {
+                    // Child position and scale on common parent
+                    Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
+                    Vector3 childScale = Vector3.Scale(child.localScale, transform.localScale);
+                    otherBounds.Left  = childPos.x - childScale.x / 2 - currentResizeStep.LocalPadding.x;
+                    otherBounds.Right = childPos.x + childScale.x / 2 + currentResizeStep.LocalPadding.x;
+                    otherBounds.Back  = childPos.z - childScale.z / 2 - currentResizeStep.LocalPadding.z;
+                    otherBounds.Front = childPos.z + childScale.z / 2 + currentResizeStep.LocalPadding.z;
+
+                    if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
+                    {
+                        bounds.Right = otherBounds.Right;
+                    }
+
+                    if (currentResizeStep.Left && bounds.Left > otherBounds.Left)
+                    {
+                        bounds.Left = otherBounds.Left;
+                    }
+
+
+                    if (currentResizeStep.Forward && bounds.Front < otherBounds.Front)
+                    {
+                        bounds.Front = otherBounds.Front;
+                    }
+
+                    if (currentResizeStep.Back && bounds.Back > otherBounds.Back)
+                    {
+                        bounds.Back = otherBounds.Back;
+                    }
+                }
+
+                newLocalScale.x = bounds.Right - bounds.Left;
+                newLocalScale.z = bounds.Front - bounds.Back;
+                newLocalPosition.x = bounds.Left + newLocalScale.x / 2;
+                newLocalPosition.z = bounds.Back + newLocalScale.z / 2;
+
+                // Ensure minimal size
+                if (newLocalScale.x < currentResizeStep.MinLocalSize.x || newLocalScale.z < currentResizeStep.MinLocalSize.z)
                 {
                     return;
                 }
@@ -506,78 +639,6 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            /// <summary>
-            /// Checks if <paramref name="localScale"/>'s 2D rectangle is too small.
-            /// </summary>
-            /// <remarks>
-            /// Uses <see cref="currentResizeStep.Value.ScaleFactor"/> to scale <paramref name="minSize"/>.
-            /// </remarks>
-            /// <param name="localScale">The (local) scale to check.</param>
-            /// <param name="minSize">The minimal world-space size.</param>
-            private bool RectTooSmall(Vector3 localScale, float minSize = 0.04f)
-            {
-                return localScale.x < minSize * currentResizeStep.ScaleFactor.x
-                        || localScale.z < minSize * currentResizeStep.ScaleFactor.z;
-            }
-
-            /// <summary>
-            /// Checks if inner transform is contained in the 2D rectangle of outer transform, ignoring the y-axis.
-            /// <para>
-            /// We don't pass the transforms here so that we can use calculated or reuse cached values for a performance benefit.
-            /// </para>
-            /// </summary>
-            /// <remarks>
-            /// Make sure to use either all local attributes if they share the same parent, or else all lossy.
-            /// </remarks>
-            /// <param name="outerPos">The position of the outer transform that should contain the inner.</param>
-            /// <param name="outerScale">The scale of the outer transform that should contain the inner.</param>
-            /// <param name="innerPos">The position of the inner transform that should be contained in the outer.</param>
-            /// <param name="innerScale">The scale of the inner transform that should be contained in the outer.</param>
-            private bool ContainedInRect(Vector3 outerPos, Vector3 outerScale, Vector3 innerPos, Vector3 innerScale)
-            {
-                float outerLeft = outerPos.x - outerScale.x / 2;
-                float outerRight = outerPos.x + outerScale.x / 2;
-                float outerBottom = outerPos.z - outerScale.z / 2;
-                float outerTop = outerPos.z + outerScale.z / 2;
-
-                float innerLeft = innerPos.x - innerScale.x / 2;
-                float innerRight = innerPos.x + innerScale.x / 2;
-                float innerBottom = innerPos.z - innerScale.z / 2;
-                float innerTop = innerPos.z + innerScale.z / 2;
-
-                return innerLeft >= outerLeft && innerRight <= outerRight
-                        && innerBottom >= outerBottom && innerTop <= outerTop;
-            }
-
-            /// <summary>
-            /// Checks if first transform overlaps with the other in terms of 2D rectangles, ignoring the y-axis.
-            /// <para>
-            /// We don't pass the transforms here so that we can use calculated or reuse cached values for a performance benefit.
-            /// </para>
-            /// </summary>
-            /// <remarks>
-            /// Make sure to use either all local attributes if they share the same parent, or else all lossy.
-            /// </remarks>
-            /// <param name="firstPos">The position of the first transform that should be checked.</param>
-            /// <param name="firstScale">The scale of the outer transform that should be checked.</param>
-            /// <param name="otherPos">The position of the other transform that should be checked.</param>
-            /// <param name="otherScale">The scale of the other transform that should be checked.</param>
-            private bool RectsOverlap(Vector3 firstPos, Vector3 firstScale, Vector3 otherPos, Vector3 otherScale)
-            {
-                float firstLeft = firstPos.x - firstScale.x / 2;
-                float firstRight = firstPos.x + firstScale.x / 2;
-                float firstBottom = firstPos.z - firstScale.z / 2;
-                float firstTop = firstPos.z + firstScale.z / 2;
-
-                float otherLeft = otherPos.x - otherScale.x / 2;
-                float otherRight = otherPos.x + otherScale.x / 2;
-                float otherBottom = otherPos.z - otherScale.z / 2;
-                float otherTop = otherPos.z + otherScale.z / 2;
-
-                return !(firstLeft > otherRight || firstRight < otherLeft
-                        || firstBottom > otherTop || firstTop < otherBottom);
-            }
-
 
             /// <summary>
             /// Data structure for the individual resize steps.
@@ -605,9 +666,36 @@ namespace SEE.Controls.Actions
                 /// </summary>
                 public readonly Vector3 InitialLocalScale;
                 /// <summary>
-                /// The factor to convert world-space to local coordinates for the resize step.
+                /// The factor to convert world-space to local coordinates in the parent's
+                /// coordinate system for the resize step.
                 /// </summary>
                 public readonly Vector3 ScaleFactor;
+                /// <summary>
+                /// The <see cref="minSize"/> scaled by <see cref="ScaleFactor"/>.
+                /// </summary>
+                public readonly Vector3 MinLocalSize;
+                /// <summary>
+                /// The <see cref="padding"/> scaled by <see cref="ScaleFactor"/>.
+                /// This is effectively the local-space padding in parent, e.g., between
+                /// the resized object and its siblings.
+                /// </summary>
+                public readonly Vector3 LocalPadding;
+                /// <summary>
+                /// Does <see cref="Direction"/> point to the left?
+                /// </summary>
+                public readonly bool Left;
+                /// <summary>
+                /// Does <see cref="Direction"/> point to the right?
+                /// </summary>
+                public readonly bool Right;
+                /// <summary>
+                /// Does <see cref="Direction"/> point forward?
+                /// </summary>
+                public readonly bool Forward;
+                /// <summary>
+                /// Does <see cref="Direction"/> point backward?
+                /// </summary>
+                public readonly bool Back;
 
                 /// <summary>
                 /// Initializes the struct.
@@ -624,6 +712,62 @@ namespace SEE.Controls.Actions
                         initialLocalScale.z / initialLossyScale.z
                     );
                     IsSet = true;
+                    MinLocalSize = minSize * ScaleFactor;
+                    LocalPadding = padding * ScaleFactor;
+                    Left    = Direction.x < 0;
+                    Right   = Direction.x > 0;
+                    Back    = Direction.z < 0;
+                    Forward = Direction.z > 0;
+                }
+            }
+
+            /// <summary>
+            /// Data structure for 2-dimensional bounds.
+            /// </summary>
+            private struct Bounds2D
+            {
+                /// <summary>
+                /// The left side of the area.
+                /// </summary>
+                public float Left;
+                /// <summary>
+                /// The right side of the area.
+                /// </summary>
+                public float Right;
+                /// <summary>
+                /// The back side of the area.
+                /// </summary>
+                public float Back;
+                /// <summary>
+                /// The front side of the area.
+                /// </summary>
+                public float Front;
+
+                /// <summary>
+                /// Initializes the struct.
+                /// </summary>
+                public Bounds2D (float left, float right, float back, float front)
+                {
+                    Left = left;
+                    Right = right;
+                    Back = back;
+                    Front = front;
+                }
+
+                /// <summary>
+                /// Implicit conversion to string.
+                /// <summary>
+                public static implicit operator string(Bounds2D bounds)
+                {
+                    return bounds.ToString();
+                }
+
+                /// <summary>
+                /// Returns a printable string with the struct's values.
+                /// <summary>
+                public override string ToString()
+                {
+                    return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
                 }
             }
         }

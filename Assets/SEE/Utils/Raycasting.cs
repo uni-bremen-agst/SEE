@@ -49,12 +49,12 @@ namespace SEE.Utils
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.
         /// The hit will be set, if no GUI element is hit.
-        ///
+        /// <para>
         /// Note: <paramref name="elementRef"/> is null if the result is <see cref="HitGraphElement.None"/>.
         /// Yet, <paramref name="raycastHit"/> will always be the hit object if any was hit,
         /// no matter whether it was a graph element or not.
+        /// </para>
         /// </summary>
-        ///
         /// <param name="raycastHit">The hit object.</param>
         /// <param name="nodeRef">The hit graph element if <code>None</code> is not returned.</param>
         /// <returns>if no GUI element is hit, but a GameObject with either

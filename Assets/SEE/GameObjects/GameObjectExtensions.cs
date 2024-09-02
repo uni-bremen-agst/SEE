@@ -588,6 +588,28 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeSelf"/>
+        /// is true and it is tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        public static bool IsNodeAndActiveSelf(this GameObject gameObject)
+        {
+            return gameObject.activeSelf && gameObject.CompareTag(Tags.Node);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeInHierarchy"/>
+        /// is true and it is tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        public static bool IsNodeAndActiveInHierarchy(this GameObject gameObject)
+        {
+            return gameObject.CompareTag(Tags.Node) && gameObject.activeInHierarchy;
+        }
+
+        /// <summary>
         /// Retrieves the node reference component, if possible.
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
