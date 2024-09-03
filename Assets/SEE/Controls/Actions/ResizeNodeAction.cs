@@ -512,10 +512,10 @@ namespace SEE.Controls.Actions
                 // Correct sibling overlap
                 foreach (Transform sibling in siblings)
                 {
-                    otherBounds.Left  = sibling.localPosition.x - sibling.localScale.x / 2 - currentResizeStep.LocalPadding.x;
-                    otherBounds.Right = sibling.localPosition.x + sibling.localScale.x / 2 + currentResizeStep.LocalPadding.x;
-                    otherBounds.Back  = sibling.localPosition.z - sibling.localScale.z / 2 - currentResizeStep.LocalPadding.z;
-                    otherBounds.Front = sibling.localPosition.z + sibling.localScale.z / 2 + currentResizeStep.LocalPadding.z;
+                    otherBounds.Left  = sibling.localPosition.x - sibling.localScale.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
+                    otherBounds.Right = sibling.localPosition.x + sibling.localScale.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
+                    otherBounds.Back  = sibling.localPosition.z - sibling.localScale.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
+                    otherBounds.Front = sibling.localPosition.z + sibling.localScale.z / 2 + currentResizeStep.LocalPadding.z - 0.0001f;
 
                     if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
                             || bounds.Left > otherBounds.Right || bounds.Right < otherBounds.Left)
@@ -549,22 +549,22 @@ namespace SEE.Controls.Actions
                     {
                         if (currentResizeStep.Right)
                         {
-                            bounds.Right = otherBounds.Left;
+                            bounds.Right = otherBounds.Left - 0.0001f;
                         }
                         else
                         {
-                            bounds.Left = otherBounds.Right;
+                            bounds.Left = otherBounds.Right + 0.0001f;
                         }
                     }
                     else if (newLocalScale.z - overlap[1] > currentResizeStep.MinLocalSize.z)
                     {
                         if (currentResizeStep.Forward)
                         {
-                            bounds.Front = otherBounds.Back;
+                            bounds.Front = otherBounds.Back - 0.0001f;
                         }
                         else
                         {
-                            bounds.Back = otherBounds.Front;
+                            bounds.Back = otherBounds.Front + 0.0001f;
                         }
                     }
                 }
@@ -575,30 +575,30 @@ namespace SEE.Controls.Actions
                     // Child position and scale on common parent
                     Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                     Vector3 childScale = Vector3.Scale(child.localScale, transform.localScale);
-                    otherBounds.Left  = childPos.x - childScale.x / 2 - currentResizeStep.LocalPadding.x;
-                    otherBounds.Right = childPos.x + childScale.x / 2 + currentResizeStep.LocalPadding.x;
-                    otherBounds.Back  = childPos.z - childScale.z / 2 - currentResizeStep.LocalPadding.z;
-                    otherBounds.Front = childPos.z + childScale.z / 2 + currentResizeStep.LocalPadding.z;
+                    otherBounds.Left  = childPos.x - childScale.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
+                    otherBounds.Right = childPos.x + childScale.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
+                    otherBounds.Back  = childPos.z - childScale.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
+                    otherBounds.Front = childPos.z + childScale.z / 2 + currentResizeStep.LocalPadding.z - 0.0001f;
 
                     if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
                     {
-                        bounds.Right = otherBounds.Right;
+                        bounds.Right = otherBounds.Right + 0.0001f;
                     }
 
                     if (currentResizeStep.Left && bounds.Left > otherBounds.Left)
                     {
-                        bounds.Left = otherBounds.Left;
+                        bounds.Left = otherBounds.Left - 0.0001f;
                     }
 
 
                     if (currentResizeStep.Forward && bounds.Front < otherBounds.Front)
                     {
-                        bounds.Front = otherBounds.Front;
+                        bounds.Front = otherBounds.Front + 0.0001f;
                     }
 
                     if (currentResizeStep.Back && bounds.Back > otherBounds.Back)
                     {
-                        bounds.Back = otherBounds.Back;
+                        bounds.Back = otherBounds.Back - 0.0001f;
                     }
                 }
 
