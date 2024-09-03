@@ -122,9 +122,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            memento.GameObject.transform.localScale = memento.OriginalLocalScale;
-            memento.GameObject.transform.position = memento.OriginalPosition;
-            // FIXME update edges
+            memento.GameObject.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
             new ResizeNodeNetAction(memento.GameObject.name, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
@@ -140,9 +138,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            memento.GameObject.transform.localScale = memento.NewLocalScale;
-            memento.GameObject.transform.position = memento.NewPosition;
-            // FIXME update edges
+            memento.GameObject.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
             new ResizeNodeNetAction(memento.GameObject.name, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
@@ -205,13 +201,17 @@ namespace SEE.Controls.Actions
         /// <see cref="ResizeNodeAction"/>.
         /// </para>
         /// </summary>
+        /// <param name="newLocalScale">The new local scale after the resize step</param>
+        /// <param name="newPosition">The new world-space position after the resize step</param>
         private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
             CurrentState = IReversibleAction.Progress.InProgress;
 
             memento.NewLocalScale = newLocalScale;
             memento.NewPosition = newPosition;
-            // FIXME update edges
+
+            // Apply new position and scale to update edges and propagate changes to other players
+            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
@@ -227,7 +227,7 @@ namespace SEE.Controls.Actions
             public readonly GameObject GameObject;
 
             /// <summary>
-            /// The original world position of the game object.
+            /// The original world-space position of the game object.
             /// </summary>
             public readonly Vector3 OriginalPosition;
 
@@ -237,7 +237,7 @@ namespace SEE.Controls.Actions
             public readonly Vector3 OriginalLocalScale;
 
             /// <summary>
-            /// The new world position of the game object.
+            /// The new world-space position of the game object.
             /// </summary>
             public Vector3 NewPosition;
 
@@ -304,6 +304,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Delegate for signalling change.
             /// </summary>
+            /// <param name="newLocalScale">The new local scale after the resize step</param>
+            /// <param name="newPosition">The new world-space position after the resize step</param>
             public delegate void ResizeNodeEvent(Vector3 newLocalScale, Vector3 newPosition);
 
             /// <summary>

@@ -190,6 +190,31 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Moves and scales the node at the same time.
+        /// </summary>
+        /// <param name="newLocalScale">the desired new local scale</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ResizeTo(Vector3 newLocalScale, Vector3 newPosition, float factor = 1, bool updateEdges = true)
+        {
+            float duration = ToDuration(factor);
+            updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
+            return new AndCombinedOperationCallback<Action>(new[]
+            {
+                positionX.AnimateTo(newPosition.x, duration),
+                positionY.AnimateTo(newPosition.y, duration),
+                positionZ.AnimateTo(newPosition.z, duration),
+                scale.AnimateTo(newLocalScale, duration)
+            }, a => a);
+        }
+
+        /// <summary>
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>.
         /// </summary>
         /// <param name="newRotation">the desired new target rotation in world space</param>

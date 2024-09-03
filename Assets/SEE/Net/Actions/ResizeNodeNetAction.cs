@@ -24,7 +24,7 @@ namespace SEE.Net.Actions
         public Vector3 LocalScale;
 
         /// <summary>
-        /// The new position to transfer over the network.
+        /// The new world-space position to transfer over the network.
         /// </summary>
         public Vector3 Position;
 
@@ -33,7 +33,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized</param>
         /// <param name="localScale">The new local scale of the <see cref="GameObject"/></param>
-        /// <param name="position">The new absolute position of the <see cref="GameObject"/></param>
+        /// <param name="position">The new world-space position of the <see cref="GameObject"/></param>
         public ResizeNodeNetAction(string gameObjectID, Vector3 localScale, Vector3 position)
         {
             GameObjectID = gameObjectID;
@@ -54,10 +54,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject go = Find(GameObjectID);
-            go.transform.localScale = LocalScale;
-            go.transform.position = Position;
-            // FIXME update edges
+            Find(GameObjectID).NodeOperator().ResizeTo(LocalScale, Position);
         }
     }
 }
