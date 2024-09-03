@@ -211,7 +211,7 @@ namespace SEE.Controls.Actions
             memento.NewPosition = newPosition;
 
             // Apply new position and scale to update edges and propagate changes to other players
-            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0);
+            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
