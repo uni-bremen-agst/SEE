@@ -27,6 +27,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private ResizeGizmo gizmo;
 
+        /// <summary>
+        /// Whether the action is finish and can be completed.
+        /// </summary>
+        private bool finish = false;
+
         #region ReversibleAction
 
         /// <summary>
@@ -67,6 +72,10 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
+            if (finish)
+            {
+                CurrentState = IReversibleAction.Progress.Completed;
+            }
             return CurrentState == IReversibleAction.Progress.Completed;
         }
 
@@ -155,7 +164,13 @@ namespace SEE.Controls.Actions
         public void ContextMenuExecution(GameObject go)
         {
             ExecuteViaContextMenu = true;
-            memento = new Memento(go);
+            InteractableObject.UnselectAll(true);
+            InteractableObject interactable = go.GetComponent<InteractableObject>();
+            interactable.SetSelect(true, true);
+
+            InteractableObject.MultiSelectionAllowed = false;
+            InteractableObject.LocalAnySelectIn += OnSelectionChanged;
+            InteractableObject.LocalAnySelectOut += OnSelectionChanged;
         }
 
         /// <summary>
@@ -176,7 +191,7 @@ namespace SEE.Controls.Actions
 
                 if (CurrentState == IReversibleAction.Progress.InProgress)
                 {
-                    CurrentState = IReversibleAction.Progress.Completed;
+                    finish = true;
                 }
                 return;
             }

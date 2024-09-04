@@ -418,6 +418,7 @@ namespace SEE.Controls.Actions
                     if (gameNodeAttributes.AllowManualResize)
                     {
                         actions.Add(new PopupMenuAction("Rotate", RotateNode, Icons.Rotate, Priority: 4));
+                        actions.Add(new PopupMenuAction("Resize Node", ResizeNode, Icons.Resize));
                         actions.Add(new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale));
                     }
                 }
@@ -430,6 +431,7 @@ namespace SEE.Controls.Actions
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.Move);
+                UpdatePlayerMenu();
                 MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
                 ExcecutePreviousAction(action, previousAction);
@@ -439,6 +441,7 @@ namespace SEE.Controls.Actions
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.Rotate);
+                UpdatePlayerMenu();
                 RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
                 ExcecutePreviousAction(action, previousAction);
@@ -457,6 +460,7 @@ namespace SEE.Controls.Actions
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.NewEdge);
+                UpdatePlayerMenu();
                 AddEdgeAction action = (AddEdgeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
                 ExcecutePreviousAction(action, previousAction);
@@ -466,8 +470,19 @@ namespace SEE.Controls.Actions
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.EditNode);
+                UpdatePlayerMenu();
                 EditNodeAction action = (EditNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(node);
+                ExcecutePreviousAction(action, previousAction);
+            }
+
+            void ResizeNode()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.ResizeNode);
+                UpdatePlayerMenu();
+                ResizeNodeAction action = (ResizeNodeAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(gameObject);
                 ExcecutePreviousAction(action, previousAction);
             }
 
@@ -475,6 +490,7 @@ namespace SEE.Controls.Actions
             {
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.ScaleNode);
+                UpdatePlayerMenu();
                 ScaleNodeAction action = (ScaleNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
                 ExcecutePreviousAction(action, previousAction);
@@ -625,6 +641,14 @@ namespace SEE.Controls.Actions
                 await UniTask.Yield();
             }
             GlobalActionHistory.Execute(previousAction);
+            UpdatePlayerMenu();
+        }
+
+        /// <summary>
+        /// Updates the current active entry in the <see cref="PlayerMenu"/>.
+        /// </summary>
+        private static void UpdatePlayerMenu()
+        {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             menu.UpdateActiveEntry();
         }
