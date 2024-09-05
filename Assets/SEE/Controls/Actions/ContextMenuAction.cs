@@ -232,7 +232,8 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 string type = graphElement is Node ? "Node" : "Edge";
-                ShowNotification.Info(type +" Properties", graphElement.ToString(), log: false);
+                ShowNotification.Info(type +" Properties", graphElement.ToString(), log: true);
+                ActivateWindow(CreatePropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowMetrics()
@@ -307,6 +308,23 @@ namespace SEE.Controls.Actions
                 metricMenu.GraphElement = graphElementRef.Elem;
             }
             return metricMenu;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="PropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the property window for</param>
+        /// <returns>The <see cref="PropertyWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static PropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
+            {
+                propertyMenu = graphElementRef.gameObject.AddComponent<PropertyWindow>();
+                propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
+                propertyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return propertyMenu;
         }
 
         /// <summary>
