@@ -38,6 +38,11 @@ namespace SEE.UI.Window
         private static string ItemPrefab => UIPrefabFolder + "PropertyRowLine";
 
         /// <summary>
+        /// Prefab for the groups.
+        /// </summary>
+        private static string GroupPrefab => UIPrefabFolder + "PropertyGroupItem";
+
+        /// <summary>
         /// The alpha keys for the gradient of a menu item (fully opaque).
         /// </summary>
         private static readonly GradientAlphaKey[] alphaKeys = { new(1, 0), new(1, 1) };
@@ -83,15 +88,18 @@ namespace SEE.UI.Window
                     }
                 }
             }
+        }
 
-            return;
-
-            static void SetActive(Dictionary<string, (string, GameObject)> searchableObjects, bool activate)
+        /// <summary>
+        /// Sets the activity of the game objects of the given dictionary (<paramref name="objects"/>)
+        /// </summary>
+        /// <param name="objects">The objects to set their activity.</param>
+        /// <param name="activate">The activity</param>
+        private static void SetActive(Dictionary<string, (string, GameObject)> objects, bool activate)
+        {
+            foreach ((_, GameObject go) in objects.Values)
             {
-                foreach ((_, GameObject go) in searchableObjects.Values)
-                {
-                    go.SetActive(activate);
-                }
+                go.SetActive(activate);
             }
         }
 
@@ -140,9 +148,9 @@ namespace SEE.UI.Window
             return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
-        private static  string AttributeValue(GameObject propertyRow)
+        private static string AttributeValue(GameObject propertyRow)
         {
-            return Value(propertyRow).text;
+            return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);
         }
 
         /// <summary>
@@ -155,7 +163,7 @@ namespace SEE.UI.Window
         /// <remarks>Assumes that the attribute name is stored in the second child of the metric row.</remarks>
         private static TextMeshProUGUI Value(GameObject propertyRow)
         {
-            return GameFinder.FindChild(propertyRow, "ValueLine").MustGetComponent<TextMeshProUGUI>();
+            return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
@@ -205,13 +213,22 @@ namespace SEE.UI.Window
             DisplayAttributes(GraphElement.ToggleAttributes.ToDictionary(item => item, item => true), propertyWindow);
 
             /// String Attributes
-            DisplayAttributes(GraphElement.StringAttributes, propertyWindow);
+            if (GraphElement.StringAttributes.Count > 0)
+            {
+                DisplayGroup("String Attributes", GraphElement.StringAttributes, propertyWindow);
+            }
 
             /// Int Attributes
-            DisplayAttributes(GraphElement.IntAttributes, propertyWindow);
+            if (GraphElement.IntAttributes.Count > 0)
+            {
+                DisplayGroup("Int Attributes", GraphElement.IntAttributes, propertyWindow);
+            }
 
             /// Float Attributes
-            DisplayAttributes(GraphElement.FloatAttributes, propertyWindow);
+            if (GraphElement.FloatAttributes.Count > 0)
+            {
+                DisplayGroup("Float Attributes", GraphElement.FloatAttributes, propertyWindow);
+            }
 
             /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
             Dictionary<string, (string, GameObject)> activeElements = new();
@@ -221,6 +238,14 @@ namespace SEE.UI.Window
             }
 
             searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery, activeElements));
+        }
+
+        private static void DisplayGroup<T>(string name, Dictionary<string, T> attributes, GameObject propertyWindowObject, int level = 0)
+        {
+            Transform items = propertyWindowObject.transform.Find("Content/Items").transform;
+            GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
+            GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+            DisplayAttributes(attributes, propertyWindowObject, items, level + 1);
         }
 
         /// <summary>
