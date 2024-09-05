@@ -1,3 +1,4 @@
+using DG.Tweening;
 using FuzzySharp;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -245,7 +246,35 @@ namespace SEE.UI.Window
             Transform items = propertyWindowObject.transform.Find("Content/Items").transform;
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
             GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
-            DisplayAttributes(attributes, propertyWindowObject, items, level + 1);
+            Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, propertyWindowObject, level + 1);
+            RegisterClickHandler();
+            return;
+
+            void RegisterClickHandler()
+            {
+                if (group.TryGetComponentOrLog(out PointerHelper pointerHelper))
+                {
+                    /// expands/collapses the group item
+                    pointerHelper.ClickEvent.AddListener(e =>
+                    {
+                        if (dict.First().Value.gameObject.activeInHierarchy)
+                        {
+                            SetActive(dict, false);
+                            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+                            {
+                                transform.DORotate(new Vector3(0, 0, -90), duration: 0.5f);
+                            }
+                        } else
+                        {
+                            SetActive(dict, true);
+                            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+                            {
+                                transform.DORotate(new Vector3(0, 0, -180), duration: 0.5f);
+                            }
+                        }
+                    });
+                }
+            }
         }
 
         /// <summary>
@@ -254,9 +283,10 @@ namespace SEE.UI.Window
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="propertyWindowObject">The GameObject representing the property window.</param>
-        private static void DisplayAttributes<T>(Dictionary<string, T> attributes, GameObject propertyWindowObject, Transform parent = null, int level = 0)
+        private static Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, GameObject propertyWindowObject, int level = 0)
         {
-            parent ??= propertyWindowObject.transform.Find("Content/Items").transform;
+            Dictionary<string, (string, GameObject)> dict = new();
+            Transform parent = propertyWindowObject.transform.Find("Content/Items").transform;
             foreach ((string name, T value) in attributes)
             {
                 /// Create GameObject
@@ -267,6 +297,7 @@ namespace SEE.UI.Window
                 Value(propertyRow).text = value.ToString();
                 /// Colors and orders the item
                 ColorOrderItem();
+                dict.Add(name, (AttributeValue(propertyRow), propertyRow));
                 continue;
 
                 void ColorOrderItem()
@@ -277,8 +308,13 @@ namespace SEE.UI.Window
                     background.offsetMin = background.offsetMin.WithXY(x: indentShift * level);
                     RectTransform foreground = (RectTransform)propertyRow.transform.Find("Foreground");
                     foreground.offsetMin = foreground.offsetMin.WithXY(x: indentShift * level);
+                    if (level > 0)
+                    {
+                        propertyRow.SetActive(false);
+                    }
                 }
             }
+            return dict;
         }
 
         public override void RebuildLayout()
