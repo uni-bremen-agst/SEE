@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UIElements;
 
 namespace SEE.UI.Window.PropertyWindow
@@ -31,27 +32,42 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Prefab for the <see cref="PropertyWindow"/>.
         /// </summary>
-        private static string WindowPrefab => UIPrefabFolder + "PropertyWindow";
+        private readonly string WindowPrefab = UIPrefabFolder + "PropertyWindow";
 
         /// <summary>
         /// Prefab for the <see cref="PropertyRowLine"/>.
         /// </summary>
-        private static string ItemPrefab => UIPrefabFolder + "PropertyRowLine";
+        private readonly string ItemPrefab = UIPrefabFolder + "PropertyRowLine";
 
         /// <summary>
         /// Prefab for the groups.
         /// </summary>
-        private static string GroupPrefab => UIPrefabFolder + "PropertyGroupItem";
+        private readonly string GroupPrefab = UIPrefabFolder + "PropertyGroupItem";
 
         /// <summary>
         /// The alpha keys for the gradient of a menu item (fully opaque).
         /// </summary>
-        private static readonly GradientAlphaKey[] alphaKeys = { new(1, 0), new(1, 1) };
+        private readonly GradientAlphaKey[] alphaKeys = { new(1, 0), new(1, 1) };
 
         /// <summary>
         /// The amount by which the text of an item is indented per level.
         /// </summary>
         private const int indentShift = 22;
+
+        /// <summary>
+        /// The context menu that is displayed when the user uses the filter, gorup or sort buttons.
+        /// </summary>
+        private PropertyWindowContextMenu contextMenu;
+
+        /// <summary>
+        /// Transform of the object containing the items of the property window.
+        /// </summary>
+        private RectTransform items;
+
+        /// <summary>
+        /// The dictionary that holds the items for a group.
+        /// </summary>
+        private readonly Dictionary<string, IEnumerable<GameObject>> groupHolder = new();
 
         protected override void StartDesktop()
         {
@@ -67,7 +83,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="searchQuery"> attribute name to search for </param>
         /// <param name="propertyRows">mapping of attribute names onto gameObjects representing
         /// the corresponding property row</param>
-        private static void ActivateMatches(string searchQuery, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
+        private void ActivateMatches(string searchQuery, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
         {
             /// Remove whitespace.
             searchQuery = searchQuery.Trim();
@@ -96,7 +112,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <param name="objects">The objects to set their activity.</param>
         /// <param name="activate">The activity</param>
-        private static void SetActive(Dictionary<string, (string, GameObject)> objects, bool activate)
+        private void SetActive(Dictionary<string, (string, GameObject)> objects, bool activate)
         {
             foreach ((_, GameObject go) in objects.Values)
             {
@@ -114,13 +130,43 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
+        /// Sets the activity of the given group with the name <paramref name="groupName"/>.
+        /// </summary>
+        /// <param name="groupName">The group name.</param>
+        /// <param name="activate">The activity.</param>
+        private void SetGroupActive(string groupName, bool activate)
+        {
+            if (groupHolder.ContainsKey(groupName))
+            {
+                if (!activate || groupName == "Header")
+                {
+                    groupHolder[groupName].ForEach(go => go.SetActive(activate));
+                }
+                else
+                {
+                    foreach(GameObject go in groupHolder[groupName])
+                    {
+                        if (go.name == groupName)
+                        {
+                            if (GameFinder.FindChild(go, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+                            {
+                                transform.DORotate(new Vector3(0, 0, -90), duration: 0.01f);
+                            }
+                            go.SetActive(activate);
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// Returns the attribute names of all <paramref name="propertyRows"/> whose attribute name or value matches the
         /// <paramref name="query"/>.
         /// </summary>
         /// <param name="query"> the search query (part of an attribute name / value)</param>
         /// <param name="propertyRows"> the dictionary representing property rows to search through</param>
         /// <returns> the attribute names / values matching the <paramref name="query"/> </returns>
-        private static IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
+        private IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
         {
             List<string> results = new();
             foreach (string key in propertyRows.Keys)
@@ -140,7 +186,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>name of the node attribute</returns>
-        private static string AttributeName(GameObject propertyRow)
+        private string AttributeName(GameObject propertyRow)
         {
             return Attribute(propertyRow).text;
         }
@@ -152,12 +198,12 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>the TMP holding the attribute name</returns>
-        private static TextMeshProUGUI Attribute(GameObject propertyRow)
+        private TextMeshProUGUI Attribute(GameObject propertyRow)
         {
             return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
-        private static string AttributeValue(GameObject propertyRow)
+        private string AttributeValue(GameObject propertyRow)
         {
             return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);
         }
@@ -169,7 +215,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>the TMP holding the attribute value</returns>
-        private static TextMeshProUGUI Value(GameObject propertyRow)
+        private TextMeshProUGUI Value(GameObject propertyRow)
         {
             return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
         }
@@ -183,17 +229,25 @@ namespace SEE.UI.Window.PropertyWindow
             GameObject propertyWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             propertyWindow.name = "Property Window";
 
-            Transform scrollViewContent = propertyWindow.transform.Find("Content/Items").transform;
+            items = (RectTransform)propertyWindow.transform.Find("Content/Items");
             TMP_InputField searchField = propertyWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
-            CreateItems(propertyWindow);
+            ButtonManagerBasic filterButton = propertyWindow.transform.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic sortButton = propertyWindow.transform.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
+            UnityEvent<string, bool> filterEvent = new();
+            filterEvent.AddListener((name, value) => SetGroupActive(name, value));
+            contextMenu = new PropertyWindowContextMenu(popupMenu, filterButton, filterEvent, sortButton, groupButton);
+
+            CreateItems();
 
             /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
             Dictionary<string, (string, GameObject)> activeElements = new();
-            foreach (Transform child in scrollViewContent)
+            foreach (Transform child in items)
             {
                 activeElements.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
             }
@@ -202,49 +256,61 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
+        /// Clears the property window of all items.
+        /// </summary>
+        private void ClearItems()
+        {
+            foreach (Transform item in items)
+            {
+                Destroyer.Destroy(item.gameObject);
+            }
+            groupHolder.Clear();
+        }
+
+        /// <summary>
         /// Creates the items (rows) for the attributes.
         /// It populates the window.
         /// </summary>
-        /// <param name="propertyWindow">The window.</param>
-        private void CreateItems(GameObject propertyWindow)
+        private void CreateItems()
         {
-            Dictionary<string, string> data = new()
+            Dictionary<string, string> header = new()
             {
                 { "Kind", GraphElement is Node ? "Node" : "Edge" },
             };
             if (GraphElement is Edge edge)
             {
-                data.Add("ID", edge.ID);
-                data.Add("Source", edge.Source.ID);
-                data.Add("Target", edge.Target.ID);
+                header.Add("ID", edge.ID);
+                header.Add("Source", edge.Source.ID);
+                header.Add("Target", edge.Target.ID);
             }
-            data.Add("Type", GraphElement.Type);
+            header.Add("Type", GraphElement.Type);
 
             /// Data Attributes
-            DisplayAttributes(data, propertyWindow);
+            Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
+            groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject));
 
             /// Toggle Attributes
             if (GraphElement.ToggleAttributes.Count > 0)
             {
-                DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true), propertyWindow);
+                DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
             }
 
             /// String Attributes
             if (GraphElement.StringAttributes.Count > 0)
             {
-                DisplayGroup("String Attributes", GraphElement.StringAttributes, propertyWindow);
+                DisplayGroup("String Attributes", GraphElement.StringAttributes);
             }
 
             /// Int Attributes
             if (GraphElement.IntAttributes.Count > 0)
             {
-                DisplayGroup("Int Attributes", GraphElement.IntAttributes, propertyWindow);
+                DisplayGroup("Int Attributes", GraphElement.IntAttributes);
             }
 
             /// Float Attributes
             if (GraphElement.FloatAttributes.Count > 0)
             {
-                DisplayGroup("Float Attributes", GraphElement.FloatAttributes, propertyWindow);
+                DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
             }
         }
 
@@ -254,15 +320,15 @@ namespace SEE.UI.Window.PropertyWindow
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="name">The group name</param>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
-        /// <param name="propertyWindowObject">The GameObject representing the property window.</param>
         /// <param name="level">The level for the group.</param>
-        private static void DisplayGroup<T>(string name, Dictionary<string, T> attributes, GameObject propertyWindowObject, int level = 0)
+        private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0)
         {
-            Transform items = propertyWindowObject.transform.Find("Content/Items").transform;
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
+            group.name = name;
             GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
-            Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, propertyWindowObject, level + 1);
+            Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1);
             RegisterClickHandler();
+            groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group));
             return;
 
             void RegisterClickHandler()
@@ -298,17 +364,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
-        /// <param name="propertyWindowObject">The GameObject representing the property window.</param>
         /// <param name="level">The level for the property row.</param>
-        private static Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
-            GameObject propertyWindowObject, int level = 0)
+        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, int level = 0)
         {
             Dictionary<string, (string, GameObject)> dict = new();
-            Transform parent = propertyWindowObject.transform.Find("Content/Items").transform;
             foreach ((string name, T value) in attributes)
             {
                 /// Create GameObject
-                GameObject propertyRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, parent, false);
+                GameObject propertyRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, items, false);
                 /// Attribute Name
                 Attribute(propertyRow).text = name;
                 /// Value Name
