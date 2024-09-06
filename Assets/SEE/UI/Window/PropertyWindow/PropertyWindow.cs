@@ -14,17 +14,17 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-namespace SEE.UI.Window
+namespace SEE.UI.Window.PropertyWindow
 {
     /// <summary>
-    /// Represents a movable, scrollable window containing metrics of a <see cref="GraphElement"/>.
+    /// Represents a movable, scrollable window containing properties of a <see cref="GraphElement"/>.
     /// It consists of a search field and a list of properties, where each property is represented by a row
     /// holding the attribute name and its value.
     /// </summary>
     public class PropertyWindow : BaseWindow
     {
         /// <summary>
-        /// GraphElement whose metrics are to be shown.
+        /// GraphElement whose properties are to be shown.
         /// </summary>
         public GraphElement GraphElement;
 
@@ -66,20 +66,20 @@ namespace SEE.UI.Window
         /// </summary>
         /// <param name="searchQuery"> attribute name to search for </param>
         /// <param name="propertyRows">mapping of attribute names onto gameObjects representing
-        /// the corresponding metric row</param>
+        /// the corresponding property row</param>
         private static void ActivateMatches(string searchQuery, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
         {
-            // Remove whitespace.
+            /// Remove whitespace.
             searchQuery = searchQuery.Trim();
             if (string.IsNullOrEmpty(searchQuery))
             {
-                // There is no search query, so activate all metric rows.
+                /// There is no search query, so activate all property rows.
                 SetActive(propertyRows, true);
             }
             else
             {
-                // First, deactivate all metric rows and then activate only those that match the
-                // search results.
+                /// First, deactivate all property rows and then activate only those that match the
+                /// search results.
                 SetActive(propertyRows, false);
                 foreach (string attributeName in Search(searchQuery, propertyRows))
                 {
@@ -101,6 +101,15 @@ namespace SEE.UI.Window
             foreach ((_, GameObject go) in objects.Values)
             {
                 go.SetActive(activate);
+                AnimateIn(go);
+            }
+            return;
+
+            /// Expands the game object by animating its scale.
+            void AnimateIn(GameObject go)
+            {
+                go.transform.localScale = new Vector3(1, 0, 1);
+                go.transform.DOScaleY(1, duration: 0.5f);
             }
         }
 
@@ -114,7 +123,7 @@ namespace SEE.UI.Window
         private static IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
         {
             List<string> results = new();
-            foreach(string key in propertyRows.Keys)
+            foreach (string key in propertyRows.Keys)
             {
                 if (key.ToLower().Contains(query.ToLower()) || propertyRows[key].value.ToLower().Contains(query.ToLower()))
                 {
@@ -126,8 +135,8 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Returns the name of a node attribute stored in the first child of the <paramref name="propertyRow"/>.
-        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the metric window providing
-        /// the name and value of a node attribute (metric).
+        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
+        /// the name and value of a node attribute (property).
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>name of the node attribute</returns>
@@ -139,11 +148,10 @@ namespace SEE.UI.Window
         /// <summary>
         /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute name.
         /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
-        /// the name and value of a node attribute (metric).
+        /// the name and value of a node attribute (property).
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>the TMP holding the attribute name</returns>
-        /// <remarks>Assumes that the attribute name is stored in the first child of the metric row.</remarks>
         private static TextMeshProUGUI Attribute(GameObject propertyRow)
         {
             return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
@@ -156,27 +164,14 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute value.
-        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the metric window providing
-        /// the name and value of a node attribute (metric).
+        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
+        /// the name and value of a node attribute (property).
         /// </summary>
         /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
         /// <returns>the TMP holding the attribute value</returns>
-        /// <remarks>Assumes that the attribute name is stored in the second child of the metric row.</remarks>
         private static TextMeshProUGUI Value(GameObject propertyRow)
         {
             return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
-        }
-
-        /// <summary>
-        /// Clears all children items of <paramref name="scrollViewContent"/>.
-        /// </summary>
-        /// <param name="scrollViewContent">The item holder.</param>
-        private static void ClearItems(Transform scrollViewContent)
-        {
-            foreach(Transform item in scrollViewContent)
-            {
-                DestroyImmediate(item.gameObject);
-            }
         }
 
         /// <summary>
@@ -189,12 +184,30 @@ namespace SEE.UI.Window
             propertyWindow.name = "Property Window";
 
             Transform scrollViewContent = propertyWindow.transform.Find("Content/Items").transform;
-            ClearItems(scrollViewContent);
             TMP_InputField searchField = propertyWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
 
+            CreateItems(propertyWindow);
+
+            /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
+            Dictionary<string, (string, GameObject)> activeElements = new();
+            foreach (Transform child in scrollViewContent)
+            {
+                activeElements.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
+            }
+
+            searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery, activeElements));
+        }
+
+        /// <summary>
+        /// Creates the items (rows) for the attributes.
+        /// It populates the window.
+        /// </summary>
+        /// <param name="propertyWindow">The window.</param>
+        private void CreateItems(GameObject propertyWindow)
+        {
             Dictionary<string, string> data = new()
             {
                 { "Kind", GraphElement is Node ? "Node" : "Edge" },
@@ -211,7 +224,10 @@ namespace SEE.UI.Window
             DisplayAttributes(data, propertyWindow);
 
             /// Toggle Attributes
-            DisplayAttributes(GraphElement.ToggleAttributes.ToDictionary(item => item, item => true), propertyWindow);
+            if (GraphElement.ToggleAttributes.Count > 0)
+            {
+                DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true), propertyWindow);
+            }
 
             /// String Attributes
             if (GraphElement.StringAttributes.Count > 0)
@@ -230,17 +246,16 @@ namespace SEE.UI.Window
             {
                 DisplayGroup("Float Attributes", GraphElement.FloatAttributes, propertyWindow);
             }
-
-            /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
-            Dictionary<string, (string, GameObject)> activeElements = new();
-            foreach (Transform child in scrollViewContent)
-            {
-                activeElements.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
-            }
-
-            searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery, activeElements));
         }
 
+        /// <summary>
+        /// Displays a attribute group and their corresponding attributes with their values.
+        /// </summary>
+        /// <typeparam name="T">The type of the attribute values.</typeparam>
+        /// <param name="name">The group name</param>
+        /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
+        /// <param name="propertyWindowObject">The GameObject representing the property window.</param>
+        /// <param name="level">The level for the group.</param>
         private static void DisplayGroup<T>(string name, Dictionary<string, T> attributes, GameObject propertyWindowObject, int level = 0)
         {
             Transform items = propertyWindowObject.transform.Find("Content/Items").transform;
@@ -264,7 +279,8 @@ namespace SEE.UI.Window
                             {
                                 transform.DORotate(new Vector3(0, 0, -90), duration: 0.5f);
                             }
-                        } else
+                        }
+                        else
                         {
                             SetActive(dict, true);
                             if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
@@ -283,7 +299,9 @@ namespace SEE.UI.Window
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="propertyWindowObject">The GameObject representing the property window.</param>
-        private static Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, GameObject propertyWindowObject, int level = 0)
+        /// <param name="level">The level for the property row.</param>
+        private static Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
+            GameObject propertyWindowObject, int level = 0)
         {
             Dictionary<string, (string, GameObject)> dict = new();
             Transform parent = propertyWindowObject.transform.Find("Content/Items").transform;
@@ -324,19 +342,16 @@ namespace SEE.UI.Window
 
         protected override void InitializeFromValueObject(WindowValues valueObject)
         {
-            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
         {
-            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
 
         public override WindowValues ToValueObject()
         {
-            // TODO (#732): Should metric windows be sent over the network?
             throw new NotImplementedException();
         }
     }

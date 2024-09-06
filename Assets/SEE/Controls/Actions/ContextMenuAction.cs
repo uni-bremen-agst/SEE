@@ -17,6 +17,7 @@ using SEE.Game.City;
 using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Window.PropertyWindow;
 
 namespace SEE.Controls.Actions
 {
@@ -181,7 +182,6 @@ namespace SEE.Controls.Actions
                             }
                         },
                             Icons.ArrowLeft, CloseAfterClick: false),
-                        // TODO (#666): Better properties view
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
                         new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
                     };
@@ -231,8 +231,6 @@ namespace SEE.Controls.Actions
 
             void ShowProperties()
             {
-                string type = graphElement is Node ? "Node" : "Edge";
-                ShowNotification.Info(type +" Properties", graphElement.ToString(), log: true);
                 ActivateWindow(CreatePropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
