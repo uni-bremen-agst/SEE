@@ -150,7 +150,10 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <param name="item">The item to be removed.</param>
         private void RemoveItem(GameObject item)
         {
+            Debug.Log("ToDelete: " + item);
             string key = surfaceItems.FirstOrDefault(x=>x.Value == item).Key;
+            Debug.Log("KEY: " +  key);
+            Debug.Log("SurfaceItems contains: " + surfaceItems.TryGetValue(key, out GameObject value));
             surfaceItems.Remove(key);
             Destroyer.Destroy(item);
         }
@@ -242,7 +245,10 @@ namespace SEE.UI.Window.DrawableManagerWindow
                             CollapseItem(item);
                             foreach (GameObject child in childrenItems)
                             {
-                                RemoveItem(child);
+                                if (child != null)
+                                {
+                                    RemoveItem(child);
+                                }
                             }
                         }
                         else
