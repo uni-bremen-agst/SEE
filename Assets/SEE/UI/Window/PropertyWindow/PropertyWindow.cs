@@ -14,6 +14,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UIElements;
+using static RootMotion.FinalIK.RagdollUtility;
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -65,6 +66,11 @@ namespace SEE.UI.Window.PropertyWindow
         private RectTransform items;
 
         /// <summary>
+        /// The input field in which the user can enter a search term.
+        /// </summary>
+        private TMP_InputField searchField;
+
+        /// <summary>
         /// The dictionary that holds the items for a group.
         /// </summary>
         private readonly Dictionary<string, IEnumerable<GameObject>> groupHolder = new();
@@ -83,8 +89,15 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="searchQuery"> attribute name to search for </param>
         /// <param name="propertyRows">mapping of attribute names onto gameObjects representing
         /// the corresponding property row</param>
-        private void ActivateMatches(string searchQuery, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
+        private void ActivateMatches(string searchQuery)
         {
+            Dictionary<string, (string, GameObject)> propertyRows = new();
+            /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
+            foreach (Transform child in items)
+            {
+                propertyRows.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
+            }
+
             /// Remove whitespace.
             searchQuery = searchQuery.Trim();
             if (string.IsNullOrEmpty(searchQuery))
@@ -126,36 +139,6 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 go.transform.localScale = new Vector3(1, 0, 1);
                 go.transform.DOScaleY(1, duration: 0.5f);
-            }
-        }
-
-        /// <summary>
-        /// Sets the activity of the given group with the name <paramref name="groupName"/>.
-        /// </summary>
-        /// <param name="groupName">The group name.</param>
-        /// <param name="activate">The activity.</param>
-        private void SetGroupActive(string groupName, bool activate)
-        {
-            if (groupHolder.ContainsKey(groupName))
-            {
-                if (!activate || groupName == "Header")
-                {
-                    groupHolder[groupName].ForEach(go => go.SetActive(activate));
-                }
-                else
-                {
-                    foreach(GameObject go in groupHolder[groupName])
-                    {
-                        if (go.name == groupName)
-                        {
-                            if (GameFinder.FindChild(go, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
-                            {
-                                transform.DORotate(new Vector3(0, 0, -90), duration: 0.01f);
-                            }
-                            go.SetActive(activate);
-                        }
-                    }
-                }
             }
         }
 
@@ -230,7 +213,7 @@ namespace SEE.UI.Window.PropertyWindow
             propertyWindow.name = "Property Window";
 
             items = (RectTransform)propertyWindow.transform.Find("Content/Items");
-            TMP_InputField searchField = propertyWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
+            searchField = propertyWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
 
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
@@ -239,20 +222,18 @@ namespace SEE.UI.Window.PropertyWindow
             ButtonManagerBasic sortButton = propertyWindow.transform.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
             ButtonManagerBasic groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
-            UnityEvent<string, bool> filterEvent = new();
-            filterEvent.AddListener((name, value) => SetGroupActive(name, value));
-            contextMenu = new PropertyWindowContextMenu(popupMenu, filterButton, filterEvent, sortButton, groupButton);
+            UnityEvent rebuild = new();
+            rebuild.AddListener(() => Rebuild());
+            contextMenu = new PropertyWindowContextMenu(popupMenu, rebuild, filterButton, sortButton, groupButton);
 
             CreateItems();
+            searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery));
+        }
 
-            /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
-            Dictionary<string, (string, GameObject)> activeElements = new();
-            foreach (Transform child in items)
-            {
-                activeElements.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
-            }
-
-            searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery, activeElements));
+        private void Rebuild()
+        {
+            ClearItems();
+            CreateItems();
         }
 
         /// <summary>
@@ -260,9 +241,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private void ClearItems()
         {
-            foreach (Transform item in items)
+            for (int i = 0; i < items.childCount;)
             {
-                Destroyer.Destroy(item.gameObject);
+                DestroyImmediate(items.GetChild(i).gameObject);
             }
             groupHolder.Clear();
         }
@@ -273,42 +254,44 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private void CreateItems()
         {
-            Dictionary<string, string> header = new()
+            if (contextMenu.Filter.IncludeHeader)
             {
-                { "Kind", GraphElement is Node ? "Node" : "Edge" },
-            };
-            if (GraphElement is Edge edge)
-            {
-                header.Add("ID", edge.ID);
-                header.Add("Source", edge.Source.ID);
-                header.Add("Target", edge.Target.ID);
+                Dictionary<string, string> header = new()
+                {
+                    { "Kind", GraphElement is Node ? "Node" : "Edge" },
+                };
+                if (GraphElement is Edge edge)
+                {
+                    header.Add("ID", edge.ID);
+                    header.Add("Source", edge.Source.ID);
+                    header.Add("Target", edge.Target.ID);
+                }
+                header.Add("Type", GraphElement.Type);
+
+                /// Data Attributes
+                Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
+                groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject));
             }
-            header.Add("Type", GraphElement.Type);
-
-            /// Data Attributes
-            Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
-            groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject));
-
             /// Toggle Attributes
-            if (GraphElement.ToggleAttributes.Count > 0)
+            if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
             {
                 DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
             }
 
             /// String Attributes
-            if (GraphElement.StringAttributes.Count > 0)
+            if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
             {
                 DisplayGroup("String Attributes", GraphElement.StringAttributes);
             }
 
             /// Int Attributes
-            if (GraphElement.IntAttributes.Count > 0)
+            if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
             {
                 DisplayGroup("Int Attributes", GraphElement.IntAttributes);
             }
 
             /// Float Attributes
-            if (GraphElement.FloatAttributes.Count > 0)
+            if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
             {
                 DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
             }

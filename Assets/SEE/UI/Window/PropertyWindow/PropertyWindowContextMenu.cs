@@ -1,9 +1,14 @@
 ﻿using Assets.SEE.UI.Window.PropertyWindow;
 using Michsky.UI.ModernUIPack;
+using SEE.Game.Drawable;
+using SEE.GO;
 using SEE.UI.PopupMenu;
+using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -30,9 +35,14 @@ namespace SEE.UI.Window.PropertyWindow
         private readonly ButtonManagerBasic sortButton;
 
         /// <summary>
-        /// the button that opens the group menu.
+        /// The button that opens the group menu.
         /// </summary>
         private readonly ButtonManagerBasic groupButton;
+
+        /// <summary>
+        /// The rebuild event.
+        /// </summary>
+        private readonly UnityEvent rebuild;
 
         /// <summary>
         /// The property filter.
@@ -42,30 +52,40 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The function to call to set the activity of the groups.
         /// </summary>
-        private readonly UnityEvent<string, bool> filterEvent;
+        //private readonly UnityEvent<string, bool> filterEvent;
+
+        /// <summary>
+        /// The property sorter.
+        /// </summary>
+        public readonly DrawableSurfaceSorter Sorter;
 
         /// <summary>
         /// Construcotr.
         /// </summary>
         /// <param name="contextMenu">The context menu that this class manages.</param>
+        /// <param name="rebuild">The rebuild event that should be executed.</param>
         /// <param name="filterButton">The button that opens the filter menu.</param>
-        /// <param name="filterEvent">The event that should be triggered if a filter will be used.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public PropertyWindowContextMenu(PopupMenu.PopupMenu contextMenu,
-            ButtonManagerBasic filterButton, UnityEvent<string, bool> filterEvent,
+        public PropertyWindowContextMenu(PopupMenu.PopupMenu contextMenu, UnityEvent rebuild,
+            ButtonManagerBasic filterButton,
             ButtonManagerBasic sortButton,
             ButtonManagerBasic groupButton)
         {
             this.contextMenu = contextMenu;
+            this.rebuild = rebuild;
             this.filterButton = filterButton;
-            this.filterEvent = filterEvent;
             this.sortButton = sortButton;
             this.groupButton = groupButton;
+
             Filter = new PropertyFilter();
+            Sorter = new DrawableSurfaceSorter();
+
             ResetFilter();
+            ResetSort();
 
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
+            this.sortButton.clickEvent.AddListener(ShowSortMenu);
         }
 
         #region Filter menu
@@ -89,41 +109,37 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     ResetFilter();
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("Header", true);
-                    filterEvent.Invoke("Toggle Attributes", true);
-                    filterEvent.Invoke("String Attributes", true);
-                    filterEvent.Invoke("Int Attributes", true);
-                    filterEvent.Invoke("Float Attributes", true);
+                    rebuild.Invoke();
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false),
                 new PopupMenuAction("Header", () =>
                 {
                     Filter.IncludeHeader = !Filter.IncludeHeader;
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("Header", Filter.IncludeHeader);
+                    rebuild.Invoke();
                 }, Checkbox(Filter.IncludeHeader), CloseAfterClick: false),
                 new PopupMenuAction("Toggle Attributes", () =>
                 {
                     Filter.IncludeToggleAttributes = !Filter.IncludeToggleAttributes;
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("Toggle Attributes", Filter.IncludeToggleAttributes);
+                    rebuild.Invoke();
                 }, Checkbox(Filter.IncludeToggleAttributes), CloseAfterClick: false),
                 new PopupMenuAction("String Attributes", () =>
                 {
                     Filter.IncludeStringAttributes = !Filter.IncludeStringAttributes;
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("String Attributes", Filter.IncludeStringAttributes);
+                    rebuild.Invoke();
                 }, Checkbox(Filter.IncludeStringAttributes), CloseAfterClick: false),
                 new PopupMenuAction("Int Attributes", () =>
                 {
                     Filter.IncludeIntAttributes = !Filter.IncludeIntAttributes;
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("Int Attributes", Filter.IncludeIntAttributes);
+                    rebuild.Invoke();
                 }, Checkbox(Filter.IncludeIntAttributes), CloseAfterClick: false),
                 new PopupMenuAction("Float Attributes", () =>
                 {
                     Filter.IncludeFloatAttributes = !Filter.IncludeFloatAttributes;
                     UpdateFilterMenuEntries();
-                    filterEvent.Invoke("Float Attributes", Filter.IncludeFloatAttributes);
+                    rebuild.Invoke();
                 }, Checkbox(Filter.IncludeFloatAttributes), CloseAfterClick: false),
             };
 
@@ -144,6 +160,102 @@ namespace SEE.UI.Window.PropertyWindow
         private void ResetFilter()
         {
             Filter.Reset();
+        }
+        #endregion
+
+        #region Sorter
+        /// <summary>
+        /// Displays the sort menu.
+        /// </summary>
+        private void ShowSortMenu()
+        {
+            UpdateSortMenuEntries();
+            contextMenu.ShowWith(position: sortButton.transform.position);
+        }
+        /// <summary>
+        /// Updates the sort menu entries.
+        /// </summary>
+        private void UpdateSortMenuEntries()
+        {
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuAction("Reset", () =>
+                {
+                    ResetSort();
+                    UpdateSortMenuEntries();
+                    //TODO ACTIOn
+                }, Icons.ArrowRotateLeft, CloseAfterClick: false)
+            };
+            /*
+            if (Grouper.IsActive)
+            {
+                entries.Add(new PopupMenuHeading("Grouping is active!"));
+                entries.Add(new PopupMenuHeading("Items ordered by group count."));
+            }
+            else
+            {*/
+                entries.Add(new PopupMenuAction("Attribute Name", () =>
+                {
+                    ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
+                }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
+
+                entries.Add(new PopupMenuAction("Attribute Value", () =>
+                {
+                    ToggleSortAction("Value", x => GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text);
+                }, SortIcon(true, Sorter.IsAttributeDescending("Value")), CloseAfterClick: false));
+            //}
+
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+            return;
+
+            /// Switch from ascending->descending->none->ascending.
+            void ToggleSortAction(string name, Func<GameObject, object> key)
+            {
+                switch (Sorter.IsAttributeDescending(name))
+                {
+                    case null:
+                        Sorter.AddSortAttribute(name, key, false);
+                        break;
+                    case false:
+                        Sorter.RemoveSortAttribute(name);
+                        Sorter.AddSortAttribute(name, key, true);
+                        break;
+                    default:
+                        Sorter.RemoveSortAttribute(name);
+                        break;
+                }
+                UpdateSortMenuEntries();
+                //TODO ACTIOn
+            }
+        }
+
+        /// <summary>
+        /// Returns the sort icon depending on whether the attribute is
+        /// <paramref name="numeric"/> and whether it is sorted in <paramref name="descending"/> order.
+        /// </summary>
+        /// <param name="numeric">Whether the attribute is numeric.</param>
+        /// <param name="descending">Whether the attribute is sorted in descending order.</param>
+        /// <returns>The sort icon depending on the given parameters.</returns>
+        private static char SortIcon(bool numeric, bool? descending)
+        {
+            return (numeric, descending) switch
+            {
+                (true, null) => Icons.Hashtag,
+                (false, null) => Icons.Text,
+                (true, true) => Icons.SortNumericDown,
+                (true, false) => Icons.SortNumericUp,
+                (false, true) => Icons.SortAlphabeticalDown,
+                (false, false) => Icons.SortAlphabeticalUp
+            };
+        }
+
+        /// <summary>
+        /// Resets the sorter to its default state.
+        /// </summary>
+        private void ResetSort()
+        {
+            Sorter.Reset();
         }
         #endregion
     }
