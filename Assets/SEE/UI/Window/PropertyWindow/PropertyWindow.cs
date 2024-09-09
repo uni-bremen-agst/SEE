@@ -75,6 +75,13 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private readonly Dictionary<string, IEnumerable<GameObject>> groupHolder = new();
 
+        /// <summary>
+        /// A set of all items that have been expanded.
+        /// Note that this may contain items that are not currently visible due to collapsed parents.
+        /// Such items will be expanded when they become visible again.
+        /// </summary>
+        private readonly ISet<string> expandedItems = new HashSet<string>();
+
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -369,7 +376,7 @@ namespace SEE.UI.Window.PropertyWindow
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
             group.name = name;
             GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
-            Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1);
+            Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
             RegisterClickHandler();
             groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group));
             return;
@@ -383,6 +390,7 @@ namespace SEE.UI.Window.PropertyWindow
                     {
                         if (dict.First().Value.gameObject.activeInHierarchy)
                         {
+                            expandedItems.Remove(group.name);
                             SetActive(dict, false);
                             if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
                             {
@@ -391,6 +399,7 @@ namespace SEE.UI.Window.PropertyWindow
                         }
                         else
                         {
+                            expandedItems.Add(group.name);
                             SetActive(dict, true);
                             if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
                             {
@@ -408,7 +417,8 @@ namespace SEE.UI.Window.PropertyWindow
         /// <typeparam name="T">The type of the attribute values.</typeparam>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the property row.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, int level = 0)
+        /// <param name="active">Whether the attributes should be active.</param>
+        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, int level = 0, bool active = true)
         {
             Dictionary<string, (string, GameObject)> dict = new();
             foreach ((string name, T value) in attributes)
@@ -432,10 +442,7 @@ namespace SEE.UI.Window.PropertyWindow
                     background.offsetMin = background.offsetMin.WithXY(x: indentShift * level);
                     RectTransform foreground = (RectTransform)propertyRow.transform.Find("Foreground");
                     foreground.offsetMin = foreground.offsetMin.WithXY(x: indentShift * level);
-                    if (level > 0)
-                    {
-                        propertyRow.SetActive(false);
-                    }
+                    propertyRow.SetActive(active);
                 }
             }
             return dict;
