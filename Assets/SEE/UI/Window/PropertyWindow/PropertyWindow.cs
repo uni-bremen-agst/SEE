@@ -296,9 +296,13 @@ namespace SEE.UI.Window.PropertyWindow
                 DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
             }
 
+            /// Sorts the properties
             Sort();
         }
 
+        /// <summary>
+        /// Sorts the properties within the group.
+        /// </summary>
         private void Sort()
         {
             if (contextMenu.Sorter.IsActive())
@@ -338,6 +342,10 @@ namespace SEE.UI.Window.PropertyWindow
             }
         }
 
+        /// <summary>
+        /// Applies the new order.
+        /// </summary>
+        /// <param name="listToOrder">The list to be sorted.</param>
         private void ChangeOrder(List<GameObject> listToOrder)
         {
             int lowestSilbing = listToOrder.Min(x => x.transform.GetSiblingIndex());
