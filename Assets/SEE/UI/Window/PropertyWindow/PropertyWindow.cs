@@ -295,6 +295,58 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
             }
+
+            Sort();
+        }
+
+        private void Sort()
+        {
+            if (contextMenu.Sorter.IsActive())
+            {
+                if (contextMenu.Filter.IncludeHeader && groupHolder.TryGetValue("Header", out IEnumerable<GameObject> headerItems))
+                {
+                    ChangeOrder(headerItems.ToList());
+                }
+
+                if (contextMenu.Filter.IncludeToggleAttributes && groupHolder.TryGetValue("Toggle Attributes", out IEnumerable<GameObject> toggleItems))
+                {
+                    List<GameObject> list = toggleItems.ToList();
+                    list.RemoveAll(x => x.name == "Toggle Attributes");
+                    ChangeOrder(list);
+                }
+
+                if (contextMenu.Filter.IncludeStringAttributes && groupHolder.TryGetValue("String Attributes", out IEnumerable<GameObject> stringItems))
+                {
+                    List<GameObject> list = stringItems.ToList();
+                    list.RemoveAll(x => x.name == "String Attributes");
+                    ChangeOrder(list);
+                }
+
+                if (contextMenu.Filter.IncludeIntAttributes && groupHolder.TryGetValue("Int Attributes", out IEnumerable<GameObject> intItems))
+                {
+                    List<GameObject> list = intItems.ToList();
+                    list.RemoveAll(x => x.name == "Int Attributes");
+                    ChangeOrder(list);
+                }
+
+                if (contextMenu.Filter.IncludeFloatAttributes && groupHolder.TryGetValue("Float Attributes", out IEnumerable<GameObject> floatItems))
+                {
+                    List<GameObject> list = floatItems.ToList();
+                    list.RemoveAll(x => x.name == "Float Attributes");
+                    ChangeOrder(list);
+                }
+            }
+        }
+
+        private void ChangeOrder(List<GameObject> listToOrder)
+        {
+            int lowestSilbing = listToOrder.Min(x => x.transform.GetSiblingIndex());
+            List<GameObject> sortedHeader = contextMenu.Sorter.ApplySort(listToOrder);
+            for (int i = 0; i < sortedHeader.Count; i++)
+            {
+                sortedHeader[i].transform.SetSiblingIndex(lowestSilbing);
+                lowestSilbing += 1;
+            }
         }
 
         /// <summary>

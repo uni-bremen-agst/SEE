@@ -57,7 +57,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The drawable surface sorter.
         /// </summary>
-        public readonly DrawableSurfaceSorter Sorter;
+        public readonly GameObjectSorter Sorter;
 
         /// <summary>
         /// Constructor.
@@ -78,7 +78,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             this.groupButton = groupButton;
             Filter = new DrawableSurfaceFilter();
             Grouper = new DrawableWindowGrouper();
-            Sorter = new DrawableSurfaceSorter();
+            Sorter = new GameObjectSorter();
 
             ResetFilter();
             ResetSort();

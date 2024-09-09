@@ -1,7 +1,9 @@
 ﻿using Assets.SEE.UI.Window.PropertyWindow;
 using Michsky.UI.ModernUIPack;
+using RTG;
 using SEE.Game.Drawable;
 using SEE.GO;
+using SEE.UI.Drawable;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
@@ -57,7 +59,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The property sorter.
         /// </summary>
-        public readonly DrawableSurfaceSorter Sorter;
+        public readonly GameObjectSorter Sorter;
 
         /// <summary>
         /// Construcotr.
@@ -79,7 +81,7 @@ namespace SEE.UI.Window.PropertyWindow
             this.groupButton = groupButton;
 
             Filter = new PropertyFilter();
-            Sorter = new DrawableSurfaceSorter();
+            Sorter = new GameObjectSorter();
 
             ResetFilter();
             ResetSort();
@@ -183,7 +185,7 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     ResetSort();
                     UpdateSortMenuEntries();
-                    //TODO ACTIOn
+                    rebuild.Invoke();
                 }, Icons.ArrowRotateLeft, CloseAfterClick: false)
             };
             /*
@@ -194,15 +196,30 @@ namespace SEE.UI.Window.PropertyWindow
             }
             else
             {*/
-                entries.Add(new PopupMenuAction("Attribute Name", () =>
-                {
-                    ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
-                }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
+            entries.Add(new PopupMenuAction("Attribute Name", () =>
+            {
+                ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
+            }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
 
-                entries.Add(new PopupMenuAction("Attribute Value", () =>
+            entries.Add(new PopupMenuAction("Attribute Value", () =>
+            {
+                ToggleSortAction("Value", x =>
                 {
-                    ToggleSortAction("Value", x => GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text);
-                }, SortIcon(true, Sorter.IsAttributeDescending("Value")), CloseAfterClick: false));
+                    string text = GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text;
+                    if (int.TryParse(text, out int intValue))
+                    {
+                        return intValue;
+                    }
+                    else if (float.TryParse(text, out float floatValue))
+                    {
+                        return floatValue;
+                    }
+                    else
+                    {
+                        return text;
+                    }
+                });
+            }, SortIcon(true, Sorter.IsAttributeDescending("Value")), CloseAfterClick: false));
             //}
 
             contextMenu.ClearEntries();
@@ -226,7 +243,7 @@ namespace SEE.UI.Window.PropertyWindow
                         break;
                 }
                 UpdateSortMenuEntries();
-                //TODO ACTIOn
+                rebuild.Invoke();
             }
         }
 
