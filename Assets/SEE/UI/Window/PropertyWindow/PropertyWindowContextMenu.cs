@@ -1,14 +1,11 @@
 ﻿using Assets.SEE.UI.Window.PropertyWindow;
 using Michsky.UI.ModernUIPack;
-using RTG;
 using SEE.Game.Drawable;
 using SEE.GO;
-using SEE.UI.Drawable;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -186,41 +183,33 @@ namespace SEE.UI.Window.PropertyWindow
                     ResetSort();
                     UpdateSortMenuEntries();
                     rebuild.Invoke();
-                }, Icons.ArrowRotateLeft, CloseAfterClick: false)
-            };
-            /*
-            if (Grouper.IsActive)
-            {
-                entries.Add(new PopupMenuHeading("Grouping is active!"));
-                entries.Add(new PopupMenuHeading("Items ordered by group count."));
-            }
-            else
-            {*/
-            entries.Add(new PopupMenuAction("Attribute Name", () =>
-            {
-                ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
-            }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false));
+                }, Icons.ArrowRotateLeft, CloseAfterClick: false),
 
-            entries.Add(new PopupMenuAction("Attribute Value", () =>
-            {
-                ToggleSortAction("Value", x =>
+                new PopupMenuAction("Attribute Name", () =>
                 {
-                    string text = GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text;
-                    if (int.TryParse(text, out int intValue))
+                    ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
+                }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false),
+
+                new PopupMenuAction("Attribute Value", () =>
+                {
+                    ToggleSortAction("Value", x =>
                     {
-                        return intValue;
-                    }
-                    else if (float.TryParse(text, out float floatValue))
-                    {
-                        return floatValue;
-                    }
-                    else
-                    {
-                        return text;
-                    }
-                });
-            }, SortIcon(true, Sorter.IsAttributeDescending("Value")), CloseAfterClick: false));
-            //}
+                        string text = GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text;
+                        if (int.TryParse(text, out int intValue))
+                        {
+                            return intValue;
+                        }
+                        else if (float.TryParse(text, out float floatValue))
+                        {
+                            return floatValue;
+                        }
+                        else
+                        {
+                            return text;
+                        }
+                    });
+                }, SortIcon(true, Sorter.IsAttributeDescending("Value")), CloseAfterClick: false)
+            };
 
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
