@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks.Triggers;
 using DG.Tweening;
 using FuzzySharp;
 using Michsky.UI.ModernUIPack;
@@ -122,6 +123,18 @@ namespace SEE.UI.Window.PropertyWindow
                     if (propertyRows.TryGetValue(attributeName, out (string v, GameObject activeObject) t))
                     {
                         t.activeObject.SetActive(true);
+                        foreach (KeyValuePair<string, IEnumerable<GameObject>> pair in groupHolder)
+                        {
+                            if (pair.Value.Contains(t.activeObject))
+                            {
+                                GameObject group = pair.Value.ToList().Find(go => go.name == pair.Key);
+                                if (group != null)
+                                {
+                                    group.SetActive(true);
+                                    RotateExpandIcon(group, true);
+                                }
+                            }
+                        }
                     }
                 }
             }
@@ -143,6 +156,7 @@ namespace SEE.UI.Window.PropertyWindow
                         go.SetActive(expanded);
                     }
                     group.SetActive(true);
+                    RotateExpandIcon(group, expanded);
                 }
                 else
                 {
@@ -164,7 +178,17 @@ namespace SEE.UI.Window.PropertyWindow
             foreach ((_, GameObject go) in objects.Values)
             {
                 go.SetActive(activate);
-                AnimateIn(go);
+                if (activate)
+                {
+                    AnimateIn(go);
+                }
+                else
+                {
+                    if (GameFinder.FindChild(go, "Expand Icon") != null)
+                    {
+                        RotateExpandIcon(go, false);
+                    }
+                }
             }
             return;
 
@@ -393,22 +417,30 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             expandedItems.Remove(group.name);
                             SetActive(dict, false);
-                            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
-                            {
-                                transform.DORotate(new Vector3(0, 0, -90), duration: 0.5f);
-                            }
+                            RotateExpandIcon(group, false);
                         }
                         else
                         {
                             expandedItems.Add(group.name);
                             SetActive(dict, true);
-                            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
-                            {
-                                transform.DORotate(new Vector3(0, 0, -180), duration: 0.5f);
-                            }
+                            RotateExpandIcon(group, true);
                         }
                     });
                 }
+            }
+        }
+
+        /// <summary>
+        /// Roates the expand icon of a group.
+        /// </summary>
+        /// <param name="group">The group.</param>
+        /// <param name="expanded">Whether the group should be expanded or not.</param>
+        private void RotateExpandIcon(GameObject group, bool expanded)
+        {
+            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+            {
+                Vector3 endValue = expanded ? new Vector3(0, 0, -180) : new Vector3(0, 0, -90);
+                transform.DORotate(endValue, duration: 0.5f);
             }
         }
 
