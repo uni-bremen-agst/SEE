@@ -314,36 +314,10 @@ namespace SEE.UI.Window.PropertyWindow
         {
             if (contextMenu.Sorter.IsActive())
             {
-                if (contextMenu.Filter.IncludeHeader && groupHolder.TryGetValue("Header", out IEnumerable<GameObject> headerItems))
+                foreach (IEnumerable<GameObject> values in groupHolder.Values)
                 {
-                    ChangeOrder(headerItems.ToList());
-                }
-
-                if (contextMenu.Filter.IncludeToggleAttributes && groupHolder.TryGetValue("Toggle Attributes", out IEnumerable<GameObject> toggleItems))
-                {
-                    List<GameObject> list = toggleItems.ToList();
-                    list.RemoveAll(x => x.name == "Toggle Attributes");
-                    ChangeOrder(list);
-                }
-
-                if (contextMenu.Filter.IncludeStringAttributes && groupHolder.TryGetValue("String Attributes", out IEnumerable<GameObject> stringItems))
-                {
-                    List<GameObject> list = stringItems.ToList();
-                    list.RemoveAll(x => x.name == "String Attributes");
-                    ChangeOrder(list);
-                }
-
-                if (contextMenu.Filter.IncludeIntAttributes && groupHolder.TryGetValue("Int Attributes", out IEnumerable<GameObject> intItems))
-                {
-                    List<GameObject> list = intItems.ToList();
-                    list.RemoveAll(x => x.name == "Int Attributes");
-                    ChangeOrder(list);
-                }
-
-                if (contextMenu.Filter.IncludeFloatAttributes && groupHolder.TryGetValue("Float Attributes", out IEnumerable<GameObject> floatItems))
-                {
-                    List<GameObject> list = floatItems.ToList();
-                    list.RemoveAll(x => x.name == "Float Attributes");
+                    List<GameObject> list = values.ToList();
+                    list.RemoveAll(x => !x.name.Contains("RowLine"));
                     ChangeOrder(list);
                 }
             }
