@@ -71,7 +71,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The dictionary that holds the items for a group.
         /// </summary>
-        private readonly Dictionary<string, IEnumerable<GameObject>> groupHolder = new();
+        private readonly Dictionary<string, List<GameObject>> groupHolder = new();
 
         /// <summary>
         /// A set of all items that have been expanded.
@@ -120,7 +120,7 @@ namespace SEE.UI.Window.PropertyWindow
                     if (propertyRows.TryGetValue(attributeName, out (string v, GameObject activeObject) t))
                     {
                         t.activeObject.SetActive(true);
-                        foreach (KeyValuePair<string, IEnumerable<GameObject>> pair in groupHolder)
+                        foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
                         {
                             if (pair.Value.Contains(t.activeObject))
                             {
@@ -142,7 +142,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private void ActivateMainProperties()
         {
-            foreach (KeyValuePair<string, IEnumerable<GameObject>> pair in groupHolder)
+            foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
             {
                 GameObject group = pair.Value.ToList().Find(go => go.name == pair.Key);
                 if (group != null)
@@ -175,6 +175,7 @@ namespace SEE.UI.Window.PropertyWindow
             foreach ((_, GameObject go) in objects.Values)
             {
                 go.SetActive(activate);
+
                 if (activate)
                 {
                     AnimateIn(go);
@@ -185,6 +186,12 @@ namespace SEE.UI.Window.PropertyWindow
                     {
                         RotateExpandIcon(go, false);
                     }
+                }
+
+                if (expandedItems.Contains(go.name))
+                {
+                    SetActive(GetDictOfGroup(go.name), activate);
+                    RotateExpandIcon(go, activate);
                 }
             }
             return;
@@ -325,7 +332,7 @@ namespace SEE.UI.Window.PropertyWindow
 
                 /// Data Attributes
                 Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
-                groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject));
+                groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
             }
             /// Toggle Attributes
             if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -376,7 +383,15 @@ namespace SEE.UI.Window.PropertyWindow
                         attributes.Add(pair.Key, pair.Value);
                     }
                 }
+                // TODO Test Area
                 DisplayGroup("Attributes", attributes);
+
+                Dictionary<string, string> att = new()
+                {
+                    { "Test1", "test" },
+                    { "123", "456" }
+                };
+                DisplayGroup("Test", att, 1, "Attributes");
             }
 
             /// Sorts the properties
@@ -427,14 +442,16 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="name">The group name</param>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the group.</param>
-        private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0)
+        private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
             group.name = name;
             GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
             Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
+            OrderGroup();
+            RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
             RegisterClickHandler();
-            groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group));
+            groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group).ToList());
             return;
 
             void RegisterClickHandler()
@@ -444,21 +461,56 @@ namespace SEE.UI.Window.PropertyWindow
                     /// expands/collapses the group item
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
+                        Dictionary<string, (string, GameObject)> newDict = GetDictOfGroup(group.name);
                         if (dict.First().Value.gameObject.activeInHierarchy)
                         {
                             expandedItems.Remove(group.name);
-                            SetActive(dict, false);
+                            SetActive(newDict, false);
                             RotateExpandIcon(group, false);
                         }
                         else
                         {
                             expandedItems.Add(group.name);
-                            SetActive(dict, true);
+                            SetActive(newDict, true);
                             RotateExpandIcon(group, true);
                         }
                     });
                 }
             }
+
+            void OrderGroup()
+            {
+                if (level > 0)
+                {
+                    RectTransform background = (RectTransform)group.transform.Find("Background");
+                    background.offsetMin = background.offsetMin.WithXY(x: indentShift * level);
+                    RectTransform foreground = (RectTransform)group.transform.Find("Foreground");
+                    foreground.offsetMin = foreground.offsetMin.WithXY(x: indentShift * level);
+                    if (parentGroup != null && groupHolder.TryGetValue(parentGroup, out List<GameObject> value))
+                    {
+                        value.Add(group);
+                        group.SetActive(expandedItems.Contains(parentGroup));
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieve the dictionary of items from a group, excluding the group itself.
+        /// </summary>
+        /// <param name="groupName">The group name.</param>
+        /// <returns>A created dictionary of the group.</returns>
+        private Dictionary<string, (string, GameObject)> GetDictOfGroup(string groupName)
+        {
+            List<GameObject> rowLines = groupHolder.GetValueOrDefault(groupName);
+            rowLines.RemoveAll(x => x.name == groupName);
+            Dictionary<string, (string, GameObject)> newDict = new();
+
+            foreach (GameObject go in rowLines)
+            {
+                newDict.Add(AttributeName(go), (AttributeValue(go), go));
+            }
+            return newDict;
         }
 
         /// <summary>
@@ -466,12 +518,12 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         /// <param name="group">The group.</param>
         /// <param name="expanded">Whether the group should be expanded or not.</param>
-        private void RotateExpandIcon(GameObject group, bool expanded)
+        private void RotateExpandIcon(GameObject group, bool expanded, float duration = 0.5f)
         {
             if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
             {
                 Vector3 endValue = expanded ? new Vector3(0, 0, -180) : new Vector3(0, 0, -90);
-                transform.DORotate(endValue, duration: 0.5f);
+                transform.DORotate(endValue, duration: duration);
             }
         }
 
