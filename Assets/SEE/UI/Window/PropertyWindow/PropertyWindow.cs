@@ -109,8 +109,8 @@ namespace SEE.UI.Window.PropertyWindow
             searchQuery = searchQuery.Trim();
             if (string.IsNullOrEmpty(searchQuery))
             {
-                /// There is no search query, so activate all property rows.
-                SetActive(propertyRows, true);
+                /// There is no search query, so activate the main property rows.
+                ActivateMainProperties();
             }
             else
             {
@@ -122,6 +122,33 @@ namespace SEE.UI.Window.PropertyWindow
                     if (propertyRows.TryGetValue(attributeName, out (string v, GameObject activeObject) t))
                     {
                         t.activeObject.SetActive(true);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Activates the main property rows.
+        /// </summary>
+        private void ActivateMainProperties()
+        {
+            foreach (KeyValuePair<string, IEnumerable<GameObject>> pair in groupHolder)
+            {
+                GameObject group = pair.Value.ToList().Find(go => go.name == pair.Key);
+                if (group != null)
+                {
+                    bool expanded = expandedItems.Contains(pair.Key);
+                    foreach (GameObject go in pair.Value)
+                    {
+                        go.SetActive(expanded);
+                    }
+                    group.SetActive(true);
+                }
+                else
+                {
+                    foreach (GameObject go in pair.Value)
+                    {
+                        go.SetActive(true);
                     }
                 }
             }
