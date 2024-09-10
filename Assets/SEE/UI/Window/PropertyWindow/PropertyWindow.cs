@@ -1,6 +1,4 @@
-using Cysharp.Threading.Tasks.Triggers;
 using DG.Tweening;
-using FuzzySharp;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
@@ -11,11 +9,10 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.UIElements;
-using static RootMotion.FinalIK.RagdollUtility;
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -335,27 +332,61 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
             }
-
-            /// String Attributes
-            if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
+            if (!contextMenu.Grouper)
             {
-                DisplayGroup("String Attributes", GraphElement.StringAttributes);
+                /// String Attributes
+                if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
+                {
+                    DisplayGroup("String Attributes", GraphElement.StringAttributes);
+                }
+
+                /// Int Attributes
+                if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
+                {
+                    DisplayGroup("Int Attributes", GraphElement.IntAttributes);
+                }
+
+                /// Float Attributes
+                if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
+                {
+                    DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
+                }
             }
-
-            /// Int Attributes
-            if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
+            else
             {
-                DisplayGroup("Int Attributes", GraphElement.IntAttributes);
-            }
-
-            /// Float Attributes
-            if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
-            {
-                DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
+                Dictionary<string, object> attributes = new();
+                if (GraphElement.StringAttributes.Count > 0 & contextMenu.Filter.IncludeStringAttributes)
+                {
+                    foreach (KeyValuePair<string, string> pair in GraphElement.StringAttributes)
+                    {
+                        attributes.Add(pair.Key, pair.Value);
+                    }
+                }
+                if (GraphElement.IntAttributes.Count > 0 & contextMenu.Filter.IncludeIntAttributes)
+                {
+                    foreach (KeyValuePair<string, int> pair in GraphElement.IntAttributes)
+                    {
+                        attributes.Add(pair.Key, pair.Value);
+                    }
+                }
+                if (GraphElement.FloatAttributes.Count > 0 & contextMenu.Filter.IncludeFloatAttributes)
+                {
+                    foreach (KeyValuePair<string, float> pair in GraphElement.FloatAttributes)
+                    {
+                        attributes.Add(pair.Key, pair.Value);
+                    }
+                }
+                DisplayGroup("Attributes", attributes);
             }
 
             /// Sorts the properties
             Sort();
+
+            /// Applies the search
+            if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
+            {
+                ActivateMatches(searchField.text);
+            }
         }
 
         /// <summary>

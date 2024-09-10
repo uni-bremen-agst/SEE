@@ -49,14 +49,16 @@ namespace SEE.UI.Window.PropertyWindow
         public readonly PropertyFilter Filter;
 
         /// <summary>
-        /// The function to call to set the activity of the groups.
-        /// </summary>
-        //private readonly UnityEvent<string, bool> filterEvent;
-
-        /// <summary>
         /// The property sorter.
         /// </summary>
         public readonly GameObjectSorter Sorter;
+
+        /// <summary>
+        /// Status of whether the grouper is active.
+        /// If it is active, grouping is done by the names of the metrics.
+        /// Otherwise, grouping is done by the type of attributes.
+        /// </summary>
+        public bool Grouper;
 
         /// <summary>
         /// Construcotr.
@@ -82,9 +84,11 @@ namespace SEE.UI.Window.PropertyWindow
 
             ResetFilter();
             ResetSort();
+            ResetGroup();
 
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
             this.sortButton.clickEvent.AddListener(ShowSortMenu);
+            this.groupButton.clickEvent.AddListener(ShowGroupMenu);
         }
 
         #region Filter menu
@@ -171,6 +175,7 @@ namespace SEE.UI.Window.PropertyWindow
             UpdateSortMenuEntries();
             contextMenu.ShowWith(position: sortButton.transform.position);
         }
+
         /// <summary>
         /// Updates the sort menu entries.
         /// </summary>
@@ -262,6 +267,56 @@ namespace SEE.UI.Window.PropertyWindow
         private void ResetSort()
         {
             Sorter.Reset();
+        }
+        #endregion
+
+        #region Group
+        /// <summary>
+        /// Displays the group menu.
+        /// </summary>
+        private void ShowGroupMenu()
+        {
+            UpdateGroupMenuEntries();
+            contextMenu.ShowWith(position: groupButton.transform.position);
+        }
+
+        /// <summary>
+        /// Updates the group menu entries.
+        /// </summary>
+        private void UpdateGroupMenuEntries()
+        {
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuAction("Type", () =>
+                {
+                    ResetGroup();
+                    UpdateGroupMenuEntries();
+                    rebuild.Invoke();
+                }, Radio(!Grouper), CloseAfterClick: false),
+                new PopupMenuAction("Metrics", () =>
+                {
+                    Grouper = true;
+                    UpdateGroupMenuEntries();
+                    rebuild.Invoke();
+                }, Radio(Grouper), CloseAfterClick: false)
+            };
+            contextMenu.ClearEntries();
+            contextMenu.AddEntries(entries);
+        }
+
+        /// <summary>
+        /// Returns a radio button icon for the given <paramref name="value"/>.
+        /// </summary>
+        /// <param name="value">Whether the radio button is checked.</param>
+        /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
+        private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
+
+        /// <summary>
+        /// Resets the grouper to its default state.
+        /// </summary>
+        private void ResetGroup()
+        {
+            Grouper = false;
         }
         #endregion
     }
