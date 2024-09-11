@@ -9,6 +9,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
@@ -333,6 +334,7 @@ namespace SEE.UI.Window.PropertyWindow
                 /// Data Attributes
                 Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
                 groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
+                expandedItems.Add("Header");
             }
             /// Toggle Attributes
             if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -383,15 +385,7 @@ namespace SEE.UI.Window.PropertyWindow
                         attributes.Add(pair.Key, pair.Value);
                     }
                 }
-                // TODO Test Area
-                DisplayGroup("Attributes", attributes);
-
-                Dictionary<string, string> att = new()
-                {
-                    { "Test1", "test" },
-                    { "123", "456" }
-                };
-                DisplayGroup("Test", att, 1, "Attributes");
+                SplitInAttributeGroup(attributes);
             }
 
             /// Sorts the properties
@@ -401,6 +395,66 @@ namespace SEE.UI.Window.PropertyWindow
             if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
             {
                 ActivateMatches(searchField.text);
+            }
+        }
+
+        /// <summary>
+        /// Divides the attributes into groups and subgroups.
+        /// </summary>
+        /// <param name="attributes">The attributes to divide.</param>
+        private void SplitInAttributeGroup(Dictionary<string, object> attributes)
+        {
+            Dictionary<string, object> nestedDict = new();
+            foreach (KeyValuePair<string, object> pair in attributes)
+            {
+                AddNestedAttribute(nestedDict, pair.Key.Split('.'), pair.Value);
+            }
+
+            CreateNestedGroups(nestedDict);
+        }
+
+        /// <summary>
+        /// Inserts an attribute to the nested dictionary.
+        /// </summary>
+        /// <param name="dict">The nested dictionary.</param>
+        /// <param name="keys">The keys to add.</param>
+        /// <param name="value">The value of the attribute.</param>
+        private void AddNestedAttribute(Dictionary<string, object> dict, string[] keys, object value)
+        {
+            Dictionary<string, object> currentDict = dict;
+
+            for (int i = 0; i < keys.Length - 1; i++)
+            {
+                if (!currentDict.ContainsKey(keys[i]))
+                {
+                    currentDict[keys[i]] = new Dictionary<string, object>();
+                }
+                currentDict = (Dictionary<string, object>)currentDict[keys[i]];
+            }
+            currentDict[keys[keys.Length - 1]] = value;
+        }
+
+        /// <summary>
+        /// Creates the nested groups and attributes.
+        /// </summary>
+        /// <param name="dict">The nested dicitonary.</param>
+        /// <param name="groupName">The group name in which the object should be added.</param>
+        /// <param name="level">The hierarchy level.</param>
+        private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
+        {
+            foreach (KeyValuePair<string, object> pair in dict)
+            {
+                if (pair.Value is Dictionary<string, object> nestedDict)
+                {
+                    DisplayGroup(pair.Key, new Dictionary<string, string>(), level, groupName);
+                    CreateNestedGroups(nestedDict, pair.Key, level + 1);
+                }
+                else
+                {
+                    groupName ??= "Header";
+                    DisplayAttributes(new Dictionary<string, string>() { { pair.Key, pair.Value.ToString() } },
+                        level, expandedItems.Contains(groupName), groupName);
+                }
             }
         }
 
@@ -461,8 +515,8 @@ namespace SEE.UI.Window.PropertyWindow
                     /// expands/collapses the group item
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        Dictionary<string, (string, GameObject)> newDict = GetDictOfGroup(group.name);
-                        if (dict.First().Value.gameObject.activeInHierarchy)
+                        Dictionary<string, (string, GameObject gameObject)> newDict = GetDictOfGroup(group.name);
+                        if (newDict.First().Value.gameObject.activeInHierarchy)
                         {
                             expandedItems.Remove(group.name);
                             SetActive(newDict, false);
@@ -534,7 +588,10 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the property row.</param>
         /// <param name="active">Whether the attributes should be active.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes, int level = 0, bool active = true)
+        /// <param name="group">The group to which this attribute is to be assigned.
+        /// Used only if the attribute is to be added to the group later.</param>
+        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
+            int level = 0, bool active = true, string group = null)
         {
             Dictionary<string, (string, GameObject)> dict = new();
             foreach ((string name, T value) in attributes)
@@ -548,6 +605,10 @@ namespace SEE.UI.Window.PropertyWindow
                 /// Colors and orders the item
                 ColorOrderItem();
                 dict.Add(name, (AttributeValue(propertyRow), propertyRow));
+                if (group != null && groupHolder.TryGetValue(group, out List<GameObject> groupList))
+                {
+                    groupList.Add(propertyRow);
+                }
                 continue;
 
                 void ColorOrderItem()
