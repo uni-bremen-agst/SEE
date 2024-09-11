@@ -56,9 +56,21 @@ namespace SEE.Utils
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
+        /// of drawables are persisted.
+        /// </summary>
+        public const string DrawableConfigExtension = ".drw";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
+        /// of metric boards are persisted.
+        /// </summary>
+        public const string MetricBoardConfigExtension = ".mbc";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
         /// of AbstractSEECity instances are persisted.
         /// </summary>
-        public const string ConfigExtension = ".cfg";
+        public const string CityConfigExtension = ".cfg";
 
         /// <summary>
         /// File extension for Speech Recognition Grammar Specifications (SRGS).
@@ -71,9 +83,24 @@ namespace SEE.Utils
         public const string SolutionExtension = ".sln";
 
         /// <summary>
-        /// File extension for LZMA compressed GXL files.
+        /// File extension for LZMA compressed data streams/files.
         /// </summary>
-        public const string CompressedGXLExtension = GXLExtension + ".xz";
+        public const string CompressedExtension = ".xz";
+
+        /// <summary>
+        /// File extension of PNG filenames.
+        /// </summary>
+        public const string PNGExtension = ".png";
+
+        /// <summary>
+        /// File extension of JPG filenames.
+        /// </summary>
+        public const string JPGExtension = ".jpg";
+
+        /// <summary>
+        /// Alternative file extension of JPG filenames.
+        /// </summary>
+        public const string JPEGExtension = ".jpeg";
 
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
@@ -156,7 +183,7 @@ namespace SEE.Utils
         public static IEnumerable<string> GXLFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(GXLExtension))
-                .Concat(FilenamesInDirectory(directory, Globbing(CompressedGXLExtension)));
+                .Concat(FilenamesInDirectory(directory, Globbing(GXLExtension + CompressedExtension)));
         }
 
         /// <summary>
@@ -169,7 +196,7 @@ namespace SEE.Utils
         /// <returns>sorted list of CSV filenames</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, Globbing(CSVExtension));
+            return FilenamesInDirectory(directory, Globbing(CSVExtension + CompressedExtension));
         }
 
         /// <summary>

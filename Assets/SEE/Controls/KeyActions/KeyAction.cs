@@ -202,5 +202,38 @@
         /// Toggles the menu for holistic code metrics.
         /// </summary>
         ToggleHolisticMetricsMenu,
+        /// <summary>
+        /// Undoes a part of the current running action.
+        /// Needed for drawing a straight line.
+        /// </summary>
+        PartUndo,
+        /// <summary>
+        /// Moves a drawable type object up.
+        /// </summary>
+        MoveObjectUp,
+        /// <summary>
+        /// Moves a drawable type object down.
+        /// </summary>
+        MoveObjectDown,
+        /// <summary>
+        /// Moves a drawable type object left.
+        /// </summary>
+        MoveObjectLeft,
+        /// <summary>
+        /// Moves a drawable type object right.
+        /// </summary>
+        MoveObjectRight,
+        /// <summary>
+        /// Moves a drawable object forward.
+        /// </summary>
+        MoveObjectForward,
+        /// <summary>
+        /// Moves a drawable object backward.
+        /// </summary>
+        MoveObjectBackward,
+        /// <summary>
+        /// Opens/closes the drawable manager view.
+        /// </summary>
+        DrawableManagerView
     }
 }

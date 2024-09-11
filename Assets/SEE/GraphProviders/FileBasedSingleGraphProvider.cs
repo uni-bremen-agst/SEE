@@ -5,8 +5,6 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using SEE.DataModel.DG;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -22,7 +20,7 @@ namespace SEE.GraphProviders
         /// The path to the file containing the additional data to be added to a graph.
         /// </summary>
         [Tooltip("Path to the input file."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public FilePath Path = new();
+        public DataPath Path = new();
 
         /// <summary>
         /// Checks whether the assumptions on <see cref="Path"/> and <paramref name="city"/> hold.
@@ -33,13 +31,9 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
-            if (string.IsNullOrEmpty(Path.Path))
+            if (string.IsNullOrWhiteSpace(Path?.Path))
             {
-                throw new ArgumentException("Empty graph path.\n");
-            }
-            if (!File.Exists(Path.Path))
-            {
-                throw new ArgumentException($"File {Path.Path} does not exist.\n");
+                throw new ArgumentException("Undefined data path.\n");
             }
             if (city == null)
             {

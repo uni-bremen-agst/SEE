@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using NUnit.Framework;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace SEE.UI.Menu
 {
@@ -13,18 +13,18 @@ namespace SEE.UI.Menu
     [TestFixture]
     internal class TestToggleMenuEntry: TestMenuEntry
     {
-        protected override MenuEntry CreateMenuEntry(UnityAction action, string title, string description = null,
+        protected override MenuEntry CreateMenuEntry(Action action, string title, string description = null,
                                                      Color entryColor = default, bool enabled = true,
-                                                     Sprite icon = null)
+                                                     char icon = '#')
         {
-            return new MenuEntry(action, null, title, description, entryColor, enabled, icon);
+            return new MenuEntry(action, title, null, description, entryColor, enabled, icon);
         }
 
         [Test]
         public void TestDefaultExitAction()
         {
-            MenuEntry entry1 = new( () => {}, null, "Test");
-            MenuEntry entry2 = new( () => {}, null, "Test");
+            MenuEntry entry1 = new(() => {}, "Test");
+            MenuEntry entry2 = new(() => {}, "Test");
             Assert.DoesNotThrow(() => entry1.SelectAction());
             Assert.DoesNotThrow(() => entry2.SelectAction());
         }
@@ -38,7 +38,7 @@ namespace SEE.UI.Menu
             GameObject go = new("Test");
             SelectionMenu selectionMenu = go.AddComponent<SelectionMenu>();
             void ExitAction() => testItems.Add(true);
-            MenuEntry entry = new(() => {}, ExitAction, "Test");
+            MenuEntry entry = new(() => {}, "Test", ExitAction);
             selectionMenu.AddEntry(entry);
             Assert.AreNotEqual(entry, selectionMenu.ActiveEntry, "SelectionMenu.ActiveEntry isn't set correctly!");
             Assert.AreEqual(0, testItems.Count, "Entry/ExitAction may not be called during initialization!");

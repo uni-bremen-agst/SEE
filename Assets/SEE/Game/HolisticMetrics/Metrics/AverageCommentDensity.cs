@@ -20,6 +20,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>The average comment density of the nodes of the given <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             float totalDensity = 0f;
             int totalNodes = 0;
 

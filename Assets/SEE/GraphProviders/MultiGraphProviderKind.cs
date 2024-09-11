@@ -1,11 +1,10 @@
-using SEE.GraphProviders.Evolution;
-
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// MultiGraphProviderKind is basically the same as <see cref="SingleGraphProviderKind"/> but just for <see cref="MultiGraphProvider"/>.
+    /// MultiGraphProviderKind is basically the same as <see cref="SingleGraphProviderKind"/>
+    /// but just for <see cref="MultiGraphProvider"/>.
     ///
-    /// They should be short and seldexplanatory as well
+    /// They should be short and self explanatory as they will be shown to the user.
     /// </summary>
     public enum MultiGraphProviderKind
     {

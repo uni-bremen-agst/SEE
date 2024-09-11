@@ -1,17 +1,10 @@
-﻿using LibGit2Sharp;
-using NUnit.Framework;
-using SEE.DataModel.DG;
-using SEE.Game.City;
-using SEE.Scanner;
+﻿using NUnit.Framework;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using Cysharp.Threading.Tasks;
 using SEE.GraphProviders.Evolution;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -42,15 +35,10 @@ namespace SEE.GraphProviders
         public static void AreEqual(MultiGraphProvider expected, MultiGraphProvider actual)
         {
             Assert.IsTrue(expected.GetType() == actual.GetType());
-            if (expected is GitEvolutionGraphProvider gitEvolution)
-            {
-                AreEqualGitEvolutionProviders(gitEvolution, actual);
-            }
-            else if (expected is GXLEvolutionGraphProvider gxlEvolution)
+            if (expected is GXLEvolutionGraphProvider gxlEvolution)
             {
                 AreEqualGXLEvolutionProviders(gxlEvolution, actual);
             }
-
             else
             {
                 throw new System.NotImplementedException();
@@ -100,7 +88,7 @@ namespace SEE.GraphProviders
             {
                 AreEqualReflexionGraphProviders(reflexionGraphProvider, actual);
             }
-            else if (expected is JaCoCoSingleGraphProvider jacocoGraphProvider)
+            else if (expected is JaCoCoGraphProvider jacocoGraphProvider)
             {
                 AreEqualJaCoCoGraphProviders(jacocoGraphProvider, actual);
             }
@@ -144,7 +132,7 @@ namespace SEE.GraphProviders
         {
             return new GXLSingleGraphProvider()
             {
-                Path = new Utils.Paths.FilePath("mydir/myfile.gxl")
+                Path = new DataPath("mydir/myfile.gxl")
             };
         }
 
@@ -152,7 +140,7 @@ namespace SEE.GraphProviders
         {
             return new GXLEvolutionGraphProvider()
             {
-                GXLDirectory = new DirectoryPath() { Path = "/path/to/gxl/files" }
+                GXLDirectory = new DataPath() { Path = "/path/to/gxl/files" }
             };
         }
 
@@ -188,7 +176,7 @@ namespace SEE.GraphProviders
         {
             return new CSVGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/myfile.csv")
+                Path = new DataPath(Application.streamingAssetsPath + "/mydir/myfile.csv")
             };
         }
 
@@ -206,23 +194,23 @@ namespace SEE.GraphProviders
         [Test]
         public void TestJaCoCoGraphProvider()
         {
-            JaCoCoSingleGraphProvider saved = GetJaCoCoProvider();
+            JaCoCoGraphProvider saved = GetJaCoCoProvider();
             Save(saved);
             AreEqualJaCoCoGraphProviders(saved, LoadSingleGraph());
         }
 
-        private JaCoCoSingleGraphProvider GetJaCoCoProvider()
+        private JaCoCoGraphProvider GetJaCoCoProvider()
         {
-            return new JaCoCoSingleGraphProvider()
+            return new JaCoCoGraphProvider()
             {
-                Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
             };
         }
 
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoSingleGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
-            JaCoCoSingleGraphProvider loadedProvider = loaded as JaCoCoSingleGraphProvider;
+            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
             AreEqual(saved.Path, loadedProvider.Path);
         }
 
@@ -245,7 +233,6 @@ namespace SEE.GraphProviders
         public void TestMultiGraphPipelineProvider()
         {
             MultiGraphPipelineProvider saved = new();
-            saved.Pipeline.Add(GetGitEvolutionProvider());
             saved.Pipeline.Add(GetGXLEvolutionProvider());
 
             Save(saved);
@@ -256,13 +243,10 @@ namespace SEE.GraphProviders
         public void TestEmptyGraphPipelineProvider()
         {
             MultiGraphPipelineProvider saved = new();
-            //saved.Pipeline.Add(GetGitEvolutionProvider());
-            //saved.Pipeline.Add(GetGXLEvolutionProvider());
 
             Save(saved);
             AreEqual(saved, LoadMultiGraph());
         }
-
 
         [Test]
         public void TestEmptyPipelineProvider()
@@ -287,7 +271,6 @@ namespace SEE.GraphProviders
             Save(saved);
             AreEqualSinglePipelineProviders(saved, LoadSingleGraph());
         }
-
 
         private static void AreEqualSinglePipelineProviders(SingleGraphPipelineProvider saved,
             SingleGraphProvider loaded)
@@ -353,7 +336,7 @@ namespace SEE.GraphProviders
         {
             return new GitRepository()
             {
-                RepositoryPath = new DirectoryPath("/path/to/repo"),
+                RepositoryPath = new DataPath("/path/to/repo"),
                 PathGlobbing = new() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
             };
         }
@@ -374,9 +357,9 @@ namespace SEE.GraphProviders
         {
             return new ReflexionGraphProvider()
             {
-                Architecture = new Utils.Paths.FilePath("mydir/Architecture.gxl"),
-                Implementation = new Utils.Paths.FilePath("mydir/Implementation.gxl"),
-                Mapping = new Utils.Paths.FilePath("mydir/Mapping.gxl"),
+                Architecture = new DataPath("mydir/Architecture.gxl"),
+                Implementation = new DataPath("mydir/Implementation.gxl"),
+                Mapping = new DataPath("mydir/Mapping.gxl"),
             };
         }
 
@@ -405,9 +388,9 @@ namespace SEE.GraphProviders
         {
             return new MergeDiffGraphProvider()
             {
-                OldGraph = new JaCoCoSingleGraphProvider()
+                OldGraph = new JaCoCoGraphProvider()
                 {
-                    Path = new Utils.Paths.FilePath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
+                    Path = new DataPath(Application.streamingAssetsPath + "/mydir/jacoco.xml")
                 }
             };
         }
@@ -423,66 +406,53 @@ namespace SEE.GraphProviders
 
         #region VCSGraphProvider
 
-        public async Task<Graph> GetVCSGraphAsync()
+        public void TestVCSGraphProvider()
         {
             VCSGraphProvider saved = GetVCSGraphProvider();
-            SEECity testCity = NewVanillaSEECity<SEECity>();
-            ;
-            Graph testGraph = new("test", "test");
-            Graph graph = await saved.ProvideAsync(testGraph, testCity);
-            return graph;
+            Save(saved);
+            AreEqualVCSGraphProviders(saved, LoadSingleGraph());
         }
 
-        [Test]
-        public async Task TestVCSGraphProviderAsync()
+        private void AreEqualVCSGraphProviders(VCSGraphProvider saved, SingleGraphProvider loaded)
         {
-            Graph graph = await GetVCSGraphAsync();
-            List<string> pathsFromGraph = new();
-            foreach (GraphElement elem in graph.Elements())
-            {
-                pathsFromGraph.Add(elem.ID);
-            }
-
-            string repositoryPath = Application.dataPath;
-            string projectPath = repositoryPath.Substring(0, repositoryPath.LastIndexOf("/"));
-            string projectName = Path.GetFileName(projectPath);
-
-            List<string> actualList = new()
-            {
-                projectName,
-                ".gitignore",
-                "Assets",
-                "Assets/Scenes.meta",
-                "Assets/Scenes",
-                "Assets/Scenes/SampleScene.unity",
-                "Assets/Scenes/SampleScene.unity.meta",
-                "Packages",
-                "Packages/manifest.json",
-                "ProjectSettings",
-                "ProjectSettings/AudioManager.asset",
-                "ProjectSettings/ClusterInputManager.asset",
-                "ProjectSettings/DynamicsManager.asset",
-                "ProjectSettings/EditorBuildSettings.asset",
-                "ProjectSettings/EditorSettings.asset",
-                "ProjectSettings/GraphicsSettings.asset",
-                "ProjectSettings/InputManager.asset",
-                "ProjectSettings/NavMeshAreas.asset",
-                "ProjectSettings/Physics2DSettings.asset",
-                "ProjectSettings/PresetManager.asset",
-                "ProjectSettings/ProjectSettings.asset",
-                "ProjectSettings/ProjectVersion.txt",
-                "ProjectSettings/QualitySettings.asset",
-                "ProjectSettings/TagManager.asset",
-                "ProjectSettings/TimeManager.asset",
-                "ProjectSettings/UnityConnectSettings.asset",
-                "ProjectSettings/VFXManager.asset",
-                "ProjectSettings/XRSettings.asset"
-            };
-            Assert.AreEqual(28, pathsFromGraph.Count());
-            Assert.IsTrue(actualList.OrderByDescending(x => x).ToList()
-                .SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            VCSGraphProvider loadedProvider = loaded as VCSGraphProvider;
+            AreEqual(saved.RepositoryPath, loadedProvider.RepositoryPath);
+            Assert.AreEqual(saved.CommitID, loadedProvider.CommitID);
+            Assert.AreEqual(saved.BaselineCommitID, loadedProvider.BaselineCommitID);
+            AreEqual(saved.PathGlobbing, loadedProvider.PathGlobbing);
         }
 
+        private void AreEqual(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
+        {
+            Assert.AreEqual(expected.Count, actual.Count);
+            foreach (var kv in expected)
+            {
+                Assert.IsTrue(actual.TryGetValue(kv.Key, out bool value));
+                Assert.AreEqual(kv.Value, value);
+            }
+        }
+
+        private VCSGraphProvider GetVCSGraphProvider()
+        {
+            Dictionary<string, bool> pathGlobbing = new()
+                {
+                    { "Assets/SEE/**/*.cs", true }
+                };
+
+            return new VCSGraphProvider()
+            {
+                RepositoryPath = new DataPath()
+                {
+                    Path = Path.GetDirectoryName(Application.dataPath)
+                },
+                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
+                BaselineCommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
+                PathGlobbing = pathGlobbing
+            };
+        }
+
+        #endregion
 
         private SingleGraphProvider LoadSingleGraph()
         {
@@ -492,95 +462,10 @@ namespace SEE.GraphProviders
             return loaded;
         }
 
-        private VCSGraphProvider GetVCSGraphProvider()
+        private void Save(SingleGraphProvider saved)
         {
-            return new VCSGraphProvider()
-            {
-                RepositoryPath = new DirectoryPath(Path.GetDirectoryName(Application.dataPath)),
-                CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
-            };
-        }
-
-        [Test]
-        public async Task TestRetrieveTokensAsync()
-        {
-            Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == "File");
-            string filePath = fileNode.ID;
-            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
-            string repoPath = Path.GetDirectoryName(Application.dataPath);
-            using Repository repo = new(repoPath);
-            TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
-
-            IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
-
-            Assert.IsNotNull(tokens);
-            Assert.NotZero(tokens.Count());
-        }
-
-        [Test]
-        public async Task TestAddMetricsToNodeAsync()
-        {
-            Graph graph = await GetVCSGraphAsync();
-            string repoPath = Path.GetDirectoryName(Application.dataPath);
-            string commitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461";
-            using Repository repo = new(repoPath);
-
-            foreach (Node node in graph.Nodes())
-            {
-                string filePath = node.ID.Replace('\\', '/');
-                TokenLanguage language = TokenLanguage.FromFileExtension(Path.GetExtension(filePath).TrimStart('.'));
-                if (node.Type == "File" && language != TokenLanguage.Plain)
-                {
-                    IEnumerable<SEEToken> tokens = VCSGraphProvider.RetrieveTokens(filePath, repo, commitID, language);
-                    AssertMetricsCanBeAdded(node);
-                }
-
-                AssertMetricsCannotBeAdded(node);
-            }
-        }
-
-        private static void AssertMetricsCanBeAdded(Node node)
-        {
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "LOD"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
-            Assert.IsTrue(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
-        }
-
-        private static void AssertMetricsCannotBeAdded(Node node)
-        {
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "LOC"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "McCabe_Complexity"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operators"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Distinct_Operands"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operators"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Total_Operands"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Vocabulary"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Program_Length"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Estimated_Program_Length"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Volume"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Difficulty"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Effort"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Time_Required_To_Program"));
-            Assert.IsFalse(node.HasToggle(Metrics.Prefix + "Halstead.Number_Of_Delivered_Bugs"));
-        }
-
-        #endregion
-
-        private static T NewVanillaSEECity<T>() where T : Component
-        {
-            return new GameObject().AddComponent<T>();
+            using ConfigWriter writer = new(filename);
+            saved.Save(writer, providerLabel);
         }
 
         private MultiGraphProvider LoadMultiGraph()
@@ -589,12 +474,6 @@ namespace SEE.GraphProviders
             MultiGraphProvider loaded = MultiGraphProvider.Restore(stream.Read(), providerLabel);
             Assert.IsNotNull(loaded);
             return loaded;
-        }
-        
-        private void Save(SingleGraphProvider saved)
-        {
-            using ConfigWriter writer = new(filename);
-            saved.Save(writer, providerLabel);
         }
 
         private void Save(MultiGraphProvider saved)

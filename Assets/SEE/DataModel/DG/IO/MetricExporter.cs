@@ -83,9 +83,10 @@ namespace SEE.DataModel.DG.IO
         /// <param name="intAttributes">integer attribute names</param>
         /// <param name="floatAttributes">float attribute names</param>
         /// <param name="separator">the character used to separate columns</param>
-        private static void WriteAttributes(StreamWriter outputFile, Node node, ICollection<string> intAttributes, ICollection<string> floatAttributes, char separator)
+        private static void WriteAttributes(StreamWriter outputFile, Node node, ICollection<string> intAttributes,
+            ICollection<string> floatAttributes, char separator)
         {
-            StringBuilder sb = new StringBuilder();
+            StringBuilder sb = new();
             // The ID must be in the first column.
             sb.Append(node.ID);
             sb.Append(separator);

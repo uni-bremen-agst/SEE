@@ -1,0 +1,6 @@
+# Ignore all subdirectories
+/*/
+
+# Ignore misplaced game server files
+*.so
+*.x86_64

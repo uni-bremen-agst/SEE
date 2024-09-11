@@ -2,7 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
@@ -60,7 +59,7 @@ namespace SEETests
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
-            city.VCSPath = new DirectoryPath(gitDirPath);
+            city.VCSPath = new DataPath(gitDirPath);
             AllGitBranchesSingleGraphProvider provider = new();
             provider.PathGlobbing = new()
             {
@@ -91,7 +90,7 @@ namespace SEETests
             provider.Date = date;
             provider.GitRepository = new GitRepository()
             {
-                RepositoryPath = new DirectoryPath(gitDirPath),
+                RepositoryPath = new DataPath(gitDirPath),
                 PathGlobbing = new() { { "**/*.cs", true } }
             };
 

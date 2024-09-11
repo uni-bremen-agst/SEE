@@ -86,6 +86,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="BaseAnimationDuration"/>.
         /// </summary>
         private const string baseAnimationDurationLabel = "BaseAnimationDuration";
+        /// <summary>
+        /// Label in the configuration file for <see cref="MarkerAttributes"/>.
+        /// </summary>
+        private const string markerAttributesLabel = "Markers";
 
         #endregion
 
@@ -115,6 +119,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
             CoseGraphSettings.Save(writer, coseGraphSettingsLabel);
+            MarkerAttributes.Save(writer, markerAttributesLabel);
         }
 
         /// <summary>
@@ -142,6 +147,7 @@ namespace SEE.Game.City
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
             CoseGraphSettings.Restore(attributes, coseGraphSettingsLabel);
+            MarkerAttributes.Restore(attributes, markerAttributesLabel);
         }
     }
 }

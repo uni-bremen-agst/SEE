@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -312,17 +311,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ServerActionPort: 55555
+  RoomPassword: 
   GameScene: SEENewWorld
-  loadCityOnStart: 0
   internalLoggingEnabled: 1
-  minimalSeverity: 2
-  networkCommsLoggingEnabled: 0
   VoiceChat: 1
   ConfigPath:
     Root: 3
-    relativePath: /network.cfg
-    absolutePath: 
+    RelativePath: /network.cfg
+    AbsolutePath: 
   vivoxChannelName: 
 --- !u!114 &831127269
 MonoBehaviour:
@@ -368,6 +364,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_ProtocolType: 0
+  m_UseWebSockets: 0
+  m_UseEncryption: 0
   m_MaxPacketQueueSize: 128
   m_MaxPayloadSize: 6144
   m_HeartbeatTimeoutMS: 500

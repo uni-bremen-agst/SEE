@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window;
@@ -150,17 +150,23 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="graphElement">The graph element to activate the tree window for</param>
         /// <param name="transform">The transform of the game object that the graph element is attached to</param>
+        /// <param name="title">The title of the tree window to be used. Should only be set if this is not supposed
+        /// to be the main tree window.</param>
         /// <returns>The activated tree window</returns>
-        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform)
+        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph);
+            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
                 GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
                 openWindow = city.AddComponent<TreeWindow>();
                 openWindow.Graph = graphElement.ItsGraph;
+                if (title != null)
+                {
+                    openWindow.Title = title;
+                }
                 manager.AddWindow(openWindow);
             }
             manager.ActiveWindow = openWindow;
@@ -208,14 +214,56 @@ namespace SEE.Controls.Actions
         {
             IList<PopupMenuAction> actions = new List<PopupMenuAction>
             {
-                new("Show in TreeView", RevealInTreeView, Icons.TreeView),
+                new("Reveal in TreeView", RevealInTreeView, Icons.TreeView),
             };
+
+            if (node.OutgoingsOfType(LSP.Reference).Any())
+            {
+                actions.Add(new("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Declaration).Any())
+            {
+                actions.Add(new("Show Declaration", () => ShowTargets(LSP.Declaration).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Definition).Any())
+            {
+                actions.Add(new("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.OfType).Any())
+            {
+                actions.Add(new("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
+            }
 
             return actions;
 
             void RevealInTreeView()
             {
                 ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
+            }
+
+            // Highlights all nodes that are targets of the given kind of edge.
+            async UniTaskVoid ShowTargets(string kind, bool outgoings = true)
+            {
+                IList<Node> nodes;
+                if (outgoings)
+                {
+                    nodes = node.OutgoingsOfType(kind).Select(e => e.Target).ToList();
+                }
+                else
+                {
+                    nodes = node.IncomingsOfType(kind).Select(e => e.Source).ToList();
+                }
+                if (nodes.Count == 1)
+                {
+                    // We will just highlight the target node directly.
+                    nodes.First().Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    TreeWindow window = ActivateTreeWindow(node, gameObject.transform, title: $"{kind}s of " + node.SourceName);
+                    await UniTask.Yield();
+                    window.ConstrainToAsync(nodes).Forget();
+                }
             }
         }
 

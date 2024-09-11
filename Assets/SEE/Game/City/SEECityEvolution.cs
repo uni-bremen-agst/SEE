@@ -1,30 +1,9 @@
-﻿//Copyright 2020 Florian Garbade
-//Copyright 2020 Florian Garbade
-
-//Permission is hereby granted, free of charge, to any person obtaining a
-//copy of this software and associated documentation files (the "Software"),
-//to deal in the Software without restriction, including without limitation
-//the rights to use, copy, modify, merge, publish, distribute, sublicense,
-//and/or sell copies of the Software, and to permit persons to whom the Software
-//is furnished to do so, subject to the following conditions:
-
-//The above copyright notice and this permission notice shall be included in
-//all copies or substantial portions of the Software.
-
-//THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-//INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
-//PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
-//LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
-//TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
-//USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Game.Evolution;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
@@ -35,7 +14,6 @@ using SEE.GraphProviders;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.Serialization;
 
 namespace SEE.Game.City
@@ -58,22 +36,16 @@ namespace SEE.Game.City
          HideReferenceObjectPicker]
         public MultiGraphPipelineProvider DataProvider = new();
 
-
         /// <summary>
-        /// Name of the Inspector foldout group for the specific evolution setttings.
+        /// Error message that will be shown when the graph provider pipeline (<see cref="DataProvider"/>)
+        /// didn't yield any graphs.
         /// </summary>
-        private const string evolutionFoldoutGroup = "Evolution settings";
-
         private const string NoGraphsProvidedErrorMessage = "Graph providers didn't yield any graphs";
 
-        private const string CantShowEvolutionMessage = "Can't show evolution";
-
         /// <summary>
-        /// Sets the maximum number of revisions to load.
+        /// Error message that will be shown if anything goes wrong in the pipeline.
         /// </summary>
-        [SerializeField, ShowInInspector, Tooltip("Maximum number of revisions to load."),
-         FoldoutGroup(evolutionFoldoutGroup), RuntimeTab(evolutionFoldoutGroup)]
-        public int MaxRevisionsToLoad = 500; // serialized by Unity
+        private const string CantShowEvolutionMessage = "An error occurred in the evolution provider pipeline";
 
         /// <summary>
         /// The renderer for rendering the evolution of the graph series.
@@ -81,13 +53,6 @@ namespace SEE.Game.City
         /// Neither serialized nor saved in the configuration file.
         /// </summary>
         private EvolutionRenderer evolutionRenderer; // not serialized by Unity; will be set in Start()
-
-        // /// <summary>
-        // /// The directory in which the GXL files of the graph series are located.
-        // /// </summary>
-        // [SerializeField, ShowInInspector, Tooltip("The directory in which the GXL files are located."),
-        //  FoldoutGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
-        // public DirectoryPath GXLDirectory = new();
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
@@ -108,41 +73,42 @@ namespace SEE.Game.City
             get => evolutionRenderer?.GraphCurrent;
             protected set => throw new NotImplementedException();
         }
+        /// <summary>
+        /// The currently loaded graph series.
+        /// </summary>
+        private List<Graph> loadedGraphSeries = new();
 
-        private List<Graph> _loadedGraphSeries = new();
-
+        /// <summary>
+        /// Public attribute for the currently loaded graph series.
+        /// </summary>
         private List<Graph> LoadedGraphSeries
         {
-            get => _loadedGraphSeries;
+            get => loadedGraphSeries;
 
             set
             {
-                if (_loadedGraphSeries.Count != 0)
+                if (loadedGraphSeries.Count != 0)
                 {
                     Reset();
                 }
 
-                _loadedGraphSeries = value;
+                loadedGraphSeries = value;
                 for (int i = 0; i < value.Count - 1; i++)
                 {
-                    InspectSchema(_loadedGraphSeries[i]);
-                    _loadedGraphSeries[i] = RelevantGraph(_loadedGraphSeries[i]);
+                    InspectSchema(loadedGraphSeries[i]);
+                    loadedGraphSeries[i] = RelevantGraph(loadedGraphSeries[i]);
                 }
             }
         }
 
         /// <summary>
-        /// Factory method to create the used EvolutionRenderer.
+        /// Factory method to create the used <see cref="EvolutionRenderer"/>.
         /// </summary>
+        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created</param>
         /// <returns>the current or new evolution renderer attached to this city</returns>
         protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
-            if (!gameObject.TryGetComponent(out EvolutionRenderer result))
-            {
-                result = gameObject.AddComponent<EvolutionRenderer>();
-                result.SetGraphEvolution(graphs);
-            }
-
+            EvolutionRenderer result = gameObject.AddOrGetComponent<EvolutionRenderer>();
             result.SetGraphEvolution(graphs);
             return result;
         }
@@ -157,12 +123,12 @@ namespace SEE.Game.City
             evolutionRenderer?.ProjectPathChanged(SourceCodeDirectory.Path);
         }
 
-
         /// <summary>
         /// The first graph of the graph series. It is used only to let the user see
         /// his/her settings in action. It will be destroyed when the game starts.
         /// </summary>
-        [NonSerialized] private Graph firstGraph;
+        [NonSerialized]
+        private Graph firstGraph;
 
         /// <summary>
         /// Dumps the metric names of all node types of the currently loaded graph.
@@ -180,11 +146,12 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Loads the first graph of the graph series. If a graph was already
+        /// Loads the whole graph series and sets the first graph of the series. If a graph was already
         /// loaded, that graph will be destroyed.
+        /// This button is intended for the Unity Editor only, but not in the runtime configuration menu.
         /// </summary>
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
+        [Button(ButtonSizes.Small, Name = "Load Data")]
+        [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public async UniTask LoadDataAsync()
         {
@@ -196,9 +163,8 @@ namespace SEE.Game.City
             try
             {
                 using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"",
-                           out Action<float> reportProgress))
+                                                      out Action<float> reportProgress))
                 {
-                    ShowNotification.Info("SEECity Evolution", "Loading graph");
                     Debug.Log("Loading graph series from provider");
 
                     void ReportProgress(float x)
@@ -208,26 +174,25 @@ namespace SEE.Game.City
                     }
 
                     LoadedGraphSeries = await DataProvider.ProvideAsync(new List<Graph>(), this, ReportProgress,
-                        cancellationTokenSource.Token);
+                                                                        cancellationTokenSource.Token);
 
                     if (LoadedGraphSeries.Count == 0)
                     {
-                        Debug.LogWarning("Could not load graph.\n");
+                        Debug.LogWarning("Could not load any graph.\n");
                         return;
                     }
 
-                    Debug.Log($"Loaded {LoadedGraphSeries.Count} graphs");
-                    ShowNotification.Info("SEECity Evolution", "Graphs loaded");
+                    ShowNotification.Info("SEECity Evolution", $"{LoadedGraphSeries.Count} Graphs loaded");
 
-                    firstGraph = LoadedGraphSeries.First();
+                    firstGraph = LoadedGraphSeries.FirstOrDefault();
                     if (firstGraph != null)
                     {
                         Debug.Log(
-                            $"Loaded graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
+                            $"Loaded the first graph with {firstGraph.NodeCount} nodes and {firstGraph.EdgeCount} edges.\n");
                     }
                     else
                     {
-                        Debug.LogWarning("Could not load graph.\n");
+                        Debug.LogWarning("Could not load graph because the provider pipeline did not yield any graphs.");
                     }
                 }
             }
@@ -241,11 +206,36 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Starts the evolution rendering at runtime.
+        /// Is intended to be used in the runtime configuration menu during play mode only,
+        /// but not in the Unity Editor. Will call <see cref="LoadDataAsync"/>.
+        /// Acts like Load and Draw in the Unity Editor, except that not only the first
+        /// graph will drawn, but the whole series subsequently.
+        /// </summary>
+        [RuntimeButton(DataButtonsGroup, "Load and Draw")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        public async UniTask StartEvolutionAsync()
+        {
+            Reset();
+            await LoadDataAsync();
+
+            if (!LoadedGraphSeries.Any())
+            {
+                ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
+                return;
+            }
+
+            DrawGraphs(LoadedGraphSeries);
+            StartEvolution();
+        }
+
+        /// <summary>
         /// Destroys <see cref="firstGraph"/> if not <c>null</c>.
         /// Postcondition: <see cref="firstGraph"/> will be <c>null</c>.
+        /// This button is intended only for the Unity Editor, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset")]
+        [ButtonGroup(ResetButtonsGroup)]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
@@ -258,9 +248,10 @@ namespace SEE.Game.City
         /// <summary>
         /// Draws the graph.
         /// Precondition: The graph and its metrics have been loaded.
+        /// This button is intended for the Unity Editor only, but not in the runtime configuration menu.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
+        [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
@@ -273,33 +264,6 @@ namespace SEE.Game.City
             {
                 Debug.LogWarning("No graph loaded yet.\n");
             }
-        }
-
-        /// <summary>
-        /// Yields the graph of the first GXL found in the directory named <code>PathPrefix</code>.
-        /// The order is ascending and alphabetic by the GXL filenames located in that directory.
-        /// If the first GXL file has a corresponding CSV with additional metrics, this CSV file
-        /// will be read, too, and the node metrics added to the graph.
-        /// Furthermore the selection of the specific node types selected by the user is applied in case
-        /// the user specified it before. By default every node type is selected.
-        ///
-        /// Precondition: PathPrefix must be set and denote an existing directory in the
-        /// file system containing at least one GXL file.
-        /// </summary>
-        /// <returns>the loaded graph or null if none could be found</returns>
-        private async UniTask<Graph> LoadFirstGraphAsync()
-        {
-            List<Graph> graphs = new List<Graph>(await DataProvider.ProvideAsync(new List<Graph>(), this));
-
-            if (graphs.Count == 0)
-            {
-                return null;
-            }
-
-            Graph graph = graphs.First();
-            InspectSchema(graph);
-            graph = RelevantGraph(graph);
-            return graph;
         }
 
         /// <summary>
@@ -318,55 +282,20 @@ namespace SEE.Game.City
         protected override void Start()
         {
             base.Start();
-            Reset();
-            LoadAsync().Forget();
-            return;
-
-            async UniTaskVoid LoadAsync()
-            {
-                await LoadDataAsync();
-                evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
-                DrawGraphs(LoadedGraphSeries);
-                gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-                evolutionRenderer.ShowGraphEvolution();
-            }
+            StartEvolutionAsync().Forget();
         }
 
         /// <summary>
-        /// Starts the evolution on runtime.
-        /// <see cref="LoadDataAsync"/> doesn't need to be called first
+        /// Sets up <see cref="evolutionRenderer"/> and initiates the visualization of the
+        /// evolving series of graphs.
         /// </summary>
-        //[Button(ButtonSizes.Small, Name = "Start Evolution")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        public void StartEvolutionAsync()
+        private void StartEvolution()
         {
-            //Start();
-            Reset();
-            //await LoadDataAsync();
-
-            LoadAsync().Forget();
-            return;
-
-            async UniTaskVoid LoadAsync()
-            {
-                await LoadDataAsync();
-                evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
-                DrawGraphs(LoadedGraphSeries);
-                gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-                evolutionRenderer.ShowGraphEvolution();
-            }
-
-            // if (!LoadedGraphSeries.Any())
-            // {
-            //     ShowNotification.Error(CantShowEvolutionMessage, NoGraphsProvidedErrorMessage);
-            //     return;
-            // }
-            //
-            // DrawGraphs(LoadedGraphSeries);
-            // evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
-            // gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            // evolutionRenderer.ShowGraphEvolution();
+            evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
+            gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
+            evolutionRenderer.ShowGraphEvolution();
         }
 
 
@@ -378,6 +307,7 @@ namespace SEE.Game.City
         /// <param name="graphs">the series of graph to be drawn</param>
         private void DrawGraphs(IList<Graph> graphs)
         {
+            // Note: We need this kind of loop because we assign graphs[i] in its body.
             for (int i = 0; i < graphs.Count; i++)
             {
                 Graph relevantGraph = RelevantGraph(graphs[i]);
@@ -408,24 +338,32 @@ namespace SEE.Game.City
             return evolutionRenderer.AllExistingMetrics();
         }
 
+        #region Config I/O
         /// <summary>
         /// The same as in <see cref="SEECity"/>
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
+        /// <summary>
+        /// Saves and writes the configuration to <paramref name="writer"/>
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
-            // writer.Save(MaxRevisionsToLoad, maxRevisionsToLoadLabel);
         }
 
+        /// <summary>
+        /// Restores the configuration from <paramref name="attributes"/>
+        /// </summary>
+        /// <param name="attributes">The attributes to restore the code city from</param>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
-            // ConfigIO.Restore(attributes, maxRevisionsToLoadLabel, ref MaxRevisionsToLoad);
         }
+        #endregion
     }
 }

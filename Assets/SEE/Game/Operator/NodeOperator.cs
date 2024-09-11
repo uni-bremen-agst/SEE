@@ -246,9 +246,14 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, float factor = 1)
+        public IOperationCallback<Action> FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
         {
             float duration = ToDuration(factor);
+
+            if (labelBase.HasValue)
+            {
+                DesiredLabelStartLinePosition = labelBase.Value;
+            }
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
@@ -305,8 +310,6 @@ namespace SEE.Game.Operator
                         }
                     }
                 }
-
-                UpdateLabelLayout(duration);
             }
         }
 

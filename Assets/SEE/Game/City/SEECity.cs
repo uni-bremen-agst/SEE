@@ -167,7 +167,7 @@ namespace SEE.Game.City
 
             if (!gameObject.IsCodeCityDrawn())
             {
-                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.\n");
                 return;
             }
 
@@ -319,7 +319,7 @@ namespace SEE.Game.City
                 try
                 {
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
-                               out Action<float> reportProgress))
+                                                          out Action<float> reportProgress))
                     {
                         ShowNotification.Info("SEECity", "Loading graph");
                         Debug.Log("Loading graph from provider");
@@ -523,7 +523,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// This method is by the runtime menu or the inspector.
-        /// It does the exact same as <see cref="Reset"/> but additionally removes the <see cref="GitPoller"/> component. 
+        /// It does the exact same as <see cref="Reset"/> but additionally removes the <see cref="GitPoller"/> component.
         /// </summary>
         public void OnClickResetButton()
         {

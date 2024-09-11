@@ -9,6 +9,7 @@ using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
 using static SEE.Net.Network;
+using SEE.Game.Worlds;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -21,24 +22,18 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Callback to be called when this dialog closes.
         /// </summary>
-        public delegate void OnClosed();
+        public Action callBack;
 
         /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
         /// <param name="callBack">delegate to be called when this dialog is closed</param>
-        public NetworkPropertyDialog(Net.Network networkConfig, OnClosed callBack = null)
+        public NetworkPropertyDialog(Net.Network networkConfig, Action callBack = null)
         {
             this.networkConfig = networkConfig;
             this.callBack = callBack;
         }
-
-        /// <summary>
-        /// Delegate to be called when this dialog is closed. May be null in which case
-        /// nothing is called.
-        /// </summary>
-        private OnClosed callBack;
 
         /// <summary>
         /// The maximal valid network port number.
@@ -48,18 +43,18 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The network configuration to be manipulated by this dialog.
         /// </summary>
-        private Net.Network networkConfig;
+        private readonly Net.Network networkConfig;
 
         /// <summary>
         /// Event triggered when the user presses the OK button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnConfirm = new();
+        private readonly UnityEvent OnConfirm = new();
         /// <summary>
         /// Event triggered when the user presses the Cancel button. Clients can
         /// register on this event to receive a notification when this happens.
         /// </summary>
-        public readonly UnityEvent OnCancel = new();
+        private readonly UnityEvent OnCancel = new();
 
         /// <summary>
         /// The dialog used to manipulate the node.
@@ -77,9 +72,19 @@ namespace SEE.UI.PropertyDialog
         private StringProperty serverPort;
 
         /// <summary>
-        /// The server port for SEE's action traffic.
+        /// The password to protect the server from unauthorized clients
         /// </summary>
-        private StringProperty serverActionPort;
+        private StringProperty roomPassword;
+
+        /// <summary>
+        /// The player name to be shown to others.
+        /// </summary>
+        private StringProperty playerName;
+
+        /// <summary>
+        /// The selector for the avatar index
+        /// </summary>
+        private SelectionProperty avatarSelector;
 
         /// <summary>
         /// The selector for the voice chat system.
@@ -118,11 +123,26 @@ namespace SEE.UI.PropertyDialog
                 group.AddProperty(serverPort);
             }
             {
-                serverActionPort = dialog.AddComponent<StringProperty>();
-                serverActionPort.Name = "Server Action TCP Port";
-                serverActionPort.Value = networkConfig.ServerActionPort.ToString();
-                serverActionPort.Description = "Server TCP port for SEE actions";
-                group.AddProperty(serverActionPort);
+                roomPassword = dialog.AddComponent<StringProperty>();
+                roomPassword.Name = "Room Password";
+                roomPassword.Value = networkConfig.RoomPassword.ToString();
+                roomPassword.Description = "Password for a meeting room";
+                group.AddProperty(roomPassword);
+            }
+            {
+                playerName = dialog.AddComponent<StringProperty>();
+                playerName.Name = "User name";
+                playerName.Value = networkConfig.PlayerName.ToString();
+                playerName.Description = "Name of the player to be shown to others";
+                group.AddProperty(playerName);
+            }
+            {
+                avatarSelector = dialog.AddComponent<SelectionProperty>();
+                avatarSelector.Name = "Avatar";
+                avatarSelector.Description = "Select an avatar";
+                avatarSelector.AddOptions(PlayerSpawner.Prefabs);
+                avatarSelector.Value = PlayerSpawner.Prefabs[(int)networkConfig.AvatarIndex % PlayerSpawner.Prefabs.Count];
+                group.AddProperty(avatarSelector);
             }
             {
                 voiceChatSelector = dialog.AddComponent<SelectionProperty>();
@@ -200,9 +220,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error
-                       ("IPv4 Syntax Error",
-                        "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
+                    ShowNotification.Error("IPv4 Syntax Error", "IPv4 addresses must have syntax number.number.number.number where number is a value in between 0 and 255.");
                     errorOccurred = true;
                 }
             }
@@ -220,17 +238,26 @@ namespace SEE.UI.PropertyDialog
                 }
             }
             {
-                // Server Action Port Number
-                if (Int32.TryParse(serverActionPort.Value.Trim(), out int serverActionPortNumber)
-                    && 0 <= serverActionPortNumber && serverActionPortNumber <= maximalPortNumber)
+                // Player Name
+                string playerNameValue = playerName.Value.Trim();
+                if (!string.IsNullOrWhiteSpace(playerNameValue))
                 {
-                    networkConfig.ServerActionPort = serverActionPortNumber;
+                    networkConfig.PlayerName = playerNameValue;
                 }
                 else
                 {
-                    ShowPortError("Server Action");
+                    ShowNotification.Error("Invalid User Name", "User name needs to be at least one character long and must not consist of whitespace only.");
                     errorOccurred = true;
                 }
+            }
+            {
+                // Avatar
+                string value = avatarSelector.Value.Trim();
+                networkConfig.AvatarIndex = (uint)PlayerSpawner.Prefabs.IndexOf(value);
+            }
+            {
+                // Room Password
+                networkConfig.RoomPassword = roomPassword.Value.ToString();
             }
             {
                 // Voice Chat
@@ -241,7 +268,7 @@ namespace SEE.UI.PropertyDialog
                 }
                 else
                 {
-                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available");
+                    ShowNotification.Error("Invalid Voice Chat", "Your choice of a voice chat is not available.");
                     errorOccurred = true;
                 }
             }

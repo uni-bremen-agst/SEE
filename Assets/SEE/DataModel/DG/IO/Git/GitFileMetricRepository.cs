@@ -171,10 +171,10 @@ namespace SEE.DataModel.DG.IO.Git
                     FileToMetrics[filePath].NumberOfCommits += 1;
                     FileToMetrics[filePath].Authors.Add(commit.Author.Email);
                     FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
-                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, 0);
+                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, () => 0);
                     foreach (var otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
                     {
-                        FileToMetrics[filePath].FilesChangesTogehter.GetOrAdd(otherFiles.Path, 0);
+                        FileToMetrics[filePath].FilesChangesTogehter.GetOrAdd(otherFiles.Path, () => 0);
                         FileToMetrics[filePath].FilesChangesTogehter[otherFiles.Path] += 1;
                     }
 

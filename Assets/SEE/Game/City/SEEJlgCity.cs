@@ -34,7 +34,7 @@ namespace SEE.Game.City
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
     /// Declared public because it will be used by editor code.
-    /// /// </summary>
+    /// </summary>
     public partial class SEEJlgCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
@@ -48,7 +48,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns>path of JLG file</returns>
         [ShowInInspector, Tooltip("Path of JLG file"), FoldoutGroup(DataFoldoutGroup)]
-        public FilePath JLGPath = new();
+        public DataPath JLGPath = new();
 
         /// <summary>
         /// Loads all city data as in <see cref="SEECity.LoadDataAsync"/> plus the

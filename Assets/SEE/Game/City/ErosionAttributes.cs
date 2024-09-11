@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using SEE.DataModel.DG;
 using SEE.Utils.Config;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace SEE.Game.City
 {
@@ -13,14 +14,14 @@ namespace SEE.Game.City
     public class ErosionAttributes : VisualAttributes
     {
         /// <summary>
-        /// Whether erosions should be visible above inner node blocks.
+        /// Whether inner erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowInnerErosions = false;
+        public bool ShowInnerErosions;
 
         /// <summary>
-        /// Whether erosions should be visible above leaf node blocks.
+        /// Whether leaf erosions should be visible above node blocks.
         /// </summary>
-        public bool ShowLeafErosions = false;
+        public bool ShowLeafErosions;
 
         /// <summary>
         /// The maximal value for <see cref="ErosionScalingFactor"/>.
@@ -34,9 +35,10 @@ namespace SEE.Game.City
         public float ErosionScalingFactor = 1.5f;
 
         /// <summary>
-        /// Whether code issues should be downloaded and shown in code viewers.
+        /// Whether code issues from the Axivion Dashboard should be downloaded and shown in code viewers.
         /// </summary>
-        public bool ShowIssuesInCodeWindow = false;
+        [FormerlySerializedAs("ShowIssuesInCodeWindow")]
+        public bool ShowDashboardIssuesInCodeWindow = false;
 
         /// <summary>
         /// The attribute name of the metric representing architecture violations.
@@ -66,6 +68,23 @@ namespace SEE.Game.City
         /// The attribute name of the metric representing other kinds of violations.
         /// </summary>
         public string UniversalIssue = NumericAttributeNames.Universal.Name(); // serialized by Unity
+
+        /// <summary>
+        /// The attribute name of the metric representing LSP hints.
+        /// </summary>
+        public string LspHint = NumericAttributeNames.LspHint.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP infos.
+        /// </summary>
+        public string LspInfo = NumericAttributeNames.LspInfo.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP warnings.
+        /// </summary>
+        public string LspWarning = NumericAttributeNames.LspWarning.Name(); // serialized by Unity
+        /// <summary>
+        /// The attribute name of the metric representing LSP errors.
+        /// </summary>
+        public string LspError = NumericAttributeNames.LspError.Name(); // serialized by Unity
 
         //-----------------------------------------------------------------------
         // Software erosion issues shown as icons on Donut charts for inner nodes
@@ -112,7 +131,7 @@ namespace SEE.Game.City
             writer.BeginGroup(label);
             writer.Save(ShowInnerErosions, showInnerErosionsLabel);
             writer.Save(ShowLeafErosions, showLeafErosionsLabel);
-            writer.Save(ShowIssuesInCodeWindow, showIssuesInCodeWindowLabel);
+            writer.Save(ShowDashboardIssuesInCodeWindow, showIssuesInCodeWindowLabel);
             writer.Save(ErosionScalingFactor, erosionScalingFactorLabel);
 
             writer.Save(StyleIssue, styleIssueLabel);
@@ -122,6 +141,10 @@ namespace SEE.Game.City
             writer.Save(CycleIssue, cycleIssueLabel);
             writer.Save(CloneIssue, cloneIssueLabel);
             writer.Save(ArchitectureIssue, architectureIssueLabel);
+            writer.Save(LspHint, lspHintLabel);
+            writer.Save(LspInfo, lspInfoLabel);
+            writer.Save(LspWarning, lspWarningLabel);
+            writer.Save(LspError, lspErrorLabel);
 
             writer.Save(StyleIssueSum, styleIssueSumLabel);
             writer.Save(UniversalIssueSum, universalIssueSumLabel);
@@ -141,7 +164,7 @@ namespace SEE.Game.City
 
                 ConfigIO.Restore(values, showInnerErosionsLabel, ref ShowInnerErosions);
                 ConfigIO.Restore(values, showLeafErosionsLabel, ref ShowLeafErosions);
-                ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowIssuesInCodeWindow);
+                ConfigIO.Restore(values, showIssuesInCodeWindowLabel, ref ShowDashboardIssuesInCodeWindow);
                 ConfigIO.Restore(values, erosionScalingFactorLabel, ref ErosionScalingFactor);
 
                 ConfigIO.Restore(values, styleIssueLabel, ref StyleIssue);
@@ -151,6 +174,10 @@ namespace SEE.Game.City
                 ConfigIO.Restore(values, cycleIssueLabel, ref CycleIssue);
                 ConfigIO.Restore(values, cloneIssueLabel, ref CloneIssue);
                 ConfigIO.Restore(values, architectureIssueLabel, ref ArchitectureIssue);
+                ConfigIO.Restore(values, lspHintLabel, ref LspHint);
+                ConfigIO.Restore(values, lspInfoLabel, ref LspInfo);
+                ConfigIO.Restore(values, lspWarningLabel, ref LspWarning);
+                ConfigIO.Restore(values, lspErrorLabel, ref LspError);
 
                 ConfigIO.Restore(values, styleIssueSumLabel, ref StyleIssueSum);
                 ConfigIO.Restore(values, universalIssueSumLabel, ref UniversalIssueSum);
@@ -165,7 +192,7 @@ namespace SEE.Game.City
         private const string showLeafErosionsLabel = "ShowLeafErosions";
         private const string showInnerErosionsLabel = "ShowInnerErosions";
         private const string erosionScalingFactorLabel = "ErosionScalingFactor";
-        private const string showIssuesInCodeWindowLabel = "ShowIssuesInCodeWindow";
+        private const string showIssuesInCodeWindowLabel = "ShowDashboardIssuesInCodeWindow";
 
         private const string styleIssueLabel = "StyleIssue";
         private const string universalIssueLabel = "UniversalIssue";
@@ -174,6 +201,10 @@ namespace SEE.Game.City
         private const string cycleIssueLabel = "CycleIssue";
         private const string cloneIssueLabel = "CloneIssue";
         private const string architectureIssueLabel = "ArchitectureIssue";
+        private const string lspHintLabel = "LspHint";
+        private const string lspInfoLabel = "LspInfo";
+        private const string lspWarningLabel = "LspWarning";
+        private const string lspErrorLabel = "LspError";
 
         private const string styleIssueSumLabel = "StyleIssue_SUM";
         private const string universalIssueSumLabel = "UniversalIssue_SUM";

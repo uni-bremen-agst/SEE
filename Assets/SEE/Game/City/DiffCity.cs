@@ -32,8 +32,8 @@ namespace SEE.Game.City
         /// </summary>
         [ShowInInspector, Tooltip("VCS path"),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public DirectoryPath VCSPath = new();
-        
+        public DataPath VCSPath = new();
+
 
         #region Config I/O
         //--------------------------------
@@ -49,7 +49,7 @@ namespace SEE.Game.City
         /// Label of attribute <see cref="VersionControlSystem"/> in the configuration file.
         /// </summary>
         private const string versionControlSystemLabel = "VersionControlSystem";
-        
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);

@@ -1,5 +1,4 @@
 ﻿using System;
-using SEE.GraphProviders.Evolution;
 
 namespace SEE.GraphProviders
 {
@@ -9,12 +8,12 @@ namespace SEE.GraphProviders
     static class GraphProviderFactory
     {
         /// <summary>
-        /// Returns a new instance of a suitable <see cref="GraphProvider"/> for the
+        /// Returns a new instance of a suitable <see cref="SingleGraphProvider"/> for single graphs for the
         /// given <paramref name="kind"/>.
         ///
         /// Postcondition: NewInstance(k).GetKind() == k.
         /// </summary>
-        /// <param name="kind">the requested kind of <see cref="GraphProvider"/></param>
+        /// <param name="kind">the requested kind of <see cref="SingleGraphProvider"/></param>
         /// <returns>a new instance</returns>
         /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
         /// is not yet handled</exception>
@@ -26,20 +25,27 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.CSV => new CSVGraphProvider(),
                 SingleGraphProviderKind.Reflexion => new ReflexionGraphProvider(),
                 SingleGraphProviderKind.SinglePipeline => new SingleGraphPipelineProvider(),
-                SingleGraphProviderKind.JaCoCo => new JaCoCoSingleGraphProvider(),
+                SingleGraphProviderKind.JaCoCo => new JaCoCoGraphProvider(),
                 SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
                 SingleGraphProviderKind.VCS => new VCSGraphProvider(),
-                SingleGraphProviderKind.GitAllBranches => new AllGitBranchesSingleGraphProvider(),
+                SingleGraphProviderKind.LSP => new LSPGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }
 
+        /// <summary>
+        /// Returns a new instance of the corresponding <see cref="MultiGraphProvider"/> to the
+        /// passed <see cref="MultiGraphPipelineProvider"/> <paramref name="kind"/>
+        /// </summary>
+        /// <param name="kind">The requested kind of <see cref="MultiGraphProvider"/></param>
+        /// <returns>a new instance</returns>
+        /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
+        /// is not yet handled</exception>
         internal static MultiGraphProvider NewMultiGraphProviderInstance(MultiGraphProviderKind kind)
         {
             return kind switch
             {
                 MultiGraphProviderKind.MultiPipeline => new MultiGraphPipelineProvider(),
-                MultiGraphProviderKind.GitEvolution => new GitEvolutionGraphProvider(),
                 MultiGraphProviderKind.GXLEvolution => new GXLEvolutionGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };

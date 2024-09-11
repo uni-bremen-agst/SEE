@@ -28,5 +28,6 @@ jobs:
         shell: cmd
         run: | 
             cd e:\koschke\SEE
+            git pull
             nugetforunity restore .
             Axivion\axivion-jenkins.bat axivion_ci

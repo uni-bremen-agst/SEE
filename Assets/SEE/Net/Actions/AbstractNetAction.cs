@@ -1,6 +1,6 @@
 ﻿using SEE.Game;
 using System;
-using System.Net;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -29,97 +29,21 @@ namespace SEE.Net.Actions
     public abstract class AbstractNetAction
     {
         /// <summary>
-        /// The IP-address of the requester of this action.
+        /// The Client ID of the requester.
         /// </summary>
-        public string RequesterIPAddress;
+        public ulong Requester;
 
         /// <summary>
-        /// The port of the requester of this action.
+        /// Should be sent to newly connecting clients
         /// </summary>
-        public int RequesterPort;
-
-        /// <summary>
-        /// The IP-addresses of the recipients.
-        /// </summary>
-        public string[] RecipientsIPAddresses;
-
-        /// <summary>
-        /// The ports of the recipients.
-        /// </summary>
-        public int[] RecipientsPorts;
+        public virtual bool ShouldBeSentToNewClient { get => true; }
 
         /// <summary>
         /// Constructs an abstract action.
         /// </summary>
         public AbstractNetAction()
         {
-            IPEndPoint requester = Client.LocalEndPoint;
-            SetRequester(requester);
-        }
-
-        /// <summary>
-        /// Sets the requester of this action to given end-point.
-        /// </summary>
-        /// <param name="requester">The requester.</param>
-        public void SetRequester(IPEndPoint requester)
-        {
-            if (requester != null)
-            {
-                RequesterIPAddress = requester.Address.ToString();
-                RequesterPort = requester.Port;
-            }
-            else
-            {
-                RequesterIPAddress = null;
-                RequesterPort = -1;
-            }
-        }
-
-        /// <summary>
-        /// Returns the <see cref="IPEndPoint"/> of the client, that requested this
-        /// action.
-        /// </summary>
-        /// <returns>The <see cref="IPEndPoint"/> of the client, that requested this
-        /// action.</returns>
-        protected IPEndPoint GetRequester()
-        {
-            return new IPEndPoint(IPAddress.Parse(RequesterIPAddress), RequesterPort);
-        }
-
-        /// <summary>
-        /// Checks, if the executing client is the one that requested this action.
-        /// </summary>
-        /// <returns><code>true</code> if this client requested this action, <code>false</code>
-        /// otherwise.</returns>
-        protected bool IsRequester()
-        {
-            if (RequesterIPAddress == null || RequesterPort == -1)
-            {
-                return true;
-            }
-
-            IPEndPoint requesterEndPoint = GetRequester();
-            return Client.LocalEndPoint.Equals(requesterEndPoint);
-        }
-
-        /// <summary>
-        /// Returns all of the recipients of this action.
-        /// </summary>
-        /// <returns>All of the recipients of this action.</returns>
-        public IPEndPoint[] GetRecipients()
-        {
-            IPEndPoint[] result = null;
-
-            if (RecipientsIPAddresses != null && RecipientsPorts != null)
-            {
-                result = new IPEndPoint[RecipientsIPAddresses.Length];
-                for (int i = 0; i < RecipientsIPAddresses.Length; i++)
-                {
-                    result[i] = new IPEndPoint(IPAddress.Parse(RecipientsIPAddresses[i]), RecipientsPorts[i]);
-                }
-            }
-
-            return result;
+            Requester = NetworkManager.Singleton.LocalClientId;
         }
 
         /// <summary>
@@ -129,81 +53,30 @@ namespace SEE.Net.Actions
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// </summary>
-        /// <param name="recipients">The recipients of this action. If <code>null</code>,
-        /// this actions will be executed everywhere.</param>
-        public void Execute(IPEndPoint[] recipients = null)
+        /// <param name="recipients">The recipients of this action. If <c>null</c>
+        /// or omitted, this actions will be executed on all clients.</param>
+        public void Execute(ulong[] recipients = null)
         {
-            if (recipients == null)
-            {
-                RecipientsIPAddresses = null;
-                RecipientsPorts = null;
-            }
-            else
-            {
-                RecipientsIPAddresses = new string[recipients.Length];
-                RecipientsPorts = new int[recipients.Length];
-                for (int i = 0; i < recipients.Length; i++)
-                {
-                    RecipientsIPAddresses[i] = recipients[i].Address.ToString();
-                    RecipientsPorts[i] = recipients[i].Port;
-                }
-            }
 #if UNITY_EDITOR
             DebugAssertCanBeSerialized();
 #endif
-            ExecuteActionPacket packet = new ExecuteActionPacket(this);
-            Network.SubmitPacket(Client.Connection, packet);
+            Network.BroadcastAction(ActionSerializer.Serialize(this), recipients);
         }
 
-        /// Executes the action on the server locally. This function is only called by
-        /// <see cref="ExecuteActionPacket"/> or by <see cref="Execute"/> directly in
-        /// offline mode. It must not be called otherwise!
-        internal void ExecuteOnServerBase()
+        /// <summary>
+        /// The implementation of the action for the server. This method will be called
+        /// only for the server.
+        /// </summary>
+        public virtual void ExecuteOnServer()
         {
-            try
-            {
-                ExecuteOnServer();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
+            // The default implementation does nothing.
         }
 
         /// <summary>
-        /// Executes the action on the client locally. This function is only called by
-        /// <see cref="ExecuteActionPacket"/> or by <see cref="Execute"/> directly in
-        /// offline mode directly. It must not be called otherwise!
+        /// The implementation of the action for the client. This method will be called
+        /// for all connected clients excluding the requester.
         /// </summary>
-        internal void ExecuteOnClientBase()
-        {
-            try
-            {
-                ExecuteOnClient();
-            }
-            catch (Exception e)
-            {
-                Debug.LogException(e);
-            }
-        }
-
-        /// <summary>
-        /// The implementation of the action for the server. Returns whether the action
-        /// could be executed successfully.
-        ///
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// </summary>
-        protected abstract void ExecuteOnServer();
-
-        /// <summary>
-        /// The implementation of the action for the client. Returns whether the action
-        /// could be executed successfully.
-        ///
-        /// If the implementation throws an exception, it will be interpreted just like
-        /// returning <code>false</code>.
-        /// </summary>
-        protected abstract void ExecuteOnClient();
+        public abstract void ExecuteOnClient();
 
         /// <summary>
         /// Retrieves and returns the game object registered at <see cref="GraphElementIDMap"/>
@@ -274,11 +147,6 @@ namespace SEE.Net.Actions
         {
             string[] tokens = data.Split(new[] { ';' }, 2, StringSplitOptions.None);
             AbstractNetAction result = (AbstractNetAction)JsonUtility.FromJson(tokens[1], Type.GetType(tokens[0]));
-            if (result.RecipientsIPAddresses.Length == 0)
-            {
-                result.RecipientsIPAddresses = null;
-                result.RecipientsPorts = null;
-            }
             return result;
         }
     }

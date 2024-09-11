@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>de.unibremen.swt.see</groupId>
+    <artifactId>manager</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>SEE Manager</name>
+    <description>Parent project of the SEE management tool</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>server</module>
+    </modules>
+
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>https://opensource.org/licenses/MIT</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+</project>

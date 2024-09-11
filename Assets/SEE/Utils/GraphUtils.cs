@@ -11,7 +11,7 @@ namespace SEE.Utils
     /// <remarks>
     /// With GraphUtils it is possible to fill a graph with new nodes representing files and their coresponding directories.
     /// </remarks>
-    /// 
+    ///
     /// <example>
     /// <para>Filling a graph with nodes representing files</para>
     /// <code>
@@ -66,7 +66,7 @@ namespace SEE.Utils
         /// This method will also add all directories in between.
         ///
         /// Files will have the node type <see cref="FileType"/> and also a Filename and Directory, so that the files can be opened in the CodeEditor.
-        /// Diecotries will have the node type <see cref="DirectoryType"/> 
+        /// Diecotries will have the node type <see cref="DirectoryType"/>
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node</param>
         /// <param name="rootNode">The root node of the repository</param>

@@ -18,7 +18,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// <summary>
         /// Does nothing on the server.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
         }
     }
