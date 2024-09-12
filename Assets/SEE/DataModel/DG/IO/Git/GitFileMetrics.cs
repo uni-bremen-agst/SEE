@@ -6,7 +6,7 @@ namespace SEE.DataModel.DG.IO.Git
     /// <summary>
     /// Represents the metrics of a file which are collected from a git repository.
     /// </summary>
-    public class GitFileMetricsCollector
+    public class GitFileMetrics
     {
         /// <summary>
         /// The total number of commits a file has
@@ -17,17 +17,21 @@ namespace SEE.DataModel.DG.IO.Git
         /// A list of the authors which contributed to this file
         /// </summary>
         public HashSet<string> Authors { get; }
-        
-        public Dictionary<string, int> FilesChangesTogehter { get; }
 
         /// <summary>
-        /// The churn (total number of changed files) of each author
+        /// A collection of other files, which where changed together in the same commit.
+        /// The key represents the filename and the value the number of common commits
+        /// </summary>
+        public Dictionary<string, int> FilesChangesTogether { get; }
+
+        /// <summary>
+        /// The churn (total number of changed lines) of each author
         /// </summary>
         public Dictionary<string, int> AuthorsChurn { get; }
 
         /// <summary>
         /// The truck/bus factor of this file.
-        /// This is the number of contributors which have at least contributed 80% of the source code
+        /// This is the number of contributors which have contributed at least 80% of the source code
         /// </summary>
         public int TruckFactor { get; set; }
 
@@ -38,18 +42,18 @@ namespace SEE.DataModel.DG.IO.Git
 
 
         /// <summary>
-        /// The constructor
+        /// The constructor of <see cref="GitFileMetrics"/>
         /// </summary>
         /// <param name="numberOfCommits">The number of commits</param>
         /// <param name="authors">A list of authors</param>
         /// <param name="churn">The churn</param>
-        public GitFileMetricsCollector(int numberOfCommits, HashSet<string> authors, int churn)
+        public GitFileMetrics(int numberOfCommits, HashSet<string> authors, int churn)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
             Churn = churn;
             AuthorsChurn = new Dictionary<string, int>();
-            FilesChangesTogehter = new();
+            FilesChangesTogether = new();
             TruckFactor = 0;
         }
     }

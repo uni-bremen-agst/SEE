@@ -36,7 +36,7 @@ namespace SEE.DataModel.DG.IO.Git
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
-        /// 
+        ///
         /// </summary>
         /// <param name="metricRepository">The metrics to add</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
@@ -50,13 +50,13 @@ namespace SEE.DataModel.DG.IO.Git
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
-        /// 
+        ///
         /// </summary>
         /// <param name="metricRepository">The metrics to add</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
         /// <param name="repositoryName">The name of the repository</param>
         /// <param name="simplifyGraph">If the final graph should be simplified</param>
-        /// <param name="idSuffix">A suffix </param>
+        /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is loaded in two code cities at the same time</param>
         public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
             string repositoryName, bool simplifyGraph, string idSuffix)
         {
@@ -89,19 +89,47 @@ namespace SEE.DataModel.DG.IO.Git
             {
                 foreach (var child in initialGraph.GetRoots()[0].Children().ToList())
                 {
-                    DoSimplyfiGraph(child, initialGraph);
+                    DoSimplifyGraph(child, initialGraph);
                 }
             }
         }
 
-        private static void DoSimplyfiGraph(Node root, Graph g)
+        /// <summary>
+        /// Simplifies a given graph by combining common directories.
+        ///
+        /// If a directory has only other directories as children, their paths will be combined.
+        /// For instance the file structure:
+        /// <code>
+        /// root/
+        ///├─ dir1/
+        ///│  ├─ dir2/
+        ///│  │  ├─ dir6/
+        ///│  ├─ dir3/
+        ///│  │  ├─ file1.md
+        ///│  │  ├─ dir5/
+        ///  ├─ dir4/
+        /// </code>
+        /// will become:
+        /// <code>
+        ///root/
+        /// ├─ dir1/dir2/dir6/
+        /// ├─ dir1/dir4/
+        /// ├─ dir1/dir3/
+        /// │  ├─ file1.md
+        /// │  ├─ dir5/
+        /// </code>
+        ///
+        /// </summary>
+        /// <param name="root">The root element of the graph to analyse from</param>
+        /// <param name="g">The <see cref="Graph"/> itself. Needed for cleaning up</param>
+        private static void DoSimplifyGraph(Node root, Graph g)
         {
             if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())
             {
                 foreach (var child in root.Children().ToList())
                 {
                     child.Reparent(root.Parent);
-                    DoSimplyfiGraph(child, g);
+                    DoSimplifyGraph(child, g);
                 }
 
                 if (g.ContainsNode(root))
@@ -113,7 +141,7 @@ namespace SEE.DataModel.DG.IO.Git
             {
                 foreach (var node in root.Children().Where(x => x.Type == "directory").ToList())
                 {
-                    DoSimplyfiGraph(node, g);
+                    DoSimplifyGraph(node, g);
                 }
             }
         }

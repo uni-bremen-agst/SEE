@@ -29,9 +29,9 @@ namespace SEE.DataModel.DG.IO.Git
     public class GitFileMetricRepository
     {
         /// <summary>
-        /// Maps the filename to the collected git file metrics
+        /// Maps the filename to the collected git metrics of that file
         /// </summary>
-        public Dictionary<string, GitFileMetricsCollector> FileToMetrics { get; } = new();
+        public Dictionary<string, GitFileMetrics> FileToMetrics { get; } = new();
 
         /// <summary>
         /// The git repository to collect the metrics from
@@ -43,6 +43,9 @@ namespace SEE.DataModel.DG.IO.Git
         /// </summary>
         private readonly Dictionary<string, bool> pathGlobbing;
 
+        /// <summary>
+        /// Matcher is used to check by a glob pattern if a file should be included in the analysis or not.
+        /// </summary>
         private Matcher matcher;
 
         /// <summary>
@@ -81,7 +84,7 @@ namespace SEE.DataModel.DG.IO.Git
             {
                 if (matcher.Match(file).HasMatches)
                 {
-                    FileToMetrics.Add(file, new GitFileMetricsCollector(0, new HashSet<string>(), 0));
+                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<string>(), 0));
                 }
             }
         }
@@ -160,7 +163,7 @@ namespace SEE.DataModel.DG.IO.Git
                 if (!FileToMetrics.ContainsKey(filePath))
                 {
                     FileToMetrics.Add(filePath,
-                        new GitFileMetricsCollector(1, new HashSet<string> { commit.Author.Email },
+                        new GitFileMetrics(1, new HashSet<string> { commit.Author.Email },
                             changedFile.LinesAdded + changedFile.LinesDeleted));
 
                     FileToMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
@@ -174,8 +177,8 @@ namespace SEE.DataModel.DG.IO.Git
                     FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, () => 0);
                     foreach (var otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
                     {
-                        FileToMetrics[filePath].FilesChangesTogehter.GetOrAdd(otherFiles.Path, () => 0);
-                        FileToMetrics[filePath].FilesChangesTogehter[otherFiles.Path] += 1;
+                        FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFiles.Path, () => 0);
+                        FileToMetrics[filePath].FilesChangesTogether[otherFiles.Path] += 1;
                     }
 
                     FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
