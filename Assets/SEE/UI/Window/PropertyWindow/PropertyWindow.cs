@@ -109,7 +109,7 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     /// If the key already in use.
                     string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
-                    while(propertyRows.ContainsKey(name))
+                    while (propertyRows.ContainsKey(name))
                     {
                         name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
                     }
@@ -154,7 +154,7 @@ namespace SEE.UI.Window.PropertyWindow
             return;
             void ActivateParentGroups(GameObject group)
             {
-                foreach(KeyValuePair<string, List<GameObject>> pair in groupHolder)
+                foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
                 {
                     if (pair.Value.Contains(group))
                     {
@@ -168,16 +168,21 @@ namespace SEE.UI.Window.PropertyWindow
                     }
                 }
             }
+        }
 
-            int GetLevel(GameObject obj)
+        /// <summary>
+        /// Returns the hierarchy level of the <paramref name="obj"/>.
+        /// </summary>
+        /// <param name="obj">The object to be checked.</param>
+        /// <returns>The level of the hierarchy.</returns>
+        private int GetLevel(GameObject obj)
+        {
+            int level = 0;
+            if (obj.transform.Find("Foreground") != null)
             {
-                int level = 0;
-                if (obj.transform.Find("Foreground") != null)
-                {
-                    level = (int)((RectTransform)obj.transform.Find("Foreground")).offsetMin.x / indentShift;
-                }
-                return level;
+                level = (int)((RectTransform)obj.transform.Find("Foreground")).offsetMin.x / indentShift;
             }
+            return level;
         }
 
         /// <summary>
@@ -188,14 +193,19 @@ namespace SEE.UI.Window.PropertyWindow
             foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
             {
                 GameObject group = pair.Value.ToList().Find(go => go.name == pair.Key);
+                List<GameObject> childenItems = pair.Value.ToList();
                 if (group != null)
                 {
-                    bool expanded = expandedItems.Contains(pair.Key);
-                    foreach (GameObject go in pair.Value)
+                    childenItems.Remove(group);
+                    if (IsNoSubgroupOrParentExpanded(group))
+                    {
+                        group.SetActive(true);
+                    }
+                    bool expanded = expandedItems.Contains(pair.Key) && IsNoSubgroupOrParentExpanded(group);
+                    foreach (GameObject go in childenItems)
                     {
                         go.SetActive(expanded);
                     }
-                    group.SetActive(true);
                     RotateExpandIcon(group, expanded);
                 }
                 else
@@ -205,6 +215,24 @@ namespace SEE.UI.Window.PropertyWindow
                         go.SetActive(true);
                     }
                 }
+            }
+            return;
+
+            bool IsNoSubgroupOrParentExpanded(GameObject obj)
+            {
+                bool shouldDisplayed = true;
+                foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
+                {
+                    if (pair.Value.Contains(obj))
+                    {
+                        GameObject parentGroup = pair.Value.Find(go => obj.name != pair.Key && GetLevel(go) < GetLevel(obj));
+                        if (parentGroup != null)
+                        {
+                            shouldDisplayed = expandedItems.Contains(parentGroup.name) && IsNoSubgroupOrParentExpanded(parentGroup);
+                        }
+                    }
+                }
+                return shouldDisplayed;
             }
         }
 
