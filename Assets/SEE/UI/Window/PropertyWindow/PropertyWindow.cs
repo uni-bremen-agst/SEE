@@ -408,13 +408,13 @@ namespace SEE.UI.Window.PropertyWindow
                 groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
                 expandedItems.Add("Header");
             }
-            /// Toggle Attributes
-            if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
-            {
-                DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
-            }
             if (!contextMenu.Grouper)
             {
+                /// Toggle Attributes
+                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
+                {
+                    DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
+                }
                 /// String Attributes
                 if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
                 {
@@ -435,6 +435,20 @@ namespace SEE.UI.Window.PropertyWindow
             }
             else
             {
+                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
+                {
+                    Dictionary<string, bool> toggleDict = GraphElement.ToggleAttributes.ToDictionary(item => item, item => true);
+                    if (groupHolder.ContainsKey("Header"))
+                    {
+                        DisplayAttributes(toggleDict, group: "Header");
+                    }
+                    else
+                    {
+                        Dictionary<string, (string, GameObject gameObject)> toggleItems = DisplayAttributes(toggleDict);
+                        groupHolder.Add("Header", toggleItems.Values.Select(x => x.gameObject).ToList());
+                        expandedItems.Add("Header");
+                    }
+                }
                 Dictionary<string, object> attributes = new();
                 if (GraphElement.StringAttributes.Count > 0 & contextMenu.Filter.IncludeStringAttributes)
                 {
