@@ -108,13 +108,11 @@ namespace SEE.UI.Window.PropertyWindow
                 else
                 {
                     /// If the key already in use.
-                    Debug.Log("Key bereits in Benutzung ("+AttributeName(child.gameObject)+")");
                     string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
                     while(propertyRows.ContainsKey(name))
                     {
                         name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
                     }
-                    Debug.Log("Verwende stattdessen: " + name);
                     propertyRows.Add(name, (AttributeValue(child.gameObject), child.gameObject));
                 }
             }
@@ -140,16 +138,48 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             if (pair.Value.Contains(t.activeObject))
                             {
-                                GameObject group = pair.Value.ToList().Find(go => go.name == pair.Key);
+                                GameObject group = pair.Value.Find(go => go.name == pair.Key);
                                 if (group != null)
                                 {
                                     group.SetActive(true);
                                     RotateExpandIcon(group, true);
+                                    ActivateParentGroups(group);
                                 }
                             }
                         }
                     }
                 }
+            }
+
+            return;
+            void ActivateParentGroups(GameObject group)
+            {
+                foreach(KeyValuePair<string, List<GameObject>> pair in groupHolder)
+                {
+                    if (pair.Value.Contains(group))
+                    {
+                        GameObject parentGroup = pair.Value.Find(go =>
+                        {
+                            return group.name != pair.Key && GetLevel(go) < GetLevel(group);
+                        });
+                        if (parentGroup != null)
+                        {
+                            parentGroup.SetActive(true);
+                            RotateExpandIcon(parentGroup, true);
+                            ActivateParentGroups(parentGroup);
+                        }
+                    }
+                }
+            }
+
+            int GetLevel(GameObject obj)
+            {
+                int level = 0;
+                if (obj.transform.Find("Foreground") != null)
+                {
+                    level = (int)((RectTransform)obj.transform.Find("Foreground")).offsetMin.x / indentShift;
+                }
+                return level;
             }
         }
 
