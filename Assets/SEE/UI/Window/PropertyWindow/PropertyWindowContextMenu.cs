@@ -287,13 +287,13 @@ namespace SEE.UI.Window.PropertyWindow
         {
             List<PopupMenuEntry> entries = new()
             {
-                new PopupMenuAction("Type", () =>
+                new PopupMenuAction("Value Type", () =>
                 {
                     ResetGroup();
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
                 }, Radio(!Grouper), CloseAfterClick: false),
-                new PopupMenuAction("Metrics", () =>
+                new PopupMenuAction("Name Type", () =>
                 {
                     Grouper = true;
                     UpdateGroupMenuEntries();

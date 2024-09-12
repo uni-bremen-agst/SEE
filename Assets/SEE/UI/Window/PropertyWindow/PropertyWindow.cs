@@ -410,11 +410,11 @@ namespace SEE.UI.Window.PropertyWindow
             }
             if (!contextMenu.Grouper)
             {
-                GroupByType();
+                GroupByValueType();
             }
             else
             {
-                GroupByMetrics();
+                GroupByNameType();
             }
 
             /// Sorts the properties
@@ -425,7 +425,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             return;
 
-            void GroupByType()
+            void GroupByValueType()
             {
                 /// Toggle Attributes
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -451,7 +451,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
             }
 
-            void GroupByMetrics()
+            void GroupByNameType()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
@@ -548,7 +548,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="level">The hierarchy level.</param>
         private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
         {
-            foreach (KeyValuePair<string, object> pair in dict)
+            List<KeyValuePair<string, object>> sortedList = dict.ToList();
+            sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object>? 1 : 0).ToList();
+            foreach (KeyValuePair<string, object> pair in sortedList)
             {
                 if (pair.Value is Dictionary<string, object> nestedDict)
                 {
