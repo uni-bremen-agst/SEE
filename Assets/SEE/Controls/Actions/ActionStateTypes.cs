@@ -1,7 +1,7 @@
-﻿using SEE.Controls.Actions.Drawable;
-using SEE.Utils;
+﻿using SEE.Utils;
 using UnityEngine;
 using SEE.Controls.Actions.HolisticMetrics;
+using SEE.Controls.Actions.Drawable;
 
 namespace SEE.Controls.Actions
 {
