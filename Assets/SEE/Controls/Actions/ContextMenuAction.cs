@@ -91,7 +91,7 @@ namespace SEE.Controls.Actions
             if (graphElement.Filename != null)
             {
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
-                if (gameObject.ContainingCity<DiffCity>() != null)
+                if (gameObject.ContainingCity<VCSCity>() != null)
                 {
                     actions.Add(new("Show Code Diff", ShowDiffCode, Icons.Code));
                 }

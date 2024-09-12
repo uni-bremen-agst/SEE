@@ -451,9 +451,9 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Test for <see cref="DiffCity"/>.
+        /// Test for <see cref="VCSCity"/>.
         /// </summary>
-        /// <remarks>We test only the attributes specific to <see cref="DiffCity"/>
+        /// <remarks>We test only the attributes specific to <see cref="VCSCity"/>
         /// excluding those just inherited. We trust that the inherited attributes
         /// are tested by <see cref="TestSEECity"/>.</remarks>
         [Test]
@@ -465,7 +465,7 @@ namespace SEE.Utils
             try
             {
                 // First save a new city with all its default values.
-                DiffCity savedCity = NewVanillaSEECity<DiffCity>();
+                VCSCity savedCity = NewVanillaSEECity<VCSCity>();
                 savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
                // savedCity.OldRevision = "old revision";
@@ -475,7 +475,7 @@ namespace SEE.Utils
                 // Create a new city with all its default values and then
                 // wipe out all its attributes to see whether they are correctly
                 // restored from the saved configuration file.
-                DiffCity loadedCity = NewVanillaSEECity<DiffCity>();
+                VCSCity loadedCity = NewVanillaSEECity<VCSCity>();
                 WipeOutDiffCityAttributes(loadedCity);
                 // Load the saved attributes from the configuration file.
                 loadedCity.Load(filename);
@@ -597,7 +597,7 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
-        private static void DiffCityAttributesAreEqual(DiffCity expected, DiffCity actual)
+        private static void DiffCityAttributesAreEqual(VCSCity expected, VCSCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
             Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
@@ -833,7 +833,7 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private static void WipeOutDiffCityAttributes(DiffCity city)
+        private static void WipeOutDiffCityAttributes(VCSCity city)
         {
             WipeOutSEECityAttributes(city);
             city.VersionControlSystem = VCS.VCSKind.None;

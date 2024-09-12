@@ -8,7 +8,7 @@ namespace SEE.Game.City
     /// <summary>
     /// This code city is used to visualize all changes which where made to a git repository across all branches in a set time range.
     /// </summary>
-    public class BranchCity : DiffCity
+    public class BranchCity : VCSCity
     {
         /// <summary>
         /// A date string in the dd/mm/yyyy format.

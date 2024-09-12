@@ -9,10 +9,20 @@ using UnityEngine;
 namespace SEE.Game.City
 {
     /// <summary>
-    /// A city for the differences between two revisions of a software
-    /// stored in a version control system (VCS).
+    /// A VCS based city.
+    ///
+    /// This class alone should not be used directly but rather with its inheritors:
+    /// <list type="bullet">
+    /// <item>
+    /// <see cref="CommitCity"/>
+    /// </item>
+    /// <item>
+    /// <see cref="BranchCity"/>
+    /// </item>
+    /// </list>
+    ///
     /// </summary>
-    public class DiffCity : SEECity
+    public class VCSCity : SEECity
     {
         /// <summary>
         /// Name of the Inspector foldout group for the version control system
@@ -24,18 +34,19 @@ namespace SEE.Game.City
         /// The version control system identifier, to get the source code from both revision.
         /// </summary>
         [ShowInInspector, Tooltip("Version control system. Currently only Git is supported."),
-            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
+         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         internal VCSKind VersionControlSystem = VCSKind.Git;
 
         /// <summary>
         /// The path to the VCS containing the two revisions to be compared.
         /// </summary>
         [ShowInInspector, Tooltip("VCS path"),
-            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
+         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public DataPath VCSPath = new();
 
 
         #region Config I/O
+
         //--------------------------------
         // Configuration file input/output
         //--------------------------------
