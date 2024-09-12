@@ -134,18 +134,14 @@ namespace SEE.UI.Window.PropertyWindow
                     if (propertyRows.TryGetValue(attributeName, out (string v, GameObject activeObject) t))
                     {
                         t.activeObject.SetActive(true);
-                        Debug.Log($"Aktiviere {AttributeName(t.activeObject)}");
                         foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
                         {
                             if (pair.Value.Contains(t.activeObject))
                             {
-                                Debug.Log($"Objekt in Gruppe gefunden - Key der Gruppe: {pair.Key}, die Gruppe enthält {pair.Value.Count} Objekte.");
-                                GameObject group = pair.Value.Find(go => { Debug.Log($"Suche nach {pair.Key} aktuelles: {go.name}"); return go.name == pair.Key; });
+                                GameObject group = pair.Value.Find(go => go.name == pair.Key);
                                 if (group != null)
                                 {
-                                    Debug.Log("Gehört zu Gruppe " + group.name);
                                     group.SetActive(true);
-                                    //expandedItems.Add(group.name);
                                     RotateExpandIcon(group, true);
                                     ActivateParentGroups(group);
                                 }
@@ -165,9 +161,7 @@ namespace SEE.UI.Window.PropertyWindow
                         GameObject parentGroup = pair.Value.Find(go => group.name != pair.Key && GetLevel(go) < GetLevel(group));
                         if (parentGroup != null)
                         {
-                            Debug.Log("Hat sogar parent gruppe " + parentGroup.name);
                             parentGroup.SetActive(true);
-                            //expandedItems.Add(parentGroup.name);
                             RotateExpandIcon(parentGroup, true);
                             ActivateParentGroups(parentGroup);
                         }
