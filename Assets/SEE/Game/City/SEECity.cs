@@ -64,7 +64,8 @@ namespace SEE.Game.City
         /// Neither serialized nor saved to the config file.
         /// </summary>
         /// <remarks>Do not use this field directly. Use <see cref="LoadedGraph"/> instead.</remarks>
-        [NonSerialized] private Graph loadedGraph = null;
+        [NonSerialized]
+        private Graph loadedGraph = null;
 
         /// <summary>
         /// The graph underlying this SEE city that was loaded from disk. May be null.
@@ -157,11 +158,6 @@ namespace SEE.Game.City
         {
             base.Start();
 
-            if (TryGetComponent(out GitPoller poller))
-            {
-                //Destroy(poller);
-            }
-
             loadedGraph = null;
             visualizedSubGraph = null;
 
@@ -205,7 +201,7 @@ namespace SEE.Game.City
                 // Because the graph elements stem from two different graphs (LoadedGraph versus subGraph),
                 // we need to provide a suitable comparer taking into account only the ID.
                 foreach (GraphElement graphElement in LoadedGraph.Elements()
-                             .Except(subGraph.Elements(), new GraphElementIDComparer()))
+                    .Except(subGraph.Elements(), new GraphElementIDComparer()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -319,7 +315,7 @@ namespace SEE.Game.City
                 try
                 {
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
-                                                          out Action<float> reportProgress))
+                        out Action<float> reportProgress))
                     {
                         ShowNotification.Info("SEECity", "Loading graph");
                         Debug.Log("Loading graph from provider");
@@ -443,7 +439,7 @@ namespace SEE.Game.City
                 try
                 {
                     using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"",
-                               out Action<float> updateProgress))
+                        out Action<float> updateProgress))
                     {
                         void ReportProgress(float x)
                         {
@@ -555,7 +551,6 @@ namespace SEE.Game.City
             {
                 Destroy(poller);
             }
-
         }
 
         /// <summary>

@@ -41,12 +41,12 @@ namespace SEE.GameObjects
         public int PollingInterval = 5;
 
         /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly added or modified nodes. 
+        /// The time in seconds for how long the node markers should be shown for newly added or modified nodes.
         /// </summary>
         public int MarkerTime = 10;
 
         /// <summary>
-        /// Maps the repository (path) to a list of all hashes of the branches from the repository 
+        /// Maps the repository (path) to a list of all hashes of the branches from the repository
         /// </summary>
         private Dictionary<string, List<string>> RepositoriesTipHashes = new();
 
@@ -106,6 +106,10 @@ namespace SEE.GameObjects
             return result;
         }
 
+        /// <summary>
+        /// Unity start function
+        /// This method will start the actual poller
+        /// </summary>
         public void Start()
         {
             if (WatchedRepositories.Count == 0)

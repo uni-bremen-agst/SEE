@@ -2,22 +2,20 @@ using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Scanner.Antlr;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.Utils;
-using SEE.Utils.Paths;
-using Sirenix.Serialization;
 
 namespace SEE.GraphProviders
 {
@@ -100,17 +98,14 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException("Empty repository path.\n");
             }
-
             if (!Directory.Exists(RepositoryPath.Path))
             {
                 throw new ArgumentException($"Directory {RepositoryPath.Path} does not exist.\n");
             }
-
             if (string.IsNullOrEmpty(CommitID))
             {
                 throw new ArgumentException("Empty CommitID.\n");
             }
-
             if (city == null)
             {
                 throw new ArgumentException("The given city is null.\n");
@@ -172,7 +167,7 @@ namespace SEE.GraphProviders
                     // Other directories/files.
                     else
                     {
-                        GraphUtils.BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
+                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
                     }
                     currentStep++;
                     changePercentage?.Invoke(currentStep / totalSteps);

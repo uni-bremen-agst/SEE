@@ -21,9 +21,9 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// This provider analyses all branches of the given git repository specified in <see cref="RepositoryData"/> within the given time range (<see cref="Date"/>).
+    /// This provider analyses all branches of a given git repository specified in <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
     ///
-    /// This provider will collect all commits from the latest to the last one before <see cref="Date"/>.
+    /// This provider will collect all commits from the latest to the last one before <see cref="BranchCity.Date"/>.
     ///
     /// The collected metrics are:
     /// <list type="bullet">
@@ -39,29 +39,21 @@ namespace SEE.GraphProviders
         #region Attributes
 
         /// <summary>
-        /// The repository from where the data should be fetched
-        /// </summary>
-        // [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-        //  ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
-        // public GitRepository RepositoryData = new();
-
-
-        /// <summary>
         /// The List of filetypes that get included/excluded.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
+                         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
+                         HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
-        {
-            { "**/*", true }
-        };
+                         {
+                             { "**/*", true }
+                         };
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
         /// </summary>
-        [OdinSerialize] [ShowInInspector] public bool SimplifyGraph = false;
+        [OdinSerialize][ShowInInspector] public bool SimplifyGraph = false;
 
         /// <summary>
         /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="RepositoryData"/>.
@@ -70,31 +62,36 @@ namespace SEE.GraphProviders
         ///
         /// Note: the repository must be fetch-able without any credentials since we cant store them securely yet.
         /// </summary>
-        [OdinSerialize] [ShowInInspector] public bool AutoFetch = false;
+        [OdinSerialize][ShowInInspector] public bool AutoFetch = false;
 
         /// <summary>
         /// The interval in seconds in which git fetch should be called
         /// </summary>
-        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int PollingInterval = 5;
+        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)] public int PollingInterval = 5;
 
-        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int MarkerTime = 10;
-
-        private float progressPercantage = 0f;
+        /// <summary>
+        /// If file changes where picked up by the <see cref="GitPoller"/> the affected files will be marked.
+        /// This filed specifies, for how long these markers should appear.
+        /// </summary>
+        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)] public int MarkerTime = 10;
 
         #endregion
 
         #region Constants
 
+        /// <summary>
+        /// Label for serializing the <see cref="PathGlobbing"/> field
+        /// </summary>
         private const string pathGlobbingLabel = "PathGlobbing";
 
-        private const string dataLabel = "Date";
-
-        private const string pathLabel = "Path";
-
+        /// <summary>
+        /// Label for serializing the <see cref="SimplifyGraph"/> field
+        /// </summary>
         private const string simplifyGraphLabel = "SimplifyGraph";
 
+        /// <summary>
+        /// Label for serializing the <see cref="AutoFetch"/> field
+        /// </summary>
         private const string autoFetchLabel = "AutoFetch";
 
         #endregion
@@ -103,15 +100,15 @@ namespace SEE.GraphProviders
 
         /// <summary>
         /// Checks if all attributes are set correctly.
-        /// Otherwise an exception is thrown.
+        /// Otherwise, an exception is thrown.
         /// </summary>
         /// <param name="branchCity">The <see cref="BranchCity"/> where this provider was executed</param>
         /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None, out _))
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
@@ -146,7 +143,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="graph">The graph of the previous provider</param>
         /// <param name="city">The city where the graph should be displayed</param>
-        /// <param name="changePercentage"></param>
+        /// <param name="changePercentage">The current status of the process</param>
         /// <param name="token">Can be used to cancel the action</param>
         /// <returns>The graph generated from the git repository <see cref="RepositoryData"/></returns>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
@@ -189,8 +186,8 @@ namespace SEE.GraphProviders
         /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>
         /// </summary>
         /// <param name="graph">The input graph</param>
-        /// <param name="changePercentage"></param>
-        /// <param name="branchCity"></param>
+        /// <param name="changePercentage">The current status of the process</param>
+        /// <param name="branchCity">The <see cref="BranchCity"/> from which the provider was called</param>
         /// <returns>The generated output graph</returns>
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
         {
@@ -221,7 +218,7 @@ namespace SEE.GraphProviders
                 var files = repo.Branches
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
-                //files = new List<string>();
+
                 GitFileMetricRepository metricRepository = new(repo, PathGlobbing, files);
 
                 int counter = 0;
@@ -257,12 +254,7 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            //   Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(RepositoryData.PathGlobbing.ToString())
-            //       ? null
-            //     : RepositoryData.PathGlobbing;
-            // RepositoryData.RepositoryPath.Save(writer, pathLabel);
             writer.Save(PathGlobbing, pathGlobbingLabel);
-            //  writer.Save(Date, dataLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
         }

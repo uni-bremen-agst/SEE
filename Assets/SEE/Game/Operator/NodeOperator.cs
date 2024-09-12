@@ -285,6 +285,7 @@ namespace SEE.Game.Operator
                         // The edge layout needs to be updated only if we actually have an edge layout.
                         UpdateEdgeLayout(duration);
 
+                        // If the operator was invoked in a BranchCity the author spheres edges should be moved too
                         if (City is BranchCity)
                         {
                             if (gameObject.TryGetComponent(out AuthorRef authorRef))

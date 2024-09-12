@@ -21,20 +21,27 @@ namespace SEE.Game.CityRendering
     /// </summary>
     public partial class GraphRenderer
     {
+        /// <summary>
+        /// Attribute key for the authors of a file
+        /// </summary>
         private const string AuthorAttributeName = "Metric.File.Authors";
 
+        /// <summary>
+        /// Attribute key for the churn value of a file
+        /// </summary>
         private const string ChurnAttributeName = "Metric.File.Churn";
 
         /// <summary>
-        /// Draws author spheres for the rendered graph and should be executed after the graph was rendered.
+        /// Draws the author spheres for the rendered graph.
+        /// This method should be executed after the graph was rendered.
         ///
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
         /// <see cref="AuthorAttributeName"/> attribute which sets the author.
         ///
         /// The collected authors are then rendered as spheres floating over the city.
         /// </summary>
-        /// <param name="nodeMap"></param>
-        /// <param name="parent"></param>
+        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject</param>
+        /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
         {
             List<string> authors =
@@ -52,13 +59,15 @@ namespace SEE.Game.CityRendering
 
 
         /// <summary>
-        /// Renders the edges connecting author spheres with the files the author has edited.
+        /// This method renders the edges connecting the author spheres with their corresponding files.
+        ///
+        /// This method should be called after the sphere where rendered.
         /// </summary>
-        /// <param name="nodeMap"></param>
-        /// <param name="gameSpheresObjects"></param>
-        /// <param name="parent"></param>
+        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject</param>
+        /// <param name="spheresObjects">A list of the previous rendered spheres</param>
+        /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object</param>
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
-            IEnumerable<GameObject> gameSpheresObjects, GameObject parent)
+            IEnumerable<GameObject> spheresObjects, GameObject parent)
         {
             IEnumerable<Node> nodesWithChurn = nodeMap.Keys
                 .Where(x => x.IntAttributes.ContainsKey(ChurnAttributeName));
@@ -71,8 +80,7 @@ namespace SEE.Game.CityRendering
             int maximalChurn = nodesWithChurn
                 .Max(x => x.IntAttributes[ChurnAttributeName]);
 
-
-            foreach (var sphere in gameSpheresObjects)
+            foreach (var sphere in spheresObjects)
             {
                 AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
                 var authorName = authorSphere.Author;
@@ -104,7 +112,6 @@ namespace SEE.Game.CityRendering
                     material.shader = Shader.Find("Standard");
                     line.sharedMaterial = material;
 
-
                     LineFactory.SetDefaults(line);
                     var width = Mathf.Clamp((float)churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
                         Settings.EdgeLayoutSettings.EdgeWidth);
@@ -132,6 +139,12 @@ namespace SEE.Game.CityRendering
             }
         }
 
+        /// <summary>
+        /// Creates <see cref="BSpline"/> connecting two points
+        /// </summary>
+        /// <param name="start">The start point</param>
+        /// <param name="end">The end point</param>
+        /// <returns>A <see cref="BSpline"/> instance connecting two points</returns>
         private BSpline CreateSpline(Vector3 start, Vector3 end)
         {
             Vector3[] points = new Vector3[2];
@@ -144,7 +157,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// This method renders all spheres for the authors specified in <paramref name="authors"/>
+        /// This method renders all spheres for the authors specified in the list <paramref name="authors"/>
         /// </summary>
         /// <param name="authors">The authors to create the spheres for</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to</param>
@@ -155,6 +168,8 @@ namespace SEE.Game.CityRendering
             Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
 
+            // Calculating number of rows and columns needed and the space between the spheres.
+            // The spheres will be distributed in a rectangle around the code city table
             int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
             int columns = Mathf.CeilToInt((float)authorsCount / rows);
             float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
@@ -201,6 +216,7 @@ namespace SEE.Game.CityRendering
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;
 
+                    // Adding a label with the authors email which will float above the sphere
                     GameObject nodeLabel = new GameObject("Text " + authors[counter])
                     {
                         tag = Tags.Text
@@ -222,7 +238,7 @@ namespace SEE.Game.CityRendering
 
                     Renderer renderer = gameObject.GetComponent<Renderer>();
                     var mat = materials.Get(0, counter);
-                    // Override shader
+                    // Override shader so the spheres don't clip over the code city
                     mat.shader = Shader.Find("Standard");
                     renderer.sharedMaterial = mat;
                     gameObject.transform.SetParent(parent.transform);

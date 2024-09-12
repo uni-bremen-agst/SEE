@@ -40,7 +40,6 @@ namespace SEE.Game.CityRendering
             {
                 throw new ArgumentNullException(nameof(graph));
             }
-
             SetGraph(settings, new List<Graph> { graph });
         }
 
@@ -56,7 +55,6 @@ namespace SEE.Game.CityRendering
             {
                 throw new ArgumentNullException(nameof(graphs));
             }
-
             SetGraph(settings, graphs);
         }
 
@@ -74,7 +72,6 @@ namespace SEE.Game.CityRendering
             {
                 graph.SortHierarchyByName();
             }
-
             SetNodeFactories();
         }
 
@@ -89,7 +86,6 @@ namespace SEE.Game.CityRendering
             {
                 nodeTypes.UnionWith(graph.AllNodeTypes());
             }
-
             return nodeTypes;
         }
 
