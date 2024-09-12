@@ -410,6 +410,23 @@ namespace SEE.UI.Window.PropertyWindow
             }
             if (!contextMenu.Grouper)
             {
+                GroupByType();
+            }
+            else
+            {
+                GroupByMetrics();
+            }
+
+            /// Sorts the properties
+            Sort();
+
+            /// Applies the search
+            ApplySearch();
+
+            return;
+
+            void GroupByType()
+            {
                 /// Toggle Attributes
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
@@ -433,7 +450,8 @@ namespace SEE.UI.Window.PropertyWindow
                     DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
                 }
             }
-            else
+
+            void GroupByMetrics()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
@@ -473,12 +491,6 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 SplitInAttributeGroup(attributes);
             }
-
-            /// Sorts the properties
-            Sort();
-
-            /// Applies the search
-            ApplySearch();
         }
 
         /// <summary>
