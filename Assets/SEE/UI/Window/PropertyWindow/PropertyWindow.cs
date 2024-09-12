@@ -134,14 +134,18 @@ namespace SEE.UI.Window.PropertyWindow
                     if (propertyRows.TryGetValue(attributeName, out (string v, GameObject activeObject) t))
                     {
                         t.activeObject.SetActive(true);
+                        Debug.Log($"Aktiviere {AttributeName(t.activeObject)}");
                         foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
                         {
                             if (pair.Value.Contains(t.activeObject))
                             {
-                                GameObject group = pair.Value.Find(go => go.name == pair.Key);
+                                Debug.Log($"Objekt in Gruppe gefunden - Key der Gruppe: {pair.Key}, die Gruppe enthält {pair.Value.Count} Objekte.");
+                                GameObject group = pair.Value.Find(go => { Debug.Log($"Suche nach {pair.Key} aktuelles: {go.name}"); return go.name == pair.Key; });
                                 if (group != null)
                                 {
+                                    Debug.Log("Gehört zu Gruppe " + group.name);
                                     group.SetActive(true);
+                                    //expandedItems.Add(group.name);
                                     RotateExpandIcon(group, true);
                                     ActivateParentGroups(group);
                                 }
@@ -158,13 +162,12 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     if (pair.Value.Contains(group))
                     {
-                        GameObject parentGroup = pair.Value.Find(go =>
-                        {
-                            return group.name != pair.Key && GetLevel(go) < GetLevel(group);
-                        });
+                        GameObject parentGroup = pair.Value.Find(go => group.name != pair.Key && GetLevel(go) < GetLevel(group));
                         if (parentGroup != null)
                         {
+                            Debug.Log("Hat sogar parent gruppe " + parentGroup.name);
                             parentGroup.SetActive(true);
+                            //expandedItems.Add(parentGroup.name);
                             RotateExpandIcon(parentGroup, true);
                             ActivateParentGroups(parentGroup);
                         }
@@ -439,6 +442,14 @@ namespace SEE.UI.Window.PropertyWindow
             Sort();
 
             /// Applies the search
+            ApplySearch();
+        }
+
+        /// <summary>
+        /// Applies the search if <see cref="searchField.text"/> isn't empty.
+        /// </summary>
+        private void ApplySearch()
+        {
             if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
             {
                 ActivateMatches(searchField.text);
@@ -563,7 +574,7 @@ namespace SEE.UI.Window.PropertyWindow
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
                         Dictionary<string, (string, GameObject gameObject)> newDict = GetDictOfGroup(group.name);
-                        if (newDict.First().Value.gameObject.activeInHierarchy)
+                        if (newDict.Values.Any(entry => entry.gameObject.activeInHierarchy))
                         {
                             expandedItems.Remove(group.name);
                             SetActive(newDict, false);
@@ -573,6 +584,7 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             expandedItems.Add(group.name);
                             SetActive(newDict, true);
+                            ApplySearch();
                             RotateExpandIcon(group, true);
                         }
                     });
@@ -603,7 +615,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>A created dictionary of the group.</returns>
         private Dictionary<string, (string, GameObject)> GetDictOfGroup(string groupName)
         {
-            List<GameObject> rowLines = groupHolder.GetValueOrDefault(groupName);
+            List<GameObject> rowLines = groupHolder.GetValueOrDefault(groupName).ToList();
             rowLines.RemoveAll(x => x.name == groupName);
             Dictionary<string, (string, GameObject)> newDict = new();
 
