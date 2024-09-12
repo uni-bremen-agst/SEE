@@ -101,7 +101,22 @@ namespace SEE.UI.Window.PropertyWindow
             /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
             foreach (Transform child in items)
             {
-                propertyRows.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
+                if (!propertyRows.ContainsKey(AttributeName(child.gameObject)))
+                {
+                    propertyRows.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
+                }
+                else
+                {
+                    /// If the key already in use.
+                    Debug.Log("Key bereits in Benutzung ("+AttributeName(child.gameObject)+")");
+                    string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
+                    while(propertyRows.ContainsKey(name))
+                    {
+                        name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
+                    }
+                    Debug.Log("Verwende stattdessen: " + name);
+                    propertyRows.Add(name, (AttributeValue(child.gameObject), child.gameObject));
+                }
             }
 
             /// Remove whitespace.
@@ -217,7 +232,9 @@ namespace SEE.UI.Window.PropertyWindow
             List<string> results = new();
             foreach (string key in propertyRows.Keys)
             {
-                if (key.ToLower().Contains(query.ToLower()) || propertyRows[key].value.ToLower().Contains(query.ToLower()))
+                /// AttributeName instead of key checking, as the key may contain a random string if two identical keys would otherwise exist.
+                if (AttributeName(propertyRows[key].gameObject).ToLower().Contains(query.ToLower())
+                    || propertyRows[key].value.ToLower().Contains(query.ToLower()))
                 {
                     results.Add(key);
                 }
