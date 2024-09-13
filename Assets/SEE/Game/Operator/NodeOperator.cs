@@ -77,7 +77,11 @@ namespace SEE.Game.Operator
         ///
         /// <em>Be aware that this may be null if the node operator is attached to an artificial node.</em>
         /// </summary>
-        public Node Node { get; private set; }
+        public Node Node
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// If this isn't null, represents the duration in seconds the layout update should take,
@@ -387,7 +391,6 @@ namespace SEE.Game.Operator
                     Debug.LogWarning($"Edge {edge.ToShortString()} has no associated GameObject!\n");
                     continue;
                 }
-
                 gameEdges.Add(gameEdge);
             }
 
@@ -474,9 +477,7 @@ namespace SEE.Game.Operator
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
-
             Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
-
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
 
             static Node GetNode(GameObject gameObject)

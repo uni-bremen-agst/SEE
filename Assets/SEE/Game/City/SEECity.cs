@@ -83,7 +83,6 @@ namespace SEE.Game.City
                 {
                     OnClickResetButton();
                 }
-
                 Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
                 InspectSchema(loadedGraph);
@@ -114,7 +113,8 @@ namespace SEE.Game.City
         /// if all node types are relevant. It is null if no graph has been loaded yet
         /// (i.e. <see cref="LoadedGraph"/> is null).
         /// </summary>
-        [NonSerialized] private Graph visualizedSubGraph = null;
+        [NonSerialized]
+        private Graph visualizedSubGraph = null;
 
         /// <summary>
         /// Specifies if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
@@ -146,7 +146,6 @@ namespace SEE.Game.City
                     visualizedSubGraph = RelevantGraph(LoadedGraph);
                     SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
-
                 return visualizedSubGraph;
             }
         }
@@ -166,7 +165,6 @@ namespace SEE.Game.City
                 Debug.LogWarning($"There is no drawn code city for {gameObject.name}.\n");
                 return;
             }
-
             LoadAsync().Forget();
             return;
 
@@ -200,8 +198,7 @@ namespace SEE.Game.City
                 // are toggled as GraphElement.IsVirtualToggle. These are not intended to be drawn.
                 // Because the graph elements stem from two different graphs (LoadedGraph versus subGraph),
                 // we need to provide a suitable comparer taking into account only the ID.
-                foreach (GraphElement graphElement in LoadedGraph.Elements()
-                    .Except(subGraph.Elements(), new GraphElementIDComparer()))
+                foreach (GraphElement graphElement in LoadedGraph.Elements().Except(subGraph.Elements(), new GraphElementIDComparer()))
                 {
                     // All other elements are virtual, i.e., should not be drawn.
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
@@ -216,7 +213,7 @@ namespace SEE.Game.City
 
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
             gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                subGraph);
+                                                                   subGraph);
             // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
 
@@ -315,10 +312,9 @@ namespace SEE.Game.City
                 try
                 {
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
-                        out Action<float> reportProgress))
+                                                          out Action<float> reportProgress))
                     {
                         ShowNotification.Info("SEECity", "Loading graph");
-                        Debug.Log("Loading graph from provider");
                         IsPipelineRunning = true;
 
                         void ReportProgress(float x)
@@ -332,7 +328,6 @@ namespace SEE.Game.City
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
                             cancellationTokenSource.Token);
                         IsPipelineRunning = false;
-                        Debug.Log("Graph Provider finished");
                         ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                     }
                 }
@@ -350,8 +345,7 @@ namespace SEE.Game.City
             }
             else
             {
-                ShowNotification.Error("No data provider",
-                    "You must set a data provider before you can load the data.");
+                ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
         }
 
@@ -438,8 +432,7 @@ namespace SEE.Game.City
                 // a component. The inherited attribute gameObject identifies this game object.
                 try
                 {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"",
-                        out Action<float> updateProgress))
+                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
                     {
                         void ReportProgress(float x)
                         {
@@ -447,8 +440,7 @@ namespace SEE.Game.City
                             updateProgress(x);
                         }
 
-                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress,
-                            cancellationTokenSource.Token);
+                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
                     }
                 }
                 catch (OperationCanceledException)

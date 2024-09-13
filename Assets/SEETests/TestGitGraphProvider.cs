@@ -162,8 +162,8 @@ namespace SEETests
 
                 Graph g = await ProvidingGraph(date: "01/12/2024");
                 // This file should be too old by now
-                Assert.IsNull(g.GetNode("firstFile.cs"));
-
+                Assert.AreEqual(0,g.GetNode("firstFile.cs").IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes["Metric.File.Commits"]);
                 Graph g2 = await ProvidingGraph();
                 Assert.NotNull(g2.GetNode("firstFile.cs"));
                 Node n = g2.GetNode("firstFile.cs");

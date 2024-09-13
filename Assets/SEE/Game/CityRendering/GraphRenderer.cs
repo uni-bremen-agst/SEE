@@ -170,9 +170,9 @@ namespace SEE.Game.CityRendering
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
             {
                 return new AntennaDecorator
-                            (scaler,
-                             value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
-                             Settings.MetricToColor);
+                             (scaler,
+                              value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
+                              Settings.MetricToColor);
             }
         }
 
@@ -286,8 +286,7 @@ namespace SEE.Game.CityRendering
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            IDictionary<Node, GameObject> nodeMap =
-                await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
+            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
 
             // the layout to be applied
             NodeLayout nodeLayout = GetLayout(parent);
@@ -320,7 +319,7 @@ namespace SEE.Game.CityRendering
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
-                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token)
+                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
             }
             catch (OperationCanceledException)
             {
@@ -518,8 +517,8 @@ namespace SEE.Game.CityRendering
         /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<T> ToLayoutNodes<T>
-              (ICollection<GameObject> gameNodes,
-               Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
+            (ICollection<GameObject> gameNodes,
+             Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
         {
             ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
             LayoutNodes.SetLevels(result);
@@ -710,12 +709,10 @@ namespace SEE.Game.CityRendering
                     }
                 }
             }
-
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}");
             }
-
             return result;
         }
     }

@@ -468,8 +468,6 @@ namespace SEE.Utils
                 VCSCity savedCity = NewVanillaSEECity<VCSCity>();
                 savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
-               // savedCity.OldRevision = "old revision";
-               // savedCity.NewRevision = "new revision";
                 savedCity.Save(filename);
 
                 // Create a new city with all its default values and then
@@ -601,8 +599,6 @@ namespace SEE.Utils
         {
             SEECityAttributesAreEqual(expected, actual);
             Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
-           // Assert.AreEqual(expected.OldRevision, actual.OldRevision);
-          //  Assert.AreEqual(expected.NewRevision, actual.NewRevision);
             AreEqual(expected.VCSPath, actual.VCSPath);
         }
 
@@ -838,8 +834,6 @@ namespace SEE.Utils
             WipeOutSEECityAttributes(city);
             city.VersionControlSystem = VCS.VCSKind.None;
             city.VCSPath.Path = "C:/MyAbsoluteDirectory/MyVCSDirectory";
-           // city.OldRevision = "XXX";
-           // city.NewRevision = "YYY";
         }
 
         /// <summary>

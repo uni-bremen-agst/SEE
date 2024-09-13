@@ -34,14 +34,14 @@ namespace SEE.Game.City
         /// The version control system identifier, to get the source code from both revision.
         /// </summary>
         [ShowInInspector, Tooltip("Version control system. Currently only Git is supported."),
-         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
+            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         internal VCSKind VersionControlSystem = VCSKind.Git;
 
         /// <summary>
         /// The path to the VCS containing the two revisions to be compared.
         /// </summary>
         [ShowInInspector, Tooltip("VCS path"),
-         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
+            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public DataPath VCSPath = new();
 
 
