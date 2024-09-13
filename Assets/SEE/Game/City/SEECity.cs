@@ -541,7 +541,7 @@ namespace SEE.Game.City
             // Remove the poller
             if (TryGetComponent(out GitPoller poller))
             {
-                Destroy(poller);
+                Destroyer.Destroy(poller);
             }
         }
 
