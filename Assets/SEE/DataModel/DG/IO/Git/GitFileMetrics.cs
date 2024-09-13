@@ -16,18 +16,18 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// A list of the authors which contributed to this file
         /// </summary>
-        public HashSet<string> Authors { get; }
+        public HashSet<string> Authors { get; set; }
 
         /// <summary>
         /// A collection of other files, which where changed together in the same commit.
         /// The key represents the filename and the value the number of common commits
         /// </summary>
-        public Dictionary<string, int> FilesChangesTogether { get; }
+        public Dictionary<string, int> FilesChangesTogether { get; set; }
 
         /// <summary>
         /// The churn (total number of changed lines) of each author
         /// </summary>
-        public Dictionary<string, int> AuthorsChurn { get; }
+        public Dictionary<string, int> AuthorsChurn { get; set; }
 
         /// <summary>
         /// The truck/bus factor of this file.

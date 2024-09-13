@@ -170,9 +170,9 @@ namespace SEE.Game.CityRendering
             AntennaDecorator GetAntennaDecorator(VisualNodeAttributes value)
             {
                 return new AntennaDecorator
-                (scaler,
-                    value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
-                    Settings.MetricToColor);
+                            (scaler,
+                             value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
+                             Settings.MetricToColor);
             }
         }
 
@@ -210,8 +210,7 @@ namespace SEE.Game.CityRendering
         /// A mapping of the name of node types of <see cref="graphs"/> onto the
         /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
         /// </summary>
-        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator =
-            new Dictionary<string, AntennaDecorator>();
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -266,7 +265,6 @@ namespace SEE.Game.CityRendering
             {
                 map[node.ItsNode] = node;
             }
-
             return map;
         }
 
@@ -279,7 +277,7 @@ namespace SEE.Game.CityRendering
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-            CancellationToken token = default)
+                                            CancellationToken token = default)
         {
             // all nodes of the graph
             IList<Node> nodes = graph.Nodes();
@@ -288,7 +286,6 @@ namespace SEE.Game.CityRendering
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-
             IDictionary<Node, GameObject> nodeMap =
                 await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
 
@@ -302,16 +299,14 @@ namespace SEE.Game.CityRendering
             ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
 
             // 1) Calculate the layout.
-            Performance p =
-                Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
+            Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
             nodeLayout.Apply(layoutNodes);
             p.End();
-            Debug.Log(
-                $"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
+            Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
 
             // Fit layoutNodes into parent.
             Fit(parent, layoutNodes);
@@ -325,18 +320,15 @@ namespace SEE.Game.CityRendering
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
-                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f),
-                    token);
+                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token)
             }
             catch (OperationCanceledException)
             {
                 // If the operation gets canceled, we need to clean up the dangling edge game objects.
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge)
-                             .Where(x => x.transform.parent is null))
+                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
                 {
                     Destroyer.Destroy(edge);
                 }
-
                 // Then re-throw.
                 throw;
             }
@@ -387,8 +379,7 @@ namespace SEE.Game.CityRendering
         /// <param name="layoutNodes">the layout nodes to be stacked</param>
         public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
         {
-            NodeLayout.Stack(layoutNodes,
-                plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
+            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
         }
 
 
@@ -412,8 +403,7 @@ namespace SEE.Game.CityRendering
             float boundingBoxWidth = maxCorner.x - minCorner.x;
             float boundingBoxDepth = maxCorner.y - minCorner.y;
 
-            lightGameObject.transform.position = parent.transform.position +
-                                                 new Vector3(0.0f, 0.25f * (boundingBoxWidth + boundingBoxDepth), 0.0f);
+            lightGameObject.transform.position = parent.transform.position + new Vector3(0.0f, 0.25f * (boundingBoxWidth + boundingBoxDepth), 0.0f);
 
             light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
@@ -447,7 +437,6 @@ namespace SEE.Game.CityRendering
             {
                 throw new ArgumentNullException(nameof(root));
             }
-
             foreach (KeyValuePair<Node, GameObject> entry in nodeMap)
             {
                 Node node = entry.Key;
@@ -473,8 +462,7 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.Manhattan => new ManhattanLayout(groundLevel),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(groundLevel),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(groundLevel),
-                NodeLayoutKind.Treemap => new TreemapLayout(groundLevel, parent.transform.lossyScale.x,
-                    parent.transform.lossyScale.z),
+                NodeLayoutKind.Treemap => new TreemapLayout(groundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
                 NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
                     groundLevel,
                     parent.transform.lossyScale.x,
@@ -483,8 +471,7 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.Balloon => new BalloonNodeLayout(groundLevel),
                 NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(groundLevel),
                 NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(groundLevel, Settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(groundLevel,
-                    Settings.NodeLayoutSettings.LayoutPath.Path),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(groundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
                 _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
             };
 
@@ -531,8 +518,8 @@ namespace SEE.Game.CityRendering
         /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
         /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<T> ToLayoutNodes<T>
-        (ICollection<GameObject> gameNodes,
-            Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
+              (ICollection<GameObject> gameNodes,
+               Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
         {
             ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
             LayoutNodes.SetLevels(result);
@@ -567,8 +554,8 @@ namespace SEE.Game.CityRendering
         /// <param name="token">token with which to cancel the operation</param>
         /// <returns>mapping of graph node onto its corresponding game object</returns>
         private async UniTask<IDictionary<Node, GameObject>> DrawNodesAsync(IList<Node> nodes,
-            Action<float> updateProgress,
-            CancellationToken token = default)
+                                                                            Action<float> updateProgress,
+                                                                            CancellationToken token = default)
         {
             IDictionary<Node, GameObject> nodeMap = new Dictionary<Node, GameObject>();
 
@@ -579,7 +566,6 @@ namespace SEE.Game.CityRendering
                 nodeMap[node] = DrawNode(node);
                 updateProgress?.Invoke((float)++i / totalNodes);
             }
-
             return nodeMap;
         }
 
@@ -589,8 +575,7 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNodes">the list of game nodes that are enclosed in the resulting bounding box</param>
         /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
         /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
-        private static void ComputeBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner,
-            out Vector2 rightUpperCorner)
+        private static void ComputeBoundingBox(ICollection<GameObject> gameNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (gameNodes.Count == 0)
             {
@@ -623,8 +608,7 @@ namespace SEE.Game.CityRendering
                             leftLowerCorner.y = z;
                         }
                     }
-                    {
-                        // x co-ordinate of upper right corner
+                    {   // x co-ordinate of upper right corner
                         float x = position.x + extent.x;
                         if (x > rightUpperCorner.x)
                         {
@@ -649,8 +633,7 @@ namespace SEE.Game.CityRendering
         /// <param name="layoutNodes">the layout nodes</param>
         /// <param name="leftLowerCorner">the left lower corner</param>
         /// <param name="rightUpperCorner">the right upper corner</param>
-        public static void ComputeBoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner,
-            out Vector2 rightUpperCorner)
+        public static void ComputeBoundingBox(ICollection<ILayoutNode> layoutNodes, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (layoutNodes.Count == 0)
             {
@@ -683,8 +666,7 @@ namespace SEE.Game.CityRendering
                             leftLowerCorner.y = z;
                         }
                     }
-                    {
-                        // x co-ordinate of upper right corner
+                    {   // x co-ordinate of upper right corner
                         float x = position.x + extent.x;
                         if (x > rightUpperCorner.x)
                         {
@@ -724,7 +706,7 @@ namespace SEE.Game.CityRendering
                     else
                     {
                         throw new Exception($"Code city {codeCity.name} has multiple children tagged by {Tags.Node}"
-                                            + $": {result.name} and {child.name}");
+                            + $": {result.name} and {child.name}");
                     }
                 }
             }

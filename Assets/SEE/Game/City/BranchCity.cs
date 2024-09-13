@@ -16,7 +16,7 @@ namespace SEE.Game.City
         /// All commits from the most recent to the latest commit before the date are used for the analysis.
         /// </summary>
         [ShowInInspector, InspectorName("Date Limit (DD/MM/YYYY)"),
-         Tooltip("The date until commits should be analysed (DD/MM/YYYY)"),  TabGroup(VCSFoldoutGroup),RuntimeTab(VCSFoldoutGroup)]
+         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"), TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string Date = "";
     }
 }
