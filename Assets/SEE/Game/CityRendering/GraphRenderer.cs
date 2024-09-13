@@ -370,7 +370,6 @@ namespace SEE.Game.CityRendering
             }
         }
 
-
         /// <summary>
         /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
         /// </summary>
@@ -380,7 +379,6 @@ namespace SEE.Game.CityRendering
         {
             NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
         }
-
 
         /// <summary>
         /// Adds light to simulate an emissive effect. The new light object will be added to
@@ -408,7 +406,6 @@ namespace SEE.Game.CityRendering
             light.type = LightType.Point;
             light.intensity = 1.0f;
         }
-
 
         /// <summary>
         /// Scales and moves the <paramref name="layoutNodes"/> so that they fit into the <paramref name="parent"/>.
