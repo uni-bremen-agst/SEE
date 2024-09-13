@@ -194,7 +194,7 @@ namespace SEE.Game.Operator
                     DOTween.To(() => spline.SubsplineEndT,
                                u => spline.SubsplineEndT = u,
                                extending ? 1.0f : 0.0f,
-                               duration).SetEase(Ease.InOutExpo).Play()
+                               duration).SetEase(Ease.InOutCubic).Play()
                 };
             }
         }
