@@ -196,6 +196,25 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        [SerializeField]
+        private bool isSelectable = true;
+
+        /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        public bool IsSelectable
+        {
+            get => isSelectable;
+            set
+            {
+                isSelectable = value;
+                needsUpdate = true;
+            }
+        }
+
+        /// <summary>
         /// Tuple of the start color of the gradient and the end color of it.
         /// Should only be changed via <see cref="GradientColors"/>.
         /// </summary>
@@ -509,10 +528,17 @@ namespace SEE.GO
             mesh.uv = uvs;
             mesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
-            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-            MeshCollider collider = gameObject.AddOrGetComponent<MeshCollider>();
-            collider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-            collider.sharedMesh = mesh;
+            if (IsSelectable)
+            {
+                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+                MeshCollider splineCollider = gameObject.AddOrGetComponent<MeshCollider>();
+                splineCollider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+                splineCollider.sharedMesh = mesh;
+            }
+            else if (gameObject.TryGetComponent(out MeshCollider splineCollider))
+            {
+                Destroyer.Destroy(splineCollider);
+            }
 
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             if (updateMaterial)

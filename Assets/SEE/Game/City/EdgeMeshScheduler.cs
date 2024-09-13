@@ -178,6 +178,7 @@ namespace SEE.Game.City
                 {
                     spline.TubularSegments = selection.TubularSegments;
                     spline.RadialSegments = selection.RadialSegments;
+                    spline.IsSelectable = selection.AreSelectable;
                 }
 
                 spline.CreateMesh();
