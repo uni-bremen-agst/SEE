@@ -67,7 +67,8 @@ namespace SEE.Controls.Actions
                         // Show the type if there is no explicit hover text.
                         hoverText = nodeOperator.Node.Type;
                     }
-                    Tooltip.ActivateWith(hoverText);
+                    // EVAL: Disable hover text.
+                    //Tooltip.ActivateWith(hoverText);
                 }
             }
         }

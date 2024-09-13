@@ -536,15 +536,17 @@ namespace SEE.Controls.Actions
                 {
                     // The grabbed object will be moved on the surface of a sphere with
                     // radius distanceToUser in the direction the user is pointing to.
-                    Ray ray = Raycasting.UserPointsTo();
-                    grabbedObject.MoveTo(ray.origin + distanceToUser * ray.direction);
+                    // EVAL: Disable moving nodes.
+                    // Ray ray = Raycasting.UserPointsTo();
+                    // grabbedObject.MoveTo(ray.origin + distanceToUser * ray.direction);
                 }
 
                 // The grabbed node is not yet at its final destination. The user is still moving
                 // it. We will run a what-if reflexion analysis to give immediate feedback on the
                 // consequences if the user were putting the grabbed node onto the node the user
                 // is currently aiming at.
-                UpdateHierarchy();
+                // EVAL: Disable moving nodes.
+                // UpdateHierarchy();
             }
             else if (grabbedObject.IsGrabbed) // dragging has ended
             {

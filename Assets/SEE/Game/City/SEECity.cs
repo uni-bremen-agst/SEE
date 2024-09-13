@@ -342,6 +342,8 @@ namespace SEE.Game.City
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
                                                                       cancellationTokenSource.Token);
                     }
+
+                    FindDeepestNode();
                 }
                 catch (OperationCanceledException)
                 {
@@ -358,6 +360,43 @@ namespace SEE.Game.City
             else
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
+            }
+
+            // EVAL: Find and log the deepest inheritance hierarchy (by LSP "Extend" edges).
+            void FindDeepestNode()
+            {
+                if (LoadedGraph != null)
+                {
+                    Queue<Edge> extendsEdges = new(LoadedGraph.Edges().Where(edge => edge.Type == "Extend"));
+                    HashSet<Edge> handledEdges = new();
+                    Dictionary<Node, int> depths = new();
+                    while (extendsEdges.Count > 0)
+                    {
+                        Edge edge = extendsEdges.Dequeue();
+                        if (!handledEdges.Add(edge))
+                        {
+                            continue;
+                        }
+
+                        // Find base type, remembering the depth.
+                        int depth = 0;
+                        Node target = edge.Target;
+                        while (target != null)
+                        {
+                            if (depths.TryGetValue(target, out int d))
+                            {
+                                depth += d + 1;
+                                break;
+                            }
+                            depth++;
+                            Edge extendsEdge = target.OutgoingsOfType("Extend").SingleOrDefault();
+                            target = extendsEdge?.Target;
+                        }
+                        depths[edge.Source] = depth;
+                    }
+                    var deepestNode = depths.Maxima(pair => pair.Value).Select(x => $"{x.Key.ID} ({x.Value})");
+                    Debug.Log($"Deepest inheritance hierarchy: {string.Join(',', deepestNode)}.\n");
+                }
             }
         }
 

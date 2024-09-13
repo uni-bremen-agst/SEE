@@ -211,7 +211,9 @@ namespace SEE.Controls.Actions
         {
             if ((isHovered || isSelected) && nodeOperator != null && nodeOperator.Node != null)
             {
-                nodeOperator.UpdateLabelLayout(pointer.Value.LastHit);
+                // EVAL: Use cursor instead of mouse to hover label.
+                //nodeOperator.UpdateLabelLayout(pointer.Value.LastHit);
+                nodeOperator.UpdateLabelLayout(gameObject.GetRoofCenter());
             }
         }
     }
