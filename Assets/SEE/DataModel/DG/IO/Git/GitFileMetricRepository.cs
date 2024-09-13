@@ -31,7 +31,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// Maps the filename to the collected git metrics of that file
         /// </summary>
-        public Dictionary<string, GitFileMetrics> FileToMetrics { get; } = new();
+        public IDictionary<string, GitFileMetrics> FileToMetrics { get; } = new Dictionary<string, GitFileMetrics>();
 
         /// <summary>
         /// The git repository to collect the metrics from
@@ -61,7 +61,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
         /// <param name="pathGlobbing">A dictionary of path glob patterns you want to include or exclude</param>
         /// <param name="repositoryFiles">A list of a files which should be displayed in the code-city</param>
-        public GitFileMetricRepository(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
+        public GitFileMetricRepository(Repository gitRepository, IDictionary<string, bool> pathGlobbing,
             IEnumerable<string> repositoryFiles)
         {
             this.gitRepository = gitRepository;

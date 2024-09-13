@@ -125,7 +125,7 @@ namespace SEE.DataModel.DG.IO.Git
         {
             if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())
             {
-                foreach (var child in root.Children().ToList())
+                foreach (Node child in root.Children().ToList())
                 {
                     child.Reparent(root.Parent);
                     DoSimplifyGraph(child, g);
@@ -138,7 +138,7 @@ namespace SEE.DataModel.DG.IO.Git
             }
             else
             {
-                foreach (var node in root.Children().Where(x => x.Type == "directory").ToList())
+                foreach (Node node in root.Children().Where(x => x.Type == "directory").ToList())
                 {
                     DoSimplifyGraph(node, g);
                 }

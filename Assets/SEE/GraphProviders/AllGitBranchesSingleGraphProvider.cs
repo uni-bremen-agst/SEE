@@ -45,7 +45,7 @@ namespace SEE.GraphProviders
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
                          Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
                          HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
+        public IDictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
                          {
                              { "**/*", true }
                          };
@@ -254,7 +254,7 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(PathGlobbing, pathGlobbingLabel);
+            writer.Save(PathGlobbing as Dictionary<string, bool>, pathGlobbingLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
         }

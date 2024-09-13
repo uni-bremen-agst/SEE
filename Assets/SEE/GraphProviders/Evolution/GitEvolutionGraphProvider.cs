@@ -232,10 +232,10 @@ namespace SEE.GraphProviders.Evolution
         protected override void SaveAttributes(ConfigWriter writer)
         {
             GitRepository.RepositoryPath.Save(writer, "RepositoryPath");
-            Dictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(GitRepository.PathGlobbing.ToString())
+            IDictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(GitRepository.PathGlobbing.ToString())
                 ? null
                 : GitRepository.PathGlobbing;
-            writer.Save(pathGlobbing, "PathGlobing");
+            writer.Save(pathGlobbing as Dictionary<string, bool>, "PathGlobing");
             writer.Save(Date, "Date");
         }
 

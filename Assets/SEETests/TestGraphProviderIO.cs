@@ -322,7 +322,7 @@ namespace SEE.GraphProviders
             {
                // Date = "01/05/2024",
                 //RepositoryData = GetGitRepository()
-                PathGlobbing = new()
+                PathGlobbing = new Dictionary<string, bool>()
                 {
                     {".cs", true},
                 },
@@ -337,7 +337,7 @@ namespace SEE.GraphProviders
             return new GitRepository()
             {
                 RepositoryPath = new DataPath("/path/to/repo"),
-                PathGlobbing = new() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
+                PathGlobbing = new Dictionary<string, bool>() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
             };
         }
 

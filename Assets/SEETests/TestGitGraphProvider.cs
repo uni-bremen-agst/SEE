@@ -61,7 +61,7 @@ namespace SEETests
             BranchCity city = go.AddComponent<BranchCity>();
             city.VCSPath = new DataPath(gitDirPath);
             AllGitBranchesSingleGraphProvider provider = new();
-            provider.PathGlobbing = new()
+            provider.PathGlobbing = new Dictionary<string, bool>()
             {
                 { "**/*.cs", true }
             };
@@ -91,7 +91,7 @@ namespace SEETests
             provider.GitRepository = new GitRepository()
             {
                 RepositoryPath = new DataPath(gitDirPath),
-                PathGlobbing = new() { { "**/*.cs", true } }
+                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
             };
 
             void ReportProgress(float x)
