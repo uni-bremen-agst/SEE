@@ -7,7 +7,7 @@ using SEE.Utils;
 namespace SEE.DataModel.DG.IO.Git
 {
     /// <summary>
-    /// Generates a <see cref="Graph"/> from the metrics of a <see cref="GitFileMetricRepository"/> instance.
+    /// Generates a <see cref="Graph"/> from the metrics of a <see cref="GitFileMetricProcessor"/> instance.
     /// </summary>
     public static class GitFileMetricsGraphGenerator
     {
@@ -36,35 +36,35 @@ namespace SEE.DataModel.DG.IO.Git
         #endregion
 
         /// <summary>
-        /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
+        /// Fills and adds all files and their metrics from <paramref name="metricProcessor"/> to the passed graph <paramref name="initialGraph"/>.
         /// </summary>
-        /// <param name="metricRepository">The metrics to add.</param>
+        /// <param name="metricProcessor">The metrics to add.</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
-        public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
+        public static void FillGraphWithGitMetrics(GitFileMetricProcessor metricProcessor, Graph initialGraph,
             string repositoryName, bool simplifyGraph)
         {
-            FillGraphWithGitMetrics(metricRepository, initialGraph, repositoryName, simplifyGraph, "");
+            FillGraphWithGitMetrics(metricProcessor, initialGraph, repositoryName, simplifyGraph, "");
         }
 
         /// <summary>
-        /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
+        /// Fills and adds all files and their metrics from <paramref name="metricProcessor"/> to the passed graph <paramref name="initialGraph"/>.
         /// </summary>
-        /// <param name="metricRepository">The metrics to add.</param>
+        /// <param name="metricProcessor">The metrics to add.</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is loaded in two code cities at the same time.</param>
-        public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
+        public static void FillGraphWithGitMetrics(GitFileMetricProcessor metricProcessor, Graph initialGraph,
             string repositoryName, bool simplifyGraph, string idSuffix)
         {
-            if (initialGraph == null || metricRepository == null)
+            if (initialGraph == null || metricProcessor == null)
             {
                 return;
             }
 
-            foreach (KeyValuePair<string, GitFileMetrics> file in metricRepository.FileToMetrics)
+            foreach (KeyValuePair<string, GitFileMetrics> file in metricProcessor.FileToMetrics)
             {
                 Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
                     initialGraph,

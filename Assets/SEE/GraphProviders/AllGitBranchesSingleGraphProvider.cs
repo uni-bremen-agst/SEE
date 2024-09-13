@@ -183,7 +183,7 @@ namespace SEE.GraphProviders
         /// Calculates and returns the actual graph.
         ///
         /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
-        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
+        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricProcessor.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
         /// </summary>
         /// <param name="graph">The input graph.</param>
         /// <param name="changePercentage">The current status of the process.</param>
@@ -219,19 +219,19 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricRepository metricRepository = new(repo, PathGlobbing, files);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
                 foreach (Commit commit in commitList)
                 {
-                    metricRepository.ProcessCommit(commit);
+                    metricProcessor.ProcessCommit(commit);
                     changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
                     counter++;
                 }
 
-                metricRepository.CalculateTruckFactor();
-                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, graph, repositoryName,
+                metricProcessor.CalculateTruckFactor();
+                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricProcessor, graph, repositoryName,
                     SimplifyGraph);
                 changePercentage(1f);
             }
@@ -271,6 +271,9 @@ namespace SEE.GraphProviders
             bool autoFetch = AutoFetch;
             ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
             AutoFetch = autoFetch;
+            IDictionary<string, bool> pathGlob = PathGlobbing;
+            ConfigIO.Restore(attributes, "PathGlobing", ref pathGlob);
+
         }
 
         #endregion

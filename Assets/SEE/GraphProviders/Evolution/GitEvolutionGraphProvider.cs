@@ -186,16 +186,16 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
 
-            GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing, files);
+            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                metricRepository.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
+                metricProcessor.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
             }
 
-            metricRepository.CalculateTruckFactor();
+            metricProcessor.CalculateTruckFactor();
 
-            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricRepository, g, repoName, SimplifyGraph,
+            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricProcessor, g, repoName, SimplifyGraph,
                 idSuffix: "-Evo");
             return g;
         }
@@ -232,10 +232,7 @@ namespace SEE.GraphProviders.Evolution
         protected override void SaveAttributes(ConfigWriter writer)
         {
             GitRepository.RepositoryPath.Save(writer, "RepositoryPath");
-            IDictionary<string, bool> pathGlobbing = string.IsNullOrEmpty(GitRepository.PathGlobbing.ToString())
-                ? null
-                : GitRepository.PathGlobbing;
-            writer.Save(pathGlobbing as Dictionary<string, bool>, "PathGlobing");
+            writer.Save(GitRepository.PathGlobbing, "PathGlobing");
             writer.Save(Date, "Date");
         }
 

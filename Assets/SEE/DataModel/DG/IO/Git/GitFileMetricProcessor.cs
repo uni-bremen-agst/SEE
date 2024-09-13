@@ -26,7 +26,7 @@ namespace SEE.DataModel.DG.IO.Git
     ///
     /// </code>
     /// </example>
-    public class GitFileMetricRepository
+    public class GitFileMetricProcessor
     {
         /// <summary>
         /// Maps the filename to the collected git metrics of that file
@@ -56,12 +56,12 @@ namespace SEE.DataModel.DG.IO.Git
         private const float TruckFactorCoreDevRatio = 0.8f;
 
         /// <summary>
-        /// Creates a new instance of <see cref="GitFileMetricRepository"/>
+        /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
         /// </summary>
         /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
         /// <param name="pathGlobbing">A dictionary of path glob patterns you want to include or exclude</param>
         /// <param name="repositoryFiles">A list of a files which should be displayed in the code-city</param>
-        public GitFileMetricRepository(Repository gitRepository, IDictionary<string, bool> pathGlobbing,
+        public GitFileMetricProcessor(Repository gitRepository, IDictionary<string, bool> pathGlobbing,
             IEnumerable<string> repositoryFiles)
         {
             this.gitRepository = gitRepository;

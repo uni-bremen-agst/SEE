@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
          Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
          HideReferenceObjectPicker]
-        public IDictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
+        public Dictionary<string, bool> PathGlobbing = new()
         {
             { "", false }
         };
