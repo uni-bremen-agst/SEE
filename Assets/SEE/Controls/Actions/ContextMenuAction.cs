@@ -229,6 +229,14 @@ namespace SEE.Controls.Actions
             {
                 actions.Add(new("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
             }
+            if (node.OutgoingsOfType(LSP.Extend).Any())
+            {
+                actions.Add(new("Show Supertype", () => ShowTargets(LSP.Extend).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Call).Any())
+            {
+                actions.Add(new("Show Outgoing Calls", () => ShowTargets(LSP.Call).Forget(), Icons.OutgoingEdge));
+            }
             if (node.OutgoingsOfType(LSP.OfType).Any())
             {
                 actions.Add(new("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
