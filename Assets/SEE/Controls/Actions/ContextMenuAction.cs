@@ -27,6 +27,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private PopupMenu popupMenu;
 
+        /// <summary>
+        /// The position of the mouse when the user started opening the context menu.
+        /// </summary>
+        private Vector3 startMousePosition = Vector3.zero;
+
         private void Start()
         {
             popupMenu = gameObject.AddComponent<PopupMenu>();
@@ -34,7 +39,11 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.OpenContextMenu())
+            if (SEEInput.OpenContextMenuStart())
+            {
+                startMousePosition = Input.mousePosition;
+            }
+            else if (SEEInput.OpenContextMenuEnd() && (Input.mousePosition - startMousePosition).magnitude < 1)
             {
                 // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
                 HitGraphElement hit = Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
