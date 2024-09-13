@@ -10,9 +10,7 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Text.RegularExpressions;
-using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -26,11 +24,13 @@ namespace SEE.UI.Window.PropertyWindow
     /// </summary>
     public class PropertyWindow : BaseWindow
     {
+        #region Attributes
         /// <summary>
         /// GraphElement whose properties are to be shown.
         /// </summary>
         public GraphElement GraphElement;
 
+        #region Prefabs
         /// <summary>
         /// Prefab for the <see cref="PropertyWindow"/>.
         /// </summary>
@@ -45,6 +45,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// Prefab for the groups.
         /// </summary>
         private readonly string GroupPrefab = UIPrefabFolder + "PropertyGroupItem";
+        #endregion
 
         /// <summary>
         /// The alpha keys for the gradient of a menu item (fully opaque).
@@ -82,13 +83,18 @@ namespace SEE.UI.Window.PropertyWindow
         /// Such items will be expanded when they become visible again.
         /// </summary>
         private readonly ISet<string> expandedItems = new HashSet<string>();
+        #endregion
 
+        /// <summary>
+        /// Starts the desktop instance.
+        /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
             CreateUIInstance();
         }
 
+        #region Search
         /// <summary>
         /// Activates all <paramref name="propertyRows"/> if they match the <paramref name="searchQuery"/>.
         /// All others are deactivated. In other words, the <paramref name="searchQuery"/> is applied as
@@ -239,6 +245,40 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
+        /// Returns the attribute names of all <paramref name="propertyRows"/> whose attribute name or value matches the
+        /// <paramref name="query"/>.
+        /// </summary>
+        /// <param name="query"> the search query (part of an attribute name / value)</param>
+        /// <param name="propertyRows"> the dictionary representing property rows to search through</param>
+        /// <returns> the attribute names / values matching the <paramref name="query"/> </returns>
+        private IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
+        {
+            List<string> results = new();
+            foreach (string key in propertyRows.Keys)
+            {
+                /// AttributeName instead of key checking, as the key may contain a random string if two identical keys would otherwise exist.
+                if (AttributeName(propertyRows[key].gameObject).ToLower().Contains(query.ToLower())
+                    || propertyRows[key].value.ToLower().Contains(query.ToLower()))
+                {
+                    results.Add(key);
+                }
+            }
+            return results;
+        }
+
+        /// <summary>
+        /// Applies the search if <see cref="searchField.text"/> isn't empty.
+        /// </summary>
+        private void ApplySearch()
+        {
+            if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
+            {
+                ActivateMatches(searchField.text);
+            }
+        }
+        #endregion
+
+        /// <summary>
         /// Sets the activity of the game objects of the given dictionary (<paramref name="objects"/>)
         /// </summary>
         /// <param name="objects">The objects to set their activity.</param>
@@ -278,74 +318,11 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Returns the attribute names of all <paramref name="propertyRows"/> whose attribute name or value matches the
-        /// <paramref name="query"/>.
-        /// </summary>
-        /// <param name="query"> the search query (part of an attribute name / value)</param>
-        /// <param name="propertyRows"> the dictionary representing property rows to search through</param>
-        /// <returns> the attribute names / values matching the <paramref name="query"/> </returns>
-        private IEnumerable<string> Search(string query, Dictionary<string, (string value, GameObject gameObject)> propertyRows)
-        {
-            List<string> results = new();
-            foreach (string key in propertyRows.Keys)
-            {
-                /// AttributeName instead of key checking, as the key may contain a random string if two identical keys would otherwise exist.
-                if (AttributeName(propertyRows[key].gameObject).ToLower().Contains(query.ToLower())
-                    || propertyRows[key].value.ToLower().Contains(query.ToLower()))
-                {
-                    results.Add(key);
-                }
-            }
-            return results;
-        }
-
-        /// <summary>
-        /// Returns the name of a node attribute stored in the first child of the <paramref name="propertyRow"/>.
-        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
-        /// the name and value of a node attribute (property).
-        /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>name of the node attribute</returns>
-        private string AttributeName(GameObject propertyRow)
-        {
-            return Attribute(propertyRow).text;
-        }
-
-        /// <summary>
-        /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute name.
-        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
-        /// the name and value of a node attribute (property).
-        /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>the TMP holding the attribute name</returns>
-        private TextMeshProUGUI Attribute(GameObject propertyRow)
-        {
-            return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
-        }
-
-        private string AttributeValue(GameObject propertyRow)
-        {
-            return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);
-        }
-
-        /// <summary>
-        /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute value.
-        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
-        /// the name and value of a node attribute (property).
-        /// </summary>
-        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
-        /// <returns>the TMP holding the attribute value</returns>
-        private TextMeshProUGUI Value(GameObject propertyRow)
-        {
-            return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
-        }
-
-        /// <summary>
         /// Creates the property window.
         /// </summary>
         public void CreateUIInstance()
         {
-            // Instantiate PropertyWindow
+            /// Instantiate PropertyWindow
             GameObject propertyWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             propertyWindow.name = "Property Window";
 
@@ -367,6 +344,9 @@ namespace SEE.UI.Window.PropertyWindow
             searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery));
         }
 
+        /// <summary>
+        /// Makes a rebuild of the window.
+        /// </summary>
         private void Rebuild()
         {
             ClearItems();
@@ -424,9 +404,9 @@ namespace SEE.UI.Window.PropertyWindow
 
             /// Applies the search
             ApplySearch();
-
             return;
 
+            /// Creates the items for the value type group.
             void GroupByValueType()
             {
                 /// Toggle Attributes
@@ -453,6 +433,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
             }
 
+            /// Creates the items for the name type group.
             void GroupByNameType()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -511,7 +492,7 @@ namespace SEE.UI.Window.PropertyWindow
                     /// Regular Expression Pattern
                     string pattern = @"^([A-Z][a-z]+)([A-Z][a-z]+)(_.*)$";
 
-                    Regex regex = new (pattern);
+                    Regex regex = new(pattern);
                     Match match = regex.Match(input);
 
                     if (match.Success)
@@ -528,17 +509,7 @@ namespace SEE.UI.Window.PropertyWindow
             }
         }
 
-        /// <summary>
-        /// Applies the search if <see cref="searchField.text"/> isn't empty.
-        /// </summary>
-        private void ApplySearch()
-        {
-            if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
-            {
-                ActivateMatches(searchField.text);
-            }
-        }
-
+        #region Grouping Name Type
         /// <summary>
         /// Divides the attributes into groups and subgroups.
         /// </summary>
@@ -584,7 +555,7 @@ namespace SEE.UI.Window.PropertyWindow
         private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
         {
             List<KeyValuePair<string, object>> sortedList = dict.ToList();
-            sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object>? 1 : 0).ToList();
+            sortedList = sortedList.OrderBy(kvp => kvp.Value is Dictionary<string, object> ? 1 : 0).ToList();
             foreach (KeyValuePair<string, object> pair in sortedList)
             {
                 if (pair.Value is Dictionary<string, object> nestedDict)
@@ -600,7 +571,9 @@ namespace SEE.UI.Window.PropertyWindow
                 }
             }
         }
+        #endregion
 
+        #region Sort
         /// <summary>
         /// Sorts the properties within the group.
         /// </summary>
@@ -660,6 +633,7 @@ namespace SEE.UI.Window.PropertyWindow
                 lowestSilbing += 1;
             }
         }
+        #endregion
 
         /// <summary>
         /// Displays a attribute group and their corresponding attributes with their values.
@@ -798,6 +772,50 @@ namespace SEE.UI.Window.PropertyWindow
             return dict;
         }
 
+        #region Getter
+        /// <summary>
+        /// Returns the name of a node attribute stored in the first child of the <paramref name="propertyRow"/>.
+        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
+        /// the name and value of a node attribute (property).
+        /// </summary>
+        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>name of the node attribute</returns>
+        private string AttributeName(GameObject propertyRow)
+        {
+            return Attribute(propertyRow).text;
+        }
+
+        /// <summary>
+        /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute name.
+        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
+        /// the name and value of a node attribute (property).
+        /// </summary>
+        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>the TMP holding the attribute name</returns>
+        private TextMeshProUGUI Attribute(GameObject propertyRow)
+        {
+            return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
+        }
+
+        private string AttributeValue(GameObject propertyRow)
+        {
+            return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);
+        }
+
+        /// <summary>
+        /// Returns the TMP container of <paramref name="propertyRow"/> holding the attribute value.
+        /// Parameter <paramref name="propertyRow"/> is assumed to represent a row in the property window providing
+        /// the name and value of a node attribute (property).
+        /// </summary>
+        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value</param>
+        /// <returns>the TMP holding the attribute value</returns>
+        private TextMeshProUGUI Value(GameObject propertyRow)
+        {
+            return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
+        }
+        #endregion
+
+        #region BaseWindow
         public override void RebuildLayout()
         {
             // Nothing needs to be done.
@@ -817,5 +835,6 @@ namespace SEE.UI.Window.PropertyWindow
         {
             throw new NotImplementedException();
         }
+        #endregion
     }
 }
