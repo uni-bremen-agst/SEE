@@ -295,9 +295,10 @@ namespace SEE.DataModel.DG.IO
             {
                 Add(range);
             }
-            else if (attributable.TryGetRange("SourceRange", out Range range1))
+            /// This case is for older gxl files, before the renaming of "SourceRange" to "Source.Range".
+            else if (attributable.TryGetRange("SourceRange", out Range rangeOfOldGlx))
             {
-                Add(range1);
+                Add(rangeOfOldGlx);
             }
 
             AppendAttributes(doc, xmlNode, "string", attributable.StringAttributes, StringToString);
