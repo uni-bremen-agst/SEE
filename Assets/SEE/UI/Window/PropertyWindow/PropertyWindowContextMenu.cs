@@ -202,7 +202,13 @@ namespace SEE.UI.Window.PropertyWindow
                         string text = GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text;
                         if (int.TryParse(text, out int intValue))
                         {
-                            return intValue;
+                            if (!Grouper) {
+                                return intValue;
+                            }
+                            else
+                            {
+                                return (float)intValue;
+                            }
                         }
                         else if (float.TryParse(text, out float floatValue))
                         {

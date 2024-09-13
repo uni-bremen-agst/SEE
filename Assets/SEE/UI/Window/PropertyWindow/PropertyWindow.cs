@@ -577,7 +577,36 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     List<GameObject> list = values.ToList();
                     list.RemoveAll(x => !x.name.Contains("RowLine"));
-                    ChangeOrder(list);
+                    if (!contextMenu.Grouper)
+                    {
+                        ChangeOrder(list);
+                    }
+                    else
+                    {
+                        List<GameObject> texts = new();
+                        List<GameObject> numbers = new();
+                        foreach (GameObject obj in list)
+                        {
+                            string text = AttributeValue(obj);
+                            if (int.TryParse(text, out int intResult)
+                                || float.TryParse(text, out float floatResult))
+                            {
+                                numbers.Add(obj);
+                            }
+                            else
+                            {
+                                texts.Add(obj);
+                            }
+                        }
+                        if (numbers.Count > 0)
+                        {
+                            ChangeOrder(numbers);
+                        }
+                        if (texts.Count > 0)
+                        {
+                            ChangeOrder(texts);
+                        }
+                    }
                 }
             }
         }
