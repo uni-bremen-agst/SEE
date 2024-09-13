@@ -156,14 +156,17 @@ namespace SEE.Game.City
                     continue;
                 }
 
+                bool hideSplines;
                 // fail-safe
                 if (layout == null)
                 {
                     Debug.LogWarning("Layout settings are missing. Falling back to defaults.\n");
+                    hideSplines = false;
                 }
                 else
                 {
-                    spline.Radius = layout.EdgeWidth / 2;
+                    spline.Radius = layout.EdgeWidth / 4;
+                    hideSplines = layout.AnimationKind == EdgeAnimationKind.Buildup;
                 }
 
                 // fail-safe
@@ -178,6 +181,11 @@ namespace SEE.Game.City
                 }
 
                 spline.CreateMesh();
+
+                if (hideSplines && edge.HasToggle(Edge.IsHiddenToggle))
+                {
+                    spline.SubsplineEndT = 0;
+                }
             }
         }
 
