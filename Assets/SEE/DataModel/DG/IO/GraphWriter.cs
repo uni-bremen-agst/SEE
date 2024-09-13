@@ -293,27 +293,16 @@ namespace SEE.DataModel.DG.IO
             // We will not consider character ranges, as they are not used in the Axivion Suite.
             if (attributable.TryGetRange(GraphElement.SourceRangeAttribute, out Range range))
             {
-                Add(range);
-            }
-            /// This case is for older gxl files, before the renaming of "SourceRange" to "Source.Range".
-            else if (attributable.TryGetRange("SourceRange", out Range rangeOfOldGlx))
-            {
-                Add(rangeOfOldGlx);
+                intAttributes.Add(RegionStartAttribute, range.StartLine);
+                intAttributes.Add(RegionLengthAttribute, range.Lines);
+                // We remove these two attributes from the intAttributes dictionary to avoid duplication.
+                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix);
+                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix);
             }
 
             AppendAttributes(doc, xmlNode, "string", attributable.StringAttributes, StringToString);
             AppendAttributes(doc, xmlNode, "float", attributable.FloatAttributes, FloatToString);
             AppendAttributes(doc, xmlNode, "int", intAttributes, IntToString);
-
-            return;
-            void Add(Range rangeToAdd)
-            {
-                intAttributes.Add(RegionStartAttribute, rangeToAdd.StartLine);
-                intAttributes.Add(RegionLengthAttribute, rangeToAdd.Lines);
-                // We remove these two attributes from the intAttributes dictionary to avoid duplication.
-                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeStartLineSuffix);
-                attributable.IntAttributes.Remove(GraphElement.SourceRangeAttribute + Attributable.RangeEndLineSuffix);
-            }
         }
 
         /// <summary>

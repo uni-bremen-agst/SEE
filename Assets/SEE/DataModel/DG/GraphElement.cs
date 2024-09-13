@@ -110,7 +110,7 @@ namespace SEE.DataModel.DG
         /// The attribute name for the source range. The source range may not exist.
         /// Note that the source range is represented by four attributes (see <see cref="SetRange"/> for details).
         /// </summary>
-        public const string SourceRangeAttribute = "Source.Range";
+        public const string SourceRangeAttribute = "SourceRange";
 
         /// <summary>
         /// The source range of this graph element.

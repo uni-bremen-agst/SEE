@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using TMPro;
 using UnityEngine;
@@ -472,24 +474,57 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     foreach (KeyValuePair<string, string> pair in GraphElement.StringAttributes)
                     {
-                        attributes.Add(pair.Key, pair.Value);
+                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
                     }
                 }
                 if (GraphElement.IntAttributes.Count > 0 & contextMenu.Filter.IncludeIntAttributes)
                 {
                     foreach (KeyValuePair<string, int> pair in GraphElement.IntAttributes)
                     {
-                        attributes.Add(pair.Key, pair.Value);
+                        string key = pair.Key;
+                        /// Block for old gxl files.
+                        if (key.Contains("SelectionRange") && !key.Contains("Source"))
+                        {
+                            key = "Source." + key;
+                        }
+                        key = InsertDotInFirstPascalCase(pair.Key);
+                        /// To remove duplicates it is needed to remove the old one. <see cref="GraphWriter"/> L.313.
+                        if (attributes.ContainsKey(key) && key.Contains("Source.Range"))
+                        {
+                            attributes.Remove(key);
+                        }
+                        attributes.Add(key, pair.Value);
                     }
                 }
                 if (GraphElement.FloatAttributes.Count > 0 & contextMenu.Filter.IncludeFloatAttributes)
                 {
                     foreach (KeyValuePair<string, float> pair in GraphElement.FloatAttributes)
                     {
-                        attributes.Add(pair.Key, pair.Value);
+                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
                     }
                 }
                 SplitInAttributeGroup(attributes);
+
+                return;
+                string InsertDotInFirstPascalCase(string input)
+                {
+                    /// Regular Expression Pattern
+                    string pattern = @"^([A-Z][a-z]+)([A-Z][a-z]+)(_.*)$";
+
+                    Regex regex = new (pattern);
+                    Match match = regex.Match(input);
+
+                    if (match.Success)
+                    {
+                        /// Build the new string by inserting a period between the matched groups
+                        return $"{match.Groups[1].Value}.{match.Groups[2].Value}{match.Groups[3].Value}";
+                    }
+                    else
+                    {
+                        /// Return the original input if it doesn't match the pattern
+                        return input;
+                    }
+                }
             }
         }
 
