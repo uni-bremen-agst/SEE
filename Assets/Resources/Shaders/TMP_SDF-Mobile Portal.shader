@@ -261,7 +261,8 @@ SubShader {
 				input.v.x > _PortalMax.x || input.v.z > _PortalMax.y
 				)
 			{
-				c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
+				// Text should not actually be cut off outside the portal.
+				// c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
 			}
 
 			return c;
