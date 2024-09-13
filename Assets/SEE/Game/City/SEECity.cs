@@ -81,7 +81,7 @@ namespace SEE.Game.City
             {
                 if (loadedGraph != null)
                 {
-                    OnClickResetButton();
+                    ResetGraphData();
                 }
                 Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
@@ -510,10 +510,9 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// This method is by the runtime menu or the inspector.
-        /// It does the exact same as <see cref="Reset"/> but additionally removes the <see cref="GitPoller"/> component.
+        /// This method will cancel any running graph provider pipelines and delete the current loaded graph.
         /// </summary>
-        public void OnClickResetButton()
+        private void ResetGraphData()
         {
             // Cancel any ongoing loading operation and reset the token.
             cancellationTokenSource.Cancel();
@@ -537,7 +536,7 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
-            OnClickResetButton();
+            ResetGraphData();
             // Remove the poller
             if (TryGetComponent(out GitPoller poller))
             {

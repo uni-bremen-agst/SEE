@@ -65,7 +65,7 @@ namespace SEE.GraphProviders
         [OdinSerialize][ShowInInspector] public bool AutoFetch = false;
 
         /// <summary>
-        /// The interval in seconds in which git fetch should be called
+        /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)] public int PollingInterval = 5;
 
@@ -80,17 +80,17 @@ namespace SEE.GraphProviders
         #region Constants
 
         /// <summary>
-        /// Label for serializing the <see cref="PathGlobbing"/> field
+        /// Label for serializing the <see cref="PathGlobbing"/> field.
         /// </summary>
         private const string pathGlobbingLabel = "PathGlobbing";
 
         /// <summary>
-        /// Label for serializing the <see cref="SimplifyGraph"/> field
+        /// Label for serializing the <see cref="SimplifyGraph"/> field.
         /// </summary>
         private const string simplifyGraphLabel = "SimplifyGraph";
 
         /// <summary>
-        /// Label for serializing the <see cref="AutoFetch"/> field
+        /// Label for serializing the <see cref="AutoFetch"/> field.
         /// </summary>
         private const string autoFetchLabel = "AutoFetch";
 
@@ -102,8 +102,8 @@ namespace SEE.GraphProviders
         /// Checks if all attributes are set correctly.
         /// Otherwise, an exception is thrown.
         /// </summary>
-        /// <param name="branchCity">The <see cref="BranchCity"/> where this provider was executed</param>
-        /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
+        /// <param name="branchCity">The <see cref="BranchCity"/> where this provider was executed.</param>
+        /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
@@ -139,13 +139,13 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Provides the graph of the git history
+        /// Provides the graph of the git history.
         /// </summary>
-        /// <param name="graph">The graph of the previous provider</param>
-        /// <param name="city">The city where the graph should be displayed</param>
-        /// <param name="changePercentage">The current status of the process</param>
-        /// <param name="token">Can be used to cancel the action</param>
-        /// <returns>The graph generated from the git repository <see cref="RepositoryData"/></returns>
+        /// <param name="graph">The graph of the previous provider.</param>
+        /// <param name="city">The city where the graph should be displayed.</param>
+        /// <param name="changePercentage">The current status of the process.</param>
+        /// <param name="token">Can be used to cancel the action.</param>
+        /// <returns>The graph generated from the git repository <see cref="RepositoryData"/>.</returns>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
@@ -157,7 +157,7 @@ namespace SEE.GraphProviders
 
             CheckAttributes(branchCity);
 
-            var task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
+            Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
                 cancellationToken: token);
             if (AutoFetch)
             {
@@ -183,12 +183,12 @@ namespace SEE.GraphProviders
         /// Calculates and returns the actual graph.
         ///
         /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
-        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>
+        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricRepository.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
         /// </summary>
-        /// <param name="graph">The input graph</param>
-        /// <param name="changePercentage">The current status of the process</param>
-        /// <param name="branchCity">The <see cref="BranchCity"/> from which the provider was called</param>
-        /// <returns>The generated output graph</returns>
+        /// <param name="graph">The input graph.</param>
+        /// <param name="changePercentage">The current status of the process.</param>
+        /// <param name="branchCity">The <see cref="BranchCity"/> from which the provider was called.</param>
+        /// <returns>The generated output graph.</returns>
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
         {
             graph.BasePath = branchCity.VCSPath.Path;
@@ -201,7 +201,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.
             DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            using (var repo = new Repository(graph.BasePath))
+            using (Repository repo = new Repository(graph.BasePath))
             {
                 CommitFilter filter;
 
@@ -215,7 +215,7 @@ namespace SEE.GraphProviders
                     .Where(commit => commit.Parents.Count() <= 1);
 
                 // select all files of this repo
-                var files = repo.Branches
+                IEnumerable<string> files = repo.Branches
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
@@ -223,7 +223,7 @@ namespace SEE.GraphProviders
 
                 int counter = 0;
                 int commitLength = commitList.Count();
-                foreach (var commit in commitList)
+                foreach (Commit commit in commitList)
                 {
                     metricRepository.ProcessCommit(commit);
                     changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
@@ -240,18 +240,18 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns the kind of this provider
+        /// Returns the kind of this provider.
         /// </summary>
-        /// <returns>Returns <see cref="SingleGraphProviderKind.GitAllBranches"/></returns>
+        /// <returns>Returns <see cref="SingleGraphProviderKind.GitAllBranches"/>.</returns>
         public override SingleGraphProviderKind GetKind()
         {
             return SingleGraphProviderKind.GitAllBranches;
         }
 
         /// <summary>
-        /// Saves the attributes of this provider to <paramref name="writer"/>
+        /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             writer.Save(PathGlobbing, pathGlobbingLabel);
@@ -260,15 +260,15 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Restores the attributes of this provider from <paramref name="attributes"/>
+        /// Restores the attributes of this provider from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">The attributes to restore from</param>
+        /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            var simplifyGraph = SimplifyGraph;
+            bool simplifyGraph = SimplifyGraph;
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref simplifyGraph);
             SimplifyGraph = simplifyGraph;
-            var autoFetch = AutoFetch;
+            bool autoFetch = AutoFetch;
             ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
             AutoFetch = autoFetch;
         }

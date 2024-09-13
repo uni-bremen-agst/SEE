@@ -112,7 +112,7 @@ namespace SEETests
                 WriteFile("AnotherFile.cs", "This is a test", testSig);
                 WriteFile("AnotherFile.cs", "This is a test", testSig2);
 
-                var series = await ProvidingGraphSeries();
+                IList<Graph> series = await ProvidingGraphSeries();
                 Assert.AreEqual(3, series.Count);
 
                 Assert.AreEqual(1, series[0].GetNode("firstFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
@@ -288,7 +288,7 @@ namespace SEETests
         {
             gitDirPath = Path.GetTempPath() + "seeGitTest";
             Directory.CreateDirectory(gitDirPath);
-            var repoPath = Repository.Init(gitDirPath);
+            string repoPath = Repository.Init(gitDirPath);
             repo = new Repository(repoPath);
         }
 

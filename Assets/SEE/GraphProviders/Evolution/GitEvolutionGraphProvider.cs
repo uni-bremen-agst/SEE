@@ -26,14 +26,14 @@ namespace SEE.GraphProviders.Evolution
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
         /// <summary>
-        /// The git repository
+        /// The git repository which should be analyzed.
         /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
         public GitRepository GitRepository = new();
 
         /// <summary>
-        /// The date limit until commits should be analysed
+        /// The date limit until commits should be analyzed.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, InspectorName("Date Limit"),
@@ -53,13 +53,13 @@ namespace SEE.GraphProviders.Evolution
         /// Provides the evolution graph of the git repository.
         ///
         /// This provider will run the calculations on the thread pool.
-        /// This can be cancled with <paramref name="token"/>
+        /// This can be canceled with <paramref name="token"/>.
         /// </summary>
-        /// <param name="graph">The graph series of the previous provider. Will most likely be empty</param>
-        /// <param name="city">The city where the graph series should be displayed</param>
-        /// <param name="changePercentage">Can be used to update the spinner</param>
-        /// <param name="token">CancellationToken to cancel the async operation </param>
-        /// <returns></returns>
+        /// <param name="graph">The graph series of the previous provider. Will most likely be empty.</param>
+        /// <param name="city">The city where the graph series should be displayed.</param>
+        /// <param name="changePercentage">Can be used to update the spinner.</param>
+        /// <param name="token">CancellationToken to cancel the async operation.</param>
+        /// <returns>The resulted graph series.</returns>
         public override async UniTask<List<Graph>> ProvideAsync(List<Graph> graph, AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
@@ -70,9 +70,9 @@ namespace SEE.GraphProviders.Evolution
 
         /// <summary>
         /// Checks if all attributes are set correctly.
-        /// Otherwise an exception is thrown.
+        /// Otherwise, an exception is thrown.
         /// </summary>
-        /// <exception cref="ArgumentException">If one attribute is not set correctly</exception>
+        /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes()
         {
             if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
@@ -92,9 +92,9 @@ namespace SEE.GraphProviders.Evolution
         /// Calculates and returns the actual graph series.
         ///
         /// </summary>
-        /// <param name="graph">The input graph series</param>
-        /// <param name="changePercentage"></param>
-        /// <returns>The calculated graph series</returns>
+        /// <param name="graph">The input graph series.</param>
+        /// <param name="changePercentage">Keeps track of the current progess.</param>
+        /// <returns>The calculated graph series.</returns>
         private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
         {
             DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
@@ -116,11 +116,11 @@ namespace SEE.GraphProviders.Evolution
             string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
 
-            using (var repo = new Repository(GitRepository.RepositoryPath.Path))
+            using (Repository repo = new Repository(GitRepository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter
-                        { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None })
+                    { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None })
                     .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
                     .Where(commit => commit.Parents.Count() <= 1)
                     .Reverse()
@@ -141,7 +141,7 @@ namespace SEE.GraphProviders.Evolution
                     .Distinct().ToList();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
-                foreach (var currentCommit in
+                foreach (KeyValuePair<Commit, Patch> currentCommit in
                          commitChanges.Where(x =>
                              x.Value.Any(y =>
                                  matcher.Match(y.Path).HasMatches)))
@@ -154,7 +154,7 @@ namespace SEE.GraphProviders.Evolution
 
                     graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                         commitChanges,
-                        repo,files));
+                        repo, files));
                     counter++;
                 }
             }
@@ -165,16 +165,16 @@ namespace SEE.GraphProviders.Evolution
         /// <summary>
         /// Returns one evolution step of a commit (<paramref name="currentCommit"/>).
         ///
-        /// This graph represents all commits between the setted time limit in <see cref="Date"/> and <paramref name="currentCommit"/>
+        /// This graph represents all commits between the setted time limit in <see cref="Date"/> and <paramref name="currentCommit"/>.
         /// </summary>
-        /// <param name="repoName">The name of the git repository</param>
-        /// <param name="currentCommit">The current commit to generate the graph</param>
-        /// <param name="commitsInBetween">All commits in between these two points</param>
-        /// <param name="commitChanges">All changes made by all commits within the evolution range</param>
-        /// <param name="repo"></param>
-        /// <param name="files"></param>
-        /// <param name="includedFiles">All included file extensions</param>
-        /// <returns>The graoh of the evolution step</returns>
+        /// <param name="repoName">The name of the git repository.</param>
+        /// <param name="currentCommit">The current commit to generate the graph.</param>
+        /// <param name="commitsInBetween">All commits in between these two points.</param>
+        /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
+        /// <param name="repo">The git repository in which the commit was made.</param>
+        /// <param name="files">A List of all files in the git repository.</param>
+        /// <param name="includedFiles">All included file extensions.</param>
+        /// <returns>The graoh of the evolution step.</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
             IDictionary<Commit, Patch> commitChanges, Repository repo, IList<string> files)
         {
@@ -188,7 +188,7 @@ namespace SEE.GraphProviders.Evolution
 
             GitFileMetricRepository metricRepository = new(repo, GitRepository.PathGlobbing, files);
 
-            foreach (var commitInBetween in commitsInBetween)
+            foreach (Commit commitInBetween in commitsInBetween)
             {
                 metricRepository.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
             }
@@ -203,9 +203,9 @@ namespace SEE.GraphProviders.Evolution
         /// <summary>
         /// Returns all changed files in a commit.
         /// </summary>
-        /// <param name="commit">The commit which files should be returned</param>
-        /// <param name="repo">The repo</param>
-        /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>)</returns>
+        /// <param name="commit">The commit which files should be returned.</param>
+        /// <param name="repo">The git repository in which the commit was made.</param>
+        /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>).</returns>
         private static Patch GetFileChanges(Commit commit, Repository repo)
         {
             if (commit.Parents.Any())
@@ -218,18 +218,17 @@ namespace SEE.GraphProviders.Evolution
                 .Compare<Patch>(null, commit.Tree);
         }
 
-
         /// <summary>
-        /// Returns the kind of this provider
+        /// Returns the kind of this provider.
         /// </summary>
-        /// <returns>Returns <see cref="MultiGraphProviderKind.GitEvolution"/></returns>
+        /// <returns>Returns <see cref="MultiGraphProviderKind.GitEvolution"/>.</returns>
         public override MultiGraphProviderKind GetKind()
             => MultiGraphProviderKind.GitEvolution;
 
         /// <summary>
-        /// Saves the attributes of this provider to <paramref name="writer"/>
+        /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             GitRepository.RepositoryPath.Save(writer, "RepositoryPath");
@@ -241,9 +240,9 @@ namespace SEE.GraphProviders.Evolution
         }
 
         /// <summary>
-        /// Restores the attributes of this provider from <paramref name="attributes"/>
+        /// Restores the attributes of this provider from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">The attributes to restore from</param>
+        /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             GitRepository.RepositoryPath.Restore(attributes, "RepositoryPath");

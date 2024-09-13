@@ -9,51 +9,50 @@ namespace SEE.DataModel.DG.IO.Git
     public class GitFileMetrics
     {
         /// <summary>
-        /// The total number of commits a file has
+        /// The total number of commits a file has.
         /// </summary>
         public int NumberOfCommits { get; set; }
 
         /// <summary>
-        /// A list of the authors which contributed to this file
+        /// A list of the authors which contributed to this file.
         /// </summary>
-        public HashSet<string> Authors { get; set; }
+        public ISet<string> Authors { get; set; }
 
         /// <summary>
         /// A collection of other files, which where changed together in the same commit.
-        /// The key represents the filename and the value the number of common commits
+        /// The key represents the filename and the value the number of common commits.
         /// </summary>
-        public Dictionary<string, int> FilesChangesTogether { get; set; }
+        public IDictionary<string, int> FilesChangesTogether { get; set; }
 
         /// <summary>
-        /// The churn (total number of changed lines) of each author
+        /// The churn (total number of changed lines) of each author.
         /// </summary>
-        public Dictionary<string, int> AuthorsChurn { get; set; }
+        public IDictionary<string, int> AuthorsChurn { get; set; }
 
         /// <summary>
         /// The truck/bus factor of this file.
-        /// This is the number of contributors which have contributed at least 80% of the source code
+        /// This is the number of contributors which have contributed at least 80% of the source code.
         /// </summary>
         public int TruckFactor { get; set; }
 
         /// <summary>
-        /// Total sum of changed lines (added and removed)
+        /// Total sum of changed lines (added and removed).
         /// </summary>
         public int Churn { get; set; }
 
-
         /// <summary>
-        /// The constructor of <see cref="GitFileMetrics"/>
+        /// The constructor of <see cref="GitFileMetrics"/>.
         /// </summary>
-        /// <param name="numberOfCommits">The number of commits</param>
-        /// <param name="authors">A list of authors</param>
-        /// <param name="churn">The churn</param>
+        /// <param name="numberOfCommits">The number of commits.</param>
+        /// <param name="authors">A list of authors.</param>
+        /// <param name="churn">The churn.</param>
         public GitFileMetrics(int numberOfCommits, HashSet<string> authors, int churn)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
             Churn = churn;
             AuthorsChurn = new Dictionary<string, int>();
-            FilesChangesTogether = new();
+            FilesChangesTogether = new Dictionary<string, int>();
             TruckFactor = 0;
         }
     }

@@ -41,7 +41,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// A list of file extensions which should be included
         /// </summary>
-        private readonly Dictionary<string, bool> pathGlobbing;
+        private readonly IDictionary<string, bool> pathGlobbing;
 
         /// <summary>
         /// Matcher is used to check by a glob pattern if a file should be included in the analysis or not.
@@ -80,7 +80,7 @@ namespace SEE.DataModel.DG.IO.Git
                 }
             }
 
-            foreach (var file in repositoryFiles)
+            foreach (string file in repositoryFiles)
             {
                 if (matcher.Match(file).HasMatches)
                 {
@@ -94,7 +94,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// </summary>
         public void CalculateTruckFactor()
         {
-            foreach (var file in FileToMetrics)
+            foreach (KeyValuePair<string, GitFileMetrics> file in FileToMetrics)
             {
                 file.Value.TruckFactor = CalculateTruckFactor(file.Value.AuthorsChurn);
             }
@@ -109,7 +109,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
         /// <returns>The calculated truck factor</returns>
-        private static int CalculateTruckFactor(IReadOnlyDictionary<string, int> developersChurn)
+        private static int CalculateTruckFactor(IDictionary<string, int> developersChurn)
         {
             if (developersChurn.Count == 0)
             {
@@ -152,7 +152,7 @@ namespace SEE.DataModel.DG.IO.Git
                 return;
             }
 
-            foreach (var changedFile in commitChanges)
+            foreach (PatchEntryChanges changedFile in commitChanges)
             {
                 string filePath = changedFile.Path;
                 if (!matcher.Match(filePath).HasMatches)
@@ -175,7 +175,7 @@ namespace SEE.DataModel.DG.IO.Git
                     FileToMetrics[filePath].Authors.Add(commit.Author.Email);
                     FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                     FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, () => 0);
-                    foreach (var otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
+                    foreach (PatchEntryChanges otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
                     {
                         FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFiles.Path, () => 0);
                         FileToMetrics[filePath].FilesChangesTogether[otherFiles.Path] += 1;
@@ -203,12 +203,12 @@ namespace SEE.DataModel.DG.IO.Git
 
             if (commit.Parents.Any())
             {
-                var changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                Patch changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
                 ProcessCommit(commit, changedFilesPath);
             }
             else
             {
-                var changedFilesPath = gitRepository.Diff.Compare<Patch>(null, commit.Tree);
+                Patch changedFilesPath = gitRepository.Diff.Compare<Patch>(null, commit.Tree);
                 ProcessCommit(commit, changedFilesPath);
             }
         }

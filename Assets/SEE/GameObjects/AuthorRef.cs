@@ -5,12 +5,12 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// Reference to all author spheres and edges of a node
+    /// Reference to all author spheres and edges of a node.
     /// </summary>
     public class AuthorRef : SerializedMonoBehaviour
     {
         /// <summary>
-        /// A list of author-sphere game objects which contributed to that file
+        /// A list of author-sphere game objects which contributed to that file.
         /// </summary>
         public ISet<GameObject> AuthorSpheres = new HashSet<GameObject>();
 

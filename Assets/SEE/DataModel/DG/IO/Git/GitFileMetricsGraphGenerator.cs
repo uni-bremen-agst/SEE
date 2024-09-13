@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using MoreLinq.Extensions;
 using SEE.Utils;
@@ -13,22 +14,22 @@ namespace SEE.DataModel.DG.IO.Git
         #region Constants
 
         /// <summary>
-        /// The name of the number of authors metric
+        /// The name of the number of authors metric.
         /// </summary>
         private const string NumberOfAuthorsMetricName = "Metric.File.AuthorsNumber";
 
         /// <summary>
-        /// The name of the number of commits metric
+        /// The name of the number of commits metric.
         /// </summary>
         private const string NumberOfCommitsMetricName = "Metric.File.Commits";
 
         /// <summary>
-        /// The name of the churn metric
+        /// The name of the churn metric.
         /// </summary>
         private const string NumberOfFileChurnMetricName = "Metric.File.Churn";
 
         /// <summary>
-        /// The Name of the number of coredevs metric
+        /// The Name of the number of the 'core devs' metric.
         /// </summary>
         private const string TruckFactorMetricName = "Metric.File.CoreDevs";
 
@@ -36,12 +37,11 @@ namespace SEE.DataModel.DG.IO.Git
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
-        ///
         /// </summary>
-        /// <param name="metricRepository">The metrics to add</param>
-        /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
-        /// <param name="repositoryName">The name of the repository</param>
-        /// <param name="simplifyGraph">If the final graph should be simplified</param>
+        /// <param name="metricRepository">The metrics to add.</param>
+        /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
+        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
             string repositoryName, bool simplifyGraph)
         {
@@ -50,13 +50,12 @@ namespace SEE.DataModel.DG.IO.Git
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="metricRepository"/> to the passed graph <paramref name="initialGraph"/>.
-        ///
         /// </summary>
-        /// <param name="metricRepository">The metrics to add</param>
-        /// <param name="initialGraph">The initial graph where the files and metrics should be generated</param>
-        /// <param name="repositoryName">The name of the repository</param>
-        /// <param name="simplifyGraph">If the final graph should be simplified</param>
-        /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is loaded in two code cities at the same time</param>
+        /// <param name="metricRepository">The metrics to add.</param>
+        /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
+        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="simplifyGraph">If the final graph should be simplified.</param>
+        /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is loaded in two code cities at the same time.</param>
         public static void FillGraphWithGitMetrics(GitFileMetricRepository metricRepository, Graph initialGraph,
             string repositoryName, bool simplifyGraph, string idSuffix)
         {
@@ -65,7 +64,7 @@ namespace SEE.DataModel.DG.IO.Git
                 return;
             }
 
-            foreach (var file in metricRepository.FileToMetrics)
+            foreach (KeyValuePair<string, GitFileMetrics> file in metricRepository.FileToMetrics)
             {
                 Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
                     initialGraph,
@@ -79,7 +78,7 @@ namespace SEE.DataModel.DG.IO.Git
                     n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
                 }
 
-                foreach (var authorChurn in file.Value.AuthorsChurn)
+                foreach (KeyValuePair<string, int> authorChurn in file.Value.AuthorsChurn)
                 {
                     n.SetInt(NumberOfFileChurnMetricName + ":" + authorChurn.Key, authorChurn.Value);
                 }
@@ -87,7 +86,7 @@ namespace SEE.DataModel.DG.IO.Git
 
             if (simplifyGraph)
             {
-                foreach (var child in initialGraph.GetRoots()[0].Children().ToList())
+                foreach (Node child in initialGraph.GetRoots()[0].Children().ToList())
                 {
                     DoSimplifyGraph(child, initialGraph);
                 }
@@ -109,7 +108,7 @@ namespace SEE.DataModel.DG.IO.Git
         ///│  │  ├─ dir5/
         ///  ├─ dir4/
         /// </code>
-        /// will become:
+        /// would become:
         /// <code>
         ///root/
         /// ├─ dir1/dir2/dir6/
@@ -120,8 +119,8 @@ namespace SEE.DataModel.DG.IO.Git
         /// </code>
         ///
         /// </summary>
-        /// <param name="root">The root element of the graph to analyse from</param>
-        /// <param name="g">The <see cref="Graph"/> itself. Needed for cleaning up</param>
+        /// <param name="root">The root element of the graph to analyse from.</param>
+        /// <param name="g">The <see cref="Graph"/> itself. Needed for cleaning up.</param>
         private static void DoSimplifyGraph(Node root, Graph g)
         {
             if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())

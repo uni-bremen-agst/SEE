@@ -7,11 +7,7 @@ namespace SEE.Utils
 {
     /// <summary>
     /// This utility class can be used to work more easily with graphs.
-    ///</summary>
-    /// <remarks>
-    /// With GraphUtils it is possible to fill a graph with new nodes representing files and their coresponding directories.
-    /// </remarks>
-    ///
+    /// </summary>
     /// <example>
     /// <para>Filling a graph with nodes representing files</para>
     /// <code>
@@ -27,24 +23,32 @@ namespace SEE.Utils
     {
         #region Contants
 
+        /// <summary>
+        /// Typename used for files.
+        /// </summary>
         private const string FileType = "file";
 
+        /// <summary>
+        /// Typename used for directories.
+        /// </summary>
         private const string DirectoryType = "directory";
 
+        /// <summary>
+        /// Typename used for repositories.
+        /// </summary>
         public const string RepositoryTypeName = "Repository";
 
         #endregion
 
-
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">Where to add the node</param>
-        /// <param name="id">Unique ID of the new node</param>
-        /// <param name="type">Type of the new node</param>
-        /// <param name="name">The source name of the node</param>
-        /// <param name="length">The length of the graph element, measured in number of lines</param>
-        /// <returns>a new node added to <paramref name="graph"/></returns>
+        /// <param name="graph">Where to add the node.</param>
+        /// <param name="id">Unique ID of the new node.</param>
+        /// <param name="type">Type of the new node.</param>
+        /// <param name="name">The source name of the node.</param>
+        /// <param name="length">The length of the graph element, measured in number of lines.</param>
+        /// <returns>a new node added to <paramref name="graph"/>.</returns>
         public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null,
             int? length = null)
         {
@@ -61,16 +65,16 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Recursive algorithm to add a file with the path <paramref name="fullRelativePath"/> to the graph <paramref name="g"/>
+        /// Recursive algorithm to add a file with the path <paramref name="fullRelativePath"/> to the graph <paramref name="g"/>.
         ///
         /// This method will also add all directories in between.
         ///
         /// Files will have the node type <see cref="FileType"/> and also a Filename and Directory, so that the files can be opened in the CodeEditor.
-        /// Diecotries will have the node type <see cref="DirectoryType"/>
+        /// Directories will have the node type <see cref="DirectoryType"/>.
         /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node</param>
-        /// <param name="rootNode">The root node of the repository</param>
-        /// <param name="g">The graph to add the nodes to</param>
+        /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node.</param>
+        /// <param name="rootNode">The root node of the repository.</param>
+        /// <param name="g">The graph to add the nodes to.</param>
         /// <returns>The found file node</returns>
         public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph g, string idSuffix = "") =>
             GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, g, idSuffix: idSuffix);
@@ -79,11 +83,11 @@ namespace SEE.Utils
         /// <summary>
         /// The same as <see cref="GetOrAddNode"/> but with the actual logic.
         /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file</param>
-        /// <param name="path">The root node of the repository</param>
-        /// <param name="parent">The parent of the current node</param>
-        /// <param name="g">The graph to add the nodes to</param>
-        /// <returns></returns>
+        /// <param name="fullRelativePath">The full relative path of the file.</param>
+        /// <param name="path">The root node of the repository.</param>
+        /// <param name="parent">The parent of the current node.</param>
+        /// <param name="g">The graph to add the nodes to.</param>
+        /// <returns>The newly created or found node.</returns>
         private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph g,
             string idSuffix = "")
         {
@@ -133,13 +137,13 @@ namespace SEE.Utils
 
         /// <summary>
         /// Creates a new node for each element of a filepath, that does not
-        /// already exists in the graph.
+        /// already exist in the graph.
         /// </summary>
-        /// <param name="path">The remaining part of the path</param>
-        /// <param name="parent">The parent node from the current element of the path</param>
-        /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID</param>
-        /// <param name="graph">The graph to which the new node belongs to</param>
-        /// <param name="mainNode">The root node of the main directory</param>
+        /// <param name="path">The remaining part of the path.</param>
+        /// <param name="parent">The parent node from the current element of the path.</param>
+        /// <param name="parentPath">The path of the current parent, which will eventually be part of the ID.</param>
+        /// <param name="graph">The graph to which the new node belongs to.</param>
+        /// <param name="mainNode">The root node of the main directory.</param>
         [Obsolete("Replaced by GetOrAddNode")]
         public static Node BuildGraphFromPath(string path, Node parent, string parentPath, Graph graph, Node mainNode)
         {

@@ -4,12 +4,12 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// This component will be attached to all author spheres
+    /// This component will be attached to all author spheres.
     /// </summary>
     public class AuthorSphere : MonoBehaviour
     {
         /// <summary>
-        /// The E-Mail/Name of the author
+        /// The E-Mail/Name of the author.
         /// </summary>
         public string Author = "";
 

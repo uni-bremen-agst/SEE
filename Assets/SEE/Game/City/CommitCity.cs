@@ -7,8 +7,10 @@ using UnityEngine;
 namespace SEE.Game.City
 {
     /// <summary>
-    /// A city for the differences between two revisions of a software
-    /// stored in a version control system (VCS).
+    /// Former DiffCity.
+    ///
+    /// This city can visualize the differences between two commits in a VCS system.
+    /// Currently only git is supported here
     /// </summary>
     public class CommitCity : VCSCity
     {
@@ -27,7 +29,6 @@ namespace SEE.Game.City
         [ShowInInspector, Tooltip("New revision"),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string NewRevision = string.Empty;
-
 
         /// <summary>
         /// Label of attribute <see cref="OldRevision"/> in the configuration file.

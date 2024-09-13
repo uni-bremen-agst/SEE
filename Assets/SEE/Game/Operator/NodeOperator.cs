@@ -294,7 +294,7 @@ namespace SEE.Game.Operator
                         {
                             if (gameObject.TryGetComponent(out AuthorRef authorRef))
                             {
-                                foreach (var edge in authorRef.Edges)
+                                foreach ((GameObject, int) edge in authorRef.Edges)
                                 {
                                     SEESpline seeSpline = edge.Item1.GetComponent<SEESpline>();
 
@@ -303,9 +303,9 @@ namespace SEE.Game.Operator
                             }
                             else
                             {
-                                var children = gameObject.GetComponentsInChildren<AuthorRef>();
+                                AuthorRef[] children = gameObject.GetComponentsInChildren<AuthorRef>();
 
-                                foreach (var child in children)
+                                foreach (AuthorRef child in children)
                                 {
                                     child.Edges.ForEach(x =>
                                         x.Item1.GetComponent<SEESpline>()

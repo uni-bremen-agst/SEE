@@ -14,7 +14,7 @@ namespace SEE.GraphProviders
         MultiPipeline,
 
         /// <summary>
-        /// For <see cref="GitEvolutionGraphProvider"/>
+        /// For <see cref="GitEvolutionGraphProvider"/>.
         /// </summary>
         GitEvolution,
 
