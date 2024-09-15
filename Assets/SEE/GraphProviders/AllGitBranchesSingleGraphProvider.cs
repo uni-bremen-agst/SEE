@@ -20,16 +20,18 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// This provider analyses all branches of a given git repository specified in <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
+    /// This provider analyses all branches of a given git repository specified in
+    /// <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
     ///
-    /// This provider will collect all commits from the latest to the last one before <see cref="BranchCity.Date"/>.
+    /// This provider will collect all commits from the latest to the last one
+    /// before <see cref="BranchCity.Date"/>.
     ///
     /// The collected metrics are:
     /// <list type="bullet">
     /// <item>Metric.File.Commits</item>
     /// <item><see cref="DataModel.DG.VCS.NumberOfDevelopers"/></item>
-    /// <item>Metric.File.Churn</item>
-    /// <item>Metric.File.CoreDevs</item>
+    /// <item><see cref="DataModel.DG.VCS.Churn"/></item>
+    /// <item><see cref="DataModel.DG.VCS.TruckNumber"/></item>
     /// </list>
     /// </summary>
     [Serializable]
@@ -38,11 +40,14 @@ namespace SEE.GraphProviders
         #region Attributes
 
         /// <summary>
-        /// The List of filetypes that get included/excluded.
+        /// The list of file globbings for file inclusion/exclusion.
+        /// The key is the globbing pattern and the value is the inclusion status.
+        /// If the latter is true, the pattern is included, otherwise it is excluded.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-                         Tooltip("Paths and their inclusion/exclusion status."), RuntimeTab(GraphProviderFoldoutGroup),
+                         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+            RuntimeTab(GraphProviderFoldoutGroup),
                          HideReferenceObjectPicker]
         public IDictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
                          {
@@ -53,46 +58,35 @@ namespace SEE.GraphProviders
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
         /// and combine directories.
         /// </summary>
-        [OdinSerialize][ShowInInspector] public bool SimplifyGraph = false;
+        [Tooltip("If true, chains in the hierarchy will be simplified.")]
+        public bool SimplifyGraph = false;
 
         /// <summary>
-        /// Specifies if SEE should automatically fetch for new commits in the repository <see cref="RepositoryData"/>.
+        /// Specifies if SEE should automatically fetch for new commits in the
+        /// repository <see cref="RepositoryData"/>.
         ///
         /// This will append the path of this repo to <see cref="GitPoller"/>.
         ///
-        /// Note: the repository must be fetch-able without any credentials since we cant store them securely yet.
+        /// Note: the repository must be fetch-able without any credentials
+        /// since we can't store them securely yet.
         /// </summary>
-        [OdinSerialize][ShowInInspector] public bool AutoFetch = false;
+        [Tooltip("If true, the repository will be polled regularly for new changes")]
+        public bool AutoFetch = false;
 
         /// <summary>
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
-        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)] public int PollingInterval = 5;
+        [Tooltip("The interval in seconds in which the repositor should be polled. Used only if Auto Fetch is true."),
+            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        public int PollingInterval = 5;
 
         /// <summary>
-        /// If file changes where picked up by the <see cref="GitPoller"/> the affected files will be marked.
-        /// This filed specifies, for how long these markers should appear.
+        /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
+        /// will be marked. This field specifies for how long these markers should appear.
         /// </summary>
-        [OdinSerialize, ShowInInspector, EnableIf(nameof(AutoFetch)), Range(5, 200)] public int MarkerTime = 10;
-
-        #endregion
-
-        #region Constants
-
-        /// <summary>
-        /// Label for serializing the <see cref="PathGlobbing"/> field.
-        /// </summary>
-        private const string pathGlobbingLabel = "PathGlobbing";
-
-        /// <summary>
-        /// Label for serializing the <see cref="SimplifyGraph"/> field.
-        /// </summary>
-        private const string simplifyGraphLabel = "SimplifyGraph";
-
-        /// <summary>
-        /// Label for serializing the <see cref="AutoFetch"/> field.
-        /// </summary>
-        private const string autoFetchLabel = "AutoFetch";
+        [Tooltip("The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
+            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        public int MarkerTime = 10;
 
         #endregion
 
@@ -152,28 +146,19 @@ namespace SEE.GraphProviders
         {
             if (city is not BranchCity branchCity)
             {
-                throw new ArgumentException("Only a Branch city is supported");
+                throw new ArgumentException($"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
 
             CheckAttributes(branchCity);
 
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
-                cancellationToken: token);
-            if (AutoFetch)
-            {
-                if (city is not BranchCity seeCity)
-                {
-                    ShowNotification.Warn("Can't enable auto fetch",
-                        "Automatically fetching git repos is only supported in SEECity");
-                    return task;
-                }
+                                                       cancellationToken: token);
 
-                // Only add the poller when in playing mode
-                if (Application.isPlaying)
-                {
-                    GitPoller poller = GetOrAddGitPollerComponent(seeCity);
-                    poller.WatchedRepositories.Add(branchCity.VCSPath.Path);
-                }
+            // Only add the poller when in play mode.
+            if (AutoFetch && Application.isPlaying)
+            {
+                GitPoller poller = GetOrAddGitPollerComponent(branchCity);
+                poller.WatchedRepositories.Add(branchCity.VCSPath.Path);
             }
 
             return task;
@@ -183,7 +168,8 @@ namespace SEE.GraphProviders
         /// Calculates and returns the actual graph.
         ///
         /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
-        /// Then from all these commits the metrics are calculated with <see cref="GitFileMetricProcessor.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
+        /// Then from all these commits the metrics are calculated with
+        /// <see cref="GitFileMetricProcessor.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
         /// </summary>
         /// <param name="graph">The input graph.</param>
         /// <param name="changePercentage">The current status of the process.</param>
@@ -198,7 +184,7 @@ namespace SEE.GraphProviders
 
             GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, pathSegments[^1]);
 
-            // Assuming that CheckAttributes() was already executed so that the date string is not empty nor malformed.
+            // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
             using (Repository repo = new Repository(graph.BasePath))
@@ -211,10 +197,10 @@ namespace SEE.GraphProviders
                     .QueryBy(filter)
                     .Where(commit =>
                         DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
-                    // Filter out merge commits
+                    // Filter out merge commits.
                     .Where(commit => commit.Parents.Count() <= 1);
 
-                // select all files of this repo
+                // Select all files of this repo.
                 IEnumerable<string> files = repo.Branches
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
@@ -248,6 +234,35 @@ namespace SEE.GraphProviders
             return SingleGraphProviderKind.GitAllBranches;
         }
 
+        #endregion
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label for serializing the <see cref="PathGlobbing"/> field.
+        /// </summary>
+        private const string pathGlobbingLabel = "PathGlobbing";
+
+        /// <summary>
+        /// Label for serializing the <see cref="SimplifyGraph"/> field.
+        /// </summary>
+        private const string simplifyGraphLabel = "SimplifyGraph";
+
+        /// <summary>
+        /// Label for serializing the <see cref="AutoFetch"/> field.
+        /// </summary>
+        private const string autoFetchLabel = "AutoFetch";
+
+        /// <summary>
+        /// Label for serializing the <see cref="PollingInterval"/> field.
+        /// </summary>
+        private const string pollingIntervalLabel = "PollingInterval";
+
+        /// <summary>
+        /// Label for serializing the <see cref="MarkerTime"/> field.
+        /// </summary>
+        private const string markerTimeLabel = "MarkerTime";
+
         /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
@@ -257,6 +272,8 @@ namespace SEE.GraphProviders
             writer.Save(PathGlobbing as Dictionary<string, bool>, pathGlobbingLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
+            writer.Save(PollingInterval, pollingIntervalLabel);
+            writer.Save(MarkerTime, markerTimeLabel);
         }
 
         /// <summary>
@@ -265,17 +282,13 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            bool simplifyGraph = SimplifyGraph;
-            ConfigIO.Restore(attributes, simplifyGraphLabel, ref simplifyGraph);
-            SimplifyGraph = simplifyGraph;
-            bool autoFetch = AutoFetch;
-            ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
-            AutoFetch = autoFetch;
-            IDictionary<string, bool> pathGlob = PathGlobbing;
-            ConfigIO.Restore(attributes, "PathGlobing", ref pathGlob);
-
+            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
+            ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
+            ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
+            ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
+            ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
         }
 
-        #endregion
+        #endregion Config I/O
     }
 }
