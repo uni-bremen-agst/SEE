@@ -26,12 +26,12 @@ namespace SEE.Utils
         /// <summary>
         /// Typename used for files.
         /// </summary>
-        private const string FileType = "file";
+        private const string fileType = "file";
 
         /// <summary>
         /// Typename used for directories.
         /// </summary>
-        private const string DirectoryType = "directory";
+        private const string directoryType = "directory";
 
         /// <summary>
         /// Typename used for repositories.
@@ -47,17 +47,14 @@ namespace SEE.Utils
         /// <param name="id">Unique ID of the new node.</param>
         /// <param name="type">Type of the new node.</param>
         /// <param name="name">The source name of the node.</param>
-        /// <param name="length">The length of the graph element, measured in number of lines.</param>
         /// <returns>a new node added to <paramref name="graph"/>.</returns>
-        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null,
-            int? length = null)
+        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null)
         {
             Node result = new()
             {
                 SourceName = name,
                 ID = id,
                 Type = type,
-                //SourceLength = length
             };
 
             graph.AddNode(result);
@@ -65,20 +62,21 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Recursive algorithm to add a file with the path <paramref name="fullRelativePath"/> to the graph <paramref name="g"/>.
+        /// Recursive algorithm to add a file with the path <paramref name="fullRelativePath"/>
+        /// to the graph <paramref name="graph"/>.
         ///
         /// This method will also add all directories in between.
         ///
-        /// Files will have the node type <see cref="FileType"/> and also a Filename and Directory, so that the files can be opened in the CodeEditor.
-        /// Directories will have the node type <see cref="DirectoryType"/>.
+        /// Files will have the node type <see cref="fileType"/> and also a Filename and Directory,
+        /// so that the files can be opened in the CodeEditor.
+        /// Directories will have the node type <see cref="directoryType"/>.
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file this will become the ID of the newly created node.</param>
         /// <param name="rootNode">The root node of the repository.</param>
-        /// <param name="g">The graph to add the nodes to.</param>
+        /// <param name="graph">The graph to add the nodes to.</param>
         /// <returns>The found file node</returns>
-        public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph g, string idSuffix = "") =>
-            GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, g, idSuffix: idSuffix);
-
+        public static Node GetOrAddNode(string fullRelativePath, Node rootNode, Graph graph, string idSuffix = "") =>
+            GetOrAddNode(fullRelativePath, fullRelativePath, rootNode, graph, idSuffix: idSuffix);
 
         /// <summary>
         /// The same as <see cref="GetOrAddNode"/> but with the actual logic.
@@ -86,16 +84,16 @@ namespace SEE.Utils
         /// <param name="fullRelativePath">The full relative path of the file.</param>
         /// <param name="path">The root node of the repository.</param>
         /// <param name="parent">The parent of the current node.</param>
-        /// <param name="g">The graph to add the nodes to.</param>
+        /// <param name="graph">The graph to add the nodes to.</param>
         /// <returns>The newly created or found node.</returns>
-        private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph g,
+        private static Node GetOrAddNode(string fullRelativePath, string path, Node parent, Graph graph,
             string idSuffix = "")
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
-            // If we are in the directory of the file
+            // If we are in the directory of the file.
             if (pathSegments.Length == 1)
             {
-                // If the file node exists
+                // If the file node exists.
                 if (parent.Children().Any(x => x.ID + idSuffix == fullRelativePath))
                 {
                     return parent.Children().First(x => x.ID + idSuffix == fullRelativePath);
@@ -106,9 +104,9 @@ namespace SEE.Utils
                 string fileDir = String.Join(Path.AltDirectorySeparatorChar,
                     fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
 
-                // Create a new file node and return it
-                Node addedFileNode = NewNode(g, fullRelativePath + idSuffix,
-                    FileType, path);
+                // Create a new file node and return it.
+                Node addedFileNode = NewNode(graph, fullRelativePath + idSuffix,
+                    fileType, path);
                 addedFileNode.Filename = path;
                 addedFileNode.Directory = fileDir;
                 parent.AddChild(addedFileNode);
@@ -117,22 +115,22 @@ namespace SEE.Utils
 
             string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix;
 
-            // If the current Node parent already has the next directory with the name directoryName
+            // If the current Node parent already has the next directory with the name directoryName.
             if (parent.Children().Any(x => x.ID == directoryName))
             {
                 Node dirNode = parent.Children().First(x =>
                     x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
                 return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                    dirNode, g, idSuffix: idSuffix);
+                    dirNode, graph, idSuffix: idSuffix);
             }
 
-            // Create a new directory node
-            Node addedDirectoryNode = NewNode(g, directoryName,
-                DirectoryType, directoryName);
+            // Create a new directory node.
+            Node addedDirectoryNode = NewNode(graph, directoryName,
+                directoryType, directoryName);
             addedDirectoryNode.Directory = directoryName;
             parent.AddChild(addedDirectoryNode);
             return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                addedDirectoryNode, g, idSuffix: idSuffix);
+                addedDirectoryNode, graph, idSuffix: idSuffix);
         }
     }
 }
