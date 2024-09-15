@@ -43,12 +43,15 @@ namespace SEE.GraphProviders
         /// The key is the globbing pattern and the value is the inclusion status.
         /// If the latter is true, the pattern is included, otherwise it is excluded.
         /// </summary>
+        /// <remarks>We use <see cref="Dictionary{TKey, TValue}"/> rather than
+        /// <see cref="IDictionary{TKey, TValue}"/> because otherwise our config I/O
+        /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
                          Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
             RuntimeTab(GraphProviderFoldoutGroup),
                          HideReferenceObjectPicker]
-        public IDictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
+        public Dictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
                          {
                              { "**/*", true }
                          };
@@ -268,7 +271,7 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(PathGlobbing as Dictionary<string, bool>, pathGlobbingLabel);
+            writer.Save(PathGlobbing, pathGlobbingLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
