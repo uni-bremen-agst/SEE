@@ -307,11 +307,8 @@ namespace SEE.GraphProviders
         private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved,
             SingleGraphProvider loaded)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            Assert.AreEqual(saved.GetType(), loaded.GetType());
             AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
-            // Assert.AreEqual(gitBranchesLoaded.Date, saved.Date);
-            // AreEqual(gitBranchesLoaded.RepositoryData.RepositoryPath, saved.RepositoryData.RepositoryPath);
-            //Assert.AreEqual(gitBranchesLoaded.RepositoryData.PathGlobbing, saved.RepositoryData.PathGlobbing);
             Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
             Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
         }
@@ -320,8 +317,6 @@ namespace SEE.GraphProviders
         {
             return new AllGitBranchesSingleGraphProvider()
             {
-               // Date = "01/05/2024",
-                //RepositoryData = GetGitRepository()
                 PathGlobbing = new Dictionary<string, bool>()
                 {
                     {".cs", true},
