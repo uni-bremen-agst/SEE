@@ -147,7 +147,7 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                List<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
+                IList<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
 
                 float totalSteps = files.Count;
                 int currentStep = 0;
@@ -186,7 +186,7 @@ namespace SEE.GraphProviders
         /// <param name="files">all files, unfiltered</param>
         /// <param name="pathGlobbing">the include/exclude patterns</param>
         /// <returns>filtered files</returns>
-        static List<string> GetFilteredFiles(List<string> files, Dictionary<string, bool> pathGlobbing)
+        private static IList<string> GetFilteredFiles(IList<string> files, Dictionary<string, bool> pathGlobbing)
         {
             Matcher matcher = new();
 
@@ -312,7 +312,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="tree">The tree of the given commit.</param>
         /// <returns>a list of paths.</returns>
-        public static List<string> ListTree(LibGit2Sharp.Tree tree)
+        public static IList<string> ListTree(LibGit2Sharp.Tree tree)
         {
             List<string> fileList = new();
 
