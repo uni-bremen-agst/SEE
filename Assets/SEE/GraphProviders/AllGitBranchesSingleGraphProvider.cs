@@ -51,7 +51,8 @@ namespace SEE.GraphProviders
                          };
 
         /// <summary>
-        /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.DoSimplyfiGraph"/> and combine directories.
+        /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
+        /// and combine directories.
         /// </summary>
         [OdinSerialize][ShowInInspector] public bool SimplifyGraph = false;
 
