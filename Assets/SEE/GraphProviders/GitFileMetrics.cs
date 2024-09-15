@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SEE.GraphProviders
+namespace SEE.GraphProviders.VCS
 {
     /// <summary>
     /// Represents the metrics of a file which are collected from a git repository.

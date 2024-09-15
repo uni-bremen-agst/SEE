@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
 
-namespace SEE.GraphProviders
+namespace SEE.GraphProviders.VCS
 {
     /// <summary>
     /// Generates a <see cref="Graph"/> from the metrics of a <see cref="GitFileMetricProcessor"/>

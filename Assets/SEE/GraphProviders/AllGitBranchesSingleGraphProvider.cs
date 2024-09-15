@@ -9,6 +9,7 @@ using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
+using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
