@@ -9,7 +9,6 @@ using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
