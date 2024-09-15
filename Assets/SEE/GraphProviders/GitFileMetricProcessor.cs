@@ -103,11 +103,12 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Calculates the truck factor based on a LOC-based heuristic by Yamashita et al (2015)
-        /// for estimating the coreDev set. Cited by Ferreira et. al.
+        /// Calculates the truck factor based on a LOC-based heuristic by Yamashita et al. (2015)
+        /// for estimating the coreDev set. Cited by Ferreira et al.
         ///
         /// Source/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
+        /// <param name="developersChurn">The churn of each developer</param>
         /// <returns>The calculated truck factor</returns>
         private static int CalculateTruckFactor(IDictionary<string, int> developersChurn)
         {
