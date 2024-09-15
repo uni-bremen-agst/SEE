@@ -18,6 +18,7 @@ using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.DataModel.DG.IO;
 using SEE.DataModel;
+using SEE.GameObjects;
 
 namespace SEE.Game.City
 {
@@ -80,7 +81,7 @@ namespace SEE.Game.City
             {
                 if (loadedGraph != null)
                 {
-                    Reset();
+                    ResetGraphData();
                 }
                 Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
@@ -114,6 +115,11 @@ namespace SEE.Game.City
         /// </summary>
         [NonSerialized]
         private Graph visualizedSubGraph = null;
+
+        /// <summary>
+        /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
+        /// </summary>
+        private bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -308,6 +314,9 @@ namespace SEE.Game.City
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
                                                           out Action<float> reportProgress))
                     {
+                        ShowNotification.Info("SEECity", "Loading graph");
+                        IsPipelineRunning = true;
+
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
@@ -317,7 +326,9 @@ namespace SEE.Game.City
                         ReportProgress(0.01f);
 
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                                                                      cancellationTokenSource.Token);
+                            cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
+                        ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                     }
                 }
                 catch (OperationCanceledException)
@@ -388,6 +399,12 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
+            if (IsPipelineRunning)
+            {
+                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
+                return;
+            }
+
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
@@ -404,6 +421,7 @@ namespace SEE.Game.City
                     DrawAsync(theVisualizedSubGraph).Forget();
                 }
             }
+
             return;
 
             async UniTaskVoid DrawAsync(Graph subGraph)
@@ -491,6 +509,23 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// This method will cancel any running graph provider pipeline and delete the currently
+        /// loaded graph.
+        /// </summary>
+        private void ResetGraphData()
+        {
+            // Cancel any ongoing loading operation and reset the token.
+            cancellationTokenSource.Cancel();
+            IsPipelineRunning = false;
+            cancellationTokenSource = new CancellationTokenSource();
+
+            // Delete the underlying graph.
+            loadedGraph?.Destroy();
+            loadedGraph = null;
+            visualizedSubGraph = null;
+        }
+
+        /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
         /// </summary>
@@ -501,13 +536,12 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
-            // Cancel any ongoing loading operation and reset the token.
-            cancellationTokenSource.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
-            // Delete the underlying graph.
-            loadedGraph?.Destroy();
-            loadedGraph = null;
-            visualizedSubGraph = null;
+            ResetGraphData();
+            // Remove the poller.
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroyer.Destroy(poller);
+            }
         }
 
         /// <summary>
