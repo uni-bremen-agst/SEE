@@ -4,8 +4,9 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// This component will be attached to all author spheres.
+    /// Attributes of an author sphere.
     /// </summary>
+    /// <remarks>This component will be attached to all author spheres.</remarks>
     public class AuthorSphere : MonoBehaviour
     {
         /// <summary>
@@ -14,7 +15,7 @@ namespace SEE.GameObjects
         public string Author = "";
 
         /// <summary>
-        /// A List of all edges the author sphere has and the churn amount.
+        /// The list of all edges the author sphere has and their associated churn.
         /// </summary>
         public IList<(GameObject, int)> Edges = new List<(GameObject, int)>();
     }
