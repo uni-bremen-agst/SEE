@@ -10,7 +10,7 @@ namespace SEE.Game.City
     /// Former DiffCity.
     ///
     /// This city can visualize the differences between two commits in a VCS system.
-    /// Currently only git is supported here
+    /// Currently only git is supported here.
     /// </summary>
     public class CommitCity : VCSCity
     {
@@ -29,6 +29,8 @@ namespace SEE.Game.City
         [ShowInInspector, Tooltip("New revision"),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string NewRevision = string.Empty;
+
+        #region Config I/O
 
         /// <summary>
         /// Label of attribute <see cref="OldRevision"/> in the configuration file.
@@ -61,5 +63,7 @@ namespace SEE.Game.City
             ConfigIO.Restore(attributes, oldRevisionLabel, ref OldRevision);
             ConfigIO.Restore(attributes, newRevisionLabel, ref NewRevision);
         }
+
+        #endregion Config I/O
     }
 }
