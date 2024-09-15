@@ -249,5 +249,29 @@ namespace SEE.Utils
             return directory[^1] == UnixDirectorySeparator ?
                 directory + filename : directory + UnixDirectorySeparator + filename;
         }
+
+        /// <summary>
+        /// Recursively deletes a directory as well as any subdirectories and files.
+        /// If the files are read-only, they are flagged as normal and then deleted.
+        /// </summary>
+        /// <param name="directory">The name of the directory to remove.</param>
+        /// <remarks>Source: https://stackoverflow.com/questions/25549589/programmatically-delete-local-repository-with-libgit2sharp
+        /// by AJ Richardson</remarks>
+        public static void DeleteReadOnlyDirectory(string directory)
+        {
+            foreach (string subdirectory in Directory.EnumerateDirectories(directory))
+            {
+                DeleteReadOnlyDirectory(subdirectory);
+            }
+            foreach (string fileName in Directory.EnumerateFiles(directory))
+            {
+                FileInfo fileInfo = new(fileName)
+                {
+                    Attributes = FileAttributes.Normal
+                };
+                fileInfo.Delete();
+            }
+            Directory.Delete(directory);
+        }
     }
 }
