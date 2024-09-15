@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using SEE.DataModel.DG;
 
-namespace SEE.Utils
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// This utility class can be used to work more easily with graphs.

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
-using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
