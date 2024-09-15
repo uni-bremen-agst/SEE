@@ -15,6 +15,10 @@ using UnityEngine.TestTools;
 
 namespace SEETests
 {
+    /// <summary>
+    /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
+    /// <see cref="GitEvolutionGraphProvider"/>"/>.
+    /// </summary>
     public class TestGitGraphProvider
     {
         /// <summary>
@@ -40,8 +44,8 @@ namespace SEETests
             new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
 
         /// <summary>
-        /// Creates a new file in the path <paramref name="path"/> and fills or append the file with the
-        /// text string <paramref name="text"/>.
+        /// Creates a new file in the path <paramref name="path"/> and fills or appends the file with
+        /// the given <paramref name="text"/>.
         ///
         /// Then a git commit is made
         /// </summary>
@@ -189,7 +193,6 @@ namespace SEETests
             return UniTask.ToCoroutine(async () =>
             {
                 WriteFile("firstFile.cs", "This is a test", testSig);
-
                 WriteFile("firstFile.cs", "This is a test from Jan", testSig2);
 
                 Graph g = await ProvidingGraphAsync();
@@ -210,8 +213,7 @@ namespace SEETests
                 WriteFile("firstFile.cs", "This is a test", testSig);
                 repo.CreateBranch("newBranch");
                 WriteFile("firstFile.cs", "This is a test on newBranch", testSig);
-                Commands.Checkout(repo, repo.Branches["main"]);
-
+                Commands.Checkout(repo, repo.Branches["master"]);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
@@ -230,9 +232,7 @@ namespace SEETests
             {
                 WriteFile("firstFile.cs", "This is a test", testSig);
                 WriteFile("firstFile.cs", "This is another test", testSig);
-
                 WriteFile("otherfile.notcs", "This is another test in another file", testSig);
-
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
@@ -299,14 +299,18 @@ namespace SEETests
         {
             gitDirPath = Path.GetTempPath() + "seeGitTest";
             Directory.CreateDirectory(gitDirPath);
-            string repoPath = Repository.Init(gitDirPath);
-            repo = new Repository(repoPath);
+            Debug.Log($"Created a temporary Git repository at {gitDirPath}\n");
+            repo = new Repository(Repository.Init(gitDirPath));
         }
 
         [TearDown, UnityTearDown]
         public void TearDown()
         {
-            Directory.Delete(gitDirPath, true);
+            repo?.Dispose();
+            if (Directory.Exists(gitDirPath))
+            {
+                SEE.Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
+            }
         }
     }
 }
