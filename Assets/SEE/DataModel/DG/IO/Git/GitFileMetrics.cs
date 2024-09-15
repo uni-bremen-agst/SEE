@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using JetBrains.Annotations;
 
 namespace SEE.DataModel.DG.IO.Git
 {
@@ -31,12 +30,13 @@ namespace SEE.DataModel.DG.IO.Git
 
         /// <summary>
         /// The truck/bus factor of this file.
-        /// This is the number of contributors which have contributed at least 80% of the source code.
+        /// This is the number of contributors which have contributed at least 80% of
+        /// the source code.
         /// </summary>
         public int TruckFactor { get; set; }
 
         /// <summary>
-        /// Total sum of changed lines (added and removed).
+        /// Total sum of changed lines (added or removed).
         /// </summary>
         public int Churn { get; set; }
 
