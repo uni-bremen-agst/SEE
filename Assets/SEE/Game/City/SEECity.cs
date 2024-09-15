@@ -117,7 +117,7 @@ namespace SEE.Game.City
         private Graph visualizedSubGraph = null;
 
         /// <summary>
-        /// Specifies if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
+        /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
         private bool IsPipelineRunning;
 
@@ -401,7 +401,6 @@ namespace SEE.Game.City
         {
             if (IsPipelineRunning)
             {
-                Debug.LogError("Pipeline is still running");
                 ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
                 return;
             }
@@ -510,7 +509,8 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// This method will cancel any running graph provider pipelines and delete the current loaded graph.
+        /// This method will cancel any running graph provider pipeline and delete the currently
+        /// loaded graph.
         /// </summary>
         private void ResetGraphData()
         {
@@ -537,7 +537,7 @@ namespace SEE.Game.City
         {
             base.Reset();
             ResetGraphData();
-            // Remove the poller
+            // Remove the poller.
             if (TryGetComponent(out GitPoller poller))
             {
                 Destroyer.Destroy(poller);
