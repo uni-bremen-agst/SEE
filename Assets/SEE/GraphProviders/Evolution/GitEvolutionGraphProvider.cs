@@ -8,7 +8,6 @@ using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;

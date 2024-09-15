@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace SEE.DataModel.DG.IO.Git
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// Represents the metrics of a file which are collected from a git repository.

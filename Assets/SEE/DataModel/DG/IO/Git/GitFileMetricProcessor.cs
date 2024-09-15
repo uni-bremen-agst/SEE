@@ -5,7 +5,7 @@ using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Utils;
 
-namespace SEE.DataModel.DG.IO.Git
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// Processes and collects all metrics from all files of a git repository.

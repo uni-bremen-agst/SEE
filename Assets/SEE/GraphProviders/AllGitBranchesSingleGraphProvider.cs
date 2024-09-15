@@ -7,7 +7,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO.Git;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.UI.Notification;

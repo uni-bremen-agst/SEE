@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.DataModel.DG;
 using SEE.Utils;
 
-namespace SEE.DataModel.DG.IO.Git
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// Generates a <see cref="Graph"/> from the metrics of a <see cref="GitFileMetricProcessor"/>
