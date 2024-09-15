@@ -9,20 +9,9 @@ using UnityEngine;
 namespace SEE.Game.City
 {
     /// <summary>
-    /// A VCS based city.
-    ///
-    /// This class alone should not be used directly but rather with its inheritors:
-    /// <list type="bullet">
-    /// <item>
-    /// <see cref="CommitCity"/>
-    /// </item>
-    /// <item>
-    /// <see cref="BranchCity"/>
-    /// </item>
-    /// </list>
-    ///
+    /// A city based on the data of a version control system (VCS).
     /// </summary>
-    public class VCSCity : SEECity
+    public abstract class VCSCity : SEECity
     {
         /// <summary>
         /// Name of the Inspector foldout group for the version control system
@@ -43,7 +32,6 @@ namespace SEE.Game.City
         [ShowInInspector, Tooltip("VCS path"),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public DataPath VCSPath = new();
-
 
         #region Config I/O
 
