@@ -68,7 +68,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Node child in initialGraph.GetRoots()[0].Children().ToList())
                 {
-                    SimplifyGraph(child, initialGraph);
+                    SimplifyGraph(child);
                 }
             }
         }
@@ -100,27 +100,27 @@ namespace SEE.GraphProviders
         ///
         /// </summary>
         /// <param name="root">The root element of the graph to analyse from.</param>
-        /// <param name="g">The <see cref="Graph"/> itself. Needed for cleaning up.</param>
-        private static void SimplifyGraph(Node root, Graph g)
+        private static void SimplifyGraph(Node root)
         {
+            Graph graph = root.ItsGraph;
             if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())
             {
                 foreach (Node child in root.Children().ToList())
                 {
                     child.Reparent(root.Parent);
-                    SimplifyGraph(child, g);
+                    SimplifyGraph(child);
                 }
 
-                if (g.ContainsNode(root))
+                if (graph.ContainsNode(root))
                 {
-                    g.RemoveNode(root);
+                    graph.RemoveNode(root);
                 }
             }
             else
             {
                 foreach (Node node in root.Children().Where(x => x.Type == "directory").ToList())
                 {
-                    SimplifyGraph(node, g);
+                    SimplifyGraph(node);
                 }
             }
         }
