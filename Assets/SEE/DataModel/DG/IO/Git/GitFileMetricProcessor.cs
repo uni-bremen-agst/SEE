@@ -10,7 +10,8 @@ namespace SEE.DataModel.DG.IO.Git
     /// <summary>
     /// Processes and collects all metrics from all files of a git repository.
     ///
-    /// This class works by passing each commit to <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> to collect the file changes.
+    /// This class works by passing each commit to
+    /// <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> to collect the file changes.
     ///
     /// The calculated metrics for each file are stored in <see cref="FileToMetrics"/>
     /// </summary>
@@ -46,7 +47,7 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// Matcher is used to check by a glob pattern if a file should be included in the analysis or not.
         /// </summary>
-        private Matcher matcher;
+        private readonly Matcher matcher;
 
         /// <summary>
         /// Used in the calculation of the truck factor.
@@ -100,13 +101,11 @@ namespace SEE.DataModel.DG.IO.Git
             }
         }
 
-
         /// <summary>
-        /// Calculates the truck factor based a LOC-based heuristic by Yamashita et al (2015). for estimating the coreDev set.
+        /// Calculates the truck factor based on a LOC-based heuristic by Yamashita et al (2015)
+        /// for estimating the coreDev set. Cited by Ferreira et. al.
         ///
-        /// cited by. Ferreira et. al
-        ///
-        /// Soruce/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
+        /// Source/Math: https://doi.org/10.1145/2804360.2804366, https://doi.org/10.1007/s11219-019-09457-2
         /// </summary>
         /// <returns>The calculated truck factor</returns>
         private static int CalculateTruckFactor(IDictionary<string, int> developersChurn)
@@ -144,7 +143,8 @@ namespace SEE.DataModel.DG.IO.Git
         /// Processes a commit and calculates the metrics.
         /// </summary>
         /// <param name="commit">The commit that should be processed</param>
-        /// <param name="commitChanges">The changes the commit has made. This will be most likely the changes between this commit and its parent</param>
+        /// <param name="commitChanges">The changes the commit has made. This will be most likely the
+        /// changes between this commit and its parent</param>
         public void ProcessCommit(Commit commit, [CanBeNull] Patch commitChanges)
         {
             if (commitChanges == null || commit == null)
@@ -190,10 +190,12 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// Processes a commit and calculates the metrics.
         ///
-        /// This method will get the changes by comparing <paramref name="commit"/> with its parent (if one exists).
-        /// If the changes are already calculated <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> can be used.
+        /// This method will get the changes by comparing <paramref name="commit"/> with its
+        /// parent (if one exists).
+        /// If the changes are already calculated
+        /// <see cref="ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/> can be used.
         /// </summary>
-        /// <param name="commit"></param>
+        /// <param name="commit">the commit to be processed</param>
         public void ProcessCommit(Commit commit)
         {
             if (commit == null)
