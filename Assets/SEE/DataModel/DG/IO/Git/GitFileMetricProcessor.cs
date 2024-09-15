@@ -32,7 +32,8 @@ namespace SEE.DataModel.DG.IO.Git
         /// <summary>
         /// Maps the filename to the collected git metrics of that file
         /// </summary>
-        public IDictionary<string, GitFileMetrics> FileToMetrics { get; } = new Dictionary<string, GitFileMetrics>();
+        public IDictionary<string, GitFileMetrics> FileToMetrics { get; }
+            = new Dictionary<string, GitFileMetrics>();
 
         /// <summary>
         /// The git repository to collect the metrics from
