@@ -451,13 +451,13 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Test for <see cref="VCSCity"/>.
+        /// Test for <see cref="CommitCity"/>.
         /// </summary>
-        /// <remarks>We test only the attributes specific to <see cref="VCSCity"/>
+        /// <remarks>We test only the attributes specific to <see cref="CommitCity"/>
         /// excluding those just inherited. We trust that the inherited attributes
         /// are tested by <see cref="TestSEECity"/>.</remarks>
         [Test]
-        public void TestDiffCity()
+        public void TestCommitCity()
         {
             string filename = Path.GetTempFileName();
             string vcsPath = "/c/mypath/myvcs";
@@ -465,7 +465,7 @@ namespace SEE.Utils
             try
             {
                 // First save a new city with all its default values.
-                VCSCity savedCity = NewVanillaSEECity<VCSCity>();
+                CommitCity savedCity = NewVanillaSEECity<CommitCity>();
                 savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
                 savedCity.Save(filename);
@@ -473,7 +473,7 @@ namespace SEE.Utils
                 // Create a new city with all its default values and then
                 // wipe out all its attributes to see whether they are correctly
                 // restored from the saved configuration file.
-                VCSCity loadedCity = NewVanillaSEECity<VCSCity>();
+                CommitCity loadedCity = NewVanillaSEECity<CommitCity>();
                 WipeOutDiffCityAttributes(loadedCity);
                 // Load the saved attributes from the configuration file.
                 loadedCity.Load(filename);
