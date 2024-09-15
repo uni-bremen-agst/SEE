@@ -15,38 +15,42 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// GitPoller is used to regularly fetch for new changes in the git repositories specified im <see cref="WatchedRepositories"/>.
+    /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
+    /// git repositories specified im <see cref="WatchedRepositories"/>.
     ///
-    /// When a new commit was detected on any branch a refresh of the CodeCity is initiated.
+    /// When a new commit was detected on any branch, a refresh of the CodeCity is initiated.
     /// Newly added or changed nodes will be marked after the refresh.
     ///
-    /// This component will be added automatically by <see cref="AllGitBranchesSingleGraphProvider"/> when <see cref="AllGitBranchesSingleGraphProvider.AutoFetch"/> is set to true.
+    /// This component will be added automatically by <see cref="AllGitBranchesSingleGraphProvider"/>
+    /// if <see cref="AllGitBranchesSingleGraphProvider.AutoFetch"/> is set to true.
     /// </summary>
     public class GitPoller : MonoBehaviour
     {
         /// <summary>
-        /// The code city where the <see cref="AllGitBranchesSingleGraphProvider"/> graph provider was executed and
-        /// which should be updated when a new commit is detected.
+        /// The code city where the <see cref="AllGitBranchesSingleGraphProvider"/> graph provider
+        /// was executed and which should be updated when a new commit is detected.
         /// </summary>
         public SEECity CodeCity;
 
         /// <summary>
-        /// The full paths to the repositories which should be watched for updates.
+        /// The full paths to the repositories that should be watched for updates.
         /// </summary>
         [ShowInInspector] public HashSet<string> WatchedRepositories = new();
 
         /// <summary>
-        /// The interval in seconds in which git should fetch.
+        /// The interval in seconds in which git should be polled.
         /// </summary>
         public int PollingInterval = 5;
 
         /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly added or modified nodes.
+        /// The time in seconds for how long the node markers should be shown for newly
+        /// added or modified nodes.
         /// </summary>
         public int MarkerTime = 10;
 
         /// <summary>
-        /// Maps the repository (path) to a list of all hashes of the branches from the repository.
+        /// Maps the repository (path) to a list of all hashes of the branches from
+        /// the repository.
         /// </summary>
         private Dictionary<string, List<string>> RepositoriesTipHashes = new();
 
@@ -68,21 +72,18 @@ namespace SEE.GameObjects
         {
             foreach (string repoPath in WatchedRepositories)
             {
-                using (Repository repo = new Repository(repoPath))
+                using Repository repo = new(repoPath);
+                // Fetch all remote branches
+                foreach (Remote remote in repo.Network.Remotes)
                 {
-                    Debug.Log($"Fetch Repo {repoPath}");
-                    // Fetch all remote branches
-                    foreach (Remote remote in repo.Network.Remotes)
+                    IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                    try
                     {
-                        IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                        try
-                        {
-                            Commands.Fetch(repo, remote.Name, refSpecs, null, "");
-                        }
-                        catch (LibGit2SharpException e)
-                        {
-                            Debug.LogError($"Error while running git fetch : {e.Message}");
-                        }
+                        Commands.Fetch(repo, remote.Name, refSpecs, null, "");
+                    }
+                    catch (LibGit2SharpException e)
+                    {
+                        Debug.LogError($"Error while running git fetch : {e.Message}.\n");
                     }
                 }
             }
@@ -91,30 +92,28 @@ namespace SEE.GameObjects
         /// <summary>
         /// Gets the hashes of all tip commits from all branches in all watched repositories.
         /// </summary>
-        /// <returns>A Mapping from a repository path to a list of the hashes of all tip commits.</returns>
+        /// <returns>A mapping from a repository path to a list of the hashes of all tip
+        /// commits.</returns>
         private Dictionary<string, List<string>> GetTipHashes()
         {
             Dictionary<string, List<string>> result = new();
             foreach (string repoPath in WatchedRepositories)
             {
-                using (Repository repo = new Repository(repoPath))
-                {
-                    result.Add(repoPath, repo.Branches.Select(x => x.Tip.Sha).ToList());
-                }
+                using Repository repo = new Repository(repoPath);
+                result.Add(repoPath, repo.Branches.Select(x => x.Tip.Sha).ToList());
             }
 
             return result;
         }
 
         /// <summary>
-        /// Unity start function.
-        /// This method will start the actual poller.
+        /// Starts the actual poller.
         /// </summary>
-        public void Start()
+        private void Start()
         {
             if (WatchedRepositories.Count == 0)
             {
-                Debug.Log("No watched repositories");
+                Debug.Log("No watched repositories.\n");
                 return;
             }
 
@@ -131,12 +130,11 @@ namespace SEE.GameObjects
         }
 
         /// <summary>
-        /// Shows a message to the user, that a new commit was detected.
+        /// Shows a message to the user that a new commit was detected.
         /// </summary>
         private void ShowNewCommitsMessage()
         {
-            Debug.Log("New commits detected");
-            ShowNotification.Info("New commits detected", "Refreshing code city");
+            ShowNotification.Info("New commits detected", "Refreshing code city.");
         }
 
         /// <summary>
@@ -147,9 +145,10 @@ namespace SEE.GameObjects
         /// <summary>
         /// Is called in every <see cref="PollingInterval"/> seconds.
         ///
-        /// This method will fetch the newest commits and if new commits exist the code city is refreshed.
+        /// This method will fetch the newest commits and if new commits exist the
+        /// code city is refreshed.
         /// </summary>
-        async UniTaskVoid PollReposAsync()
+        private async UniTaskVoid PollReposAsync()
         {
             if (!doNotPool)
             {
@@ -177,19 +176,15 @@ namespace SEE.GameObjects
                         Debug.LogError(e);
                     }
 
-                    ISet<Node> addedNodes;
-                    ISet<Node> changedNodes;
-
                     CodeCity.LoadedGraph.Diff(oldGraph,
                         g => g.Nodes(),
                         (g, id) => g.GetNode(id),
                         GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
                         nodeEqualityComparer,
-                        out addedNodes,
+                        out ISet<Node> addedNodes,
                         out _,
-                        out changedNodes,
+                        out ISet<Node> changedNodes,
                         out _);
-                    Debug.Log($"{changedNodes.Count} changed nodes");
 
                     foreach (Node changedNode in changedNodes)
                     {
@@ -209,7 +204,7 @@ namespace SEE.GameObjects
         }
 
         /// <summary>
-        /// This method will remove all markers after <see cref="MarkerTime"/> seconds.
+        /// Removes all markers.
         /// </summary>
         private void RemoveMarker() => markerFactory.Clear();
     }
