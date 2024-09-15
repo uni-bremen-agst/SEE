@@ -34,18 +34,15 @@ namespace SEE.GraphProviders.Evolution
         /// <summary>
         /// The date limit until commits should be analyzed.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+        [InspectorName("Date Limit"),
+         Tooltip("The date until commits should be analyzed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
         /// <summary>
         /// Specifies if the resulting graph should be simplified.
         /// This means that directories which only contains other directories will be combined to safe space in the code city.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analysed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+        [Tooltip("If true, chains in the hierarchy will be simplified."), RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
         /// <summary>
@@ -172,18 +169,18 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
         /// <param name="repo">The git repository in which the commit was made.</param>
         /// <param name="files">A List of all files in the git repository.</param>
-        /// <param name="includedFiles">All included file extensions.</param>
         /// <returns>The graoh of the evolution step.</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
             IDictionary<Commit, Patch> commitChanges, Repository repo, IList<string> files)
         {
-            Graph g = new Graph(GitRepository.RepositoryPath.Path);
-            g.BasePath = GitRepository.RepositoryPath.Path;
+            Graph g = new(GitRepository.RepositoryPath.Path)
+            {
+                BasePath = GitRepository.RepositoryPath.Path
+            };
             GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
 
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
-
 
             GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files);
 
@@ -209,20 +206,29 @@ namespace SEE.GraphProviders.Evolution
         {
             if (commit.Parents.Any())
             {
-                return repo.Diff
-                    .Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                return repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
             }
 
-            return repo.Diff
-                .Compare<Patch>(null, commit.Tree);
+            return repo.Diff.Compare<Patch>(null, commit.Tree);
         }
 
         /// <summary>
         /// Returns the kind of this provider.
         /// </summary>
         /// <returns>Returns <see cref="MultiGraphProviderKind.GitEvolution"/>.</returns>
-        public override MultiGraphProviderKind GetKind()
-            => MultiGraphProviderKind.GitEvolution;
+        public override MultiGraphProviderKind GetKind() => MultiGraphProviderKind.GitEvolution;
+
+        #region Config IO
+
+        /// <summary>
+        /// The label for <see cref="Date"/> in the configuration file.
+        /// </summary>
+        private const string dateLabel = "Date";
+
+        /// <summary>
+        /// The label for <see cref="GitRepository"/> in the configuration file.
+        /// </summary>
+        private const string gitRepositoryLabel = "Repository";
 
         /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
@@ -230,9 +236,8 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            GitRepository.RepositoryPath.Save(writer, "RepositoryPath");
-            writer.Save(GitRepository.PathGlobbing, "PathGlobing");
-            writer.Save(Date, "Date");
+            GitRepository.Save(writer, gitRepositoryLabel);
+            writer.Save(Date, dateLabel);
         }
 
         /// <summary>
@@ -241,9 +246,9 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            GitRepository.RepositoryPath.Restore(attributes, "RepositoryPath");
-            ConfigIO.Restore(attributes, "PathGlobing", ref GitRepository.PathGlobbing);
-            ConfigIO.Restore(attributes, "Date", ref Date);
+            GitRepository.Restore(attributes, gitRepositoryLabel);
+            ConfigIO.Restore(attributes, dateLabel, ref Date);
         }
+        #endregion Config IO
     }
 }
