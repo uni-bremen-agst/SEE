@@ -17,19 +17,31 @@ namespace SEETests
 {
     public class TestGitGraphProvider
     {
+        /// <summary>
+        /// Path to the git directory.
+        /// </summary>
         private string gitDirPath;
 
-
+        /// <summary>
+        /// The Git repository.
+        /// </summary>
         private Repository repo;
 
-        private Signature testSig = new Signature("John Doe", "doe@example.com",
-            new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
-
-        private Signature testSig2 = new Signature("Jan Muller", "muller@example.com",
+        /// <summary>
+        /// Signature of one developer.
+        /// </summary>
+        private readonly Signature testSig = new("John Doe", "doe@example.com",
             new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
 
         /// <summary>
-        /// Creates a new file in the path <paramref name="path"/> and fills or append the file with the text string <paramref name="text"/>.
+        /// Signature of another developer.
+        /// </summary>
+        private readonly Signature testSig2 = new("Jan Muller", "muller@example.com",
+            new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+
+        /// <summary>
+        /// Creates a new file in the path <paramref name="path"/> and fills or append the file with the
+        /// text string <paramref name="text"/>.
         ///
         /// Then a git commit is made
         /// </summary>
@@ -51,11 +63,11 @@ namespace SEETests
         }
 
         /// <summary>
-        /// Executes the graph provider
+        /// Executes the graph provider.
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<Graph> ProvidingGraph(string date = "01/01/2024")
+        private async UniTask<Graph> ProvidingGraphAsync(string date = "01/01/2024")
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
@@ -67,7 +79,7 @@ namespace SEETests
             };
             city.Date = date;
 
-            void ReportProgress(float x)
+            static void ReportProgress(float x)
             {
                 // Do nothing here
             }
@@ -77,11 +89,11 @@ namespace SEETests
         }
 
         /// <summary>
-        /// Executes the graph provider
+        /// Executes the graph provider.
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<IList<Graph>> ProvidingGraphSeries(string date = "01/01/2024")
+        private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = "01/01/2024")
         {
             GameObject go = new();
             SEECityEvolution city = go.AddComponent<SEECityEvolution>();
@@ -94,7 +106,7 @@ namespace SEETests
                 PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
             };
 
-            void ReportProgress(float x)
+            static void ReportProgress(float x)
             {
                 // Do nothing here
             }
@@ -112,19 +124,18 @@ namespace SEETests
                 WriteFile("AnotherFile.cs", "This is a test", testSig);
                 WriteFile("AnotherFile.cs", "This is a test", testSig2);
 
-                IList<Graph> series = await ProvidingGraphSeries();
+                IList<Graph> series = await ProvidingGraphSeriesAsync();
                 Assert.AreEqual(3, series.Count);
 
-                Assert.AreEqual(1, series[0].GetNode("firstFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
+                Assert.AreEqual(1, series[0].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
 
-                Assert.AreEqual(1, series[1].GetNode("AnotherFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, series[1].GetNode("firstFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
+                Assert.AreEqual(1, series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, series[1].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
 
-                Assert.AreEqual(2, series[2].GetNode("AnotherFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, series[2].GetNode("firstFile.cs-Evo").IntAttributes["Metric.File.Commits"]);
+                Assert.AreEqual(2, series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, series[2].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
             });
         }
-
 
         [UnityTest]
         public IEnumerator TestGitProviderForMultipleFiles()
@@ -136,17 +147,17 @@ namespace SEETests
                 WriteFile("AnotherFile.cs", "This is a test", testSig2);
                 WriteFile(Path.Combine("dir1", "dir2", "actualFile.cs"), "This is a test", testSig2);
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n1 = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n1.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n1.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(1, n1.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n1.IntAttributes[VCS.NumberOfDevelopers]);
 
 
                 Assert.NotNull(g.GetNode("AnotherFile.cs"));
                 Node n2 = g.GetNode("AnotherFile.cs");
-                Assert.AreEqual(2, n2.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(2, n2.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(2, n2.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(2, n2.IntAttributes[VCS.NumberOfDevelopers]);
 
 
                 Assert.NotNull(g.GetNode("dir1/dir2/actualFile.cs"));
@@ -160,15 +171,15 @@ namespace SEETests
             {
                 WriteFile("firstFile.cs", "This is a test", testSig);
 
-                Graph g = await ProvidingGraph(date: "01/12/2024");
+                Graph g = await ProvidingGraphAsync(date: "01/12/2024");
                 // This file should be too old by now
-                Assert.AreEqual(0,g.GetNode("firstFile.cs").IntAttributes["Metric.File.AuthorsNumber"]);
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes["Metric.File.Commits"]);
-                Graph g2 = await ProvidingGraph();
+                Assert.AreEqual(0,g.GetNode("firstFile.cs").IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[VCS.CommitFrequency]);
+                Graph g2 = await ProvidingGraphAsync();
                 Assert.NotNull(g2.GetNode("firstFile.cs"));
                 Node n = g2.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
             });
         }
 
@@ -181,13 +192,13 @@ namespace SEETests
 
                 WriteFile("firstFile.cs", "This is a test from Jan", testSig2);
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(2, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[VCS.NumberOfDevelopers]);
             });
         }
 
@@ -202,13 +213,13 @@ namespace SEETests
                 Commands.Checkout(repo, repo.Branches["main"]);
 
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
             });
         }
 
@@ -223,13 +234,13 @@ namespace SEETests
                 WriteFile("otherfile.notcs", "This is another test in another file", testSig);
 
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
 
                 Assert.IsNull(g.GetNode("otherfile.notcs"));
             });
@@ -243,13 +254,13 @@ namespace SEETests
                 WriteFile("firstFile.cs", "This is a test", testSig);
                 WriteFile("firstFile.cs", "This is another test", testSig);
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
             });
         }
 
@@ -260,7 +271,7 @@ namespace SEETests
                 {
                     WriteFile("firstFile.cs", "This is a test", testSig);
 
-                    Graph g = await ProvidingGraph();
+                    Graph g = await ProvidingGraphAsync();
                     Assert.IsNull(g.GetNode("file/does/not/exists"));
                 }
             );
@@ -273,13 +284,13 @@ namespace SEETests
             {
                 WriteFile("firstFile.cs", "This is a test", testSig);
 
-                Graph g = await ProvidingGraph();
+                Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.Commits"]);
-                Assert.AreEqual(1, n.IntAttributes["Metric.File.AuthorsNumber"]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
             });
         }
 

@@ -27,7 +27,7 @@ namespace SEE.GraphProviders
     /// The collected metrics are:
     /// <list type="bullet">
     /// <item>Metric.File.Commits</item>
-    /// <item>Metric.File.AuthorsNumber</item>
+    /// <item><see cref="DataModel.DG.VCS.NumberOfDevelopers"/></item>
     /// <item>Metric.File.Churn</item>
     /// <item>Metric.File.CoreDevs</item>
     /// </list>

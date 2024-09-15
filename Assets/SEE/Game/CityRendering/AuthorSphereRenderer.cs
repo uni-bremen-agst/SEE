@@ -17,20 +17,10 @@ namespace SEE.Game.CityRendering
     /// Implements the methods for rendering author spheres in a branch city.
     ///
     /// This functionality is primarily needed for a <see cref="BranchCity"/> and builds on the precondition that
-    /// nodes have authors which are marked by the <see cref="AuthorAttributeName"/> attribute.
+    /// nodes have authors which are marked by the <see cref="DataModel.DG.VCS.AuthorAttributeName"/> attribute.
     /// </summary>
     public partial class GraphRenderer
     {
-        /// <summary>
-        /// Attribute key for the authors of a file.
-        /// </summary>
-        private const string AuthorAttributeName = "Metric.File.Authors";
-
-        /// <summary>
-        /// Attribute key for the churn value of a file.
-        /// </summary>
-        private const string ChurnAttributeName = "Metric.File.Churn";
-
         /// <summary>
         /// Draws the author spheres for the rendered graph.
         /// This method should be executed after the graph was rendered.
@@ -46,7 +36,7 @@ namespace SEE.Game.CityRendering
         {
             List<string> authors =
                 nodeMap.Keys.Where(x => x.Type == "file")
-                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == AuthorAttributeName))
+                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
                     .ToList();
@@ -69,7 +59,7 @@ namespace SEE.Game.CityRendering
             IEnumerable<GameObject> spheresObjects, GameObject parent)
         {
             IEnumerable<Node> nodesWithChurn = nodeMap.Keys
-                .Where(x => x.IntAttributes.ContainsKey(ChurnAttributeName));
+                .Where(x => x.IntAttributes.ContainsKey(DataModel.DG.VCS.Churn));
 
             if (!nodesWithChurn.Any())
             {
@@ -77,7 +67,7 @@ namespace SEE.Game.CityRendering
             }
 
             int maximalChurn = nodesWithChurn
-                .Max(x => x.IntAttributes[ChurnAttributeName]);
+                .Max(x => x.IntAttributes[DataModel.DG.VCS.Churn]);
 
             foreach (GameObject sphere in spheresObjects)
             {
@@ -85,16 +75,16 @@ namespace SEE.Game.CityRendering
                 string authorName = authorSphere.Author;
 
                 IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
-                    .Where(x => x.Key.StringAttributes.ContainsKey(AuthorAttributeName))
+                    .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
                     .Where(x =>
-                        x.Key.StringAttributes[AuthorAttributeName]
+                        x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
                             .Split(',')
                             .Contains(authorName));
 
                 foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
                 {
                     BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.GetRoofCenter());
-                    int churn = nodeOfAuthor.Key.IntAttributes[ChurnAttributeName + ":" + authorName];
+                    int churn = nodeOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
                     GameObject gameEdge = new()
                     {
@@ -149,7 +139,7 @@ namespace SEE.Game.CityRendering
             Vector3[] points = new Vector3[2];
             points[0] = start;
             points[1] = end;
-            return new TinySpline.BSpline(2, 3, 1)
+            return new BSpline(2, 3, 1)
             {
                 ControlPoints = TinySplineInterop.VectorsToList(points)
             };

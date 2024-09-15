@@ -12,30 +12,6 @@ namespace SEE.GraphProviders
     /// </summary>
     public static class GitFileMetricsGraphGenerator
     {
-        #region Constants
-
-        /// <summary>
-        /// The name of the number of authors metric.
-        /// </summary>
-        private const string NumberOfAuthorsMetricName = "Metric.File.AuthorsNumber";
-
-        /// <summary>
-        /// The name of the number of commits metric.
-        /// </summary>
-        private const string NumberOfCommitsMetricName = "Metric.File.Commits";
-
-        /// <summary>
-        /// The name of the churn metric.
-        /// </summary>
-        private const string NumberOfFileChurnMetricName = "Metric.File.Churn";
-
-        /// <summary>
-        /// The Name of the number of the 'core devs' metric.
-        /// </summary>
-        private const string TruckFactorMetricName = "Metric.File.CoreDevs";
-
-        #endregion
-
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="metricProcessor"/>
         /// to the passed graph <paramref name="initialGraph"/>.
@@ -73,18 +49,18 @@ namespace SEE.GraphProviders
                 Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
                     initialGraph,
                     idSuffix: idSuffix);
-                n.SetInt(NumberOfAuthorsMetricName, file.Value.Authors.Count);
-                n.SetInt(NumberOfCommitsMetricName, file.Value.NumberOfCommits);
-                n.SetInt(NumberOfFileChurnMetricName, file.Value.Churn);
-                n.SetInt(TruckFactorMetricName, file.Value.TruckFactor);
+                n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
+                n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
+                n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);
+                n.SetInt(DataModel.DG.VCS.TruckNumber, file.Value.TruckFactor);
                 if (file.Value.Authors.Any())
                 {
-                    n.SetString("Metric.File.Authors", String.Join(',', file.Value.Authors));
+                    n.SetString(DataModel.DG.VCS.AuthorAttributeName, String.Join(',', file.Value.Authors));
                 }
 
                 foreach (KeyValuePair<string, int> authorChurn in file.Value.AuthorsChurn)
                 {
-                    n.SetInt(NumberOfFileChurnMetricName + ":" + authorChurn.Key, authorChurn.Value);
+                    n.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
                 }
             }
 
