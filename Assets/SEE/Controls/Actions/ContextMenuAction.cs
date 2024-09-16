@@ -42,6 +42,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private InteractableObject startObject;
 
+        /// <summary>
+        /// Tries to open the context menu with multiselection.
+        /// </summary>
+        private bool multiselection = false;
+
         private void Start()
         {
             popupMenu = gameObject.AddComponent<PopupMenu>();
@@ -51,22 +56,48 @@ namespace SEE.Controls.Actions
         {
             if (SEEInput.StartOpenContextMenu())
             {
-                Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
-                startObject = o;
+                if (InteractableObject.SelectedObjects.Count <= 1)
+                {
+                    Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
+                    startObject = o;
+                    multiselection = false;
+                }
+                else
+                {
+                    startObject = null;
+                    multiselection = true;
+                }
             }
             if (SEEInput.OpenContextMenu())
             {
-                // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
-                HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
-                if (hit == HitGraphElement.None)
+                if (!multiselection)
                 {
-                    return;
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
+                    if (hit == HitGraphElement.None)
+                    {
+                        return;
+                    }
+                    if (o == startObject)
+                    {
+                        position = Input.mousePosition;
+                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
+                        popupMenu.ShowWith(entries, position);
+                    }
                 }
-                if (o == startObject)
+                else
                 {
-                    position = Input.mousePosition;
-                    IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
-                    popupMenu.ShowWith(entries, position);
+                    // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
+                    if (hit == HitGraphElement.None)
+                    {
+                        return;
+                    }
+                    if (InteractableObject.SelectedObjects.Contains(o))
+                    {
+                        position = Input.mousePosition;
+                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
+                        popupMenu.ShowWith(entries, position);
+                    }
                 }
             }
         }
@@ -82,6 +113,152 @@ namespace SEE.Controls.Actions
             popupMenu.ShowWith(entries, position);
         }
 
+        #region Multiple-Selection
+        /// <summary>
+        /// Returns the options available for multiple selection.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="selectedObjects">The selected objects.</param>
+        /// <returns>Options available for the selected objects.</returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection(PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
+        {
+            List<PopupMenuEntry> entries = new()
+            {
+                new PopupMenuHeading("More graph elements selected!", int.MaxValue),
+
+                new PopupMenuActionDoubleIcon("Inspect", () =>
+                {
+                    List<PopupMenuEntry> submenuEntries = new()
+                    {
+                        new PopupMenuAction("Inspect", () =>
+                        {
+                            UpdateEntries(popupMenu, position, GetApplicableOptionsForMultiselection(popupMenu, selectedObjects));
+                        }, Icons.ArrowLeft, CloseAfterClick: false),
+                        new PopupMenuAction("Properties", ShowProperties, Icons.Info),
+                        new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
+                        new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
+                    };
+
+                    if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
+                    {
+                        submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
+                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<DiffCity>() != null))
+                        {
+                            submenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
+                        }
+                    }
+                    UpdateEntries(popupMenu, position, submenuEntries);
+                },
+                Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 5),
+
+                /// TODO
+                new PopupMenuAction("Delete", ()=>Debug.Log("DELETE"), Icons.Trash)
+            };
+            // TODO Nodes:
+            //entries.Add(new PopupMenuActionDoubleIcon("Inspect Nodes"));
+            /*
+             if (!openViaTreeView)
+                    {
+                        actions.Add(new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView));
+                    }
+                    if (node.OutgoingsOfType(LSP.Reference).Any())
+                    {
+                        actions.Add(new PopupMenuAction("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
+                    }
+                    if (node.OutgoingsOfType(LSP.Declaration).Any())
+                    {
+                        actions.Add(new PopupMenuAction("Show Declaration", () => ShowTargets(LSP.Declaration).Forget(), Icons.OutgoingEdge));
+                    }
+                    if (node.OutgoingsOfType(LSP.Definition).Any())
+                    {
+                        actions.Add(new PopupMenuAction("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
+                    }
+                    if (node.OutgoingsOfType(LSP.OfType).Any())
+                    {
+                        actions.Add(new PopupMenuAction("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
+                    }
+            */
+
+            // TODO EDGES
+            //entries.Add(new PopupMenuActionDoubleIcon("Inspect Edges"));
+            /*
+                    List<PopupMenuEntry> entries = new() {
+                        new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
+                        new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
+                    };
+
+                    if (edge.Type == "Clone")
+                    {
+                        entries.Add(new PopupMenuAction("Show Unified Diff", ShowUnifiedDiff, Icons.Compare));
+                    }
+            */
+            foreach (InteractableObject iO in selectedObjects)
+            {
+                // ACCEPT DIVERGENCE
+            }
+            return entries;
+
+            void ShowProperties()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        ActivateWindow(CreatePropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowMetrics()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        ActivateWindow(CreateMetricWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowCode()
+            {
+                foreach(InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        ActivateWindow(ShowCodeAction.ShowCode(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowDiffCode()
+            {
+                foreach(InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null && iO.gameObject.ContainingCity<DiffCity>())
+                    {
+                        ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
+                                                          iO.gameObject.ContainingCity<DiffCity>()));
+                    }
+                }
+            }
+
+            void Highlight()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        iO.gameObject.Operator().Highlight(duration: 10);
+                    }
+                }
+            }
+        }
+
+
+        #endregion
+
+        #region Single-Selection
         /// <summary>
         /// Returns the options available for the given graph element.
         /// </summary>
@@ -95,7 +272,7 @@ namespace SEE.Controls.Actions
         public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position, GraphElement graphElement,
             GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
-            List<PopupMenuAction> actions = new ();
+            List<PopupMenuAction> actions = new();
             actions.AddRange(GetApplicableOptions(popupMenu, position, position, graphElement, gameObject, appendActions).OfType<PopupMenuAction>());
 
             return actions;
@@ -112,7 +289,7 @@ namespace SEE.Controls.Actions
         /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
-        public static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+        private static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
             IEnumerable<PopupMenuEntry> options = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
@@ -224,7 +401,7 @@ namespace SEE.Controls.Actions
                 {
                     // TODO: Test the case. I'm not sure when this case would be triggered.
                     // It should be better documented how this case could occur.
-                    ConfirmDialogMenu confirm = new ($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
+                    ConfirmDialogMenu confirm = new($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
                     confirm.ExecuteAfterConfirmAsync(() => graphElement.ItsGraph.RemoveElement(graphElement)).Forget();
                 }
             }
@@ -264,82 +441,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Activates the tree window for the given graph element and returns it.
-        /// </summary>
-        /// <param name="graphElement">The graph element to activate the tree window for</param>
-        /// <param name="transform">The transform of the game object that the graph element is attached to</param>
-        /// <param name="title">The title of the tree window to be used. Should only be set if this is not supposed
-        /// to be the main tree window.</param>
-        /// <returns>The activated tree window</returns>
-        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
-        {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
-            if (openWindow == null)
-            {
-                // Window is not open yet, so we create it.
-                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
-                openWindow = city.AddComponent<TreeWindow>();
-                openWindow.Graph = graphElement.ItsGraph;
-                if (title != null)
-                {
-                    openWindow.Title = title;
-                }
-                manager.AddWindow(openWindow);
-            }
-            manager.ActiveWindow = openWindow;
-            return openWindow;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="MetricWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
-        /// </summary>
-        /// <param name="graphElementRef">The graph element to activate the metric window for</param>
-        /// <returns>The <see cref="MetricWindow"/> object showing the attributes of the specified graph element.</returns>
-        private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
-        {
-            // Create new window for active selection, or use existing one
-            if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
-            {
-                metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
-                metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
-                metricMenu.GraphElement = graphElementRef.Elem;
-            }
-            return metricMenu;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="PropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
-        /// </summary>
-        /// <param name="graphElementRef">The graph element to activate the property window for</param>
-        /// <returns>The <see cref="PropertyWindow"/> object showing the attributes of the specified graph element.</returns>
-        private static PropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
-        {
-            // Create new window for active selection, or use existing one
-            if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
-            {
-                propertyMenu = graphElementRef.gameObject.AddComponent<PropertyWindow>();
-                propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
-                propertyMenu.GraphElement = graphElementRef.Elem;
-            }
-            return propertyMenu;
-        }
-
-        /// <summary>
-        /// Activates the given window, that is, adds it to the window space and makes it the active window.
-        /// </summary>
-        /// <param name="window">The window to activate</param>
-        private static void ActivateWindow(BaseWindow window)
-        {
-            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            if (!manager.Windows.Contains(window))
-            {
-                manager.AddWindow(window);
-            }
-            manager.ActiveWindow = window;
-        }
-
-        /// <summary>
         /// Returns the show options available for the given node.
         /// </summary>
         /// <param name="node">The node to get the show options for</param>
@@ -349,7 +450,8 @@ namespace SEE.Controls.Actions
         private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject, bool openViaTreeView)
         {
             List<PopupMenuEntry> actions = new();
-            if (!openViaTreeView) {
+            if (!openViaTreeView)
+            {
                 actions.Add(new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView));
             }
             if (node.OutgoingsOfType(LSP.Reference).Any())
@@ -514,52 +616,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Creates a sub menu for the context menu.
-        /// </summary>
-        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
-        /// <param name="position">The position to be displayed the popup menu.</param>
-        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
-        /// <param name="name">The name for the sub menu.</param>
-        /// <param name="icon">The icon for the sub menu.</param>
-        /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
-        /// <param name="graphElement">The graph element to get the options for</param>
-        /// <param name="gameObject">The game object that the graph element is attached to</param>
-        /// <param name="priority">The priority for this sub menu.</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
-        /// <returns>The created sub menu.</returns>
-        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-            string name, char icon, IEnumerable<PopupMenuEntry> actions,
-            GraphElement graphElement, GameObject gameObject = null, int priority = 0, IEnumerable<PopupMenuAction> appendActions = null)
-        {
-            return new(name, () =>
-            {
-                List<PopupMenuEntry> entries = new()
-                    {
-                        new PopupMenuAction(name, () =>
-                        {
-                            if (appendActions != null)
-                            {
-                                List<PopupMenuAction> treeViewActions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                                                                        graphElement, gameObject, appendActions)
-                                                                    .OfType<PopupMenuAction>()
-                                                                    .Where(x=>!x.Name.Contains("TreeWindow")));
-                                treeViewActions.AddRange(appendActions);
-                                UpdateEntries(popupMenu, position, treeViewActions);
-                            }
-                            else
-                            {
-                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
-                            }
-                        },
-                        Icons.ArrowLeft, CloseAfterClick: false, Priority: int.MaxValue)
-                    };
-                entries.AddRange(actions);
-                UpdateEntries(popupMenu, position, entries);
-
-            }, icon, Icons.ArrowRight, CloseAfterClick: false, priority);
-        }
-
-        /// <summary>
         /// Returns the show options available for the given edge.
         /// </summary>
         /// <param name="edge">The edge to get the show options for</param>
@@ -567,7 +623,7 @@ namespace SEE.Controls.Actions
         /// <returns>Show options available for the given edge</returns>
         private static IEnumerable<PopupMenuEntry> GetEdgeShowOptions(Edge edge, GameObject gameObject)
         {
-            List<PopupMenuEntry> entries = new () {
+            List<PopupMenuEntry> entries = new() {
                 new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
                 new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
             };
@@ -642,6 +698,129 @@ namespace SEE.Controls.Actions
                 // TODO: Useful?
                 ShowNotification.Info("Not implemented", "The action is not implemented yet.");
             }
+        }
+        #endregion
+
+        /// <summary>
+        /// Activates the tree window for the given graph element and returns it.
+        /// </summary>
+        /// <param name="graphElement">The graph element to activate the tree window for</param>
+        /// <param name="transform">The transform of the game object that the graph element is attached to</param>
+        /// <param name="title">The title of the tree window to be used. Should only be set if this is not supposed
+        /// to be the main tree window.</param>
+        /// <returns>The activated tree window</returns>
+        private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
+            if (openWindow == null)
+            {
+                // Window is not open yet, so we create it.
+                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
+                openWindow = city.AddComponent<TreeWindow>();
+                openWindow.Graph = graphElement.ItsGraph;
+                if (title != null)
+                {
+                    openWindow.Title = title;
+                }
+                manager.AddWindow(openWindow);
+            }
+            manager.ActiveWindow = openWindow;
+            return openWindow;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="MetricWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the metric window for</param>
+        /// <returns>The <see cref="MetricWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
+            {
+                metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
+                metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
+                metricMenu.GraphElement = graphElementRef.Elem;
+            }
+            return metricMenu;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="PropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the property window for</param>
+        /// <returns>The <see cref="PropertyWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static PropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
+            {
+                propertyMenu = graphElementRef.gameObject.AddComponent<PropertyWindow>();
+                propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
+                propertyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return propertyMenu;
+        }
+
+        /// <summary>
+        /// Activates the given window, that is, adds it to the window space and makes it the active window.
+        /// </summary>
+        /// <param name="window">The window to activate</param>
+        private static void ActivateWindow(BaseWindow window)
+        {
+            WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+            if (!manager.Windows.Contains(window))
+            {
+                manager.AddWindow(window);
+            }
+            manager.ActiveWindow = window;
+        }
+
+        /// <summary>
+        /// Creates a sub menu for the context menu.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="raycastHitPosition">The position of the raycast hit.</param>
+        /// <param name="name">The name for the sub menu.</param>
+        /// <param name="icon">The icon for the sub menu.</param>
+        /// <param name="actions">A list of the actions which should be displayed in the sub menu.</param>
+        /// <param name="graphElement">The graph element to get the options for</param>
+        /// <param name="gameObject">The game object that the graph element is attached to</param>
+        /// <param name="priority">The priority for this sub menu.</param>
+        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>The created sub menu.</returns>
+        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
+            string name, char icon, IEnumerable<PopupMenuEntry> actions,
+            GraphElement graphElement, GameObject gameObject = null, int priority = 0, IEnumerable<PopupMenuAction> appendActions = null)
+        {
+            return new(name, () =>
+            {
+                List<PopupMenuEntry> entries = new()
+                    {
+                        new PopupMenuAction(name, () =>
+                        {
+                            if (appendActions != null)
+                            {
+                                List<PopupMenuAction> treeViewActions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                                                                        graphElement, gameObject, appendActions)
+                                                                    .OfType<PopupMenuAction>()
+                                                                    .Where(x=>!x.Name.Contains("TreeWindow")));
+                                treeViewActions.AddRange(appendActions);
+                                UpdateEntries(popupMenu, position, treeViewActions);
+                            }
+                            else
+                            {
+                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
+                            }
+                        },
+                        Icons.ArrowLeft, CloseAfterClick: false, Priority: int.MaxValue)
+                    };
+                entries.AddRange(actions);
+                UpdateEntries(popupMenu, position, entries);
+
+            }, icon, Icons.ArrowRight, CloseAfterClick: false, priority);
         }
 
         /// <summary>
