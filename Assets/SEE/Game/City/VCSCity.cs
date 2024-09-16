@@ -1,9 +1,9 @@
-﻿using SEE.UI.RuntimeConfigMenu;
+﻿using System.Collections.Generic;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.VCS;
 using Sirenix.OdinInspector;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -29,7 +29,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The path to the VCS containing the two revisions to be compared.
         /// </summary>
-        [ShowInInspector, Tooltip("VCS path"),
+        [ShowInInspector, Tooltip("The path to the VCS."),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public DataPath VCSPath = new();
 
