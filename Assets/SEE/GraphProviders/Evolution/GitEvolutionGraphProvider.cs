@@ -112,7 +112,7 @@ namespace SEE.GraphProviders.Evolution
             string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
 
-            using (Repository repo = new Repository(GitRepository.RepositoryPath.Path))
+            using (Repository repo = new(GitRepository.RepositoryPath.Path))
             {
                 List<Commit> commitList = repo.Commits
                     .QueryBy(new CommitFilter
@@ -177,7 +177,7 @@ namespace SEE.GraphProviders.Evolution
             {
                 BasePath = GitRepository.RepositoryPath.Path
             };
-            GraphUtils.NewNode(g, repoName + "-Evo", "Repository", repoName + "-Evo");
+            GraphUtils.NewNode(g, repoName + "-Evo", GraphUtils.RepositoryTypeName, repoName + "-Evo");
 
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
