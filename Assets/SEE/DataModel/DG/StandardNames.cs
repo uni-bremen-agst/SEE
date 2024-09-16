@@ -261,6 +261,7 @@
         /// Prefix for VCS metrics.
         /// </summary>
         public const string Prefix = Metrics.Prefix + VCSPrefix;
+
         /// <summary>
         /// The number of lines of code added for a file that was changed between two commits.
         /// </summary>
@@ -285,12 +286,26 @@
         /// The truck factor of a file (core-devs metric).
         /// </summary>
         public const string TruckNumber = Prefix + "Truck_Number";
+
         /// <summary>
         /// String attribute for the list of authors of a file.
         /// </summary>
         /// <remarks>Note that this is not actually a numeric metric but a list of
         /// author names seperated by a comma.</remarks>
         public const string AuthorAttributeName = VCSPrefix + "Authors";
+
+        /// <summary>
+        /// Name of node type used for files.
+        /// </summary>
+        public const string FileType = "File";
+        /// <summary>
+        /// Name of node type used for directories.
+        /// </summary>
+        public const string DirectoryType = "Directory";
+        /// <summary>
+        /// Name of node type used for repositories.
+        /// </summary>
+        public const string RepositoryType = "Repository";
     }
 
     /// <summary>

@@ -21,25 +21,6 @@ namespace SEE.GraphProviders.VCS
     /// </example>
     public static class GraphUtils
     {
-        #region Contants
-
-        /// <summary>
-        /// Typename used for files.
-        /// </summary>
-        private const string fileType = "File";
-
-        /// <summary>
-        /// Typename used for directories.
-        /// </summary>
-        private const string directoryType = "Directory";
-
-        /// <summary>
-        /// Typename used for repositories.
-        /// </summary>
-        public const string RepositoryTypeName = "Repository";
-
-        #endregion
-
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
         /// </summary>
@@ -106,7 +87,7 @@ namespace SEE.GraphProviders.VCS
 
                 // Create a new file node and return it.
                 Node addedFileNode = NewNode(graph, fullRelativePath + idSuffix,
-                    fileType, path);
+                    DataModel.DG.VCS.FileType, path);
                 addedFileNode.Filename = path;
                 addedFileNode.Directory = fileDir;
                 parent.AddChild(addedFileNode);
@@ -126,7 +107,7 @@ namespace SEE.GraphProviders.VCS
 
             // Create a new directory node.
             Node addedDirectoryNode = NewNode(graph, directoryName,
-                directoryType, directoryName);
+                DataModel.DG.VCS.DirectoryType, directoryName);
             addedDirectoryNode.Directory = directoryName;
             parent.AddChild(addedDirectoryNode);
             return GetOrAddNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),

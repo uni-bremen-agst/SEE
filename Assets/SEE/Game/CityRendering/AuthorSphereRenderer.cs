@@ -35,7 +35,7 @@ namespace SEE.Game.CityRendering
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
         {
             List<string> authors =
-                nodeMap.Keys.Where(x => x.Type == "file")
+                nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
