@@ -11,6 +11,7 @@ using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -179,17 +180,27 @@ namespace SEE.GraphProviders
         /// <returns>The generated output graph.</returns>
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
         {
-            graph.BasePath = branchCity.VCSPath.Path;
-            string[] pathSegments = graph.BasePath.Split(Path.DirectorySeparatorChar);
+            // Note: repositoryPath is platform dependent.
+            string repositoryPath = branchCity.VCSPath.Path;
+            if (string.IsNullOrWhiteSpace(repositoryPath))
+            {
+                throw new Exception("The repository path is not set.");
+            }
+            if (!Directory.Exists(repositoryPath))
+            {
+                throw new Exception("The repository path does not exist or is not a directory.");
+            }
 
-            string repositoryName = pathSegments[^1];
+            graph.BasePath = repositoryPath;
 
-            GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, pathSegments[^1]);
+            string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
+
+            GraphUtils.NewNode(graph, repositoryName, GraphUtils.RepositoryTypeName, repositoryName);
 
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
 
-            using (Repository repo = new Repository(graph.BasePath))
+            using (Repository repo = new(graph.BasePath))
             {
                 CommitFilter filter;
 
@@ -224,6 +235,7 @@ namespace SEE.GraphProviders
                 changePercentage(1f);
             }
 
+            graph.FinalizeNodeHierarchy();
             return graph;
         }
 
