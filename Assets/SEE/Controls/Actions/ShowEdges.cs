@@ -44,7 +44,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The toggle that is used to determine whether an edge is currently selected.
         /// </summary>
-        private const string EdgeIsSelectedToggle = "IsSelected";
+        private const string edgeIsSelectedToggle = "IsSelected";
 
         /// <summary>
         /// The delay between each depth level when showing/hiding the transitive closure of edges.
@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions
                 if (gameObject.TryGetNode(out Node node))
                 {
                     RelevantEdges(node, followSource: false, followTarget: true, true)
-                        .SelectMany(x => x).ForEach(x => x.SetToggle(EdgeIsSelectedToggle, true));
+                        .SelectMany(x => x).ForEach(x => x.SetToggle(edgeIsSelectedToggle, true));
                 }
             }
         }
@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
                 if (gameObject.TryGetNode(out Node node))
                 {
                     RelevantEdges(node, followSource: false, followTarget: true, true)
-                        .SelectMany(x => x).ForEach(x => x.SetToggle(EdgeIsSelectedToggle, false));
+                        .SelectMany(x => x).ForEach(x => x.SetToggle(edgeIsSelectedToggle, false));
                 }
             }
         }
@@ -251,7 +251,7 @@ namespace SEE.Controls.Actions
                     List<Edge> connected = DirectlyConnectedEdges(currentNode).ToList();
                     results[distance].AddRange(connected.Where(x => x.HasToggle(Edge.IsHiddenToggle)
                                                                    // Hover should not override edges shown by selection.
-                                                                   && (fromSelection || !x.HasToggle(EdgeIsSelectedToggle))));
+                                                                   && (fromSelection || !x.HasToggle(edgeIsSelectedToggle))));
                     // Queue successors, if there are any.
                     connected.Select(getSuccessorNode)
                              .Where(x => x != null)
