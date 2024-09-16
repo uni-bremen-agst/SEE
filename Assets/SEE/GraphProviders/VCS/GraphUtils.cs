@@ -26,12 +26,12 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// Typename used for files.
         /// </summary>
-        private const string fileType = "file";
+        private const string fileType = "File";
 
         /// <summary>
         /// Typename used for directories.
         /// </summary>
-        private const string directoryType = "directory";
+        private const string directoryType = "Directory";
 
         /// <summary>
         /// Typename used for repositories.
@@ -48,7 +48,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="type">Type of the new node.</param>
         /// <param name="name">The source name of the node.</param>
         /// <returns>a new node added to <paramref name="graph"/>.</returns>
-        public static Node NewNode(Graph graph, string id, string type = "Routine", string name = null)
+        public static Node NewNode(Graph graph, string id, string type, string name = null)
         {
             Node result = new()
             {
