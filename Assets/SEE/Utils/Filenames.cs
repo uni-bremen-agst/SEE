@@ -273,5 +273,32 @@ namespace SEE.Utils
             }
             Directory.Delete(directory);
         }
+
+        /// <summary>
+        /// Returns the innermost directory name of the given <paramref name="directoryPath"/>
+        /// where <paramref name="directoryPath"/> is a (possibly nested) platform-dependent
+        /// path to a directory
+        /// </summary>
+        /// <param name="directoryPath">platform-dependent directory path</param>
+        /// <returns>innermost directory name</returns>
+        /// <exception cref="ArgumentException">if <paramref name="directoryPath"/> is null or empty</exception>
+        /// <example>If <paramref name="directoryPath"/> is C:\Users\someone\develop\SEE\
+        /// while running on a Windows computer, then SEE will be returned; likewise if it
+        /// is C:\Users\someone\develop\SEE. If <paramref name="directoryPath"/> is
+        /// /home/someone/develop/SEE/ while running on a Unix computer, then SEE will be returned;
+        /// likewise if it is /home/someone/develop/SEE.
+        /// </example>
+        public static string InnermostDirectoryName(string directoryPath)
+        {
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                throw new ArgumentException("Directory path must neither be null nor empty.");
+            }
+            string path = directoryPath[^1] == Path.DirectorySeparatorChar ?
+                directoryPath[..^1] : directoryPath;
+
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
+                .Split(Path.DirectorySeparatorChar).Last();
+        }
     }
 }
