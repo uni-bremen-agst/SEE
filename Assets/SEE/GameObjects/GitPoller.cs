@@ -83,7 +83,7 @@ namespace SEE.GameObjects
                     }
                     catch (LibGit2SharpException e)
                     {
-                        Debug.LogError($"Error while running git fetch : {e.Message}.\n");
+                        Debug.LogError($"Error while running git fetch for repository path {repoPath} and remote name {remote.Name}: {e.Message}.\n");
                     }
                 }
             }
