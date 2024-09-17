@@ -123,9 +123,9 @@ namespace SEE.Game.SceneManipulation
         /// contained in this tree are the transitive descendants of <paramref name="root"/>.
         /// The edges in this tree are those whose source or target node
         /// is contained in the tree.
-        ///
+        /// <para>
         /// Note: The result consists of both nodes and edges.
-        ///
+        /// </para>
         /// Precondition: <paramref name="root"/> is a game node.
         /// </summary>
         /// <param name="root">the root of the tree to be deleted</param>

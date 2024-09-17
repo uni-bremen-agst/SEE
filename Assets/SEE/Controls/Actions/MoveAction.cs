@@ -2,18 +2,18 @@ using System;
 using System.Collections.Generic;
 using SEE.Audio;
 using SEE.Controls.Interactables;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
-using UnityEngine;
-using Node = SEE.DataModel.DG.Node;
 using SEE.Utils.History;
-using SEE.Game.Drawable.ActionHelpers;
+using UnityEngine;
 
 
 namespace SEE.Controls.Actions
@@ -75,11 +75,6 @@ namespace SEE.Controls.Actions
                 get;
                 private set;
             }
-
-            /// <summary>
-            /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
-            /// </summary>
-            private Vector3 cursorOffset;
 
             /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
@@ -172,8 +167,10 @@ namespace SEE.Controls.Actions
             /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
             public readonly bool CanBePlaced()
             {
-                if (GrabbedGameObject.transform.lossyScale.x > NewParent.transform.lossyScale.x
-                    || GrabbedGameObject.transform.lossyScale.z > NewParent.transform.lossyScale.z)
+                Vector3 scale = GrabbedGameObject.WorldSpaceSize();
+                Vector3 parentScale = NewParent.WorldSpaceSize();
+                if (scale.x > parentScale.x
+                    || scale.z > parentScale.z)
                 {
                     return false;
                 }
@@ -208,7 +205,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The name of the grabbed object if any was grabbed; otherwise the empty string.
             /// </summary>
-            internal string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
+            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
 
             /// <summary>
             /// The position of the grabbed object in world space.
@@ -233,7 +230,7 @@ namespace SEE.Controls.Actions
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
-            public NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
+            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
@@ -296,7 +293,7 @@ namespace SEE.Controls.Actions
                 {
                     return;
                 }
-                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.transform.lossyScale, targetPosition, targetGameObject);
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(), targetPosition, targetGameObject);
                 MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
             }
 
