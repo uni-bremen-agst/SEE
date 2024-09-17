@@ -18,6 +18,7 @@ using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
+using Crosstales.RTVoice;
 
 namespace SEE.Controls.Actions
 {
@@ -154,44 +155,7 @@ namespace SEE.Controls.Actions
                 /// TODO
                 new PopupMenuAction("Delete", ()=>Debug.Log("DELETE"), Icons.Trash)
             };
-            // TODO Nodes:
-            //entries.Add(new PopupMenuActionDoubleIcon("Inspect Nodes"));
-            /*
-             if (!openViaTreeView)
-                    {
-                        actions.Add(new PopupMenuAction("Reveal in TreeView", RevealInTreeView, Icons.TreeView));
-                    }
-                    if (node.OutgoingsOfType(LSP.Reference).Any())
-                    {
-                        actions.Add(new PopupMenuAction("Show References", () => ShowTargets(LSP.Reference, false).Forget(), Icons.IncomingEdge));
-                    }
-                    if (node.OutgoingsOfType(LSP.Declaration).Any())
-                    {
-                        actions.Add(new PopupMenuAction("Show Declaration", () => ShowTargets(LSP.Declaration).Forget(), Icons.OutgoingEdge));
-                    }
-                    if (node.OutgoingsOfType(LSP.Definition).Any())
-                    {
-                        actions.Add(new PopupMenuAction("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
-                    }
-                    if (node.OutgoingsOfType(LSP.OfType).Any())
-                    {
-                        actions.Add(new PopupMenuAction("Show Type", () => ShowTargets(LSP.OfType).Forget(), 'T'));
-                    }
-            */
 
-            // TODO EDGES
-            //entries.Add(new PopupMenuActionDoubleIcon("Inspect Edges"));
-            /*
-                    List<PopupMenuEntry> entries = new() {
-                        new PopupMenuAction("Show at Source (TreeView)", RevealAtSource, Icons.TreeView),
-                        new PopupMenuAction("Show at Target (TreeView)", RevealAtTarget, Icons.TreeView)
-                    };
-
-                    if (edge.Type == "Clone")
-                    {
-                        entries.Add(new PopupMenuAction("Show Unified Diff", ShowUnifiedDiff, Icons.Compare));
-                    }
-            */
             foreach (InteractableObject iO in selectedObjects)
             {
                 // ACCEPT DIVERGENCE
@@ -253,6 +217,43 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
+
+            void RevealInTreeView()
+            {
+                foreach(InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null && iO.GraphElemRef.Elem != null && iO.GraphElemRef.Elem is Node node)
+                    {
+                        ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
+                    }
+                }
+            }
+
+            /*
+            // Highlights all nodes that are targets of the given kind of edge.
+            async UniTaskVoid ShowTargets(string kind, bool outgoings = true)
+            {
+                IList<Node> nodes;
+                if (outgoings)
+                {
+                    nodes = node.OutgoingsOfType(kind).Select(e => e.Target).ToList();
+                }
+                else
+                {
+                    nodes = node.IncomingsOfType(kind).Select(e => e.Source).ToList();
+                }
+                if (nodes.Count == 1)
+                {
+                    // We will just highlight the target node directly.
+                    nodes.First().Operator().Highlight(duration: 10);
+                }
+                else
+                {
+                    TreeWindow window = ActivateTreeWindow(node, gameObject.transform, title: $"{kind}s of " + node.SourceName);
+                    await UniTask.Yield();
+                    window.ConstrainToAsync(nodes).Forget();
+                }
+            }*/
         }
 
 
