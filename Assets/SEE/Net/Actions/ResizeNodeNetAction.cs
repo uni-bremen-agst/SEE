@@ -1,6 +1,4 @@
-﻿using SEE.Game.Operator;
-using SEE.GO;
-using SEE.Utils;
+﻿using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -29,16 +27,30 @@ namespace SEE.Net.Actions
         public Vector3 Position;
 
         /// <summary>
+        /// Should the edges be updated along with the targe node?
+        /// </summary>
+        public bool UpdateEdges;
+
+        /// <summary>
+        /// Should the child nodes keep their size?
+        /// </summary>
+        public bool ReparentChildren;
+
+        /// <summary>
         /// Constructs a <see cref="ResizeNodeNetAction"/>.
         /// </summary>
         /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized</param>
         /// <param name="localScale">The new local scale of the <see cref="GameObject"/></param>
         /// <param name="position">The new world-space position of the <see cref="GameObject"/></param>
-        public ResizeNodeNetAction(string gameObjectID, Vector3 localScale, Vector3 position)
+        /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        public ResizeNodeNetAction(string gameObjectID, Vector3 localScale, Vector3 position, bool updateEdges = true, bool reparentChildren = true)
         {
             GameObjectID = gameObjectID;
             LocalScale = localScale;
             Position = position;
+            UpdateEdges = updateEdges;
+            ReparentChildren = reparentChildren;
         }
 
         /// <summary>
@@ -54,7 +66,15 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Find(GameObjectID).NodeOperator().ResizeTo(LocalScale, Position);
+            GameObject go = Find(GameObjectID);
+            if (go != null)
+            {
+                go.NodeOperator().ResizeTo(LocalScale, Position, 1, UpdateEdges, ReparentChildren);
+            }
+            else
+            {
+                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
+            }
         }
     }
 }
