@@ -45,27 +45,27 @@ namespace SEE.Game.SceneManipulation
 
         /// <summary>
         /// Returns the new world coordinates based on <paramref name="childPosition"/> so that the child
-        /// node with a size of <paramref name="childLossyScale"/> would appear on top of
+        /// node with a size of <paramref name="childWorldScale"/> would appear on top of
         /// <paramref name="target"/> if moved there.
         /// </summary>
         /// <remarks>
         /// Keep in mind that <paramref name="child"/> might be hanging over if it is too big.
         /// </remarks>
-        /// <param name="childLossyScale">the world scale of a node</param>
+        /// <param name="childWorldScale">the world-space scale of a node</param>
         /// <param name="childPosition">the world position of a node</param>
         /// <param name="target">the target node's <c>GameObject</c></param>
         /// <param name="topPadding">additional amount of empty space on the Y-axis that should be between
         /// <paramref name="parent"/> and <paramref name="child"/> in absolute world-space units</param>
         /// <returns>the new world position after the correction</returns>
         ///
-        public static Vector3 GetCoordinatesOn(Vector3 childLossyScale, Vector3 childPosition, GameObject target, float topPadding = 0.0001f)
+        public static Vector3 GetCoordinatesOn(Vector3 childWorldScale, Vector3 childPosition, GameObject target, float topPadding = 0.0001f)
         {
-            Vector3 childWorldExtent = childLossyScale / 2;
+            Vector3 childWorldExtent = childWorldScale / 2;
             childPosition.y = target.GetRoof() + childWorldExtent.y + topPadding;
 
             // Make sure mappingTarget stays within the roof of parent.
             {
-                Vector3 parentWorldExtent = target.transform.lossyScale / 2;
+                Vector3 parentWorldExtent = target.WorldSpaceSize() / 2;
 
                 // Fit child into x range of parent.
                 if (childPosition.x + childWorldExtent.x > target.transform.position.x + parentWorldExtent.x)
