@@ -176,7 +176,11 @@ namespace SEE.Controls.Actions
             InteractableObject.UnselectAll(true);
             foreach (GameObject go in hitGraphElements)
             {
-                Assert.IsTrue(go.HasNodeRef() || go.HasEdgeRef());
+                if (!go.HasNodeRef() && !go.HasEdgeRef()
+                    || go.HasNodeRef() && go.IsRoot())
+                {
+                    continue;
+                }
                 ISet<GameObject> deleted;
                 (_, deleted) = GameElementDeleter.Delete(go);
                 deletedGameObjects.UnionWith(deleted);
@@ -235,6 +239,10 @@ namespace SEE.Controls.Actions
             {
                 foreach (GameObject go in hitGraphElements)
                 {
+                    if (go.IsRoot())
+                    {
+                        continue;
+                    }
                     GameElementDeleter.Delete(go);
                     new DeleteNetAction(go.name).Execute();
                 }

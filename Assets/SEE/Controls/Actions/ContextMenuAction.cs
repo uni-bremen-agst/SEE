@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions
         {
             List<PopupMenuEntry> entries = new()
             {
-                new PopupMenuHeading("More graph elements selected!", int.MaxValue),
+                new PopupMenuHeading($"{selectedObjects.Count} elements selected!", int.MaxValue),
 
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
