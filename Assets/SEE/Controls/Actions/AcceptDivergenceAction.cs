@@ -10,6 +10,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -83,6 +84,22 @@ namespace SEE.Controls.Actions
         private Edge createdEdge;
 
         /// <summary>
+        /// The information required to (re-)create the edges that solves the divergence via mutliselection context menu.
+        /// </summary>
+        private List<Memento> mementoList = new();
+
+        /// <summary>
+        /// The edges created by this action <see cref="createdEdge"/>.
+        /// The list is needed for the multiselection via context menu.
+        /// </summary>
+        private List<Edge> createdEdgeList = new();
+
+        /// <summary>
+        /// Whether the context menu was executed in multiselection mode.
+        /// </summary>
+        private bool multiselection = false;
+
+        /// <summary>
         /// Registers itself at <see cref="InteractableObject"/> to listen for hovering events.
         /// </summary>
         public override void Start()
@@ -145,6 +162,9 @@ namespace SEE.Controls.Actions
                         // add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
 
+                        /// Sets the multiselection to false.
+                        multiselection = false;
+
                         // update the current state depending on whether the divergence has been solved
                         // (required in order to register as an undo-able action)
                         CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
@@ -160,7 +180,7 @@ namespace SEE.Controls.Actions
             }
             if (ExecuteViaContextMenu)
             {
-                bool divergenceSolved = createdEdge != null;
+                bool divergenceSolved = multiselection ? createdEdgeList.All(e => e != null) : createdEdge != null;
                 CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
                 return true;
             }
@@ -173,30 +193,50 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            if (!multiselection)
+            {
+                RemoveDivergence(createdEdge);
+                // set any edge references back to null
+                createdEdge = null;
+            }
+            else
+            {
+                foreach (Edge edge in createdEdgeList)
+                {
+                    RemoveDivergence(edge);
+                }
+                createdEdgeList.Clear();
+            }
+        }
 
+        /// <summary>
+        /// Removes the divergence (undo).
+        /// </summary>
+        /// <param name="edge">The edge divergence to remove.</param>
+        /// <exception cref="Exception">If the edge not contained in a graph.</exception>
+        private void RemoveDivergence(Edge edge)
+        {
             // remove the synced edge (its info is saved in memento)
-            ReflexionGraph graph = (ReflexionGraph)createdEdge.ItsGraph;
+            ReflexionGraph graph = (ReflexionGraph)edge.ItsGraph;
 
             if (graph != null)
             {
                 // find the corresponding GameObject
-                GameObject createdEdgeGO = GraphElementIDMap.Find(createdEdge.ID);
+                GameObject createdEdgeGO = GraphElementIDMap.Find(edge.ID);
                 // remove the edge's GameObject and graph representation locally and on the network
                 GameEdgeAdder.Remove(createdEdgeGO);
 
                 // propagate the new edge via network
-                new DeleteNetAction(createdEdge.ID).Execute();
+                new DeleteNetAction(edge.ID).Execute();
 
                 // ensure the edge's GameObject gets destroyed properly
                 Destroyer.Destroy(createdEdgeGO);
             }
             else
             {
-                throw new Exception($"Edge {createdEdge.ID} to be removed is not contained in a graph.");
+                throw new Exception($"Edge {edge.ID} to be removed is not contained in a graph.");
             }
 
-            // set any edge references back to null
-            createdEdge = null;
         }
 
         /// <summary>
@@ -205,8 +245,18 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            // recreate the edge
-            createdEdge = CreateConvergentEdge(memento);
+            if (!multiselection)
+            {
+                // recreate the edge
+                createdEdge = CreateConvergentEdge(memento);
+            }
+            else
+            {
+                foreach (Memento mem in mementoList)
+                {
+                    createdEdgeList.Add(CreateConvergentEdge(mem));
+                }
+            }
         }
 
         /// <summary>
@@ -234,12 +284,29 @@ namespace SEE.Controls.Actions
         public Edge ContextMenuExecution(Edge divergence)
         {
             ExecuteViaContextMenu = true;
+            multiselection = false;
             ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;
             Node source = graph.MapsTo(divergence.Source);
             Node target = graph.MapsTo(divergence.Target);
             memento = new(source, target, Edge.SourceDependency);
             createdEdge = CreateConvergentEdge(memento);
             return createdEdge;
+        }
+
+        public void ContextMenuExection(List<Edge> divergences)
+        {
+            ExecuteViaContextMenu = true;
+            multiselection = true;
+            foreach (Edge divergence in divergences)
+            {
+                ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;
+                Node source = graph.MapsTo(divergence.Source);
+                Node target = graph.MapsTo(divergence.Target);
+                memento = new(source, target, Edge.SourceDependency);
+                mementoList.Add(memento);
+                createdEdge = CreateConvergentEdge(memento);
+                createdEdgeList.Add(createdEdge);
+            }
         }
 
         /// <summary>
@@ -263,12 +330,26 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                return new HashSet<string>
+                if (!multiselection)
                 {
-                    memento.From.ID,
-                    memento.To.ID,
-                    createdEdge.ID
-                };
+                    return new HashSet<string>
+                    {
+                        memento.From.ID,
+                        memento.To.ID,
+                        createdEdge.ID
+                    };
+                }
+                else
+                {
+                    HashSet<string> strings = new ();
+                    for (int i = 0; i < mementoList.Count; i++)
+                    {
+                        strings.Add(mementoList[i].From.ID);
+                        strings.Add(mementoList[i].To.ID);
+                        strings.Add(createdEdgeList[i].ID);
+                    }
+                    return strings;
+                }
             }
         }
     }

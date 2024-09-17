@@ -154,9 +154,9 @@ namespace SEE.Controls.Actions
                 new PopupMenuAction("Delete", Delete, Icons.Trash)
             };
 
-            foreach (InteractableObject iO in selectedObjects)
+            if (selectedObjects.Any(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
             {
-                // ACCEPT DIVERGENCE
+                entries.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark));
             }
             return entries;
 
@@ -166,6 +166,23 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.Delete);
                 DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject));
+                ExcecutePreviousAction(action, previousAction);
+            }
+
+            void AcceptDivergence()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
+                AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
+                List<Edge> divergences = new();
+                foreach(InteractableObject iO in selectedObjects.Where(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
+                {
+                    if (iO.GraphElemRef.Elem is Edge edge)
+                    {
+                        divergences.Add(edge);
+                    }
+                }
+                action.ContextMenuExection(divergences);
                 ExcecutePreviousAction(action, previousAction);
             }
 
