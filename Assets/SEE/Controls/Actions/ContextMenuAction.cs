@@ -87,7 +87,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
                     HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
                     if (hit == HitGraphElement.None)
                     {
@@ -156,7 +155,7 @@ namespace SEE.Controls.Actions
 
             if (selectedObjects.Any(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
             {
-                entries.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark));
+                entries.Add(new PopupMenuAction("Accept Divergence", AcceptDivergence, Icons.Checkmark, Priority: 1));
             }
             return entries;
 
