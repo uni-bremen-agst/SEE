@@ -217,43 +217,6 @@ namespace SEE.Controls.Actions
                     }
                 }
             }
-
-            void RevealInTreeView()
-            {
-                foreach(InteractableObject iO in selectedObjects)
-                {
-                    if (iO.gameObject != null && iO.GraphElemRef.Elem != null && iO.GraphElemRef.Elem is Node node)
-                    {
-                        ActivateTreeWindow(node, gameObject.transform).RevealElementAsync(node).Forget();
-                    }
-                }
-            }
-
-            /*
-            // Highlights all nodes that are targets of the given kind of edge.
-            async UniTaskVoid ShowTargets(string kind, bool outgoings = true)
-            {
-                IList<Node> nodes;
-                if (outgoings)
-                {
-                    nodes = node.OutgoingsOfType(kind).Select(e => e.Target).ToList();
-                }
-                else
-                {
-                    nodes = node.IncomingsOfType(kind).Select(e => e.Source).ToList();
-                }
-                if (nodes.Count == 1)
-                {
-                    // We will just highlight the target node directly.
-                    nodes.First().Operator().Highlight(duration: 10);
-                }
-                else
-                {
-                    TreeWindow window = ActivateTreeWindow(node, gameObject.transform, title: $"{kind}s of " + node.SourceName);
-                    await UniTask.Yield();
-                    window.ConstrainToAsync(nodes).Forget();
-                }
-            }*/
         }
 
 
