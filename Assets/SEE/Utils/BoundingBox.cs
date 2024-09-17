@@ -80,9 +80,10 @@ namespace SEE.Utils
             float result = float.NegativeInfinity;
             foreach (GameObject gameObject in gameObjects)
             {
-                if (gameObject.transform.position.y > result)
+                float yTop = gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
+                if (yTop > result)
                 {
-                    result = gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
+                    result = yTop;
                 }
             }
             return result;
