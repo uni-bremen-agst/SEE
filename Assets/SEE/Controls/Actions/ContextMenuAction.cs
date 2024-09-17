@@ -151,9 +151,7 @@ namespace SEE.Controls.Actions
                     UpdateEntries(popupMenu, position, submenuEntries);
                 },
                 Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 5),
-
-                /// TODO
-                new PopupMenuAction("Delete", ()=>Debug.Log("DELETE"), Icons.Trash)
+                new PopupMenuAction("Delete", Delete, Icons.Trash)
             };
 
             foreach (InteractableObject iO in selectedObjects)
@@ -161,6 +159,15 @@ namespace SEE.Controls.Actions
                 // ACCEPT DIVERGENCE
             }
             return entries;
+
+            void Delete()
+            {
+                ActionStateType previousAction = GlobalActionHistory.Current();
+                GlobalActionHistory.Execute(ActionStateTypes.Delete);
+                DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
+                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject));
+                ExcecutePreviousAction(action, previousAction);
+            }
 
             void ShowProperties()
             {

@@ -89,6 +89,16 @@ namespace SEE.Controls.Actions
         private GameObject hitGraphElement;
 
         /// <summary>
+        /// The graph elements to be deleted.
+        /// </summary>
+        private List<GameObject> hitGraphElements;
+
+        /// <summary>
+        /// Whether the context menu was executed in multiselection mode.
+        /// </summary>
+        private bool multiselection = false;
+
+        /// <summary>
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion
         /// of one particular selected game object (in <see cref="Update"/>).
         ///
@@ -121,11 +131,19 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the one to be deleted
                 hitGraphElement = raycastHit.collider.gameObject;
+                multiselection = false;
                 return Delete(); // the selected objects are deleted and this action is done now
             }
-            else if(ExecuteViaContextMenu)
+            else if (ExecuteViaContextMenu)
             {
-                return Delete();
+                if (!multiselection)
+                {
+                    return Delete();
+                }
+                else
+                {
+                    return MultiDelete();
+                }
             }
             else
             {
@@ -149,6 +167,26 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Executes the multi deletion.
+        /// </summary>
+        /// <returns>true if the deletion can be executed.</returns>
+        private bool MultiDelete()
+        {
+            deletedGameObjects = new HashSet<GameObject>();
+            InteractableObject.UnselectAll(true);
+            foreach (GameObject go in hitGraphElements)
+            {
+                Assert.IsTrue(go.HasNodeRef() || go.HasEdgeRef());
+                ISet<GameObject> deleted;
+                (_, deleted) = GameElementDeleter.Delete(go);
+                deletedGameObjects.UnionWith(deleted);
+            }
+            CurrentState = IReversibleAction.Progress.Completed;
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+            return true;
+        }
+
+        /// <summary>
         /// Used to execute the <see cref="DeleteAction"> from the context menu.
         /// It sets the object to be deleted and ensures that the <see cref="Update"/> method performs the external execution.
         /// </summary>
@@ -156,7 +194,20 @@ namespace SEE.Controls.Actions
         public void ContextMenuExecution(GameObject toDelete)
         {
             ExecuteViaContextMenu = true;
+            multiselection = false;
             hitGraphElement = toDelete;
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="DeleteAction"/> from the multiselection context menu.
+        /// It sets the objects to be deleted and ensures that the <see cref="Update"/> method performs the external execution.
+        /// </summary>
+        /// <param name="toDelete">The objects to be deleted.</param>
+        public void ContextMenuExecution(IEnumerable<GameObject> toDelete)
+        {
+            ExecuteViaContextMenu = true;
+            multiselection = true;
+            hitGraphElements = toDelete.ToList();
         }
 
         /// <summary>
@@ -175,8 +226,19 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            GameElementDeleter.Delete(hitGraphElement);
-            new DeleteNetAction(hitGraphElement.name).Execute();
+            if (!multiselection)
+            {
+                GameElementDeleter.Delete(hitGraphElement);
+                new DeleteNetAction(hitGraphElement.name).Execute();
+            }
+            else
+            {
+                foreach (GameObject go in hitGraphElements)
+                {
+                    GameElementDeleter.Delete(go);
+                    new DeleteNetAction(go.name).Execute();
+                }
+            }
         }
 
         /// <summary>
