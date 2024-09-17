@@ -21,14 +21,39 @@ namespace SEE.Utils
         public static int MainThreadId = 0;
 
         /// <summary>
-        /// Converts the given <paramref name="task"/> to an asynchronous UniTask enumerable.
+        /// Converts the given <paramref name="task"/> of enumerables to an asynchronous UniTask enumerable.
         /// </summary>
         /// <param name="task">The task of enumerables to convert.</param>
+        /// <param name="logErrors">Whether to log errors that occur during conversion instead of throwing them.</param>
         /// <typeparam name="T">The type of the elements in the enumerable.</typeparam>
         /// <returns>An asynchronous UniTask enumerable that emits the elements of the enumerable.</returns>
-        public static IUniTaskAsyncEnumerable<T> AsUniTaskAsyncEnumerable<T>(this UniTask<IEnumerable<T>> task)
+        public static IUniTaskAsyncEnumerable<T> AsUniTaskAsyncEnumerable<T>(this UniTask<IEnumerable<T>> task,
+                                                                             bool logErrors = false)
         {
-            return task.ToUniTaskAsyncEnumerable().SelectMany(x => x.ToUniTaskAsyncEnumerable());
+            return task.ToUniTaskAsyncEnumerable().SelectMany(x =>
+            {
+                if (x == null)
+                {
+                    return UniTaskAsyncEnumerable.Empty<T>();
+                }
+
+                if (!logErrors)
+                {
+                    return x.ToUniTaskAsyncEnumerable();
+                }
+                else
+                {
+                    try
+                    {
+                        return x.ToUniTaskAsyncEnumerable();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Error converting enumerable to UniTaskAsyncEnumerable: {e}");
+                        return UniTaskAsyncEnumerable.Empty<T>();
+                    }
+                }
+            });
         }
 
         /// <summary>

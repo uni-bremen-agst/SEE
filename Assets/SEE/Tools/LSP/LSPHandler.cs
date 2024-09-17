@@ -682,7 +682,7 @@ namespace SEE.Tools.LSP
                 // as the specialized method contains a bug (issue #1303 in OmniSharp/csharp-language-server-protocol).
                 // return AsyncUtils.ObserveUntilTimeout(t => Client.RequestCallHierarchyOutgoing(outgoingParams, t), TimeoutSpan).Select(x => x.To);
                 return AsyncUtils.RunWithTimeoutAsync(MakeOutgoingCallRequest(outgoingParams), TimeoutSpan)
-                                 .AsUniTaskAsyncEnumerable()
+                                 .AsUniTaskAsyncEnumerable(logErrors: true)
                                  .Select(y => y.To);
             });
 
