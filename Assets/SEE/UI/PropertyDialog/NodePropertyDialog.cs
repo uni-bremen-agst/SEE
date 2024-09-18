@@ -1,6 +1,8 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.GO;
 using SEE.Utils;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -49,7 +51,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The dialog property for the type of the node to be entered in the dialog.
         /// </summary>
-        private StringProperty nodeType;
+        private SelectionProperty nodeType;
 
         /// <summary>
         /// Creates and opens the dialog.
@@ -65,8 +67,9 @@ namespace SEE.UI.PropertyDialog
             nodeName.Description = "Name of the node";
 
             // Type of the node
-            nodeType = dialog.AddComponent<StringProperty>();
+            nodeType = dialog.AddComponent<SelectionProperty>();
             nodeType.Name = "Node type";
+            nodeType.AddOptions(node.GameObject().ContainingCity().NodeTypes.Types.OrderBy(t => t));
             nodeType.Value = node.Type;
             nodeType.Description = "Type of the node";
 
