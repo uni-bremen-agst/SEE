@@ -553,7 +553,7 @@
                                 {
                                     "type": "HelpSystemEntry",
                                     "name": "Simple navigation",
-                                    "description": "How to edit an existing node",
+                                    "description": "",
                                     "color": "green",
                                     "video": "HelpSystem/Videos/navigation.mp4",
                                     "HelpEntries": [
