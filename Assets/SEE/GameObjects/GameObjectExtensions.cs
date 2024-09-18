@@ -473,7 +473,7 @@ namespace SEE.GO
             // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                return renderer.localBounds.size;
+                return Vector3.Scale(renderer.localBounds.size, gameObject.transform.localScale);
             }
             else
             {
