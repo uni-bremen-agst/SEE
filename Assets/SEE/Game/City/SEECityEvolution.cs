@@ -289,12 +289,15 @@ namespace SEE.Game.City
         /// Sets up <see cref="evolutionRenderer"/> and initiates the visualization of the
         /// evolving series of graphs.
         /// </summary>
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
         private void StartEvolution()
         {
             evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
             evolutionRenderer.ShowGraphEvolution();
         }
+
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected

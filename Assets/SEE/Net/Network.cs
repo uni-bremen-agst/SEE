@@ -1,7 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Dissonance;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -102,6 +101,18 @@ namespace SEE.Net
         /// Used to tell the caller whether the routine has been completed.
         /// </summary>
         private CallBack callbackToMenu = null;
+
+        /// <summary>
+        /// Name of the local player; used for the text chat and the avatar badge.
+        /// </summary>
+        [Tooltip("The name of the player."), ShowInInspector]
+        public string PlayerName { get; set; } = "Me";
+
+        /// <summary>
+        /// The index of the player's avatar.
+        /// </summary>
+        [Tooltip("The index of the player's avatar"), ShowInInspector]
+        public uint AvatarIndex { get; set; } = 0;
 
         /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
@@ -1015,7 +1026,7 @@ namespace SEE.Net
             Load(ConfigPath.Path);
         }
 
-#region ConfigIO
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -1041,6 +1052,14 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
+        /// <summary>
+        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "playername";
+        /// <summary>
+        /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
+        /// </summary>
+        private const string avatarIndexLabel = "avatarIndex";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1081,6 +1100,10 @@ namespace SEE.Net
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
+            writer.Save(PlayerName, playernameLabel);
+            // The following cast from uint to int is necessary because otherwise the value
+            // would be saved as a float.
+            writer.Save((int)AvatarIndex, avatarIndexLabel);
         }
 
         /// <summary>
@@ -1102,6 +1125,19 @@ namespace SEE.Net
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
+            {
+                string value = PlayerName;
+                ConfigIO.Restore(attributes, playernameLabel, ref value);
+                PlayerName = value;
+            }
+            {
+                int value = (int)AvatarIndex;
+                if (ConfigIO.Restore(attributes, avatarIndexLabel, ref value))
+                {
+                    AvatarIndex = (uint)value;
+                }
+            }
+
         }
 
 #endregion

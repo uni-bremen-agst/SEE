@@ -20,6 +20,11 @@ namespace SEE.Game.Drawable
         public static Color CurrentSecondaryColor { get; set; }
 
         /// <summary>
+        /// The current chosen tertiary color.
+        /// </summary>
+        public static Color CurrentTertiaryColor { get; set; }
+
+        /// <summary>
         /// The current chosen thickness for drawing.
         /// </summary>
         public static float CurrentThickness { get; set; }
@@ -53,9 +58,14 @@ namespace SEE.Game.Drawable
         /// The current order in layer value.
         /// </summary>
         public static int MaxOrderInLayer { get; set; }
+
+        /// <summary>
+        /// The current fill out status.
+        /// </summary>
+        public static bool CurrentFillOutStatus { get; set; }
         #endregion
 
-        #region prefixes
+        #region prefixes and names
         /// <summary>
         /// The prefix of a line object name.
         /// </summary>
@@ -105,6 +115,11 @@ namespace SEE.Game.Drawable
         /// The name of the attached objects object.
         /// </summary>
         public const string AttachedObject = "AttachedObjects";
+
+        /// <summary>
+        /// The name of the fill out game object for the lines.
+        /// </summary>
+        public const string FillOut = "FillOut";
         #endregion
 
         /// <summary>
@@ -183,9 +198,9 @@ namespace SEE.Game.Drawable
         public const float LineSplitTimer = 3.0f;
 
         /// <summary>
-        /// The default marker color for colors that do not have a complementary color.
+        /// The default color for colors that do not have a complementary color.
         /// </summary>
-        public static readonly Color LineSplitDefaultMarkerColor = Color.magenta;
+        public static readonly Color DefaultComplementary = Color.magenta;
 
         /// <summary>
         /// The initial scale for sticky notes.
@@ -251,6 +266,7 @@ namespace SEE.Game.Drawable
         {
             CurrentPrimaryColor = UnityEngine.Random.ColorHSV();
             CurrentSecondaryColor = Color.clear;
+            CurrentTertiaryColor = Color.clear;
             CurrentOutlineThickness = 0.4f;
             CurrentFontSize = 0.5f;
             CurrentThickness = 0.01f;
@@ -258,6 +274,7 @@ namespace SEE.Game.Drawable
             CurrentColorKind = GameDrawer.ColorKind.Monochrome;
             CurrentTiling = 1f;
             MaxOrderInLayer = 1;
+            CurrentFillOutStatus = false;
         }
     }
 }

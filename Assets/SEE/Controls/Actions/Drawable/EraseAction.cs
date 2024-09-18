@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block to get the drawable object to delete.
                 if (Selector.SelectQueryHasDrawableSurface(out RaycastHit raycastHit))
                 {
-                    GameObject hitObject = raycastHit.collider.gameObject;
+                    GameObject hitObject = GameFinder.GetDrawableTypObject(raycastHit.collider.gameObject);
 
                     if (Tags.DrawableTypes.Contains(hitObject.tag))
                     {

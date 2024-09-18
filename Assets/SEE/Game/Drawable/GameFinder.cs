@@ -276,6 +276,33 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
+        /// Returns the next higher <see cref="DrawableType"/> object.
+        /// It will be needed if a child object of the <see cref="DrawableType"/> object was selected.
+        /// </summary>
+        /// <param name="obj">The currently selected obj.</param>
+        /// <returns>The next higher <see cref="DrawableType"/> object or null.</returns>
+        public static GameObject GetDrawableTypObject(GameObject obj)
+        {
+            if (Tags.DrawableTypes.Contains(obj.tag))
+            {
+                return obj;
+            }
+            else if (obj.transform.parent != null
+                && Tags.DrawableTypes.Contains(obj.transform.parent.tag))
+            {
+                return obj.transform.parent.gameObject;
+            }
+            else if (obj.transform.parent != null)
+            {
+                return GetDrawableTypObject(obj.transform.parent.gameObject);
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
         /// Gets the parent name of the drawable surface.
         /// </summary>
         /// <param name="surface">The drawable surface</param>

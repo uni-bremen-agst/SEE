@@ -127,11 +127,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = true;
-                // if the object is currently selected, the label is already shown
-                if (!isSelected)
-                {
-                    On();
-                }
+                On();
             }
         }
 
@@ -147,10 +143,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = false;
-                if (!isSelected)
-                {
-                    Off();
-                }
+                Off();
             }
         }
 

@@ -66,7 +66,7 @@ namespace SEE.Net
             }
             else
             {
-                using NativeArray<ulong> targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp);
+                using NativeArray<ulong> targetClientIds = new(recipientIds, Allocator.Temp);
                 ExecuteActionClientRpc(serializedAction, RpcTarget.Group(targetClientIds, RpcTargetUse.Temp));
             }
         }

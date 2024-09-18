@@ -47,6 +47,9 @@ namespace SEE.Controls.Actions
         /// Tries to open the context menu with multiselection.
         /// </summary>
         private bool multiselection = false;
+        /// The position of the mouse when the user started opening the context menu.
+        /// </summary>
+        private Vector3 startMousePosition = Vector3.zero;
 
         private void Start()
         {
@@ -55,12 +58,13 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.StartOpenContextMenu())
+            if (SEEInput.OpenContextMenuStart())
             {
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                     startObject = o;
+                    startMousePosition = Input.mousePosition;
                     multiselection = false;
                 }
                 else
@@ -69,7 +73,7 @@ namespace SEE.Controls.Actions
                     multiselection = true;
                 }
             }
-            if (SEEInput.OpenContextMenu())
+            if (SEEInput.OpenContextMenuEnd())
             {
                 if (!multiselection)
                 {
@@ -78,7 +82,7 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (o == startObject)
+                    if (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
                     {
                         position = Input.mousePosition;
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
@@ -142,7 +146,7 @@ namespace SEE.Controls.Actions
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
-                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<DiffCity>() != null))
+                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<VCSCity>() != null))
                         {
                             submenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
                         }
@@ -222,10 +226,10 @@ namespace SEE.Controls.Actions
             {
                 foreach(InteractableObject iO in selectedObjects)
                 {
-                    if (iO.gameObject != null && iO.gameObject.ContainingCity<DiffCity>())
+                    if (iO.gameObject != null && iO.gameObject.ContainingCity<VCSCity>())
                     {
                         ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
-                                                          iO.gameObject.ContainingCity<DiffCity>()));
+                                                          iO.gameObject.ContainingCity<CommitCity>()));
                     }
                 }
             }
@@ -299,7 +303,7 @@ namespace SEE.Controls.Actions
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>Common options available for all graph elements</returns>
         private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+                    GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
             string name = graphElement.ID;
             string target, source = target = null;
@@ -357,7 +361,7 @@ namespace SEE.Controls.Actions
                 if (graphElement.Filename != null)
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
-                    if (gameObject.ContainingCity<DiffCity>() != null)
+                    if (gameObject.ContainingCity<VCSCity>() != null)
                     {
                         subMenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
                     }
@@ -411,7 +415,7 @@ namespace SEE.Controls.Actions
             void ShowDiffCode()
             {
                 ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
-                                                          gameObject.ContainingCity<DiffCity>()));
+                                                          gameObject.ContainingCity<CommitCity>()));
             }
 
             void Highlight()
@@ -452,6 +456,14 @@ namespace SEE.Controls.Actions
             if (node.OutgoingsOfType(LSP.Definition).Any())
             {
                 actions.Add(new PopupMenuAction("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Extend).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Supertype", () => ShowTargets(LSP.Extend).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Call).Any())
+            {
+                actions.Add(new PopupMenuAction("Show Outgoing Calls", () => ShowTargets(LSP.Call).Forget(), Icons.OutgoingEdge));
             }
             if (node.OutgoingsOfType(LSP.OfType).Any())
             {
@@ -806,7 +818,6 @@ namespace SEE.Controls.Actions
                     };
                 entries.AddRange(actions);
                 UpdateEntries(popupMenu, position, entries);
-
             }, icon, Icons.ArrowRight, CloseAfterClick: false, priority);
         }
 

@@ -68,7 +68,9 @@ namespace SEE.Controls
             // Returns the radius of the player's head.
             float HeadRadius()
             {
-                const string headName = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust";
+                //const string headName = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust";
+                const string headName =
+                    "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head/HeadAdjust";
                 Transform head = transform.Find(headName);
                 if (head == null)
                 {

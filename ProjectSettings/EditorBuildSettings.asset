@@ -8,9 +8,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/SEEStart.unity
     guid: f0ffd1879ec1ac440b7e28cd35b500bf
-  - enabled: 0
-    path: Assets/Scenes/SEEWorld.unity
-    guid: 077ae3d112f905849b6dd5427be72ce8
   - enabled: 1
     path: Assets/Scenes/SEENewWorld.unity
     guid: 0d7b5ac2e517b4e42b010e83e09da948

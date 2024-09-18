@@ -3,13 +3,13 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -87,17 +87,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// Calculates the negativ color for the marker.
             Color color = GetColor(hitObject);
-
-            Color.RGBToHSV(color, out float H, out float S, out float V);
-            /// Calculate the complementary color.
-            float negativH = (H + 0.5f) % 1f;
-            Color negativColor = Color.HSVToRGB(negativH, S, V);
-
-            /// If the color does not have a complementary color, take the default.
-            if (color == negativColor)
-            {
-                negativColor = ValueHolder.LineSplitDefaultMarkerColor;
-            }
+            Color negativColor = ColorConverter.Complementary(color);
 
             /// Calculates the positions of the marker polygon.
             Vector3[] positions = ShapePointsCalculator.Polygon(position,
@@ -106,7 +96,7 @@ namespace SEE.Controls.Actions.Drawable
             GameObject point = GameDrawer.DrawLine(surface, RandomStrings.GetRandomString(10), positions,
                 GameDrawer.ColorKind.Monochrome,
                 negativColor, negativColor, 0.01f,
-                false, GameDrawer.LineKind.Solid, 1f, false);
+                false, GameDrawer.LineKind.Solid, 1f, increaseCurrentOrder: false);
             /// Sets the pivot point of the marker.
             GameDrawer.SetPivotShape(point, position);
             /// Adds the point on all clients.

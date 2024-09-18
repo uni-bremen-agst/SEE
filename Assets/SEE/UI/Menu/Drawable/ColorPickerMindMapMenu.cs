@@ -182,7 +182,7 @@ namespace SEE.UI.Menu.Drawable
                 return true;
             }
 
-            color = Color.black;
+            color = Color.clear;
             return false;
         }
     }

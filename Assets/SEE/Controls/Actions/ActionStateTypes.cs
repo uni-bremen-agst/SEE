@@ -330,27 +330,27 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType LoadBoard;
         public static readonly ActionStateType SaveBoard;
 
-        public readonly static ActionStateTypeGroup Drawable;
-        public readonly static ActionStateType DrawFreehand;
-        public readonly static ActionStateType DrawShapes;
-        public readonly static ActionStateType WriteText;
-        public readonly static ActionStateType AddImage;
-        public readonly static ActionStateType MindMap;
-        public readonly static ActionStateType StickyNote;
-        public readonly static ActionStateType ColorPicker;
-        public readonly static ActionStateType Edit;
-        public readonly static ActionStateType MoveRotator;
-        public readonly static ActionStateType LayerChanger;
-        public readonly static ActionStateType CutCopyPaste;
-        public readonly static ActionStateType Scale;
-        public readonly static ActionStateType MovePoint;
-        public readonly static ActionStateType LineSplit;
-        public readonly static ActionStateType LinePointErase;
-        public readonly static ActionStateType LineConnectionErase;
-        public readonly static ActionStateType Erase;
-        public readonly static ActionStateType Clear;
-        public readonly static ActionStateType Save;
-        public readonly static ActionStateType Load;
+        public static readonly ActionStateTypeGroup Drawable;
+        public static readonly ActionStateType DrawFreehand;
+        public static readonly ActionStateType DrawShapes;
+        public static readonly ActionStateType WriteText;
+        public static readonly ActionStateType AddImage;
+        public static readonly ActionStateType MindMap;
+        public static readonly ActionStateType StickyNote;
+        public static readonly ActionStateType ColorPicker;
+        public static readonly ActionStateType Edit;
+        public static readonly ActionStateType MoveRotator;
+        public static readonly ActionStateType LayerChanger;
+        public static readonly ActionStateType CutCopyPaste;
+        public static readonly ActionStateType Scale;
+        public static readonly ActionStateType MovePoint;
+        public static readonly ActionStateType LineSplit;
+        public static readonly ActionStateType LinePointErase;
+        public static readonly ActionStateType LineConnectionErase;
+        public static readonly ActionStateType Erase;
+        public static readonly ActionStateType Clear;
+        public static readonly ActionStateType Save;
+        public static readonly ActionStateType Load;
 
         #endregion
 

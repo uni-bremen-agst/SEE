@@ -118,20 +118,24 @@ namespace SEE.Game.City
         [OdinSerialize, Tooltip("Edge types of hierarchical edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public HashSet<string> HierarchicalEdges = HierarchicalEdgeTypes();
 
+        [OdinSerialize, Tooltip("Edge types of hidden edges (will only be shown upon hovering)."),
+         TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
+        public HashSet<string> HiddenEdges = new();
+
         /// <summary>
         /// A mapping of all node types of the nodes in the graph onto whether
         /// they should be visualized or not and if so, how.
         /// </summary>
         [NonSerialized, OdinSerialize, Tooltip("Visual attributes of nodes."), HideReferenceObjectPicker]
         [DictionaryDrawerSettings(KeyLabel = "Node type", ValueLabel = "Visual attributes",
-            DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
+                                  DisplayMode = DictionaryDisplayOptions.CollapsedFoldout), TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup)]
         public NodeTypeVisualsMap NodeTypes = new();
 
         /// <summary>
         /// Attributes to mark changes of nodes.
         /// </summary>
         [Tooltip("How changes of nodes should be marked."),
-            TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup), HideReferenceObjectPicker]
+         TabGroup(NodeFoldoutGroup), RuntimeTab(NodeFoldoutGroup), HideReferenceObjectPicker]
         [NonSerialized, OdinSerialize]
         public MarkerAttributes MarkerAttributes = new();
 
@@ -278,6 +282,7 @@ namespace SEE.Game.City
         public BoardAttributes BoardSettings = new();
 
         #region LabelLineMaterial
+
         /// <summary>
         /// The material for the line connecting a node and its label. We use exactly one material
         /// for all connecting lines within this city, different from the lines used for labels in
@@ -285,7 +290,10 @@ namespace SEE.Game.City
         /// </summary>
         [HideInInspector]
         public Material LabelLineMaterial
-        { get; private set; }
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Returns the material for the line connecting a node and its label.
@@ -297,6 +305,7 @@ namespace SEE.Game.City
             return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
                                  renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
+
         #endregion
 
         /// <summary>
@@ -364,17 +373,13 @@ namespace SEE.Game.City
         /// <summary>
         /// The names of the edge types of hierarchical edges.
         /// </summary>
-        public static HashSet<string> HierarchicalEdgeTypes()
+        public static HashSet<string> HierarchicalEdgeTypes() => new()
         {
-            HashSet<string> result = new()
-            {
-                "Enclosing",
-                "Belongs_To",
-                "Part_Of",
-                "Defined_In"
-            };
-            return result;
-        }
+            "Enclosing",
+            "Belongs_To",
+            "Part_Of",
+            "Defined_In"
+        };
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here:
