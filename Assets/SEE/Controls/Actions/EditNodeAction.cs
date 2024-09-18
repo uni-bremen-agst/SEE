@@ -7,6 +7,7 @@ using SEE.Net.Actions;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls.Actions
 {
@@ -160,8 +161,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            memento.Node.SourceName = memento.OriginalName;
-            memento.Node.Type = memento.OriginalType;
+            GameEditNode.ChangeName(memento.Node, memento.OriginalName);
+            GameEditNode.ChangeType(memento.Node, memento.OriginalType);
             NotifyClients(memento.Node);
         }
 
@@ -171,8 +172,8 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            memento.Node.SourceName = memento.NewName;
-            memento.Node.Type = memento.NewType;
+            GameEditNode.ChangeName(memento.Node, memento.NewName);
+            GameEditNode.ChangeType(memento.Node, memento.NewType);
             NotifyClients(memento.Node);
         }
 

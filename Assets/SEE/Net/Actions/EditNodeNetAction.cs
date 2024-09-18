@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using UnityEngine;
 
@@ -54,8 +55,8 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             Node node = Find(NodeID).GetNode();
-            node.SourceName = SourceName;
-            node.Type = NodeType;
+            GameEditNode.ChangeName(node, SourceName);
+            GameEditNode.ChangeType(node, NodeType);
         }
     }
 }

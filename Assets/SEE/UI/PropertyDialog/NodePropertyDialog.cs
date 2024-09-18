@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Utils;
 using System.Linq;
@@ -110,8 +111,8 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private void OKButtonPressed()
         {
-            node.SourceName = nodeName.Value.Trim();
-            node.Type = nodeType.Value.Trim();
+            GameEditNode.ChangeName(node, nodeName.Value);
+            GameEditNode.ChangeType(node, nodeType.Value);
             OnConfirm.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
