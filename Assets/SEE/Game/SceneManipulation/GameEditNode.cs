@@ -1,10 +1,8 @@
-﻿using InControl.UnityDeviceProfiles;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.Utils;
-using System.Collections;
 using TMPro;
 using UnityEngine;
 
@@ -25,6 +23,7 @@ namespace SEE.Game.SceneManipulation
             node.SourceName = newName.Trim();
             if (node.GameObject() != null)
             {
+                ShouldAddTextObject(node);
                 Transform transform = node.GameObject().transform;
                 foreach (Transform t in transform)
                 {
@@ -47,36 +46,53 @@ namespace SEE.Game.SceneManipulation
             GameObject nodeObject = node.GameObject(true);
             AbstractSEECity city = nodeObject.ContainingCity();
 
+            ShouldAddTextObject(node);
             if (city.NodeTypes[node.Type].ShowNames)
             {
-                GetText()?.SetActive(true);
+                GetText(nodeObject)?.SetActive(true);
             }
             else
             {
-                GetText()?.SetActive(false);
+                GetText(nodeObject)?.SetActive(false);
             }
 
             if (city.Renderer is GraphRenderer renderer)
             {
                 renderer.AdjustStyle(nodeObject);
-                if (GetText() != null)
+                if (GetText(nodeObject) != null)
                 {
-                    GetText().GetComponent<TextMeshPro>().color = nodeObject.GetColor().Invert();
+                    GetText(nodeObject).GetComponent<TextMeshPro>().color = nodeObject.GetColor().Invert();
                 }
             }
+        }
 
-            return;
-
-            GameObject GetText()
+        /// <summary>
+        /// Returns the text object of a node game object.
+        /// </summary>
+        /// <returns>The text object.</returns>
+        private static GameObject GetText(GameObject node)
+        {
+            foreach (Transform transform in node.transform)
             {
-                foreach (Transform transform in nodeObject.transform)
+                if (transform.name.Contains("Text") && transform.GetComponent<TextMeshPro>() != null)
                 {
-                    if (transform.name.Contains("Text") && transform.GetComponent<TextMeshPro>() != null)
-                    {
-                        return transform.gameObject;
-                    }
+                    return transform.gameObject;
                 }
-                return null;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Checks if the text object needs to be added.
+        /// </summary>
+        /// <param name="node">The node to be checked.</param>
+        private static void ShouldAddTextObject(Node node)
+        {
+            if (node.GameObject().ContainingCity().NodeTypes[node.Type].ShowNames
+                && node.GameObject().ContainingCity().Renderer is GraphRenderer renderer
+                && GetText(node.GameObject()) == null)
+            {
+                renderer.AddDecorations(node.GameObject());
             }
         }
     }
