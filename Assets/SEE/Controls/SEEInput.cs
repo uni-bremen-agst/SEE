@@ -243,10 +243,19 @@ namespace SEE.Controls
         //-----------------------------------------------------
 
         /// <summary>
-        /// True if the user wants to open the context menu.
+        /// True if the user starts the mouse interaction to open the context menu.
         /// </summary>
-        /// <returns>True if the user wants to open the context menu.</returns>
-        internal static bool OpenContextMenu()
+        /// <returns>true if the user starts the mouse interaction to open the context menu</returns>
+        internal static bool OpenContextMenuStart()
+        {
+            return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user ends the mouse interaction to open the context menu.
+        /// </summary>
+        /// <returns>true if the user ends the mouse interaction to open the context menu</returns>
+        internal static bool OpenContextMenuEnd()
         {
             return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }

@@ -4,6 +4,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
+using SEE.GraphProviders.Evolution;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -50,6 +51,15 @@ namespace SEE.GraphProviders
             GXLEvolutionGraphProvider gxlLoaded = loaded as GXLEvolutionGraphProvider;
             AreEqual(gxlLoaded.GXLDirectory, saved.GXLDirectory);
             Assert.AreEqual(gxlLoaded.MaxRevisionsToLoad, saved.MaxRevisionsToLoad);
+        }
+
+        private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider saved, MultiGraphProvider loaded)
+        {
+            Assert.IsTrue(saved.GetType() == loaded.GetType());
+            GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
+            Assert.AreEqual(gitLoaded.Date, saved.Date);
+            AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
+            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
         }
 
         /// <summary>
@@ -130,9 +140,19 @@ namespace SEE.GraphProviders
         {
             return new GXLEvolutionGraphProvider()
             {
-                GXLDirectory = new DataPath("/path/to/gxl/files")
+                GXLDirectory = new DataPath() { Path = "/path/to/gxl/files" }
             };
         }
+
+        private GitEvolutionGraphProvider GetGitEvolutionProvider()
+        {
+            return new GitEvolutionGraphProvider()
+            {
+                Date = "01/05/2024",
+                GitRepository = GetGitRepository()
+            };
+        }
+
         private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
@@ -228,7 +248,6 @@ namespace SEE.GraphProviders
             AreEqual(saved, LoadMultiGraph());
         }
 
-
         [Test]
         public void TestEmptyPipelineProvider()
         {
@@ -267,21 +286,55 @@ namespace SEE.GraphProviders
 
         #endregion
 
-        #region GXLEvolution
+        #region GitProvider
 
         [Test]
-        public void TestGXLEvolutionGraphProvider()
+        public void TestGitEvolutionProvider()
         {
-            GXLEvolutionGraphProvider saved = new()
-            {
-                GXLDirectory = new(),
-                MaxRevisionsToLoad = 42
-            };
-            saved.GXLDirectory.Path = "/path/to/file.gxl";
+            GitEvolutionGraphProvider saved = GetGitEvolutionProvider();
             Save(saved);
-            AreEqual(saved, LoadMultiGraph());
+            AreEqualGitEvolutionProviders(saved, LoadMultiGraph());
         }
 
+        [Test]
+        public void TestAllBranchGitSingleProvider()
+        {
+            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
+            Save(saved);
+            AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
+        }
+
+        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved,
+            SingleGraphProvider loaded)
+        {
+            Assert.AreEqual(saved.GetType(), loaded.GetType());
+            AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
+            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
+            Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
+        }
+
+        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
+        {
+            return new AllGitBranchesSingleGraphProvider()
+            {
+                PathGlobbing = new Dictionary<string, bool>()
+                {
+                    {".cs", true},
+                },
+                AutoFetch = true,
+                PollingInterval = 5,
+                MarkerTime = 10,
+            };
+        }
+
+        private GitRepository GetGitRepository()
+        {
+            return new GitRepository()
+            {
+                RepositoryPath = new DataPath("/path/to/repo"),
+                PathGlobbing = new Dictionary<string, bool>() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
+            };
+        }
 
         #endregion
 
@@ -404,18 +457,18 @@ namespace SEE.GraphProviders
             return loaded;
         }
 
+        private void Save(SingleGraphProvider saved)
+        {
+            using ConfigWriter writer = new(filename);
+            saved.Save(writer, providerLabel);
+        }
+
         private MultiGraphProvider LoadMultiGraph()
         {
             using ConfigReader stream = new(filename);
             MultiGraphProvider loaded = MultiGraphProvider.Restore(stream.Read(), providerLabel);
             Assert.IsNotNull(loaded);
             return loaded;
-        }
-
-        private void Save(SingleGraphProvider saved)
-        {
-            using ConfigWriter writer = new(filename);
-            saved.Save(writer, providerLabel);
         }
 
         private void Save(MultiGraphProvider saved)

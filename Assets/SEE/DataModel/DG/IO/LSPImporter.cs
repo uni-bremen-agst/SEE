@@ -4,7 +4,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Tools;
 using SEE.Tools.LSP;
@@ -260,6 +259,12 @@ namespace SEE.DataModel.DG.IO
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
             Debug.Log($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).");
 
+            if (Handler.Server == LSPServer.EclipseJdtls)
+            {
+                // This server requires manual correction of the Java package hierarchies.
+                HandleJavaClasses(relevantNodes);
+            }
+
             if (relevantNodes.Count == 0)
             {
                 Debug.LogError("LSPImporter: No relevant nodes found. Aborting import.\n");
@@ -313,7 +318,7 @@ namespace SEE.DataModel.DG.IO
 
                     // The remaining 80% of the progress is made by connecting the nodes.
                     // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
-                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count+1));
+                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
                 }
             }
             Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
@@ -344,6 +349,71 @@ namespace SEE.DataModel.DG.IO
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
                 return relevantExtensions.SelectMany(x => Directory.EnumerateFiles(path, $"*.{x}", SearchOption.AllDirectories));
+            }
+
+            void HandleJavaClasses(IList<Node> nodes)
+            {
+                Dictionary<string, Node> packageNodes = new();
+                // Java package hierarchies are not collected properly by the language server.
+                // Instead, we will infer them from the file paths.
+                foreach (Node node in nodes.Where(x => x.Type == NodeKind.Class.ToString()))
+                {
+                    // Aside from the hierarchies, we also want to remember as a metric how many methods are in a class.
+                    node.SetInt("Num_Methods", nodes.Count(x => x.Parent == node && x.Type == NodeKind.Method.ToString()));
+
+                    string relativePath = Path.GetRelativePath(Handler.ProjectPath, node.Directory);
+                    string packageName = relativePath.Replace(Path.DirectorySeparatorChar, '.').TrimEnd('.');
+
+                    if (packageNodes.TryGetValue(packageName, out Node package))
+                    {
+                        // The package node already exists, so we reparent the class node to it.
+                        node.Reparent(package);
+                        continue;
+                    }
+                    Node packageNode = new()
+                    {
+                        ID = packageName,
+                        SourceName = packageName,
+                        Directory = node.Directory,
+                        Type = NodeKind.Package.ToString()
+                    };
+                    graph.AddNode(packageNode);
+                    packageNodes[packageName] = packageNode;
+
+                    // Reparent the class node to the package node (if it previously was just inside a directory).
+                    if (node.Parent != null &&
+                        (node.Parent.Type == NodeKind.File.ToString()
+                            || node.Parent.Type == NodeKind.Package.ToString()
+                            || node.Parent.Type == "Directory"))
+                    {
+                        node.Reparent(packageNode);
+                    }
+                }
+
+                // Finally, another run through the nodes to reparent the package nodes to their parent packages.
+                foreach (Node packageNode in packageNodes.Values)
+                {
+                    Node parentPackage = GetParentPackage(packageNode.ID);
+                    if (parentPackage != null)
+                    {
+                        packageNode.Reparent(parentPackage);
+                    }
+                }
+
+                return;
+
+                Node GetParentPackage(string package)
+                {
+                    for (int lastDot = package.LastIndexOf('.'); lastDot != -1; lastDot = package.LastIndexOf('.'))
+                    {
+                        package = package[..lastDot];
+                        if (packageNodes.TryGetValue(package, out Node parent))
+                        {
+                            return parent;
+                        }
+                    }
+                    return null;
+                }
             }
         }
 

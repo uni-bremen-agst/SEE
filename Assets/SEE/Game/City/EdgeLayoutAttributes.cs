@@ -31,6 +31,12 @@ namespace SEE.Game.City
                  nameof(WarnAboutInnerEdgeAnimation))]
         public bool AnimateInnerEdges = true;
 
+        [Tooltip("When hovering over nodes, repeatedly animate the edges of source nodes, one after another.")]
+        public bool AnimateTransitiveSourceEdges = false;
+
+        [Tooltip("When hovering over nodes, repeatedly animate the edges of target nodes, one after another.")]
+        public bool AnimateTransitiveTargetEdges = false;
+
         /// <summary>
         /// True if the user should be warned about animating inner edges due to performance issues.
         /// </summary>
@@ -68,6 +74,8 @@ namespace SEE.Game.City
             writer.Save(Kind.ToString(), edgeLayoutLabel);
             writer.Save(AnimationKind.ToString(), animationKindLabel);
             writer.Save(AnimateInnerEdges, animateInnerEdgesLabel);
+            writer.Save(AnimateTransitiveSourceEdges, animateTransitiveSourceEdgesLabel);
+            writer.Save(AnimateTransitiveTargetEdges, animateTransitiveTargetEdgesLabel);
             writer.Save(EdgeWidth, edgeWidthLabel);
             writer.Save(EdgesAboveBlocks, edgesAboveBlocksLabel);
             writer.Save(Tension, tensionLabel);
@@ -83,6 +91,8 @@ namespace SEE.Game.City
                 ConfigIO.RestoreEnum(values, edgeLayoutLabel, ref Kind);
                 ConfigIO.RestoreEnum(values, animationKindLabel, ref AnimationKind);
                 ConfigIO.Restore(values, animateInnerEdgesLabel, ref AnimateInnerEdges);
+                ConfigIO.Restore(values, animateTransitiveSourceEdgesLabel, ref AnimateTransitiveSourceEdges);
+                ConfigIO.Restore(values, animateTransitiveTargetEdgesLabel, ref AnimateTransitiveTargetEdges);
                 ConfigIO.Restore(values, edgeWidthLabel, ref EdgeWidth);
                 ConfigIO.Restore(values, edgesAboveBlocksLabel, ref EdgesAboveBlocks);
                 ConfigIO.Restore(values, tensionLabel, ref Tension);
@@ -95,5 +105,7 @@ namespace SEE.Game.City
         private const string tensionLabel = "Tension";
         private const string animationKindLabel = "AnimationKind";
         private const string animateInnerEdgesLabel = "AnimateInnerEdges";
+        private const string animateTransitiveSourceEdgesLabel = "AnimateTransitiveSourceEdges";
+        private const string animateTransitiveTargetEdgesLabel = "AnimateTransitiveTargetEdges";
     }
 }

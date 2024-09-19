@@ -15,6 +15,10 @@ namespace SEE.Game.City
         /// </summary>
         private const string hierarchicalEdgesLabel = "HierarchicalEdges";
         /// <summary>
+        /// Label in the configuration file for <see cref="HiddenEdges"/>.
+        /// </summary>
+        private const string hiddenEdgesLabel = "HiddenEdges";
+        /// <summary>
         /// Label in the configuration file for <see cref="NodeTypes"/>.
         /// </summary>
         private const string nodeTypesLabel = "NodeTypes";
@@ -105,6 +109,7 @@ namespace SEE.Game.City
             SolutionPath.Save(writer, solutionPathLabel);
             writer.Save(LODCulling, lodCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
+            writer.Save(HiddenEdges.ToList(), hiddenEdgesLabel);
             NodeTypes.Save(writer, nodeTypesLabel);
             writer.Save(IgnoreSelfLoopsInLifting, ignoreSelfLoopsInLiftingLabel);
             writer.Save(MaximalAntennaSegmentHeight, maximalAntennaSegmentHeightLabel);
@@ -133,6 +138,7 @@ namespace SEE.Game.City
             SolutionPath.Restore(attributes, solutionPathLabel);
             ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
+            ConfigIO.Restore(attributes, hiddenEdgesLabel, ref HiddenEdges);
             NodeTypes.Restore(attributes, nodeTypesLabel);
             ConfigIO.Restore(attributes, ignoreSelfLoopsInLiftingLabel, ref IgnoreSelfLoopsInLifting);
             ConfigIO.Restore(attributes, maximalAntennaSegmentHeightLabel, ref MaximalAntennaSegmentHeight);

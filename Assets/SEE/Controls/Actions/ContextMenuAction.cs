@@ -27,6 +27,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         private PopupMenu popupMenu;
 
+        /// <summary>
+        /// The position of the mouse when the user started opening the context menu.
+        /// </summary>
+        private Vector3 startMousePosition = Vector3.zero;
+
         private void Start()
         {
             popupMenu = gameObject.AddComponent<PopupMenu>();
@@ -34,7 +39,11 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.OpenContextMenu())
+            if (SEEInput.OpenContextMenuStart())
+            {
+                startMousePosition = Input.mousePosition;
+            }
+            else if (SEEInput.OpenContextMenuEnd() && (Input.mousePosition - startMousePosition).magnitude < 1)
             {
                 // TODO (#664): Detect if multiple elements are selected and adjust options accordingly.
                 HitGraphElement hit = Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
@@ -91,7 +100,7 @@ namespace SEE.Controls.Actions
             if (graphElement.Filename != null)
             {
                 actions.Add(new("Show Code", ShowCode, Icons.Code));
-                if (gameObject.ContainingCity<DiffCity>() != null)
+                if (gameObject.ContainingCity<VCSCity>() != null)
                 {
                     actions.Add(new("Show Code Diff", ShowDiffCode, Icons.Code));
                 }
@@ -129,7 +138,7 @@ namespace SEE.Controls.Actions
             void ShowDiffCode()
             {
                 ActivateWindow(ShowCodeAction.ShowVCSDiff(gameObject.MustGetComponent<GraphElementRef>(),
-                                                          gameObject.ContainingCity<DiffCity>()));
+                                                          gameObject.ContainingCity<CommitCity>()));
             }
 
             void Highlight()
@@ -228,6 +237,14 @@ namespace SEE.Controls.Actions
             if (node.OutgoingsOfType(LSP.Definition).Any())
             {
                 actions.Add(new("Show Definition", () => ShowTargets(LSP.Definition).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Extend).Any())
+            {
+                actions.Add(new("Show Supertype", () => ShowTargets(LSP.Extend).Forget(), Icons.OutgoingEdge));
+            }
+            if (node.OutgoingsOfType(LSP.Call).Any())
+            {
+                actions.Add(new("Show Outgoing Calls", () => ShowTargets(LSP.Call).Forget(), Icons.OutgoingEdge));
             }
             if (node.OutgoingsOfType(LSP.OfType).Any())
             {

@@ -196,6 +196,25 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        [SerializeField]
+        private bool isSelectable = true;
+
+        /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        public bool IsSelectable
+        {
+            get => isSelectable;
+            set
+            {
+                isSelectable = value;
+                needsUpdate = true;
+            }
+        }
+
+        /// <summary>
         /// Tuple of the start color of the gradient and the end color of it.
         /// Should only be changed via <see cref="GradientColors"/>.
         /// </summary>
@@ -368,7 +387,7 @@ namespace SEE.GO
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            int totalVertices = (tubularSegments+1) * (radialSegments+1);
+            int totalVertices = (tubularSegments + 1) * (radialSegments + 1);
             int totalIndices = tubularSegments * radialSegments * 6;
             Vector3[] vertices = new Vector3[totalVertices];
             Vector3[] normals = new Vector3[totalVertices];
@@ -435,7 +454,7 @@ namespace SEE.GO
                 Vector3 frPosition = TinySplineInterop.VectorToVector(fr.Position);
                 Vector3 frNormal = TinySplineInterop.VectorToVector(fr.Normal);
                 Vector3 frBinormal = TinySplineInterop.VectorToVector(fr.Binormal);
-                Vector4 frTangent = TinySplineInterop.VectorToVector(fr.Tangent);  // w = 0f by default.
+                Vector4 frTangent = TinySplineInterop.VectorToVector(fr.Tangent); // w = 0f by default.
 
                 // TODO: This was previously (before the optimization) implicit behavior. Is this intentional?
                 if (float.IsNaN(frNormal.x))
@@ -467,8 +486,12 @@ namespace SEE.GO
                         int d = index - segmentPlusOne;
 
                         // faces
-                        indices[indexIndex++] = a; indices[indexIndex++] = d; indices[indexIndex++] = b;
-                        indices[indexIndex++] = b; indices[indexIndex++] = d; indices[indexIndex++] = c;
+                        indices[indexIndex++] = a;
+                        indices[indexIndex++] = d;
+                        indices[indexIndex++] = b;
+                        indices[indexIndex++] = b;
+                        indices[indexIndex++] = d;
+                        indices[indexIndex++] = c;
                     }
 
                     index++;
@@ -480,17 +503,19 @@ namespace SEE.GO
             bool updateMaterial; // Whether to call `UpdateMaterial'.
 
             if (gameObject.TryGetComponent(out MeshFilter filter))
-            { // Does this game object already have a mesh which we can reuse?
+            {
+                // Does this game object already have a mesh which we can reuse?
                 mesh = filter.mesh;
                 updateMaterial = // The geometrics of the mesh have changed.
-                                 mesh.vertices.Length != vertices.Length ||
-                                 mesh.normals.Length != normals.Length ||
-                                 mesh.tangents.Length != tangents.Length ||
-                                 mesh.uv.Length != uvs.Length ||
-                                 needsColorUpdate; // Or the color of the mesh has been changed.
+                    mesh.vertices.Length != vertices.Length ||
+                    mesh.normals.Length != normals.Length ||
+                    mesh.tangents.Length != tangents.Length ||
+                    mesh.uv.Length != uvs.Length ||
+                    needsColorUpdate; // Or the color of the mesh has been changed.
             }
             else
-            { // Create a new mesh for this game object.
+            {
+                // Create a new mesh for this game object.
                 mesh = new Mesh();
                 mesh.MarkDynamic(); // May improve performance.
                 filter = gameObject.AddComponent<MeshFilter>();
@@ -509,19 +534,28 @@ namespace SEE.GO
             mesh.uv = uvs;
             mesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
-            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-            MeshCollider collider = gameObject.AddOrGetComponent<MeshCollider>();
-            collider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-            collider.sharedMesh = mesh;
+            if (IsSelectable)
+            {
+                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+                MeshCollider splineCollider = gameObject.AddOrGetComponent<MeshCollider>();
+                splineCollider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+                splineCollider.sharedMesh = mesh;
+            }
+            else if (gameObject.TryGetComponent(out MeshCollider splineCollider))
+            {
+                Destroyer.Destroy(splineCollider);
+            }
 
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             if (updateMaterial)
-            { // Needs the meshRenderer.
+            {
+                // Needs the meshRenderer.
                 UpdateMaterial();
             }
 
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-            { // Remove line meshRenderer.
+            {
+                // Remove line meshRenderer.
                 Destroyer.Destroy(lineRenderer);
             }
 
