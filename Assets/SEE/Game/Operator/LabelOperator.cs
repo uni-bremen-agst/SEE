@@ -3,6 +3,7 @@ using DG.Tweening;
 using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
+using Sirenix.Utilities;
 using TMPro;
 using UnityEngine;
 
@@ -46,6 +47,15 @@ namespace SEE.Game.Operator
             labelTextPosition.AnimateTo(DesiredLabelTextPosition, duration);
             labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration);
             labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration);
+        }
+
+        /// <summary>
+        /// Checks if the label is not empty.
+        /// </summary>
+        /// <returns>True, if the label isn't empty.</returns>
+        public bool LabelIsNotEmpty()
+        {
+            return labelText != null && labelText.text.Trim() != "";
         }
 
         /// <summary>
