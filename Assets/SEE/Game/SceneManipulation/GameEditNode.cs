@@ -1,4 +1,6 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
+using SEE.GO;
 using SEE.Utils;
 using System.Collections;
 using TMPro;
@@ -40,7 +42,10 @@ namespace SEE.Game.SceneManipulation
         public static void ChangeType(Node node, string type)
         {
             node.Type = type;
-            // TODO: Change color etc.
+            if (node.GameObject(true).ContainingCity().Renderer is GraphRenderer renderer)
+            {
+                renderer.AdjustStyle(node.GameObject());
+            }
         }
     }
 }
