@@ -1,4 +1,6 @@
-﻿using SEE.DataModel.DG;
+﻿using InControl.UnityDeviceProfiles;
+using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.Utils;
@@ -42,9 +44,39 @@ namespace SEE.Game.SceneManipulation
         public static void ChangeType(Node node, string type)
         {
             node.Type = type;
-            if (node.GameObject(true).ContainingCity().Renderer is GraphRenderer renderer)
+            GameObject nodeObject = node.GameObject(true);
+            AbstractSEECity city = nodeObject.ContainingCity();
+
+            if (city.NodeTypes[node.Type].ShowNames)
             {
-                renderer.AdjustStyle(node.GameObject());
+                GetText()?.SetActive(true);
+            }
+            else
+            {
+                GetText()?.SetActive(false);
+            }
+
+            if (city.Renderer is GraphRenderer renderer)
+            {
+                renderer.AdjustStyle(nodeObject);
+                if (GetText() != null)
+                {
+                    GetText().GetComponent<TextMeshPro>().color = nodeObject.GetColor().Invert();
+                }
+            }
+
+            return;
+
+            GameObject GetText()
+            {
+                foreach (Transform transform in nodeObject.transform)
+                {
+                    if (transform.name.Contains("Text") && transform.GetComponent<TextMeshPro>() != null)
+                    {
+                        return transform.gameObject;
+                    }
+                }
+                return null;
             }
         }
     }
