@@ -8,6 +8,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.Utils.History;
 using SEE.Game.SceneManipulation;
+using SEE.UI.Notification;
 
 namespace SEE.Controls.Actions
 {
@@ -100,9 +101,16 @@ namespace SEE.Controls.Actions
                         GameObject editedNode = raycastHit.collider.gameObject;
                         if (editedNode.TryGetNode(out Node node))
                         {
-                            progress = ProgressState.WaitingForInput;
-                            memento = new Memento(node);
-                            OpenDialog();
+                            if (!node.IsRoot())
+                            {
+                                progress = ProgressState.WaitingForInput;
+                                memento = new Memento(node);
+                                OpenDialog();
+                            }
+                            else
+                            {
+                                ShowNotification.Warn("Forbidden!", "You can't edit a root node.");
+                            }
                         }
                         else
                         {

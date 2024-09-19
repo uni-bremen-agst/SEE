@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
                 List<Edge> divergences = new();
-                foreach(InteractableObject iO in selectedObjects.Where(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
+                foreach (InteractableObject iO in selectedObjects.Where(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
                 {
                     if (iO.GraphElemRef.Elem is Edge edge)
                     {
@@ -213,7 +213,7 @@ namespace SEE.Controls.Actions
 
             void ShowCode()
             {
-                foreach(InteractableObject iO in selectedObjects)
+                foreach (InteractableObject iO in selectedObjects)
                 {
                     if (iO.gameObject != null)
                     {
@@ -224,7 +224,7 @@ namespace SEE.Controls.Actions
 
             void ShowDiffCode()
             {
-                foreach(InteractableObject iO in selectedObjects)
+                foreach (InteractableObject iO in selectedObjects)
                 {
                     if (iO.gameObject != null && iO.gameObject.ContainingCity<VCSCity>())
                     {
@@ -380,6 +380,11 @@ namespace SEE.Controls.Actions
 
             void DeleteElement()
             {
+                if (graphElement is Node node && node.IsRoot())
+                {
+                    ShowNotification.Warn("Forbidden!", "You can't delete a root node.");
+                    return;
+                }
                 if (gameObject != null)
                 {
                     ActionStateType previousAction = GlobalActionHistory.Current();
@@ -516,18 +521,14 @@ namespace SEE.Controls.Actions
         private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
         {
-            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
-            {
-                new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1),
-            };
+            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>();
+
             if (appendActions == null)
             {
-                if (!node.IsRoot())
-                {
-                    actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
-                }
-                actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
+                actions.Add(new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1));
+                actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
                 actions.Add(new PopupMenuAction("New Edge", NewEdge, Icons.Edge, Priority: 2));
+                actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
 
                 if (gameObject != null)
                 {
@@ -541,8 +542,9 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
-                "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
+            return node.IsRoot()? new List<PopupMenuEntry>() { } :
+                new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
 
             void MoveNode()
             {
