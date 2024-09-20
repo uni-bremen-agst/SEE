@@ -143,6 +143,20 @@ namespace SEE.Game.Operator
             };
         }
 
+        // TODO Use DoTween instead of component if possible
+        public void AnimateDataFlow(bool enable = true)
+        {
+            if (enable)
+            {
+                gameObject.AddOrGetComponent<EdgeDataFlowVisualizer>();
+            }
+            else
+            {
+                EdgeDataFlowVisualizer edfv = gameObject.GetComponent<EdgeDataFlowVisualizer>();
+                Destroy(edfv);
+            }
+        }
+
         #endregion
 
         protected override IEnumerable<Color> AsEnumerable((Color start, Color end) color)
@@ -253,6 +267,134 @@ namespace SEE.Game.Operator
             morphism = null;
             construction.KillAnimator();
             construction = null;
+        }
+
+        /// <summary>
+        /// Implements a data flow visualization to indicate the direction of an edge.
+        /// </summary>
+        public class EdgeDataFlowVisualizer : MonoBehaviour
+        {
+            /// <summary>
+            /// Maximal count of particles.
+            /// </summary>
+            private static readonly int maxParticleCount = 12;
+            /// <summary>
+            /// Minimal distance between particles for the actual particle count.
+            /// </summary>
+            private static readonly float minParticleDistance = 0.16f;
+            /// <summary>
+            /// Scale of the particle meshes.
+            /// </summary>
+            private static readonly Vector3 particleScale = new (0.012f, 0.012f, 0.012f);
+            /// <summary>
+            /// Color of the particle material.
+            /// </summary>
+            private static readonly Color particleColor = new (0.06f, 0.81f, 1.0f, 1.0f);
+            /// <summary>
+            /// Particle speed.
+            /// </summary>
+            private static readonly float particleSpeed = 50f;
+
+            /// <summary>
+            /// The coordinates of the edge's vertices.
+            /// </summary>
+            private Vector3[] vertices;
+
+            /// <summary>
+            /// The actual particle count as calculated based on <see cref="minParticleDistance"/>
+            /// and capped by <see cref="maxParticleCount"/>.
+            /// </summary>
+            private int particleCount;
+            /// <summary>
+            /// The particle game objects.
+            /// </summary>
+            private GameObject[] particles;
+            /// <summary>
+            /// The current position of the particles.
+            /// </summary>
+            private float[] particlePositions;
+
+            /// <summary>
+            /// Destroys the particles when the component is destroyed.
+            /// </summary>
+            private void OnDestroy()
+            {
+                foreach (GameObject particle in particles)
+                {
+                    Destroy(particle);
+                }
+            }
+
+            /// <summary>
+            /// Initializes the particles and fields.
+            /// </summary>
+            public void Start()
+            {
+                SEESpline seeSpline = GetComponent<SEESpline>();
+                vertices = seeSpline.GenerateVertices();
+
+                particleCount = (int)Mathf.Max(Mathf.Min(GetApproxEdgeLength() / minParticleDistance, maxParticleCount), 1);
+
+                particles = new GameObject[particleCount];
+                particlePositions = new float[particleCount];
+
+                float separation = vertices.Length / (float)particleCount;
+                for (int i = 0; i < particleCount; i++)
+                {
+                    particles[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    particles[i].GetComponent<Renderer>().material.color = particleColor;
+                    particlePositions[i] = separation * i;
+                    particles[i].transform.localScale = particleScale;
+                    particles[i].transform.SetParent(transform);
+                    particles[i].transform.localPosition = GetPositionOnEdge(particlePositions[i]);
+                }
+            }
+
+            /// <summary>
+            /// Updates the position and color of the vertices.
+            /// </summary>
+            private void Update()
+            {
+                for (int i = 0; i < particleCount; i++)
+                {
+                    particlePositions[i] += particleSpeed * Time.deltaTime;
+                    if (particlePositions[i] >= vertices.Length)
+                    {
+                        particlePositions[i] = 0;
+                    }
+                    particles[i].transform.localPosition = GetPositionOnEdge(particlePositions[i]);
+                }
+            }
+
+            /// <summary>
+            /// Calculates the coordinate of the position on the edge by interpolating between two
+            /// neighboring vertices.
+            /// </summary>
+            /// <param name="position">The position between zero and <see cref="vertices"/><c>.Length - 1</c></param>
+            /// <returns>The coordinate of the position on the edge.</returns>
+            private Vector3 GetPositionOnEdge(float position)
+            {
+                if (position >= vertices.Length - 1)
+                {
+                    return vertices[^1]; // last element
+                }
+
+                return Vector3.Lerp(vertices[(int)position], vertices[(int)position + 1], position - (int)position);
+            }
+
+            /// <summary>
+            /// Calculates the approximate length of the edge that is represented by <see cref="vertices"/>.
+            /// </summary>
+            /// <returns>Approximate edge length.</returns>
+            private float GetApproxEdgeLength()
+            {
+                float length = 0;
+                for (int i = 1; i < vertices.Length; i++)
+                {
+                    length += Vector3.Distance(vertices[i - 1], vertices[i]);
+                }
+                return length;
+            }
         }
     }
 }
