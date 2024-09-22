@@ -46,6 +46,7 @@ namespace SEE.UI.HelpSystem
         private void Start()
         {
             mainMenu = CreateStartMenu(jsonFilePath);
+            ShowNotification.Info("HelpSystem", "Press H to open HelpSystem.");
         }
 
         /// <summary>
