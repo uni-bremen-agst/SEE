@@ -85,6 +85,16 @@ namespace SEE.GO
         private float subsplineEndT = 1.0f;
 
         /// <summary>
+        /// Delegate for signalling change.
+        /// </summary>
+        public delegate void SEESplineChangedEvent();
+
+        /// <summary>
+        /// The event is emitted each the renderer was updated (cmp. <see cref="needsUpdate"/>).
+        /// </summary>
+        public event SEESplineChangedEvent OnRendererChanged;
+
+        /// <summary>
         /// Property of <see cref="subsplineEndT"/>.
         /// </summary>
         public float SubsplineEndT
@@ -303,6 +313,7 @@ namespace SEE.GO
                 UpdateLineRenderer();
                 UpdateMesh();
                 needsUpdate = needsColorUpdate = false;
+                OnRendererChanged();
             }
             else if (needsColorUpdate)
             {

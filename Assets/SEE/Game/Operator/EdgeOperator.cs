@@ -143,7 +143,10 @@ namespace SEE.Game.Operator
             };
         }
 
-        // TODO Use DoTween instead of component if possible
+        /// <summary>
+        /// Enables or disables the data flow animation to indicate edge direction.
+        /// </summary>
+        /// <param name="enable">Enable or disable animation.</param>
         public void AnimateDataFlow(bool enable = true)
         {
             if (enable)
@@ -272,7 +275,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Implements a data flow visualization to indicate the direction of an edge.
         /// </summary>
-        public class EdgeDataFlowVisualizer : MonoBehaviour
+        private class EdgeDataFlowVisualizer : MonoBehaviour
         {
             /// <summary>
             /// Maximal count of particles.
@@ -295,6 +298,10 @@ namespace SEE.Game.Operator
             /// </summary>
             private static readonly float particleSpeed = 50f;
 
+            /// <summary>
+            /// The spline the edge is based on.
+            /// </summary>
+            private SEESpline seeSpline;
             /// <summary>
             /// The coordinates of the edge's vertices.
             /// </summary>
@@ -321,6 +328,7 @@ namespace SEE.Game.Operator
             {
                 foreach (GameObject particle in particles)
                 {
+                    seeSpline.OnRendererChanged -= OnSplineChanged;
                     Destroy(particle);
                 }
             }
@@ -330,7 +338,8 @@ namespace SEE.Game.Operator
             /// </summary>
             public void Start()
             {
-                SEESpline seeSpline = GetComponent<SEESpline>();
+                seeSpline = GetComponent<SEESpline>();
+                seeSpline.OnRendererChanged += OnSplineChanged;
                 vertices = seeSpline.GenerateVertices();
 
                 particleCount = (int)Mathf.Max(Mathf.Min(GetApproxEdgeLength() / minParticleDistance, maxParticleCount), 1);
@@ -355,6 +364,7 @@ namespace SEE.Game.Operator
             /// </summary>
             private void Update()
             {
+
                 for (int i = 0; i < particleCount; i++)
                 {
                     particlePositions[i] += particleSpeed * Time.deltaTime;
@@ -364,6 +374,14 @@ namespace SEE.Game.Operator
                     }
                     particles[i].transform.localPosition = GetPositionOnEdge(particlePositions[i]);
                 }
+            }
+
+            /// <summary>
+            /// This callback is triggered whenever the spline has changed.
+            /// </summary>
+            private void OnSplineChanged()
+            {
+                vertices = seeSpline.GenerateVertices();
             }
 
             /// <summary>
