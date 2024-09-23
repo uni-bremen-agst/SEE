@@ -667,10 +667,7 @@ namespace SEE.Controls.Actions
         private static IEnumerable<PopupMenuEntry> GetEdgeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Edge edge, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions = null)
         {
-            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>
-            {
-                //new PopupMenuAction("Edit Edge", EditEdge, Icons.PenToSquare)
-            };
+            IList<PopupMenuEntry> actions = new List<PopupMenuEntry>();
 
             if (edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge))
             {
@@ -692,12 +689,6 @@ namespace SEE.Controls.Actions
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(edge);
                 ExcecutePreviousAction(action, previousAction);
-            }
-
-            void EditEdge()
-            {
-                // TODO: Useful?
-                ShowNotification.Info("Not implemented", "The action is not implemented yet.");
             }
         }
         #endregion
