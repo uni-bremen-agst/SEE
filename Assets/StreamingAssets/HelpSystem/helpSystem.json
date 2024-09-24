@@ -1,0 +1,626 @@
+{
+    "HelpSystem": {
+        "MenuEntry": {
+            "name": "Help System",
+            "description": "Find your specific use case",
+            "icon": "Materials/Notification/info",
+            "MenuEntries": [
+                {
+                    "type": "MenuEntry",
+                    "name": "Architecture",
+                    "description": "Use cases related to the architecture",
+                    "color": "magenta",
+                    "MenuEntries": [
+                        {
+                            "type": "MenuEntry",
+                            "name": "Player Menu",
+                            "description": "Player Menu use cases",
+                            "color": "magenta",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Move node",
+                                    "description": "How to move a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/MoveNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Initial the move mode is selected, if not press Space and left click on Move.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Press and hold the left mouse button to drag a node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Release mouse button to place the node on its new position.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "You can undo by pressing Control and Z.",
+                                            "startPosition": 20
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Rotate node",
+                                    "description": "How to rotate a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/RotateNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry Rotate Node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the node. A yellow ring appears.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click and hold the ring. Move your mouse and release when you reach the right rotation.",
+                                            "startPosition": 15
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Hide Node",
+                                    "description": "How to hide node(s)",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/hideNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "For hiding one or more nodes press space to open the player menu and select hide node.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Scroll down and select hide selected or hide unselected.",
+                                            "startPosition": 9
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Select the node to hide or stay by left clicking on it.",
+                                            "startPosition": 22
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "For the selection of multiple nodes, hold key Control while clicking.",
+                                            "startPosition": 30
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "If you are ready, confirm your selection with the button done.",
+                                            "startPosition": 39
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Hint: If you hide a parent node, all connected edges and child nodes will be hidden too.",
+                                            "startPosition": 50
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Add Edge",
+                                    "description": "How to add a new edge",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/AddEdge.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry new edge.",
+                                            "startPosition": 5
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on a node to select the start node.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click on a node to select the target node.",
+                                            "startPosition": 14
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can now see the edge as a spline with a color gradient.",
+                                            "startPosition": 18
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Press key U to reset the selected start node.",
+                                            "startPosition": 22
+                                        }
+                                    ]
+                                },
+
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Add Node",
+                                    "description": "How to add a new node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/NewNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry New Node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Search for the place you want to insert the node.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click to place it.",
+                                            "startPosition": 14
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Open player menu again to choose Edit Node. ",
+                                            "startPosition": 18
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Left click on your new node and add attributes to it.",
+                                            "startPosition": 22
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Edit Node",
+                                    "description": "How to edit an existing node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/EditNodev2.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry edit node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the node you want to edit.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "You can see all editable metrics inside of this new window.",
+                                            "startPosition": 16
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Insert new values, if so desired.",
+                                            "startPosition": 20
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Finish the editing process by pushing the Okay button.",
+                                            "startPosition": 24
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Scale Node",
+                                    "description": "How to scale a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/ScaleNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry scale node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on a node. Axis will appear.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Drag the axis in which direction you want to scale the node.",
+                                            "startPosition": 17
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Release mouse to confirm..",
+                                            "startPosition": 21
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Delete Node or Edge",
+                                    "description": "How to delete node or edge",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Delete.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on entry Delete",
+                                            "startPosition": 7
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "To delete an edge just left click it.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "After blinking it will disappear.",
+                                            "startPosition": 17
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can also remove a node with its edges, just click it.",
+                                            "startPosition": 21
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "After blinking it will also disappear.",
+                                            "startPosition": 26
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "You can undo with Control and Z.",
+                                            "startPosition": 34
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Show Code",
+                                    "description": "How to show code of a node.",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/ShowCode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "This Code city represents the SEE project.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "To see code, open the player menu with space.",
+                                            "startPosition": 4
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the entry Show Code.",
+                                            "startPosition": 8
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click to select a node. A code window opens.",
+                                            "startPosition": 13
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can also use the context menu. Right click on a node.",
+                                            "startPosition": 28
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Now choose Show Code again.",
+                                            "startPosition": 33
+                                        },
+                                        {
+                                            "index": 7,
+                                            "text": "By dragging the code window corner you can adjust the size.",
+                                            "startPosition": 38
+                                        }
+                                    ]
+                                }
+
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Search for a node",
+                            "description": "How to search for a node by source-name",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/workInProgress.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press key F for opening the search menu.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Insert the name of the node or part of it into the input field.",
+                                    "startPosition": 5
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Press the button Okay.",
+                                    "startPosition": 13
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "You can see the 5 best matching nodes, ascending by their matching score.",
+                                    "startPosition": 16
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "If you left click on one node entry, the respective node will be highlighted.",
+                                    "startPosition": 23
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "The node is blinking and a light beam strikes for a few seconds.",
+                                    "startPosition": 30
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Evolution",
+                    "description": "Use cases related to software-evolution",
+                    "color": "red",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Navigation bar",
+                            "description": "How to navigate between versions of evolution",
+                            "color": "red",
+                            "video": "HelpSystem/Videos/evolution.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "You can start the evolution with the play button at the navigation bar.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "You can see the current version of all versions on the lower right side.",
+                                    "startPosition": 10
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "If you want to pause the evolution, press the pause button, which appears after pushing the play button.",
+                                    "startPosition": 20
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "The other play button is for backward playing and works as same as the normal play button.",
+                                    "startPosition": 27
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Pushing multiple times on the double play buttons determines the play speed.",
+                                    "startPosition": 34
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "You also can skip by moving the dragger of the navigation bar by left click on it.",
+                                    "startPosition": 44
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "Yellow beams represent changes in classes.",
+                                    "startPosition": 49
+                                },
+                                {
+                                    "index": 8,
+                                    "text": "Green beams represent new classes.",
+                                    "startPosition": 52
+                                },
+                                {
+                                    "index": 9,
+                                    "text": "Red beams represent deleted classes.",
+                                    "startPosition": 55
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Drawable",
+                    "description": "Use cases related to drawable-system",
+                    "color": "magenta",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Draw free in the room",
+                            "description": "How to draw somewhere in the room",
+                            "color": "green",
+                            "video": "HelpSystem/Videos/DrawFreeRoom.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press Space for opening the player menu.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Left click on the entry Draw.",
+                                    "startPosition": 8
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Left click and hold to draw.",
+                                    "startPosition": 14
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Your drawing is now placed in the room and you can walk around it.",
+                                    "startPosition": 21
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Debugging",
+                    "description": "Use cases related to software-debugging",
+                    "color": "blue"
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Quality",
+                    "description": "Use cases related to the software-quality",
+                    "color": "cyan"
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Navigation",
+                    "description": "Use cases related to the navigation in SEE",
+                    "color": "green",
+                    "MenuEntries": [
+                        {
+                            "type": "MenuEntry",
+                            "name": "Player navigation",
+                            "description": "How to navigate in SEE",
+                            "color": "green",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Switch table",
+                                    "description": "How to switch between tables",
+                                    "color": "green",
+                                    "video": "HelpSystem/Videos/toggleFocus.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "By default, your focussed view may be locked on a code city.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Press key L for unlock your view to move free in space.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Now you can move free in space to other tables.",
+                                            "startPosition": 20
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "If you press key L again, your view is focussed on the architecture again.",
+                                            "startPosition": 28
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Simple navigation",
+                                    "description": "How to edit an existing node",
+                                    "color": "green",
+                                    "video": "HelpSystem/Videos/navigation.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "To switch your point of view, hold the right mouse button and move the mouse.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Press Key W or S to move forwards or backwards.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "If your view is unlocked, you can move to the right or left with Key A or D.",
+                                            "startPosition": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "MenuEntry",
+                            "name": "City navigation",
+                            "description": "How to navigate a code city",
+                            "color": "green",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Zoom into Code-Cities",
+                                    "description": "How to zoom into code-cities",
+                                    "color": "green",
+                                    "video": "HelpSystem/Videos/zoomIntoCodeCity.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Hover with the mouse over the city you want to zoom into.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Now, you can scroll the mouse wheel up for zooming.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "The zooming is focussed on the mouse pointer.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "If you want to zoom out, scroll with the mouse wheel down.",
+                                            "startPosition": 15
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "If the city is not centered anymore, press key R to reset the layout to centered.",
+                                            "startPosition": 26
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}
