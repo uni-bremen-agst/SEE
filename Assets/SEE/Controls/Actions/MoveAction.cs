@@ -14,6 +14,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 
 namespace SEE.Controls.Actions
@@ -24,9 +25,21 @@ namespace SEE.Controls.Actions
     internal class MoveAction : AbstractPlayerAction
     {
         /// <summary>
+        /// The currently grabbed object if any.
+        /// </summary>
+        private GrabbedObject grabbedObject;
+
+        /// <summary>
+        /// The object to move which was selected via context menu.
+        /// </summary>
+        private GameObject contextMenuObjectToMove;
+
+        /// <summary>
         /// The offset of the cursor to the pivot of <see cref="GrabbedGameObject"/>.
         /// </summary>
         private Vector3 cursorOffset = Vector3.zero;
+
+        #region ReversibleAction
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
@@ -60,6 +73,132 @@ namespace SEE.Controls.Actions
         {
             return ActionStateTypes.Move;
         }
+
+        /// <summary>
+        /// Reacts to the user interactions. An object can be grabbed and moved
+        /// around. If it is put onto another node, it will be re-parented onto this
+        /// node. If we are operating in a <see cref="SEEReflexionCity"/>, re-parenting
+        /// may be a mapping of an implementation node onto an architecture node
+        /// or a hierarchical re-parenting. If we are operating in a different kind
+        /// of city, re-parenting is always hierarchically interpreted. A hierarchical
+        /// re-parenting means that the moved node becomes a child of the target node
+        /// both in the game-node hierarchy as well as in the underlying graph.
+        /// <seealso cref="IReversibleAction.Update"/>.
+        /// </summary>
+        /// <returns><c>true</c> if completed</returns>
+        public override bool Update()
+        {
+            if (EventSystem.current.IsPointerOverGameObject())
+            {
+                // User interacts with UI element
+                return false;
+            }
+            bool mouseHeldDown = Queries.LeftMouseInteraction();
+            if (!grabbedObject.IsGrabbed) // grab object
+            {
+                if (Queries.LeftMouseDown() && !ExecuteViaContextMenu)
+                {
+                    // User starts dragging the currently hovered object.
+                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
+                    if (hoveredObject == null)
+                    {
+                        return false;
+                    }
+
+                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _) == HitGraphElement.Node)
+                    {
+                        cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
+                    }
+
+                    // An object to be grabbed must be representing a node that is not the root.
+                    if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                    {
+                        grabbedObject.Grab(hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
+                        CurrentState = IReversibleAction.Progress.InProgress;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+
+                } else if (ExecuteViaContextMenu && !mouseHeldDown)
+                {
+                    // User starts dragging object selected via context menu.
+                    // Override the initial cursorOffset based on new mouse position to prevent jump
+                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
+                    {
+                        cursorOffset = targetObjectHit.Value.point - contextMenuObjectToMove.transform.position;
+                    }
+
+                    grabbedObject.Grab(contextMenuObjectToMove);
+                    CurrentState = IReversibleAction.Progress.InProgress;
+                }
+            } else if (mouseHeldDown ^ ExecuteViaContextMenu) // drag grabbed object
+            {
+                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
+                if (targetObjectHit.HasValue)
+                {
+                    GameObject newTarget = targetObjectHit.Value.transform.gameObject;
+                    grabbedObject.MoveToTarget(newTarget, targetObjectHit.Value.point - cursorOffset);
+                    // The grabbed node is not yet at its final destination. The user is still moving
+                    // it. We will run a what-if reflexion analysis to give immediate feedback on the
+                    // consequences if the user were putting the grabbed node onto the node the user
+                    // is currently aiming at.
+                    grabbedObject.Reparent(newTarget, true);
+                }
+            }
+            else // end dragging
+            {
+                if (grabbedObject.GrabbedGameObject != null)
+                {
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
+                }
+
+                bool wasMoved = grabbedObject.UnGrab();
+                // Action is finished.
+                // Prevent instant re-grab if the action was started via context menu and is not completed
+                ExecuteViaContextMenu = ExecuteViaContextMenu && wasMoved;
+                CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                return wasMoved;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// <see cref="IReversibleAction.Undo"/>.
+        /// </summary>
+        public override void Undo()
+        {
+            base.Undo();
+            grabbedObject.Undo();
+        }
+
+        /// <summary>
+        /// <see cref="IReversibleAction.Redo"/>.
+        /// </summary>
+        public override void Redo()
+        {
+            base.Redo();
+            grabbedObject.Redo();
+        }
+
+        #endregion ReversibleAction
+
+        /// <summary>
+        /// Used to execute the <see cref="MoveAction"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// the selected game object <paramref name="objToMove"/>.
+        /// </summary>
+        /// <param name="objToMove">The object to be moved.</param>
+        /// <param name="raycastHitPosition">The hit position of the object</param>
+        public void ContextMenuExecution(GameObject objToMove, Vector3 raycastHitPosition)
+        {
+            ExecuteViaContextMenu = true;
+            cursorOffset = raycastHitPosition - objToMove.transform.position;
+            contextMenuObjectToMove = objToMove;
+        }
+
 
         /// <summary>
         /// Data structure to manage the game object that was grabbed.
@@ -540,139 +679,6 @@ namespace SEE.Controls.Actions
                 UnHighlightTarget();
                 MoveToOrigin();
             }
-        }
-
-        /// <summary>
-        /// The currently grabbed object if any.
-        /// </summary>
-        private GrabbedObject grabbedObject;
-
-        /// <summary>
-        /// Reacts to the user interactions. An object can be grabbed and moved
-        /// around. If it is put onto another node, it will be re-parented onto this
-        /// node. If we are operating in a <see cref="SEEReflexionCity"/>, re-parenting
-        /// may be a mapping of an implementation node onto an architecture node
-        /// or a hierarchical re-parenting. If we are operating in a different kind
-        /// of city, re-parenting is always hierarchically interpreted. A hierarchical
-        /// re-parenting means that the moved node becomes a child of the target node
-        /// both in the game-node hierarchy as well as in the underlying graph.
-        /// <seealso cref="IReversibleAction.Update"/>.
-        /// </summary>
-        /// <returns><c>true</c> if completed</returns>
-        public override bool Update()
-        {
-            if (!grabbedObject.IsGrabbed) // start to grab the object
-            {
-                if (Queries.LeftMouseDown())
-                {
-                    // User is starting dragging the currently hovered object.
-                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
-                    if (hoveredObject == null)
-                    {
-                        return false;
-                    }
-
-                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _) == HitGraphElement.Node)
-                    {
-                        cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
-                    }
-
-                    // An object to be grabbed must be representing a node that is not the root.
-                    if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
-                    {
-                        grabbedObject.Grab(hoveredObject.gameObject);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
-                        CurrentState = IReversibleAction.Progress.InProgress;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-
-                } else if (ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))
-                {
-                    /// The calculation of the <see cref="cursorOffset"/>
-                    /// and setting the <see cref="CurrentState"/> to <see cref="IReversibleAction.Progress.InProgress"/>
-                    /// will be done in <see cref="ContextMenuExecution"/>.
-                    grabbedObject.Grab(contextMenuObjectToMove);
-                }
-            } else if (grabbedObject.IsGrabbed && (UserIsGrabbing() ^ ExecuteViaContextMenu && !Queries.MouseUp(MouseButton.Left))) // continue to move the grabbed object
-            {
-                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
-                if (targetObjectHit.HasValue)
-                {
-                    GameObject newTarget = targetObjectHit.Value.transform.gameObject;
-                    grabbedObject.MoveToTarget(newTarget, targetObjectHit.Value.point - cursorOffset);
-                    // The grabbed node is not yet at its final destination. The user is still moving
-                    // it. We will run a what-if reflexion analysis to give immediate feedback on the
-                    // consequences if the user were putting the grabbed node onto the node the user
-                    // is currently aiming at.
-                    grabbedObject.Reparent(newTarget, true);
-                }
-            }
-            else if (grabbedObject.IsGrabbed && (!ExecuteViaContextMenu || Queries.MouseUp(MouseButton.Left))) // dragging has ended
-            {
-                // Finalize the action with the grabbed object.
-                if (grabbedObject.GrabbedGameObject != null)
-                {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
-                }
-                bool wasMoved = grabbedObject.UnGrab();
-                // Action is finished.
-                CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
-                return wasMoved;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// The object to move which was selected via context menu.
-        /// </summary>
-        private GameObject contextMenuObjectToMove;
-
-        /// <summary>
-        /// Used to execute the <see cref="MoveAction"/> from the context menu.
-        /// It ensures that the <see cref="Update"/> method performs the external execution for
-        /// the selected game object <paramref name="objToMove"/>.
-        /// </summary>
-        /// <param name="objToMove">The object to be moved.</param>
-        /// <param name="raycastHitPosition">The hit position of the object</param>
-        public void ContextMenuExecution(GameObject objToMove, Vector3 raycastHitPosition)
-        {
-            ExecuteViaContextMenu = true;
-            cursorOffset = raycastHitPosition - objToMove.transform.position;
-            CurrentState = IReversibleAction.Progress.InProgress;
-            contextMenuObjectToMove = objToMove;
-        }
-
-        /// <summary>
-        /// Returns true if the user is currently grabbing.
-        /// </summary>
-        /// <returns><c>true</c> if user is grabbing</returns>
-        private static bool UserIsGrabbing()
-        {
-            // Index of the left mouse button.
-            const int leftMouseButton = 0;
-            // FIXME: We need a VR interaction, too.
-            return Input.GetMouseButton(leftMouseButton);
-        }
-
-        /// <summary>
-        /// <see cref="IReversibleAction.Undo"/>.
-        /// </summary>
-        public override void Undo()
-        {
-            base.Undo();
-            grabbedObject.Undo();
-        }
-
-        /// <summary>
-        /// <see cref="IReversibleAction.Redo"/>.
-        /// </summary>
-        public override void Redo()
-        {
-            base.Redo();
-            grabbedObject.Redo();
         }
     }
 }
