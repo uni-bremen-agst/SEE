@@ -126,10 +126,10 @@ namespace SEE.Controls.Actions
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to prevent jump
-                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
-                    {
-                        cursorOffset = targetObjectHit.Value.point - contextMenuObjectToMove.transform.position;
-                    }
+                    // if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
+                    // {
+                    //     cursorOffset = targetObjectHit.Value.point - contextMenuObjectToMove.transform.position;
+                    // }
 
                     grabbedObject.Grab(contextMenuObjectToMove);
                     CurrentState = IReversibleAction.Progress.InProgress;
