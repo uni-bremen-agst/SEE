@@ -6,6 +6,11 @@ using UnityEngine;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
+using SEE.UI.DebugAdapterProtocol;
+using System;
+using SEE.UI;
+using SEE.UI.PropertyDialog;
+using SEE.DataModel.DG;
 
 namespace SEE.Controls.Actions
 {
@@ -14,6 +19,21 @@ namespace SEE.Controls.Actions
     /// </summary>
     internal class AddNodeAction : AbstractPlayerAction
     {
+        /// <summary>
+        /// The life cycle of this add node action.
+        /// </summary>
+        private enum ProgressState
+        {
+            NoNodeSelected,  // initial state when no parent node is selected
+            WaitingForInput, // a new node is created and selected, the dialog is opened, and we wait for input
+            Finish           // when the action is finished.
+        }
+
+        /// <summary>
+        /// The current state of the add node process.
+        /// </summary>
+        private ProgressState progress = ProgressState.NoNodeSelected;
+
         /// <summary>
         /// The chosen parent for the new node.
         /// Will be used for context menu execution.
@@ -36,18 +56,32 @@ namespace SEE.Controls.Actions
         {
             bool result = false;
 
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+            switch (progress)
             {
-                // the hit object is the parent in which to create the new node
-                GameObject parent = raycastHit.collider.gameObject;
-                AddNode(raycastHit.collider.gameObject, raycastHit.point);
-                result = true;
-            } else if (ExecuteViaContextMenu)
-            {
-                AddNode(parent, position);
-                result = true;
+                case ProgressState.NoNodeSelected:
+                    // FIXME: Needs adaptation for VR where no mouse is available.
+                    if (Input.GetMouseButtonDown(0)
+                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+                    {
+                        // the hit object is the parent in which to create the new node
+                        GameObject parent = raycastHit.collider.gameObject;
+                        AddNode(raycastHit.collider.gameObject, raycastHit.point);
+                    }
+                    else if (ExecuteViaContextMenu)
+                    {
+                        AddNode(parent, position);
+                    }
+                    break;
+                case ProgressState.WaitingForInput:
+                    /// Waiting until the dialog is closed ad all input is present.
+                    break;
+                case ProgressState.Finish:
+                    result = true;
+                    CurrentState = IReversibleAction.Progress.Completed;
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
+                    break;
+                default:
+                    throw new NotImplementedException("Unhandled case.");
             }
             return result;
         }
@@ -67,11 +101,47 @@ namespace SEE.Controls.Actions
             addedGameNode.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             addedGameNode.transform.position = GameNodeMover.GetCoordinatesOn(addedGameNode.transform.lossyScale, position, parent);
             // TODO The new node is scaled down arbitrarily and might overlap with its siblings.
-            memento = new Memento(child: addedGameNode, parent: parent);
+            memento = new(child: addedGameNode, parent: parent);
             memento.NodeID = addedGameNode.name;
             new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
-            CurrentState = IReversibleAction.Progress.Completed;
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
+            progress = ProgressState.WaitingForInput;
+            OpenDialog(addedGameNode.GetNode());
+        }
+
+        /// <summary>
+        /// Opens a dialog where the user can enter the node name and type.
+        /// If the user presses the OK button, the SourceName and Type of
+        /// <see cref="memento.node"/> will have the new values entered
+        /// and <see cref="memento.Name"/> and <see cref="memento.Type"/>
+        /// will be set to memorize these and <see cref="progress"/> is
+        /// moved forward to <see cref="ProgressState.ValuesAreGiven"/>.
+        /// If the user presses the Cancel button, the node will be created as
+        /// an unnamed node with the unkown type.
+        /// </summary>
+        private void OpenDialog(Node node)
+        {
+            NodePropertyDialog dialog = new(node);
+            dialog.OnConfirm.AddListener(OKButtonPressed);
+            dialog.OnCancel.AddListener(CancelButtonPressed);
+            dialog.Open();
+            SEEInput.KeyboardShortcutsEnabled = false;
+
+            void OKButtonPressed()
+            {
+                memento.Name = node.SourceName;
+                memento.Type = node.Type;
+                new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
+                InteractableObject.UnselectAll(true);
+                progress = ProgressState.Finish;
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
+
+            void CancelButtonPressed()
+            {
+                progress = ProgressState.Finish;
+                InteractableObject.UnselectAll(true);
+                SEEInput.KeyboardShortcutsEnabled = true;
+            }
         }
 
         /// <summary>
@@ -121,6 +191,14 @@ namespace SEE.Controls.Actions
             /// original name of the node in Redo().
             /// </summary>
             public string NodeID;
+            /// <summary>
+            /// The chosen name for the added node.
+            /// </summary>
+            public string Name;
+            /// <summary>
+            /// The chosen type for the added node.
+            /// </summary>
+            public string Type;
 
             /// <summary>
             /// Constructor setting the information necessary to re-do this action.
@@ -133,6 +211,8 @@ namespace SEE.Controls.Actions
                 Position = child.transform.position;
                 Scale = child.transform.lossyScale;
                 NodeID = null;
+                Name = string.Empty;
+                Type = string.Empty;
             }
         }
 
@@ -161,6 +241,14 @@ namespace SEE.Controls.Actions
             if (addedGameNode != null)
             {
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+
+                if (!string.IsNullOrEmpty(memento.Type))
+                {
+                    Node node = addedGameNode.GetNode();
+                    GameEditNode.ChangeName(node, memento.Name);
+                    GameEditNode.ChangeType(node, memento.Type);
+                    new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
+                }
             }
         }
 
