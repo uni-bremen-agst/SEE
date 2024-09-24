@@ -489,15 +489,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             System.Random rand = new System.Random(seed);
 
             int candidatesCount = candidates.Count;
-            double alreadyMappedNodesCount = mappedCandidates.Count;
+            double alreadyMappedNodes = mappedCandidates.Count;
             double artificallyMappedNodes = 0;
             double currentPercentage = 0;
 
-            Dictionary<string, List<Node>> expectedNodesForCluster = new();
+            Dictionary<string, List<Node>> expectedNodes = new();
 
             foreach (Node currentCluster in oracleCluster)
             {
-                expectedNodesForCluster[currentCluster.ID] = new List<Node>();
+                expectedNodes[currentCluster.ID] = new List<Node>();
             }
 
             HashSet<string> candidatesAvailableToMap = new();
@@ -507,7 +507,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // TODO: can cause endless loops
                 if(GetExpectedClusterID(unmappedCandidate.ID) != null)
                 {
-                    expectedNodesForCluster[GetExpectedClusterID(unmappedCandidate.ID)].Add(unmappedCandidate);
+                    expectedNodes[GetExpectedClusterID(unmappedCandidate.ID)].Add(unmappedCandidate);
                     candidatesAvailableToMap.Add(unmappedCandidate.ID);
                 }
             }
@@ -516,10 +516,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             {
                 foreach (Node currentCluster in oracleCluster)
                 {
-                    int countUnmappedExpectedCandidates = expectedNodesForCluster[currentCluster.ID].Count();
+                    int countUnmappedExpectedCandidates = expectedNodes[currentCluster.ID].Count();
                     if (countUnmappedExpectedCandidates > 0)
                     {
-                        Node nodeToMap = expectedNodesForCluster[currentCluster.ID][rand.Next(countUnmappedExpectedCandidates)];
+                        Node nodeToMap = expectedNodes[currentCluster.ID][rand.Next(countUnmappedExpectedCandidates)];
 
                         if (OracleGraph.MapsTo(nodeToMap).ID != currentCluster.ID)
                         {
@@ -527,7 +527,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         }
 
                         AddToInitialMapping(ReflexionGraph.GetNode(currentCluster.ID), nodeToMap);
-                        expectedNodesForCluster[currentCluster.ID].Remove(nodeToMap);
+                        expectedNodes[currentCluster.ID].Remove(nodeToMap);
                         candidatesAvailableToMap.Remove(nodeToMap.ID);
                         artificallyMappedNodes++;
                     }
@@ -536,7 +536,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                         continue;
                     }
                 }
-                currentPercentage = (artificallyMappedNodes + alreadyMappedNodesCount) / candidatesCount;
+                currentPercentage = (artificallyMappedNodes + alreadyMappedNodes) / candidatesCount;
             }
 
             return initialMapping;

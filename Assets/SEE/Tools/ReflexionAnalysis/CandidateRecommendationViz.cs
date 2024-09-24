@@ -26,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 using UnityEngine;
 using XInputDotNetPure;
 
@@ -432,8 +433,17 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         #region experiment
 
+        private bool evaluationRunning = false;
+
         public async UniTask Evaluation()
         {
+            if(evaluationRunning)
+            {
+                return;
+            }
+
+            evaluationRunning = true;
+
             UnityEngine.Debug.Log("Start Evaluation...");
             GameObject gameobject = SceneQueries.GetCodeCity(this.transform)?.gameObject;
 
@@ -444,7 +454,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             gameobject.TryGetComponent(out SEEReflexionCity city);
 
-            int n = 10;
+            int n = 200;
 
             List<RecommendationSettings> settings = new()
             {
@@ -474,6 +484,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 setting.OutputPath.Path = Path.Combine(Path.Combine(GetConfigPath(), "Results"), setting.ExperimentName);
                 await city.RunMappingExperiment();
             }
+            evaluationRunning = false;
             UnityEngine.Debug.Log($"finish Evaluation...");
         }
 
@@ -975,8 +986,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // city.ReDrawGraph();
                     
                     new MoveNetAction(candidateInViz.GameObject().name, clusterInViz.GameObject().GetGroundCenter(), 1.0f).Execute(); 
+                    ReflexionMapper.SetParent(candidateInViz.GameObject(), clusterInViz.GameObject());
+                } 
+                else
+                {
+                    reflexionGraphViz.AddToMapping(candidateInViz, clusterInViz);
                 }
-                ReflexionMapper.SetParent(candidateInViz.GameObject(), clusterInViz.GameObject());
+
             }
             await UniTask.Delay(delay);
         }
@@ -1264,6 +1280,46 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UnityEngine.Debug.Log($"Saved architecture to {architectureGxl}");
         }
 
+        [Button("Dump System Statistics", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public async UniTask Generate()
+        {
+            await this.ResetMappingAsync();
+            await this.CreateInitialMappingAsync(1, 245345, syncWithView: false);
+
+            int CadidatesTotal = this.ReflexionGraphVisualized.Nodes().Where(n => CandidateRecommendation.IsCandidate(n)).Count();
+            int ClusterTotal = this.ReflexionGraphVisualized.Nodes().Where(n => CandidateRecommendation.IsCluster(n)).Count();
+            int archDependencies = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInArchitecture()).Count();
+            int convergentEdges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation() && e.State() == State.Allowed).Count();
+            int impliticlyConvergentEdges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation() && e.State() == State.ImplicitlyAllowed).Count();
+            int divergentEdges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation() && e.State() == State.Divergent).Count();
+            int Edges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation()).Count();
+
+            string path = this.GetConfigPath();
+
+            // Define CSV headers
+            var headers = new[] { "CadidatesTotal", "ClusterTotal", "archDependencies", "convergentEdges", "impliticlyConvergentEdges", "divergentEdges", "Edges" };
+
+            // Define CSV data
+            var data = new[] {
+            CadidatesTotal.ToString(),
+            ClusterTotal.ToString(),
+            archDependencies.ToString(),
+            convergentEdges.ToString(),
+            impliticlyConvergentEdges.ToString(),
+            divergentEdges.ToString(),
+            Edges.ToString()
+            };
+
+            // Create CSV content
+            var csvContent = new StringBuilder();
+            csvContent.AppendLine(string.Join(",", headers));
+            csvContent.AppendLine(string.Join(",", data));
+
+            // Write CSV to file
+            await File.WriteAllTextAsync(Path.Combine(path, "SystemStatistics.csv"), csvContent.ToString());
+        }
+
         [Button("Generate initial mapping with instructions", ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
         public void GenerateInitialMappingWithInstructions()
@@ -1481,45 +1537,77 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return mapping;
         }
 
-        // TODO: Delete later only for debug purposes
-        [Button("Print Edge Types", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void PrintEdgeTypeInformation()
-        {
-            HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
 
-            foreach (string edgeType in edgeTypes)
+        [Button("RemeasureOutput", ButtonSizes.Small)]
+        [ButtonGroup(debugButtonGroup)]
+        public async UniTask RemeasureOutput()
+        {
+            //HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
+
+            //foreach (string edgeType in edgeTypes)
+            //{
+            //    int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
+            //    UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
+            //}
+
+            string resultPath = Path.Combine(GetConfigPath(),"Results");
+
+            IEnumerable<string> allOutputFiles = Directory.EnumerateFiles(resultPath,"*.xml");
+
+            foreach(string outputFile in allOutputFiles)
             {
-                int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
-                UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
+                if(outputFile.Contains("output") && !outputFile.Contains("cleaned"))
+                {
+                    UnityEngine.Debug.Log($"Found output of run {outputFile}");
+                    this.reflexionGraphViz.ResetMapping();
+
+
+
+                }
             }
+
+            return;
         }
 
         // TODO: Delete later only for debug purposes
-        [Button("Candidate Status", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void PrintCandidateStatus()
-        {
-            IEnumerable<Node> candidates = this.CandidateRecommendation.GetCandidates();
+        //[Button("Print Edge Types", ButtonSizes.Small)]
+        //[ButtonGroup(debugButtonGroup)]
+        //public void PrintEdgeTypeInformation()
+        //{
+        //    HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
 
-            foreach (Node candidate in candidates)
-            {
-                UnityEngine.Debug.Log($"Candidate {candidate.ID} Maps to {this.reflexionGraphCalc.MapsTo(candidate)?.ID ?? "NOTHING"}. Expected Cluster {this.CandidateRecommendation.GetExpectedClusterID(candidate.ID)}");
-            }
-        }
+        //    foreach (string edgeType in edgeTypes)
+        //    {
+        //        int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
+        //        UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
+        //    }
+        //}
 
         // TODO: Delete later only for debug purposes
-        [Button("Print Roots", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void PrintRoots()
-        {
-            List<Node> rootNodes = this.reflexionGraphViz.Nodes().Where(n => n.IsRoot()).ToList();
+        //[Button("Candidate Status", ButtonSizes.Small)]
+        //[ButtonGroup(debugButtonGroup)]
+        //public void PrintCandidateStatus()
+        //{
+        //    IEnumerable<Node> candidates = this.CandidateRecommendation.GetCandidates();
 
-            foreach (Node rootNode in rootNodes)
-            {
-                UnityEngine.Debug.Log($"Node {rootNode.ID} is root.");
-            }
-        }
+        //    foreach (Node candidate in candidates)
+        //    {
+        //        UnityEngine.Debug.Log($"Candidate {candidate.ID} Maps to {this.reflexionGraphCalc.MapsTo(candidate)?.ID ?? "NOTHING"}. Expected Cluster {this.CandidateRecommendation.GetExpectedClusterID(candidate.ID)}");
+        //    }
+        //}
+
+        // TODO: Delete later only for debug purposes
+        //[Button("Print Roots", ButtonSizes.Small)]
+        //[ButtonGroup(debugButtonGroup)]
+        //public void PrintRoots()
+        //{
+        //    List<Node> rootNodes = this.reflexionGraphViz.Nodes().Where(n => n.IsRoot()).ToList();
+
+        //    foreach (Node rootNode in rootNodes)
+        //    {
+        //        UnityEngine.Debug.Log($"Node {rootNode.ID} is root.");
+        //    }
+        //}
 
 
         /// <summary>
@@ -1542,13 +1630,24 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             StringBuilder sb = new StringBuilder();
 
-            IEnumerable<Node> nodes = graph.Nodes().Where(n => n.IsInImplementation());/*.Where(n => this.CandidateRecommendation.IsCandidate(n));*/
+            IEnumerable<Node> nodes = graph.Nodes().Where(n => n.IsInImplementation());
 
             foreach (Node node in nodes)
             {
                 sb.Append(node.ID.PadRight(120));
                 sb.Append(" Maps To ".PadRight(20));
-                Node oracleCluster = oracleGraph.MapsTo(node);
+                Node oracleCluster = null;
+                try
+                {
+                    UnityEngine.Debug.Log($"Try to retrieve expected cluster for node {node?.ID}...");
+                    oracleCluster = oracleGraph.MapsTo(node);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                    continue;
+                }
+
                 string oracleClusterID = oracleCluster != null ? oracleCluster.ID : "UNKNOWN";
                 sb.Append(oracleClusterID.PadRight(20));
                 string type = $"Type:{node.Type}";
@@ -1585,12 +1684,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             // Empty method for debugging
         }
 
-        [Button("Color unmapped Candidates", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void ColorUnmappedCandidates()
-        {
-            this.ColorUnmappedCandidates(Color.black);
-        }
+        //[Button("Color unmapped Candidates", ButtonSizes.Small)]
+        //[ButtonGroup(debugButtonGroup)]
+        //public void ColorUnmappedCandidates()
+        //{
+        //    this.ColorUnmappedCandidates(Color.black);
+        //}
 
 
         #endregion
