@@ -313,7 +313,7 @@ namespace SEE.GO
                 UpdateLineRenderer();
                 UpdateMesh();
                 needsUpdate = needsColorUpdate = false;
-                OnRendererChanged();
+                OnRendererChanged?.Invoke();
             }
             else if (needsColorUpdate)
             {
