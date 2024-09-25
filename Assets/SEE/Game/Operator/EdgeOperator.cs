@@ -364,7 +364,6 @@ namespace SEE.Game.Operator
             /// </summary>
             private void Update()
             {
-
                 for (int i = 0; i < particleCount; i++)
                 {
                     particlePositions[i] += particleSpeed * Time.deltaTime;
@@ -378,6 +377,7 @@ namespace SEE.Game.Operator
 
             /// <summary>
             /// This callback is triggered whenever the spline has changed.
+            /// It will then re-calculate <see cref="vertices"/>.
             /// </summary>
             private void OnSplineChanged()
             {

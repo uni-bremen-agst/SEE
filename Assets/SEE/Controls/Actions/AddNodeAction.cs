@@ -6,9 +6,7 @@ using UnityEngine;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
-using SEE.UI.DebugAdapterProtocol;
 using System;
-using SEE.UI;
 using SEE.UI.PropertyDialog;
 using SEE.DataModel.DG;
 
@@ -24,9 +22,19 @@ namespace SEE.Controls.Actions
         /// </summary>
         private enum ProgressState
         {
-            NoNodeSelected,  // initial state when no parent node is selected
-            WaitingForInput, // a new node is created and selected, the dialog is opened, and we wait for input
-            Finish           // when the action is finished.
+            /// <summary>
+            /// Initial state when no parent node is selected.
+            /// </summary>
+            NoNodeSelected,
+            /// <summary>
+            /// A new node is created and selected, the dialog is opened,
+            /// and we wait for input
+            /// </summary>
+            WaitingForInput,
+            /// <summary>
+            /// When the action is finished.
+            /// </summary>
+            Finish
         }
 
         /// <summary>
@@ -59,7 +67,6 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    // FIXME: Needs adaptation for VR where no mouse is available.
                     if (Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
@@ -73,7 +80,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case ProgressState.WaitingForInput:
-                    /// Waiting until the dialog is closed ad all input is present.
+                    // Waiting until the dialog is closed ad all input is present.
                     break;
                 case ProgressState.Finish:
                     result = true;
@@ -81,16 +88,16 @@ namespace SEE.Controls.Actions
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
                     break;
                 default:
-                    throw new NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException($"Unhandled case {nameof(progress)}.");
             }
             return result;
         }
 
         /// <summary>
-        /// Adds a node on the chosen <paramref name="parent"/> on the
+        /// Adds a node on the chosen <paramref name="parent"/> at the
         /// chosen <paramref name="position"/>.
         /// </summary>
-        /// <param name="parent">The node parent.</param>
+        /// <param name="parent">The parent on which to place the node.</param>
         /// <param name="position">The position where the node should be placed.</param>
         private void AddNode(GameObject parent, Vector3 position)
         {
@@ -101,8 +108,10 @@ namespace SEE.Controls.Actions
             addedGameNode.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             addedGameNode.transform.position = GameNodeMover.GetCoordinatesOn(addedGameNode.transform.lossyScale, position, parent);
             // TODO The new node is scaled down arbitrarily and might overlap with its siblings.
-            memento = new(child: addedGameNode, parent: parent);
-            memento.NodeID = addedGameNode.name;
+            memento = new(child: addedGameNode, parent: parent)
+            {
+                NodeID = addedGameNode.name
+            };
             new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
             progress = ProgressState.WaitingForInput;
             OpenDialog(addedGameNode.GetNode());
@@ -125,6 +134,8 @@ namespace SEE.Controls.Actions
             dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open(true);
             SEEInput.KeyboardShortcutsEnabled = false;
+
+            return;
 
             void OKButtonPressed()
             {
@@ -166,7 +177,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// The node that was added when this action was executed. It is saved so
-        /// that it can be removed on Undo().
+        /// that it can be removed on <see cref="Undo"/>.
         /// </summary>
         private GameObject addedGameNode;
 
@@ -223,7 +234,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this AddNodeAction.
+        /// Undoes this action.
         /// </summary>
         public override void Undo()
         {
@@ -238,15 +249,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redoes this AddNodeAction.
+        /// Redoes this action.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
-            addedGameNode = GameNodeAdder.AddChild(memento.Parent, worldSpacePosition: memento.Position, worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
+            addedGameNode = GameNodeAdder.AddChild(memento.Parent, worldSpacePosition: memento.Position,
+                                                   worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
-                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                new AddNodeNetAction(parentID: memento.Parent.name,
+                    newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
 
                 if (!string.IsNullOrEmpty(memento.Type))
                 {

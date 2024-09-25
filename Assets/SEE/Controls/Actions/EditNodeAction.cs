@@ -109,7 +109,7 @@ namespace SEE.Controls.Actions
                             }
                             else
                             {
-                                ShowNotification.Warn("Forbidden!", "You can't edit a root node.");
+                                ShowNotification.Warn("Root node is readonly", "You cannot edit the root node.");
                             }
                         }
                         else
@@ -135,7 +135,7 @@ namespace SEE.Controls.Actions
                     break;
 
                 default:
-                    throw new NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException($"Unhandled case {nameof(progress)}.");
             }
             return result;
         }

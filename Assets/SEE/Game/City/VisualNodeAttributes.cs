@@ -160,9 +160,9 @@ namespace SEE.Game.City
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
         /// <summary>
-        /// Defines if node type may be manually manipulated (e.g., resized) by users.
+        /// Whether users may manipulate (e.g., resize) instances of this type of node.
         /// </summary>
-        [Tooltip("May users manipulate (e.g., resize) this type of node?")]
+        [Tooltip("Whether users may manipulate (e.g., resize) instances of this type of node.")]
         public bool AllowManualNodeManipulation = false;
 
         /// <summary>

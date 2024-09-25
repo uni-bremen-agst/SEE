@@ -26,9 +26,9 @@ namespace SEE.Controls.Actions
         private ResizeGizmo gizmo;
 
         /// <summary>
-        /// Whether the action is finish and can be completed.
+        /// Whether the action is finished and can be completed.
         /// </summary>
-        private bool finish = false;
+        private bool finished = false;
 
         #region ReversibleAction
 
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (finish)
+            if (finished)
             {
                 CurrentState = IReversibleAction.Progress.Completed;
             }
@@ -185,14 +185,15 @@ namespace SEE.Controls.Actions
 
                 if (CurrentState == IReversibleAction.Progress.InProgress)
                 {
-                    finish = true;
+                    finished = true;
                 }
                 return;
             }
 
             // Incompatible type
             GameObject selectedGameObject = interactableObject.gameObject;
-            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef) || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualNodeManipulation)
+            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef)
+                || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualNodeManipulation)
             {
                 return;
             }
@@ -223,7 +224,6 @@ namespace SEE.Controls.Actions
             memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
-
 
         /// <summary>
         /// The metadata of a resize action that affects the scale and position of a node.
@@ -267,7 +267,6 @@ namespace SEE.Controls.Actions
                 NewLocalScale = OriginalLocalScale;
             }
         }
-
 
         private class ResizeGizmo : MonoBehaviour
         {
@@ -484,7 +483,8 @@ namespace SEE.Controls.Actions
                 Vector3 hitPoint = targetObjectHit.Value.point;
                 Vector3 cursorMovement = Vector3.Scale(currentResizeStep.InitialHitPoint - hitPoint, currentResizeStep.Direction);
                 Vector3 newLocalSize = currentResizeStep.InitialLocalSize - Vector3.Scale(currentResizeStep.LocalScaleFactor, cursorMovement);
-                Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
+                Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition
+                    - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
 
                 // Contain in parent
                 Bounds2D bounds = new(
@@ -553,7 +553,6 @@ namespace SEE.Controls.Actions
                     {
                         overlap[1] = otherBounds.Front - bounds.Back;
                     }
-
 
                     // Pick correction direction
                     if (overlap[0] < overlap[1] && newLocalSize.x - overlap[0] > currentResizeStep.MinLocalSize.x)
@@ -650,7 +649,6 @@ namespace SEE.Controls.Actions
                     handle.transform.SetParent(transform);
                 }
             }
-
 
             /// <summary>
             /// Data structure for the individual resize steps.
@@ -788,7 +786,7 @@ namespace SEE.Controls.Actions
                 /// <summary>
                 /// Returns a printable string with the struct's values.
                 /// <summary>
-                public override string ToString()
+                public override readonly string ToString()
                 {
                     return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
                 }

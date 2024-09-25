@@ -84,15 +84,16 @@ namespace SEE.Controls.Actions
         private Edge createdEdge;
 
         /// <summary>
-        /// The information required to (re-)create the edges that solves the divergence via mutliselection context menu.
+        /// The information required to (re-)create the edges that solve the divergence
+        /// via the multi-selection context menu.
         /// </summary>
-        private List<Memento> mementoList = new();
+        private readonly List<Memento> mementoList = new();
 
         /// <summary>
         /// The edges created by this action <see cref="createdEdge"/>.
-        /// The list is needed for the multiselection via context menu.
+        /// The list is needed for the multi-selection via context menu.
         /// </summary>
-        private List<Edge> createdEdgeList = new();
+        private readonly List<Edge> createdEdgeList = new();
 
         /// <summary>
         /// Whether the context menu was executed in multiselection mode.
@@ -264,7 +265,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>the new edge</returns>
-        private Edge CreateConvergentEdge(Memento memento)
+        private static Edge CreateConvergentEdge(Memento memento)
         {
             Edge newEdge = AcceptDivergence.Accept(memento.From, memento.To, memento.Type);
 
@@ -293,7 +294,7 @@ namespace SEE.Controls.Actions
             return createdEdge;
         }
 
-        public void ContextMenuExection(List<Edge> divergences)
+        public void ContextMenuExection(IList<Edge> divergences)
         {
             ExecuteViaContextMenu = true;
             multiselection = true;
