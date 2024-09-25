@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
@@ -98,10 +96,9 @@ namespace SEE.Controls.Actions
         {
             base.Stop();
 
-            if (memento.GameObject == null)
-            {
-                return;
-            }
+            InteractableObject.LocalAnySelectIn -= OnSelectionChanged;
+            InteractableObject.LocalAnySelectOut -= OnSelectionChanged;
+            InteractableObject.MultiSelectionAllowed = true;
 
             if (gizmo != null)
             {
@@ -114,9 +111,6 @@ namespace SEE.Controls.Actions
                 memento = new Memento();
             }
 
-            InteractableObject.LocalAnySelectIn -= OnSelectionChanged;
-            InteractableObject.LocalAnySelectOut -= OnSelectionChanged;
-            InteractableObject.MultiSelectionAllowed = true;
         }
 
         /// <summary>
