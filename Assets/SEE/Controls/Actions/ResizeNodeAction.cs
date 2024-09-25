@@ -311,16 +311,9 @@ namespace SEE.Controls.Actions
             #region Change Event
 
             /// <summary>
-            /// Delegate for signalling change.
-            /// </summary>
-            /// <param name="newLocalScale">The new local scale after the resize step</param>
-            /// <param name="newPosition">The new world-space position after the resize step</param>
-            public delegate void ResizeNodeEvent(Vector3 newLocalScale, Vector3 newPosition);
-
-            /// <summary>
             /// The event is emitted each time a resize step has finished.
             /// </summary>
-            public event ResizeNodeEvent OnSizeChanged;
+            public event Action<Vector3, Vector3> OnSizeChanged;
 
             #endregion Change Event
 
