@@ -156,7 +156,7 @@ namespace SEE.Game.Operator
             else
             {
                 EdgeDataFlowVisualizer edfv = gameObject.GetComponent<EdgeDataFlowVisualizer>();
-                Destroy(edfv);
+                Destroyer.Destroy(edfv);
             }
         }
 
@@ -329,7 +329,7 @@ namespace SEE.Game.Operator
                 foreach (GameObject particle in particles)
                 {
                     seeSpline.OnRendererChanged -= OnSplineChanged;
-                    Destroy(particle);
+                    Destroyer.Destroy(particle);
                 }
             }
 

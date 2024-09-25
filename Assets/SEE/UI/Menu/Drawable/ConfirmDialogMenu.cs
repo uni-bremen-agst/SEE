@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Net.Actions.Drawable;
+using SEE.Utils;
 using TMPro;
 using UnityEngine.Events;
 
@@ -31,21 +31,21 @@ namespace SEE.UI.Menu.Drawable
             cancelDragger.clickEvent.AddListener(() =>
              {
                  WasCanceled = true;
-                 Destroy();
+                 Destroyer.Destroy(gameObject);
              });
             ButtonManagerBasic confirm = GameFinder.FindChild(gameObject, "Confirm")
                 .GetComponent<ButtonManagerBasic>();
             confirm.clickEvent.AddListener(() =>
             {
                 WasConfirmed = true;
-                Destroy();
+                Destroyer.Destroy(gameObject);
             });
             ButtonManagerBasic cancel = GameFinder.FindChild(gameObject, "Cancel")
                 .GetComponent<ButtonManagerBasic>();
             cancel.clickEvent.AddListener(() =>
             {
                 WasCanceled = true;
-                Destroy();
+                Destroyer.Destroy(gameObject);
             });
             TextMeshProUGUI description = GameFinder.FindChild(gameObject, "Description")
                 .GetComponent<TextMeshProUGUI>();

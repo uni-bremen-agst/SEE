@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions
             if (gizmo != null)
             {
                 gizmo.OnSizeChanged -= OnResizeStep;
-                GameObject.Destroy(gizmo);
+                Destroyer.Destroy(gizmo);
             }
 
             if (CurrentState == IReversibleAction.Progress.NoEffect)
@@ -346,7 +346,7 @@ namespace SEE.Controls.Actions
                 }
                 foreach (GameObject handle in handles.Keys)
                 {
-                    Destroy(handle);
+                    Destroyer.Destroy(handle);
                 }
             }
 
