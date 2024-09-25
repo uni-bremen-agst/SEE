@@ -38,7 +38,7 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Filepath containing json with information to build HelpSystem
         /// </summary>
-        private string jsonFilePath = Application.streamingAssetsPath + "/Videos/helpSystem.json";
+        private string jsonFilePath = Application.streamingAssetsPath + "/HelpSystem/helpSystem.json";
 
         /// <summary>
         /// Creates the menu.
