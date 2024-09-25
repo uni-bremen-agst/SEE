@@ -125,11 +125,17 @@ namespace SEE.Controls.Actions
                 } else if (ExecuteViaContextMenu && !mouseHeldDown)
                 {
                     // User starts dragging object selected via context menu.
-                    // Override the initial cursorOffset based on new mouse position to prevent jump
-                    // if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
-                    // {
-                    //     cursorOffset = targetObjectHit.Value.point - contextMenuObjectToMove.transform.position;
-                    // }
+                    // Override the initial cursorOffset based on new mouse position to reduce jump
+                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
+                    {
+                        // Calculate position on object and close to the cursor
+                        Vector3 objectSize = contextMenuObjectToMove.WorldSpaceSize();
+                        Vector3 objectPosition = contextMenuObjectToMove.transform.position;
+                        Vector3 anchorPosition = targetObjectHit.Value.point;
+                        anchorPosition.x = Mathf.Clamp(anchorPosition.x, objectPosition.x - 0.5f * objectSize.x, objectPosition.x + 0.5f * objectSize.x);
+                        anchorPosition.z = Mathf.Clamp(anchorPosition.z, objectPosition.z - 0.5f * objectSize.z, objectPosition.z + 0.5f * objectSize.z);
+                        cursorOffset = anchorPosition - objectPosition;
+                    }
 
                     grabbedObject.Grab(contextMenuObjectToMove);
                     CurrentState = IReversibleAction.Progress.InProgress;
