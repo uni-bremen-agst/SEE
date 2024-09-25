@@ -385,7 +385,7 @@ namespace SEE.Controls.Actions
                 {
                     clicked = false;
                     currentResizeStep = new();
-                    OnSizeChanged(transform.localScale, transform.position);
+                    OnSizeChanged?.Invoke(transform.localScale, transform.position);
                 }
 
                 if (newClick)
