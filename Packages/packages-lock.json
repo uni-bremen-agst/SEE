@@ -36,7 +36,7 @@
       "hash": "12574c32f658fa23c194357141abc3fc157ea362"
     },
     "com.openai.unity": {
-      "version": "8.2.3",
+      "version": "8.3.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
