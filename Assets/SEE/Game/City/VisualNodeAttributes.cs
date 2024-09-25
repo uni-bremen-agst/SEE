@@ -160,10 +160,10 @@ namespace SEE.Game.City
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
         /// <summary>
-        /// Defines if node type may be manually resized by users.
+        /// Defines if node type may be manually manipulated (e.g., resized) by users.
         /// </summary>
-        [Tooltip("May users resize this type of node?.")]
-        public bool AllowManualResize = false;
+        [Tooltip("May users manipulate (e.g., resize) this type of node?")]
+        public bool AllowManualNodeManipulation = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -183,7 +183,7 @@ namespace SEE.Game.City
             AntennaSettings.Save(writer, antennaSettingsLabel);
             writer.Save(OutlineWidth, outlineWidthLabel);
             writer.Save(ShowNames, showNamesLabel);
-            writer.Save(AllowManualResize, allowManualResizeLabel);
+            writer.Save(AllowManualNodeManipulation, allowManualNodeManipulationLabel);
             writer.EndGroup();
         }
 
@@ -219,7 +219,7 @@ namespace SEE.Game.City
             AntennaSettings.Restore(values, antennaSettingsLabel);
             ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
             ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
-            ConfigIO.Restore(values, allowManualResizeLabel, ref AllowManualResize);
+            ConfigIO.Restore(values, allowManualNodeManipulationLabel, ref AllowManualNodeManipulation);
         }
 
         /// <summary>
@@ -264,8 +264,8 @@ namespace SEE.Game.City
         private const string showNamesLabel = "ShowNames";
 
         /// <summary>
-        /// Label in the configuration file for <see cref="AllowManualResize"/>.
+        /// Label in the configuration file for <see cref="AllowManualNodeManipulation"/>.
         /// </summary>
-        private const string allowManualResizeLabel = "AllowManualResize";
+        private const string allowManualNodeManipulationLabel = "AllowManualNodeManipulation";
     }
 }

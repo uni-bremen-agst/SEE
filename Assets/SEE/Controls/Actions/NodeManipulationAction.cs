@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions
                 return;
             }
             VisualNodeAttributes gameNodeAttributes = gameNode.ContainingCity().NodeTypes[nodeRef.Value.Type];
-            if (!gameNodeAttributes.AllowManualResize)
+            if (!gameNodeAttributes.AllowManualNodeManipulation)
             {
                 ShowNotification.Info("Manipulation Forbidden", "The node cannot be manipulated!", 5, false);
                 return;

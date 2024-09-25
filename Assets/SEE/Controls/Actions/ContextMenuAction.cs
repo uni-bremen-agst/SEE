@@ -533,7 +533,7 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     VisualNodeAttributes gameNodeAttributes = gameObject.ContainingCity().NodeTypes[node.Type];
-                    if (gameNodeAttributes.AllowManualResize)
+                    if (gameNodeAttributes.AllowManualNodeManipulation)
                     {
                         actions.Add(new PopupMenuAction("Rotate", RotateNode, Icons.Rotate, Priority: 4));
                         actions.Add(new PopupMenuAction("Resize Node", ResizeNode, Icons.Resize));
