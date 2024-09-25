@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions
 
             // Start resizing
             memento = new Memento(selectedGameObject);
-            gizmo = memento.GameObject.AddComponent<ResizeGizmo>();
+            gizmo = memento.GameObject.AddOrGetComponent<ResizeGizmo>();
             gizmo.OnSizeChanged += OnResizeStep;
         }
 
