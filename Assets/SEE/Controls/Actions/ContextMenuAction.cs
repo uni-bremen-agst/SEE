@@ -4,7 +4,6 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game;
-using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
@@ -18,7 +17,6 @@ using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
-using Crosstales.RTVoice;
 
 namespace SEE.Controls.Actions
 {
@@ -47,6 +45,7 @@ namespace SEE.Controls.Actions
         /// Tries to open the context menu with multiselection.
         /// </summary>
         private bool multiselection = false;
+
         /// The position of the mouse when the user started opening the context menu.
         /// </summary>
         private Vector3 startMousePosition = Vector3.zero;
@@ -124,7 +123,8 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="selectedObjects">The selected objects.</param>
         /// <returns>Options available for the selected objects.</returns>
-        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection(PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection
+            (PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
         {
             List<PopupMenuEntry> entries = new()
             {
@@ -260,11 +260,16 @@ namespace SEE.Controls.Actions
         /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
-        public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position, GraphElement graphElement,
-            GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        public static IEnumerable<PopupMenuAction> GetOptionsForTreeView
+            (PopupMenu popupMenu,
+            Vector3 position,
+            GraphElement graphElement,
+            GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
         {
             List<PopupMenuAction> actions = new();
-            actions.AddRange(GetApplicableOptions(popupMenu, position, position, graphElement, gameObject, appendActions).OfType<PopupMenuAction>());
+            actions.AddRange(GetApplicableOptions(popupMenu, position, position, graphElement, gameObject, appendActions)
+                .OfType<PopupMenuAction>());
 
             return actions;
         }
@@ -280,10 +285,16 @@ namespace SEE.Controls.Actions
         /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
-        private static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-            GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        private static IEnumerable<PopupMenuEntry> GetApplicableOptions
+            (PopupMenu popupMenu,
+            Vector3 position,
+            Vector3 raycastHitPosition,
+            GraphElement graphElement,
+            GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
         {
-            IEnumerable<PopupMenuEntry> options = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+            IEnumerable<PopupMenuEntry> options
+                = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
             return options.Concat(graphElement switch
             {
                 Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions),
@@ -302,8 +313,13 @@ namespace SEE.Controls.Actions
         /// <param name="gameObject">The game object that the graph element is attached to</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>Common options available for all graph elements</returns>
-        private static IEnumerable<PopupMenuEntry> GetCommonOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-                    GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
+        private static IEnumerable<PopupMenuEntry> GetCommonOptions
+            (PopupMenu popupMenu,
+            Vector3 position,
+            Vector3 raycastHitPosition,
+            GraphElement graphElement,
+            GameObject gameObject = null,
+            IEnumerable<PopupMenuAction> appendActions = null)
         {
             string name = graphElement.ID;
             string target, source = target = null;
@@ -664,8 +680,13 @@ namespace SEE.Controls.Actions
         /// <param name="gameObject">The game object that the edge is attached to</param>
         /// <param name="appendActions">Options to be append at the end of the entries.</param>
         /// <returns>Options available for the given edge</returns>
-        private static IEnumerable<PopupMenuEntry> GetEdgeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-            Edge edge, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions = null)
+        private static IEnumerable<PopupMenuEntry> GetEdgeOptions
+            (PopupMenu popupMenu,
+            Vector3 position,
+            Vector3 raycastHitPosition,
+            Edge edge,
+            GameObject gameObject,
+            IEnumerable<PopupMenuAction> appendActions = null)
         {
             IList<PopupMenuEntry> actions = new List<PopupMenuEntry>();
 
@@ -704,7 +725,9 @@ namespace SEE.Controls.Actions
         private static TreeWindow ActivateTreeWindow(GraphElement graphElement, Transform transform, string title = null)
         {
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>().FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
+            TreeWindow openWindow = manager.Windows.OfType<TreeWindow>()
+                .FirstOrDefault(x => x.Graph == graphElement.ItsGraph && (title == null || x.Title == title));
+
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
@@ -783,9 +806,17 @@ namespace SEE.Controls.Actions
         /// <param name="priority">The priority for this sub menu.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>The created sub menu.</returns>
-        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
-            string name, char icon, IEnumerable<PopupMenuEntry> actions,
-            GraphElement graphElement, GameObject gameObject = null, int priority = 0, IEnumerable<PopupMenuAction> appendActions = null)
+        private static PopupMenuActionDoubleIcon CreateSubMenu
+            (PopupMenu popupMenu,
+            Vector3 position,
+            Vector3 raycastHitPosition,
+            string name,
+            char icon,
+            IEnumerable<PopupMenuEntry> actions,
+            GraphElement graphElement,
+            GameObject gameObject = null,
+            int priority = 0,
+            IEnumerable<PopupMenuAction> appendActions = null)
         {
             return new(name, () =>
             {
@@ -795,16 +826,18 @@ namespace SEE.Controls.Actions
                         {
                             if (appendActions != null)
                             {
-                                List<PopupMenuAction> treeViewActions = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                                                                        graphElement, gameObject, appendActions)
-                                                                    .OfType<PopupMenuAction>()
-                                                                    .Where(x=>!x.Name.Contains("TreeWindow")));
+                                List<PopupMenuAction> treeViewActions
+                                = new (GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                                                            graphElement, gameObject, appendActions)
+                                           .OfType<PopupMenuAction>()
+                                           .Where(x=>!x.Name.Contains("TreeWindow")));
                                 treeViewActions.AddRange(appendActions);
                                 UpdateEntries(popupMenu, position, treeViewActions);
                             }
                             else
                             {
-                                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
+                                UpdateEntries(popupMenu, position,
+                                    GetApplicableOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject));
                             }
                         },
                         Icons.ArrowLeft, CloseAfterClick: false, Priority: int.MaxValue)
@@ -815,7 +848,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Ensures that the previous action is executed again after the current action has been fully completed (<see cref="IReversibleAction.Progress.Completed"/>).
+        /// Ensures that the previous action is executed again after the current action has
+        /// been fully completed (<see cref="IReversibleAction.Progress.Completed"/>).
         /// Additionally, the <see cref="PlayerMenu"> is updated.
         /// </summary>
         /// <param name="action">The current action which was executed via context menu.</param>
