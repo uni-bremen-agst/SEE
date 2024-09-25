@@ -123,7 +123,7 @@ namespace SEE.Controls.Actions
             NodePropertyDialog dialog = new(node);
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(CancelButtonPressed);
-            dialog.Open();
+            dialog.Open(true);
             SEEInput.KeyboardShortcutsEnabled = false;
 
             void OKButtonPressed()
@@ -138,8 +138,14 @@ namespace SEE.Controls.Actions
 
             void CancelButtonPressed()
             {
+                /// Case when last used is used and it has a value other
+                /// then 'UNKOWNTYPE', use it.
+                if (node.Type != Graph.UnknownType)
+                {
+                    memento.Name = node.SourceName;
+                    memento.Type = node.Type;
+                }
                 progress = ProgressState.Finish;
-                InteractableObject.UnselectAll(true);
                 SEEInput.KeyboardShortcutsEnabled = true;
             }
         }

@@ -1,7 +1,9 @@
 ﻿using SEE.Controls;
+using SEE.Controls.Actions; /// Reference in comment.
 using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Utils;
 using System.Linq;
 using UnityEngine;
@@ -55,9 +57,15 @@ namespace SEE.UI.PropertyDialog
         private SelectionProperty nodeType;
 
         /// <summary>
+        /// The last chosen node type for the <see cref="AddNodeAction"/> mode.
+        /// </summary>
+        private static string lastUsed;
+
+        /// <summary>
         /// Creates and opens the dialog.
         /// </summary>
-        public void Open()
+        /// <param name="useLastUsed">Whether the last used index should be used and updated.</param>
+        public void Open(bool useLastUsed = false)
         {
             dialog = new GameObject("Node attributes");
 
@@ -71,7 +79,19 @@ namespace SEE.UI.PropertyDialog
             nodeType = dialog.AddComponent<SelectionProperty>();
             nodeType.Name = "Node type";
             nodeType.AddOptions(node.GameObject().ContainingCity().NodeTypes.Types.OrderBy(t => t));
-            nodeType.Value = node.Type;
+            if (!useLastUsed || string.IsNullOrEmpty(lastUsed))
+            {
+                nodeType.Value = node.Type;
+            }
+            else if (useLastUsed)
+            {
+                if (node.Type != lastUsed)
+                {
+                    GameEditNode.ChangeType(node, lastUsed);
+                    new EditNodeNetAction(node.ID, node.SourceName, lastUsed);
+                }
+                nodeType.Value = lastUsed;
+            }
             nodeType.Description = "Type of the node";
 
             // Group for node name and type
@@ -93,6 +113,25 @@ namespace SEE.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = false;
             // Go online
             propertyDialog.DialogShouldBeShown = true;
+
+            /// <summary>
+            /// Sets the attributes of <see cref="node"/> to the trimmed values entered in the dialog,
+            /// notifies all listeners on <see cref="OnConfirm"/>, and closes the dialog.
+            /// </summary>
+            void OKButtonPressed()
+            {
+                GameEditNode.ChangeName(node, nodeName.Value);
+                GameEditNode.ChangeType(node, nodeType.Value);
+
+                /// Updates the <see cref="lastUsed"/> attribute.
+                if (useLastUsed)
+                {
+                    lastUsed = nodeType.Value;
+                }
+                OnConfirm.Invoke();
+                SEEInput.KeyboardShortcutsEnabled = true;
+                Close();
+            }
         }
 
         /// <summary>
@@ -101,19 +140,6 @@ namespace SEE.UI.PropertyDialog
         private void CancelButtonPressed()
         {
             OnCancel.Invoke();
-            SEEInput.KeyboardShortcutsEnabled = true;
-            Close();
-        }
-
-        /// <summary>
-        /// Sets the attributes of <see cref="node"/> to the trimmed values entered in the dialog,
-        /// notifies all listeners on <see cref="OnConfirm"/>, and closes the dialog.
-        /// </summary>
-        private void OKButtonPressed()
-        {
-            GameEditNode.ChangeName(node, nodeName.Value);
-            GameEditNode.ChangeType(node, nodeType.Value);
-            OnConfirm.Invoke();
             SEEInput.KeyboardShortcutsEnabled = true;
             Close();
         }
