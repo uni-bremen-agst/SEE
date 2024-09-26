@@ -105,7 +105,8 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _) == HitGraphElement.Node)
+                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _)
+                        == HitGraphElement.Node)
                     {
                         cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
                     }
@@ -122,11 +123,13 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                } else if (ExecuteViaContextMenu && !mouseHeldDown)
+                }
+                else if (ExecuteViaContextMenu && !mouseHeldDown)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
-                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef) && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
+                    if (contextMenuObjectToMove.TryGetNodeRef(out NodeRef nodeRef)
+                        && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
                     {
                         // Calculate position on object and close to the cursor
                         Vector3 objectSize = contextMenuObjectToMove.WorldSpaceSize();
@@ -140,7 +143,8 @@ namespace SEE.Controls.Actions
                     grabbedObject.Grab(contextMenuObjectToMove);
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
-            } else if (mouseHeldDown ^ ExecuteViaContextMenu) // drag grabbed object
+            }
+            else if (mouseHeldDown ^ ExecuteViaContextMenu) // drag grabbed object
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)
@@ -204,7 +208,6 @@ namespace SEE.Controls.Actions
             cursorOffset = raycastHitPosition - objToMove.transform.position;
             contextMenuObjectToMove = objToMove;
         }
-
 
         /// <summary>
         /// Data structure to manage the game object that was grabbed.
