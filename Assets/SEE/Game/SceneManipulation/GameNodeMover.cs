@@ -1,7 +1,5 @@
-﻿using SEE.Game.Operator;
-using SEE.GO;
+﻿using SEE.GO;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.SceneManipulation
 {
