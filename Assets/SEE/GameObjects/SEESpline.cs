@@ -85,7 +85,7 @@ namespace SEE.GO
         private float subsplineEndT = 1.0f;
 
         /// <summary>
-        /// The event is emitted each the renderer was updated (cmp. <see cref="needsUpdate"/>).
+        /// The event is emitted each time the renderer is updated (see <see cref="needsUpdate"/>).
         /// </summary>
         public event Action OnRendererChanged;
 
