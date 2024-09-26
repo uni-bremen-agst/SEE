@@ -158,19 +158,19 @@ namespace SEE.Utils
                     continue;
                 }
 
-                // is it in the same graph as the reference node, if present?
+                // Is it in the same graph as the reference node, if present?
                 if (referenceNode == null || referenceNode.Value == null || hitNodeRef.Value.ItsGraph != referenceNode.Value.ItsGraph)
                 {
                     continue;
                 }
 
-                // have we found a node deeper into the tree than the current hitNode?
+                // Have we found a node deeper into the tree than the current hitNode?
                 if (hitNode != null && hitNode.Level >= hitNodeRef.Value.Level)
                 {
                     continue;
                 }
 
-                // check whether descendants are to be ignored and if so, whether the hit node is a descendant
+                // Check whether descendants are to be ignored and if so, whether the hit node is a descendant
                 if (referenceNode != null && hitNodeRef.Value.IsDescendantOf(referenceNode.Value))
                 {
                     continue;
