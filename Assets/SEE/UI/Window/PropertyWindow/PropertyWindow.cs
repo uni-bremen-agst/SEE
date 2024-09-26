@@ -3,7 +3,6 @@ using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
 using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
@@ -96,13 +95,11 @@ namespace SEE.UI.Window.PropertyWindow
 
         #region Search
         /// <summary>
-        /// Activates all <paramref name="propertyRows"/> if they match the <paramref name="searchQuery"/>.
+        /// Activates all rows matching the <paramref name="searchQuery"/>.
         /// All others are deactivated. In other words, the <paramref name="searchQuery"/> is applied as
         /// a filter.
         /// </summary>
-        /// <param name="searchQuery"> attribute name to search for </param>
-        /// <param name="propertyRows">mapping of attribute names onto gameObjects representing
-        /// the corresponding property row</param>
+        /// <param name="searchQuery">attribute name to search for</param>
         private void ActivateMatches(string searchQuery)
         {
             Dictionary<string, (string, GameObject)> propertyRows = new();
@@ -115,7 +112,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 else
                 {
-                    /// If the key already in use.
+                    /// If the key is already in use.
                     string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
                     while (propertyRows.ContainsKey(name))
                     {
@@ -160,6 +157,7 @@ namespace SEE.UI.Window.PropertyWindow
             }
 
             return;
+
             void ActivateParentGroups(GameObject group)
             {
                 foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
@@ -179,16 +177,16 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Returns the hierarchy level of the <paramref name="obj"/>.
+        /// Returns the hierarchy level of the <paramref name="go"/>.
         /// </summary>
-        /// <param name="obj">The object to be checked.</param>
+        /// <param name="go">The object to be checked.</param>
         /// <returns>The level of the hierarchy.</returns>
-        private int GetLevel(GameObject obj)
+        private int GetLevel(GameObject go)
         {
             int level = 0;
-            if (obj.transform.Find("Foreground") != null)
+            if (go.transform.Find("Foreground") != null)
             {
-                level = (int)((RectTransform)obj.transform.Find("Foreground")).offsetMin.x / indentShift;
+                level = (int)((RectTransform)go.transform.Find("Foreground")).offsetMin.x / indentShift;
             }
             return level;
         }
@@ -226,14 +224,14 @@ namespace SEE.UI.Window.PropertyWindow
             }
             return;
 
-            bool IsNoSubgroupOrParentExpanded(GameObject obj)
+            bool IsNoSubgroupOrParentExpanded(GameObject go)
             {
                 bool shouldDisplayed = true;
                 foreach (KeyValuePair<string, List<GameObject>> pair in groupHolder)
                 {
-                    if (pair.Value.Contains(obj))
+                    if (pair.Value.Contains(go))
                     {
-                        GameObject parentGroup = pair.Value.Find(go => obj.name != pair.Key && GetLevel(go) < GetLevel(obj));
+                        GameObject parentGroup = pair.Value.Find(go => go.name != pair.Key && GetLevel(go) < GetLevel(go));
                         if (parentGroup != null)
                         {
                             shouldDisplayed = expandedItems.Contains(parentGroup.name) && IsNoSubgroupOrParentExpanded(parentGroup);
@@ -310,7 +308,7 @@ namespace SEE.UI.Window.PropertyWindow
             return;
 
             /// Expands the game object by animating its scale.
-            void AnimateIn(GameObject go)
+            static void AnimateIn(GameObject go)
             {
                 go.transform.localScale = new Vector3(1, 0, 1);
                 go.transform.DOScaleY(1, duration: 0.5f);
@@ -345,7 +343,7 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Makes a rebuild of the window.
+        /// Rebuilds the window.
         /// </summary>
         private void Rebuild()
         {
@@ -521,7 +519,6 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 AddNestedAttribute(nestedDict, pair.Key.Split('.'), pair.Value);
             }
-
             CreateNestedGroups(nestedDict);
         }
 
@@ -543,7 +540,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 currentDict = (Dictionary<string, object>)currentDict[keys[i]];
             }
-            currentDict[keys[keys.Length - 1]] = value;
+            currentDict[keys[^1]] = value;
         }
 
         /// <summary>
@@ -715,7 +712,7 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Roates the expand icon of a group.
+        /// Rotates the expand icon of a group.
         /// </summary>
         /// <param name="group">The group.</param>
         /// <param name="expanded">Whether the group should be expanded or not.</param>
@@ -737,8 +734,11 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="active">Whether the attributes should be active.</param>
         /// <param name="group">The group to which this attribute is to be assigned.
         /// Used only if the attribute is to be added to the group later.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
-            int level = 0, bool active = true, string group = null)
+        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>
+            (Dictionary<string, T> attributes,
+            int level = 0,
+            bool active = true,
+            string group = null)
         {
             Dictionary<string, (string, GameObject)> dict = new();
             foreach ((string name, T value) in attributes)
