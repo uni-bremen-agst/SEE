@@ -74,7 +74,7 @@ namespace SEE.UI.Window
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
 
             /// Disables the window dragger IDE buttons.
-            /// Note: If a sub class need the IDE buttons call <see cref="ActivateWindowDraggerButtons">
+            /// Note: If a sub class needs the IDE buttons, call <see cref="ActivateWindowDraggerButtons">
             DisableWindowDraggerButtons();
         }
 
