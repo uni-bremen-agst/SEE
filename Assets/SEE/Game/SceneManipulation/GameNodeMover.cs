@@ -63,7 +63,7 @@ namespace SEE.Game.SceneManipulation
 
             // Make sure mappingTarget stays within the roof of parent.
             {
-                Vector3 parentWorldExtent = target.WorldSpaceSize() / 2;
+                Vector3 parentWorldExtent = target.WorldSpaceScale() / 2;
 
                 // Fit child into x range of parent.
                 if (childPosition.x + childWorldExtent.x > target.transform.position.x + parentWorldExtent.x)

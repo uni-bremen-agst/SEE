@@ -32,7 +32,7 @@ namespace SEE.Utils
 
                 foreach (GameObject go in gameObjects)
                 {
-                    Vector3 extent = go.WorldSpaceSize() / 2.0f;
+                    Vector3 extent = go.WorldSpaceScale() / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = go.transform.position;
                     {
@@ -80,7 +80,7 @@ namespace SEE.Utils
             float result = float.NegativeInfinity;
             foreach (GameObject gameObject in gameObjects)
             {
-                float yTop = gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
+                float yTop = gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
                 if (yTop > result)
                 {
                     result = yTop;

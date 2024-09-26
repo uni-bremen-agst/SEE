@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions
                         && Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, nodeRef))
                     {
                         // Calculate position on object and close to the cursor
-                        Vector3 objectSize = contextMenuObjectToMove.WorldSpaceSize();
+                        Vector3 objectSize = contextMenuObjectToMove.WorldSpaceScale();
                         Vector3 objectPosition = contextMenuObjectToMove.transform.position;
                         Vector3 anchorPosition = targetObjectHit.Value.point;
                         anchorPosition.x = Mathf.Clamp(anchorPosition.x, objectPosition.x - 0.5f * objectSize.x, objectPosition.x + 0.5f * objectSize.x);
@@ -315,8 +315,8 @@ namespace SEE.Controls.Actions
             /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
             public readonly bool CanBePlaced()
             {
-                Vector3 scale = GrabbedGameObject.WorldSpaceSize();
-                Vector3 parentScale = NewParent.WorldSpaceSize();
+                Vector3 scale = GrabbedGameObject.WorldSpaceScale();
+                Vector3 parentScale = NewParent.WorldSpaceScale();
                 if (scale.x > parentScale.x
                     || scale.z > parentScale.z)
                 {
@@ -441,7 +441,7 @@ namespace SEE.Controls.Actions
                 {
                     return;
                 }
-                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(), targetPosition, targetGameObject);
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceScale(), targetPosition, targetGameObject);
                 MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
             }
 
