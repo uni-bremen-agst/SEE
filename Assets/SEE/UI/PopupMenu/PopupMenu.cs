@@ -198,9 +198,9 @@ namespace SEE.UI.PopupMenu
 
         /// <summary>
         /// Adds a new <paramref name="doubleIconAction"/> to the menu.
-        /// It can be used for sub popup menu's.
+        /// It can be used for popup sub-menus.
         /// </summary>
-        /// <param name="doubleIconAction">The sub menu to be added.</param>
+        /// <param name="doubleIconAction">The sub-smenu to be added.</param>
         private void AddDoubleIconAction(PopupMenuActionDoubleIcon doubleIconAction)
         {
             GameObject actionItem = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuSubMenuButton", actionList, false);
