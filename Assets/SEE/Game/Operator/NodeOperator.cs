@@ -208,7 +208,12 @@ namespace SEE.Game.Operator
         /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ResizeTo(Vector3 newLocalScale, Vector3 newPosition, float factor = 1, bool updateEdges = true, bool reparentChildren = true)
+        public IOperationCallback<Action> ResizeTo
+            (Vector3 newLocalScale,
+            Vector3 newPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool reparentChildren = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
@@ -228,22 +233,19 @@ namespace SEE.Game.Operator
                     }
                 }
                 reparent(tempParent);
-                // Debug.Log("Children: " + string.Join(", ", children.Select(item => item.name)));
             }
 
-            IOperationCallback<Action> animation =  new AndCombinedOperationCallback<Action>(new[]
-            {
-                positionX.AnimateTo(newPosition.x, duration),
-                positionY.AnimateTo(newPosition.y, duration),
-                positionZ.AnimateTo(newPosition.z, duration),
-                scale.AnimateTo(newLocalScale, duration)
-            }, a => a);
-            animation.OnComplete(() => {
-                reparent(originalParent);
-            });
-            animation.OnKill(() => {
-                reparent(originalParent);
-            });
+            IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
+                (new[]
+                  {
+                    positionX.AnimateTo(newPosition.x, duration),
+                    positionY.AnimateTo(newPosition.y, duration),
+                    positionZ.AnimateTo(newPosition.z, duration),
+                    scale.AnimateTo(newLocalScale, duration)
+                  },
+                 a => a);
+            animation.OnComplete(() => { reparent(originalParent); });
+            animation.OnKill(() => { reparent(originalParent); });
             return animation;
 
             void reparent(Transform newParent)
