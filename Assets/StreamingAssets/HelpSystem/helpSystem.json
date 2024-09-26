@@ -36,7 +36,7 @@
                                         },
                                         {
                                             "index": 3,
-                                            "text": "To change your view direction hold right click and move your mouse.",
+                                            "text": "To change your view direction keep the right mouse button pressed while moving your mouse.",
                                             "startPosition": 11
                                         },
                                         {
@@ -56,8 +56,8 @@
                             "MenuEntries": [
                                 {
                                     "type": "HelpSystemEntry",
-                                    "name": "Zoom into Code-Cities",
-                                    "description": "How to zoom into code-cities",
+                                    "name": "Zoom into Code Cities",
+                                    "description": "How to zoom into a code city",
                                     "color": "green",
                                     "video": "HelpSystem/Videos/Navigation/zoomIntoCodeCity.mp4",
                                     "HelpEntries": [
@@ -103,7 +103,7 @@
                                     "HelpEntries": [
                                         {
                                             "index": 1,
-                                            "text": "Initial the move mode is selected, if not press Space and left click on Move.",
+                                            "text": "Initially the move mode is selected. If not press Space and left click on Move.",
                                             "startPosition": 0
                                         },
                                         {
@@ -1105,7 +1105,7 @@
                                 },
                                 {
                                     "index": 2,
-                                    "text": "Add the provided IP-address and server port",
+                                    "text": "Add the provided IP address and server port",
                                     "startPosition": 14
                                 },
                                 {
