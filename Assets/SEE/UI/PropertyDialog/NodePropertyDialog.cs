@@ -59,7 +59,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The last chosen node type for the <see cref="AddNodeAction"/> mode.
         /// </summary>
-        private static string lastUsed;
+        private static string lastUsed = string.Empty;
 
         /// <summary>
         /// Creates and opens the dialog.
