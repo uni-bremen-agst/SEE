@@ -3,7 +3,6 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -93,13 +92,13 @@ namespace SEE.Game
                 {
                     reflexionCity.ReflexionGraph.RemoveFromMapping(source);
                 }
-                // TODO (falko17): This branch and the next branch can be merged as soon
+                // TODO (#785): This branch and the next branch can be merged as soon
                 // as the general Unparent and AddChild methods are implemented.
                 // This changes the node hierarchy in the implementation only.
                 if (source.Parent != null)
                 {
                     // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
-                    // TODO: Implement a proper transaction model for the reflexion analysis.
+                    // TODO (#785): Implement a proper transaction model for the reflexion analysis.
                     reflexionCity.ReflexionGraph.UnparentInImplementation(source);
                 }
                 reflexionCity.ReflexionGraph.AddChildInImplementation(source, target);
@@ -108,7 +107,7 @@ namespace SEE.Game
             // architecture -> architecture
             else if (source.IsInArchitecture() && target.IsInArchitecture())
             {
-                // TODO (falko17): This branch and the previous branch can be merged as soon
+                // TODO (#785): This branch and the previous branch can be merged as soon
                 // as the general Unparent and AddChild methods are implemented.
                 // This changes the node hierarchy in the architecture only.
                 if (source.Parent != null)
