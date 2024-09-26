@@ -150,12 +150,12 @@ namespace SEE.Controls.Actions
         /// Because we may have multiple code cities in the scene, there is not only one such
         /// root node.
         /// </summary>
-        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new();
 
         /// <summary>
         /// The node operator for every root transform of a city.
         /// </summary>
-        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new Dictionary<Transform, NodeOperator>();
+        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new();
 
         /// <summary>
         /// Factor to apply to the animation.
@@ -210,7 +210,7 @@ namespace SEE.Controls.Actions
                     Vector3 targetPosition = zoomState.OriginalPosition;
                     if (!resetPosition)
                     {
-                        Vector3 averagePosition = new Vector3(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
+                        Vector3 averagePosition = new(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
                         Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
                         Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
                         targetPosition = rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, nodeOperator.TargetScale);
