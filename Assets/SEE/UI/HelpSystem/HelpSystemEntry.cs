@@ -381,7 +381,14 @@ namespace SEE.UI.HelpSystem
             Destroyer.Destroy(helpSystemSpace);
         }
 
+        /// <summary>
+        /// The icon for playing the video.
+        /// </summary>
         private Sprite playIcon;
+
+        /// <summary>
+        /// The icon for pausing the video.
+        /// </summary>
         private Sprite pauseIcon;
 
         /// <summary>
