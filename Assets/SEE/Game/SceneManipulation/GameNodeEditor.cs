@@ -67,12 +67,15 @@ namespace SEE.Game.SceneManipulation
         }
 
         /// <summary>
-        /// Returns the text object of a node game object.
+        /// Returns the text object of <paramref name="go"/>. This is the first child of
+        /// <paramref name="go"/> that has a <see cref="TextMeshPro"/> component and whose
+        /// name contains 'Text'.
         /// </summary>
-        /// <returns>The text object.</returns>
-        private static GameObject GetText(GameObject node)
+        /// <param name="go">the game object whose text object is requested</param>
+        /// <returns>The text object or null if there is no such object.</returns>
+        private static GameObject GetText(GameObject go)
         {
-            foreach (Transform transform in node.transform)
+            foreach (Transform transform in go.transform)
             {
                 if (transform.name.Contains("Text") && transform.GetComponent<TextMeshPro>() != null)
                 {
