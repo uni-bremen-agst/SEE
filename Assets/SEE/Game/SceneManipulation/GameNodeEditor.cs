@@ -9,7 +9,7 @@ using UnityEngine;
 namespace SEE.Game.SceneManipulation
 {
     /// <summary>
-    /// Edits a node.
+    /// Provides methods to edit a node, that is, to change its name or type.
     /// </summary>
     public class GameNodeEditor
     {
@@ -47,14 +47,7 @@ namespace SEE.Game.SceneManipulation
             AbstractSEECity city = nodeObject.ContainingCity();
 
             ShouldAddTextObject(node);
-            if (city.NodeTypes[node.Type].ShowNames)
-            {
-                GetText(nodeObject)?.SetActive(true);
-            }
-            else
-            {
-                GetText(nodeObject)?.SetActive(false);
-            }
+            GetText(nodeObject)?.SetActive(city.NodeTypes[node.Type].ShowNames);
 
             if (city.Renderer is GraphRenderer renderer)
             {
