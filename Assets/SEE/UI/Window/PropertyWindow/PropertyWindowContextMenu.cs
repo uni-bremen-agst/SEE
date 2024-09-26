@@ -68,7 +68,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public PropertyWindowContextMenu(PopupMenu.PopupMenu contextMenu, UnityEvent rebuild,
+        public PropertyWindowContextMenu
+            (PopupMenu.PopupMenu contextMenu,
+            UnityEvent rebuild,
             ButtonManagerBasic filterButton,
             ButtonManagerBasic sortButton,
             ButtonManagerBasic groupButton)
@@ -151,7 +153,8 @@ namespace SEE.UI.Window.PropertyWindow
         }
 
         /// <summary>
-        /// Returns the icon for a checkbox.
+        /// Returns the icon for a checkbox. If <paramref name="value"/> is false,
+        /// <see cref="Icons.EmptyCheckbox"/> is returned; otherwise, <see cref="Icons.CheckedCheckbox"/>.
         /// </summary>
         /// <param name="value">Whether the checkbox is checked.</param>
         /// <returns>The icon for a checkbox.</returns>
@@ -312,6 +315,8 @@ namespace SEE.UI.Window.PropertyWindow
 
         /// <summary>
         /// Returns a radio button icon for the given <paramref name="value"/>.
+        /// If <paramref name="value"/> is true, <see cref="Icons.CheckedRadio"/> is returned;
+        /// otherwise <see cref="Icons.EmptyRadio"/> is returned.
         /// </summary>
         /// <param name="value">Whether the radio button is checked.</param>
         /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
