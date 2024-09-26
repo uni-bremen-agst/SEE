@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions
             // The node is scaled down and placed on top of its parent.
             addedGameNode.transform.localScale = new Vector3(0.2f, 0.2f, 0.2f);
             addedGameNode.transform.position = GameNodeMover.GetCoordinatesOn(addedGameNode.transform.lossyScale, position, parent);
-            // TODO The new node is scaled down arbitrarily and might overlap with its siblings.
+            // TODO(#786) The new node is scaled down arbitrarily and might overlap with its siblings.
             memento = new(child: addedGameNode, parent: parent)
             {
                 NodeID = addedGameNode.name
