@@ -55,8 +55,8 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             Node node = Find(NodeID).GetNode();
-            GameEditNode.ChangeName(node, SourceName);
-            GameEditNode.ChangeType(node, NodeType);
+            GameNodeEditor.ChangeName(node, SourceName);
+            GameNodeEditor.ChangeType(node, NodeType);
         }
     }
 }

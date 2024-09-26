@@ -87,7 +87,7 @@ namespace SEE.UI.PropertyDialog
             {
                 if (node.Type != lastUsed)
                 {
-                    GameEditNode.ChangeType(node, lastUsed);
+                    GameNodeEditor.ChangeType(node, lastUsed);
                     new EditNodeNetAction(node.ID, node.SourceName, lastUsed).Execute();
                 }
                 nodeType.Value = lastUsed;
@@ -120,8 +120,8 @@ namespace SEE.UI.PropertyDialog
             /// </summary>
             void OKButtonPressed()
             {
-                GameEditNode.ChangeName(node, nodeName.Value);
-                GameEditNode.ChangeType(node, nodeType.Value);
+                GameNodeEditor.ChangeName(node, nodeName.Value);
+                GameNodeEditor.ChangeType(node, nodeType.Value);
 
                 /// Updates the <see cref="lastUsed"/> attribute.
                 if (useLastUsed)

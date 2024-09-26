@@ -169,8 +169,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            GameEditNode.ChangeName(memento.Node, memento.OriginalName);
-            GameEditNode.ChangeType(memento.Node, memento.OriginalType);
+            GameNodeEditor.ChangeName(memento.Node, memento.OriginalName);
+            GameNodeEditor.ChangeType(memento.Node, memento.OriginalType);
             NotifyClients(memento.Node);
         }
 
@@ -180,8 +180,8 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            GameEditNode.ChangeName(memento.Node, memento.NewName);
-            GameEditNode.ChangeType(memento.Node, memento.NewType);
+            GameNodeEditor.ChangeName(memento.Node, memento.NewName);
+            GameNodeEditor.ChangeType(memento.Node, memento.NewType);
             NotifyClients(memento.Node);
         }
 

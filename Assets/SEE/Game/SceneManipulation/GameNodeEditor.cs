@@ -11,7 +11,7 @@ namespace SEE.Game.SceneManipulation
     /// <summary>
     /// Edits a node.
     /// </summary>
-    public class GameEditNode
+    public class GameNodeEditor
     {
         /// <summary>
         /// Changes the name of a node.

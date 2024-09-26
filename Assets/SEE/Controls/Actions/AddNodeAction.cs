@@ -264,8 +264,8 @@ namespace SEE.Controls.Actions
                 if (!string.IsNullOrEmpty(memento.Type))
                 {
                     Node node = addedGameNode.GetNode();
-                    GameEditNode.ChangeName(node, memento.Name);
-                    GameEditNode.ChangeType(node, memento.Type);
+                    GameNodeEditor.ChangeName(node, memento.Name);
+                    GameNodeEditor.ChangeType(node, memento.Type);
                     new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
                 }
             }
