@@ -268,6 +268,13 @@ namespace SEE.Controls.Actions
             }
         }
 
+        /// <summary>
+        /// Added as a component to a game object, this will add handles for manual resize.
+        /// <para>
+        /// The <see cref="OnSizeChanged"/> event is emitted each time the user finishes a resize
+        /// step. To conclude the resize process, the component should be destroyed.
+        /// </para>
+        /// </summary>
         private class ResizeGizmo : MonoBehaviour
         {
             /// <summary>
