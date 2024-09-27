@@ -278,7 +278,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="AcceptDivergenceAction"/> from the context menu.
         /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>
-        /// and ensures that the <see cref="Update"/> method performs the external execution.
+        /// and ensures that the <see cref="Update"/> method performs the execution via context menu.
         /// </summary>
         /// <param name="divergence">the edge representing the divergence</param>
         /// <returns>the new edge</returns>
@@ -294,6 +294,12 @@ namespace SEE.Controls.Actions
             return createdEdge;
         }
 
+        /// <summary>
+        /// Used to execute the <see cref="AcceptDivergenceAction"/> from the context menu in multiselection mode.
+        /// Creates new edges in the architecture to allow the given <paramref name="divergences"/> and ensures
+        /// that the <see cref="Update"/> method perfoms the execution via context menu.
+        /// </summary>
+        /// <param name="divergences">The edges representing the divergences.</param>
         public void ContextMenuExection(IList<Edge> divergences)
         {
             ExecuteViaContextMenu = true;

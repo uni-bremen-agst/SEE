@@ -797,6 +797,11 @@ namespace SEE.UI.Window.PropertyWindow
             return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
+        /// <summary>
+        /// Returns the value of a node attribute.
+        /// </summary>
+        /// <param name="propertyRow">a game object representing a pair of an attribute name and an attribute value.</param>
+        /// <returns>value of the node attribute or the name of the node attribute if it does not have a value (SubMenuButton). </returns>
         private string AttributeValue(GameObject propertyRow)
         {
             return Value(propertyRow) != null ? Value(propertyRow).text : AttributeName(propertyRow);

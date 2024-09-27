@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
         protected IReversibleAction.Progress CurrentState = IReversibleAction.Progress.NoEffect;
 
         /// <summary>
-        /// Whether the action was executed via context menu.
+        /// Whether the action is executed through the context menu.
         /// </summary>
         public bool ExecuteViaContextMenu { get; set; } = false;
 

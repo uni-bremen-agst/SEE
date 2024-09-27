@@ -414,7 +414,7 @@ namespace SEE.UI.Window.TreeWindow
                                     }, Icons.Hide)
                             };
                             IEnumerable<PopupMenuEntry> actions = ContextMenuAction
-                                                                   .GetOptionsForTreeView(contextMenu.contextMenu,
+                                                                   .GetOptionsForTreeView(contextMenu.ContextMenu,
                                                                                          e.position,
                                                                                          representedGraphElement,
                                                                                          representedGameObject,

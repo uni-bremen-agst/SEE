@@ -177,7 +177,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Used to execute the <see cref="AddEdgeAction"/> from the context menu.
-        /// It ensures that the <see cref="Update"/> method performs the external execution.
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu.
         /// </summary>
         /// <param name="source">Is the source node of the edge.</param>
         public void ContextMenuExecution(GameObject source)

@@ -160,15 +160,16 @@ namespace SEE.UI.PopupMenu
                 default:
                     throw new System.ArgumentException($"Unknown entry type: {entry.GetType()}");
             }
-
-            // TODO (#668): Respect priority
         }
 
         /// <summary>
         /// Adds a new <paramref name="action"/> to the menu.
         /// </summary>
         /// <param name="action">The action to be added.</param>
-        /// <param name="actionItem">Whether the standard item for the action entry should be used.</param>
+        /// <param name="actionItem">The item to be added to the PopupMenu.
+        /// If the default item is to be added, null should be used.
+        /// Another item can be, for example, the SubMenuButton.
+        /// </param>
         private void AddAction(PopupMenuAction action, GameObject actionItem = null)
         {
             actionItem ??= PrefabInstantiator.InstantiatePrefab("Prefabs/UI/PopupMenuButton", actionList, false);

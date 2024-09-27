@@ -193,7 +193,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="DeleteAction"> from the context menu.
         /// It sets the object to be deleted and ensures that the <see cref="Update"/> method
-        /// performs the external execution.
+        /// performs the execution via context menu.
         /// </summary>
         /// <param name="toDelete">The object to be deleted.</param>
         public void ContextMenuExecution(GameObject toDelete)
@@ -206,7 +206,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="DeleteAction"/> from the multiselection context menu.
         /// It sets the objects to be deleted and ensures that the <see cref="Update"/> method
-        /// performs the external execution.
+        /// performs the execution via context menu.
         /// </summary>
         /// <param name="toDelete">The objects to be deleted.</param>
         public void ContextMenuExecution(IEnumerable<GameObject> toDelete)
