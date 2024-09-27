@@ -345,7 +345,7 @@ namespace SEE.GO
         /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
         public static float GetRoof(this GameObject gameObject)
         {
-            return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+            return gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
         }
 
         /// <summary>
@@ -356,7 +356,7 @@ namespace SEE.GO
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
             Vector3 result = gameObject.transform.position;
-            result.y += gameObject.WorldSpaceScale().y / 2.0f;
+            result.y += gameObject.WorldSpaceSize().y / 2.0f;
             return result;
         }
 
@@ -368,7 +368,7 @@ namespace SEE.GO
         public static Vector3 GetGroundCenter(this GameObject gameObject)
         {
             Vector3 result = gameObject.transform.position;
-            result.y -= gameObject.WorldSpaceScale().y / 2.0f;
+            result.y -= gameObject.WorldSpaceSize().y / 2.0f;
             return result;
         }
 
@@ -434,14 +434,23 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the scale of the given <paramref name="gameObject"/> in world space.
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// <para>
+        /// This is a shorthand to get the <c>bounds.size</c> of the <see cref="Renderer"/> component, if present.
+        /// This value reflects the actual world-space bounds of the cuboid that contains the rendered object.
+        /// </para><para>
+        /// This value should often be used instead of the <c>transform.lossyScale</c> because the scale only reflects
+        /// the size for objects with a standardized size like cube primitives.
+        /// </para><para>
+        /// Local-space counterpart: <see cref="LocalSize"/>
+        /// </para>
         /// </summary>
         /// <remarks>
         /// If the game object has no renderer, its <c>lossyScale</c> is returned.
         /// </remarks>
         /// <param name="gameObject">object whose scale is requested</param>
-        /// <returns>scale of given <paramref name="gameObject"/></returns>
-        public static Vector3 WorldSpaceScale(this GameObject gameObject)
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceSize(this GameObject gameObject)
         {
             // For some objects, such as capsules, lossyScale gives wrong results.
             // The more reliable option to determine the scale is using the
@@ -458,17 +467,23 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the scale of the given <paramref name="gameObject"/> in local space,
+        /// Returns the size of the given <paramref name="gameObject"/> in local space,
         /// i.e., in relation to its parent.
+        /// <para>
+        /// This value should often be used instead of the <c>transform.localScale</c> because the scale only reflects
+        /// the size for objects with a standardized size like cube primitives.
+        /// </para><para>
+        /// World-space counterpart: <see cref="WorldSpaceSize"/>
+        /// </para>
         /// </summary>
         /// <remarks>
         /// If the game object has no renderer, its <c>localScale</c> is returned.
         /// </remarks>
         /// <param name="gameObject">object whose scale is requested</param>
-        /// <returns>scale of given <paramref name="gameObject"/></returns>
-        public static Vector3 LocalScale(this GameObject gameObject)
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 LocalSize(this GameObject gameObject)
         {
-            // For some objects, such as capsules, lossyScale gives wrong results.
+            // For some objects, such as capsules, localScale gives wrong results.
             // The more reliable option to determine the scale is using the
             // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))

@@ -404,10 +404,10 @@ namespace SEE.Controls.Actions
                                                Vector3.right + Vector3.forward, Vector3.right + Vector3.back,
                                                Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
                 Vector3 position = transform.position;
-                Vector3 scale = gameObject.WorldSpaceScale();
+                Vector3 size = gameObject.WorldSpaceSize();
                 foreach (Vector3 direction in directions)
                 {
-                    handles[CreateHandle(direction, position, scale)] = direction;
+                    handles[CreateHandle(direction, position, size)] = direction;
                 }
             }
 
@@ -525,7 +525,7 @@ namespace SEE.Controls.Actions
                 // Correct sibling overlap
                 foreach (Transform sibling in siblings)
                 {
-                    Vector3 siblingSize = sibling.gameObject.LocalScale();
+                    Vector3 siblingSize = sibling.gameObject.LocalSize();
                     Vector3 siblingPos = sibling.localPosition;
                     // A small offset of 0.0001f is used as a difference between the detection and the set value.
                     otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
@@ -589,7 +589,7 @@ namespace SEE.Controls.Actions
                 {
                     // Child position and scale on common parent
                     Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
-                    Vector3 childSize = Vector3.Scale(child.gameObject.LocalScale(), transform.localScale);
+                    Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
                     otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
                     otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
                     otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
@@ -723,7 +723,7 @@ namespace SEE.Controls.Actions
                     InitialHitPoint = initialHitPoint;
                     Direction = direction;
                     InitialLocalPosition = transform.localPosition;
-                    InitialLocalSize = transform.gameObject.LocalScale();
+                    InitialLocalSize = transform.gameObject.LocalSize();
                     Vector3 localScale = transform.localScale;
                     ScaleSizeFactor = new (
                         InitialLocalSize.x / localScale.x,
