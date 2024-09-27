@@ -592,7 +592,6 @@ namespace SEE.Controls.Actions
                     // Child position and scale on common parent
                     Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                     Vector3 childSize = Vector3.Scale(child.gameObject.LocalScale(), transform.localScale);
-                    Debug.Log($"{child.localScale} vs. {child.gameObject.LocalScale()}");
                     otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
                     otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
                     otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
