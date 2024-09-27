@@ -473,7 +473,6 @@ namespace SEE.Controls.Actions
                         siblings.Add(sibling);
                     }
                 }
-                // Debug.Log("Siblings: " + string.Join(", ", siblings.Select(item => item.name)));
 
                 // Collect children
                 List<Transform> children = new (transform.childCount);
@@ -484,7 +483,6 @@ namespace SEE.Controls.Actions
                         children.Add(child);
                     }
                 }
-                // Debug.Log("Children: " + string.Join(", ", children.Select(item => item.name)));
 
                 // Calculate new scale and position
                 Vector3 hitPoint = targetObjectHit.Value.point;
