@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.Delete);
                 DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject));
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void AcceptDivergence()
@@ -187,7 +187,7 @@ namespace SEE.Controls.Actions
                     }
                 }
                 action.ContextMenuExection(divergences);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void ShowProperties()
@@ -408,7 +408,7 @@ namespace SEE.Controls.Actions
                     GlobalActionHistory.Execute(ActionStateTypes.Delete);
                     DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
                     action.ContextMenuExecution(gameObject);
-                    ExcecutePreviousActionAsync(action, previousAction);
+                    _ = ExcecutePreviousActionAsync(action, previousAction);
                 }
                 else
                 {
@@ -570,7 +570,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void RotateNode()
@@ -580,7 +580,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void NewNode()
@@ -589,7 +589,7 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.NewNode);
                 AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void NewEdge()
@@ -599,7 +599,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 AddEdgeAction action = (AddEdgeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void EditNode()
@@ -609,7 +609,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 EditNodeAction action = (EditNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(node);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void ResizeNode()
@@ -619,7 +619,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 ResizeNodeAction action = (ResizeNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
 
             void ScaleNode()
@@ -629,7 +629,7 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 ScaleNodeAction action = (ScaleNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
         }
 
@@ -710,7 +710,7 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(edge);
-                ExcecutePreviousActionAsync(action, previousAction);
+                _ = ExcecutePreviousActionAsync(action, previousAction);
             }
         }
         #endregion

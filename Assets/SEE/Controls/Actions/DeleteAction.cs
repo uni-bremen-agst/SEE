@@ -83,20 +83,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The graph element (a game object representing a node or edge) that was
-        /// hit by the user for deletion. Set in <see cref="Update"/>.
+        /// The graph elements (a game object representing a node or edge) that was
+        /// chosen by the user for deletion.
         /// </summary>
-        private GameObject hitGraphElement;
-
-        /// <summary>
-        /// The graph elements to be deleted.
-        /// </summary>
-        private List<GameObject> hitGraphElements;
-
-        /// <summary>
-        /// Whether the context menu was executed in multiselection mode.
-        /// </summary>
-        private bool multiselection = false;
+        private List<GameObject> hitGraphElements = new ();
 
         /// <summary>
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion
@@ -108,7 +98,7 @@ namespace SEE.Controls.Actions
         /// are deleted and contained in this set. This set will always include the
         /// explicitly selected node to be deleted.
         ///
-        /// The <see cref="hitGraphElement"/> will always be included in this set
+        /// The <see cref="hitGraphElements"/> will always be included in this set
         /// unless it is null.
         ///
         /// Note that we will not actually destroy the deleted objects for the time
@@ -130,20 +120,12 @@ namespace SEE.Controls.Actions
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
-                hitGraphElement = raycastHit.collider.gameObject;
-                multiselection = false;
+                hitGraphElements.Add(raycastHit.collider.gameObject);
                 return Delete(); // the selected objects are deleted and this action is done now
             }
             else if (ExecuteViaContextMenu)
             {
-                if (!multiselection)
-                {
-                    return Delete();
-                }
-                else
-                {
-                    return MultiDelete();
-                }
+                return Delete();
             }
             else
             {
@@ -156,21 +138,6 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>true if the deletion can be executed.</returns>
         private bool Delete()
-        {
-            Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
-            InteractableObject.UnselectAll(true);
-            (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
-            new DeleteNetAction(hitGraphElement.name).Execute();
-            CurrentState = IReversibleAction.Progress.Completed;
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-            return true;
-        }
-
-        /// <summary>
-        /// Executes the multi deletion.
-        /// </summary>
-        /// <returns>true if the deletion can be executed.</returns>
-        private bool MultiDelete()
         {
             deletedGameObjects = new HashSet<GameObject>();
             InteractableObject.UnselectAll(true);
@@ -198,9 +165,7 @@ namespace SEE.Controls.Actions
         /// <param name="toDelete">The object to be deleted.</param>
         public void ContextMenuExecution(GameObject toDelete)
         {
-            ExecuteViaContextMenu = true;
-            multiselection = false;
-            hitGraphElement = toDelete;
+            ContextMenuExecution(new List<GameObject> { toDelete });
         }
 
         /// <summary>
@@ -212,7 +177,6 @@ namespace SEE.Controls.Actions
         public void ContextMenuExecution(IEnumerable<GameObject> toDelete)
         {
             ExecuteViaContextMenu = true;
-            multiselection = true;
             hitGraphElements = toDelete.ToList();
         }
 
@@ -232,22 +196,14 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            if (!multiselection)
+            foreach (GameObject go in hitGraphElements)
             {
-                GameElementDeleter.Delete(hitGraphElement);
-                new DeleteNetAction(hitGraphElement.name).Execute();
-            }
-            else
-            {
-                foreach (GameObject go in hitGraphElements)
+                if (go.IsRoot())
                 {
-                    if (go.IsRoot())
-                    {
-                        continue;
-                    }
-                    GameElementDeleter.Delete(go);
-                    new DeleteNetAction(go.name).Execute();
+                    continue;
                 }
+                _ = GameElementDeleter.Delete(go);
+                new DeleteNetAction(go.name).Execute();
             }
         }
 
