@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void OnSelectionChanged(InteractableObject interactableObject)
         {
-            // FIXME Interactable object is deselected when a handle is clicked, so we cannot stop here…
+            // Interactable object is deselected when a handle is clicked, so we cannot stop here…
             if (!interactableObject.IsSelected || InteractableObject.SelectedObjects.Count != 1)
             {
                 return;
