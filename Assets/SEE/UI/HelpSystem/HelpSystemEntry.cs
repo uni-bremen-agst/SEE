@@ -139,6 +139,12 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         protected override void StartDesktop()
         {
+            /// Note: <see cref="GetTextField()"/> called below accesses <see cref="helpSystemEntry"/>
+            /// that is why we need to instantiate it first.
+            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+            helpSystemSpace.SetActive(false);
+            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            helpSystemEntry.SetActive(false);
             instructionsDisplay = GetTextField();
         }
 
@@ -243,8 +249,8 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
-            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
-            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            helpSystemSpace.SetActive(true);
+            helpSystemEntry.SetActive(true);
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
