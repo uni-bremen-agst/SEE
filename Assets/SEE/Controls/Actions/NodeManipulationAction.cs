@@ -235,7 +235,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Used to execute the <see cref="NodeManipulationAction{T}"/> from the context menu.
-        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu for
         /// the selected game object <paramref name="obj"/>.
         /// </summary>
         /// <param name="obj">The object to be modify.</param>

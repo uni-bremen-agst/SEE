@@ -164,7 +164,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="AddNodeAction"/> from the context menu.
         /// Calls <see cref="AddNode"/> and ensures that the <see cref="Update"/> method
-        /// performs the external execution.
+        /// performs the execution via context menu.
         /// </summary>
         /// <param name="parent">The parent node.</param>
         /// <param name="position">The position where the node should be placed.</param>

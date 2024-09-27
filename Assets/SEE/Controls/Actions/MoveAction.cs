@@ -197,7 +197,7 @@ namespace SEE.Controls.Actions
 
         /// <summary>
         /// Used to execute the <see cref="MoveAction"/> from the context menu.
-        /// It ensures that the <see cref="Update"/> method performs the external execution for
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu for
         /// the selected game object <paramref name="objToMove"/>.
         /// </summary>
         /// <param name="objToMove">The object to be moved.</param>
