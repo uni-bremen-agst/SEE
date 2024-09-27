@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using SEE.Controls;
+using SEE.Controls.KeyActions;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using UnityEngine;
@@ -36,9 +37,9 @@ namespace SEE.UI.HelpSystem
         private NestedListMenu mainMenu;
 
         /// <summary>
-        /// Filepath containing json with information to build HelpSystem
+        /// File path the necessary information for the help system (in JSON).
         /// </summary>
-        private string jsonFilePath = Application.streamingAssetsPath + "/HelpSystem/helpSystem.json";
+        private readonly string jsonFilePath = Application.streamingAssetsPath + "/HelpSystem/helpSystem.json";
 
         /// <summary>
         /// Creates the menu.
@@ -46,11 +47,18 @@ namespace SEE.UI.HelpSystem
         private void Start()
         {
             mainMenu = CreateStartMenu(jsonFilePath);
-            ShowNotification.Info("HelpSystem", "Press H to open HelpSystem.");
+            if (KeyBindings.TryGetKeyCode(KeyAction.Help, out KeyCode helpKey))
+            {
+                ShowNotification.Info("Help System", $"Press {helpKey} to open help system.");
+            }
+            else
+            {
+                ShowNotification.Warn("Help System", "No keybinding for help system found.");
+            }
         }
 
         /// <summary>
-        /// Shows the help menu when the user requests help and content is provided by json file.
+        /// Shows the help menu when the user requests help and content is provided by <see cref="jsonFilePath"/>.
         /// </summary>
         private void Update()
         {
@@ -58,7 +66,9 @@ namespace SEE.UI.HelpSystem
             {
                 if (!System.IO.File.Exists(jsonFilePath))
                 {
-                    ShowNotification.Error("Missing HelpSystem", "There is no content for the HelpSystem yet.");
+                    ShowNotification.Error("Missing Help System",
+                        $"There is no content for the help system yet. File {jsonFilePath} is missing.");
+                    return;
                 }
                 if (!mainMenu.ShowMenu)
                 {
@@ -94,8 +104,9 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// Parses json object and recursive build inner nodes (MenuEntries). When it arrives at a outer node it calls
-        /// BuildHelpEntriesFromJson for tutorial-like HelpEntries.
+        /// Parses <paramref name="jsonNode"/> and recursively build inner nodes (MenuEntries).
+        /// When it arrives at an outer node, it calls <see cref="BuildHelpEntriesFromJson"/>
+        /// for tutorial-like <see cref="HelpEntry"/>s.
         /// </summary>
         /// <param name="jsonNode">Json object of current level of the menu hierarchy.</param>
         /// <param name="parentEntry">Parent to attach the entries.</param>
@@ -104,7 +115,7 @@ namespace SEE.UI.HelpSystem
         {
             List<MenuEntry> menuEntries = new();
 
-            foreach (var entry in jsonNode["MenuEntries"] ?? new JObject())
+            foreach (JToken entry in jsonNode["MenuEntries"] ?? new JObject())
             {
                 JObject node = (JObject)entry;
 
@@ -136,15 +147,15 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// Get information and build tutorial-like HelpEntry.
+        /// Gets information and builds tutorial-like <see cref="HelpEntry"/>.
         /// </summary>
-        /// <param name="helpSystemNode">Node to attach the </param>
-        /// <returns>The helpEntries containing the explaining information</returns>
+        /// <param name="helpSystemNode">Node to attach the entry to</param>
+        /// <returns>The help entries containing the explaining information</returns>
         private static LinkedList<HelpEntry> BuildHelpEntriesFromJson(JObject helpSystemNode)
         {
             LinkedList<HelpEntry> helpEntries = new();
 
-            foreach (var entry in helpSystemNode["HelpEntries"] ?? new JArray())
+            foreach (JToken entry in helpSystemNode["HelpEntries"] ?? new JArray())
             {
                 JObject entryNode = (JObject)entry;
                 int index = (int)entryNode["index"];
@@ -157,7 +168,6 @@ namespace SEE.UI.HelpSystem
             return helpEntries;
         }
 
-
         /// <summary>
         /// Converts some color name strings to a Unity Color object.
         /// </summary>
@@ -165,23 +175,20 @@ namespace SEE.UI.HelpSystem
         /// <returns>Unity Color object.</returns>
         private static Color ColorFromName(string colorName)
         {
-            if (string.IsNullOrEmpty(colorName)) return Color.white;
-
-            switch (colorName.ToLower())
+            if (string.IsNullOrWhiteSpace(colorName))
             {
-                case "magenta":
-                    return Color.magenta;
-                case "red":
-                    return Color.red;
-                case "blue":
-                    return Color.blue;
-                case "cyan":
-                    return Color.cyan;
-                case "green":
-                    return Color.green;
-                default:
-                    return Color.white;
+                return Color.white;
             }
+
+            return colorName.ToLower() switch
+            {
+                "magenta" => Color.magenta,
+                "red" => Color.red,
+                "blue" => Color.blue,
+                "cyan" => Color.cyan,
+                "green" => Color.green,
+                _ => Color.white,
+            };
         }
 
         /// <summary>
