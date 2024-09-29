@@ -23,7 +23,7 @@ namespace SEE.Game.Drawable
             effect.outline = 1;
             effect.outlineQuality = HighlightPlus.QualityLevel.Highest;
             effect.outlineColor = Color.yellow;
-            effect.glowQuality = HighlightPlus.QualityLevel.Highest;
+            effect.glowQuality = Highlighter.DefaultGlowQuality;
             effect.glow = 1.0f;
             effect.glowHQColor = Color.yellow;
             return effect;
@@ -40,7 +40,7 @@ namespace SEE.Game.Drawable
             effect.highlighted = true;
             effect.previewInEditor = false;
             effect.outline = 0;
-            effect.glowQuality = HighlightPlus.QualityLevel.Highest;
+            effect.glowQuality = Highlighter.DefaultGlowQuality;
             effect.glow = 1.0f;
             effect.glowHQColor = Color.yellow;
             effect.overlay = 1.0f;
