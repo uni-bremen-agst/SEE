@@ -5,6 +5,7 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -141,7 +142,7 @@ namespace SEE.Controls.Actions
                         // we have both source and target of the edge and use a memento struct
                         // to remember which edge we have added
                         memento = new Memento(source, target, Edge.SourceDependency);
-
+                        mementoList.Add(memento);
                         // create the edge
                         createdEdgeList.Add(CreateConvergentEdge(memento));
 
@@ -253,7 +254,7 @@ namespace SEE.Controls.Actions
         public void ContextMenuExecution(Edge divergence)
         {
             ExecuteViaContextMenu = true;
-            CreateMementoAndConvergentEdge(divergence);
+            mementoList.Add(CreateMementoAndConvergentEdge(divergence));
         }
 
         /// <summary>
