@@ -64,7 +64,7 @@ namespace SEE.UI.Window
         {
             if (panels.Count > 0 && ActiveWindow != null && ActiveWindow.Window != null)
             {
-                if (!windows.Contains(ActiveWindow) && windows.Count > 0)
+                if (!windows.Contains(ActiveWindow))
                 {
                     Debug.LogWarning("Active window is not part of available windows. Resetting to previous entry.\n");
                     if (ActiveWindow == currentActiveWindow)

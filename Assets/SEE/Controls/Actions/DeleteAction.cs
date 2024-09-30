@@ -83,7 +83,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The graph elements (a game object representing a node or edge) that was
+        /// The graph elements (game objects, each representing a node or edge) that were
         /// chosen by the user for deletion.
         /// </summary>
         private List<GameObject> hitGraphElements = new ();
@@ -97,9 +97,6 @@ namespace SEE.Controls.Actions
         /// node including edges whose source or target is contained in the subtree
         /// are deleted and contained in this set. This set will always include the
         /// explicitly selected node to be deleted.
-        ///
-        /// The <see cref="hitGraphElements"/> will always be included in this set
-        /// unless it is null.
         ///
         /// Note that we will not actually destroy the deleted objects for the time
         /// being to be able to revert the deletion. Instead the objects will simply be set

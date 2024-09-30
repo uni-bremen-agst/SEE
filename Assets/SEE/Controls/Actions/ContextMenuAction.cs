@@ -258,8 +258,8 @@ namespace SEE.Controls.Actions
         /// <param name="position">The context menu position.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
-        /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>Options available for the given graph element</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
         public static IEnumerable<PopupMenuAction> GetOptionsForTreeView
             (PopupMenu popupMenu,
@@ -283,8 +283,8 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
-        /// <returns>Options available for the given graph element</returns>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <returns>Options available for the given graph element</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
         private static IEnumerable<PopupMenuEntry> GetApplicableOptions
             (PopupMenu popupMenu,
@@ -312,7 +312,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="graphElement">The graph element to get the options for</param>
         /// <param name="gameObject">The game object that the graph element is attached to</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
         /// <returns>Common options available for all graph elements</returns>
         private static IEnumerable<PopupMenuEntry> GetCommonOptions
             (PopupMenu popupMenu,
@@ -412,8 +412,6 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    // TODO: Test the case. I'm not sure when this case would be triggered.
-                    // It should be better documented how this case could occur.
                     ConfirmDialogMenu confirm = new($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
                     confirm.ExecuteAfterConfirmAsync(() => graphElement.ItsGraph.RemoveElement(graphElement)).Forget();
                 }
@@ -458,7 +456,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="node">The node to get the show options for</param>
         /// <param name="gameObject">The game object that the node is attached to</param>
-        /// <param name="openViaTreeView">Whether the popup menu was opened via context menu.</param>
+        /// <param name="openViaTreeView">Whether the popup menu was opened via tree view.</param>
         /// <returns>Show options available for the given node</returns>
         private static IEnumerable<PopupMenuEntry> GetNodeShowOptions(Node node, GameObject gameObject, bool openViaTreeView)
         {
@@ -533,7 +531,7 @@ namespace SEE.Controls.Actions
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="node">The node to get the options for</param>
         /// <param name="gameObject">The game object that the node is attached to</param>
-        /// <param name="appendActions">Actions to be append at the end of the entries.</param>
+        /// <param name="appendActions">Actions to be appended at the end of the entries.</param>
         /// <returns>Options available for the given node</returns>
         private static IEnumerable<PopupMenuEntry> GetNodeOptions(PopupMenu popupMenu, Vector3 position, Vector3 raycastHitPosition,
             Node node, GameObject gameObject, IEnumerable<PopupMenuAction> appendActions)
@@ -559,7 +557,7 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            return node.IsRoot()? new List<PopupMenuEntry>() { } :
+            return node.IsRoot() ? new List<PopupMenuEntry>() { } :
                 new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
                     "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
 
@@ -797,7 +795,7 @@ namespace SEE.Controls.Actions
         /// Creates a sub menu for the context menu.
         /// </summary>
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
-        /// <param name="position">The position to be displayed the popup menu.</param>
+        /// <param name="position">The position to be displayed in the popup menu.</param>
         /// <param name="raycastHitPosition">The position of the raycast hit.</param>
         /// <param name="name">The name for the sub menu.</param>
         /// <param name="icon">The icon for the sub menu.</param>
@@ -807,8 +805,7 @@ namespace SEE.Controls.Actions
         /// <param name="priority">The priority for this sub menu.</param>
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>The created sub menu.</returns>
-        private static PopupMenuActionDoubleIcon CreateSubMenu
-            (PopupMenu popupMenu,
+        private static PopupMenuActionDoubleIcon CreateSubMenu(PopupMenu popupMenu,
             Vector3 position,
             Vector3 raycastHitPosition,
             string name,

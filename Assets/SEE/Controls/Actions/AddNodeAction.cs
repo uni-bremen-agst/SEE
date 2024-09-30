@@ -28,7 +28,7 @@ namespace SEE.Controls.Actions
             NoNodeSelected,
             /// <summary>
             /// A new node is created and selected, the dialog is opened,
-            /// and we wait for input
+            /// and we wait for input.
             /// </summary>
             WaitingForInput,
             /// <summary>
@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions
                     }
                     break;
                 case ProgressState.WaitingForInput:
-                    // Waiting until the dialog is closed ad all input is present.
+                    // Waiting until the dialog is closed and all input is present.
                     break;
                 case ProgressState.Finish:
                     result = true;
@@ -149,8 +149,8 @@ namespace SEE.Controls.Actions
 
             void CancelButtonPressed()
             {
-                /// Case when last used is used and it has a value other
-                /// then 'UNKOWNTYPE', use it.
+                // Case when last used is used and it has a value other
+                // then 'UNKOWNTYPE', use it.
                 if (node.Type != Graph.UnknownType)
                 {
                     memento.Name = node.SourceName;

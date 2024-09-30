@@ -407,7 +407,7 @@ namespace SEE.UI.Window.TreeWindow
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
                             List<PopupMenuAction> appends = new ()
                             {
-                                new ("Hide in TreeWindow", () =>
+                                new("Hide in TreeWindow", () =>
                                     {
                                         searcher.Filter.ExcludeElements.Add(representedGraphElement);
                                         Rebuild();

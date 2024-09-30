@@ -92,7 +92,7 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Activates the window dragger buttons.
-        /// </summary>dd
+        /// </summary>
         public void ActivateWindowDraggerButtons()
         {
             Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>(true);

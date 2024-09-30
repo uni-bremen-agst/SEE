@@ -275,7 +275,7 @@ namespace SEE.UI.PopupMenu
                 position.x = Screen.width - MenuWidth * ScaleFactor;
                 moved = true;
             }
-            if(!moved)
+            if (!moved)
             {
                 // The mouse should hover over the first menu item already rather than being just outside of it,
                 // so we move the menu up and to the left a bit.

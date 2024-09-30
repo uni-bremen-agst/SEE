@@ -79,7 +79,8 @@ namespace SEE.Game.SceneManipulation
         }
 
         /// <summary>
-        /// Checks if the decorations of the node needs to be added <see cref="GraphRenderer.AddDecorations(GameObject)"/>.
+        /// Checks if the decorations of the node needs to be added <see cref="GraphRenderer.AddDecorations(GameObject)"/>
+        /// and adds them if necessary.
         /// </summary>
         /// <param name="node">The node to be checked.</param>
         private static void ShouldAddTextObject(Node node)

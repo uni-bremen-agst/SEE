@@ -103,7 +103,7 @@ namespace SEE.UI.Window.PropertyWindow
         private void ActivateMatches(string searchQuery)
         {
             Dictionary<string, (string, GameObject)> propertyRows = new();
-            /// Create mapping of attribute names onto gameObjects representing the corresponding property row.
+            // Create mapping of attribute names onto gameObjects representing the corresponding property row.
             foreach (Transform child in items)
             {
                 if (!propertyRows.ContainsKey(AttributeName(child.gameObject)))
@@ -112,7 +112,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 else
                 {
-                    /// If the key is already in use.
+                    // If the key is already in use.
                     string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
                     while (propertyRows.ContainsKey(name))
                     {
@@ -122,17 +122,17 @@ namespace SEE.UI.Window.PropertyWindow
                 }
             }
 
-            /// Remove whitespace.
+            // Remove whitespace.
             searchQuery = searchQuery.Trim();
             if (string.IsNullOrEmpty(searchQuery))
             {
-                /// There is no search query, so activate the main property rows.
+                // There is no search query, so activate the main property rows.
                 ActivateMainProperties();
             }
             else
             {
-                /// First, deactivate all property rows and then activate only those that match the
-                /// search results.
+                // First, deactivate all property rows and then activate only those that match the
+                // search results.
                 SetActive(propertyRows, false);
                 foreach (string attributeName in Search(searchQuery, propertyRows))
                 {
@@ -254,7 +254,7 @@ namespace SEE.UI.Window.PropertyWindow
             List<string> results = new();
             foreach (string key in propertyRows.Keys)
             {
-                /// AttributeName instead of key checking, as the key may contain a random string if two identical keys would otherwise exist.
+                // AttributeName instead of key checking, as the key may contain a random string if two identical keys would otherwise exist.
                 if (AttributeName(propertyRows[key].gameObject).ToLower().Contains(query.ToLower())
                     || propertyRows[key].value.ToLower().Contains(query.ToLower()))
                 {
@@ -307,7 +307,7 @@ namespace SEE.UI.Window.PropertyWindow
             }
             return;
 
-            /// Expands the game object by animating its scale.
+            // Expands the game object by animating its scale.
             static void AnimateIn(GameObject go)
             {
                 go.transform.localScale = new Vector3(1, 0, 1);
@@ -320,7 +320,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         public void CreateUIInstance()
         {
-            /// Instantiate PropertyWindow
+            // Instantiate PropertyWindow
             GameObject propertyWindow = PrefabInstantiator.InstantiatePrefab(WindowPrefab, Window.transform.Find("Content"), false);
             propertyWindow.name = "Property Window";
 
@@ -383,7 +383,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 header.Add("Type", GraphElement.Type);
 
-                /// Data Attributes
+                // Data Attributes
                 Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
                 groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
                 expandedItems.Add("Header");
@@ -397,41 +397,42 @@ namespace SEE.UI.Window.PropertyWindow
                 GroupByNameType();
             }
 
-            /// Sorts the properties
+            // Sorts the properties
             Sort();
 
-            /// Applies the search
+            // Applies the search
             ApplySearch();
             return;
 
-            /// Creates the items for the value type group.
+            // Creates the items for the value type group.
             void GroupByValueType()
             {
-                /// Toggle Attributes
+                // Toggle Attributes
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
                     DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
                 }
-                /// String Attributes
+
+                // String Attributes
                 if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
                 {
                     DisplayGroup("String Attributes", GraphElement.StringAttributes);
                 }
 
-                /// Int Attributes
+                // Int Attributes
                 if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
                 {
                     DisplayGroup("Int Attributes", GraphElement.IntAttributes);
                 }
 
-                /// Float Attributes
+                // Float Attributes
                 if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
                 {
                     DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
                 }
             }
 
-            /// Creates the items for the name type group.
+            // Creates the items for the name type group.
             void GroupByNameType()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -461,13 +462,13 @@ namespace SEE.UI.Window.PropertyWindow
                     foreach (KeyValuePair<string, int> pair in GraphElement.IntAttributes)
                     {
                         string key = pair.Key;
-                        /// Block for old gxl files.
+                        // Block for old gxl files.
                         if (key.Contains("SelectionRange") && !key.Contains("Source"))
                         {
                             key = "Source." + key;
                         }
                         key = InsertDotInFirstPascalCase(pair.Key);
-                        /// To remove duplicates it is needed to remove the old one. <see cref="GraphWriter"/> L.313.
+                        // To remove duplicates it is needed to remove the old one. <see cref="GraphWriter"/> L.313.
                         if (attributes.ContainsKey(key) && key.Contains("Source.Range"))
                         {
                             attributes.Remove(key);
@@ -487,7 +488,7 @@ namespace SEE.UI.Window.PropertyWindow
                 return;
                 string InsertDotInFirstPascalCase(string input)
                 {
-                    /// Regular Expression Pattern
+                    // Regular Expression Pattern
                     string pattern = @"^([A-Z][a-z]+)([A-Z][a-z]+)(_.*)$";
 
                     Regex regex = new(pattern);
@@ -495,12 +496,12 @@ namespace SEE.UI.Window.PropertyWindow
 
                     if (match.Success)
                     {
-                        /// Build the new string by inserting a period between the matched groups
+                        // Build the new string by inserting a period between the matched groups
                         return $"{match.Groups[1].Value}.{match.Groups[2].Value}{match.Groups[3].Value}";
                     }
                     else
                     {
-                        /// Return the original input if it doesn't match the pattern
+                        // Return the original input if it doesn't match the pattern
                         return input;
                     }
                 }
@@ -546,7 +547,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Creates the nested groups and attributes.
         /// </summary>
-        /// <param name="dict">The nested dicitonary.</param>
+        /// <param name="dict">The nested dictionary.</param>
         /// <param name="groupName">The group name in which the object should be added.</param>
         /// <param name="level">The hierarchy level.</param>
         private void CreateNestedGroups(Dictionary<string, object> dict, string groupName = null, int level = 0)
@@ -622,12 +623,12 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="listToOrder">The list to be sorted.</param>
         private void ChangeOrder(List<GameObject> listToOrder)
         {
-            int lowestSilbing = listToOrder.Min(x => x.transform.GetSiblingIndex());
+            int lowestSibling = listToOrder.Min(x => x.transform.GetSiblingIndex());
             List<GameObject> sortedHeader = contextMenu.Sorter.ApplySort(listToOrder);
             for (int i = 0; i < sortedHeader.Count; i++)
             {
-                sortedHeader[i].transform.SetSiblingIndex(lowestSilbing);
-                lowestSilbing += 1;
+                sortedHeader[i].transform.SetSiblingIndex(lowestSibling);
+                lowestSibling += 1;
             }
         }
         #endregion
@@ -639,6 +640,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="name">The group name</param>
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the group.</param>
+        /// <param name="parentGroup">The parent group of this group, if none exists, null is used.</param>
         private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
@@ -655,7 +657,7 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 if (group.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    /// expands/collapses the group item
+                    // expands/collapses the group item
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
                         Dictionary<string, (string, GameObject gameObject)> newDict = GetDictOfGroup(group.name);
@@ -743,13 +745,13 @@ namespace SEE.UI.Window.PropertyWindow
             Dictionary<string, (string, GameObject)> dict = new();
             foreach ((string name, T value) in attributes)
             {
-                /// Create GameObject
+                // Create GameObject
                 GameObject propertyRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, items, false);
-                /// Attribute Name
+                // Attribute Name
                 Attribute(propertyRow).text = name;
-                /// Value Name
+                // Value Name
                 Value(propertyRow).text = value.ToString();
-                /// Colors and orders the item
+                // Colors and orders the item
                 ColorOrderItem();
                 dict.Add(name, (AttributeValue(propertyRow), propertyRow));
                 if (group != null && groupHolder.TryGetValue(group, out List<GameObject> groupList))
