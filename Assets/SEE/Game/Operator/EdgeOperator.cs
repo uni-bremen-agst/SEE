@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using MoreLinq;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
@@ -280,23 +281,23 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Maximal count of particles.
             /// </summary>
-            private static readonly int maxParticleCount = 12;
+            private const int maxParticleCount = 12;
             /// <summary>
             /// Minimal distance between particles for the actual particle count.
             /// </summary>
-            private static readonly float minParticleDistance = 0.16f;
+            private const float minParticleDistance = 0.16f;
             /// <summary>
             /// Scale of the particle meshes.
             /// </summary>
-            private static readonly Vector3 particleScale = new (0.012f, 0.012f, 0.012f);
+            private static readonly Vector3 particleScale = new(0.012f, 0.012f, 0.012f);
             /// <summary>
             /// Color of the particle material.
             /// </summary>
-            private static readonly Color particleColor = new (0.06f, 0.81f, 1.0f, 1.0f);
+            private static readonly Color particleColor = new(0.06f, 0.81f, 1.0f, 1.0f);
             /// <summary>
             /// Particle speed.
             /// </summary>
-            private static readonly float particleSpeed = 50f;
+            private const float particleSpeed = 50f;
 
             /// <summary>
             /// The spline the edge is based on.
@@ -387,8 +388,13 @@ namespace SEE.Game.Operator
             /// <summary>
             /// Calculates the coordinate of the position on the edge by interpolating between two
             /// neighboring vertices.
+            /// <para>
+            /// The vertices of the edge are derived from the integer places of <paramref name="position"/>,
+            /// while the decimal places represent the progress between the two vertices.
+            /// </para>
             /// </summary>
-            /// <param name="position">The position between zero and <see cref="vertices"/><c>.Length - 1</c></param>
+            /// <param name="position">The position on the edge between zero and <see cref="vertices"/>
+            /// <c>.Length - 1</c></param>.
             /// <returns>The coordinate of the position on the edge.</returns>
             private Vector3 GetPositionOnEdge(float position)
             {
@@ -404,15 +410,7 @@ namespace SEE.Game.Operator
             /// Calculates the approximate length of the edge that is represented by <see cref="vertices"/>.
             /// </summary>
             /// <returns>Approximate edge length.</returns>
-            private float GetApproxEdgeLength()
-            {
-                float length = 0;
-                for (int i = 1; i < vertices.Length; i++)
-                {
-                    length += Vector3.Distance(vertices[i - 1], vertices[i]);
-                }
-                return length;
-            }
+            private float GetApproxEdgeLength() => vertices.Pairwise(Vector3.Distance).Sum();
         }
     }
 }
