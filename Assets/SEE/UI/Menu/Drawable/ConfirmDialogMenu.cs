@@ -59,10 +59,7 @@ namespace SEE.UI.Menu.Drawable
         /// <returns>nothing, it waits until the dialog was confirmed or canceled.</returns>
         public async UniTask ExecuteAfterConfirmAsync(UnityAction action)
         {
-            while (IsOpen())
-            {
-                await UniTask.Yield();
-            }
+            await UniTask.WaitWhile(IsOpen);
             if (WasConfirmed && !WasCanceled)
             {
                 action.Invoke();
