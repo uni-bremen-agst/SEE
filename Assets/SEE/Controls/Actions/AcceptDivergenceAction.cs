@@ -308,14 +308,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                HashSet<string> strings = new();
-                for (int i = 0; i < mementoList.Count; i++)
-                {
-                    strings.Add(mementoList[i].From.ID);
-                    strings.Add(mementoList[i].To.ID);
-                    strings.Add(createdEdgeList[i].ID);
-                }
-                return strings;
+                return mementoList.Zip(createdEdgeList, (m, e) => new[] { m.From.ID, m.To.ID, e.ID }).SelectMany(x => x).ToHashSet();
             }
         }
     }
