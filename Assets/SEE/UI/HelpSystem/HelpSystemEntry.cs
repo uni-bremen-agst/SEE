@@ -139,6 +139,12 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         protected override void StartDesktop()
         {
+            /// Note: <see cref="GetTextField()"/> called below accesses <see cref="helpSystemEntry"/>
+            /// that is why we need to instantiate it first.
+            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+            helpSystemSpace.SetActive(false);
+            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            helpSystemEntry.SetActive(false);
             instructionsDisplay = GetTextField();
         }
 
@@ -243,8 +249,8 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
-            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
-            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            helpSystemSpace.SetActive(true);
+            helpSystemEntry.SetActive(true);
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
@@ -382,17 +388,40 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
+        /// The icon for playing the video.
+        /// </summary>
+        private Sprite playIcon;
+
+        /// <summary>
+        /// The icon for pausing the video.
+        /// </summary>
+        private Sprite pauseIcon;
+
+        /// <summary>
+        /// Initializes the sprites to avoid loading them multiple times.
+        /// </summary>
+        private void InitializeIcons()
+        {
+            playIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+            pauseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+        }
+
+        /// <summary>
         /// Toggles the "IsPlaying" state. If the entry is running, it will be paused; if it is paused,
         /// it will be played on.
         /// </summary>
         public void TogglePlaying()
         {
+            if (playIcon == null || pauseIcon == null)
+            {
+                InitializeIcons();
+            }
+
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             if (!IsPlaying)
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+                pauseButton.buttonIcon = pauseIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
                 Speaker.Instance.PauseOrUnPause();
@@ -400,8 +429,7 @@ namespace SEE.UI.HelpSystem
             }
             else
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+                pauseButton.buttonIcon = playIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();
