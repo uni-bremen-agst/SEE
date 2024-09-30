@@ -85,13 +85,5 @@ namespace SEE.Net.Actions
                 RemoteHeadPosition, RemoteRightHandPosition, RemoteLeftHandPosition,
                 RemoteHeadRotation, RemoteRightHandRotation, RemoteLeftHandRotation);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }
