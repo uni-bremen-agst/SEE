@@ -79,14 +79,6 @@ namespace SEE.Net.Actions
         public HistoryType NewItemType;
 
         /// <summary>
-        /// Stuff to execute on the server. Nothing to be done here.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// Syncs the GlobalActionHistory on each client.
         /// </summary>
         public override void ExecuteOnClient()

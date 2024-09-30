@@ -46,13 +46,5 @@ namespace SEE.Net.Actions
         {
             GameNodeMover.MoveTo(Find(GameObjectID), TargetPosition, AnimationFactor);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

@@ -42,10 +42,5 @@ namespace SEE.Net.Actions
             NodeOperator nodeOperator = gameObject.NodeOperator ();
             nodeOperator.RotateTo(Rotation, 0);
         }
-
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

@@ -46,19 +46,10 @@ namespace SEE.Net.Actions
              Vector3 scale)
             : base()
         {
-            this.ParentID = parentID;
-            this.NewNodeID = newNodeID;
-            this.Position = position;
-            this.Scale = scale;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            ParentID = parentID;
+            NewNodeID = newNodeID;
+            Position = position;
+            Scale = scale;
         }
 
         /// <summary>

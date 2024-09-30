@@ -22,14 +22,6 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method does nothing.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// This method executes the action on all clients except the requester, i.e., it deletes the board on all
         /// clients.
         /// </summary>

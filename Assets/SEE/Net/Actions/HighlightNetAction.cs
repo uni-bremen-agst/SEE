@@ -45,13 +45,5 @@ namespace SEE.Net.Actions
         {
             Highlighter.SetHighlight(Find(GameObjectID), Highlight);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

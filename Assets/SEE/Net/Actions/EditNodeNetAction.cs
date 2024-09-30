@@ -35,17 +35,9 @@ namespace SEE.Net.Actions
         /// <param name="type">the new node type</param>
         public EditNodeNetAction(string nodeID, string sourceName, string type) : base()
         {
-            this.SourceName = sourceName;
-            this.NodeType = type;
-            this.NodeID = nodeID;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class)
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            SourceName = sourceName;
+            NodeType = type;
+            NodeID = nodeID;
         }
 
         /// <summary>

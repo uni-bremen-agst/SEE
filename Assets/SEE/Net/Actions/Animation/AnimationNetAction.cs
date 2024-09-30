@@ -49,11 +49,6 @@ namespace SEE.Net.Actions.Animation
             throw new Exception($"GameObject with ID {gameObjectID} does not have an {nameof(AnimationInteraction)} component.");
         }
 
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
         /// <summary>
         /// Runs <see cref="Trigger"/> on the <see cref="AnimationInteraction"/> component attached to the"
         /// game object with <see cref="GameObjectID"/> if this is note the requester.

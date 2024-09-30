@@ -27,14 +27,6 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method does nothing.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank
-        }
-
-        /// <summary>
         /// This method executes the action on all clients except the requester which means it calls the method of the
         /// metric board with the given name that will change the selection.
         /// </summary>

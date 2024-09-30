@@ -38,11 +38,6 @@ namespace SEE.Net.Actions
             }
         }
 
-        public override void ExecuteOnServer()
-        {
-            // Nothing needs to be done on the server
-        }
-
         public override void ExecuteOnClient()
         {
             // If no space manager exists, there is nothing we can (or should) do.

@@ -54,16 +54,6 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this
-        /// class). Necessary because it is abstract in the
-        /// superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// Creates a new GameObject on each client.
         /// </summary>
         public override void ExecuteOnClient()

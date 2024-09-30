@@ -39,13 +39,5 @@ namespace SEE.Net.Actions
         {
             Find(GameObjectID).NodeOperator().MoveTo(Position, 0);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

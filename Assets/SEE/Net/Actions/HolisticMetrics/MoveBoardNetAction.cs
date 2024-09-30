@@ -37,14 +37,6 @@ namespace SEE.Net.Actions.HolisticMetrics
         }
 
         /// <summary>
-        /// This method does nothing.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// This method executes the action on all clients except the requester, i.e., changes the position/rotation of
         /// the board.
         /// </summary>

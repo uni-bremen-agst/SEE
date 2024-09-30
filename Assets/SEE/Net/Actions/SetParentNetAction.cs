@@ -59,13 +59,5 @@ namespace SEE.Net.Actions
                 GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
             }
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

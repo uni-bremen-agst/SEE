@@ -14,12 +14,5 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// Widget path
         /// </summary>
         public string WidgetPath;
-
-        /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-        }
     }
 }

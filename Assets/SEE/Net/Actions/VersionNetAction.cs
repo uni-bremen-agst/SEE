@@ -31,13 +31,5 @@ namespace SEE.Net.Actions
         {
             GameNodeMover.NewMovementVersion(Find(GameObjectID));
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

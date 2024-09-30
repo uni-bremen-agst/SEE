@@ -57,13 +57,5 @@ namespace SEE.Net.Actions
                 throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
             }
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

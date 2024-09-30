@@ -64,13 +64,5 @@ namespace SEE.Net.Actions
             GameObject originalParent = Find(OriginalParentID);
             GameNodeMover.PutOnAndFit(child.transform, newParent, originalParent, OriginalLocalScale);
         }
-
-        /// <summary>
-        /// Does not do anything.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
     }
 }

@@ -54,11 +54,6 @@ namespace SEE.Net.Actions
             }
         }
 
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
         /// <summary>
         /// Updates position, rotation and potentially local scale of the interactable
         /// object of given id.

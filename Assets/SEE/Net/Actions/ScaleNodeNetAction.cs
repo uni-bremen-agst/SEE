@@ -40,14 +40,6 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class).
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank
-        }
-
-        /// <summary>
         /// Finds the GameObject on the Client and sets its scale.
         /// </summary>
         public override void ExecuteOnClient()

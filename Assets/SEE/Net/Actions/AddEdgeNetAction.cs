@@ -38,14 +38,6 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Stuff to execute on the Server. Nothing to be done here.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// Creates the new edge on each client.
         /// </summary>
         public override void ExecuteOnClient()
