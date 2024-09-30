@@ -2,7 +2,6 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
-using UnityEngine.Serialization;
 
 namespace SEE.Game.Avatars
 {
