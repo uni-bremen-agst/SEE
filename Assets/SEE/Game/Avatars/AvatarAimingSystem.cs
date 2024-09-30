@@ -90,14 +90,22 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If <paramref name="activate"/> is true, the laser will be turned on;
         /// otherwise turned off.
-        /// This parameter is also propagated to all clients.
+        /// This parameter is also propagated to all clients if not <paramref name="remoteRequest"/>
         /// </summary>
         /// <param name="activate">whether pointing is to be activated</param>
-        /// <remarks>This method is called either as a interaction request of the local
+        /// <param name="remoteRequest">whether the request comes from a remote
+        /// client, in which case the change of the pointing modus will not be
+        /// propataged to other clients vai <see cref="TogglePointingNetAction"/></param>
+        /// <remarks>This method is called either as an interaction request of the local
         /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
-        /// the network.</remarks>
-        public void SetPointing(bool activate)
+        /// the network (in which case <paramref name="remoteRequest"/> must be true.</remarks>
+        public void SetPointing(bool activate, bool remoteRequest = false)
         {
+            if (activate == IsPointing)
+            {
+                // Nothing needs to be done.
+                return;
+            }
             IsPointing = activate;
             // The pointing animation only overrides the upper body animation while pointing.
             Animator.SetLayerWeight(1, System.Convert.ToSingle(activate));
@@ -119,7 +127,7 @@ namespace SEE.Game.Avatars
             {
                 aimIK.solver.target.gameObject.SetActive(IsPointing);
             }
-            if (IsLocallyControlled && gameObject.TryGetComponentOrLog(out networkObject))
+            if (!remoteRequest && IsLocallyControlled)
             {
                 new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
             }
@@ -161,7 +169,11 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
-            gameObject.TryGetComponentOrLog(out networkObject);
+            if (!gameObject.TryGetComponentOrLog(out networkObject))
+            {
+                enabled = false;
+                return;
+            }
             MoveTarget();
             /// We start in the pointing state.
             SetPointing(true);
