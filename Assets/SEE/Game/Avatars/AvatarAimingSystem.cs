@@ -90,7 +90,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If <paramref name="activate"/> is true, the laser will be turned on;
         /// otherwise turned off.
-        /// This parameter is also propagated to all clients if not <paramref name="remoteRequest"/>
+        /// This parameter is also propagated to all clients if not <paramref name="remoteRequest"/>.
         /// </summary>
         /// <param name="activate">whether pointing is to be activated</param>
         /// <param name="remoteRequest">whether the request comes from a remote
@@ -98,7 +98,7 @@ namespace SEE.Game.Avatars
         /// propataged to other clients vai <see cref="TogglePointingNetAction"/></param>
         /// <remarks>This method is called either as an interaction request of the local
         /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
-        /// the network (in which case <paramref name="remoteRequest"/> must be true.</remarks>
+        /// the network (in which case <paramref name="remoteRequest"/> must be true).</remarks>
         public void SetPointing(bool activate, bool remoteRequest = false)
         {
             if (activate == IsPointing)
