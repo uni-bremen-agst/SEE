@@ -14,7 +14,7 @@ namespace SEE.Game
         /// </summary>
         /// <remarks>The value <see cref="HighlightPlus.QualityLevel.Highest"/> does not work
         /// in Highlight Plus version 21.0 anymore.</remarks>
-        public const HighlightPlus.QualityLevel DefaultGlowQuality = HighlightPlus.QualityLevel.High;
+        public const HighlightPlus.QualityLevel DefaultGlowQuality = HighlightPlus.QualityLevel.Highest;
 
         /// <summary>
         /// Whether or not the <paramref name="gameObject"/> should be highlighted.
