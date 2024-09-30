@@ -1048,12 +1048,9 @@ namespace SEE.GO
             {
                 return false;
             }
-            Transform parent = gameObject.transform.parent;
-            int childCount = parent.childCount;
-            for (int i = 0; i < childCount; i++)
+            foreach (Transform sibling in gameObject.transform.parent)
             {
-                GameObject sibling = parent.GetChild(i).gameObject;
-                if (sibling == gameObject || !sibling.HasNodeRef() || !sibling.TryGetComponent(out Collider siblingCollider))
+                if (sibling.gameObject == gameObject || !sibling.gameObject.HasNodeRef() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
                 {
                     continue;
                 }

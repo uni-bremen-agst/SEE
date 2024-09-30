@@ -224,7 +224,7 @@ namespace SEE.Game.Operator
             Transform tempParent = transform.parent;
             if (reparentChildren)
             {
-                children = new (transform.childCount);
+                children = new(transform.childCount);
                 foreach (Transform child in transform)
                 {
                     if (child.gameObject.IsNodeAndActiveSelf())
@@ -244,8 +244,8 @@ namespace SEE.Game.Operator
                     scale.AnimateTo(newLocalScale, duration)
                   },
                  a => a);
-            animation.OnComplete(() => { reparent(originalParent); });
-            animation.OnKill(() => { reparent(originalParent); });
+            animation.OnComplete(() => reparent(originalParent));
+            animation.OnKill(() => reparent(originalParent));
             return animation;
 
             void reparent(Transform newParent)

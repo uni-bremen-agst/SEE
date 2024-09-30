@@ -61,7 +61,7 @@ namespace SEE.Net.Actions
             GameObject go = Find(GameObjectID);
             if (go != null)
             {
-                go.NodeOperator().ResizeTo(LocalScale, Position, 1, UpdateEdges, ReparentChildren);
+                go.NodeOperator().ResizeTo(LocalScale, Position, factor: 1, UpdateEdges, ReparentChildren);
             }
             else
             {
