@@ -37,9 +37,9 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// If executed by the initiating client, nothing happens. Otherwise the pointing
-        /// mode of the avatar identified by <see cref="NetworkObjectID"/> will be toggled.
+        /// The pointing mode of the avatar identified by <see cref="NetworkObjectID"/> will be toggled.
         /// </summary>
+        /// <remarks>This method is not called for the requester.</remarks>
         public override void ExecuteOnClient()
         {
             NetworkManager networkManager = NetworkManager.Singleton;
@@ -50,7 +50,7 @@ namespace SEE.Net.Actions
                 {
                     if (networkObject.gameObject.TryGetComponentOrLog(out AvatarAimingSystem aimingSystem))
                     {
-                        aimingSystem.SetPointing(Activate);
+                        aimingSystem.SetPointing(Activate, true);
                     }
                 }
                 else
@@ -62,14 +62,6 @@ namespace SEE.Net.Actions
             {
                 Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
-        }
-
-        /// <summary>
-        /// Nothing will happen.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
     }
 }
