@@ -95,12 +95,7 @@ namespace SEE.UI.PopupMenu
         /// <returns>The current height.</returns>
         private float GetHeight()
         {
-            float height = 0;
-            foreach (GameObject obj in entries)
-            {
-                height += ((RectTransform)obj.transform).rect.height;
-            }
-            return height;
+            return entries.Sum(x => ((RectTransform) x.transform).rect.height);
         }
 
         protected override void StartDesktop()
