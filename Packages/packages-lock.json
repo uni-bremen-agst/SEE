@@ -33,7 +33,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "12574c32f658fa23c194357141abc3fc157ea362"
+      "hash": "a011c51ed65c9abc3151a7a408bc70d408352933"
     },
     "com.openai.unity": {
       "version": "8.3.0",
