@@ -151,11 +151,11 @@ namespace SEE.Game.Operator
         {
             if (enable)
             {
-                gameObject.AddOrGetComponent<EdgeDataFlowVisualizer>();
+                gameObject.AddOrGetComponent<EdgeDirectionVisualizer>();
             }
             else
             {
-                EdgeDataFlowVisualizer edfv = gameObject.GetComponent<EdgeDataFlowVisualizer>();
+                EdgeDirectionVisualizer edfv = gameObject.GetComponent<EdgeDirectionVisualizer>();
                 Destroyer.Destroy(edfv);
             }
         }
@@ -275,7 +275,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Implements a data flow visualization to indicate the direction of an edge.
         /// </summary>
-        private class EdgeDataFlowVisualizer : MonoBehaviour
+        private class EdgeDirectionVisualizer : MonoBehaviour
         {
             /// <summary>
             /// Maximal count of particles.
