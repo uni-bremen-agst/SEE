@@ -178,14 +178,11 @@ namespace SEE.Controls.Actions
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.AcceptDivergence);
                 AcceptDivergenceAction action = (AcceptDivergenceAction)GlobalActionHistory.CurrentAction();
-                List<Edge> divergences = new();
-                foreach (InteractableObject iO in selectedObjects.Where(iO => iO.GraphElemRef.Elem is Edge edge && edge.IsInImplementation() && ReflexionGraph.IsDivergent(edge)))
-                {
-                    if (iO.GraphElemRef.Elem is Edge edge)
-                    {
-                        divergences.Add(edge);
-                    }
-                }
+                List<Edge> divergences = selectedObjects
+                    .Select(x => x.GraphElemRef.Elem)
+                    .OfType<Edge>()
+                    .Where(e => e.IsInImplementation() && ReflexionGraph.IsDivergent(e))
+                    .ToList();
                 action.ContextMenuExection(divergences);
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
