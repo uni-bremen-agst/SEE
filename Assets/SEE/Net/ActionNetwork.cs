@@ -30,42 +30,54 @@ namespace SEE.Net
         {
             if (!IsServer && !IsHost)
             {
+                // Pure client, i.e., a client that is not also a server.
                 Debug.Log("Starting client action network!\n");
                 RequestSynchronizationServerRpc();
-                return;
             }
-            Debug.Log("Starting server action network!\n");
-            BackendSyncUtil.InitializeCitiesAsync().Forget();
+            else
+            {
+                Debug.Log("Starting server action network!\n");
+                BackendSyncUtil.InitializeCitiesAsync().Forget();
+            }
         }
 
         /// <summary>
-        /// Sends an action to all clients in the recipients list, or to all connected clients (except the sender) if <c>recipients</c> is <c>null</c>.
+        /// Sends an action to all clients in the <paramref name="recipientIds"/> if it is
+        /// not <c>null</c>, or to all connected clients (except the sender) <paramref name="recipientIds"/> is <c>null</c>.
         /// </summary>
+        /// <param name="serializedAction">The serialized action that is to be sent and executed. It must a
+        /// serialized instance of <see cref="AbstractNetAction"/></param>
+        /// <param name="recipientIds">The recipient ids of the receivers of this broadcast message; if null all clients
+        /// will receive the message.</param>
+        /// <param name="rpcParams">The remote-procedure parameters</param>
         [Rpc(SendTo.Server)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipientIds = null, RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
-            {
-                return;
-            }
             if (recipientIds != null && recipientIds.Length == 0)
             {
                 return;
             }
 
             AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
+            // If the action should be sent to future clients (i.e., clients not connected yet,
+            // but connecting at a later point in time), add it to the list of actions to be sent
+            // to new clients.
             if (deserializedAction.ShouldBeSentToNewClient)
             {
                 Network.NetworkActionList.Add(serializedAction);
             }
+            // Execute the action on the server.
             deserializedAction.ExecuteOnServer();
 
-            if (recipientIds == null) {
+            if (recipientIds == null)
+            {
+                // Send to all clients except the original sender.
                 ulong senderId = rpcParams.Receive.SenderClientId;
                 ExecuteActionClientRpc(serializedAction, RpcTarget.Not(senderId, RpcTargetUse.Temp));
             }
             else
             {
+                // Send to the specified clients.
                 using NativeArray<ulong> targetClientIds = new(recipientIds, Allocator.Temp);
                 ExecuteActionClientRpc(serializedAction, RpcTarget.Group(targetClientIds, RpcTargetUse.Temp));
             }
@@ -109,10 +121,6 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         private void BroadcastFragmentedActionServerRpc(string key, ulong[] recipientIds, RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
-            {
-                return;
-            }
             if (recipientIds != null && recipientIds.Length == 0)
             {
                 return;
@@ -150,22 +158,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Requests client synchronization.
-        /// This RPC is called by the client to initiate the synchronization process.
-        /// </summary>
-        [Rpc(SendTo.Server)]
-        public void RequestSynchronizationServerRpc(RpcParams rpcParams = default)
-        {
-            if (!IsServer && !IsHost)
-            {
-                return;
-            }
-
-            ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
-        }
-
-        /// <summary>
         /// Syncs the current state of the server with the connecting client.
         /// </summary>
         [Rpc(SendTo.Server)]
@@ -179,20 +171,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes an action, even if the sender and this client are the same. This is used
+        /// Executes an action on aclient, even if the sender and this client are the same. This is used
         /// for synchronizing server state.
         /// </summary>
-        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+        [Rpc(SendTo.ClientsAndHost, AllowTargetOverride = true)]
         private void ExecuteActionUnsafeClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
-            {
-                return;
-            }
-
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received an {nameof(ExecuteActionUnsafeClientRpc)} from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -203,17 +190,12 @@ namespace SEE.Net
         /// <summary>
         /// Executes an action on the client.
         /// </summary>
-        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+        [Rpc(SendTo.ClientsAndHost, AllowTargetOverride = true)]
         private void ExecuteActionClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
-            {
-                return;
-            }
-
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received an {nameof(ExecuteActionClientRpc)} from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -232,16 +214,12 @@ namespace SEE.Net
         /// <param name="currentFragment">The current fragment.</param>
         /// <param name="data">The data of the fragment</param>
         /// <param name="rpcParams">Used to define recipients.</param>
-        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+        [Rpc(SendTo.ClientsAndHost, AllowTargetOverride = true)]
         public void ReceiveFragmentActionClientRpc(string id, int packetSize, int currentFragment, string data, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
-            {
-                return;
-            }
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received an ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
             Fragment fragment = new(id, packetSize, currentFragment, data);
@@ -280,20 +258,27 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Requests client synchronization.
+        /// This RPC is called by the client to initiate the synchronization process.
+        /// </summary>
+        [Rpc(SendTo.Server)]
+        public void RequestSynchronizationServerRpc(RpcParams rpcParams = default)
+        {
+            ulong senderId = rpcParams.Receive.SenderClientId;
+            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+        }
+
+        /// <summary>
         /// Initiates the synchronization process with the backend and game server.
         /// This RPC is called by the game server after the client has registered itself.
+        /// It is executed on the client which called <see cref="RequestSynchronizationServerRpc"/>.
         /// </summary>
         [Rpc(SendTo.SpecifiedInParams)]
         private void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
-            {
-                return;
-            }
-
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a SyncFilesClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received a {nameof(SyncFilesClientRpc)} from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
