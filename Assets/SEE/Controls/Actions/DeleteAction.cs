@@ -86,7 +86,7 @@ namespace SEE.Controls.Actions
         /// The graph elements (game objects, each representing a node or edge) that were
         /// chosen by the user for deletion.
         /// </summary>
-        private List<GameObject> hitGraphElements = new ();
+        private List<GameObject> hitGraphElements = new();
 
         /// <summary>
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion

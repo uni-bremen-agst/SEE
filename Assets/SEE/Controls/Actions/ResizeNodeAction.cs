@@ -278,41 +278,54 @@ namespace SEE.Controls.Actions
         private class ResizeGizmo : MonoBehaviour
         {
             /// <summary>
+            /// The data of the resize step that is in action.
+            /// </summary>
+            private ResizeStepData currentResizeStep;
+
+            /// <summary>
             /// The node reference.
             /// </summary>
             private NodeRef nodeRef;
+
             /// <summary>
             /// Stores the directional vectors that belong to the individual handles.
             /// </summary>
             private Dictionary<GameObject, Vector3> handles;
 
             /// <summary>
-            /// The size of the handles.
-            /// </summary>
-            private static readonly Vector3 handleScale = new (0.02f, 0.02f, 0.02f);
-            /// <summary>
-            /// The color of the handles.
-            /// </summary>
-            private Color handleColor = Color.cyan;
-
-            /// <summary>
             /// Used to remember if a click was detected in an earlier frame.
             /// </summary>
             private bool clicked = false;
 
-            /// <summary>
-            /// The data of the resize step that is in action.
-            /// </summary>
-            private ResizeStepData currentResizeStep;
+            #region Configurations
 
             /// <summary>
             /// The minimal size of a node in world space.
             /// </summary>
-            private static readonly float minSize = 0.04f;
+            private const float minSize = 0.04f;
+
             /// <summary>
             /// The minimal world-space distance between nodes while resizing.
             /// </summary>
-            private static readonly float padding = 0.004f;
+            private const float padding = 0.004f;
+
+            /// <summary>
+            /// A small offset of is used as a difference between the detection and the set value
+            /// to prevent instant re-detection.
+            /// </summary>
+            private const float detectionOffset = 0.0001f;
+
+            /// <summary>
+            /// The size of the handles.
+            /// </summary>
+            private static readonly Vector3 handleScale = new(0.02f, 0.02f, 0.02f);
+
+            /// <summary>
+            /// The color of the handles.
+            /// </summary>
+            private static Color handleColor = Color.cyan;
+
+            #endregion Configurations
 
             #region Change Event
 
@@ -393,7 +406,7 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Initialized the resize handles and stores them in <see cref="handles"/>
+            /// Initializes the resize handles and stores them in <see cref="handles"/>
             /// together with the direction vector.
             /// </summary>
             private void InitHandles()
@@ -447,7 +460,7 @@ namespace SEE.Controls.Actions
                     return;
                 }
 
-                currentResizeStep = new (hit.point, resizeDirection.Value, transform);
+                currentResizeStep = new(hit.point, resizeDirection.Value, transform);
             }
 
             /// <summary>
@@ -465,7 +478,7 @@ namespace SEE.Controls.Actions
                 Transform parent = transform.parent;
                 // We use an initial size of the list so that the memory does not need to get
                 // reallocated each time an item is added.
-                List<Transform> siblings = new (parent.childCount);
+                List<Transform> siblings = new(parent.childCount);
                 foreach (Transform sibling in parent)
                 {
                     if (sibling != transform && sibling.gameObject.IsNodeAndActiveSelf())
@@ -475,7 +488,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Collect children
-                List<Transform> children = new (transform.childCount);
+                List<Transform> children = new(transform.childCount);
                 foreach (Transform child in transform)
                 {
                     if (child.gameObject.IsNodeAndActiveSelf())
@@ -527,11 +540,10 @@ namespace SEE.Controls.Actions
                 {
                     Vector3 siblingSize = sibling.gameObject.LocalSize();
                     Vector3 siblingPos = sibling.localPosition;
-                    // A small offset of 0.0001f is used as a difference between the detection and the set value.
-                    otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
-                    otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
-                    otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
-                    otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z - 0.0001f;
+                    otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x + detectionOffset;
+                    otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x - detectionOffset;
+                    otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z + detectionOffset;
+                    otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z - detectionOffset;
 
                     if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
                             || bounds.Left > otherBounds.Right || bounds.Right < otherBounds.Left)
@@ -564,22 +576,22 @@ namespace SEE.Controls.Actions
                     {
                         if (currentResizeStep.Right)
                         {
-                            bounds.Right = otherBounds.Left - 0.0001f;
+                            bounds.Right = otherBounds.Left - detectionOffset;
                         }
                         else
                         {
-                            bounds.Left = otherBounds.Right + 0.0001f;
+                            bounds.Left = otherBounds.Right + detectionOffset;
                         }
                     }
                     else if (newLocalSize.z - overlap[1] > currentResizeStep.MinLocalSize.z)
                     {
                         if (currentResizeStep.Forward)
                         {
-                            bounds.Front = otherBounds.Back - 0.0001f;
+                            bounds.Front = otherBounds.Back - detectionOffset;
                         }
                         else
                         {
-                            bounds.Back = otherBounds.Front + 0.0001f;
+                            bounds.Back = otherBounds.Front + detectionOffset;
                         }
                     }
                 }
@@ -590,30 +602,30 @@ namespace SEE.Controls.Actions
                     // Child position and scale on common parent
                     Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                     Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
-                    otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + 0.0001f;
-                    otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - 0.0001f;
-                    otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + 0.0001f;
-                    otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z - 0.0001f;
+                    otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + detectionOffset;
+                    otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - detectionOffset;
+                    otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + detectionOffset;
+                    otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z - detectionOffset;
 
                     if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
                     {
-                        bounds.Right = otherBounds.Right + 0.0001f;
+                        bounds.Right = otherBounds.Right + detectionOffset;
                     }
 
                     if (currentResizeStep.Left && bounds.Left > otherBounds.Left)
                     {
-                        bounds.Left = otherBounds.Left - 0.0001f;
+                        bounds.Left = otherBounds.Left - detectionOffset;
                     }
 
 
                     if (currentResizeStep.Forward && bounds.Front < otherBounds.Front)
                     {
-                        bounds.Front = otherBounds.Front + 0.0001f;
+                        bounds.Front = otherBounds.Front + detectionOffset;
                     }
 
                     if (currentResizeStep.Back && bounds.Back > otherBounds.Back)
                     {
-                        bounds.Back = otherBounds.Back - 0.0001f;
+                        bounds.Back = otherBounds.Back - detectionOffset;
                     }
                 }
 
@@ -663,53 +675,65 @@ namespace SEE.Controls.Actions
                 /// Whether the struct has been explicitly initialized with values.
                 /// </summary>
                 public readonly bool IsSet;
+
                 /// <summary>
                 /// The initial raycast hit from which the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialHitPoint;
+
                 /// <summary>
                 /// The resize direction.
                 /// </summary>
                 public readonly Vector3 Direction;
+
                 /// <summary>
                 /// The position right before the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialLocalPosition;
+
                 /// <summary>
                 /// The local size right before the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialLocalSize;
+
                 /// <summary>
                 /// The factor to convert from local size to local scale.
                 /// </summary>
                 public readonly Vector3 ScaleSizeFactor;
+
                 /// <summary>
                 /// The factor to convert world-space to local coordinates in the parent's
                 /// coordinate system for the resize step.
                 /// </summary>
                 public readonly Vector3 LocalScaleFactor;
+
                 /// <summary>
                 /// The <see cref="minSize"/> scaled by <see cref="LocalScaleFactor"/>.
                 /// </summary>
                 public readonly Vector3 MinLocalSize;
+
                 /// <summary>
                 /// The <see cref="padding"/> scaled by <see cref="LocalScaleFactor"/>.
                 /// This is effectively the local-space padding in parent, e.g., between
                 /// the resized object and its siblings.
                 /// </summary>
                 public readonly Vector3 LocalPadding;
+
                 /// <summary>
                 /// Does <see cref="Direction"/> point to the left?
                 /// </summary>
                 public readonly bool Left;
+
                 /// <summary>
                 /// Does <see cref="Direction"/> point to the right?
                 /// </summary>
                 public readonly bool Right;
+
                 /// <summary>
                 /// Does <see cref="Direction"/> point forward?
                 /// </summary>
                 public readonly bool Forward;
+
                 /// <summary>
                 /// Does <see cref="Direction"/> point backward?
                 /// </summary>
@@ -725,13 +749,13 @@ namespace SEE.Controls.Actions
                     InitialLocalPosition = transform.localPosition;
                     InitialLocalSize = transform.gameObject.LocalSize();
                     Vector3 localScale = transform.localScale;
-                    ScaleSizeFactor = new (
+                    ScaleSizeFactor = new(
                         InitialLocalSize.x / localScale.x,
                         InitialLocalSize.y / localScale.y,
                         InitialLocalSize.z / localScale.z
                     );
                     Vector3 lossyScale = transform.lossyScale;
-                    LocalScaleFactor = new (
+                    LocalScaleFactor = new(
                         localScale.x / lossyScale.x,
                         localScale.y / lossyScale.y,
                         localScale.z / lossyScale.z

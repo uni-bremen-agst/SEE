@@ -17,7 +17,6 @@ using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
-using System.Threading.Tasks;
 
 namespace SEE.Controls.Actions
 {

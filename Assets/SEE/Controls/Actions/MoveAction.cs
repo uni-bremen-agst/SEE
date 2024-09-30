@@ -317,18 +317,9 @@ namespace SEE.Controls.Actions
             {
                 Vector3 size = GrabbedGameObject.WorldSpaceSize();
                 Vector3 parentSize = NewParent.WorldSpaceSize();
-                if (size.x > parentSize.x
-                    || size.z > parentSize.z)
-                {
-                    return false;
-                }
-
-                if (GrabbedGameObject.OverlapsWithSiblings())
-                {
-                    return false;
-                }
-
-                return true;
+                return size.x <= parentSize.x
+                    && size.z <= parentSize.z
+                    && !GrabbedGameObject.OverlapsWithSiblings();
             }
 
             /// <summary>
