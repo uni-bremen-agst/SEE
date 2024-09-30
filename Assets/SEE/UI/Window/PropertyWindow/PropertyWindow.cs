@@ -3,6 +3,7 @@ using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
@@ -335,11 +336,11 @@ namespace SEE.UI.Window.PropertyWindow
             ButtonManagerBasic groupButton = propertyWindow.transform.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             UnityEvent rebuild = new();
-            rebuild.AddListener(() => Rebuild());
+            rebuild.AddListener(Rebuild);
             contextMenu = new PropertyWindowContextMenu(popupMenu, rebuild, filterButton, sortButton, groupButton);
 
             CreateItems();
-            searchField.onValueChanged.AddListener(searchQuery => ActivateMatches(searchQuery));
+            searchField.onValueChanged.AddListener(ActivateMatches);
         }
 
         /// <summary>
@@ -468,7 +469,7 @@ namespace SEE.UI.Window.PropertyWindow
                             key = "Source." + key;
                         }
                         key = InsertDotInFirstPascalCase(pair.Key);
-                        // To remove duplicates it is needed to remove the old one. <see cref="GraphWriter"/> L.313.
+                        /// To remove duplicates it is needed to remove the old one. <see cref="GraphWriter.AppendAttributes"/>
                         if (attributes.ContainsKey(key) && key.Contains("Source.Range"))
                         {
                             attributes.Remove(key);
@@ -531,17 +532,11 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="value">The value of the attribute.</param>
         private void AddNestedAttribute(Dictionary<string, object> dict, string[] keys, object value)
         {
-            Dictionary<string, object> currentDict = dict;
-
             for (int i = 0; i < keys.Length - 1; i++)
             {
-                if (!currentDict.ContainsKey(keys[i]))
-                {
-                    currentDict[keys[i]] = new Dictionary<string, object>();
-                }
-                currentDict = (Dictionary<string, object>)currentDict[keys[i]];
+                dict = (Dictionary<string, object>)dict.GetOrAdd(keys[i], () => new Dictionary<string, object>());
             }
-            currentDict[keys[^1]] = value;
+            dict[keys[^1]] = value;
         }
 
         /// <summary>
@@ -581,8 +576,7 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 foreach (IEnumerable<GameObject> values in groupHolder.Values)
                 {
-                    List<GameObject> list = values.ToList();
-                    list.RemoveAll(x => !x.name.Contains("RowLine"));
+                    List<GameObject> list = values.Where(x => x.name.Contains("RowLine")).ToList();
                     if (!contextMenu.Grouper)
                     {
                         ChangeOrder(list);
@@ -702,15 +696,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>A created dictionary of the group.</returns>
         private Dictionary<string, (string, GameObject)> GetDictOfGroup(string groupName)
         {
-            List<GameObject> rowLines = groupHolder.GetValueOrDefault(groupName).ToList();
-            rowLines.RemoveAll(x => x.name == groupName);
-            Dictionary<string, (string, GameObject)> newDict = new();
-
-            foreach (GameObject go in rowLines)
-            {
-                newDict.Add(AttributeName(go), (AttributeValue(go), go));
-            }
-            return newDict;
+            return groupHolder.GetValueOrDefault(groupName)
+                .Where(x => x.name != groupName)
+                .ToDictionary(AttributeName, go => (AttributeValue(go), go));
         }
 
         /// <summary>
