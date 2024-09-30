@@ -99,17 +99,5 @@ namespace SEE.Net.Actions.Drawable
         {
             Surface = Find(SurfaceID, SurfaceParentID);
         }
-
-        /// <summary>
-        /// Ensures that the changes are also applied to the server, necessary for the <see cref="DrawableSynchronizer">.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            if (Requester != NetworkManager.Singleton.LocalClientId)
-            {
-                base.ExecuteOnServer();
-                ExecuteOnClient();
-            }
-        }
     }
 }

@@ -33,17 +33,5 @@ namespace SEE.Net.Actions.Drawable
         {
             ValueHolder.MaxOrderInLayer = OrderInLayer;
         }
-
-        /// <summary>
-        /// Ensures that the changes are also applied to the server, necessary for the <see cref="DrawableSynchronizer">.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            if (Requester != NetworkManager.Singleton.LocalClientId)
-            {
-                base.ExecuteOnServer();
-                ExecuteOnClient();
-            }
-        }
     }
 }
