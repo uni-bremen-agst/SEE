@@ -263,7 +263,7 @@ namespace SEE.Controls.Actions
         /// that the <see cref="Update"/> method perfoms the execution via context menu.
         /// </summary>
         /// <param name="divergences">The edges representing the divergences.</param>
-        public void ContextMenuExection(IList<Edge> divergences)
+        public void ContextMenuExecution(IList<Edge> divergences)
         {
             ExecuteViaContextMenu = true;
             foreach (Edge divergence in divergences)
