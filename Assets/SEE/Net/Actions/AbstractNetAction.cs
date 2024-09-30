@@ -74,7 +74,9 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// The implementation of the action for the client. This method will be called
-        /// for all connected clients excluding the requester.
+        /// for all connected clients, including a client that is also a server, that
+        /// is a host, but excluding the requester. This method will not be called on
+        /// a dedicated server, that is a server without a client.
         /// </summary>
         public abstract void ExecuteOnClient();
 
