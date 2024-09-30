@@ -832,10 +832,7 @@ namespace SEE.Controls.Actions
         /// <param name="previousAction">The previously executed action to be re-executed.</param>
         private static async UniTask ExcecutePreviousActionAsync(IReversibleAction action, ActionStateType previousAction)
         {
-            while (action.CurrentProgress() != IReversibleAction.Progress.Completed)
-            {
-                await UniTask.Yield();
-            }
+            await UniTask.WaitUntil(() => action.CurrentProgress() == IReversibleAction.Progress.Completed);
             GlobalActionHistory.Execute(previousAction);
             UpdatePlayerMenu();
         }
