@@ -282,7 +282,7 @@ namespace SEE.Controls.Actions
                 bool wasMoved = originalWorldPosition != currentPositionOfGrabbedObject;
                 if (!CanBePlaced())
                 {
-                    // Debug.Log("Node does not fit, resetting…");
+                    // Node does not fit, resetting…
                     UnReparent();
                     wasMoved = false;
                 }
