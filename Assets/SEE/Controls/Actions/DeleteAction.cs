@@ -145,8 +145,7 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                ISet<GameObject> deleted;
-                (_, deleted) = GameElementDeleter.Delete(go);
+                (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
                 deletedGameObjects.UnionWith(deleted);
             }
             CurrentState = IReversibleAction.Progress.Completed;
