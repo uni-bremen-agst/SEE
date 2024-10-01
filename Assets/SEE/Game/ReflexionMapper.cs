@@ -19,19 +19,19 @@ namespace SEE.Game
         /// Maps <paramref name="mappingSource"/> onto <paramref name="mappingTarget"/> distinguishing
         /// the following four cases regarding to which domains <paramref name="mappingSource"/>
         /// and <paramref name="mappingTarget"/> belong to:
-        /// <list type="number">
+        /// <list type="table">
         /// <item><description>
         ///   implementation -> architecture: interpreted as an architecture mapping,
         ///   i.e., <paramref name="mappingSource"/> is mapped onto <paramref name="mappingTarget"/>
         ///   in the architecture.
         /// </description></item>
-        /// <item><description>
+        /// <item><term>1.</term><description>
         ///   implementation -> implementation: interpreted as a restructuring in the implementation
         /// </description></item>
-        /// <item><description>
+        /// <item><term>2.</term><description>
         ///   architecture -> architecture: interpreted as a restructuring in the architecture
         /// </description></item>
-        /// <item><description>
+        /// <item><term>3.</term><description>
         ///   architecture -> implementation: makes no sense; will be ignored
         /// </description></item>
         /// </list>
