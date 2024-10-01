@@ -52,7 +52,7 @@ namespace SEE.Game.Operator
         /// <returns>True if the label is not empty.</returns>
         public bool LabelIsNotEmpty()
         {
-            return labelText != null && labelText.text.Trim() != "";
+            return !string.IsNullOrWhiteSpace(labelText?.text);
         }
 
         /// <summary>
