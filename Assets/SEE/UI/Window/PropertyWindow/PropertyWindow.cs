@@ -73,6 +73,11 @@ namespace SEE.UI.Window.PropertyWindow
         private TMP_InputField searchField;
 
         /// <summary>
+        /// The current displayed items of the property window.
+        /// </summary>
+        private readonly List<GameObject> currentDisplayedItems = new();
+
+        /// <summary>
         /// The dictionary that holds the items for a group.
         /// </summary>
         private readonly Dictionary<string, List<GameObject>> groupHolder = new();
@@ -105,21 +110,21 @@ namespace SEE.UI.Window.PropertyWindow
         {
             Dictionary<string, (string, GameObject)> propertyRows = new();
             // Create mapping of attribute names onto gameObjects representing the corresponding property row.
-            foreach (Transform child in items)
+            foreach (GameObject child in currentDisplayedItems)
             {
-                if (!propertyRows.ContainsKey(AttributeName(child.gameObject)))
+                if (!propertyRows.ContainsKey(AttributeName(child)))
                 {
-                    propertyRows.Add(AttributeName(child.gameObject), (AttributeValue(child.gameObject), child.gameObject));
+                    propertyRows.Add(AttributeName(child), (AttributeValue(child), child));
                 }
                 else
                 {
                     // If the key is already in use.
-                    string name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
+                    string name = AttributeName(child) + RandomStrings.GetRandomString(10);
                     while (propertyRows.ContainsKey(name))
                     {
-                        name = AttributeName(child.gameObject) + RandomStrings.GetRandomString(10);
+                        name = AttributeName(child) + RandomStrings.GetRandomString(10);
                     }
-                    propertyRows.Add(name, (AttributeValue(child.gameObject), child.gameObject));
+                    propertyRows.Add(name, (AttributeValue(child), child));
                 }
             }
 
@@ -232,7 +237,7 @@ namespace SEE.UI.Window.PropertyWindow
                 {
                     if (pair.Value.Contains(go))
                     {
-                        GameObject parentGroup = pair.Value.Find(go => go.name != pair.Key && GetLevel(go) < GetLevel(go));
+                        GameObject parentGroup = pair.Value.Find(obj => obj.name != go.name && GetLevel(obj) < GetLevel(go));
                         if (parentGroup != null)
                         {
                             shouldDisplayed = expandedItems.Contains(parentGroup.name) && IsNoSubgroupOrParentExpanded(parentGroup);
@@ -357,11 +362,12 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private void ClearItems()
         {
-            for (int i = 0; i < items.childCount;)
+            foreach (GameObject go in currentDisplayedItems)
             {
-                DestroyImmediate(items.GetChild(i).gameObject);
+                Destroyer.Destroy(go);
             }
             groupHolder.Clear();
+            currentDisplayedItems.Clear();
         }
 
         /// <summary>
@@ -645,6 +651,7 @@ namespace SEE.UI.Window.PropertyWindow
             RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
             RegisterClickHandler();
             groupHolder.Add(name, dict.Values.Select(x => x.gameObject).Append(group).ToList());
+            currentDisplayedItems.Add(group);
             return;
 
             void RegisterClickHandler()
@@ -724,11 +731,8 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="active">Whether the attributes should be active.</param>
         /// <param name="group">The group to which this attribute is to be assigned.
         /// Used only if the attribute is to be added to the group later.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>
-            (Dictionary<string, T> attributes,
-            int level = 0,
-            bool active = true,
-            string group = null)
+        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
+            int level = 0, bool active = true, string group = null)
         {
             Dictionary<string, (string, GameObject)> dict = new();
             foreach ((string name, T value) in attributes)
@@ -742,6 +746,7 @@ namespace SEE.UI.Window.PropertyWindow
                 // Colors and orders the item
                 ColorOrderItem();
                 dict.Add(name, (AttributeValue(propertyRow), propertyRow));
+                currentDisplayedItems.Add(propertyRow);
                 if (group != null && groupHolder.TryGetValue(group, out List<GameObject> groupList))
                 {
                     groupList.Add(propertyRow);

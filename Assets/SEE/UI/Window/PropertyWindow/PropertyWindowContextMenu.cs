@@ -68,12 +68,9 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="filterButton">The button that opens the filter menu.</param>
         /// <param name="sortButton">The button that opens the sort menu.</param>
         /// <param name="groupButton">The button that opens the group menu.</param>
-        public PropertyWindowContextMenu
-            (PopupMenu.PopupMenu contextMenu,
-            UnityEvent rebuild,
-            ButtonManagerBasic filterButton,
-            ButtonManagerBasic sortButton,
-            ButtonManagerBasic groupButton)
+        public PropertyWindowContextMenu(PopupMenu.PopupMenu contextMenu,
+            UnityEvent rebuild, ButtonManagerBasic filterButton,
+            ButtonManagerBasic sortButton, ButtonManagerBasic groupButton)
         {
             this.contextMenu = contextMenu;
             this.rebuild = rebuild;
