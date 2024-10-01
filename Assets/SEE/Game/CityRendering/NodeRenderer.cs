@@ -511,7 +511,7 @@ namespace SEE.Game.CityRendering
         /// for inner node kinds and nodelayout.
         /// </summary>
         /// <param name="gameNode"></param>
-        protected void AddDecorations(GameObject gameNode)
+        public void AddDecorations(GameObject gameNode)
         {
             AddDecorations(new List<GameObject> { gameNode });
         }

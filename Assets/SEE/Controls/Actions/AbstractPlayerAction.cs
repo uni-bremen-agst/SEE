@@ -28,6 +28,11 @@ namespace SEE.Controls.Actions
         protected IReversibleAction.Progress CurrentState = IReversibleAction.Progress.NoEffect;
 
         /// <summary>
+        /// Whether the action is executed through the context menu.
+        /// </summary>
+        public bool ExecuteViaContextMenu { get; set; } = false;
+
+        /// <summary>
         /// The undo operation which has to be implemented specifically by subclasses
         /// to revert the effect of an executed action.
         /// See <see cref="IReversibleAction.Undo"/>.

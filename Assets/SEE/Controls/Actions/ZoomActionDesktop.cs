@@ -98,7 +98,6 @@ namespace SEE.Controls.Actions
                     // as requested per mouse wheel.
                     if (zoomTowards)
                     {
-                        zoomSteps = Mathf.Clamp(zoomSteps, -(int)zoomState.CurrentTargetZoomSteps, (int)ZoomState.ZoomMaxSteps - (int)zoomState.CurrentTargetZoomSteps);
                         zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
                     }
 

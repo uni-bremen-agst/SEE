@@ -95,6 +95,11 @@ namespace SEE.Controls.Actions
                   Color.green.Darker(), Icons.PenToSquare,
                   EditNodeAction.CreateReversibleAction);
 
+            ResizeNode =
+              new("Resize Node", "Change the size of a node",
+                  Color.green.Darker(), Icons.Resize,
+                  ResizeNodeAction.CreateReversibleAction);
+
             ScaleNode =
               new("Scale Node", "Scale a node",
                   Color.green.Darker(), Icons.Scale,
@@ -308,6 +313,7 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
+        public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType ScaleNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;

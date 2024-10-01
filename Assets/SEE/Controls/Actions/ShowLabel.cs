@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                if (settings.Show && pointer.Value.On)
+                if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
                 {
                     nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
                 }

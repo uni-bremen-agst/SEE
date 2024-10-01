@@ -159,6 +159,11 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
+        /// <summary>
+        /// Whether users may manipulate (e.g., resize) instances of this type of node.
+        /// </summary>
+        [Tooltip("Whether users may manipulate (e.g., resize) instances of this type of node.")]
+        public bool AllowManualNodeManipulation = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -178,6 +183,7 @@ namespace SEE.Game.City
             AntennaSettings.Save(writer, antennaSettingsLabel);
             writer.Save(OutlineWidth, outlineWidthLabel);
             writer.Save(ShowNames, showNamesLabel);
+            writer.Save(AllowManualNodeManipulation, allowManualNodeManipulationLabel);
             writer.EndGroup();
         }
 
@@ -213,6 +219,7 @@ namespace SEE.Game.City
             AntennaSettings.Restore(values, antennaSettingsLabel);
             ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
             ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
+            ConfigIO.Restore(values, allowManualNodeManipulationLabel, ref AllowManualNodeManipulation);
         }
 
         /// <summary>
@@ -255,5 +262,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="ShowNames"/>.
         /// </summary>
         private const string showNamesLabel = "ShowNames";
+
+        /// <summary>
+        /// Label in the configuration file for <see cref="AllowManualNodeManipulation"/>.
+        /// </summary>
+        private const string allowManualNodeManipulationLabel = "AllowManualNodeManipulation";
     }
 }
