@@ -198,8 +198,10 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                _ = GameElementDeleter.Delete(go);
                 new DeleteNetAction(go.name).Execute();
+#pragma warning disable VSTHRD110
+                GameElementDeleter.Delete(go);
+#pragma warning restore VSTHRD110
             }
         }
 
