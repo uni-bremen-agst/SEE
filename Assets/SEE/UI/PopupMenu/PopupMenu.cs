@@ -246,7 +246,7 @@ namespace SEE.UI.PopupMenu
             }
             foreach (GameObject entry in entries)
             {
-                DestroyImmediate(entry);
+                Destroyer.Destroy(entry);
             }
             entries.Clear();
         }
