@@ -1,5 +1,4 @@
-﻿using SEE.Utils;
-using SEE.Utils.History;
+﻿using SEE.Utils.History;
 using static SEE.Utils.History.ActionHistory;
 
 namespace SEE.Controls.Actions
