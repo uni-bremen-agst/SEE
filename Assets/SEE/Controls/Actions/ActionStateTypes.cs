@@ -1,5 +1,5 @@
-﻿using SEE.Utils;
-using UnityEngine;
+﻿using UnityEngine;
+using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
 
@@ -114,11 +114,6 @@ namespace SEE.Controls.Actions
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
                   ShowCodeAction.CreateReversibleAction);
-
-            Draw =
-              new("Draw", "Draw freely in world space",
-                  Color.magenta.Darker(), Icons.Pencil,
-                  DrawAction.CreateReversibleAction);
 
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
