@@ -143,6 +143,23 @@ namespace SEE.Game.Operator
             };
         }
 
+        /// <summary>
+        /// Enables or disables the data flow animation to indicate edge direction.
+        /// </summary>
+        /// <param name="enable">Enable or disable animation.</param>
+        public void AnimateDataFlow(bool enable = true)
+        {
+            if (enable)
+            {
+                gameObject.AddOrGetComponent<EdgeDirectionVisualizer>();
+            }
+            else
+            {
+                EdgeDirectionVisualizer edfv = gameObject.GetComponent<EdgeDirectionVisualizer>();
+                Destroyer.Destroy(edfv);
+            }
+        }
+
         #endregion
 
         protected override IEnumerable<Color> AsEnumerable((Color start, Color end) color)

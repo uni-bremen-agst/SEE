@@ -31084,9 +31084,9 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   ConfigurationPath:
-    Root: 0
+    Root: 3
     RelativePath: /reflexion/compiler/Reflexion.cfg
-    AbsolutePath: s/reflexion/compiler/Reflexion.cfgexion/compiler/Reflexion.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 3
     RelativePath: /reflexion/compiler/minilax

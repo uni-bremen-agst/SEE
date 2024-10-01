@@ -192,6 +192,76 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Moves and scales the node at the same time.
+        /// <para>
+        /// If <paramref name="reparentChildren"/> is <c>true></c> (default), children are not scaled and moved along.
+        /// For this purpose they are reparented to their grandparent during the animation and back to the original
+        /// parent after the animation has completed.
+        /// </para>
+        /// </summary>
+        /// <param name="newLocalScale">the desired new local scale</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ResizeTo
+            (Vector3 newLocalScale,
+            Vector3 newPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool reparentChildren = true)
+        {
+            float duration = ToDuration(factor);
+            updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
+
+            List<Transform> children = null;
+            Transform originalParent = transform;
+            Transform tempParent = transform.parent;
+            if (reparentChildren)
+            {
+                children = new(transform.childCount);
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.IsNodeAndActiveSelf())
+                    {
+                        children.Add(child);
+                    }
+                }
+                reparent(tempParent);
+            }
+
+            IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
+                (new[]
+                  {
+                    positionX.AnimateTo(newPosition.x, duration),
+                    positionY.AnimateTo(newPosition.y, duration),
+                    positionZ.AnimateTo(newPosition.z, duration),
+                    scale.AnimateTo(newLocalScale, duration)
+                  },
+                 a => a);
+            animation.OnComplete(() => reparent(originalParent));
+            animation.OnKill(() => reparent(originalParent));
+            return animation;
+
+            void reparent(Transform newParent)
+            {
+                if (!reparentChildren)
+                {
+                    return;
+                }
+                foreach (Transform child in children)
+                {
+                    child.SetParent(newParent);
+                }
+            }
+        }
+
+        /// <summary>
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>.
         /// </summary>
         /// <param name="newRotation">the desired new target rotation in world space</param>

@@ -73,11 +73,13 @@ namespace SEE.UI.Window
             // Set title
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
 
-            // TODO: Disable IDE Button if unused
+            /// Disables the window dragger IDE buttons.
+            /// Note: If a sub class needs the IDE buttons, call <see cref="ActivateWindowDraggerButtons">
+            DisableWindowDraggerButtons();
         }
 
         /// <summary>
-        /// Disables all window dragger buttons.
+        /// Disables the window dragger buttons.
         /// </summary>dd
         public void DisableWindowDraggerButtons()
         {
@@ -85,6 +87,18 @@ namespace SEE.UI.Window
             foreach (Button button in buttons)
             {
                 button.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Activates the window dragger buttons.
+        /// </summary>
+        public void ActivateWindowDraggerButtons()
+        {
+            Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>(true);
+            foreach (Button button in buttons)
+            {
+                button.gameObject.SetActive(true);
             }
         }
 

@@ -1,5 +1,4 @@
-﻿using SEE.Utils;
-using SEE.Utils.History;
+﻿using SEE.Utils.History;
 using static SEE.Utils.History.ActionHistory;
 
 namespace SEE.Controls.Actions
@@ -13,7 +12,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// The history of actions.
         /// </summary>
-        private static readonly ActionHistory history = new ActionHistory();
+        private static readonly ActionHistory history = new();
 
         /// <summary>
         /// Executes the currently active action (if there is any).
@@ -93,6 +92,15 @@ namespace SEE.Controls.Actions
         public static ActionStateType Current()
         {
             return history.CurrentAction?.GetActionStateType();
+        }
+
+        /// <summary>
+        /// Gets the currently executed action.
+        /// </summary>
+        /// <returns>The currently executed action.</returns>
+        public static IReversibleAction CurrentAction()
+        {
+            return history.CurrentAction;
         }
 
         /// <summary>

@@ -11,6 +11,7 @@ using Valve.VR.InteractionSystem;
 #endif
 using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.Game.Operator;
 
 namespace SEE.Controls
 {
@@ -76,6 +77,11 @@ namespace SEE.Controls
         /// The grabbed objects.
         /// </summary>
         public static readonly HashSet<InteractableObject> GrabbedObjects = new();
+
+        /// <summary>
+        /// If multiple objects should be selectable at the same time.
+        /// </summary>
+        public static bool MultiSelectionAllowed = true;
 
         /// <summary>
         /// The selected objects per graph.
@@ -354,6 +360,11 @@ namespace SEE.Controls
         {
             Assert.IsTrue(IsSelected != select);
 
+            if (select && !MultiSelectionAllowed && SelectedObjects.Count > 0)
+            {
+                return;
+            }
+
             IsSelected = select;
 
             if (select)
@@ -371,7 +382,12 @@ namespace SEE.Controls
                 graphToSelectedIOs[graph].Add(this);
 
                 // Start blinking indefinitely.
-                gameObject.Operator().Blink(-1);
+                GraphElementOperator op = gameObject.Operator();
+                op.Blink(-1);
+                if (op is EdgeOperator eop)
+                {
+                    eop.AnimateDataFlow(true);
+                }
 
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
@@ -393,7 +409,12 @@ namespace SEE.Controls
                 graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
                 // Stop blinking.
-                gameObject.Operator().Blink(0);
+                GraphElementOperator op = gameObject.Operator();
+                op.Blink(0);
+                if (op is EdgeOperator eop)
+                {
+                    eop.AnimateDataFlow(false);
+                }
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
