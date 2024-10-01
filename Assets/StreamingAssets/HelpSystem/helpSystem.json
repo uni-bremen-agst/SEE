@@ -498,7 +498,7 @@
                             "name": "Draw free in the room",
                             "description": "How to draw somewhere in the room",
                             "color": "magenta",
-                            "video": "HelpSystem/Videos/DrawFreeRoom.mp4",
+                            "video": "HelpSystem/Videos/Drawable/DrawFreeRoom.mp4",
                             "HelpEntries": [
                                 {
                                     "index": 1,
