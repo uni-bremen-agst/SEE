@@ -171,7 +171,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Executes an action on aclient, even if the sender and this client are the same. This is used
+        /// Executes an action on a client, even if the sender and this client are the same. This is used
         /// for synchronizing server state.
         /// </summary>
         [Rpc(SendTo.ClientsAndHost, AllowTargetOverride = true)]

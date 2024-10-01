@@ -94,8 +94,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         /// <param name="activate">whether pointing is to be activated</param>
         /// <param name="remoteRequest">whether the request comes from a remote
-        /// client, in which case the change of the pointing modus will not be
-        /// propataged to other clients vai <see cref="TogglePointingNetAction"/></param>
+        /// client, in which case the change of the pointing mode will not be
+        /// propagated to other clients via <see cref="TogglePointingNetAction"/></param>
         /// <remarks>This method is called either as an interaction request of the local
         /// player or from <see cref="TogglePointingNetAction"/> from a remote player via
         /// the network (in which case <paramref name="remoteRequest"/> must be true).</remarks>
