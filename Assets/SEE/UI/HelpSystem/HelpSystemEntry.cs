@@ -336,8 +336,6 @@ namespace SEE.UI.HelpSystem
             IsPlaying = false;
             PersonalAssistantBrain.Instance?.Stop();
             Destroyer.Destroy(helpSystemSpace);
-            helpSystemSpace = null;
-            helpSystemEntry = null;
             EntryShown = false;
         }
 
