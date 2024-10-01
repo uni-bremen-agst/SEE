@@ -49,12 +49,12 @@ namespace SEE.Utils
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing.
         /// The hit will be set, if no GUI element is hit.
-        ///
+        /// <para>
         /// Note: <paramref name="elementRef"/> is null if the result is <see cref="HitGraphElement.None"/>.
         /// Yet, <paramref name="raycastHit"/> will always be the hit object if any was hit,
         /// no matter whether it was a graph element or not.
+        /// </para>
         /// </summary>
-        ///
         /// <param name="raycastHit">The hit object.</param>
         /// <param name="nodeRef">The hit graph element if <code>None</code> is not returned.</param>
         /// <returns>if no GUI element is hit, but a GameObject with either
@@ -63,6 +63,7 @@ namespace SEE.Utils
         /// respectively, is returned. Otherwise if a GUI element is hit or if the
         /// hit game object has neither a <see cref="NodeRef"/> nor an <see cref="EdgeRef"/>
         /// attached, <see cref="HitGraphElement.None"/> is returned.
+        /// </returns>
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
             if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
@@ -110,14 +111,16 @@ namespace SEE.Utils
 
         /// <summary>
         /// Raycasts the scene from the camera in the direction the mouse is pointing and chooses the
-        /// node that is the lowest one in the node hierarchy (more precisely, the one with the
-        /// greatest value of the node attribute Level; where Level counting starts at the root
-        /// and increases downward into the tree) if considered relevant for a hit.
+        /// node that is the lowest one in the node hierarchy, if considered relevant for a hit.
+        /// More precisely, the lowest one is that one with the greatest value of the node attribute
+        /// <c>Level</c>, where <c>Level</c> counting starts at the root and increases downward into the tree.
         ///
+        /// <para>
         /// If <paramref name="referenceNode"/> equals <c>null</c>, all nodes are considered relevant.
         /// Otherwise a node is considered relevant if it is in the same graph as
         /// <paramref name="referenceNode"/> and neither <paramref name="referenceNode"/> itself nor
         /// any of its descendants in the node hierarchy in the underlying graph.
+        /// </para>
         /// </summary>
         /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
         /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
@@ -143,25 +146,38 @@ namespace SEE.Utils
             {
                 RaycastHit hit = hits[i];
                 // referenceNode will be ignored if set
-                if (referenceNode == null || hit.collider.gameObject != referenceNode.gameObject)
+                if (hit.collider.gameObject == referenceNode.gameObject)
                 {
-                    NodeRef hitNodeRef = hit.transform.GetComponent<NodeRef>();
-                    // Is it a node at all and if so, are they in the same graph?
-                    if (hitNodeRef != null && hitNodeRef.Value != null
-                        && (referenceNode == null || (referenceNode.Value != null && hitNodeRef.Value.ItsGraph == referenceNode.Value.ItsGraph)))
-                    {
-                        // update hitNode when we found a node deeper into the tree
-                        if (hitNode == null || hitNodeRef.Value.Level > hitNode.Level)
-                        {
-                            // check whether descendants are to be ignored and if so, whether the hit node is a descendant
-                            if (referenceNode == null || !hitNodeRef.Value.IsDescendantOf(referenceNode.Value))
-                            {
-                                hitNode = hitNodeRef.Value;
-                                raycastHit = hit;
-                            }
-                        }
-                    }
+                    continue;
                 }
+
+                // Is it a node at all?
+                NodeRef hitNodeRef = hit.transform.GetComponent<NodeRef>();
+                if (hitNodeRef == null || hitNodeRef.Value == null)
+                {
+                    continue;
+                }
+
+                // Is it in the same graph as the reference node, if present?
+                if (referenceNode == null || referenceNode.Value == null || hitNodeRef.Value.ItsGraph != referenceNode.Value.ItsGraph)
+                {
+                    continue;
+                }
+
+                // Have we found a node deeper into the tree than the current hitNode?
+                if (hitNode != null && hitNode.Level >= hitNodeRef.Value.Level)
+                {
+                    continue;
+                }
+
+                // Check whether descendants are to be ignored and if so, whether the hit node is a descendant
+                if (referenceNode != null && hitNodeRef.Value.IsDescendantOf(referenceNode.Value))
+                {
+                    continue;
+                }
+
+                hitNode = hitNodeRef.Value;
+                raycastHit = hit;
             }
             return hitNode != null;
         }

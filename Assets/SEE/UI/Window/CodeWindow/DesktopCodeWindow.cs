@@ -46,10 +46,12 @@ namespace SEE.UI.Window.CodeWindow
             if (text == null)
             {
                 Debug.LogError("Text must be defined when setting up CodeWindow!\n");
+                Destroyer.Destroy(this);
                 return;
             }
 
             base.StartDesktop();
+            ActivateWindowDraggerButtons();
 
             scrollable = PrefabInstantiator.InstantiatePrefab(codeWindowPrefab, Window.transform.Find("Content"), false);
             scrollable.name = "Scrollable";

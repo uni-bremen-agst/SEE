@@ -8,7 +8,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
     /// <summary>
     /// A class that sorts a list of GameObjects based on a set of attributes.
     /// </summary>
-    public class DrawableSurfaceSorter
+    public class GameObjectSorter
     {
         /// <summary>
         /// The attributes to sort by, along with whether to sort descending, in the order of precedence.

@@ -13,12 +13,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>true if the user uses the left mouse button.</returns>
         public static bool LeftMouseInteraction()
         {
-            return Input.GetMouseButton(0) || Input.GetMouseButtonDown(0);
+            return Input.GetMouseButton(0);
         }
 
         /// <summary>
         /// Registers the users left mouse down input.
         /// </summary>
+        /// <remarks>
+        /// This is only <c>true</c> in the exact frame the mouse button is pressed down.
+        /// </remarks>
         /// <returns>True if the user uses left mouse down.</returns>
         public static bool LeftMouseDown()
         {
@@ -31,7 +34,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>true if the user uses the left mouse button.</returns>
         public static bool RightMouseInteraction()
         {
-            return Input.GetMouseButton(1) || Input.GetMouseButtonDown(1);
+            return Input.GetMouseButton(1);
         }
 
         /// <summary>

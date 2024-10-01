@@ -22,7 +22,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// The context menu that this class manages.
         /// </summary>
-        private readonly PopupMenu.PopupMenu contextMenu;
+        public readonly PopupMenu.PopupMenu ContextMenu;
 
         /// <summary>
         /// The graph search associated with the tree window.
@@ -69,7 +69,7 @@ namespace SEE.UI.Window.TreeWindow
                                      Action rebuild, ButtonManagerBasic filterButton, ButtonManagerBasic sortButton,
                                      ButtonManagerBasic groupButton)
         {
-            this.contextMenu = contextMenu;
+            this.ContextMenu = contextMenu;
             this.searcher = searcher;
             this.grouper = grouper;
             this.rebuild = rebuild;
@@ -88,7 +88,7 @@ namespace SEE.UI.Window.TreeWindow
         /// <summary>
         /// Forwards to <see cref="PopupMenu.ShowWith(IEnumerable{PopupMenuEntry},Vector2)"/>.
         /// </summary>
-        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position) => contextMenu.ShowWith(entries, position);
+        public void ShowWith(IEnumerable<PopupMenuEntry> entries, Vector2 position) => ContextMenu.ShowWith(entries, position);
 
         #region Filter menu
 
@@ -98,7 +98,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowFilterMenu()
         {
             UpdateFilterMenuEntries();
-            contextMenu.ShowWith(position: filterButton.transform.position);
+            ContextMenu.ShowWith(position: filterButton.transform.position);
         }
 
         /// <summary>
@@ -158,8 +158,8 @@ namespace SEE.UI.Window.TreeWindow
                 entries.AddRange(edgeToggles.Select(FilterActionFor));
             }
 
-            contextMenu.ClearEntries();
-            contextMenu.AddEntries(entries);
+            ContextMenu.ClearEntries();
+            ContextMenu.AddEntries(entries);
         }
 
         /// <summary>
@@ -221,7 +221,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowSortMenu()
         {
             UpdateSortMenuEntries();
-            contextMenu.ShowWith(position: sortButton.transform.position);
+            ContextMenu.ShowWith(position: sortButton.transform.position);
         }
 
         /// <summary>
@@ -250,8 +250,8 @@ namespace SEE.UI.Window.TreeWindow
             entries.AddRange(searcher.Graph.AllNumericAttributes().Select(NumericAttributeSortAction));
             entries.AddRange(searcher.Graph.AllStringAttributes().Select(StringAttributeSortAction));
 
-            contextMenu.ClearEntries();
-            contextMenu.AddEntries(entries);
+            ContextMenu.ClearEntries();
+            ContextMenu.AddEntries(entries);
             return;
 
             PopupMenuAction NumericAttributeSortAction(string attributeKey)
@@ -338,7 +338,7 @@ namespace SEE.UI.Window.TreeWindow
         private void ShowGroupMenu()
         {
             UpdateGroupMenuEntries();
-            contextMenu.ShowWith(position: groupButton.transform.position);
+            ContextMenu.ShowWith(position: groupButton.transform.position);
         }
 
         /// <summary>
@@ -365,8 +365,8 @@ namespace SEE.UI.Window.TreeWindow
                 GroupActionFor("Type",
                                new TreeWindowGroupAssigment<string>(searcher.Graph.AllElementTypes().ToDictionary(x => x, TypeToGroup), element => element.Type)),
             };
-            contextMenu.ClearEntries();
-            contextMenu.AddEntries(entries);
+            ContextMenu.ClearEntries();
+            ContextMenu.AddEntries(entries);
             return;
 
             // Returns the group action for the given <paramref name="name"/> and <paramref name="assignment"/>.
