@@ -310,7 +310,7 @@ namespace SEE.Controls.Actions
             private const float padding = 0.004f;
 
             /// <summary>
-            /// A small offset of is used as a difference between the detection and the set value
+            /// A small offset is used as a difference between the detection and the set value
             /// to prevent instant re-detection.
             /// </summary>
             private const float detectionOffset = 0.0001f;
