@@ -68,7 +68,8 @@
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
         "Microsoft.Extensions.FileSystemGlobbing.dll",
-        "MediatR.dll"
+        "MediatR.dll",
+        "MediatR.Contracts.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
