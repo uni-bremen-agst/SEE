@@ -87,7 +87,8 @@ namespace SEE.Game.SceneManipulation
         {
             if (node.GameObject().ContainingCity().NodeTypes[node.Type].ShowNames
                 && node.GameObject().ContainingCity().Renderer is GraphRenderer renderer
-                && GetText(node.GameObject()) == null)
+                && GetText(node.GameObject()) == null
+                && !string.IsNullOrWhiteSpace(node.SourceName))
             {
                 renderer.AddDecorations(node.GameObject());
             }
