@@ -115,10 +115,9 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            Debug.Log(XRSEEActions.Delete);
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.Delete)
+                if (XRSEEActions.Selected)
                 {
                     GameObject DeleteGameObject = XRSEEActions.hoveredGameObject;
                     Assert.IsTrue(DeleteGameObject.HasNodeRef() || DeleteGameObject.HasEdgeRef());
@@ -127,7 +126,7 @@ namespace SEE.Controls.Actions
                     new DeleteNetAction(DeleteGameObject.name).Execute();
                     CurrentState = IReversibleAction.Progress.Completed;
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-                    XRSEEActions.Delete = false;
+                    XRSEEActions.Selected = false;
                     return true; // the selected objects are deleted and this action is done now
                 }
                 else

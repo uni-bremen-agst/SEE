@@ -2,6 +2,7 @@
 using System.Linq;
 using DynamicPanels;
 using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -104,6 +105,17 @@ namespace SEE.UI.Window
 
         protected override void UpdateDesktop()
         {
+            // In VR the TreeView could be open, while the user moves a Node. In this case, the TreeView
+            // would update the entire time, the user is moving the Node, which is causing laggs. Thats
+            // why we close it.
+            if (GlobalActionHistory.Current() == ActionStateTypes.Move && XRSEEActions.CloseTreeView)
+            {
+                foreach (BaseWindow window in currentWindows)
+                {
+                    CloseWindow(window);
+                }
+                XRSEEActions.CloseTreeView = false;
+            }
             if (panel && !windows.Any())
             {
                 // We need to destroy the panel now

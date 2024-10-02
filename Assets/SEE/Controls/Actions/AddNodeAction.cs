@@ -23,7 +23,7 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-            if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Delete && XRSEEActions.hoveredGameObject.HasNodeRef() &&
+            if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Selected && XRSEEActions.hoveredGameObject.HasNodeRef() &&
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res))
             {
                 GameObject parent = XRSEEActions.hoveredGameObject;
@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions
                 new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
                 result = true;
                 CurrentState = IReversibleAction.Progress.Completed;
-                XRSEEActions.Delete = false;
+                XRSEEActions.Selected = false;
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, parent);
             }
             // FIXME: Needs adaptation for VR where no mouse is available.

@@ -3,6 +3,7 @@ using SEE.Game.Operator;
 using RTG;
 using UnityEngine;
 using SEE.Utils.History;
+using SEE.GO;
 
 namespace SEE.Controls.Actions
 {
@@ -164,7 +165,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             public ScaleGizmo()
             {
-                ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                {
+                    ObjectTransformationGizmo = RTGizmosEngine.Get.CreateObjectScaleGizmo();
+                }
             }
         }
         #endregion

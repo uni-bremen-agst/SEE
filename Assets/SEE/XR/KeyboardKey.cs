@@ -1,19 +1,32 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-
+/// <summary>
+/// This class handles a single keyboard key.
+/// </summary>
 public class KeyboardKey : MonoBehaviour
 {
+    /// <summary>
+    /// The character of the key.
+    /// </summary>
     public string character;
+    /// <summary>
+    /// The shifted character.
+    /// </summary>
     public string shiftCharacter;
-
+    /// <summary>
+    /// Is true, when the key is shifted.
+    /// </summary>
     private bool isShifted = false;
-
+    /// <summary>
+    /// The actual keyboard key.
+    /// </summary>
     private Button key;
+    /// <summary>
+    /// The label of the keyboard key.
+    /// </summary>
     public TextMeshProUGUI keyLabel;
-
+    // Start is called before the first frame update
     private void Start()
     {
         KeyboardManager.instance.shiftButton.onClick.AddListener(HandleShift);
@@ -29,7 +42,11 @@ public class KeyboardKey : MonoBehaviour
             shiftCharacter = GetShiftCharacter();
         }
     }
-
+    /// <summary>
+    /// This method returns the shifted equivalent to
+    /// each number on the keyboard.
+    /// </summary>
+    /// <returns>The shifted equivalent to each number.</returns>
     private string GetShiftCharacter()
     {
         switch (keyLabel.text)
@@ -59,7 +76,10 @@ public class KeyboardKey : MonoBehaviour
         }
         return string.Empty;
     }
-
+    /// <summary>
+    /// This method handles the shifting of the
+    /// alphabetical characters.
+    /// </summary>
     private void HandleShift()
     {
         isShifted = !isShifted;
@@ -73,7 +93,9 @@ public class KeyboardKey : MonoBehaviour
             keyLabel.text = character;
         }
     }
-
+    /// <summary>
+    /// This method transfer the character to the inputfield.
+    /// </summary>
     private void TypeKey()
     {
         if (isShifted)

@@ -21,7 +21,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public NodeManipulationAction() : base()
         {
-            RTGInitializer.Enable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Enable();
+            }
         }
 
         #region ReversibleAction Overrides
@@ -44,7 +47,10 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             base.Start();
-            RTGInitializer.Enable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Enable();
+            }
         }
 
         /// <summary>
@@ -53,8 +59,11 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-            RTGInitializer.Disable();
-            UsedGizmo.Disable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Disable();
+                UsedGizmo.Disable();
+            }
         }
 
         #endregion ReversibleAction Overrides
@@ -106,81 +115,85 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (UsedGizmo.IsHovered())
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
-                // Transformation via the gizmo is in progress.
-                if (GameNodeSelected && HasChanges())
+                if (UsedGizmo.IsHovered())
                 {
-                    CurrentState = IReversibleAction.Progress.InProgress;
-                }
-                return false;
-            }
-
-            if (SEEInput.Select())
-            {
-                if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
-                {
-                    // An object different from a graph node was selected.
+                    // Transformation via the gizmo is in progress.
                     if (GameNodeSelected && HasChanges())
                     {
-                        // An object to be manipulated was selected already and it was changed.
-                        // The action is finished.
-                        FinalizeAction();
-                        return true;
+                        CurrentState = IReversibleAction.Progress.InProgress;
                     }
-                    else
-                    {
-                        // No game node has been selected yet or the previously selected game node
-                        // has had no changes. The action is continued.
-                        return false;
-                    }
+                    return false;
                 }
-                else
+
+                if (SEEInput.Select())
                 {
-                    // A game node was selected by the user.
-                    // Has the user already selected a game node in a previous iteration?
-                    if (GameNodeSelected)
+                    if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                     {
-                        // The user has already selected a game node in a previous iteration.
-                        // Are the two game nodes different?
-                        if (GameNodeSelected != raycastHit.collider.gameObject)
+                        // An object different from a graph node was selected.
+                        if (GameNodeSelected && HasChanges())
                         {
-                            // The newly and previously selected nodes are different.
-                            // Have we had any changes yet? If not, we assume the user wants
-                            // to manipulate the newly game node instead.
-                            if (!HasChanges())
-                            {
-                                StartAction(raycastHit.collider.gameObject);
-                                return false;
-                            }
-                            else
-                            {
-                                // This action is considered finished and a different action should
-                                // be started to continue with the newly selected node.
-                                FinalizeAction();
-                                GameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
-                                return true;
-                            }
+                            // An object to be manipulated was selected already and it was changed.
+                            // The action is finished.
+                            FinalizeAction();
+                            return true;
                         }
                         else
                         {
-                            // The user has selected the same node again.
-                            // Nothing to be done.
+                            // No game node has been selected yet or the previously selected game node
+                            // has had no changes. The action is continued.
                             return false;
                         }
                     }
                     else
                     {
-                        // It's the first time, a game node was selected. The action starts.
-                        StartAction(raycastHit.collider.gameObject);
-                        return false;
+                        // A game node was selected by the user.
+                        // Has the user already selected a game node in a previous iteration?
+                        if (GameNodeSelected)
+                        {
+                            // The user has already selected a game node in a previous iteration.
+                            // Are the two game nodes different?
+                            if (GameNodeSelected != raycastHit.collider.gameObject)
+                            {
+                                // The newly and previously selected nodes are different.
+                                // Have we had any changes yet? If not, we assume the user wants
+                                // to manipulate the newly game node instead.
+                                if (!HasChanges())
+                                {
+                                    StartAction(raycastHit.collider.gameObject);
+                                    return false;
+                                }
+                                else
+                                {
+                                    // This action is considered finished and a different action should
+                                    // be started to continue with the newly selected node.
+                                    FinalizeAction();
+                                    GameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
+                                    return true;
+                                }
+                            }
+                            else
+                            {
+                                // The user has selected the same node again.
+                                // Nothing to be done.
+                                return false;
+                            }
+                        }
+                        else
+                        {
+                            // It's the first time, a game node was selected. The action starts.
+                            StartAction(raycastHit.collider.gameObject);
+                            return false;
+                        }
                     }
                 }
-            }
-            else if (SEEInput.ToggleMenu() || SEEInput.Cancel())
-            {
-                FinalizeAction();
-                return true;
+                else if (SEEInput.ToggleMenu() || SEEInput.Cancel())
+                {
+                    FinalizeAction();
+                    return true;
+                }
+                return false;
             }
             return false;
         }

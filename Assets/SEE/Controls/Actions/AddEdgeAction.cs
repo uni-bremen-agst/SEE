@@ -139,20 +139,17 @@ namespace SEE.Controls.Actions
             // FIXME: We need an interaction for VR, too.
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Delete && XRSEEActions.hoveredGameObject.HasNodeRef())
+                if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Selected && XRSEEActions.hoveredGameObject.HasNodeRef())
                 {
-                    Debug.Log("nice");
                     if (from == null)
                     {
                         from = XRSEEActions.hoveredGameObject;
-                        XRSEEActions.Delete = false;
-                        Debug.Log(from.name);
+                        XRSEEActions.Selected = false;
                     }
                     else if (to == null)
                     {
                         to = XRSEEActions.hoveredGameObject;
-                        XRSEEActions.Delete = false;
-                        Debug.Log(to.name);
+                        XRSEEActions.Selected = false;
                     }
                 }
             }
@@ -160,7 +157,6 @@ namespace SEE.Controls.Actions
             {
                 if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
                 {
-                    Debug.Log("nice");
                     if (from == null)
                     {
                         // No source selected yet; this interaction is meant to set the source.

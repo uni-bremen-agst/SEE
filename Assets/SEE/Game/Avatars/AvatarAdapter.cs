@@ -332,7 +332,7 @@ namespace SEE.Game.Avatars
 
             // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
             // will remove components, the former must query.
-            VRIKActions.AddComponents(gameObject, IsLocalPlayer);
+            //VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
             VRIKActions.ReplaceAnimator(gameObject, animatorForVRIKPrefab);
 

@@ -104,9 +104,9 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override bool Update()
         {
-            if (!XRSEEActions.Selected || !Raycasting.IsMouseOverGUI())
+            if (!Raycasting.IsMouseOverGUI())
             {
-                if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0) || XRSEEActions.Selected)
+                if (Input.GetMouseButtonDown(0) || Input.GetMouseButton(0))
                 {
                     // We create the line on demand so that there is no left-over
                     // when the drawing action has never actually started to draw anything.
@@ -116,25 +116,9 @@ namespace SEE.Controls.Actions
                     }
                     // FIXME: This would needed to be adjusted to VR and AR.
                     // The position at which to continue the line.
-                    Vector3 newPosition;
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
-                    {
-                        if (XRSEEActions.hoveredGameObject.name == "Pen(Clone)")
-                        {
-                            newPosition = XRSEEActions.hoveredGameObject.transform.Find("Front").position;
-                        }
-                        else
-                        {
-                            XRSEEActions.RayInteractor.GetLineOriginAndDirection(out Vector3 origin, out Vector3 direction);
-                            newPosition = origin;
-                        }
-                    }
-                    else
-                    {
-                        newPosition = Input.mousePosition;
-                        newPosition.z = 1.0f;
-                        newPosition = Camera.main.ScreenToWorldPoint(newPosition);
-                    }
+                    Vector3 newPosition = Input.mousePosition;
+                    newPosition.z = 1.0f;
+                    newPosition = Camera.main.ScreenToWorldPoint(newPosition);
 
                     // Add newPosition to the line renderer.
                     Vector3[] newPositions = new Vector3[positions.Length + 1];
@@ -146,12 +130,12 @@ namespace SEE.Controls.Actions
                     // The line has been continued so this action has had a visible effect.
                     CurrentState = IReversibleAction.Progress.Completed;
                 }
-                if (Input.GetMouseButtonDown(0) || XRSEEActions.Selected)
+                if (Input.GetMouseButtonDown(0))
                 {
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.ScribbleSound);
                 }
                 // The action is considered complete if the mouse button is no longer pressed.
-                return Input.GetMouseButtonUp(0) || !XRSEEActions.Selected;
+                return Input.GetMouseButtonUp(0);
             }
             return false;
         }

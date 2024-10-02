@@ -308,6 +308,7 @@ namespace SEE.Controls.Actions
                         manager.AddWindow(codeWindow);
                     }
                     manager.ActiveWindow = codeWindow;
+                    XRSEEActions.Selected = false;
                 }
                 return false;
             }

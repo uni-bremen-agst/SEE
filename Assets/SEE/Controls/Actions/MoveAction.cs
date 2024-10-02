@@ -527,6 +527,7 @@ namespace SEE.Controls.Actions
             {
                 if (XRSEEActions.Selected)
                 {
+                    XRSEEActions.CloseTreeView = true;
                     if (!grabbedObject.IsGrabbed)
                     {
                         InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;

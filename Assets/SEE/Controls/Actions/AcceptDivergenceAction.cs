@@ -109,21 +109,18 @@ namespace SEE.Controls.Actions
         {
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.Delete
+                if (XRSEEActions.Selected
                 && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
                 {
-                    Debug.Log("stimmt");
                     // find the edge representing the divergence that should be solved.
                     GameObject divergentEdge = hit.collider.gameObject;
 
                     // check whether the object selected is an edge.
                     if (divergentEdge.TryGetEdge(out Edge selectedEdge))
                     {
-                        Debug.Log("stimmt auch");
                         // check if the selected edge represents a divergence
                         if (selectedEdge.ItsGraph is ReflexionGraph graph && ReflexionGraph.IsDivergent(selectedEdge))
                         {
-                            Debug.Log("stimmt auch auch");
                             // find that node in the architecture graph,
                             // which the divergence's source node is
                             // explicitly or implicitly mapped to
@@ -152,13 +149,13 @@ namespace SEE.Controls.Actions
                             CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
 
                             // the selected object is synced and this action is done
-                            XRSEEActions.Delete = false;
+                            XRSEEActions.Selected = false;
                             return true;
                         }
                     }
                     else
                     {
-                        XRSEEActions.Delete = false;
+                        XRSEEActions.Selected = false;
                         ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                     }
                 }

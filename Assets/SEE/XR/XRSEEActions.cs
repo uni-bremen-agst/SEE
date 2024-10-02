@@ -1,99 +1,95 @@
 using SEE.Controls;
 using SEE.Controls.Actions;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
-using UnityEngine.XR.Interaction.Toolkit.Inputs;
-using UnityEngine.XR.Interaction.Toolkit.Inputs.Readers;
-using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
-using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 
 public class XRSEEActions : MonoBehaviour
 {
-    [SerializeField]
-    [Tooltip("Reads input data from the right hand controller. Input Action must be a Value action type (Vector 2).")]
-    XRInputValueReader<Vector2> m_RightHandTurnInput = new XRInputValueReader<Vector2>("Right Hand Snap Turn");
-
     /// <summary>
-    /// Reads input data from the right hand controller. Input Action must be a Value action type (Vector 2).
+    /// The RayInteractor, which will be accessed.
     /// </summary>
-    public XRInputValueReader<Vector2> rightHandTurnInput
-    {
-        get => m_RightHandTurnInput;
-        set => XRInputReaderUtility.SetInputProperty(ref m_RightHandTurnInput, value, this);
-    }
-
-    public InputHelpers.Button rightTurnButton = InputHelpers.Button.PrimaryAxis2DRight;
-    public InputHelpers.Button leftTurnButton = InputHelpers.Button.SecondaryAxis2DLeft;
-
     [SerializeField]
     XRRayInteractor m_RayInteractor;
+    /// <summary>
+    /// The RayInteractor, which we use, to get the current position of the Laserpointer.
+    /// </summary>
     public static XRRayInteractor RayInteractor { get; set; }
-
+    /// <summary>
+    /// Is true, when the user is hovering over an interactable.
+    /// </summary>
     private bool hovering = false;
-    public static GameObject hoveredGameObject { get; set; }
-
-    public static Transform oldParent { get; set; }
-
+    /// <summary>
+    /// The GameObject the user is currently hovering over.
+    /// </summary>
+    public static GameObject hoveredGameObject { get; private set; }
+    /// <summary>
+    /// The old parent of a node. We need this for the MoveAction.
+    /// </summary>
+    public static Transform oldParent { get; private set; }
+    /// <summary>
+    /// The button, which is used for the primary actions.
+    /// </summary>
     public InputActionReference inputAction;
-
-    public InputActionReference openContextMenu;
-
+    /// <summary>
+    /// The button, which is used for the undo-action.
+    /// </summary>
     public InputActionReference undo;
+    /// <summary>
+    /// The button, which is used for the redo-action.
+    /// </summary>
     public InputActionReference redo;
-    public InputActionReference radialMenu;
-    public InputActionReference scale;
+    /// <summary>
+    /// The button, which is used, to open the tooltip.
+    /// </summary>
     public InputActionReference tooltip;
+    /// <summary>
+    /// Shows the source name of the hovered or selected object as a text label above the
+    /// object. In between that label and the game object, a connecting bar
+    /// will be shown.
+    /// </summary>
     private ShowLabel showLabel;
-    private Vector3 originalScale;
-    private Vector3 originalPoint;
-    private Vector3 updatedScale;
-    public bool allowTurn { get; set; }
 
-    // Start is called before the first frame update
+    // Awake is always called before any Start functions.
     private void Awake()
     {
-        //radialMenu.action.performed += RadialMenu;
         tooltip.action.performed += Tooltip;
         undo.action.performed += Undo;
         redo.action.performed += Redo;
-        //rightHandTurnInput.inputAction.performed += Rotate;
         inputAction.action.Enable();
         inputAction.action.performed += Action;
-        //scale.action.performed += Scale;
-        //openContextMenu.action.Enable();
-        //openContextMenu.action.performed += OpenContexMenu;
         RayInteractor = m_RayInteractor;
+        Selected = false;
     }
-
+    /// <summary>
+    /// This method gets called, when the user begins to hover over an interactable.
+    /// </summary>
+    /// <param name="args">Event data associated with the event when an Interactor first initiates hovering over an Interactable.</param>
     public void OnHoverEnter(HoverEnterEventArgs args)
     {
-        Debug.Log($"{args.interactorObject} hovered over {args.interactableObject}", this);
         hovering = true;
         hoveredGameObject = args.interactableObject.transform.gameObject;
-        oldParent = args.interactableObject.transform.parent;
-        Debug.Log(oldParent.name + "cool");
+        if (GlobalActionHistory.Current() == ActionStateTypes.Move)
+        {
+            oldParent = args.interactableObject.transform.parent;
+        }
         hoveredGameObject.transform.TryGetComponent(out showLabel);
         showLabel?.On();
         if (hoveredGameObject.transform.TryGetComponent(out InteractableObject io))
         {
-            allowTurn = false;
             io.SetHoverFlag(HoverFlag.World, true, true);
         }
     }
-
+    /// <summary>
+    /// This method gets called, when the user stops hovering over an interactable.
+    /// </summary>
+    /// <param name="args">Event data associated with the event when an Interactor stops hovering over an Interactable.</param>
     public void OnHoverExited(HoverExitEventArgs args)
     {
-        Debug.Log($"{args.interactorObject} stopped hovered over {args.interactableObject}", this);
         hovering = false;
         hoveredGameObject = args.interactableObject.transform.gameObject;
         oldParent = null;
@@ -101,15 +97,24 @@ public class XRSEEActions : MonoBehaviour
         showLabel?.Off();
         if (hoveredGameObject.transform.TryGetComponent(out InteractableObject io))
         {
-            allowTurn = true;
             io.SetHoverFlag(HoverFlag.World, false, true);
         }
     }
-
-    public void OnSelectEnter(SelectEnterEventArgs args)
+    /// <summary>
+    /// Is true, when the button for the primary actions is pressed.
+    /// </summary>
+    public static bool Selected { get; set; }
+    /// <summary>
+    /// The GameObject, which should be rotated.
+    /// </summary>
+    public static GameObject RotateObject { get; private set; }
+    /// <summary>
+    /// This method gets called, when the button for the primary actions is pressed.
+    /// </summary>
+    /// <param name="context">Information provided to action callbacks about what triggered an action.</param>
+    private void Action(InputAction.CallbackContext context)
     {
-        if(GlobalActionHistory.Current() == ActionStateTypes.Move || GlobalActionHistory.Current() == ActionStateTypes.Draw || GlobalActionHistory.Current() == ActionStateTypes.ShowCode
-            || GlobalActionHistory.Current() == ActionStateTypes.Rotate)
+        if (hovering)
         {
             if (GlobalActionHistory.Current() == ActionStateTypes.Move && Selected == true)
             {
@@ -119,47 +124,45 @@ public class XRSEEActions : MonoBehaviour
             {
                 Selected = true;
             }
-        }
-    }
-
-    public void OnSelectExited(SelectExitEventArgs args)
-    {
-        if (GlobalActionHistory.Current() == ActionStateTypes.Draw || GlobalActionHistory.Current() == ActionStateTypes.ShowCode
-            || GlobalActionHistory.Current() == ActionStateTypes.Rotate)
-        {
-            Selected = false;
-        }
-    }
-    public static bool Selected { get; set; }
-    public static bool Delete { get; set; }
-    public static GameObject RotateObject { get; set; }
-    private void Action(InputAction.CallbackContext context)
-    {
-        if (hovering)
-        {
-            Delete = true;
             if (GlobalActionHistory.Current() == ActionStateTypes.NewEdge || GlobalActionHistory.Current() == ActionStateTypes.Delete ||
                 GlobalActionHistory.Current() == ActionStateTypes.NewNode || GlobalActionHistory.Current() == ActionStateTypes.AcceptDivergence)
             {
-                Delete = true;
+                Selected = true;
             }
             if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
             {
                 RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 RotateObject = hit.collider.transform.gameObject;
-                Delete = true;
+                Selected = true;
             }
         }
     }
-
+    /// <summary>
+    /// Will be true, when the TreeView is open, while the user tries to move a node.
+    /// </summary>
+    public static bool CloseTreeView { get; set; }
+    /// <summary>
+    /// Is true, when the Tooltip is getting activated.
+    /// </summary>
     public static bool TooltipToggle { get; set; }
-
+    /// <summary>
+    /// Is true, while the Tooltip is open.
+    /// This bool is used, to close the Tooltip, if the user does not want
+    /// to use an action.
+    /// </summary>
     public static bool OnSelectToggle { get; set; }
-
+    /// <summary>
+    /// Is true, when the user opens the tooltip in the treeview.
+    /// </summary>
     public static bool OnTreeViewToggle { get; set; }
-
+    /// <summary>
+    /// The treview-entry for which the tooltip should be shown.
+    /// </summary>
     public static GameObject TreeViewEntry { get; set; }
-
+    /// <summary>
+    /// This method gets called, when the button for the tooltip is pressed.
+    /// </summary>
+    /// <param name="context">Information provided to action callbacks about what triggered an action.</param>
     private void Tooltip(InputAction.CallbackContext context)
     {
         if (OnTreeViewToggle)
@@ -177,79 +180,29 @@ public class XRSEEActions : MonoBehaviour
             TooltipToggle = true;
         }
     }
-
+    /// <summary>
+    /// Is true, when the button for the undo-action is pressed.
+    /// </summary>
     public static bool UndoToggle { get; set; }
+    /// <summary>
+    /// This method gets called, when the button for the undo-action is pressed.
+    /// </summary>
+    /// <param name="context">Information provided to action callbacks about what triggered an action.</param>
     private void Undo(InputAction.CallbackContext context)
     {
         UndoToggle = true;
     }
+    /// <summary>
+    /// Is true, when the button for the redo-action is pressed.
+    /// </summary>
     public static bool RedoToggle { get; set; }
+    /// <summary>
+    /// This method gets called, when the button for the redo-action is pressed.
+    /// </summary>
+    /// <param name="context">Information provided to action callbacks about what triggered an action.</param>
     private void Redo(InputAction.CallbackContext context)
     {
         RedoToggle = true;
-    }
-    public static bool RadialMenuTrigger { get; set; }
-    private void RadialMenu(InputAction.CallbackContext context)
-    {
-        RadialMenuTrigger = true;
-    }
-
-    public static bool ContextMenu { get; set; }
-
-    private void OpenContexMenu(InputAction.CallbackContext context)
-    {
-        if (hovering)
-        {
-            if (hoveredGameObject.gameObject.TryGetNode(out Node node))
-            {
-                ContextMenu = true;
-            }
-        }
-    }
-
-    private void Rotate(InputAction.CallbackContext context)
-    {
-        if (hovering && GlobalActionHistory.Current() == ActionStateTypes.Rotate)
-        {
-            if (hoveredGameObject.gameObject.TryGetNode(out Node node))
-            {
-                var amount = GetTurnAmount(m_RightHandTurnInput.ReadValue());
-                if (Math.Abs(amount) > 0f)
-                {
-                    hoveredGameObject.transform.Rotate(0, amount * Time.deltaTime, 0);
-                }
-                ContextMenu = true;
-            }
-        }
-    }
-
-    /// <summary>
-    /// Determines the turn amount in degrees for the given <paramref name="input"/> vector.
-    /// </summary>
-    /// <param name="input">Input vector, such as from a thumbstick.</param>
-    /// <returns>Returns the turn amount in degrees for the given <paramref name="input"/> vector.</returns>
-    protected virtual float GetTurnAmount(Vector2 input)
-    {
-        if (input == Vector2.zero)
-            return 0f;
-
-        var cardinal = CardinalUtility.GetNearestCardinal(input);
-        switch (cardinal)
-        {
-            case Cardinal.North:
-                break;
-            case Cardinal.South:
-                break;
-            case Cardinal.East:
-                    return 45f;
-            case Cardinal.West:
-                    return -45f;
-            default:
-                Assert.IsTrue(false, $"Unhandled {nameof(Cardinal)}={cardinal}");
-                break;
-        }
-
-        return 0f;
     }
 
     // Update is called once per frame

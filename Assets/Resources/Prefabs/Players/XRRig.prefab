@@ -1019,7 +1019,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 0}
   m_AnchorMax: {x: 1, y: 0}
-  m_AnchoredPosition: {x: 0.018, y: 0.178}
+  m_AnchoredPosition: {x: 0.018, y: 0.301}
   m_SizeDelta: {x: 15, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &324583388101303568
@@ -3930,7 +3930,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  radialMenu: {fileID: 0}
+  radialMenu: {fileID: -5682838919551673433, guid: c348712bda248c246b8c49b3db54643f,
+    type: 3}
 --- !u!1 &7806924667908141112
 GameObject:
   m_ObjectHideFlags: 0
@@ -5334,6 +5335,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6114475630110519974, guid: 162ddcf88c59fddd8968cbb10ab97990,
+        type: 3}
+      propertyPath: m_Value
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7268603804443373351, guid: 162ddcf88c59fddd8968cbb10ab97990,
         type: 3}
       propertyPath: m_AnchorMax.x
@@ -5907,30 +5913,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df5e8c7d8b96d6944aaafef73a15f5b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RightHandTurnInput:
-    m_InputSourceMode: 2
-    m_InputAction:
-      m_Name: Right Hand Snap Turn
-      m_Type: 0
-      m_ExpectedControlType: Vector2
-      m_Id: 490210c5-ce56-4a31-b1ba-81ebd985ece6
-      m_Processors: 
-      m_Interactions: 
-      m_SingletonActionBindings: []
-      m_Flags: 0
-    m_InputActionReference: {fileID: 0}
-    m_ObjectReferenceObject: {fileID: 0}
-    m_ManualValue: {x: 0, y: 0}
-  rightTurnButton: 17
-  leftTurnButton: 20
   m_RayInteractor: {fileID: 645861538944586177}
-  inputAction: {fileID: 0}
-  openContextMenu: {fileID: 0}
-  undo: {fileID: 0}
-  redo: {fileID: 0}
-  radialMenu: {fileID: 0}
-  scale: {fileID: 0}
-  tooltip: {fileID: 0}
+  inputAction: {fileID: -8702539468625610546, guid: c348712bda248c246b8c49b3db54643f,
+    type: 3}
+  undo: {fileID: -812385805868538792, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  redo: {fileID: -3920244069173739677, guid: c348712bda248c246b8c49b3db54643f, type: 3}
+  tooltip: {fileID: 8743747968909092437, guid: c348712bda248c246b8c49b3db54643f, type: 3}
 --- !u!1001 &6545633283681792108
 PrefabInstance:
   m_ObjectHideFlags: 0
