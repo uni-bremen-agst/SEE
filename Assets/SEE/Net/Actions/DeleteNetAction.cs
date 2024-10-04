@@ -42,7 +42,9 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             GameObject gameObject = GraphElementIDMap.Find(GameObjectID, mustFindElement: true);
+#pragma warning disable VSTHRD110
             GameElementDeleter.Delete(gameObject);
+#pragma warning restore VSTHRD110
         }
     }
 }

@@ -47,12 +47,16 @@ namespace SEE.UI.HelpSystem
         public bool IsPlaying { get; set; }
 
         /// <summary>
-        /// Path to the HelpSystemEntry prefab.
+        /// Path to the HelpSystemEntry prefab. It contains the video player,
+        /// the text area for the help text, and the buttons for controlling the video
+        /// as well as the button to close the dialog and the button to go back to the
+        /// parent in the help menu.
         /// </summary>
         private const string helpSystemEntryPrefab = "Prefabs/UI/HelpSystemEntry";
 
         /// <summary>
-        /// Path to the HelpSystemEntrySpace prefab.
+        /// Path to the HelpSystemEntrySpace prefab. It is a panel in which
+        /// the HelpSystemEntry is placed.
         /// </summary>
         private const string helpSystemEntrySpacePrefab = "Prefabs/UI/HelpSystemEntrySpace";
 
@@ -96,13 +100,17 @@ namespace SEE.UI.HelpSystem
         private ButtonManagerBasicIcon backwardButton;
 
         /// <summary>
-        /// The helpSystemEntry-GameObject.
+        /// The helpSystemEntry GameObject.
+        /// It will be instantiated from the prefab <see cref="helpSystemEntryPrefab"/>.
+        /// It will be a child of <see cref="helpSystemSpace"/>.
         /// </summary>
         private GameObject helpSystemEntry;
 
         /// <summary>
         /// The helpSystemEntrySpace-GameObject which contains the helpSystemEntry.
         /// It is nessecary because of the dynamic panel for scaling the entry.
+        /// It will be instantiated from the prefab <see cref="helpSystemEntrySpacePrefab"/>.
+        /// It will be a child of <see cref="PlatformDependentComponent.Canvas"/>.
         /// </summary>
         private GameObject helpSystemSpace;
 
@@ -141,11 +149,23 @@ namespace SEE.UI.HelpSystem
         {
             /// Note: <see cref="GetTextField()"/> called below accesses <see cref="helpSystemEntry"/>
             /// that is why we need to instantiate it first.
-            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+            SetUpHelpSystemEntryAndSpace();
             helpSystemSpace.SetActive(false);
-            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
             helpSystemEntry.SetActive(false);
             instructionsDisplay = GetTextField();
+        }
+
+        /// <summary>
+        /// Instantiates the help system entry and the space if necessary, that is,
+        /// if <see cref="helpSystemEntry"/> is null.
+        /// </summary>
+        private void SetUpHelpSystemEntryAndSpace()
+        {
+            if (helpSystemSpace == null)
+            {
+                helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+                helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            }
         }
 
         /// <summary>
@@ -249,6 +269,9 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
+            /// If the dialog was closed, <see cref="helpSystemSpace"/> and <see cref="helpSystemEntry"/>
+            /// are null and need to be instantiated again.
+            SetUpHelpSystemEntryAndSpace();
             helpSystemSpace.SetActive(true);
             helpSystemEntry.SetActive(true);
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);

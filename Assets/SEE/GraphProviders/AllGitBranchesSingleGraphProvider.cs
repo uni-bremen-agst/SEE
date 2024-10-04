@@ -52,7 +52,7 @@ namespace SEE.GraphProviders
                          Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
             RuntimeTab(GraphProviderFoldoutGroup),
                          HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new Dictionary<string, bool>()
+        public Dictionary<string, bool> PathGlobbing = new()
                          {
                              { "**/*", true }
                          };
@@ -79,7 +79,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
-        [Tooltip("The interval in seconds in which the repositor should be polled. Used only if Auto Fetch is true."),
+        [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
             EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int PollingInterval = 5;
 

@@ -495,37 +495,8 @@
                     "MenuEntries": [
                         {
                             "type": "HelpSystemEntry",
-                            "name": "Draw free in the room",
-                            "description": "How to draw somewhere in the room",
-                            "color": "magenta",
-                            "video": "HelpSystem/Videos/DrawFreeRoom.mp4",
-                            "HelpEntries": [
-                                {
-                                    "index": 1,
-                                    "text": "Press Space for opening the player menu.",
-                                    "startPosition": 0
-                                },
-                                {
-                                    "index": 2,
-                                    "text": "Left click on the entry Draw.",
-                                    "startPosition": 8
-                                },
-                                {
-                                    "index": 3,
-                                    "text": "Left click and hold to draw.",
-                                    "startPosition": 14
-                                },
-                                {
-                                    "index": 4,
-                                    "text": "Your drawing is now placed in the room and you can walk around it.",
-                                    "startPosition": 21
-                                }
-                            ]
-                        },
-                        {
-                            "type": "HelpSystemEntry",
-                            "name": "Draw free on the whiteboard",
-                            "description": "How to draw free on the whiteboard",
+                            "name": "Draw freely on the whiteboard",
+                            "description": "How to drawly free on the whiteboard",
                             "color": "magenta",
                             "video": "HelpSystem/Videos/Drawable/FreeDraw.mp4",
                             "HelpEntries": [

@@ -1,5 +1,5 @@
-﻿using SEE.Utils;
-using UnityEngine;
+﻿using UnityEngine;
+using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
 
@@ -95,6 +95,11 @@ namespace SEE.Controls.Actions
                   Color.green.Darker(), Icons.PenToSquare,
                   EditNodeAction.CreateReversibleAction);
 
+            ResizeNode =
+              new("Resize Node", "Change the size of a node",
+                  Color.green.Darker(), Icons.Resize,
+                  ResizeNodeAction.CreateReversibleAction);
+
             ScaleNode =
               new("Scale Node", "Scale a node",
                   Color.green.Darker(), Icons.Scale,
@@ -109,11 +114,6 @@ namespace SEE.Controls.Actions
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
                   ShowCodeAction.CreateReversibleAction);
-
-            Draw =
-              new("Draw", "Draw freely in world space",
-                  Color.magenta.Darker(), Icons.Pencil,
-                  DrawAction.CreateReversibleAction);
 
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
@@ -308,6 +308,7 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
+        public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType ScaleNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;

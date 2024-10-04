@@ -1,16 +1,18 @@
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.GO;
-using SEE.Utils.History;
-using UnityEngine;
-using System;
-using SEE.Game.SceneManipulation;
-using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.SceneManipulation;
+using SEE.GO;
+using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -76,11 +78,16 @@ namespace SEE.Controls.Actions
         private Memento memento;
 
         /// <summary>
-        /// The edge created by this action. Can be null if no edge has been created yet or whether
-        /// an Undo was called. The created edge is stored only to delete it again if Undo is
-        /// called. All information to create the edge is kept in <see cref="memento"/>.
+        /// The information required to (re-)create the edges that solve the divergence
+        /// via the multi-selection context menu.
         /// </summary>
-        private Edge createdEdge;
+        private readonly List<Memento> mementoList = new();
+
+        /// <summary>
+        /// The edges created by this action <see cref="createdEdge"/>.
+        /// The list is needed for the multi-selection via context menu.
+        /// </summary>
+        private readonly List<Edge> createdEdgeList = new();
 
         /// <summary>
         /// Registers itself at <see cref="InteractableObject"/> to listen for hovering events.
@@ -135,12 +142,12 @@ namespace SEE.Controls.Actions
                         // we have both source and target of the edge and use a memento struct
                         // to remember which edge we have added
                         memento = new Memento(source, target, Edge.SourceDependency);
-
+                        mementoList.Add(memento);
                         // create the edge
-                        createdEdge = CreateConvergentEdge(memento);
+                        createdEdgeList.Add(CreateConvergentEdge(memento));
 
                         // check whether edge creation was successful
-                        bool divergenceSolved = createdEdge != null;
+                        bool divergenceSolved = createdEdgeList[0] != null;
 
                         // add audio cue to the appearance of the new architecture edge
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
@@ -158,6 +165,12 @@ namespace SEE.Controls.Actions
                     ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                 }
             }
+            if (ExecuteViaContextMenu)
+            {
+                bool divergenceSolved = createdEdgeList.All(e => e != null);
+                CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                return true;
+            }
             return false;
         }
 
@@ -167,30 +180,41 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            foreach (Edge edge in createdEdgeList)
+            {
+                RemoveDivergence(edge);
+            }
+            createdEdgeList.Clear();
+        }
 
+        /// <summary>
+        /// Removes the divergence (undo).
+        /// </summary>
+        /// <param name="edge">The edge divergence to remove.</param>
+        /// <exception cref="Exception">If the edge not contained in a graph.</exception>
+        private void RemoveDivergence(Edge edge)
+        {
             // remove the synced edge (its info is saved in memento)
-            ReflexionGraph graph = (ReflexionGraph)createdEdge.ItsGraph;
+            ReflexionGraph graph = (ReflexionGraph)edge.ItsGraph;
 
             if (graph != null)
             {
                 // find the corresponding GameObject
-                GameObject createdEdgeGO = GraphElementIDMap.Find(createdEdge.ID);
+                GameObject createdEdgeGO = GraphElementIDMap.Find(edge.ID);
                 // remove the edge's GameObject and graph representation locally and on the network
                 GameEdgeAdder.Remove(createdEdgeGO);
 
                 // propagate the new edge via network
-                new DeleteNetAction(createdEdge.ID).Execute();
+                new DeleteNetAction(edge.ID).Execute();
 
                 // ensure the edge's GameObject gets destroyed properly
                 Destroyer.Destroy(createdEdgeGO);
             }
             else
             {
-                throw new Exception($"Edge {createdEdge.ID} to be removed is not contained in a graph.");
+                throw new Exception($"Edge {edge.ID} to be removed is not contained in a graph.");
             }
 
-            // set any edge references back to null
-            createdEdge = null;
         }
 
         /// <summary>
@@ -199,8 +223,10 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            // recreate the edge
-            createdEdge = CreateConvergentEdge(memento);
+            foreach (Memento mem in mementoList)
+            {
+                createdEdgeList.Add(CreateConvergentEdge(mem));
+            }
         }
 
         /// <summary>
@@ -219,17 +245,46 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>.
+        /// Used to execute the <see cref="AcceptDivergenceAction"/> from the context menu.
+        /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>
+        /// and ensures that the <see cref="Update"/> method performs the execution via context menu.
         /// </summary>
         /// <param name="divergence">the edge representing the divergence</param>
         /// <returns>the new edge</returns>
-        public static Edge CreateConvergentEdge(Edge divergence)
+        public void ContextMenuExecution(Edge divergence)
+        {
+            ExecuteViaContextMenu = true;
+            mementoList.Add(CreateMementoAndConvergentEdge(divergence));
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="AcceptDivergenceAction"/> from the context menu in multiselection mode.
+        /// Creates new edges in the architecture to allow the given <paramref name="divergences"/> and ensures
+        /// that the <see cref="Update"/> method perfoms the execution via context menu.
+        /// </summary>
+        /// <param name="divergences">The edges representing the divergences.</param>
+        public void ContextMenuExecution(IList<Edge> divergences)
+        {
+            ExecuteViaContextMenu = true;
+            foreach (Edge divergence in divergences)
+            {
+                mementoList.Add(CreateMementoAndConvergentEdge(divergence));
+            }
+        }
+
+        /// <summary>
+        /// Creates the memento for restoring the edge and creates the edge.
+        /// </summary>
+        /// <param name="divergence">the edge representing the divergence.</param>
+        /// <returns>The created memento.</returns>
+        private Memento CreateMementoAndConvergentEdge(Edge divergence)
         {
             ReflexionGraph graph = (ReflexionGraph)divergence.ItsGraph;
             Node source = graph.MapsTo(divergence.Source);
             Node target = graph.MapsTo(divergence.Target);
-            Memento memento = new(source, target, Edge.SourceDependency);
-            return CreateConvergentEdge(memento);
+            memento = new(source, target, Edge.SourceDependency);
+            createdEdgeList.Add(CreateConvergentEdge(memento));
+            return memento;
         }
 
         /// <summary>
@@ -247,18 +302,13 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of GameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (createdEdge == null)
+            if (createdEdgeList.Count == 0)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return new HashSet<string>
-                {
-                    memento.From.ID,
-                    memento.To.ID,
-                    createdEdge.ID
-                };
+                return mementoList.Zip(createdEdgeList, (m, e) => new[] { m.From.ID, m.To.ID, e.ID }).SelectMany(x => x).ToHashSet();
             }
         }
     }

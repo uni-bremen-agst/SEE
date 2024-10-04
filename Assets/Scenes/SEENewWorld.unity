@@ -866,7 +866,6 @@ GameObject:
   - component: {fileID: 153801763}
   - component: {fileID: 153801762}
   - component: {fileID: 153801761}
-  - component: {fileID: 153801760}
   - component: {fileID: 153801759}
   m_Layer: 0
   m_Name: BranchCity
@@ -1083,6 +1082,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -1209,6 +1211,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -1333,6 +1338,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -1743,18 +1751,6 @@ MonoBehaviour:
     RelativePath: /
     AbsolutePath: 
   Date: 24/08/2024
---- !u!114 &153801760
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 153801757}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: af55e17518e6453db9e9d0f6cfa588cf, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2866,6 +2862,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -2990,6 +2989,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -3118,6 +3120,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3242,6 +3247,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -3370,6 +3378,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3494,6 +3505,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -3622,6 +3636,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3746,6 +3763,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -3874,6 +3894,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3998,6 +4021,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -5071,6 +5097,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5195,6 +5224,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -5323,6 +5355,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5447,6 +5482,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -5575,6 +5613,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5704,6 +5745,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5830,6 +5874,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5954,6 +6001,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -6082,6 +6132,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6208,6 +6261,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6332,6 +6388,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -6463,6 +6522,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6592,6 +6654,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6716,6 +6781,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -6844,6 +6912,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6968,6 +7039,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -10528,6 +10602,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -10657,6 +10734,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -10781,6 +10861,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -10909,6 +10992,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11033,6 +11119,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -11161,6 +11250,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11287,6 +11379,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11416,6 +11511,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11542,6 +11640,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11666,6 +11767,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -11794,6 +11898,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11920,6 +12027,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12044,6 +12154,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -12175,6 +12288,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12304,6 +12420,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12428,6 +12547,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -12556,6 +12678,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12680,6 +12805,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -17677,6 +17805,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -17801,6 +17932,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -17929,6 +18063,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -18053,6 +18190,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -18181,6 +18321,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -18305,6 +18448,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -18433,6 +18579,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -18559,6 +18708,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -18683,6 +18835,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -30187,6 +30342,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -30313,6 +30471,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -30439,6 +30600,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -30565,6 +30729,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: true
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -30689,6 +30856,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -30817,6 +30987,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -30941,6 +31114,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -31069,6 +31245,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -31193,6 +31372,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -31321,6 +31503,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -31445,6 +31630,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -31573,6 +31761,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -31697,6 +31888,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -31825,6 +32019,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -31951,6 +32148,9 @@ MonoBehaviour:
     - Name: ShowNames
       Entry: 5
       Data: false
+    - Name: AllowManualNodeManipulation
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -32075,6 +32275,9 @@ MonoBehaviour:
       Entry: 4
       Data: 1
     - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualNodeManipulation
       Entry: 5
       Data: false
     - Name: 
@@ -32469,9 +32672,9 @@ MonoBehaviour:
       Data: 
   LODCulling: 0.001
   ConfigurationPath:
-    Root: 0
+    Root: 3
     RelativePath: /reflexion/compiler/Reflexion.cfg
-    AbsolutePath: s/reflexion/compiler/Reflexion.cfgexion/compiler/Reflexion.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
     Root: 3
     RelativePath: /reflexion/compiler/minilax

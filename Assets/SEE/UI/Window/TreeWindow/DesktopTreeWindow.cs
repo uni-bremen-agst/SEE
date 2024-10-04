@@ -405,15 +405,21 @@ namespace SEE.UI.Window.TreeWindow
 
                             // We want all applicable actions for the element, except ones where the element
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
-                            IEnumerable<PopupMenuAction> actions = ContextMenuAction
-                                                                   .GetApplicableOptions(representedGraphElement,
-                                                                                         representedGameObject)
-                                                                   .Where(x => !x.Name.Contains("TreeWindow"));
-                            actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
+                            List<PopupMenuAction> appends = new ()
                             {
-                                searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                Rebuild();
-                            }, Icons.Hide));
+                                new("Hide in TreeWindow", () =>
+                                    {
+                                        searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                        Rebuild();
+                                    }, Icons.Hide)
+                            };
+                            IEnumerable<PopupMenuEntry> actions = ContextMenuAction
+                                                                   .GetOptionsForTreeView(contextMenu.ContextMenu,
+                                                                                         e.position,
+                                                                                         representedGraphElement,
+                                                                                         representedGameObject,
+                                                                                         appends);
+                            actions = actions.Concat(appends);
                             contextMenu.ShowWith(actions, e.position);
                         }
                         else

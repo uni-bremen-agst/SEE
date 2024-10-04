@@ -57,7 +57,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// <summary>
         /// The drawable surface sorter.
         /// </summary>
-        public readonly DrawableSurfaceSorter Sorter;
+        public readonly GameObjectSorter Sorter;
 
         /// <summary>
         /// Constructor.
@@ -78,7 +78,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             this.groupButton = groupButton;
             Filter = new DrawableSurfaceFilter();
             Grouper = new DrawableWindowGrouper();
-            Sorter = new DrawableSurfaceSorter();
+            Sorter = new GameObjectSorter();
 
             ResetFilter();
             ResetSort();
@@ -443,26 +443,14 @@ namespace SEE.UI.Window.DrawableManagerWindow
             {
                 if (GameFinder.GetDrawableTypesOfPage(surface, page).Count > 0)
                 {
-                    ConfirmDialogMenu confirm = new();
-                    confirm.Enable($"Do you really want to delete the page {page}?\r\nThis action cannot be undone.");
-                    WaitForConfirm(confirm, page).Forget();
+                    ConfirmDialogMenu confirm = new($"Do you really want to delete the page {page}?\r\nThis action cannot be undone.");
+                    confirm.ExecuteAfterConfirmAsync(() =>
+                    {
+                        GameDrawableManager.RemovePage(surface, page);
+                        new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
+                    }).Forget();
                 }
                 else
-                {
-                    GameDrawableManager.RemovePage(surface, page);
-                    new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
-                }
-
-            }
-
-            /// Waits for the user input of the confirm dialog menu.
-            async UniTask WaitForConfirm(ConfirmDialogMenu confirm, int page)
-            {
-                while (confirm.IsOpen())
-                {
-                    await UniTask.Yield();
-                }
-                if (confirm.WasConfirmed && !confirm.WasCanceled)
                 {
                     GameDrawableManager.RemovePage(surface, page);
                     new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
