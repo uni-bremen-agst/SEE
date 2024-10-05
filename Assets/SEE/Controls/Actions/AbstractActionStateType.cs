@@ -25,11 +25,11 @@ namespace SEE.Controls.Actions
         public Color Color { get; }
 
         /// <summary>
-        /// Path to the material of the icon for this action.
+        /// The FontAwesome codepoint of the icon for this action. See <see cref="Icons"/> for more information.
         /// The icon itself should be a visual representation of the action.
         /// Will be used in the <see cref="DesktopMenu"/>.
         /// </summary>
-        public string IconPath { get; }
+        public char Icon { get; }
 
         /// <summary>
         /// The parent of this action state type, i.e., the <see cref="ActionStateTypeGroup"/>
@@ -47,16 +47,17 @@ namespace SEE.Controls.Actions
         /// <param name="name">The Name of this ActionStateType. Must be unique.</param>
         /// <param name="description">Description for this ActionStateType.</param>
         /// <param name="color">Color for this ActionStateType.</param>
-        /// <param name="iconPath">Path to the material of the icon for this ActionStateType.</param>
+        /// <param name="icon">The icon which shall be displayed alongside this entry,
+        /// given as a FontAwesome codepoint.</param>
         /// <param name="group">The group this action state type belongs to; may be null.</param>
         /// <param name="register">If true, this action state type will be registered in <see cref="ActionStateTypes"/>.</param>
-        protected AbstractActionStateType
-            (string name, string description, Color color, string iconPath, ActionStateTypeGroup group, bool register)
+        protected AbstractActionStateType(string name, string description, Color color, char icon,
+                                          ActionStateTypeGroup group, bool register)
         {
             Name = name;
             Description = description;
             Color = color;
-            IconPath = iconPath;
+            Icon = icon;
             group?.Add(this);
             if (register)
             {

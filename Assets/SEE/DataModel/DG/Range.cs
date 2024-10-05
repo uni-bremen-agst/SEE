@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace SEE.DataModel.DG
@@ -34,6 +35,45 @@ namespace SEE.DataModel.DG
         /// Returns the end line and character as a tuple.
         /// </summary>
         public (int Line, int Character) End => (EndLine, EndCharacter ?? 0);
+
+        /// <summary>
+        /// Whether this range has a character range.
+        /// If this is false, the range only contains full lines.
+        /// </summary>
+        public bool HasCharacter => StartCharacter.HasValue || EndCharacter.HasValue;
+
+        /// <summary>
+        /// Splits this range into individual lines.
+        /// The resulting ranges, taken together, will cover the same area as this range,
+        /// but each range will only cover a single line at most.
+        /// </summary>
+        /// <returns>An enumerable of ranges, each covering a single line.</returns>
+        public IEnumerable<Range> SplitIntoLines()
+        {
+            if (Lines <= 1)
+            {
+                // Just the one line.
+                yield return this;
+            }
+            else if (HasCharacter)
+            {
+                // If we have characters, we need to split the first and last line.
+                yield return this with { EndLine = StartLine + 1, EndCharacter = null };
+                for (int line = StartLine + 1; line < EndLine; line++)
+                {
+                    yield return new Range(line, line + 1);
+                }
+                yield return this with { StartLine = EndLine - 1, StartCharacter = 0 };
+            }
+            else
+            {
+                // If we don't have characters, we can just return the full lines.
+                for (int line = StartLine; line < EndLine; line++)
+                {
+                    yield return new Range(line, line + 1);
+                }
+            }
+        }
 
         /// <summary>
         /// Returns true if the given line and character are contained in this range.
@@ -89,6 +129,16 @@ namespace SEE.DataModel.DG
                 contains = contains && Contains(other.EndLine - 1, 0) && Contains(other.EndLine - 1, int.MaxValue);
             }
             return contains;
+        }
+
+        /// <summary>
+        /// Whether this range overlaps with the given line.
+        /// </summary>
+        /// <param name="line">The line to check.</param>
+        /// <returns>True if this range overlaps with the given line.</returns>
+        public bool Overlaps(int line)
+        {
+            return line >= StartLine && line < EndLine;
         }
 
         public override string ToString()

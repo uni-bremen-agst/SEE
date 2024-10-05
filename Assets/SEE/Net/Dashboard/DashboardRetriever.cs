@@ -36,22 +36,7 @@ namespace SEE.Net.Dashboard
         [EnvironmentVariable("DASHBOARD_PUBLIC_KEY")]
         [TextArea]
         [Tooltip("The public key for the X.509 certificate authority from the dashboard's certificate.")]
-        public string PublicKey =
-            "3082018A0282018100A302EA2CC9324FAF313D6CE3930BACF377215E"
-            + "A94BC7DA68FDCB9764DC912A8C8F7AD08D7C81A2185E3204DAC3C7F6"
-            + "B4EC938DDE7B7803B1D83586F8F47FE1A917C47DE55051D766234789"
-            + "1E95DB2D893B730FA32566784F3B309B8854214EB944170B1B0F0D3D"
-            + "11604221422CA08D434591EB3CFE21DC126FA5C13BE34CD86A2DC050"
-            + "EFE992C294C7E337FD7EC0CC13A92E88434CB55D6399E60FD2F21149"
-            + "CDA3BB9F615A124BF6F3A0F278C7D20E65671EBC4DAC737720991367"
-            + "A23091854F57083C4FE3DB9132D9CFCEED2C4F0B7FD0771F052ADDC6"
-            + "5A80C5D68F08BFBEB70E1B92AF08031E964F87A82B9BA5CD6E7D77C9"
-            + "9A3E88D5FE663B0FD67BBF9EEAC95EE08CC53CDAC861C90C0B824FBA"
-            + "91E6EAB562685486E0ED9849379FBD5E766B6F84DA704FAD6E8E07E6"
-            + "73FA177595D013ED29D452464995939E4F4071E6ABFAB4B970EA30FF"
-            + "8628C1E1C92D14EAEEA9BAF2DAB298984E88DA7E94BD3C00BBD8E421"
-            + "0E018FFD17FBCF39463A5734A5161A3DA7741385F8EA96F6F2C0D12C"
-            + "6F0203010001";
+        public string PublicKey;
 
         /// <summary>
         /// The URL to the Axivion Dashboard, up to the project name.
@@ -75,6 +60,16 @@ namespace SEE.Net.Dashboard
         [EnvironmentVariable("DASHBOARD_STRICT_MODE")]
         [Tooltip("Whether to throw an error if Dashboard models have more fields than the C# models.")]
         public bool StrictMode = false;
+
+        /// <summary>
+        /// The number of seconds after which a request to the dashboard will be considered timed out.
+        /// If this is set to 0, the request will never time out.
+        /// </summary>
+        [EnvironmentVariable("DASHBOARD_TIMEOUT_SECONDS")]
+        [Tooltip("The number of seconds after which a request to the dashboard will be considered timed out. "
+            + "If this is set to 0, the request will never time out.")]
+        [Min(0)]
+        public float TimeoutSeconds = 5;
 
         [Header("Issue Retrieval")]
         /// <summary>
@@ -159,7 +154,7 @@ namespace SEE.Net.Dashboard
         {
             string requestUrl = apiPath ? BaseUrl.Replace("/projects/", "/api/projects/") : BaseUrl;
             requestUrl += path;
-            if (queryParameters != null && queryParameters.Count > 0)
+            if (queryParameters is { Count: > 0 })
             {
                 requestUrl += "?" + Encoding.UTF8.GetString(UnityWebRequest.SerializeSimpleForm(queryParameters));
             }
@@ -172,10 +167,13 @@ namespace SEE.Net.Dashboard
             }
             request.SetRequestHeader("Accept", accept);
             request.SetRequestHeader("Authorization", $"AxToken {Token}");
-#pragma warning disable CS4014
-            request.SendWebRequest(); // we don't need to await this, because of the next line
-#pragma warning restore CS4014
-            await UniTask.WaitUntil(() => request.isDone);
+            request.SendWebRequest();
+            bool timeout = !await AsyncUtils.RunWithTimeoutAsync(t => UniTask.WaitUntil(() => request.isDone, cancellationToken: t),
+                                                                 TimeSpan.FromSeconds(TimeoutSeconds), throwOnTimeout: false);
+            if (timeout)
+            {
+                return new DashboardResult(new TimeoutException("Request timed out."));
+            }
             DashboardResult result = request.result switch
             {
                 UnityWebRequest.Result.Success => new DashboardResult(true, request.downloadHandler.text),
@@ -264,7 +262,7 @@ namespace SEE.Net.Dashboard
                     ShowNotification.Error("Dashboard Version too old",
                                            $"The version of the dashboard is {version}, but the DashboardRetriever "
                                            + $"has been written for version {DashboardVersion.SupportedVersion}."
-                                           + $" Please update your dashboard.");
+                                           + " Please update your dashboard.");
                     break;
                 case DashboardVersion.Difference.PathOlder:
                     // If patch version is older, there may be some bugfixes / security problems not accounted for.
@@ -310,12 +308,12 @@ namespace SEE.Net.Dashboard
         public Color GetIssueColor(Issue issue) =>
             issue switch
             {
-                ArchitectureViolationIssue _ => ArchitectureViolationIssueColor,
-                CloneIssue _ => CloneIssueColor,
-                CycleIssue _ => CycleIssueColor,
-                DeadEntityIssue _ => DeadEntityIssueColor,
-                MetricViolationIssue _ => MetricViolationIssueColor,
-                StyleViolationIssue _ => StyleViolationIssueColor,
+                ArchitectureViolationIssue => ArchitectureViolationIssueColor,
+                CloneIssue => CloneIssueColor,
+                CycleIssue => CycleIssueColor,
+                DeadEntityIssue => DeadEntityIssueColor,
+                MetricViolationIssue => MetricViolationIssueColor,
+                StyleViolationIssue => StyleViolationIssueColor,
                 _ => throw new ArgumentOutOfRangeException(nameof(issue), issue, "Unknown issue kind!")
             };
 

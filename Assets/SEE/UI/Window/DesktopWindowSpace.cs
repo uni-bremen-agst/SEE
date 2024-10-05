@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using DynamicPanels;
 using SEE.Controls;
@@ -6,7 +7,7 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.UI;
+using CollectionExtensions = SEE.Utils.CollectionExtensions;
 
 namespace SEE.UI.Window
 {
@@ -16,9 +17,9 @@ namespace SEE.UI.Window
     public partial class WindowSpace
     {
         /// <summary>
-        /// The <see cref="panel"/> containing the windows.
+        /// The panels containing the windows.
         /// </summary>
-        private Panel panel;
+        private readonly Dictionary<Panel, List<BaseWindow>> panels = new();
 
         /// <summary>
         /// The dynamic canvas of the panel.
@@ -75,7 +76,7 @@ namespace SEE.UI.Window
         /// </exception>
         private void UpdateActiveTab()
         {
-            if (panel != null && ActiveWindow != null && ActiveWindow.Window != null)
+            if (panels.Count > 0 && ActiveWindow != null && ActiveWindow.Window != null)
             {
                 if (!windows.Contains(ActiveWindow))
                 {
@@ -94,51 +95,49 @@ namespace SEE.UI.Window
                     // recursive one to be more efficient, but this will just "improve" an O(1) space complexity to
                     // O(1) space complexity, because the recursion will at most happen once per call.
                     // Additionally, the readability of the iterative version is (in my opinion) much worse, this is
-                    // why I have left it the way it is. The following disables this recommendation in some IDEs.
-                    // ReSharper disable once TailRecursiveCall
+                    // why I have left it the way it is.
                     UpdateActiveTab();
                     return;
                 }
-                panel.ActiveTab = panel.GetTabIndex((RectTransform)ActiveWindow.Window.transform);
+                if (PanelTabForWindow(ActiveWindow) is ({ } panel, { } tab))
+                {
+                    panel.ActiveTab = tab.Index;
+                }
             }
+        }
+
+        /// <summary>
+        /// Returns the panel and tab for a given window.
+        /// </summary>
+        /// <param name="window">The window to find the panel and tab for.</param>
+        /// <returns>The panel and tab for the window, or <c>null</c> if the window is not part of the space.</returns>
+        private (Panel, PanelTab)? PanelTabForWindow(BaseWindow window)
+        {
+            if (window == null || window.Window == null)
+            {
+                return null;
+            }
+            RectTransform windowTransform = (RectTransform)window.Window.transform;
+            return panels.Keys.Select(x => (x, x.GetTab(windowTransform))).SingleOrDefault(x => x.Item2 != null);
         }
 
         protected override void UpdateDesktop()
         {
-            // In VR the TreeView could be open, while the user moves a Node. In this case, the TreeView
-            // would update the entire time, the user is moving the Node, which is causing laggs. Thats
-            // why we close it.
-            if (GlobalActionHistory.Current() == ActionStateTypes.Move && XRSEEActions.CloseTreeView)
+            switch (panels.Count)
             {
-                foreach (BaseWindow window in currentWindows)
-                {
-                    CloseWindow(window);
-                }
-                XRSEEActions.CloseTreeView = false;
-            }
-            if (panel && !windows.Any())
-            {
-                // We need to destroy the panel now
-                Destroyer.Destroy(panel);
-            }
-            else if (!panel && windows.Any(x => x.Window))
-            {
-                InitializePanel();
-            }
-            else if (!panel)
-            {
-                // If no window is initialized yet, there's nothing we can do
-                return;
-            }
-
-            if (currentActiveWindow != ActiveWindow)
-            {
-                // Nominal active window has been changed, so we change the actual active window as well.
-                UpdateActiveTab();
-
-                // The window will only be actually changed when UpdateActiveTab() didn't throw an exception,
-                // so currentActiveWindow is guaranteed to be part of windows.
-                currentActiveWindow = ActiveWindow;
+                case > 0:
+                    // We need to destroy any empty panels now.
+                    foreach (Panel emptyPanel in panels.Where(x => x.Value.Count == 0).Select(x => x.Key).ToList())
+                    {
+                        Destroyer.Destroy(emptyPanel);
+                        panels.Remove(emptyPanel);
+                    }
+                    break;
+                case 0 when windows.Any(x => x.Window):
+                    // We need to initialize at least one panel.
+                    InitializePanel();
+                    break;
+                case 0: return; // If no window is initialized yet, there's nothing we can do.
             }
 
             // Now we need to detect changes in the open windows.
@@ -148,18 +147,24 @@ namespace SEE.UI.Window
             // First, close old windows that are not open anymore
             foreach (BaseWindow window in currentWindows.Except(windows).ToList())
             {
-                panel.RemoveTab(panel.GetTab((RectTransform)window.Window.transform));
+                if (PanelTabForWindow(window) is ({ } panel, { } tab))
+                {
+                    panel.RemoveTab(tab);
+                    panels[panel].Remove(window);
+                }
                 currentWindows.Remove(window);
                 Destroyer.Destroy(window);
             }
 
             // Then, add new tabs
             // We need to skip windows which weren't initialized yet
-            foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.Window != null).ToList())
+            foreach (BaseWindow window in windows.Except(currentWindows).Where(x => x.Window).ToList())
             {
                 RectTransform rectTransform = (RectTransform)window.Window.transform;
-                // Add the new window as a tab to our panel
-                PanelTab tab = panel.AddTab(rectTransform);
+                // Add the new window as a tab to the latest panel
+                Panel targetPanel = panels.Keys.Last();
+                panels[targetPanel].Add(window);
+                PanelTab tab = targetPanel.AddTab(rectTransform);
                 tab.Label = window.Title;
                 tab.Icon = null;
                 currentWindows.Add(window);
@@ -173,17 +178,25 @@ namespace SEE.UI.Window
 
                 // Rebuild layout
                 panelsCanvas.ForceRebuildLayoutImmediate();
-                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
-                {
-                    window.RebuildLayout();
-                }
+                window.RebuildLayout();
             }
+
+            if (currentActiveWindow != ActiveWindow && ActiveWindow)
+            {
+                // Nominal active window has been changed, so we change the actual active window as well.
+                UpdateActiveTab();
+
+                // The window will only be actually changed when UpdateActiveTab() didn't throw an exception,
+                // so currentActiveWindow is guaranteed to be part of windows.
+                currentActiveWindow = ActiveWindow;
+            }
+            return;
 
             void CloseTab(PanelTab panelTab)
             {
-                if (panelTab.Panel == panel)
+                if (panels.TryGetValue(panelTab.Panel, out List<BaseWindow> panel))
                 {
-                    BaseWindow window = windows.FirstOrDefault(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID());
+                    BaseWindow window = panel.FirstOrDefault(x => x.Window.GetInstanceID() == panelTab.Content.gameObject.GetInstanceID());
                     if (window != null)
                     {
                         CloseWindow(window);
@@ -220,34 +233,74 @@ namespace SEE.UI.Window
                 windows.Clear();
                 return;
             }
-            panel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, panelsCanvas);
-            // When the active tab *on this panel* is changed, we invoke the corresponding event
-            PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
+
+            // Create the first panel.
+            Panel firstPanel = PanelUtils.CreatePanelFor((RectTransform)windows[0].Window.transform, panelsCanvas);
+            panels[firstPanel] = new();
+
+            // The user may create panels themselves.
+            PanelNotificationCenter.OnPanelCreated += HandleNewPanel;
             PanelNotificationCenter.OnPanelClosed += ClosePanel;
+            PanelNotificationCenter.OnStoppedDraggingTab += HandleMovedTab;
+            // When the active tab *on one of our panels* is changed, we invoke the corresponding event
+            PanelNotificationCenter.OnActiveTabChanged += ChangeActiveTab;
+            return;
+
+            void HandleNewPanel(Panel panel)
+            {
+                // There may already be windows in the panel (if the user created it by dragging tabs into the void)
+                ISet<BaseWindow> panelWindows = CollectionExtensions.GetValueOrDefault(panels, panel, new()).ToHashSet();
+                for (int i = 0; i < panel.NumberOfTabs; i++)
+                {
+                    if (Windows.SingleOrDefault(w => w.Window == panel[i].Content.gameObject) is { } window)
+                    {
+                        panelWindows.Add(window);
+                    }
+                }
+                panels[panel] = panelWindows.ToList();
+            }
+
+            void HandleMovedTab(PanelTab tab)
+            {
+                foreach ((Panel key, List<BaseWindow> value) in panels)
+                {
+                    foreach (BaseWindow baseWindow in value.Where(baseWindow => baseWindow.Window == tab.Content.gameObject))
+                    {
+                        panels[key].Remove(baseWindow);
+                        panels.GetOrAdd(tab.Panel, () => new()).Add(baseWindow);
+                        return;
+                    }
+                }
+            }
 
             void ChangeActiveTab(PanelTab tab)
             {
-                if (panel == tab.Panel)
+                if (panels.TryGetValue(tab.Panel, out List<BaseWindow> panel))
                 {
-                    ActiveWindow = Windows.First(x => x.Window.GetInstanceID() == tab.Content.gameObject.GetInstanceID());
-                    OnActiveWindowChanged.Invoke();
+                    BaseWindow activePanel = panel.FirstOrDefault(x => x.Window == tab.Content.gameObject);
+                    if (activePanel != null)
+                    {
+                        ActiveWindow = activePanel;
+                        OnActiveWindowChanged.Invoke();
+                    }
                 }
             }
 
             void ClosePanel(Panel panel)
             {
-                if (panel == this.panel)
+                if (panels.ContainsKey(panel))
                 {
-                    // Close each tab
-                    foreach (BaseWindow window in windows)
+                    // Close each tab in this panel.
+                    foreach (BaseWindow window in panels[panel].Where(x => x.Window != null))
                     {
-                        this.panel.RemoveTab(this.panel.GetTab((RectTransform)window.Window.transform));
+                        panel.RemoveTab(panel.GetTab((RectTransform)window.Window.transform));
                         Destroyer.Destroy(window);
                     }
 
-                    windows.Clear();
+                    windows.RemoveAll(panels[panel]);
+                    panels.Remove(panel);
                     OnActiveWindowChanged.Invoke();
-                    Destroyer.Destroy(this.panel);
+                    Destroyer.Destroy(panel);
                 }
             }
         }

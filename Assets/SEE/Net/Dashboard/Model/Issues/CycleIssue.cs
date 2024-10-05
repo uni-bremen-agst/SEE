@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -89,17 +89,17 @@ namespace SEE.Net.Dashboard.Model.Issues
                              string sourcePath, int sourceLine, string sourceLinkName, string targetEntity,
                              string targetEntityType, string targetPath, int targetLine, string targetLinkName)
         {
-            this.DependencyType = dependencyType;
-            this.SourceEntity = sourceEntity;
-            this.SourceEntityType = sourceEntityType;
-            this.SourcePath = sourcePath;
-            this.SourceLine = sourceLine;
-            this.SourceLinkName = sourceLinkName;
-            this.TargetEntity = targetEntity;
-            this.TargetEntityType = targetEntityType;
-            this.TargetPath = targetPath;
-            this.TargetLine = targetLine;
-            this.TargetLinkName = targetLinkName;
+            DependencyType = dependencyType;
+            SourceEntity = sourceEntity;
+            SourceEntityType = sourceEntityType;
+            SourcePath = sourcePath;
+            SourceLine = sourceLine;
+            SourceLinkName = sourceLinkName;
+            TargetEntity = targetEntity;
+            TargetEntityType = targetEntityType;
+            TargetPath = targetPath;
+            TargetLine = targetLine;
+            TargetLinkName = targetLinkName;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

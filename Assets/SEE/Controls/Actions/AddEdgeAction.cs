@@ -194,6 +194,17 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Used to execute the <see cref="AddEdgeAction"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu.
+        /// </summary>
+        /// <param name="source">Is the source node of the edge.</param>
+        public void ContextMenuExecution(GameObject source)
+        {
+            from = source;
+            ShowNotification.Info("Select target", "Next, select a target node for the line.");
+        }
+
+        /// <summary>
         /// Undoes this AddEdgeAction
         /// </summary>
         public override void Undo()

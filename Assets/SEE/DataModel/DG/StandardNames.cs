@@ -254,9 +254,14 @@
     public static class VCS
     {
         /// <summary>
+        /// Prefix for VCS data (metrics and other kinds of VCS related attributes).
+        /// </summary>
+        public const string VCSPrefix = "VCS.";
+        /// <summary>
         /// Prefix for VCS metrics.
         /// </summary>
-        public const string Prefix = Metrics.Prefix + "VCS.";
+        public const string Prefix = Metrics.Prefix + VCSPrefix;
+
         /// <summary>
         /// The number of lines of code added for a file that was changed between two commits.
         /// </summary>
@@ -266,6 +271,10 @@
         /// </summary>
         public const string LinesDeleted = Prefix + "Lines_Deleted";
         /// <summary>
+        /// The churn of a file, that is, the number of lines added and deleted.
+        /// </summary>
+        public const string Churn = Prefix + "Churn";
+        /// <summary>
         /// The number of unique developers who contributed to a file that was changed between two commits.
         /// </summary>
         public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
@@ -273,6 +282,30 @@
         /// The number of times a file was changed between two commits.
         /// </summary>
         public const string CommitFrequency = Prefix + "Commit_Frequency";
+        /// <summary>
+        /// The truck factor of a file (core-devs metric).
+        /// </summary>
+        public const string TruckNumber = Prefix + "Truck_Number";
+
+        /// <summary>
+        /// String attribute for the list of authors of a file.
+        /// </summary>
+        /// <remarks>Note that this is not actually a numeric metric but a list of
+        /// author names seperated by a comma.</remarks>
+        public const string AuthorAttributeName = VCSPrefix + "Authors";
+
+        /// <summary>
+        /// Name of node type used for files.
+        /// </summary>
+        public const string FileType = "File";
+        /// <summary>
+        /// Name of node type used for directories.
+        /// </summary>
+        public const string DirectoryType = "Directory";
+        /// <summary>
+        /// Name of node type used for repositories.
+        /// </summary>
+        public const string RepositoryType = "Repository";
     }
 
     /// <summary>

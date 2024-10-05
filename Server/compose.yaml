@@ -1,44 +1,53 @@
 version: "3.8"
 
 services:
-  frontend-server:
+  frontend:
     build: ./Frontend
-    container_name: frontend
+    container_name: see-frontend
+    restart: always
     depends_on:
       - backend-server
-    networks:
-      server-network:
-        ipv4_address: 172.18.0.6
     ports:
-      - "80:8080"
+      - "8083:8080"
+    environment:
+      # Backend API URL
+      VITE_APP_API_URL: http://localhost:8080/api/v1/
 
-  backend-server:
+  backend:
     privileged: true
     build: ./Backend
-    container_name: backend
+    container_name: see-backend
     restart: always
     volumes:
       - backend-data:/see
-    depends_on:
-      - storage-server
-    networks:
-      server-network:
-        ipv4_address: 172.18.0.2
+      # - /var/run/docker.sock:/var/run/docker.sock
+      - /run/user/1001/podman/podman.sock:/var/run/docker.sock
     ports:
       - "8080:8080"
     environment:
-      FRONTEND_DOMAIN: localhost
+      BACKEND_DOMAIN: localhost:8080
+      FRONTEND_DOMAIN: localhost:8083
       FRONTEND_SCHEME: HTTP
+      FILESTORAGE_DIR: /see/file-storage
       SQLITE_DB_FILE: /see/database.db
-      JWT_SECRET: 1RNG9ja6MtadMuLsRC5ci3fy53KcQJmdEWWrp3hV5dnukvW5SQ
+      # Docker daemon must be reachable from backend container to spawn game servers.
+      DOCKER_HOST: unix:///var/run/docker.sock
+      # This is the docker host's external IP or domain. Game servers will be reachable on this host.
+      DOCKER_HOST_EXTERNAL: localhost
+      GAME_SERVER_IMAGE: localhost/see-gameserver:latest
+      # Use a new secure random secret for production!
+      #   dd if=/dev/random bs=64 count=1 | base64 -w 0
+      JWT_SECRET: Pd0lrQXVI8wVYuX+LGtJRCd62gvRDfS0Gd2BnUdwFWJsHiNDf6FOx9muwOTPB7YBqt1MDMlS4emg2DvDOHSkOg==
+      JWT_EXPIRATION: 86400000
+      # This will add an admin account to the backend. Use with care!
+      # ADD_ADMIN_NAME: see
+      # ADD_ADMIN_PASSWORD: XAo%@X9LQHdmV?+F
 
-networks:
-  server-network:
-    driver: bridge
-    ipam:
-      config:
-        - subnet: 172.18.0.0/16
 
 volumes:
   backend-data:
-    driver: TODO
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./backend-data

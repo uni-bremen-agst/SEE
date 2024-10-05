@@ -4,6 +4,7 @@ using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.Window
 {
@@ -72,7 +73,33 @@ namespace SEE.UI.Window
             // Set title
             Window.transform.Find("Dragger/Title").gameObject.GetComponent<TextMeshProUGUI>().text = Title;
 
-            // TODO: Disable IDE Button if unused
+            /// Disables the window dragger IDE buttons.
+            /// Note: If a sub class needs the IDE buttons, call <see cref="ActivateWindowDraggerButtons">
+            DisableWindowDraggerButtons();
+        }
+
+        /// <summary>
+        /// Disables the window dragger buttons.
+        /// </summary>dd
+        public void DisableWindowDraggerButtons()
+        {
+            Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>();
+            foreach (Button button in buttons)
+            {
+                button.gameObject.SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Activates the window dragger buttons.
+        /// </summary>
+        public void ActivateWindowDraggerButtons()
+        {
+            Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>(true);
+            foreach (Button button in buttons)
+            {
+                button.gameObject.SetActive(true);
+            }
         }
 
         protected override void StartVR()

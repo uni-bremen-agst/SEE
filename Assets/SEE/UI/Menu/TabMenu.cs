@@ -77,20 +77,13 @@ namespace SEE.UI.Menu
         public virtual GameObject ViewGameObject(T entry) => ViewList.transform.Find(entry.Title).gameObject;
 
         /// <summary>
-        /// Overrides HideAfterSelection to false.
-        /// </summary>
-        public TabMenu()
-        {
-            HideAfterSelection = false;
-        }
-
-        /// <summary>
         /// Initializes the menu and stores specific parts of the menu.
         /// Creates the view list if necessary.
         /// </summary>
         protected override void StartDesktop()
         {
             base.StartDesktop();
+            HideAfterSelection = false;
             // Instantiates the view list if necessary
             if (Content.transform.Find(ViewListPath) == null)
             {

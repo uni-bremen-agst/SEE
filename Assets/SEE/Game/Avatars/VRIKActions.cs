@@ -1,7 +1,6 @@
 ﻿using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Utils;
-using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -209,24 +208,16 @@ namespace SEE.Game.Avatars
         /// <param name="animatorForVrik">The to be replaced Animator</param>
         public static void ReplaceAnimator(GameObject gameObject, string animatorForVrik)
         {
-            if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
-            {
-                RuntimeAnimatorController animationController =
-                    Resources.Load<RuntimeAnimatorController>(animatorForVrik);
-                if (animationController != null)
-                {
-                    avatar.raceAnimationControllers.defaultAnimationController = animationController;
+            RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(animatorForVrik);
 
-                    if (gameObject.TryGetComponentOrLog(out Animator animator))
-                    {
-                        animator.runtimeAnimatorController = animationController;
-                        Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"Could not load the animation controller at '{animatorForVrik}.'\n");
-                }
+            if (gameObject.TryGetComponentOrLog(out Animator animator))
+            {
+                animator.runtimeAnimatorController = animationController;
+                Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
+            }
+            else
+            {
+                Debug.LogError($"Could not load the animation controller at '{animatorForVrik}.'\n");
             }
         }
     }

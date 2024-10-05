@@ -57,6 +57,11 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         }
 
         /// <summary>
+        /// The fully qualified name of the floor in the scene.
+        /// </summary>
+        private const string floorPath = "/Assets/Building/Floor";
+
+        /// <summary>
         /// Sets up this class to get a new mouse click on the floor.
         /// </summary>
         internal static void Init()
@@ -64,7 +69,12 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
             boardPrefab = Resources.Load<GameObject>("Prefabs/HolisticMetrics/SceneComponents/MetricsBoard");
             positioningDone = false;
             gotPosition = false;
-            GameObject.Find("/DemoWorld/Plane").AddComponent<BoardAdder>();
+            GameObject floor = GameObject.Find(floorPath);
+            if (floor == null)
+            {
+                throw new System.Exception($"Could not find the floor in the scene. Please make sure the floor is at '{floorPath}'.");
+            }
+            floor.AddComponent<BoardAdder>();
         }
 
         /// <summary>

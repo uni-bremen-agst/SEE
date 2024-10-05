@@ -4,7 +4,7 @@ import HomeView from './views/HomeView'
 import ServerView from './views/ServerView'
 import CreateServerView from './views/CreateServerView'
 import SettingsView from './views/SettingsView'
-import PersonalSettingsView from './views/PersonalSettingsView'
+import UserSettingsView from './views/UserSettingsView'
 import { BrowserRouter } from 'react-router-dom'
 import { useContext } from 'react'
 import { AuthContext } from './contexts/AuthContext'
@@ -14,28 +14,28 @@ function Router() {
 
   return (
     <BrowserRouter>
-      {user ? <PrivateRoutes/> : <PublicRoutes/>}
+      {user ? <PrivateRoutes /> : <PublicRoutes />}
     </BrowserRouter>
   )
 }
 
 function PublicRoutes() {
-  return(
+  return (
     <Routes>
-        <Route path="*" element={<LoginView/>}/> 
-    </Routes> 
+      <Route path="*" element={<LoginView />} />
+    </Routes>
   )
 }
 
 function PrivateRoutes() {
-  return(
+  return (
     <Routes>
-        <Route path="/" element={<HomeView/>}/> 
-        <Route path="/server" element={<ServerView/>}/> 
-        <Route path="/createServer" element={<CreateServerView/>}/> 
-        <Route path="/settings" element={<SettingsView/>}/> 
-        <Route path="/personalSettings" element={<PersonalSettingsView/>}/> 
-      </Routes> 
+      <Route path="/" element={<HomeView />} />
+      <Route path="/server" element={<ServerView />} />
+      <Route path="/createServer" element={<CreateServerView />} />
+      <Route path="/settings" element={<SettingsView />} />
+      <Route path="/userSettings" element={<UserSettingsView />} />
+    </Routes>
   )
 }
 

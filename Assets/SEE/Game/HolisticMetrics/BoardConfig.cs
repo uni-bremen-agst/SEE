@@ -78,9 +78,9 @@ namespace SEE.Game.HolisticMetrics
         private const string widgetConfigsLabel = "WidgetConfigs";
 
         /// <summary>
-        /// Writes this instances' attributes into the given <see cref="ConfigWriter"/>.
+        /// Saves this instance's attributes using the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
             writer.Save(Title, boardTitleLabel);
@@ -217,7 +217,7 @@ namespace SEE.Game.HolisticMetrics
         /// <summary>
         /// Writes this <see cref="BoardConfig"/>'s attributes into the given <see cref="ConfigWriter"/>.
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes into.</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the attributes.</param>
         internal void Save(ConfigWriter writer)
         {
             writer.BeginGroup();

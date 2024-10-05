@@ -83,10 +83,10 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// The graph element (a game object representing a node or edge) that was
-        /// hit by the user for deletion. Set in <see cref="Update"/>.
+        /// The graph elements (game objects, each representing a node or edge) that were
+        /// chosen by the user for deletion.
         /// </summary>
-        private GameObject hitGraphElement;
+        private List<GameObject> hitGraphElements = new();
 
         /// <summary>
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion
@@ -97,9 +97,6 @@ namespace SEE.Controls.Actions
         /// node including edges whose source or target is contained in the subtree
         /// are deleted and contained in this set. This set will always include the
         /// explicitly selected node to be deleted.
-        ///
-        /// The <see cref="hitGraphElement"/> will always be included in this set
-        /// unless it is null.
         ///
         /// Note that we will not actually destroy the deleted objects for the time
         /// being to be able to revert the deletion. Instead the objects will simply be set
@@ -115,46 +112,68 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            // FIXME: Needs adaptation for VR where no mouse is available.
+            if (Input.GetMouseButtonDown(0)
+                && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
-                if (XRSEEActions.Selected)
-                {
-                    GameObject DeleteGameObject = XRSEEActions.hoveredGameObject;
-                    Assert.IsTrue(DeleteGameObject.HasNodeRef() || DeleteGameObject.HasEdgeRef());
-                    InteractableObject.UnselectAll(true);
-                    (_, deletedGameObjects) = GameElementDeleter.Delete(DeleteGameObject);
-                    new DeleteNetAction(DeleteGameObject.name).Execute();
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-                    XRSEEActions.Selected = false;
-                    return true; // the selected objects are deleted and this action is done now
-                }
-                else
-                {
-                    return false;
-                }
+                // the hit object is the one to be deleted
+                hitGraphElements.Add(raycastHit.collider.gameObject);
+                return Delete(); // the selected objects are deleted and this action is done now
+            }
+            else if (ExecuteViaContextMenu)
+            {
+                return Delete();
             }
             else
             {
-                // FIXME: Needs adaptation for VR where no mouse is available.
-                if (Input.GetMouseButtonDown(0)
-                    && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
-                {
-                    // the hit object is the one to be deleted
-                    hitGraphElement = raycastHit.collider.gameObject;
-                    Assert.IsTrue(hitGraphElement.HasNodeRef() || hitGraphElement.HasEdgeRef());
-                    InteractableObject.UnselectAll(true);
-                    (_, deletedGameObjects) = GameElementDeleter.Delete(hitGraphElement);
-                    new DeleteNetAction(hitGraphElement.name).Execute();
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
-                    return true; // the selected objects are deleted and this action is done now
-                }
-                else
-                {
-                    return false;
-                }
+                return false;
             }
+        }
+
+        /// <summary>
+        /// Executes the deletion.
+        /// </summary>
+        /// <returns>true if the deletion can be executed.</returns>
+        private bool Delete()
+        {
+            deletedGameObjects = new HashSet<GameObject>();
+            InteractableObject.UnselectAll(true);
+            foreach (GameObject go in hitGraphElements)
+            {
+                if (!go.HasNodeRef() && !go.HasEdgeRef()
+                    || go.HasNodeRef() && go.IsRoot())
+                {
+                    continue;
+                }
+                (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
+                deletedGameObjects.UnionWith(deleted);
+            }
+            CurrentState = IReversibleAction.Progress.Completed;
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+            return true;
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="DeleteAction"> from the context menu.
+        /// It sets the object to be deleted and ensures that the <see cref="Update"/> method
+        /// performs the execution via context menu.
+        /// </summary>
+        /// <param name="toDelete">The object to be deleted.</param>
+        public void ContextMenuExecution(GameObject toDelete)
+        {
+            ContextMenuExecution(new List<GameObject> { toDelete });
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="DeleteAction"/> from the multiselection context menu.
+        /// It sets the objects to be deleted and ensures that the <see cref="Update"/> method
+        /// performs the execution via context menu.
+        /// </summary>
+        /// <param name="toDelete">The objects to be deleted.</param>
+        public void ContextMenuExecution(IEnumerable<GameObject> toDelete)
+        {
+            ExecuteViaContextMenu = true;
+            hitGraphElements = toDelete.ToList();
         }
 
         /// <summary>
@@ -173,8 +192,17 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            GameElementDeleter.Delete(hitGraphElement);
-            new DeleteNetAction(hitGraphElement.name).Execute();
+            foreach (GameObject go in hitGraphElements)
+            {
+                if (go.IsRoot())
+                {
+                    continue;
+                }
+                new DeleteNetAction(go.name).Execute();
+#pragma warning disable VSTHRD110
+                GameElementDeleter.Delete(go);
+#pragma warning restore VSTHRD110
+            }
         }
 
         /// <summary>

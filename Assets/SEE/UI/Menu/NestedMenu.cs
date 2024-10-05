@@ -56,7 +56,7 @@ namespace SEE.UI.Menu
         /// Whether to reset the level of the menu when clicking on the close button.
         /// Can only be changed before this component has been started.
         /// </summary>
-        public bool ResetLevelOnClose = true;
+        public bool ResetLevelOnClose = false;
 
         /// <summary>
         /// All leaf-entries of the nestedMenu.
@@ -132,10 +132,15 @@ namespace SEE.UI.Menu
             // as the title is technically the last element in the breadcrumb)
             string breadcrumb = withBreadcrumb ? GetBreadcrumb() : string.Empty;
             Description = nestedEntry.Description + (breadcrumb.Length > 0 ? $"\n{GetBreadcrumb()}" : "");
-            Icon = nestedEntry.Icon;
+            Icon = nestedEntry.MenuIconSprite;
             nestedEntry.InnerEntries.ForEach(AddEntry);
-            KeywordListener.Unregister(HandleKeyword);
-            KeywordListener.Register(HandleKeyword);
+            /// The null check must be performed due to the <see cref="DrawableActionBar">.
+            /// When switching to a drawable action via the bar without opening the menu, the KeywordListener is null.
+            if (KeywordListener != null)
+            {
+                KeywordListener.Unregister(HandleKeyword);
+                KeywordListener.Register(HandleKeyword);
+            }
             Tooltip.Deactivate();
         }
 
@@ -210,7 +215,7 @@ namespace SEE.UI.Menu
             }
             else
             {
-                Debug.Log("Search field must be present in the prefab for the nested menu to work properly.");
+                Debug.LogWarning("Search field must be present in the prefab for the nested menu to work properly.");
             }
             MenuManager.onCancel.AddListener(() => AscendLevel()); // Go one level higher when clicking "back"
             if (ResetLevelOnClose)
@@ -231,7 +236,6 @@ namespace SEE.UI.Menu
                     {
                         searchInput.text = string.Empty;
                     }
-                    ResetToBase();
                 }
             };
         }
@@ -311,8 +315,7 @@ namespace SEE.UI.Menu
                                                 .Select(x => allEntries[x.Value])
                                                 .ToList();
 
-                NestedMenuEntry<T> resultEntry = new(results, Title, Description,
-                                                     default, default, Icon);
+                NestedMenuEntry<T> resultEntry = new(results, Title, Description, menuIconSprite: Icon);
                 DescendLevel(resultEntry, withBreadcrumb: false);
             }
             finally

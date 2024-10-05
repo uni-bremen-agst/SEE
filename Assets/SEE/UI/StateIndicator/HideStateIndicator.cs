@@ -89,12 +89,12 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Used to store the icon of <see cref="doneButton"/>
         /// </summary>
-        private Sprite iconSpriteDone;
+        private readonly Sprite iconSpriteDone;
 
         /// <summary>
         /// Used to store the icon of <see cref="backButton"/>
         /// </summary>
-        private Sprite iconSpriteBack;
+        private readonly Sprite iconSpriteBack;
 
         /// <summary>
         /// Event triggered when the user presses the button.

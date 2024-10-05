@@ -336,11 +336,11 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 Destroyer.Destroy(controls);
             }
-            if (adapterProcess != null && !adapterProcess.HasExited)
+            if (adapterProcess is { HasExited: false })
             {
                 adapterProcess.Kill();
             }
-            if (adapterHost != null && adapterHost.IsRunning)
+            if (adapterHost is { IsRunning: true })
             {
                 adapterHost.Stop();
             }
@@ -349,12 +349,12 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Creates the process for the debug adapter.
         /// </summary>
-        /// <returns>Whether the creation was sucessful.</returns>
+        /// <returns>Whether the creation was successful.</returns>
         private bool CreateAdapterProcess()
         {
             adapterProcess = new Process
             {
-                StartInfo = new ProcessStartInfo()
+                StartInfo = new ProcessStartInfo
                 {
                     FileName = Adapter.AdapterFileName,
                     Arguments = Adapter.AdapterArguments,
@@ -371,8 +371,8 @@ namespace SEE.UI.DebugAdapterProtocol
                 },
                 EnableRaisingEvents = true
             };
-            adapterProcess.Exited += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
-            adapterProcess.Disposed += (_, args) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
+            adapterProcess.Exited += (_, _) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
+            adapterProcess.Disposed += (_, _) => ConsoleWindow.AddMessage($"Process: Exited! ({(!adapterProcess.HasExited ? adapterProcess.ProcessName : null)})");
             adapterProcess.OutputDataReceived += (_, args) => ConsoleWindow.AddMessage($"Process: OutputDataReceived! ({adapterProcess.ProcessName})\n\t{args.Data}");
             adapterProcess.ErrorDataReceived += (_, args) =>
             {
@@ -410,7 +410,7 @@ namespace SEE.UI.DebugAdapterProtocol
         private bool CreateAdapterHost()
         {
             adapterHost = new DebugProtocolHost(adapterProcess.StandardInput.BaseStream, adapterProcess.StandardOutput.BaseStream);
-            adapterHost.DispatcherError += (sender, args) =>
+            adapterHost.DispatcherError += (_, args) =>
             {
                 string message = $"DispatcherError - {args.Exception}";
                 ConsoleWindow.AddMessage(message + "\n", "Adapter", "Error");
@@ -451,7 +451,7 @@ namespace SEE.UI.DebugAdapterProtocol
                 return;
             }
 
-            stackFrames = adapterHost.SendRequestSync(new StackTraceRequest() { ThreadId = MainThread.Id }).StackFrames;
+            stackFrames = adapterHost.SendRequestSync(new StackTraceRequest { ThreadId = MainThread.Id }).StackFrames;
         }
 
 
@@ -474,7 +474,7 @@ namespace SEE.UI.DebugAdapterProtocol
 
                 foreach (StackFrame stackFrame in stackFrames)
                 {
-                    List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest() { FrameId = stackFrame.Id }).Scopes;
+                    List<Scope> stackScopes = adapterHost.SendRequestSync(new ScopesRequest { FrameId = stackFrame.Id }).Scopes;
                     Dictionary<Scope, List<Variable>> stackVariables = stackScopes.ToDictionary(scope => scope, scope => RetrieveNestedVariables(scope.VariablesReference));
                     threadVariables.Add(stackFrame, stackVariables);
                 }
@@ -499,7 +499,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 return new();
             }
-            return adapterHost.SendRequestSync(new VariablesRequest() { VariablesReference = variablesReference }).Variables;
+            return adapterHost.SendRequestSync(new VariablesRequest { VariablesReference = variablesReference }).Variables;
         }
 
         /// <summary>
@@ -512,7 +512,7 @@ namespace SEE.UI.DebugAdapterProtocol
         {
             if (IsRunning && variable.EvaluateName != null)
             {
-                EvaluateResponse value = adapterHost.SendRequestSync(new EvaluateRequest()
+                EvaluateResponse value = adapterHost.SendRequestSync(new EvaluateRequest
                 {
                     Expression = variable.EvaluateName,
                     FrameId = IsRunning ? null : StackFrame.Id

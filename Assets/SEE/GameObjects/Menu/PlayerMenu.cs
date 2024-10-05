@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using InControl;
 using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;
@@ -37,7 +36,6 @@ namespace SEE.GO.Menu
         /// <returns>the newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
-
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
             GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
 
@@ -86,12 +84,11 @@ namespace SEE.GO.Menu
 
                     if (child is ActionStateType actionStateType)
                     {
-                        MenuEntry menuEntry = new(selectAction: () => GlobalActionHistory.Execute(actionStateType),
-                                                  unselectAction: null,
-                                                  title: actionStateType.Name,
-                                                  description: actionStateType.Description,
-                                                  entryColor: actionStateType.Color,
-                                                  icon: Resources.Load<Sprite>(actionStateType.IconPath));
+                        MenuEntry menuEntry = new(SelectAction: () => GlobalActionHistory.Execute(actionStateType),
+                                                  Title: actionStateType.Name,
+                                                  Description: actionStateType.Description,
+                                                  EntryColor: actionStateType.Color,
+                                                  Icon: actionStateType.Icon);
                         entry = menuEntry;
                     }
                     else if (child is ActionStateTypeGroup actionStateTypeGroup)
@@ -100,7 +97,7 @@ namespace SEE.GO.Menu
                                                                           title: actionStateTypeGroup.Name,
                                                                           description: actionStateTypeGroup.Description,
                                                                           entryColor: actionStateTypeGroup.Color,
-                                                                          icon: Resources.Load<Sprite>(actionStateTypeGroup.IconPath));
+                                                                          icon: actionStateTypeGroup.Icon);
                         toNestedMenuEntry[actionStateTypeGroup] = nestedMenuEntry;
                         entry = nestedMenuEntry;
                     }
@@ -246,6 +243,33 @@ namespace SEE.GO.Menu
                 {
                     playerMenu.modeMenu.ActiveEntry = toggleMenuEntry;
                     break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the menu depending on the currently selected action in <see cref="GlobalActionHistory"/>.
+        /// It changes the current selected menu entry in PlayerMenu and
+        /// it changes also the depending indicator.
+        /// </summary>
+        /// <param name="nestedMenuName">The name of the nested menu of the new active entry;
+        /// null if the entry is in the root menu.</param>
+        internal void UpdateActiveEntry(string nestedMenuName = null)
+        {
+            ActionStateType currentAction = GlobalActionHistory.Current();
+            if (nestedMenuName != null && LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
+            {
+                playerMenu.modeMenu.ResetToBase();
+                playerMenu.modeMenu.SelectEntry(playerMenu.modeMenu.Entries.First(x => x.Title.Equals(nestedMenuName)));
+            }
+            SetPlayerMenu(currentAction.Name);
+            indicator.ChangeActionState(currentAction);
+
+            foreach (MenuEntry entry in modeMenu.Entries)
+            {
+                if (entry.Title.Equals(currentAction.Name))
+                {
+                    modeMenu.SelectEntry(entry);
                 }
             }
         }

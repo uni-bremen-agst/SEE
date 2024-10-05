@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
@@ -18,6 +19,7 @@ using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.DataModel.DG.IO;
 using SEE.DataModel;
+using SEE.GameObjects;
 
 namespace SEE.Game.City
 {
@@ -80,7 +82,7 @@ namespace SEE.Game.City
             {
                 if (loadedGraph != null)
                 {
-                    Reset();
+                    ResetGraphData();
                 }
                 Assert.IsNull(visualizedSubGraph);
                 loadedGraph = value;
@@ -114,6 +116,11 @@ namespace SEE.Game.City
         /// </summary>
         [NonSerialized]
         private Graph visualizedSubGraph = null;
+
+        /// <summary>
+        /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
+        /// </summary>
+        private bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -156,7 +163,7 @@ namespace SEE.Game.City
 
             if (!gameObject.IsCodeCityDrawn())
             {
-                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.");
+                Debug.LogWarning($"There is no drawn code city for {gameObject.name}.\n");
                 return;
             }
             LoadAsync().Forget();
@@ -203,15 +210,37 @@ namespace SEE.Game.City
             else
             {
                 Debug.LogError($"Could not load city {name}.\n");
+                return;
             }
 
+            // Set the hidden edges according to the EdgeLayoutSettings.
+            subGraph.Edges().Where(x => HiddenEdges.Contains(x.Type))
+                    .ForEach(edge => edge.SetToggle(Edge.IsHiddenToggle));
+
             // Add EdgeMeshScheduler to convert edge lines to meshes over time.
-            gameObject.AddOrGetComponent<EdgeMeshScheduler>().Init(EdgeLayoutSettings, EdgeSelectionSettings,
-                                                                   subGraph);
+            EdgeMeshScheduler edgeMeshScheduler = gameObject.AddOrGetComponent<EdgeMeshScheduler>();
+            edgeMeshScheduler.Init(EdgeLayoutSettings, EdgeSelectionSettings, subGraph);
+            edgeMeshScheduler.OnInitialEdgesDone += HideHiddenEdges;
+
             // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
 
             UpdateGraphElementIDMap(gameObject);
+            return;
+
+            void HideHiddenEdges()
+            {
+                if (EdgeLayoutSettings.AnimationKind is EdgeAnimationKind.None or EdgeAnimationKind.Buildup)
+                {
+                    // If None: Nothing needs to be done.
+                    // If Buildup: The edges are already hidden by the EdgeMeshScheduler.
+                    return;
+                }
+                foreach (Edge edge in subGraph.Edges().Where(x => x.HasToggle(Edge.IsHiddenToggle)))
+                {
+                    edge.Operator().Hide(EdgeLayoutSettings.AnimationKind);
+                }
+            }
         }
 
         /// <summary>
@@ -305,9 +334,12 @@ namespace SEE.Game.City
             {
                 try
                 {
-                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...\n",
+                    using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
                                                           out Action<float> reportProgress))
                     {
+                        ShowNotification.Info("SEECity", "Loading graph");
+                        IsPipelineRunning = true;
+
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
@@ -317,7 +349,9 @@ namespace SEE.Game.City
                         ReportProgress(0.01f);
 
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                                                                      cancellationTokenSource.Token);
+                            cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
+                        ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                     }
                 }
                 catch (OperationCanceledException)
@@ -388,6 +422,12 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
+            if (IsPipelineRunning)
+            {
+                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
+                return;
+            }
+
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
@@ -404,6 +444,7 @@ namespace SEE.Game.City
                     DrawAsync(theVisualizedSubGraph).Forget();
                 }
             }
+
             return;
 
             async UniTaskVoid DrawAsync(Graph subGraph)
@@ -491,6 +532,23 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// This method will cancel any running graph provider pipeline and delete the currently
+        /// loaded graph.
+        /// </summary>
+        private void ResetGraphData()
+        {
+            // Cancel any ongoing loading operation and reset the token.
+            cancellationTokenSource.Cancel();
+            IsPipelineRunning = false;
+            cancellationTokenSource = new CancellationTokenSource();
+
+            // Delete the underlying graph.
+            loadedGraph?.Destroy();
+            loadedGraph = null;
+            visualizedSubGraph = null;
+        }
+
+        /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
         /// </summary>
@@ -501,13 +559,12 @@ namespace SEE.Game.City
         public override void Reset()
         {
             base.Reset();
-            // Cancel any ongoing loading operation and reset the token.
-            cancellationTokenSource.Cancel();
-            cancellationTokenSource = new CancellationTokenSource();
-            // Delete the underlying graph.
-            loadedGraph?.Destroy();
-            loadedGraph = null;
-            visualizedSubGraph = null;
+            ResetGraphData();
+            // Remove the poller.
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroyer.Destroy(poller);
+            }
         }
 
         /// <summary>

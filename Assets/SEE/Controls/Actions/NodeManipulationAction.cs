@@ -1,8 +1,10 @@
 ﻿using RTG;
 using SEE.Audio;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
@@ -206,6 +208,17 @@ namespace SEE.Controls.Actions
         /// <param name="gameNode">game node to start the manipulation with</param>
         protected void StartAction(GameObject gameNode)
         {
+            if (!gameNode.TryGetNodeRef(out NodeRef nodeRef))
+            {
+                return;
+            }
+            VisualNodeAttributes gameNodeAttributes = gameNode.ContainingCity().NodeTypes[nodeRef.Value.Type];
+            if (!gameNodeAttributes.AllowManualNodeManipulation)
+            {
+                ShowNotification.Info("Manipulation Forbidden", "The node cannot be manipulated!", 5, false);
+                return;
+            }
+
             GameNodeSelected = gameNode;
             GameNodeMemento = CreateMemento(GameNodeSelected);
             UsedGizmo.Enable(GameNodeSelected);
@@ -232,6 +245,18 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <returns>true if <see cref="GameNodeSelected"/> has had a change</returns>
         protected abstract bool HasChanges();
+
+        /// <summary>
+        /// Used to execute the <see cref="NodeManipulationAction{T}"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu for
+        /// the selected game object <paramref name="obj"/>.
+        /// </summary>
+        /// <param name="obj">The object to be modify.</param>
+        public void ContextMenuExecution(GameObject obj)
+        {
+            ExecuteViaContextMenu = true;
+            StartAction(obj);
+        }
 
         #endregion Update
 

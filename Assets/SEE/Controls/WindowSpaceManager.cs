@@ -83,11 +83,11 @@ namespace SEE.Controls
             {
                 windowSpaces[playerName] = WindowSpace.FromValueObject(valueObject, gameObject);
                 windowMenu.AddEntry(new MenuEntry(() => ActivateSpace(playerName),
-                                                  DeactivateCurrentSpace, playerName,
+                                                  playerName, DeactivateCurrentSpace,
                                                   $"Code window from player with IP address '{playerName}'.", Color.white));
                 windowSpaces[playerName].WindowSpaceName += $" ({playerName})";
                 windowSpaces[playerName].enabled = false;
-                windowSpaces[playerName].CanClose = false;  // User may only close their own windows
+                windowSpaces[playerName].CanClose = false; // User may only close their own windows
             }
             else
             {
@@ -171,22 +171,21 @@ namespace SEE.Controls
         /// </summary>
         private void SetUpWindowSelectionMenu()
         {
-            //TODO: Icons
             windowMenu = gameObject.AddComponent<SelectionMenu>();
-            MenuEntry localEntry = new(selectAction: () => ActivateSpace(LocalPlayer),
-                                       unselectAction: DeactivateCurrentSpace,
-                                       title: LocalPlayer,
-                                       description: "Windows for the local player (you).",
-                                       entryColor: Color.black);
-            MenuEntry noneEntry = new(() => CurrentPlayer = NoPlayer, () => { }, NoPlayer,
-                                      "This option hides all windows.", Color.grey);
+            MenuEntry localEntry = new(SelectAction: () => ActivateSpace(LocalPlayer),
+                                       UnselectAction: DeactivateCurrentSpace,
+                                       Title: LocalPlayer,
+                                       Description: "Windows for the local player (you).",
+                                       EntryColor: Color.black);
+            MenuEntry noneEntry = new(() => CurrentPlayer = NoPlayer, NoPlayer,
+                                      Description: "This option hides all windows.", EntryColor: Color.grey);
             windowMenu.AddEntry(noneEntry);
             windowMenu.AddEntry(localEntry);
             windowMenu.SelectEntry(localEntry);
             foreach (KeyValuePair<string, WindowSpace> space in windowSpaces.Where(space => space.Key != LocalPlayer))
             {
                 windowMenu.AddEntry(new MenuEntry(() => ActivateSpace(space.Key),
-                                                  DeactivateCurrentSpace, space.Key,
+                                                  space.Key, DeactivateCurrentSpace,
                                                   $"Window from player with IP address '{space.Key}'.", Color.white));
             }
             windowMenu.Title = "Window Selection";

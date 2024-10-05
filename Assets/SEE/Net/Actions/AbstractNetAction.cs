@@ -53,8 +53,8 @@ namespace SEE.Net.Actions
         /// client. The Server executes <see cref="ExecuteOnServer"/> and each Client
         /// executes <see cref="ExecuteOnClient"/> locally.
         /// </summary>
-        /// <param name="recipients">The recipients of this action. If <code>null</code>,
-        /// this actions will be executed everywhere.</param>
+        /// <param name="recipients">The recipients of this action. If <c>null</c>
+        /// or omitted, this actions will be executed on all clients.</param>
         public void Execute(ulong[] recipients = null)
         {
 #if UNITY_EDITOR
@@ -67,7 +67,10 @@ namespace SEE.Net.Actions
         /// The implementation of the action for the server. This method will be called
         /// only for the server.
         /// </summary>
-        public abstract void ExecuteOnServer();
+        public virtual void ExecuteOnServer()
+        {
+            // The default implementation does nothing.
+        }
 
         /// <summary>
         /// The implementation of the action for the client. This method will be called

@@ -34,7 +34,7 @@ namespace SEE.Game.City
     /// Configuration of a code city for the visualization of dynamic data in
     /// traced at the level of statements.
     /// Declared public because it will be used by editor code.
-    /// /// </summary>
+    /// </summary>
     public partial class SEEJlgCity : SEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a

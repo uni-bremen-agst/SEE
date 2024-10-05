@@ -1,22 +1,17 @@
-FROM node:21-alpine AS base
+FROM docker.io/node:22-alpine AS builder
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 COPY . /app
 WORKDIR /app
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store  \
+  corepack enable  &&\
+  pnpm install --frozen-lockfile  &&\
+  pnpm run build
 
-FROM base AS prod-deps
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+# ----------------------------------------------------------
 
-FROM base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
-RUN pnpm install
-RUN pnpm run build
-
-FROM nginx:alpine
+FROM docker.io/nginx:alpine
+COPY --from=builder /app/dist /usr/share/nginx/html
 RUN sed -i /etc/nginx/conf.d/default.conf \
         -e 's|\(listen.*\)80\(.*\)|\18080\2|g;'
-WORKDIR /usr/share/nginx/html
-COPY --from=build /app/dist .
-CMD ["nginx", "-g", "daemon off;"]
 EXPOSE 8080

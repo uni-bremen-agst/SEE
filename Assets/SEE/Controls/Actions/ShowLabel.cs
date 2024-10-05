@@ -127,11 +127,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = true;
-                // if the object is currently selected, the label is already shown
-                if (!isSelected)
-                {
-                    On();
-                }
+                On();
             }
         }
 
@@ -147,10 +143,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = false;
-                if (!isSelected)
-                {
-                    Off();
-                }
+                Off();
             }
         }
 
@@ -166,22 +159,10 @@ namespace SEE.Controls.Actions
 
             if (nodeOperator.Node != null)
             {
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
+                if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
                 {
-                    LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                    if (settings.Show)
-                    {
-                        XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit);
-                        nodeOperator.FadeLabel(settings.LabelAlpha, raycasthit.point, settings.AnimationFactor);
-                    }
-                }
-                else
-                {
-                    LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                    if (settings.Show && pointer.Value.On)
-                    {
-                        nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
-                    }
+                    nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
                 }
             }
         }

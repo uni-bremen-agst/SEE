@@ -262,10 +262,19 @@ namespace SEE.Controls
         //-----------------------------------------------------
 
         /// <summary>
-        /// True if the user wants to open the context menu.
+        /// True if the user starts the mouse interaction to open the context menu.
         /// </summary>
-        /// <returns>True if the user wants to open the context menu.</returns>
-        internal static bool OpenContextMenu()
+        /// <returns>true if the user starts the mouse interaction to open the context menu</returns>
+        internal static bool OpenContextMenuStart()
+        {
+            return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+        }
+
+        /// <summary>
+        /// True if the user ends the mouse interaction to open the context menu.
+        /// </summary>
+        /// <returns>true if the user ends the mouse interaction to open the context menu</returns>
+        internal static bool OpenContextMenuEnd()
         {
             return Input.GetMouseButtonUp(rightMouseButton) && !Raycasting.IsMouseOverGUI();
         }
@@ -657,6 +666,81 @@ namespace SEE.Controls
         internal static bool ToggleFaceCamPosition()
         {
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition);
+        }
+        #endregion
+        //----------------------------------------------------
+        #region Drawable
+        /// <summary>
+        /// Undoes a part of the current running action.
+        /// Needed for removing a point while drawing a straight line.
+        /// </summary>
+        /// <returns>True if the user wants to undo a part of the running action.</returns>
+        internal static bool PartUndo()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.PartUndo);
+        }
+
+        /// <summary>
+        /// Moves an object up.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object up.</returns>
+        internal static bool MoveObjectUp()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectUp);
+        }
+
+        /// <summary>
+        /// Moves an object down.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object down.</returns>
+        internal static bool MoveObjectDown()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectDown);
+        }
+
+        /// <summary>
+        /// Moves an object left.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object left.</returns>
+        internal static bool MoveObjectLeft()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectLeft);
+        }
+
+        /// <summary>
+        /// Moves an object right.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object right.</returns>
+        internal static bool MoveObjectRight()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectRight);
+        }
+
+        /// <summary>
+        /// Moves an object forward.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object forward.</returns>
+        internal static bool MoveObjectForward()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectForward);
+        }
+
+        /// <summary>
+        /// Moves an object backward.
+        /// </summary>
+        /// <returns>True if the user wants to moves an object backward.</returns>
+        internal static bool MoveObjectBackward()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.MoveObjectBackward);
+        }
+
+        /// <summary>
+        /// Toggles the drawable manager menu.
+        /// </summary>
+        /// <returns>True if the user wants to toggle the drawable manager menu.</returns>
+        internal static bool ToggleDrawableManagerView()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.DrawableManagerView);
         }
         #endregion
     }

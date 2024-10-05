@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Utils;
+using static SEE.Tools.LSP.LSPLanguage;
 
 namespace SEE.Tools.LSP
 {
@@ -75,7 +76,7 @@ namespace SEE.Tools.LSP
         /// <returns>The language ID for the given file <paramref name="extension"/>.</returns>
         public string LanguageIdFor(string extension)
         {
-            LSPLanguage language = Languages.FirstOrDefault(language => language.Extensions.Contains(extension));
+            LSPLanguage language = Languages.FirstOrDefault(language => language.FileExtensions.Contains(extension));
             return language?.LanguageIds.GetValueOrDefault(extension, language.LanguageIds.GetValueOrDefault(string.Empty));
         }
 
@@ -86,69 +87,73 @@ namespace SEE.Tools.LSP
 
         public static readonly IList<LSPServer> All = new List<LSPServer>();
 
+        // NOTE: All servers below have been tested first. Before adding a language server to this list,
+        //       please make sure that it actually works in SEE, since we have some special requirements
+        //       (e.g., we require a documentSymbol provider that returns hierarchic `DocumentSymbol` objects).
+
         public static readonly LSPServer Clangd = new("clangd",
                                                       "https://clangd.llvm.org/",
-                                                      new List<LSPLanguage> { LSPLanguage.C, LSPLanguage.CPP },
+                                                      new List<LSPLanguage> { C, CPP },
                                                       "clangd", "--background-index");
 
         public static readonly LSPServer Gopls = new("gopls",
                                                      "https://github.com/golang/tools/tree/master/gopls",
-                                                     new List<LSPLanguage> { LSPLanguage.Go },
+                                                     new List<LSPLanguage> { Go },
                                                      "gopls");
 
         public static readonly LSPServer HaskellLanguageServer = new("Haskell Language Server",
                                                                      "https://haskell-language-server.readthedocs.io/en/latest/",
-                                                                     new List<LSPLanguage> { LSPLanguage.Haskell },
+                                                                     new List<LSPLanguage> { Haskell },
                                                                      "haskell-language-server", "--lsp");
 
         public static readonly LSPServer EclipseJdtls = new("Eclipse JDT Language Server",
                                                             "https://github.com/eclipse-jdtls/eclipse.jdt.ls",
-                                                            new List<LSPLanguage> { LSPLanguage.Java },
+                                                            new List<LSPLanguage> { Java },
                                                             "jdtls");
 
         public static readonly LSPServer TypescriptLanguageServer = new("Typescript Language Server",
                                                                         "https://github.com/typescript-language-server/typescript-language-server",
-                                                                        new List<LSPLanguage> { LSPLanguage.TypeScript, LSPLanguage.JavaScript },
+                                                                        new List<LSPLanguage> { TypeScript, JavaScript },
                                                                         "typescript-language-server", "--stdio");
 
         public static readonly LSPServer VscodeJson = new("VSCode JSON Language Server",
                                                           "https://www.npmjs.com/package/vscode-json-languageserver",
-                                                          new List<LSPLanguage> { LSPLanguage.JSON },
+                                                          new List<LSPLanguage> { JSON },
                                                           "vscode-json-languageserver", "--stdio");
 
         public static readonly LSPServer Texlab = new("Texlab",
                                                       "https://github.com/latex-lsp/texlab",
-                                                      new List<LSPLanguage> { LSPLanguage.LaTeX },
+                                                      new List<LSPLanguage> { LaTeX },
                                                       "texlab");
 
         public static readonly LSPServer LuaLanguageServer = new("Lua Language Server",
                                                                  "https://github.com/LuaLS/lua-language-server",
-                                                                 new List<LSPLanguage> { LSPLanguage.Lua },
+                                                                 new List<LSPLanguage> { Lua },
                                                                  "lua-language-server");
 
         public static readonly LSPServer Marksman = new("Marksman",
                                                         "https://github.com/artempyanykh/marksman",
-                                                        new List<LSPLanguage> { LSPLanguage.Markdown },
+                                                        new List<LSPLanguage> { Markdown },
                                                         "marksman", "server");
 
         public static readonly LSPServer MatlabLanguageServer = new("Matlab Language Server",
                                                                     "https://github.com/mathworks/MATLAB-language-server",
-                                                                    new List<LSPLanguage> { LSPLanguage.MATLAB },
+                                                                    new List<LSPLanguage> { MATLAB },
                                                                     "matlab-language-server", "--stdio");
 
         public static readonly LSPServer PhpActor = new("Phpactor",
                                                         "https://github.com/phpactor/phpactor",
-                                                        new List<LSPLanguage> { LSPLanguage.PHP },
+                                                        new List<LSPLanguage> { PHP },
                                                         "phpactor", "language-server");
 
         public static readonly LSPServer Intelephense = new("Intelephense",
                                                             "https://github.com/bmewburn/vscode-intelephense",
-                                                            new List<LSPLanguage> { LSPLanguage.PHP },
+                                                            new List<LSPLanguage> { PHP },
                                                             "intelephense", "--stdio");
 
         public static readonly LSPServer Omnisharp = new("Omnisharp",
                                                          "https://github.com/OmniSharp/omnisharp-roslyn",
-                                                         new List<LSPLanguage> { LSPLanguage.CSharp },
+                                                         new List<LSPLanguage> { CSharp },
                                                          "omnisharp", "-z DotNet:enablePackageRestore=false -e utf-8 -lsp",
                                                          initOptions: new Dictionary<string, object>
                                                          {
@@ -164,33 +169,33 @@ namespace SEE.Tools.LSP
 
         public static readonly LSPServer DartAnalysisServer = new("Dart analysis server",
                                                                   "https://github.com/dart-lang/sdk/blob/master/pkg/analysis_server/tool/lsp_spec/README.md",
-                                                                  new List<LSPLanguage> { LSPLanguage.Dart },
+                                                                  new List<LSPLanguage> { Dart },
                                                                   "dart", "language-server");
 
         public static readonly LSPServer KotlinLanguageServer = new("Kotlin Language Server",
                                                                     "https://github.com/fwcd/kotlin-language-server",
-                                                                    new List<LSPLanguage> { LSPLanguage.Kotlin },
+                                                                    new List<LSPLanguage> { Kotlin },
                                                                     "kotlin-language-server");
 
         public static readonly LSPServer Pyright = new("Pyright",
                                                        "https://github.com/microsoft/pyright",
-                                                       new List<LSPLanguage> { LSPLanguage.Python },
+                                                       new List<LSPLanguage> { Python },
                                                        "pyright-langserver",
                                                        "--stdio");
 
         public static readonly LSPServer Jedi = new("Jedi Language Server",
                                                     "https://github.com/pappasam/jedi-language-server",
-                                                    new List<LSPLanguage> { LSPLanguage.Python },
+                                                    new List<LSPLanguage> { Python },
                                                     "jedi-language-server");
 
         public static readonly LSPServer RubyLsp = new("Ruby LSP",
                                                        "https://github.com/Shopify/ruby-lsp",
-                                                       new List<LSPLanguage> { LSPLanguage.Ruby },
+                                                       new List<LSPLanguage> { Ruby },
                                                        "srb", "typecheck --lsp --disable-watchman .");
 
         public static readonly LSPServer RustAnalyzer = new("Rust Analyzer",
                                                             "https://github.com/rust-lang/rust-analyzer",
-                                                            new List<LSPLanguage> { LSPLanguage.Rust },
+                                                            new List<LSPLanguage> { Rust },
                                                             "rust-analyzer",
                                                             initOptions: new Dictionary<string, object>
                                                             {
@@ -204,12 +209,12 @@ namespace SEE.Tools.LSP
 
         public static readonly LSPServer Lemminx = new("Lemminx",
                                                        "https://github.com/eclipse/lemminx",
-                                                       new List<LSPLanguage> { LSPLanguage.XML },
+                                                       new List<LSPLanguage> { XML },
                                                        "lemminx");
 
         public static readonly LSPServer ZLS = new("ZLS",
                                                    "https://github.com/zigtools/zls",
-                                                   new List<LSPLanguage> { LSPLanguage.Zig },
+                                                   new List<LSPLanguage> { Zig },
                                                    "zls");
 
         /// <summary>

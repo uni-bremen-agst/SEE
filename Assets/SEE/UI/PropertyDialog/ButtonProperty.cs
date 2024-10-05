@@ -10,7 +10,7 @@ using UnityEngine.UI;
 namespace SEE.UI.PropertyDialog
 {
     /// <summary>
-    /// A button for a for a property dialog.
+    /// A button for a property dialog.
     /// </summary>
     public class ButtonProperty : Property<HideModeSelector>
     {
@@ -30,9 +30,9 @@ namespace SEE.UI.PropertyDialog
         private GameObject button;
 
         /// <summary>
-        /// Used to store the icon of the button.
+        /// The codepoint of the icon for the button.
         /// </summary>
-        public Sprite IconSprite;
+        public char Icon;
 
         /// <summary>
         /// Saves which method of the hide action is to be executed.
@@ -80,6 +80,7 @@ namespace SEE.UI.PropertyDialog
 
             SetupTooltip();
             SetUpButton();
+            return;
 
             void SetUpButton()
             {
@@ -87,10 +88,10 @@ namespace SEE.UI.PropertyDialog
                 GameObject text = button.transform.Find("Text").gameObject;
                 GameObject icon = button.transform.Find("Icon").gameObject;
 
-                if (!button.TryGetComponentOrLog(out ButtonManagerBasicWithIcon buttonManager)
+                if (!button.TryGetComponentOrLog(out ButtonManagerBasic buttonManager)
                      || !button.TryGetComponentOrLog(out Image buttonImage)
                      || !text.TryGetComponentOrLog(out TextMeshProUGUI textMeshPro)
-                     || !icon.TryGetComponentOrLog(out Image iconImage)
+                     || !icon.TryGetComponentOrLog(out TextMeshProUGUI iconText)
                      || !button.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
                     return;
@@ -99,8 +100,8 @@ namespace SEE.UI.PropertyDialog
                 textMeshPro.fontSize = 20;
                 buttonImage.color = ButtonColor;
                 textMeshPro.color = ButtonColor.IdealTextColor();
-                iconImage.color = ButtonColor.IdealTextColor();
-                iconImage.sprite = IconSprite;
+                iconText.color = ButtonColor.IdealTextColor();
+                iconText.text = Icon.ToString();
 
                 buttonManager.buttonText = Name;
                 buttonManager.clickEvent.AddListener(Clicked);

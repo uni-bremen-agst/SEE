@@ -106,6 +106,13 @@ namespace SEE.GraphProviders
         public DiagnosticKind IncludedDiagnosticLevels = DiagnosticKind.All;
 
         /// <summary>
+        /// If true, LSP functionality will be available in code windows.
+        /// </summary>
+        [Tooltip("If true, LSP functionality will be available in code windows."), RuntimeTab(GraphProviderFoldoutGroup)]
+        [LabelWidth(150)]
+        public bool UseInCodeWindows = true;
+
+        /// <summary>
         /// If true, the communication between the language server and SEE will be logged.
         /// </summary>
         [Tooltip("If true, the communication between the language server and SEE will be logged."), RuntimeTab(GraphProviderFoldoutGroup)]
@@ -139,7 +146,7 @@ namespace SEE.GraphProviders
         /// <returns>The available language servers as a dropdown list.</returns>
         private IEnumerable<string> ServerDropdown()
         {
-            return LSPLanguage.All.Select(language => (language, LSPServer.All.Where(server => server.Languages.Contains(language))))
+            return LSPLanguage.AllLspLanguages.Select(language => (language, LSPServer.All.Where(server => server.Languages.Contains(language))))
                               .SelectMany(pair => pair.Item2.Select(server => $"{pair.language}/{server}"))
                               .OrderBy(server => server);
         }
@@ -248,6 +255,7 @@ namespace SEE.GraphProviders
             handler.Server = Server;
             handler.ProjectPath = ProjectPath.Path;
             handler.LogLSP = LogLSP;
+            handler.UseInCodeWindows = UseInCodeWindows;
             handler.TimeoutSpan = TimeSpan.FromSeconds(Timeout);
             await handler.InitializeAsync(executablePath: ServerPath ?? Server.ServerExecutable, token);
             if (token.IsCancellationRequested)

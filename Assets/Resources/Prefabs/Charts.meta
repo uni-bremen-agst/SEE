@@ -1,12 +1,8 @@
 fileFormatVersion: 2
-<<<<<<< HEAD:Assets/Dependencies.meta
-guid: 31815e5d24ab3b84fb9d47cacc562874
-=======
 guid: fb21df1ff65c7ca479f097c3034c820d
->>>>>>> origin/master:Assets/Prefabs/Charts.meta
 folderAsset: yes
 DefaultImporter:
   externalObjects: {}
-  userData: 
-  assetBundleName: 
-  assetBundleVariant: 
+  userData:
+  assetBundleName:
+  assetBundleVariant:

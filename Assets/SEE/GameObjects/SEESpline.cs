@@ -22,8 +22,8 @@ namespace SEE.GO
     /// <see cref="Spline"/>), the internal state is marked dirty and the
     /// rendering is updated in the next frame (via <see cref="Update"/>).
     /// There are two rendering methods:
-    ///
-    /// 1. <see cref="LineRenderer"/>: The spline is rendered as polyline.
+    /// <list type="number"><item>
+    /// <see cref="LineRenderer"/>: The spline is rendered as polyline.
     /// This method is comparatively fast, but lacks more advanced features
     /// such as collision detection. It serves as a placeholder until the
     /// runtime environment found the time to create a <see cref="Mesh"/>
@@ -31,15 +31,15 @@ namespace SEE.GO
     /// <see cref="MeshCollider"/> etc.). This class doesn't create
     /// <see cref="LineRenderer"/> instances on its own, but rather updates
     /// them if they are present.
-    ///
-    /// 2. <see cref="Mesh"/>: The spline is rendered as tubular mesh. This
+    /// </item><item>
+    /// <see cref="Mesh"/>: The spline is rendered as tubular mesh. This
     /// method is a lot slower than <see cref="LineRenderer"/>, but in
     /// contrast creates "real" 3D objects with collision detection. Because
     /// the creation of a larger amount of meshes is quite slow, it is up to
     /// an external client to replace any <see cref="LineRenderer"/> with a
     /// <see cref="MeshRenderer"/>. For this purpose there is the method
     /// <see cref="CreateMesh"/>.
-    ///
+    /// </item></list>
     /// The geometric characteristics of the generated mesh, e.g., the radius
     /// of the tube, can be set via properties. By setting a property, the
     /// rendering of the spline is updated in the next frame. If an update
@@ -83,6 +83,11 @@ namespace SEE.GO
         /// </summary>
         [SerializeField]
         private float subsplineEndT = 1.0f;
+
+        /// <summary>
+        /// The event is emitted each time the renderer is updated (see <see cref="needsUpdate"/>).
+        /// </summary>
+        public event Action OnRendererChanged;
 
         /// <summary>
         /// Property of <see cref="subsplineEndT"/>.
@@ -196,6 +201,25 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        [SerializeField]
+        private bool isSelectable = true;
+
+        /// <summary>
+        /// Whether the spline shall be selectable, that is, whether a <see cref="MeshCollider"/> shall be added to it.
+        /// </summary>
+        public bool IsSelectable
+        {
+            get => isSelectable;
+            set
+            {
+                isSelectable = value;
+                needsUpdate = true;
+            }
+        }
+
+        /// <summary>
         /// Tuple of the start color of the gradient and the end color of it.
         /// Should only be changed via <see cref="GradientColors"/>.
         /// </summary>
@@ -284,6 +308,7 @@ namespace SEE.GO
                 UpdateLineRenderer();
                 UpdateMesh();
                 needsUpdate = needsColorUpdate = false;
+                OnRendererChanged?.Invoke();
             }
             else if (needsColorUpdate)
             {
@@ -329,8 +354,7 @@ namespace SEE.GO
         {
             if (gameObject.TryGetComponent(out LineRenderer lr))
             {
-                BSpline subSpline = CreateSubSpline();
-                Vector3[] polyLine = TinySplineInterop.ListToVectors(subSpline.Sample());
+                Vector3[] polyLine = GenerateVertices();
 
                 lr.positionCount = polyLine.Length;
                 lr.SetPositions(polyLine);
@@ -338,6 +362,16 @@ namespace SEE.GO
                 lr.endColor = gradientColors.end;
             }
             needsUpdate = false;
+        }
+
+        /// <summary>
+        /// Generates the vertices that represent this spline.
+        /// </summary>
+        /// <returns>The vertices that make up this spline.</returns>
+        public Vector3[] GenerateVertices()
+        {
+            BSpline subSpline = CreateSubSpline();
+            return TinySplineInterop.ListToVectors(subSpline.Sample());
         }
 
         /// <summary>
@@ -368,7 +402,7 @@ namespace SEE.GO
         /// <returns>The created or updated mesh</returns>
         private Mesh CreateOrUpdateMesh()
         {
-            int totalVertices = (tubularSegments+1) * (radialSegments+1);
+            int totalVertices = (tubularSegments + 1) * (radialSegments + 1);
             int totalIndices = tubularSegments * radialSegments * 6;
             Vector3[] vertices = new Vector3[totalVertices];
             Vector3[] normals = new Vector3[totalVertices];
@@ -435,7 +469,7 @@ namespace SEE.GO
                 Vector3 frPosition = TinySplineInterop.VectorToVector(fr.Position);
                 Vector3 frNormal = TinySplineInterop.VectorToVector(fr.Normal);
                 Vector3 frBinormal = TinySplineInterop.VectorToVector(fr.Binormal);
-                Vector4 frTangent = TinySplineInterop.VectorToVector(fr.Tangent);  // w = 0f by default.
+                Vector4 frTangent = TinySplineInterop.VectorToVector(fr.Tangent); // w = 0f by default.
 
                 // TODO: This was previously (before the optimization) implicit behavior. Is this intentional?
                 if (float.IsNaN(frNormal.x))
@@ -467,8 +501,12 @@ namespace SEE.GO
                         int d = index - segmentPlusOne;
 
                         // faces
-                        indices[indexIndex++] = a; indices[indexIndex++] = d; indices[indexIndex++] = b;
-                        indices[indexIndex++] = b; indices[indexIndex++] = d; indices[indexIndex++] = c;
+                        indices[indexIndex++] = a;
+                        indices[indexIndex++] = d;
+                        indices[indexIndex++] = b;
+                        indices[indexIndex++] = b;
+                        indices[indexIndex++] = d;
+                        indices[indexIndex++] = c;
                     }
 
                     index++;
@@ -480,17 +518,19 @@ namespace SEE.GO
             bool updateMaterial; // Whether to call `UpdateMaterial'.
 
             if (gameObject.TryGetComponent(out MeshFilter filter))
-            { // Does this game object already have a mesh which we can reuse?
+            {
+                // Does this game object already have a mesh which we can reuse?
                 mesh = filter.mesh;
                 updateMaterial = // The geometrics of the mesh have changed.
-                                 mesh.vertices.Length != vertices.Length ||
-                                 mesh.normals.Length != normals.Length ||
-                                 mesh.tangents.Length != tangents.Length ||
-                                 mesh.uv.Length != uvs.Length ||
-                                 needsColorUpdate; // Or the color of the mesh has been changed.
+                    mesh.vertices.Length != vertices.Length ||
+                    mesh.normals.Length != normals.Length ||
+                    mesh.tangents.Length != tangents.Length ||
+                    mesh.uv.Length != uvs.Length ||
+                    needsColorUpdate; // Or the color of the mesh has been changed.
             }
             else
-            { // Create a new mesh for this game object.
+            {
+                // Create a new mesh for this game object.
                 mesh = new Mesh();
                 mesh.MarkDynamic(); // May improve performance.
                 filter = gameObject.AddComponent<MeshFilter>();
@@ -509,19 +549,28 @@ namespace SEE.GO
             mesh.uv = uvs;
             mesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
-            // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-            MeshCollider collider = gameObject.AddOrGetComponent<MeshCollider>();
-            collider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-            collider.sharedMesh = mesh;
+            if (IsSelectable)
+            {
+                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+                MeshCollider splineCollider = gameObject.AddOrGetComponent<MeshCollider>();
+                splineCollider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+                splineCollider.sharedMesh = mesh;
+            }
+            else if (gameObject.TryGetComponent(out MeshCollider splineCollider))
+            {
+                Destroyer.Destroy(splineCollider);
+            }
 
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             if (updateMaterial)
-            { // Needs the meshRenderer.
+            {
+                // Needs the meshRenderer.
                 UpdateMaterial();
             }
 
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-            { // Remove line meshRenderer.
+            {
+                // Remove line meshRenderer.
                 Destroyer.Destroy(lineRenderer);
             }
 

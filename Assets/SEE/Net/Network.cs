@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Threading;
+﻿using Cysharp.Threading.Tasks;
 using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
@@ -16,6 +8,15 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
+using System.Linq;
+using System.Net;
+using System.Text;
+using System.Threading;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -37,6 +38,11 @@ namespace SEE.Net
         public static Network Instance { get; private set; }
 
         /// <summary>
+        /// The <see cref="ActionNetwork"/> instance for communication between the clients and the server.
+        /// </summary>
+        public static readonly Lazy<ActionNetwork> ActionNetworkInst = new(InitActionNetworkInst);
+
+        /// <summary>
         /// The maximal port number.
         /// </summary>
         private const int maxServerPort = 65535;
@@ -53,11 +59,11 @@ namespace SEE.Net
         /// <summary>
         /// Base URL of the backend server where the files are stored
         /// </summary>
-        public static string BackendDomain = "localhost";
+        public static string BackendDomain = "localhost:8080";
         /// <summary>
         /// REST resource path, i.e., the URL part identifying the client REST API.
         /// </summary>
-        public static string ClientAPI = "/api/v1/file/client/";
+        public static string ClientAPI = "/api/v1/";
         /// <summary>
         /// The complete URL of the Client REST API.
         /// </summary>
@@ -97,6 +103,18 @@ namespace SEE.Net
         private CallBack callbackToMenu = null;
 
         /// <summary>
+        /// Name of the local player; used for the text chat and the avatar badge.
+        /// </summary>
+        [Tooltip("The name of the player."), ShowInInspector]
+        public string PlayerName { get; set; } = "Me";
+
+        /// <summary>
+        /// The index of the player's avatar.
+        /// </summary>
+        [Tooltip("The index of the player's avatar"), ShowInInspector]
+        public uint AvatarIndex { get; set; } = 0;
+
+        /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
         /// This information is retrieved differently depending upon whether we are running
         /// in the editor or in game play because <see cref="NetworkManager.Singleton"/> is
@@ -109,7 +127,7 @@ namespace SEE.Net
             NetworkConfig networkConfig = networkManager.NetworkConfig;
             if (networkConfig == null)
             {
-                Debug.LogError("NetworkManager.Singleton has no valid NetworkConfig.\n");
+                Debug.LogError($"NetworkManager.Singleton has no valid {nameof(NetworkConfig)}.\n");
                 return null;
             }
             return networkConfig.NetworkTransport as UnityTransport;
@@ -297,7 +315,11 @@ namespace SEE.Net
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+#if UNITY_EDITOR
+            Debug.Log("Skipping parsing command-line parameters in Editor mode.\n");
+#else
             ProcessCommandLineArguments();
+#endif
         }
 
         /// <summary>
@@ -314,50 +336,66 @@ namespace SEE.Net
 
             bool launchAsServer = false;
 
+            // Commented out because it logs the plaintext password!
+            Debug.Log($"Parsing {arguments.Length} command-line parameters.\n"); //:\n{string.Join("; ", arguments)}");
+
             // Check command line arguments
             // The first element in the array contains the file name of the executing program.
             // If the file name is not available, the first element is equal to String.Empty.
             for (int i = 1; i < arguments.Length; i++)
             {
-                if (arguments[i] == portArgument)
+                switch (arguments[i])
                 {
-                    CheckArgumentValue(arguments, i, portArgument);
-                    ServerPort = Int32.Parse(arguments[i + 1]);
-                    i++;
-                }
-                else if (arguments[i] == passwordArgument)
-                {
-                    CheckArgumentValue(arguments, i, passwordArgument);
-                    RoomPassword = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == domainArgument)
-                {
-                    CheckArgumentValue(arguments, i, domainArgument);
-                    BackendDomain = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == serverIdArgument)
-                {
-                    CheckArgumentValue(arguments, i, serverIdArgument);
-                    ServerId = arguments[i + 1];
-                    i++;
-                }
-                else if (arguments[i] == launchAsServerArgument)
-                {
-                    // This argument does not have a value. It works as a flag.
-                    launchAsServer = true;
-                    i++;
-                }
-                else
-                {
-                    Debug.LogWarning($"Unknown command-line parameter {arguments[i]} will be ignored.\n");
+                    case portArgument:
+                        Debug.Log($"Found {portArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, portArgument);
+                        ServerPort = Int32.Parse(arguments[i + 1]);
+                        i++; // skip one parameter
+                        break;
+                    case passwordArgument:
+                        Debug.Log($"Found {passwordArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, passwordArgument);
+                        RoomPassword = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case domainArgument:
+                        Debug.Log($"Found {domainArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, domainArgument);
+                        BackendDomain = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case serverIdArgument:
+                        Debug.Log($"Found {serverIdArgument} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, serverIdArgument);
+                        ServerId = arguments[i + 1];
+                        i++; // skip one parameter
+                        break;
+                    case launchAsServerArgument:
+                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}.\n");
+                        // This argument does not have a value. It works as a flag.
+                        launchAsServer = true;
+                        break;
+                    default:
+                        Debug.LogWarning($"Unknown command-line parameter {i} will be ignored: {arguments[i]}.\n");
+                        break;
                 }
             }
 
             if (launchAsServer)
             {
-                StartServer(null);
+                CallBack serverCallback = (success, message) =>
+                {
+                    if (success)
+                    {
+                        Debug.Log($"Server started successfully: {message}.\n");
+                    }
+                    else
+                    {
+                        Debug.LogError($"Starting server failed: {message}.\n");
+                    }
+                };
+                Debug.LogWarning("Starting server...\n");
+                StartServer(serverCallback);
             }
 
             return;
@@ -376,20 +414,15 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The gateway to the server.
+        /// Yields the <see cref="ActionNetwork"/> component attached to the Server game object.
         /// </summary>
-        public static readonly Lazy<ServerActionNetwork> ServerNetwork = new(InitServerNetwork);
-
-        /// <summary>
-        /// Yields the <see cref="ServerActionNetwork"/> component attached to the Server game object.
-        /// </summary>
-        private static ServerActionNetwork InitServerNetwork()
+        private static ActionNetwork InitActionNetworkInst()
         {
             const string serverName = "Server";
             GameObject server = GameObject.Find(serverName);
             if (server != null)
             {
-                server.TryGetComponentOrLog(out ServerActionNetwork serverNetwork);
+                server.TryGetComponentOrLog(out ActionNetwork serverNetwork);
                 return serverNetwork;
             }
             else
@@ -403,10 +436,49 @@ namespace SEE.Net
         /// Broadcasts a serialized action.
         /// </summary>
         /// <param name="serializedAction">Serialized action to be broadcast</param>
-        /// <param name="recipients">List of recipients to broadcast to, will broadcast to all if this is null.</param>
-        public static void BroadcastAction(String serializedAction, ulong[] recipients)
+        /// <param name="recipients">List of recipients to broadcast to. Will broadcast to all clients if this is <c>null</c> or omitted.</param>
+        public static void BroadcastAction(String serializedAction, ulong[] recipients = null)
         {
-            ServerNetwork.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            /// TODO(#754): Replace with the exact value.
+            int maxPacketSize = 32000;
+            if (serializedAction.Length < maxPacketSize)
+            {
+                ActionNetworkInst.Value?.BroadcastActionServerRpc(serializedAction, recipients);
+            }
+            else
+            {
+                List<string> fragmentData = SplitString(serializedAction, maxPacketSize);
+                string id = Guid.NewGuid().ToString();
+                for (int i = 0; i < fragmentData.Count; i++)
+                {
+                    ActionNetworkInst.Value?.BroadcastActionServerRpc(id, fragmentData.Count, i, fragmentData[i], recipients);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Splitts a string after <paramref name="fragmentSize"/> chars.
+        /// </summary>
+        /// <param name="str">The string to be split</param>
+        /// <param name="fragmentSize">The size for the sub strings.</param>
+        /// <returns>A list with the split strings.</returns>
+        private static List<string> SplitString(string str, int fragmentSize)
+        {
+            List<string> fragments = new();
+
+            for (int i = 0; i < str.Length; i += fragmentSize)
+            {
+                if (i + fragmentSize > str.Length)
+                {
+                    fragments.Add(str.Substring(i));
+                }
+                else
+                {
+                    fragments.Add(str.Substring(i, fragmentSize));
+                }
+            }
+
+            return fragments;
         }
 
         /// <summary>
@@ -710,7 +782,7 @@ namespace SEE.Net
         {
             if (RoomPassword == Encoding.ASCII.GetString(request.Payload))
             {
-                Debug.Log($"Client {request.ClientNetworkId} has sent right room password.\n");
+                Debug.Log($"Client {request.ClientNetworkId} has sent correct room password.\n");
                 response.Approved = true;
 
             }
@@ -718,7 +790,7 @@ namespace SEE.Net
             {
                 response.Approved = false;
                 response.Reason = "Invalid password";
-                Debug.LogWarning($"Client {request.ClientNetworkId} has sent wrong room password.\n");
+                Debug.LogWarning($"Client {request.ClientNetworkId} has sent incorrect room password.\n");
             }
         }
 
@@ -730,7 +802,7 @@ namespace SEE.Net
         /// <param name="owner">ID of the owner (ignored)</param>
         private void OnClientConnectedCallback(ulong owner)
         {
-            callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.\n");
+            callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
         }
 
@@ -954,7 +1026,7 @@ namespace SEE.Net
             Load(ConfigPath.Path);
         }
 
-#region ConfigIO
+        #region ConfigIO
 
         //--------------------------------
         // Configuration file input/output
@@ -980,6 +1052,14 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
+        /// <summary>
+        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
+        /// </summary>
+        private const string playernameLabel = "playername";
+        /// <summary>
+        /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
+        /// </summary>
+        private const string avatarIndexLabel = "avatarIndex";
 
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
@@ -1020,6 +1100,10 @@ namespace SEE.Net
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
+            writer.Save(PlayerName, playernameLabel);
+            // The following cast from uint to int is necessary because otherwise the value
+            // would be saved as a float.
+            writer.Save((int)AvatarIndex, avatarIndexLabel);
         }
 
         /// <summary>
@@ -1041,6 +1125,19 @@ namespace SEE.Net
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
             }
+            {
+                string value = PlayerName;
+                ConfigIO.Restore(attributes, playernameLabel, ref value);
+                PlayerName = value;
+            }
+            {
+                int value = (int)AvatarIndex;
+                if (ConfigIO.Restore(attributes, avatarIndexLabel, ref value))
+                {
+                    AvatarIndex = (uint)value;
+                }
+            }
+
         }
 
 #endregion

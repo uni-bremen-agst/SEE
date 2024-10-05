@@ -123,7 +123,6 @@ GlobalConnectionShutdownDelegate*.txt
 **/._.DS_Store
 
 # VSCode
-.vscode
 .vsconfig
 
 # Custom entries
@@ -151,3 +150,7 @@ Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/install.ps1
 Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/uninstall.ps1
 Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/install.ps1
 Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/uninstall.ps1
+
+# Files downloaded from backend server
+/Assets/StreamingAssets/Multiplayer
+/Assets/StreamingAssets/Multiplayer.meta

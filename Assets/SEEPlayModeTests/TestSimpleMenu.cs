@@ -1,8 +1,7 @@
-﻿using NUnit.Framework;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
+using NUnit.Framework;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.TestTools;
 
 namespace SEE.UI.Menu
@@ -16,10 +15,12 @@ namespace SEE.UI.Menu
         /// Title of option 1 in the menu.
         /// </summary>
         private const string OptionOne = "Option 1";
+
         /// <summary>
         /// Title of option 2 in the menu.
         /// </summary>
         private const string OptionTwo = "Option 2";
+
         /// <summary>
         /// Title of the menu.
         /// </summary>
@@ -29,7 +30,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuOption1()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -44,7 +45,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuOption2()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -59,7 +60,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <returns><see cref="WaitForEndOfFrame"/></returns>
         [UnityTest]
-        [LoadScene()]
+        [LoadScene]
         public IEnumerator TestMenuNoOption()
         {
             yield return new WaitForSeconds(TimeUntilMenuIsSetup);
@@ -83,24 +84,20 @@ namespace SEE.UI.Menu
             menu.Title = MenuTitle;
             menu.Description = "Tests the menu";
             menu.HideAfterSelection = true;
-            menu.Icon = GetIcon();
+            menu.Icon = GetIconSprite();
 
             IEnumerable<MenuEntry> menuEntries = new List<MenuEntry>
             {
-                new MenuEntry(selectAction: new UnityAction(() => { selection = 1; }),
-                              unselectAction: null,
-                              title: OptionOne,
-                              description: "Select option 1",
-                              entryColor: Color.red,
-                              enabled: true,
-                              icon: GetIcon()),
-                new MenuEntry(selectAction: new UnityAction(() => { selection = 2; }),
-                              unselectAction: null,
-                              title: OptionTwo,
-                              description: "Select option 2",
-                              entryColor: Color.green,
-                              enabled: true,
-                              icon: GetIcon()),
+                new(SelectAction: () => selection = 1,
+                    Title: OptionOne,
+                    Description: "Select option 1",
+                    EntryColor: Color.red,
+                    Icon: ExampleIcon),
+                new(SelectAction: () => selection = 2,
+                    Title: OptionTwo,
+                    Description: "Select option 2",
+                    EntryColor: Color.green,
+                    Icon: ExampleIcon),
             };
 
             menu.AddEntries(menuEntries);

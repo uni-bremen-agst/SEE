@@ -4,12 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Markdig;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using OmniSharp.Extensions.LanguageServer.Server;
 using SEE.Tools;
 using SEE.Tools.LSP;
 using SEE.Utils;
+using SEE.Utils.Markdown;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -185,7 +184,7 @@ namespace SEE.DataModel.DG.IO
                                        CancellationToken token = default)
         {
             // Query all documents whose file extension is supported by the language server.
-            List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.Extensions).ToList();
+            List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.FileExtensions).ToList();
             List<string> relevantDocuments = SourcePaths.SelectMany(RelevantDocumentsForPath)
                                                         .Where(x => ExcludedPaths.All(y => !x.StartsWith(y)))
                                                         .Distinct().ToList();
@@ -260,6 +259,12 @@ namespace SEE.DataModel.DG.IO
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
             Debug.Log($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).");
 
+            if (Handler.Server == LSPServer.EclipseJdtls)
+            {
+                // This server requires manual correction of the Java package hierarchies.
+                HandleJavaClasses(relevantNodes);
+            }
+
             if (relevantNodes.Count == 0)
             {
                 Debug.LogError("LSPImporter: No relevant nodes found. Aborting import.\n");
@@ -304,8 +309,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        // FIXME (external: OmniSharp bug, sends wrong method name)
-                        // await HandleCallHierarchyAsync(node, graph, token);
+                        await HandleCallHierarchyAsync(node, graph, token);
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
                     {
@@ -314,9 +318,8 @@ namespace SEE.DataModel.DG.IO
 
                     // The remaining 80% of the progress is made by connecting the nodes.
                     // The Count+1 prevents the progress from reaching 1.0, since the diagnostics may not yet be pulled.
-                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count+1));
+                    changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
                 }
-                //Handler.CloseDocument(path);
             }
             Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
 
@@ -325,8 +328,8 @@ namespace SEE.DataModel.DG.IO
             {
                 // In this case, we will wait one additional second to give the server at least some time to emit diagnostics.
                 // TODO (#746): Collect diagnostics in background, or find a better way to handle this.
-                await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
-                foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetPublishedDiagnostics())
+                await UniTask.Delay(Handler.TimeoutSpan, cancellationToken: token);
+                foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetUnhandledPublishedDiagnostics())
                 {
                     HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path);
                 }
@@ -337,6 +340,8 @@ namespace SEE.DataModel.DG.IO
             // Aggregate diagnostics upwards. We do this with a suffix, since these metrics may be used for erosion icons.
             MetricAggregator.AggregateSum(graph, IncludeDiagnostics.ToDiagnosticSeverity().Select(x => x.Name()), withSuffix: true, asInt: true);
 
+            graph.BasePath = Handler.ProjectPath;
+
             changePercentage?.Invoke(1);
 
             return;
@@ -344,6 +349,71 @@ namespace SEE.DataModel.DG.IO
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
                 return relevantExtensions.SelectMany(x => Directory.EnumerateFiles(path, $"*.{x}", SearchOption.AllDirectories));
+            }
+
+            void HandleJavaClasses(IList<Node> nodes)
+            {
+                Dictionary<string, Node> packageNodes = new();
+                // Java package hierarchies are not collected properly by the language server.
+                // Instead, we will infer them from the file paths.
+                foreach (Node node in nodes.Where(x => x.Type == NodeKind.Class.ToString()))
+                {
+                    // Aside from the hierarchies, we also want to remember as a metric how many methods are in a class.
+                    node.SetInt("Num_Methods", nodes.Count(x => x.Parent == node && x.Type == NodeKind.Method.ToString()));
+
+                    string relativePath = Path.GetRelativePath(Handler.ProjectPath, node.Directory);
+                    string packageName = relativePath.Replace(Path.DirectorySeparatorChar, '.').TrimEnd('.');
+
+                    if (packageNodes.TryGetValue(packageName, out Node package))
+                    {
+                        // The package node already exists, so we reparent the class node to it.
+                        node.Reparent(package);
+                        continue;
+                    }
+                    Node packageNode = new()
+                    {
+                        ID = packageName,
+                        SourceName = packageName,
+                        Directory = node.Directory,
+                        Type = NodeKind.Package.ToString()
+                    };
+                    graph.AddNode(packageNode);
+                    packageNodes[packageName] = packageNode;
+
+                    // Reparent the class node to the package node (if it previously was just inside a directory).
+                    if (node.Parent != null &&
+                        (node.Parent.Type == NodeKind.File.ToString()
+                            || node.Parent.Type == NodeKind.Package.ToString()
+                            || node.Parent.Type == "Directory"))
+                    {
+                        node.Reparent(packageNode);
+                    }
+                }
+
+                // Finally, another run through the nodes to reparent the package nodes to their parent packages.
+                foreach (Node packageNode in packageNodes.Values)
+                {
+                    Node parentPackage = GetParentPackage(packageNode.ID);
+                    if (parentPackage != null)
+                    {
+                        packageNode.Reparent(parentPackage);
+                    }
+                }
+
+                return;
+
+                Node GetParentPackage(string package)
+                {
+                    for (int lastDot = package.LastIndexOf('.'); lastDot != -1; lastDot = package.LastIndexOf('.'))
+                    {
+                        package = package[..lastDot];
+                        if (packageNodes.TryGetValue(package, out Node parent))
+                        {
+                            return parent;
+                        }
+                    }
+                    return null;
+                }
             }
         }
 
@@ -387,14 +457,18 @@ namespace SEE.DataModel.DG.IO
         /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         private async UniTask HandleCallHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
-            IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
+            IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (CallHierarchyItem item in results)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                if (targetNode == null)
+                {
+                    continue;
+                }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
@@ -402,7 +476,7 @@ namespace SEE.DataModel.DG.IO
 
             bool SelectItem(CallHierarchyItem item)
             {
-                return item.Uri.Path == node.Path() && node.SourceRange.Contains(Range.FromLspRange(item.Range));
+                return item.Uri.Path == node.Path() && Range.FromLspRange(item.Range) == node.SourceRange;
             }
         }
 
@@ -415,14 +489,18 @@ namespace SEE.DataModel.DG.IO
         /// <param name="token">A cancellation token that can be used to cancel the operation.</param>
         private async UniTask HandleTypeHierarchyAsync(Node node, Graph graph, CancellationToken token)
         {
-            IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine ?? 0, node.SourceColumn ?? 0);
+            IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (TypeHierarchyItem item in results)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).First();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                if (targetNode == null)
+                {
+                    continue;
+                }
                 Edge edge = AddEdge(node, targetNode, LSP.Extend, false, graph);
                 edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
@@ -494,7 +572,7 @@ namespace SEE.DataModel.DG.IO
                         Hover hover = await Handler.HoverAsync(path, node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
                         if (hover != null)
                         {
-                            node.SetString("HoverText", MarkupToRichText(hover.Contents));
+                            node.SetString("HoverText", hover.Contents.ToRichText());
                         }
                     }
 
@@ -522,50 +600,6 @@ namespace SEE.DataModel.DG.IO
             {
                 await AddSymbolNodeAsync(child, path, graph, childParent, token);
             }
-        }
-
-        /// <summary>
-        /// Converts the given <paramref name="content"/> to TextMeshPro-compatible rich text.
-        /// </summary>
-        /// <param name="content">The content to convert.</param>
-        /// <returns>The converted rich text.</returns>
-        private static string MarkupToRichText(MarkedStringsOrMarkupContent content)
-        {
-            string markdown;
-            if (content.HasMarkupContent)
-            {
-                MarkupContent markup = content.MarkupContent!;
-                switch (markup.Kind)
-                {
-                    case MarkupKind.PlainText: return $"<noparse>{markup.Value}</noparse>";
-                    case MarkupKind.Markdown:
-                        markdown = markup.Value;
-                        break;
-                    default:
-                        Debug.LogError($"Unsupported markup kind: {markup.Kind}");
-                        return string.Empty;
-                }
-            }
-            else
-            {
-                // This is technically deprecated, but we still need to support it,
-                // since some language servers still use it.
-                Container<MarkedString> strings = content.MarkedStrings!;
-                markdown = string.Join("\n", strings.Select(x =>
-                {
-                    if (x.Language != null)
-                    {
-                        return $"```{x.Language}\n{x.Value}\n```";
-                    }
-                    else
-                    {
-                        return x.Value;
-                    }
-                }));
-            }
-
-            // TODO (#728): Parse markdown to TextMeshPro rich text (custom MarkDig parser).
-            return Markdown.ToPlainText(markdown);
         }
 
         /// <summary>

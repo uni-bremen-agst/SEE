@@ -397,14 +397,14 @@ namespace SEE.Game.Avatars
             {
                 GameObject teleportArea = PrefabInstantiator.InstantiatePrefab("Prefabs/Players/TeleportArea");
                 teleportArea.name = "TeleportArea";
-                if (teleportArea.TryGetComponentOrLog(out TeleportationArea teleportationArea) 
+                if (teleportArea.TryGetComponentOrLog(out TeleportationArea teleportationArea)
                     && ground.TryGetComponentOrLog(out Collider collider))
                 {
                     if (teleportationArea.colliders.Count == 0)
                     {
                         teleportationArea.colliders.Add(collider);
                     }
-                    else                     
+                    else
                     {
                         if (teleportationArea.colliders[0] != null)
                         {
@@ -418,7 +418,7 @@ namespace SEE.Game.Avatars
                     // We need to first assign the collider and then enable the teleport area.
                     teleportArea.SetActive(true);
                     teleportationArea.enabled = true;
-                }               
+                }
             }
 
             // Adds component to VR-Player to sent data from VRIK to all remote clients.
@@ -492,8 +492,8 @@ namespace SEE.Game.Avatars
                 Debug.Log("[HTC Facial Tracker] SR_Runtime found. Adding components...\n");
                 gameObject.AddComponent<AvatarBlendshapeExpressions>();
 
-                // Multiplayer functionality for UMAExpressionplayer and Facialtracker.
-                gameObject.AddComponent<ExpressionPlayerSynchronizer>();
+                // Multiplayer functionality for Facialtracker.
+                gameObject.AddComponent<BlendshapeExpressionsSynchronizer>();
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
             }
         }

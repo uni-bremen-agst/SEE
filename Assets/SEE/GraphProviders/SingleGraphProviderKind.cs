@@ -40,6 +40,11 @@
         Reflexion,
 
         /// <summary>
+        /// For <see cref="AllGitBranchesSingleGraphProvider"/>.
+        /// </summary>
+        GitAllBranches,
+
+        /// <summary>
         /// For <see cref="MergeDiffGraphProvider"/>.
         /// </summary>
         MergeDiff,

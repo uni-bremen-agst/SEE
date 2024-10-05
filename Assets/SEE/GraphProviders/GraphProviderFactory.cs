@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.GraphProviders.Evolution;
 
 namespace SEE.GraphProviders
 {
@@ -29,6 +30,7 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.MergeDiff => new MergeDiffGraphProvider(),
                 SingleGraphProviderKind.VCS => new VCSGraphProvider(),
                 SingleGraphProviderKind.LSP => new LSPGraphProvider(),
+                SingleGraphProviderKind.GitAllBranches => new AllGitBranchesSingleGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }
@@ -47,6 +49,7 @@ namespace SEE.GraphProviders
             {
                 MultiGraphProviderKind.MultiPipeline => new MultiGraphPipelineProvider(),
                 MultiGraphProviderKind.GXLEvolution => new GXLEvolutionGraphProvider(),
+                MultiGraphProviderKind.GitEvolution => new GitEvolutionGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

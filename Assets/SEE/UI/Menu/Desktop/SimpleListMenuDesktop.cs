@@ -1,6 +1,9 @@
-﻿using Michsky.UI.ModernUIPack;
+﻿using System.Linq;
+using Michsky.UI.ModernUIPack;
+using SEE.GO;
 using SEE.Utils;
 using Sirenix.Utilities;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,7 +23,7 @@ namespace SEE.UI.Menu
 
         /// <summary>
         /// Prefab for each menu entry.
-        /// Required components: ButtonManagerBasicWithIcon, PointerHelper and Image.
+        /// Required components: ButtonManagerBasic, PointerHelper and Image.
         /// </summary>
         protected virtual string EntryPrefab => $"{UIPrefabFolder}Button";
 
@@ -52,7 +55,7 @@ namespace SEE.UI.Menu
         /// </summary>
         /// <param name="entry">The menu entry.</param>
         /// <returns>The game object of the entry.</returns>
-        public GameObject EntryGameObject(T entry) => EntryList.transform.Find(entry.Title)?.gameObject;
+        protected GameObject EntryGameObject(T entry) => EntryList.transform.Cast<Transform>().FirstOrDefault(x => x.name == entry.Title)?.gameObject;
 
         /// <summary>
         /// Initializes the menu.
@@ -110,14 +113,18 @@ namespace SEE.UI.Menu
 
             // title and icon
             button.name = entry.Title;
-            ButtonManagerBasicWithIcon buttonManager = button.GetComponent<ButtonManagerBasicWithIcon>();
+            ButtonManagerBasic buttonManager = button.MustGetComponent<ButtonManagerBasic>();
+            TextMeshProUGUI iconText = button.transform.Find("Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             buttonManager.buttonText = entry.Title;
-            buttonManager.buttonIcon = entry.Icon;
+            iconText.text = entry.Icon.ToString();
 
             // hover listeners
-            PointerHelper pointerHelper = button.GetComponent<PointerHelper>();
-            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(entry.Description));
-            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+            PointerHelper pointerHelper = button.MustGetComponent<PointerHelper>();
+            if (entry.Description != null)
+            {
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(entry.Description));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
+            }
 
             // adds clickEvent listener or show that button is disabled
             if (entry.Enabled)
@@ -131,10 +138,10 @@ namespace SEE.UI.Menu
 
             // colors
             Color color = entry.Enabled ? entry.EntryColor : entry.DisabledColor;
-            button.GetComponent<Image>().color = color;
+            button.MustGetComponent<Image>().color = color;
             Color textColor = color.IdealTextColor();
             buttonManager.normalText.color = textColor;
-            buttonManager.normalImage.color = textColor;
+            iconText.color = textColor;
         }
 
         /// <summary>

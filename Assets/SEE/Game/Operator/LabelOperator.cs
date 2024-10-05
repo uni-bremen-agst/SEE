@@ -1,6 +1,4 @@
-using System.Linq;
 using DG.Tweening;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -46,6 +44,15 @@ namespace SEE.Game.Operator
             labelTextPosition.AnimateTo(DesiredLabelTextPosition, duration);
             labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration);
             labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration);
+        }
+
+        /// <summary>
+        /// Returns true if the label is not empty.
+        /// </summary>
+        /// <returns>True if the label is not empty.</returns>
+        public bool LabelIsNotEmpty()
+        {
+            return !string.IsNullOrWhiteSpace(labelText?.text);
         }
 
         /// <summary>
