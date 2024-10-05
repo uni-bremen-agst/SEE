@@ -160,9 +160,19 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                 {
-                    nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
+                    if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
+                    {
+                        nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
+                    }
+                }
+                else
+                {
+                    if (settings.Show && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit) && nodeOperator.LabelIsNotEmpty())
+                    {
+                        nodeOperator.FadeLabel(settings.LabelAlpha, raycasthit.point, settings.AnimationFactor);
+                    }
                 }
             }
         }

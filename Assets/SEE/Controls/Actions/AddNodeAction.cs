@@ -67,12 +67,19 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (Input.GetMouseButtonDown(0)
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
                         // the hit object is the parent in which to create the new node
                         GameObject parent = raycastHit.collider.gameObject;
                         AddNode(raycastHit.collider.gameObject, raycastHit.point);
+                    }
+                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.hoveredGameObject != null && XRSEEActions.Selected && XRSEEActions.hoveredGameObject.HasNodeRef() &&
+                        XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res))
+                    {
+                        // the hit object is the parent in which to create the new node
+                        GameObject parent = res.collider.gameObject;
+                        AddNode(res.collider.gameObject, res.point);
                     }
                     else if (ExecuteViaContextMenu)
                     {

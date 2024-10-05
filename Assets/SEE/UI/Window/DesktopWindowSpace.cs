@@ -7,6 +7,7 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.UI;
 using CollectionExtensions = SEE.Utils.CollectionExtensions;
 
 namespace SEE.UI.Window

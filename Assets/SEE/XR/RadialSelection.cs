@@ -335,16 +335,6 @@ public class RadialSelection : MonoBehaviour
                     actionObject.transform.position = handTransform.position;
                     actionObject.SetActive(true);
                 }
-                else if (actions[i] == ActionStateTypes.Draw.Name)
-                {
-                    if (actionObject != null)
-                    {
-                        Destroy(actionObject);
-                    }
-                    actionObject = PrefabInstantiator.InstantiatePrefab("Prefabs/Pen").transform.gameObject;
-                    actionObject.transform.position = handTransform.position;
-                    actionObject.SetActive(true);
-                }
                 else
                 {
                     if (actionObject != null)

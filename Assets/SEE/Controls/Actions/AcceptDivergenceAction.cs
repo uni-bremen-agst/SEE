@@ -141,12 +141,12 @@ namespace SEE.Controls.Actions
                             // we have both source and target of the edge and use a memento struct
                             // to remember which edge we have added
                             memento = new Memento(source, target, Edge.SourceDependency);
-
+                            mementoList.Add(memento);
                             // create the edge
-                            createdEdge = CreateConvergentEdge(memento);
+                            createdEdgeList.Add(CreateConvergentEdge(memento));
 
                             // check whether edge creation was successful
-                            bool divergenceSolved = createdEdge != null;
+                            bool divergenceSolved = createdEdgeList[0] != null;
 
                             // add audio cue to the appearance of the new architecture edge
                             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
@@ -165,6 +165,12 @@ namespace SEE.Controls.Actions
                         XRSEEActions.Selected = false;
                         ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                     }
+                }
+                if (ExecuteViaContextMenu)
+                {
+                    bool divergenceSolved = createdEdgeList.All(e => e != null);
+                    CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                    return true;
                 }
                 return false;
             }
@@ -195,15 +201,15 @@ namespace SEE.Controls.Actions
                             // or implicitly mapped to
                             Node target = graph.MapsTo(selectedEdge.Target);
 
-                        // we have both source and target of the edge and use a memento struct
-                        // to remember which edge we have added
-                        memento = new Memento(source, target, Edge.SourceDependency);
-                        mementoList.Add(memento);
-                        // create the edge
-                        createdEdgeList.Add(CreateConvergentEdge(memento));
+                            // we have both source and target of the edge and use a memento struct
+                            // to remember which edge we have added
+                            memento = new Memento(source, target, Edge.SourceDependency);
+                            mementoList.Add(memento);
+                            // create the edge
+                            createdEdgeList.Add(CreateConvergentEdge(memento));
 
-                        // check whether edge creation was successful
-                        bool divergenceSolved = createdEdgeList[0] != null;
+                            // check whether edge creation was successful
+                            bool divergenceSolved = createdEdgeList[0] != null;
 
                             // add audio cue to the appearance of the new architecture edge
                             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
@@ -212,22 +218,23 @@ namespace SEE.Controls.Actions
                             // (required in order to register as an undo-able action)
                             CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
 
-                        // the selected object is synced and this action is done
-                        return true;
+                            // the selected object is synced and this action is done
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                     }
                 }
-                else
+                if (ExecuteViaContextMenu)
                 {
-                    ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
+                    bool divergenceSolved = createdEdgeList.All(e => e != null);
+                    CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                    return true;
                 }
+                return false;
             }
-            if (ExecuteViaContextMenu)
-            {
-                bool divergenceSolved = createdEdgeList.All(e => e != null);
-                CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
-                return true;
-            }
-            return false;
         }
 
         /// <summary>

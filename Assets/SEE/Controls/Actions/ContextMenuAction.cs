@@ -55,18 +55,27 @@ namespace SEE.Controls.Actions
             popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
+        /// <summary>
+        /// Is true, when the context-menu is open.
+        /// This is used in VR, to open and close the menu.
+        /// </summary>
         bool onSelect;
 
         private void Update()
         {
-            if (SEEInput.OpenContextMenuStart())
+            if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !onSelect))
             {
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                     startObject = o;
-                    startMousePosition = Input.mousePosition;
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        startMousePosition = Input.mousePosition;
+                    }
                     multiselection = false;
+                    XRSEEActions.TooltipToggle = false;
+                    onSelect = true;
                 }
                 else
                 {
@@ -74,7 +83,7 @@ namespace SEE.Controls.Actions
                     multiselection = true;
                 }
             }
-            if (SEEInput.OpenContextMenuEnd())
+            if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.TooltipToggle && onSelect))
             {
                 if (!multiselection)
                 {
@@ -83,10 +92,20 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
+                    if ((o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1) || SceneSettings.InputType == PlayerInputType.VRPlayer)
                     {
-                        position = Input.mousePosition;
+                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
+                        XRSEEActions.TooltipToggle = false;
+                        onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
@@ -99,7 +118,15 @@ namespace SEE.Controls.Actions
                     }
                     if (InteractableObject.SelectedObjects.Contains(o))
                     {
-                        position = Input.mousePosition;
+                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
                         popupMenu.ShowWith(entries, position);
                     }

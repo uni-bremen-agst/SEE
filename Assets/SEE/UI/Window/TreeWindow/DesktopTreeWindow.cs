@@ -407,16 +407,22 @@ namespace SEE.UI.Window.TreeWindow
                                 }
 
                                 // We want all applicable actions for the element, except ones where the element
-                                // element is shown in the TreeWindow, since we are already in the TreeWindow.
-                                IEnumerable<PopupMenuAction> actions = ContextMenuAction
-                                                                       .GetApplicableOptions(representedGraphElement,
-                                                                                             representedGameObject)
-                                                                       .Where(x => !x.Name.Contains("TreeWindow"));
-                                actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
+                                // is shown in the TreeWindow, since we are already in the TreeWindow.
+                                List<PopupMenuAction> appends = new()
                                 {
-                                    searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                    Rebuild();
-                                }, Icons.Hide));
+                                    new("Hide in TreeWindow", () =>
+                                    {
+                                        searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                        Rebuild();
+                                    }, Icons.Hide)
+                                };
+                                IEnumerable<PopupMenuEntry> actions = ContextMenuAction
+                                                                       .GetOptionsForTreeView(contextMenu.ContextMenu,
+                                                                                             e.position,
+                                                                                             representedGraphElement,
+                                                                                             representedGameObject,
+                                                                                             appends);
+                                actions = actions.Concat(appends);
                                 XRSEEActions.TooltipToggle = false;
                                 XRSEEActions.OnSelectToggle = true;
                                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray);
@@ -438,13 +444,13 @@ namespace SEE.UI.Window.TreeWindow
 
                             // We want all applicable actions for the element, except ones where the element
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
-                            List<PopupMenuAction> appends = new ()
+                            List<PopupMenuAction> appends = new()
                             {
                                 new("Hide in TreeWindow", () =>
-                                    {
-                                        searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                        Rebuild();
-                                    }, Icons.Hide)
+                                {
+                                    searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                                    Rebuild();
+                                }, Icons.Hide)
                             };
                             IEnumerable<PopupMenuEntry> actions = ContextMenuAction
                                                                    .GetOptionsForTreeView(contextMenu.ContextMenu,

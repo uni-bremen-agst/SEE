@@ -106,7 +106,14 @@ namespace SEE.Utils
         {
             raycastHit = new RaycastHit();
             Physics.queriesHitBackfaces = true;
-            return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            }
+            else
+            {
+                return Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            }
         }
 
         /// <summary>

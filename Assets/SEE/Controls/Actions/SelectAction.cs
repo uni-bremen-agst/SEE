@@ -35,25 +35,25 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             }
-            else if (SEEInput.Select() || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Delete))
+            else if (SEEInput.Select() || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected))
             {
                 InteractableObject obj = null;
                 if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
                 {
                     obj = o;
                 }
-                if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Delete))
+                if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected))
                 {
                     if (obj != null)
                     {
                         obj.SetSelect(!obj.IsSelected, true);
-                        XRSEEActions.Delete = false;
+                        XRSEEActions.Selected = false;
                     }
                 }
                 else
                 {
                     InteractableObject.ReplaceSelection(obj, true);
-                    XRSEEActions.Delete = false;
+                    XRSEEActions.Selected = false;
                 }
             }
             else if (IDEIntegration.Instance != null && IDEIntegration.Instance.PendingSelectionsAction())
