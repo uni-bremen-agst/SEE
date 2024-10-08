@@ -1537,79 +1537,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return mapping;
         }
 
-
-        [Button("RemeasureOutput", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public async UniTask RemeasureOutput()
-        {
-            //HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
-
-            //foreach (string edgeType in edgeTypes)
-            //{
-            //    int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
-            //    UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
-            //}
-
-            string resultPath = Path.Combine(GetConfigPath(),"Results");
-
-            IEnumerable<string> allOutputFiles = Directory.EnumerateFiles(resultPath,"*.xml");
-
-            foreach(string outputFile in allOutputFiles)
-            {
-                if(outputFile.Contains("output") && !outputFile.Contains("cleaned"))
-                {
-                    UnityEngine.Debug.Log($"Found output of run {outputFile}");
-                    this.reflexionGraphViz.ResetMapping();
-
-
-
-                }
-            }
-
-            return;
-        }
-
-        // TODO: Delete later only for debug purposes
-        //[Button("Print Edge Types", ButtonSizes.Small)]
-        //[ButtonGroup(debugButtonGroup)]
-        //public void PrintEdgeTypeInformation()
-        //{
-        //    HashSet<string> edgeTypes = this.reflexionGraphCalc.Edges().Where(e => e.IsInImplementation()).Select(e => e.Type).ToHashSet();
-
-        //    foreach (string edgeType in edgeTypes)
-        //    {
-        //        int count = this.reflexionGraphCalc.Edges().Where(e => e.Type.Equals(edgeType)).Count();
-        //        UnityEngine.Debug.Log($"There are {count} edges with type {edgeType} within implementation");
-        //    }
-        //}
-
-        // TODO: Delete later only for debug purposes
-        //[Button("Candidate Status", ButtonSizes.Small)]
-        //[ButtonGroup(debugButtonGroup)]
-        //public void PrintCandidateStatus()
-        //{
-        //    IEnumerable<Node> candidates = this.CandidateRecommendation.GetCandidates();
-
-        //    foreach (Node candidate in candidates)
-        //    {
-        //        UnityEngine.Debug.Log($"Candidate {candidate.ID} Maps to {this.reflexionGraphCalc.MapsTo(candidate)?.ID ?? "NOTHING"}. Expected Cluster {this.CandidateRecommendation.GetExpectedClusterID(candidate.ID)}");
-        //    }
-        //}
-
-        // TODO: Delete later only for debug purposes
-        //[Button("Print Roots", ButtonSizes.Small)]
-        //[ButtonGroup(debugButtonGroup)]
-        //public void PrintRoots()
-        //{
-        //    List<Node> rootNodes = this.reflexionGraphViz.Nodes().Where(n => n.IsRoot()).ToList();
-
-        //    foreach (Node rootNode in rootNodes)
-        //    {
-        //        UnityEngine.Debug.Log($"Node {rootNode.ID} is root.");
-        //    }
-        //}
-
-
         /// <summary>
         /// Generates a text file containg a table showing the mapping of the current candidates 
         /// with their expected cluster regarding the loaded oracle graph. The file can be used 
@@ -1683,15 +1610,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             // Empty method for debugging
         }
-
-        //[Button("Color unmapped Candidates", ButtonSizes.Small)]
-        //[ButtonGroup(debugButtonGroup)]
-        //public void ColorUnmappedCandidates()
-        //{
-        //    this.ColorUnmappedCandidates(Color.black);
-        //}
-
-
         #endregion
     }
 }
