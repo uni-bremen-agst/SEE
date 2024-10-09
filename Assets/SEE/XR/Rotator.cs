@@ -1,3 +1,4 @@
+using SEE.Controls.Actions;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -38,7 +39,7 @@ public class Rotator : MonoBehaviour
     /// <summary>
     /// Is true, when the dial/node should be roated according to the hand-rotation.
     /// </summary>
-    private bool shouldGetHandRotation = false;
+    public static bool shouldGetHandRotation { get; private set; } = false;
     /// <summary>
     /// The grab-interactor of the dial.
     /// </summary>
@@ -79,6 +80,10 @@ public class Rotator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        if (GlobalActionHistory.Current() != ActionStateTypes.Rotate)
+        {
+            Destroy(gameObject);
+        }
         if (shouldGetHandRotation)
         {
             var rotationAngle = GetInteractorRotation();

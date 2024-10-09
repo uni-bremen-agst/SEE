@@ -22,10 +22,7 @@ namespace SEE.Controls.Actions
         private RotateAction(GameObject gameNodeToBeContinuedWith) : base()
         {
             Initialize();
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
-            {
-                StartAction(gameNodeToBeContinuedWith);
-            }
+            StartAction(gameNodeToBeContinuedWith);
         }
 
         /// <summary>

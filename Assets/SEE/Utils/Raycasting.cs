@@ -66,7 +66,7 @@ namespace SEE.Utils
         /// </returns>
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
-            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+            if (((SceneSettings.InputType == PlayerInputType.DesktopPlayer && !IsMouseOverGUI()) || SceneSettings.InputType == PlayerInputType.VRPlayer) && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
             {
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out NodeRef nodeRef))

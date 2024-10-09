@@ -111,91 +111,93 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected GameObject GameNodeToBeContinuedInNextAction;
 
+        bool a;
+
         /// <summary
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && UsedGizmo.IsHovered()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && Rotator.shouldGetHandRotation))
             {
-                if (UsedGizmo.IsHovered())
+                // Transformation via the gizmo is in progress.
+                if (GameNodeSelected && HasChanges())
                 {
-                    // Transformation via the gizmo is in progress.
+                    a = true;
+                    CurrentState = IReversibleAction.Progress.InProgress;
+                }
+                return false;
+            }
+
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.shouldGetHandRotation && a))))
+            {
+                Debug.Log("zweite Schzleife");
+                if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
+                {
+                    // An object different from a graph node was selected.
                     if (GameNodeSelected && HasChanges())
                     {
-                        CurrentState = IReversibleAction.Progress.InProgress;
+                        // An object to be manipulated was selected already and it was changed.
+                        // The action is finished.
+                        a = false;
+                        FinalizeAction();
+                        return true;
                     }
-                    return false;
-                }
-
-                if (SEEInput.Select())
-                {
-                    if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
+                    else
                     {
-                        // An object different from a graph node was selected.
-                        if (GameNodeSelected && HasChanges())
+                        // No game node has been selected yet or the previously selected game node
+                        // has had no changes. The action is continued.
+                        return false;
+                    }
+                }
+                else
+                {
+                    // A game node was selected by the user.
+                    // Has the user already selected a game node in a previous iteration?
+                    if (GameNodeSelected)
+                    {
+                        // The user has already selected a game node in a previous iteration.
+                        // Are the two game nodes different?
+                        if (GameNodeSelected != raycastHit.collider.gameObject)
                         {
-                            // An object to be manipulated was selected already and it was changed.
-                            // The action is finished.
-                            FinalizeAction();
-                            return true;
+                            // The newly and previously selected nodes are different.
+                            // Have we had any changes yet? If not, we assume the user wants
+                            // to manipulate the newly game node instead.
+                            if (!HasChanges())
+                            {
+                                StartAction(raycastHit.collider.gameObject);
+                                return false;
+                            }
+                            else
+                            {
+                                // This action is considered finished and a different action should
+                                // be started to continue with the newly selected node.
+                                FinalizeAction();
+                                GameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
+                                return true;
+                            }
                         }
                         else
                         {
-                            // No game node has been selected yet or the previously selected game node
-                            // has had no changes. The action is continued.
+                            // The user has selected the same node again.
+                            // Nothing to be done.
                             return false;
                         }
                     }
                     else
                     {
-                        // A game node was selected by the user.
-                        // Has the user already selected a game node in a previous iteration?
-                        if (GameNodeSelected)
-                        {
-                            // The user has already selected a game node in a previous iteration.
-                            // Are the two game nodes different?
-                            if (GameNodeSelected != raycastHit.collider.gameObject)
-                            {
-                                // The newly and previously selected nodes are different.
-                                // Have we had any changes yet? If not, we assume the user wants
-                                // to manipulate the newly game node instead.
-                                if (!HasChanges())
-                                {
-                                    StartAction(raycastHit.collider.gameObject);
-                                    return false;
-                                }
-                                else
-                                {
-                                    // This action is considered finished and a different action should
-                                    // be started to continue with the newly selected node.
-                                    FinalizeAction();
-                                    GameNodeToBeContinuedInNextAction = raycastHit.collider.gameObject;
-                                    return true;
-                                }
-                            }
-                            else
-                            {
-                                // The user has selected the same node again.
-                                // Nothing to be done.
-                                return false;
-                            }
-                        }
-                        else
-                        {
-                            // It's the first time, a game node was selected. The action starts.
-                            StartAction(raycastHit.collider.gameObject);
-                            return false;
-                        }
+                        XRSEEActions.Selected = false;
+                        // It's the first time, a game node was selected. The action starts.
+                        StartAction(raycastHit.collider.gameObject);
+                        return false;
                     }
                 }
-                else if (SEEInput.ToggleMenu() || SEEInput.Cancel())
-                {
-                    FinalizeAction();
-                    return true;
-                }
-                return false;
+            }
+            else if (SEEInput.ToggleMenu() || SEEInput.Cancel())
+            {
+                FinalizeAction();
+                return true;
             }
             return false;
         }
@@ -221,7 +223,10 @@ namespace SEE.Controls.Actions
 
             GameNodeSelected = gameNode;
             GameNodeMemento = CreateMemento(GameNodeSelected);
-            UsedGizmo.Enable(GameNodeSelected);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo.Enable(GameNodeSelected);
+            }
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, GameNodeSelected);
         }
 
@@ -234,7 +239,10 @@ namespace SEE.Controls.Actions
         protected virtual void FinalizeAction()
         {
             UnityEngine.Assertions.Assert.IsNotNull(GameNodeSelected);
-            UsedGizmo.Disable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo.Disable();
+            }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, GameNodeSelected);
         }

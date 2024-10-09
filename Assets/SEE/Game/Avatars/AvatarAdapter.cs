@@ -11,6 +11,7 @@ using UnityEngine;
 using SEE.Controls.Actions;
 using TMPro;
 using UnityEngine.UI;
+using SEE.GO.Menu;
 
 #if ENABLE_VR
 using UnityEngine.Assertions;
@@ -51,6 +52,19 @@ namespace SEE.Game.Avatars
                 if (!gameObject.TryGetComponent(out WindowSpaceManager _))
                 {
                     gameObject.AddComponent<WindowSpaceManager>();
+                }
+
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    if (!gameObject.TryGetComponent(out PlayerMenu _))
+                    {
+                        gameObject.AddComponent<PlayerMenu>();
+                    }
+
+                    if (!gameObject.TryGetComponent(out DrawableSurfacesRef _))
+                    {
+                        gameObject.AddComponent<DrawableSurfacesRef>();
+                    }
                 }
 
                 switch (SceneSettings.InputType)
