@@ -111,7 +111,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected GameObject GameNodeToBeContinuedInNextAction;
 
-        bool a;
+        /// <summary>
+        /// This is true, if the user is rotating an object.
+        /// We use this in VR, to finish this action.
+        /// </summary>
+        bool inProgress;
 
         /// <summary
         /// See <see cref="IReversibleAction.Update"/>.
@@ -124,13 +128,13 @@ namespace SEE.Controls.Actions
                 // Transformation via the gizmo is in progress.
                 if (GameNodeSelected && HasChanges())
                 {
-                    a = true;
+                    inProgress = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
                 return false;
             }
 
-            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.shouldGetHandRotation && a))))
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.shouldGetHandRotation && inProgress))))
             {
                 Debug.Log("zweite Schzleife");
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
@@ -140,7 +144,7 @@ namespace SEE.Controls.Actions
                     {
                         // An object to be manipulated was selected already and it was changed.
                         // The action is finished.
-                        a = false;
+                        inProgress = false;
                         FinalizeAction();
                         return true;
                     }

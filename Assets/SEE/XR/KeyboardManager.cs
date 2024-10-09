@@ -4,6 +4,7 @@ using UnityEngine.UI;
 
 /// <summary>
 /// This class manages the input for all buttons on the keyboard.
+/// This script is based on this tutorial: https://www.youtube.com/watch?v=vTonHBr4t4g
 /// </summary>
 public class KeyboardManager : MonoBehaviour
 {

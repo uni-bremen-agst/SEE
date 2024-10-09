@@ -7,6 +7,7 @@ using UnityEngine.EventSystems;
 /// <summary>
 /// This class changes the inputfield for the VR-Keyboard and
 /// also activates the keyboard.
+/// This script is based on this tutorial: https://www.youtube.com/watch?v=vTonHBr4t4g
 /// </summary>
 public class KeyboardInputHandler : MonoBehaviour, IPointerClickHandler
 {

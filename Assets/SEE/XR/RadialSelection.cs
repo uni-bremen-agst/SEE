@@ -13,6 +13,7 @@ using SEE.Utils;
 /// <summary>
 /// This class is used, to open a
 /// radial menu in VR.
+/// This script is based on this tutorial: https://www.youtube.com/watch?v=n-xPN1v3dvA
 /// </summary>
 public class RadialSelection : MonoBehaviour
 {

@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.UI;
 /// <summary>
 /// This class handles a single keyboard key.
+/// This script is based on this tutorial: https://www.youtube.com/watch?v=vTonHBr4t4g
 /// </summary>
 public class KeyboardKey : MonoBehaviour
 {
