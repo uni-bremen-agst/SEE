@@ -104,7 +104,7 @@ namespace SEE.UI.PopupMenu
             // Instantiate the menu.
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/ModePanel/XRCanvas/PopupMenu").transform;
+                menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/Popup/XRCanvas/PopupMenu").transform;
             }
             else
             {

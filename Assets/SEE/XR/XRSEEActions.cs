@@ -122,17 +122,11 @@ public class XRSEEActions : MonoBehaviour
             }
             else
             {
-                Selected = true;
-            }
-            if (GlobalActionHistory.Current() == ActionStateTypes.NewEdge || GlobalActionHistory.Current() == ActionStateTypes.Delete ||
-                GlobalActionHistory.Current() == ActionStateTypes.NewNode || GlobalActionHistory.Current() == ActionStateTypes.AcceptDivergence)
-            {
-                Selected = true;
-            }
-            if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
-            {
-                RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
-                RotateObject = hit.collider.transform.gameObject;
+                if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
+                {
+                    RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
+                    RotateObject = hit.collider.transform.gameObject;
+                }
                 Selected = true;
             }
         }
