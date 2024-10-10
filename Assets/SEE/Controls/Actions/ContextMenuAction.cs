@@ -63,7 +63,7 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !onSelect))
+            if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle))
             {
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
@@ -75,15 +75,19 @@ namespace SEE.Controls.Actions
                     }
                     multiselection = false;
                     XRSEEActions.TooltipToggle = false;
+                    XRSEEActions.OnSelectToggle = true;
                     onSelect = true;
                 }
                 else
                 {
                     startObject = null;
                     multiselection = true;
+                    XRSEEActions.TooltipToggle = false;
+                    XRSEEActions.OnSelectToggle = true;
+                    onSelect = true;
                 }
             }
-            if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.TooltipToggle && onSelect))
+            if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
             {
                 if (!multiselection)
                 {
@@ -104,7 +108,6 @@ namespace SEE.Controls.Actions
                             position = res.point;
                         }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
-                        XRSEEActions.TooltipToggle = false;
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
@@ -128,6 +131,7 @@ namespace SEE.Controls.Actions
                             position = res.point;
                         }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
+                        onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
@@ -604,6 +608,11 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.position = gameObject.transform.position + new Vector3(0, 1, 0);
+                    XRSEEActions.RotateObject = gameObject;
+                }
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
 

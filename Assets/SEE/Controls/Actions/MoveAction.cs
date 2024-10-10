@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions
                     }
 
                 }
-                else if (ExecuteViaContextMenu && !mouseHeldDown)
+                else if ((SceneSettings.InputType == PlayerInputType.VRPlayer && ExecuteViaContextMenu) || (ExecuteViaContextMenu && !mouseHeldDown))
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -152,12 +152,12 @@ namespace SEE.Controls.Actions
                         anchorPosition.z = Mathf.Clamp(anchorPosition.z, objectPosition.z - 0.5f * objectSize.z, objectPosition.z + 0.5f * objectSize.z);
                         cursorOffset = anchorPosition - objectPosition;
                     }
-
                     grabbedObject.Grab(contextMenuObjectToMove);
+                    activeAction = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
             }
-            else if ((!XRSEEActions.Selected && activeAction) || mouseHeldDown ^ ExecuteViaContextMenu) // drag grabbed object
+            else if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && (mouseHeldDown ^ ExecuteViaContextMenu)) || (SceneSettings.InputType == PlayerInputType.VRPlayer && !XRSEEActions.Selected && activeAction)) // drag grabbed object
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)

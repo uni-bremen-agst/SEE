@@ -314,28 +314,6 @@ namespace SEE.Game.Avatars
 
             GameObject rig = PrefabInstantiator.InstantiatePrefab(vrPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
-            Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
-            Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
-            Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
-            Debug.Log("aaaaaaaaaaaaaaaaaaa" + gameObject.name);
-            GameObject indicator = rig.transform.Find("Camera Offset/Left Controller/ModePanel/XRCanvas").transform.gameObject;
-            Debug.Log(indicator.name + "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa");
-            ActionStateType firstType = ActionStateTypes.NewEdge;
-            GlobalActionHistory.Execute(ActionStateTypes.Delete);
-            // Initial state will be the first action state type
-            GlobalActionHistory.Execute(firstType);
-            indicator.name = "StateIndicator";
-            foreach (AbstractActionStateType a in ActionStateTypes.AllRootTypes.AllElements())
-            {
-                Debug.Log(a.Name);
-                GameObject mode = PrefabInstantiator.InstantiatePrefab("Prefabs/UI/XRButton", indicator.transform.Find("Scroll View/Viewport/Content").transform, false).transform.gameObject;
-                mode.transform.SetParent(indicator.transform.Find("Scroll View/Viewport/Content"));
-                mode.transform.Find("Text").gameObject.MustGetComponent<TextMeshProUGUI>().SetText(a.Name);
-                if (a is ActionStateType actionStateType)
-                {
-                    mode.transform.gameObject.MustGetComponent<Button>().onClick.AddListener(() => GlobalActionHistory.Execute(actionStateType));
-                }
-            }
             //indicator.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().SetText(firstType.Name);
             // FIXME: Only the server is allowed to spawn objects.
             //rig.AddComponent<NetworkObject>().Spawn();

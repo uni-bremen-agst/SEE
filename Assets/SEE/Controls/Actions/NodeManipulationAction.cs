@@ -136,7 +136,6 @@ namespace SEE.Controls.Actions
 
             if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.shouldGetHandRotation && inProgress))))
             {
-                Debug.Log("zweite Schzleife");
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {
                     // An object different from a graph node was selected.

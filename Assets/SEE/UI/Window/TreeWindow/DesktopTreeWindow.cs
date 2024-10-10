@@ -896,8 +896,17 @@ namespace SEE.UI.Window.TreeWindow
             searchField.onValueChanged.AddListener(SearchFor);
 
             filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            filterButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            sortButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            groupButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             contextMenu = new TreeWindowContextMenu(popupMenu, searcher, grouper, Rebuild,
                                                     filterButton, sortButton, groupButton);

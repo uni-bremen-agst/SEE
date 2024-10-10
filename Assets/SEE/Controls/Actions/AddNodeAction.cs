@@ -248,8 +248,8 @@ namespace SEE.Controls.Actions
             base.Undo();
             if (addedGameNode != null)
             {
-                new DeleteNetAction(addedGameNode.name).Execute();
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
+                new DeleteNetAction(addedGameNode.name).Execute();
                 Destroyer.Destroy(addedGameNode);
                 addedGameNode = null;
             }

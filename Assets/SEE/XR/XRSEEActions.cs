@@ -107,7 +107,7 @@ public class XRSEEActions : MonoBehaviour
     /// <summary>
     /// The GameObject, which should be rotated.
     /// </summary>
-    public static GameObject RotateObject { get; private set; }
+    public static GameObject RotateObject { get; set; }
     /// <summary>
     /// This method gets called, when the button for the primary actions is pressed.
     /// </summary>
