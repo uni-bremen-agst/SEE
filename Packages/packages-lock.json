@@ -447,6 +447,13 @@
       },
       "url": "https://package.openupm.com"
     },
+    "io.livekit.livekit-sdk": {
+      "version": "https://github.com/livekit/client-sdk-unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9f9bfdf84f2e28b50d5e0c708b4ccabcefdc38bf"
+    },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
       "depth": 0,
