@@ -330,7 +330,7 @@ public class RadialSelection : MonoBehaviour
                 {
                     if (actionObject != null)
                     {
-                        Destroy(actionObject);
+                        Destroyer.Destroy(actionObject);
                     }
                     actionObject = PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.gameObject;
                     actionObject.transform.position = handTransform.position;
@@ -380,7 +380,7 @@ public class RadialSelection : MonoBehaviour
 
         foreach (GameObject item in spawnedParts)
         {
-            Destroy(item);
+            Destroyer.Destroy(item);
         }
 
         spawnedParts.Clear();
@@ -397,7 +397,7 @@ public class RadialSelection : MonoBehaviour
             spawnRadialPart.GetComponent<Image>().fillAmount = (1 / (float)numberOfRadialPart) - (angleBetweenPart / 360);
             if (i > (numberOfRadialPart / 2))
             {
-                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation = 
+                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation =
                     spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation * Quaternion.Euler(0, 0, 180);
                 spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Right;
             }

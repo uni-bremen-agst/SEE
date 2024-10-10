@@ -1,4 +1,5 @@
 using SEE.Controls.Actions;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
@@ -82,7 +83,7 @@ public class Rotator : MonoBehaviour
     {
         if (GlobalActionHistory.Current() != ActionStateTypes.Rotate)
         {
-            Destroy(gameObject);
+            Destroyer.Destroy(gameObject);
         }
         if (shouldGetHandRotation)
         {

@@ -176,7 +176,6 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                // FIXME: Needs adaptation for VR where no mouse is available.
                 if (Input.GetMouseButtonDown(0)
                     && Raycasting.RaycastGraphElement(
                         out RaycastHit raycastHit,
