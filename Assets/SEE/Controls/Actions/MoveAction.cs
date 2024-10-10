@@ -152,6 +152,7 @@ namespace SEE.Controls.Actions
                         anchorPosition.z = Mathf.Clamp(anchorPosition.z, objectPosition.z - 0.5f * objectSize.z, objectPosition.z + 0.5f * objectSize.z);
                         cursorOffset = anchorPosition - objectPosition;
                     }
+                    XRSEEActions.Selected = false;
                     grabbedObject.Grab(contextMenuObjectToMove);
                     activeAction = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
@@ -305,6 +306,7 @@ namespace SEE.Controls.Actions
                 {
                     // Node does not fit, resetting…
                     UnReparent();
+                    XRSEEActions.oldParent = null;
                     wasMoved = false;
                 }
                 else

@@ -30,7 +30,7 @@ public class XRSEEActions : MonoBehaviour
     /// <summary>
     /// The old parent of a node. We need this for the MoveAction.
     /// </summary>
-    public static Transform oldParent { get; private set; }
+    public static Transform oldParent { get; set; }
     /// <summary>
     /// The button, which is used for the primary actions.
     /// </summary>
@@ -92,7 +92,6 @@ public class XRSEEActions : MonoBehaviour
     {
         hovering = false;
         hoveredGameObject = args.interactableObject.transform.gameObject;
-        oldParent = null;
         hoveredGameObject.transform.TryGetComponent(out showLabel);
         showLabel?.Off();
         if (hoveredGameObject.transform.TryGetComponent(out InteractableObject io))
@@ -104,6 +103,8 @@ public class XRSEEActions : MonoBehaviour
     /// Is true, when the button for the primary actions is pressed.
     /// </summary>
     public static bool Selected { get; set; }
+
+    public static bool SelectedFlag { get; set; }
     /// <summary>
     /// The GameObject, which should be rotated.
     /// </summary>
@@ -119,6 +120,7 @@ public class XRSEEActions : MonoBehaviour
             if (GlobalActionHistory.Current() == ActionStateTypes.Move && Selected == true)
             {
                 Selected = false;
+                SelectedFlag = false;
             }
             else
             {
@@ -126,9 +128,18 @@ public class XRSEEActions : MonoBehaviour
                 {
                     RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                     RotateObject = hit.collider.transform.gameObject;
+                    Selected = true;
                 }
                 Selected = true;
+                if (GlobalActionHistory.Current() != ActionStateTypes.Move)
+                {
+                    SelectedFlag = true;
+                }
             }
+        }
+        else
+        {
+            InteractableObject.ReplaceSelection(null, true);
         }
     }
     /// <summary>
