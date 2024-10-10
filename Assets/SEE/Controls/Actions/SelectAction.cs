@@ -35,7 +35,7 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             }
-            else if (SEEInput.Select() || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected))
+            else if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected))
             {
                 InteractableObject obj = null;
                 if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
