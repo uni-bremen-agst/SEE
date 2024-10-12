@@ -200,6 +200,18 @@ namespace SEE.Utils
         {
             HitGraphElement result = HitGraphElement.None;
 
+            static HitGraphElement DetermineHit(InteractableObject element)
+            {
+                HitGraphElement result = element.GraphElemRef.Elem switch
+                {
+                    null => HitGraphElement.None,
+                    Node => HitGraphElement.Node,
+                    Edge => HitGraphElement.Edge,
+                    _ => throw new System.ArgumentOutOfRangeException()
+                };
+                return result;
+            }
+
             raycastHit = new RaycastHit();
             obj = null;
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
@@ -209,13 +221,7 @@ namespace SEE.Utils
                     raycastHit = ray;
                     if (ray.transform.TryGetComponent(out InteractableObject io))
                     {
-                        result = io.GraphElemRef.Elem switch
-                        {
-                            null => HitGraphElement.None,
-                            Node => HitGraphElement.Node,
-                            Edge => HitGraphElement.Edge,
-                            _ => throw new System.ArgumentOutOfRangeException()
-                        };
+                        DetermineHit(io);
                         obj = io;
                     }
                 }
@@ -227,13 +233,7 @@ namespace SEE.Utils
                     raycastHit = hit;
                     if (hit.transform.TryGetComponent(out InteractableObject io))
                     {
-                        result = io.GraphElemRef.Elem switch
-                        {
-                            null => HitGraphElement.None,
-                            Node => HitGraphElement.Node,
-                            Edge => HitGraphElement.Edge,
-                            _ => throw new System.ArgumentOutOfRangeException()
-                        };
+                        DetermineHit(io);
                         obj = io;
                     }
                 }
@@ -323,19 +323,20 @@ namespace SEE.Utils
         {
             // FIXME: We need to an interaction for VR, too.
             Camera mainCamera = MainCamera.Camera;
+            Vector3 screenPoint;
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
-                return mainCamera != null
-                ? mainCamera.ScreenPointToRay(mainCamera.WorldToScreenPoint(hit.point))
-                : new Ray(origin: Vector3.zero, direction: Vector3.zero);
+                screenPoint = mainCamera.WorldToScreenPoint(hit.point);
             }
             else
             {
-                return mainCamera != null
-                ? mainCamera.ScreenPointToRay(Input.mousePosition)
-                : new Ray(origin: Vector3.zero, direction: Vector3.zero);
+                screenPoint = Input.mousePosition;
             }
+
+            return mainCamera != null
+                ? mainCamera.ScreenPointToRay(screenPoint)
+                : new Ray(origin: Vector3.zero, direction: Vector3.zero);
         }
     }
 }

@@ -112,8 +112,8 @@ namespace SEE.Controls.Actions
         protected GameObject GameNodeToBeContinuedInNextAction;
 
         /// <summary>
-        /// This is true, if the user is rotating an object.
-        /// We use this in VR, to finish this action.
+        /// This is true if the user is rotating an object.
+        /// We use this in VR to finish this action.
         /// </summary>
         bool inProgress;
 
@@ -123,7 +123,7 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && UsedGizmo.IsHovered()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && Rotator.shouldGetHandRotation))
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && UsedGizmo.IsHovered()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && Rotator.ShouldGetHandRotation))
             {
                 // Transformation via the gizmo is in progress.
                 if (GameNodeSelected && HasChanges())
@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions
                 return false;
             }
 
-            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.shouldGetHandRotation && inProgress))))
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.ShouldGetHandRotation && inProgress))))
             {
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {

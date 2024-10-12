@@ -24,6 +24,11 @@ namespace SEE.UI.PopupMenu
         private const string menuPrefabPath = "Prefabs/UI/PopupMenu";
 
         /// <summary>
+        /// Path to the gameobject that should be used as the popup menu in VR.
+        /// </summary>
+        private const string xrMenuPrefabPath = "XRRig(Clone)/Camera Offset/Right Controller/Popup/XRCanvas/PopupMenu";
+
+        /// <summary>
         /// The root transform of the popup menu.
         /// </summary>
         private RectTransform menu;
@@ -104,7 +109,7 @@ namespace SEE.UI.PopupMenu
             // Instantiate the menu.
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                menu = (RectTransform)GameObject.Find("XRRig(Clone)/Camera Offset/Right Controller/Popup/XRCanvas/PopupMenu").transform;
+                menu = (RectTransform)GameObject.Find(xrMenuPrefabPath).transform;
             }
             else
             {

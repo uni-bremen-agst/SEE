@@ -394,8 +394,12 @@ namespace SEE.UI.Window.TreeWindow
                 {
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                     {
-                        pointerHelper.EnterEvent.AddListener(e => { XRSEEActions.OnTreeViewToggle = true; XRSEEActions.TreeViewEntry = item; });
-                        pointerHelper.ExitEvent.AddListener(e => XRSEEActions.OnTreeViewToggle = false);
+                        pointerHelper.EnterEvent.AddListener(_ =>
+                        {
+                            XRSEEActions.OnTreeViewToggle = true;
+                            XRSEEActions.TreeViewEntry = item;
+                        });
+                        pointerHelper.ExitEvent.AddListener(_ => XRSEEActions.OnTreeViewToggle = false);
                         pointerHelper.ThumbstickEvent.AddListener(e =>
                         {
                             if (XRSEEActions.TooltipToggle)
@@ -408,21 +412,7 @@ namespace SEE.UI.Window.TreeWindow
 
                                 // We want all applicable actions for the element, except ones where the element
                                 // is shown in the TreeWindow, since we are already in the TreeWindow.
-                                List<PopupMenuAction> appends = new()
-                                {
-                                    new("Hide in TreeWindow", () =>
-                                    {
-                                        searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                        Rebuild();
-                                    }, Icons.Hide)
-                                };
-                                IEnumerable<PopupMenuEntry> actions = ContextMenuAction
-                                                                       .GetOptionsForTreeView(contextMenu.ContextMenu,
-                                                                                             e.position,
-                                                                                             representedGraphElement,
-                                                                                             representedGameObject,
-                                                                                             appends);
-                                actions = actions.Concat(appends);
+                                IEnumerable<PopupMenuEntry> actions = CreateContextMenuActions(contextMenu, e.position, representedGraphElement, representedGameObject);
                                 XRSEEActions.TooltipToggle = false;
                                 XRSEEActions.OnSelectToggle = true;
                                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray);
@@ -444,21 +434,7 @@ namespace SEE.UI.Window.TreeWindow
 
                             // We want all applicable actions for the element, except ones where the element
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
-                            List<PopupMenuAction> appends = new()
-                            {
-                                new("Hide in TreeWindow", () =>
-                                {
-                                    searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                    Rebuild();
-                                }, Icons.Hide)
-                            };
-                            IEnumerable<PopupMenuEntry> actions = ContextMenuAction
-                                                                   .GetOptionsForTreeView(contextMenu.ContextMenu,
-                                                                                         e.position,
-                                                                                         representedGraphElement,
-                                                                                         representedGameObject,
-                                                                                         appends);
-                            actions = actions.Concat(appends);
+                            IEnumerable<PopupMenuEntry> actions = CreateContextMenuActions(contextMenu, e.position, representedGraphElement, representedGameObject);
                             contextMenu.ShowWith(actions, e.position);
                         }
                         else
@@ -473,6 +449,23 @@ namespace SEE.UI.Window.TreeWindow
                             }
                         }
                     });
+                }
+
+                IEnumerable<PopupMenuEntry> CreateContextMenuActions (TreeWindowContextMenu contextMenu, Vector2 position, GraphElement representedGraphElement, GameObject representedGameObject)
+                {
+                    List<PopupMenuAction> appends = new()
+                    {
+                        new("Hide in TreeWindow", () =>
+                        {
+                            searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                            Rebuild();
+                        }, Icons.Hide)
+                    };
+
+                    IEnumerable<PopupMenuEntry> actions = ContextMenuAction
+                        .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);
+
+                    return actions.Concat(appends);
                 }
             }
         }

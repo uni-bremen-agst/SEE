@@ -43,12 +43,13 @@ namespace SEE.UI.Window
         protected override void StartVR()
         {
             Canvas.MustGetComponent<Canvas>().renderMode = RenderMode.WorldSpace;
-            Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas(Clone)").transform.Find("Screen").transform, false);
+            Canvas.transform.SetParent(GameObject.Find("XRTabletCanvas(Clone)/Screen").transform, false);
             Canvas.AddComponent<TrackedDeviceGraphicRaycaster>();
-            Canvas.GetComponent<RectTransform>().localScale = new Vector3(0.001f, 0.001f, 0.001f);
-            Canvas.GetComponent<RectTransform>().sizeDelta = new Vector2(950, 950);
-            Canvas.GetComponent<RectTransform>().localRotation = Quaternion.Euler(0, -90, 0);
-            Canvas.GetComponent<RectTransform>().localPosition = new Vector3(0.9f, 0, 0);
+            RectTransform canvasTransform = Canvas.GetComponent<RectTransform>();
+            canvasTransform.localScale = new Vector3(0.001f, 0.001f, 0.001f);
+            canvasTransform.sizeDelta = new Vector2(950, 950);
+            canvasTransform.localRotation = Quaternion.Euler(0, -90, 0);
+            canvasTransform.localPosition = new Vector3(0.9f, 0, 0);
             StartDesktop();
         }
 

@@ -4,6 +4,7 @@ using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit;
 using UnityEngine.XR.Interaction.Toolkit.Interactables;
 using UnityEngine.XR.Interaction.Toolkit.Interactors;
+
 /// <summary>
 /// This class is used to rotate nodes in VR.
 /// This script is based on this tutorial: "https://www.youtube.com/watch?v=vIrgCMNsE3s".
@@ -14,37 +15,49 @@ public class Rotator : MonoBehaviour
     /// The actual dial, which gets rotated.
     /// </summary>
     [SerializeField]
-    Transform linkedDial;
+    private Transform linkedDial;
+
     /// <summary>
     /// The amount of degrees the dial gets roated each time.
     /// </summary>
     [SerializeField]
     private int snapRotationAmount = 25;
+
     /// <summary>
     /// The amount of degrees at which the dial is starting to rotate.
     /// </summary>
     [SerializeField]
     private float angleTolerance;
+
     /// <summary>
     /// The controller, which is used to rotated the dial/node.
     /// </summary>
     private XRBaseInteractor interactor;
+
     /// <summary>
     /// The base angle.
     /// </summary>
     private float startAngle;
+
     /// <summary>
-    /// This bool is used, to determin if it is the first rotation, or not.
+    /// Whether this is the first rotation.
     /// </summary>
-    private bool requiresStartAngle = true;
+    private bool firstRotation = true;
+
     /// <summary>
-    /// Is true, when the dial/node should be roated according to the hand-rotation.
+    /// Whether the dial/node should be rotated according to the hand-rotation.
     /// </summary>
-    public static bool shouldGetHandRotation { get; private set; } = false;
+    public static bool ShouldGetHandRotation { get; private set; } = false;
+
     /// <summary>
     /// The grab-interactor of the dial.
     /// </summary>
-    private XRGrabInteractable grabInteractor => GetComponent<XRGrabInteractable>();
+    private XRGrabInteractable grabInteractor;
+
+    private void Awake()
+    {
+        grabInteractor = GetComponent<XRGrabInteractable>();
+    }
 
     private void OnEnable()
     {
@@ -57,54 +70,56 @@ public class Rotator : MonoBehaviour
         grabInteractor.selectEntered.RemoveListener(GrabbedBy);
         grabInteractor.selectExited.RemoveListener(GrabEnd);
     }
+
     /// <summary>
-    /// This method gets called, when the user stops to use the dial.
+    /// This method gets called when the user stops using the dial.
     /// </summary>
     /// <param name="args">Event data associated with the event when an Interactor stops selecting an Interactable.</param>
     private void GrabEnd(SelectExitEventArgs args)
     {
-        shouldGetHandRotation = false;
-        requiresStartAngle = true;
+        ShouldGetHandRotation = false;
+        firstRotation = true;
     }
+
     /// <summary>
-    /// This method gets called, when the user begins to use the dial.
+    /// This method gets called when the user begins using the dial.
     /// </summary>
     /// <param name="args">Event data associated with the event when an Interactor first initiates selecting an Interactable.</param>
     private void GrabbedBy(SelectEnterEventArgs args)
     {
         interactor = (XRBaseInteractor)GetComponent<XRGrabInteractable>().interactorsSelecting[0];
-        shouldGetHandRotation = true;
+        ShouldGetHandRotation = true;
         startAngle = 0f;
-
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (GlobalActionHistory.Current() != ActionStateTypes.Rotate)
         {
             Destroyer.Destroy(gameObject);
         }
-        if (shouldGetHandRotation)
+        if (ShouldGetHandRotation)
         {
-            var rotationAngle = GetInteractorRotation();
+            float rotationAngle = GetInteractorRotation();
             GetRotationDistance(rotationAngle);
         }
     }
+
     /// <summary>
-    /// Gets the current roation-angle from the controller.
+    /// Returns the current rotation-angle from the controller.
     /// </summary>
     /// <returns>The current rotation-angle from the controller.</returns>
-    public float GetInteractorRotation() => interactor.GetComponent<Transform>().eulerAngles.z;
+    public float GetInteractorRotation() => interactor.transform.eulerAngles.z;
+
     /// <summary>
-    /// Determins in which direction and how much the dial/node should be rotated.
+    /// Determines in which direction and how much the dial/node should be rotated.
     /// </summary>
     /// <param name="currentAngle">The current angle from the controller.</param>
     private void GetRotationDistance(float currentAngle)
     {
-        if (!requiresStartAngle)
+        if (!firstRotation)
         {
-            var angleDifference = Mathf.Abs(startAngle - currentAngle);
+            float angleDifference = Mathf.Abs(startAngle - currentAngle);
             if (angleDifference > angleTolerance)
             {
                 if (angleDifference > 270f)
@@ -142,32 +157,32 @@ public class Rotator : MonoBehaviour
                     if (startAngle < currentAngle)
                     {
                         RotateDialAntiClockwise();
-                        startAngle = currentAngle;
                     }
                     else if (startAngle > currentAngle)
                     {
                         RotateDialClockwise();
-                        startAngle = currentAngle;
                     }
+                    startAngle = currentAngle;
                 }
             }
         }
         else
         {
-            requiresStartAngle = false;
+            firstRotation = false;
             startAngle = currentAngle;
         }
     }
+
     /// <summary>
-    /// This method is used, to calculate, if the rotation angle is significant enough, to rotate the dial/node.
+    /// Calculates the current rotation angle of the controller.
     /// </summary>
     /// <param name="currentAngle">The current angle of the controller.</param>
     /// <param name="startAngle">The base angle.</param>
-    /// <returns></returns>
+    /// <returns>the amount of rotation</returns>
     private float CheckAngle(float currentAngle, float startAngle) => (360f - currentAngle) + startAngle;
 
     /// <summary>
-    /// This method is used, to rotate the dial/node clockwise.
+    /// Rotates the dial/node clockwise.
     /// </summary>
     private void RotateDialClockwise()
     {
@@ -175,8 +190,9 @@ public class Rotator : MonoBehaviour
         Transform rotateObject = XRSEEActions.RotateObject.transform;
         rotateObject.localEulerAngles = new Vector3(rotateObject.localEulerAngles.x, linkedDial.localEulerAngles.y, rotateObject.localEulerAngles.z);
     }
+
     /// <summary>
-    /// This method is used, to rotate the dial/node anticlockwise.
+    /// Rotates the dial/node anticlockwise.
     /// </summary>
     private void RotateDialAntiClockwise()
     {

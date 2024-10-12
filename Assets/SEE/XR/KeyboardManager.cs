@@ -12,36 +12,42 @@ public class KeyboardManager : MonoBehaviour
     /// The instance of the keyboardmanager.
     /// </summary>
     public static KeyboardManager instance;
+
     /// <summary>
-    /// The shiftbutton, which performs the shift-action.
+    /// The shiftbutton, which shifts a character.
     /// </summary>
     public Button shiftButton;
+
     /// <summary>
-    /// The deletebutton, which performs the delete-action.
+    /// The deletebutton, which deletes a character.
     /// </summary>
     public Button deleteButton;
+
     /// <summary>
-    /// The spacebuttom, which performs the space-action.
+    /// The spacebuttom, which adds a space.
     /// </summary>
     public Button spaceButton;
+
     /// <summary>
-    /// The enterbutton, which performs the enter-action.
+    /// The enterbutton, which finalizes the input.
     /// </summary>
     public Button enterButton;
+
     /// <summary>
     /// The inputfield, which is accessed by the keyboard.
     /// </summary>
     public TMP_InputField inputField;
+
     /// <summary>
-    /// This image is used, to tell the user, that the shiftbutton is active.
+    /// This image is used to tell the user that the shiftbutton is active.
     /// </summary>
     private Image shiftButtonImage;
 
     /// <summary>
-    /// Is true, when the shiftbutton is active.
+    /// Is true when the shiftbutton is active.
     /// </summary>
     private bool isShifted = false;
-    // Awake is always called before any Start functions.
+
     private void Awake()
     {
         if (instance == null)
@@ -54,13 +60,15 @@ public class KeyboardManager : MonoBehaviour
         enterButton.onClick.AddListener(Enter);
         shiftButtonImage = shiftButton.gameObject.GetComponent<Image>();
     }
+
     /// <summary>
-    /// This method performs the space-action on the keyboard.
+    /// This method adds a whitespace character.
     /// </summary>
     private void Space()
     {
         inputField.text += " ";
     }
+
     /// <summary>
     /// This method performs the enter-action on the keyboard.
     /// </summary>
@@ -69,6 +77,7 @@ public class KeyboardManager : MonoBehaviour
         inputField.onSubmit.Invoke(inputField.text);
         gameObject.transform.Find("Keyboard").gameObject.SetActive(false);
     }
+
     /// <summary>
     /// This method performs the delete-action on the keyboard.
     /// </summary>
@@ -81,6 +90,7 @@ public class KeyboardManager : MonoBehaviour
             inputField.text = inputField.text.Substring(0, length);
         }
     }
+
     /// <summary>
     /// This method performs the shift-action on the keyboard.
     /// </summary>

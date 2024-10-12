@@ -56,15 +56,8 @@ namespace SEE.Game.Avatars
 
                 if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                 {
-                    if (!gameObject.TryGetComponent(out PlayerMenu _))
-                    {
-                        gameObject.AddComponent<PlayerMenu>();
-                    }
-
-                    if (!gameObject.TryGetComponent(out DrawableSurfacesRef _))
-                    {
-                        gameObject.AddComponent<DrawableSurfacesRef>();
-                    }
+                    gameObject.AddOrGetComponent<PlayerMenu>();
+                    gameObject.AddOrGetComponent<DrawableSurfacesRef>();
                 }
 
                 switch (SceneSettings.InputType)
@@ -314,17 +307,6 @@ namespace SEE.Game.Avatars
 
             GameObject rig = PrefabInstantiator.InstantiatePrefab(vrPlayerRigPrefab);
             rig.transform.position = gameObject.transform.position;
-            //indicator.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().SetText(firstType.Name);
-            // FIXME: Only the server is allowed to spawn objects.
-            //rig.AddComponent<NetworkObject>().Spawn();
-            //rig.AddComponent<ClientNetworkTransform>();
-
-            //gameObject.transform.SetParent(rig.transform);
-            //gameObject.transform.position = Vector3.zero;
-
-            // Note: AddComponents() must be run before TurnOffAvatarAimingSystem() because the latter
-            // will remove components, the former must query.
-            //VRIKActions.AddComponents(gameObject, IsLocalPlayer);
             VRIKActions.TurnOffAvatarAimingSystem(gameObject);
             VRIKActions.ReplaceAnimator(gameObject, animatorForVRIKPrefab);
 

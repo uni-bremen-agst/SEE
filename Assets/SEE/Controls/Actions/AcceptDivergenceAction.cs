@@ -116,8 +116,8 @@ namespace SEE.Controls.Actions
         {
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.Selected
-                && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
+                if (XRSEEActions.Selected 
+                    && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
                 {
                     // find the edge representing the divergence that should be solved.
                     GameObject divergentEdge = hit.collider.gameObject;

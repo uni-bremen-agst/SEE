@@ -56,8 +56,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Is true, when the context-menu is open.
-        /// This is used in VR, to open and close the menu.
+        /// Is true when the context-menu is open.
+        /// This is used in VR to open and close the menu.
         /// </summary>
         bool onSelect;
 
@@ -96,7 +96,7 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if ((o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1) || SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
                         if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                         {
@@ -610,7 +610,7 @@ namespace SEE.Controls.Actions
                 action.ContextMenuExecution(gameObject);
                 if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                 {
-                    PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.position = gameObject.transform.position + new Vector3(0, 1, 0);
+                    PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.position = gameObject.transform.position + Vector3.up;
                     XRSEEActions.RotateObject = gameObject;
                 }
                 ExcecutePreviousActionAsync(action, previousAction).Forget();

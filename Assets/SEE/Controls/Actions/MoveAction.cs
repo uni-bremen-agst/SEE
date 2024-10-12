@@ -75,8 +75,8 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// This is true, if the user is dragging an object.
-        /// We use this in VR, to activate/deactivate this action.
+        /// This is true if the user is dragging an object.
+        /// We use this in VR to activate/deactivate this action.
         /// </summary>
         bool activeAction;
 
