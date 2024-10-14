@@ -48,25 +48,22 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Setting the new parent in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            if (Reflexion)
             {
-                if (Reflexion)
-                {
-                    ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
-                }
-                else
-                {
-                    GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
-                }
+                ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
+            }
+            else
+            {
+                GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
             }
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

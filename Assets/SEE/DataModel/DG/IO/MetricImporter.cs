@@ -13,7 +13,6 @@ using SEE.Tools;
 using UnityEngine;
 using CsvHelper;
 using CsvHelper.Configuration;
-using Newtonsoft.Json.Linq;
 using SEE.Utils;
 
 namespace SEE.DataModel.DG.IO
@@ -40,8 +39,10 @@ namespace SEE.DataModel.DG.IO
                                                               Action<float> changePercentage = null,
                                                               CancellationToken token = default)
         {
-            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
-            IDictionary<string, List<Issue>> issues = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
+            IDictionary<(string path, string entity), List<MetricValueTableRow>> metrics
+                = await DashboardRetriever.Instance.GetAllMetricRowsAsync();
+            IDictionary<string, List<Issue>> issues
+                = await LoadIssueMetrics(string.IsNullOrWhiteSpace(addedFrom) ? null : addedFrom);
             string projectFolder = DataPath.ProjectFolder();
 
             await UniTask.SwitchToThreadPool();
@@ -156,6 +157,24 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
+        /// Analogous to <see cref="LoadCsv(Graph, string, char)"/> except that the
+        /// data are read from the given <paramref name="stream"/>.
+        /// </summary>
+        /// <param name="graph">graph for which node metrics are to be imported</param>
+        /// <param name="path">path to a data file containing CSV data from which to import node metrics</param>
+        /// <param name="separator">used to separate column entries</param>
+        /// <param name="token">the token to cancel the loading</param>
+        /// <returns>the number of errors that occurred</returns>
+        /// <returns>the number of errors</returns>
+        public static async UniTask<int> LoadCsvAsync(Graph graph, DataPath path, char separator = ';',
+                                                      CancellationToken token = default)
+        {
+            Stream stream = await path.LoadAsync();
+            using StreamReader reader = new(stream);
+            return await LoadCsvAsync(graph, separator, reader, path.Path, token);
+        }
+
+        /// <summary>
         /// Loads node metric values from given CSV file with given separator.
         /// The file must contain a header with the column names. The first column
         /// name must be the Node.ID. Values must be either integers or
@@ -179,6 +198,7 @@ namespace SEE.DataModel.DG.IO
         /// <param name="separator">used to separate column entries</param>
         /// <param name="token">token to cancel the operation</param>
         /// <returns>the number of errors</returns>
+        [Obsolete("Use LoadCsvAsync(Graph, DataPath, char, CancellationToken) instead.")]
         public static async UniTask<int> LoadCsvAsync(Graph graph, string filename, char separator = ';',
                                                       CancellationToken token = default)
         {
@@ -188,14 +208,30 @@ namespace SEE.DataModel.DG.IO
                 return 0;
             }
 
+            using StreamReader reader = new(filename);
+            return await LoadCsvAsync(graph, separator, reader, filename, token);
+        }
+
+        /// <summary>
+        /// Does the actual CSV import.
+        /// </summary>
+        /// <param name="graph">graph for which node metrics are to be imported</param>
+        /// <param name="separator">used to separate column entries</param>
+        /// <param name="reader">a reader yielding the CSV data</param>
+        /// <param name="filename">the name of the CSV; will be used only for
+        /// error messages; can be empty</param>
+        /// <param name="token">the token to cancel the loading</param>
+        /// <returns>the number of errors that occurred</returns>
+        /// <exception cref="IOException">if the file is malformed, i.e., does not conform
+        /// to the expected CSV format</exception>
+        private static async UniTask<int> LoadCsvAsync(Graph graph, char separator, StreamReader reader,
+                                                       string filename, CancellationToken token)
+        {
             CsvConfiguration config = new(CultureInfo.InvariantCulture)
             {
                 Delimiter = separator.ToString(),
             };
-
-            using StreamReader reader = new(filename);
-            using CsvReader csv = new(reader, config);
-
+            CsvReader csv = new(reader, config);
             int numberOfErrors = 0;
             int lineCount = 1;
 
@@ -213,13 +249,13 @@ namespace SEE.DataModel.DG.IO
                 }
                 if (header[0] != IDColumnName)
                 {
-                    throw new IOException($"First header column in file {filename} is not {IDColumnName}.");
+                    throw new IOException($"First header column in {Input()} is not {IDColumnName}.");
                 }
 
                 string[] columns = header[1..];
                 if (columns.Length == 0)
                 {
-                    Debug.LogWarning($"There are no data columns in {filename}.\n");
+                    Debug.LogWarning($"There are no data columns in {Input()}.\n");
                     return 0;
                 }
                 while (await csv.ReadAsync())
@@ -283,7 +319,17 @@ namespace SEE.DataModel.DG.IO
 
             return numberOfErrors;
 
-            string SourceLocation() => $"{filename}:{lineCount}: ";
+            string Input()
+            {
+                return string.IsNullOrWhiteSpace(filename) ? "CSV data" : filename;
+            }
+
+            string SourceLocation()
+            {
+                return string.IsNullOrWhiteSpace(filename) ?
+                          $"{lineCount}: "
+                       :  $"{filename}:{lineCount}: ";
+            }
         }
     }
 }

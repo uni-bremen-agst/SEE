@@ -298,6 +298,17 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns all incoming edges of given node that have exactly the given <paramref name="edgeType"/>.
+        /// If <paramref name="edgeType"/> is <c>null</c> or empty, all incoming edges are returned.
+        /// </summary>
+        /// <param name="edgeType">the requested exact edge type (may be null or empty)</param>
+        /// <returns>all incoming edges of <paramref name="edgeType"/></returns>
+        public IEnumerable<Edge> IncomingsOfType(string edgeType)
+        {
+            return Incomings.Where(edge => string.IsNullOrEmpty(edgeType) || edge.Type == edgeType);
+        }
+
+        /// <summary>
         /// All edges connected to this node, i.e., the union of its incoming and outgoing edges.
         /// </summary>
         public ISet<Edge> Edges => Incomings.Union(Outgoings).ToHashSet();

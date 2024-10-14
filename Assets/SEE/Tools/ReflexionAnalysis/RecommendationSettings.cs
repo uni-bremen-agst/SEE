@@ -47,12 +47,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public double InitialMappingPercentage { get => initialMappingPercentage; set => initialMappingPercentage = value; }
 
         [SerializeField]
-        private DirectoryPath outputPath;
+        // private DirectoryPath outputPath;
+        private DataPath outputPath;
 
         [SerializeField]
         public bool measurePercentileRanks;
 
-        public DirectoryPath OutputPath { get => outputPath; set => outputPath = value; }
+        // public DirectoryPath OutputPath { get => outputPath; set => outputPath = value; }
+        public DataPath OutputPath { get => outputPath; set => outputPath = value; }
 
         public INodeReader NodeReader { get; set; }
 
@@ -108,7 +110,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             settings.CountAttractConfig.Phi = phi;
             settings.AttractFunctionConfig.CandidateType = "Class";
             settings.AttractFunctionConfig.ClusterType = "Cluster";
-            settings.OutputPath = new DirectoryPath();
+            settings.OutputPath = new DataPath();
+            // settings.OutputPath = new DirectoryPath();
             settings.ExperimentName = name;
             return settings;
         }

@@ -35,11 +35,15 @@ namespace SEE.GO
             DeadCode = 3,
             Metric = 4,
             Style = 5,
-            Universal = 6
+            Universal = 6,
+            LspHint = 7,
+            LspInfo = 8,
+            LspWarning = 9,
+            LspError = 10,
         }
 
         /// <summary>
-        /// Returns an erosion as human readable string.
+        /// Returns an erosion as a human readable string.
         /// </summary>
         /// <param name="erosion">erosion type for which to yield a string</param>
         /// <returns>human readable string representation</returns>
@@ -53,6 +57,10 @@ namespace SEE.GO
                 Erosion.Metric => "Metric",
                 Erosion.Style => "Style",
                 Erosion.Universal => "Universal",
+                Erosion.LspHint => "LSP_Hint",
+                Erosion.LspInfo => "LSP_Info",
+                Erosion.LspWarning => "LSP_Warning",
+                Erosion.LspError => "LSP_Error",
                 _ => "UNDEFINED"
             };
 
@@ -76,7 +84,11 @@ namespace SEE.GO
             "Icons/deadcodeSprite",
             "Icons/metricSprite",
             "Icons/stilSprite",
-            "Icons/universalSprite"
+            "Icons/universalSprite",
+            "Icons/lspHintSprite",
+            "Icons/lspInfoSprite",
+            "Icons/lspWarningSprite",
+            "Icons/lspErrorSprite",
         };
 
         /// <summary>
@@ -163,11 +175,14 @@ namespace SEE.GO
         /// <returns>a new game object for this type of erosion</returns>
         public GameObject GetIcon(Vector3 position, Erosion erosion, string metricText, Color color = default)
         {
-            GameObject gameObject = new GameObject(ToString(erosion))
+            GameObject gameObject = new(ToString(erosion))
             {
-                tag = Tags.Erosion
+                tag = Tags.Erosion,
+                transform =
+                {
+                    position = position
+                }
             };
-            gameObject.transform.position = position;
             HorizontalLayoutGroup layoutGroup = gameObject.AddComponent<HorizontalLayoutGroup>();
             layoutGroup.spacing = 7;
             layoutGroup.childControlHeight = true;

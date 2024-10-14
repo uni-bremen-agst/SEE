@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.GO;
 using UnityEngine;
@@ -213,6 +214,15 @@ namespace SEE.Game
                 result.UnionWith(root.Descendants(gameObjectNames));
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns the local player game object.
+        /// </summary>
+        /// <returns>local player game object</returns>
+        public static GameObject GetLocalPlayer()
+        {
+            return WindowSpaceManager.ManagerInstance.gameObject;
         }
     }
 }

@@ -122,15 +122,20 @@ namespace SEE.Game.Operator
         /// If this is set to a negative value, the element will be highlighted indefinitely, with a blink rate
         /// proportional to the absolute value of <paramref name="duration"/>.
         /// </param>
+        /// <param name="showNotification">Whether to display a notification.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> Highlight(float duration)
+        public IOperationCallback<Action> Highlight(float duration, bool showNotification = true)
         {
-            ShowNotification.Info($"Highlighting '{name}'",
-                                  $"The selected element will be blinking and marked by a spear for {duration} seconds.",
-                                  log: false);
+            if (showNotification)
+            {
+                ShowNotification.Info($"Highlighting '{name}'",
+                      $"The selected element will be blinking and marked by a spear for {duration} seconds.",
+                      log: false);
+            }
+
             // Display marker above the element
             // FIXME: marker is not displayed above edge.
-            MarkerFactory marker = new(new MarkerAttributes(0.01f, 1f, Color.red, default, default));
+            MarkerFactory marker = new(new MarkerAttributes(height: 1f, width: 0.01f, Color.red, default, default));
             marker.MarkBorn(gameObject);
             // The factor of 1.3 causes the element to blink slightly more than once per second,
             // which seems visually fitting.

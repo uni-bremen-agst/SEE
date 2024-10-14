@@ -21,7 +21,18 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// </summary>
         /// <param name="city">The code city for which the metric should be calculated.</param>
         /// <returns>The calculated metric value</returns>
-        internal abstract MetricValue Refresh(AbstractSEECity city);
+        internal virtual MetricValue Refresh(AbstractSEECity city)
+        {
+            if (city == null)
+            {
+                throw new ArgumentNullException(nameof(city));
+            }
+            if (city.LoadedGraph == null)
+            {
+                throw new Exception($"The city {city.name} does not have a loaded graph.");
+            }
+            return null;
+        }
 
         /// <summary>
         /// Returns all available <see cref="Metric"/> implementations.

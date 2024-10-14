@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.Game.City;

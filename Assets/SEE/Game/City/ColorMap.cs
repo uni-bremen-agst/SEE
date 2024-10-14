@@ -29,8 +29,8 @@ namespace SEE.Game.City
         /// <returns>retrieved color for <paramref name="name"/></returns>
         public ColorRange this[string name]
         {
-            get { return map[name]; }
-            set { map[name] = value; }
+            get => map[name];
+            set => map[name] = value;
         }
 
         /// <summary>

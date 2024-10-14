@@ -11,7 +11,7 @@ namespace SEE.Net.Actions.Animation
     public abstract class AnimationNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique full (hierarchical) name of the gameObject holding an <see cref="AnimationInteraction"/> 
+        /// The unique full (hierarchical) name of the gameObject holding an <see cref="AnimationInteraction"/>
         /// component that needs to be triggered.
         /// </summary>
         public string GameObjectID;
@@ -27,20 +27,20 @@ namespace SEE.Net.Actions.Animation
         }
 
         /// <summary>
-        /// Returns the <see cref="AnimationInteraction"/> component attached to the gameObject with the 
+        /// Returns the <see cref="AnimationInteraction"/> component attached to the gameObject with the
         /// given <paramref name="gameObjectID"/>.
-        /// 
+        ///
         /// The result is never null.
         /// </summary>
         /// <param name="gameObjectID">the unique full (hierarchical) name of the gameObject holding an
         /// <see cref="AnimationInteraction"/>component</param>
-        /// <returns>the <see cref="AnimationInteraction"/> component attached to the gameObject with the 
+        /// <returns>the <see cref="AnimationInteraction"/> component attached to the gameObject with the
         /// given <paramref name="gameObjectID"/></returns>
         /// <exception cref="Exception">thrown if there is no game object with <paramref name="gameObjectID"/>
         /// or if it does not have an <see cref="AnimationInteraction"/></exception>
         protected static AnimationInteraction FindAnimationInteraction(string gameObjectID)
         {
-            GameObject animationInteractionHolder 
+            GameObject animationInteractionHolder
                 = GameObject.Find(gameObjectID) ?? throw new Exception($"Could not find GameObject with ID {gameObjectID}.");
             if (animationInteractionHolder.TryGetComponentOrLog(out AnimationInteraction ai))
             {
@@ -49,7 +49,7 @@ namespace SEE.Net.Actions.Animation
             throw new Exception($"GameObject with ID {gameObjectID} does not have an {nameof(AnimationInteraction)} component.");
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -58,12 +58,9 @@ namespace SEE.Net.Actions.Animation
         /// Runs <see cref="Trigger"/> on the <see cref="AnimationInteraction"/> component attached to the"
         /// game object with <see cref="GameObjectID"/> if this is note the requester.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                FindAnimationInteraction(GameObjectID).PressPlay();
-            }
+            FindAnimationInteraction(GameObjectID).PressPlay();
         }
 
         /// <summary>

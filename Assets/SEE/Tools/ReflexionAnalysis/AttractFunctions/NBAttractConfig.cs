@@ -1,5 +1,7 @@
+using SEE.Scanner.Antlr;
 using System.Xml.Linq;
 using UnityEngine;
+using static SEE.Scanner.Antlr.AntlrLanguage;
 using static SEE.Scanner.TokenLanguage;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
@@ -53,7 +55,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// This constructor initializes a new instance of <see cref="NBAttractConfig"/>.
         /// </summary>
         /// <param name="useCda">Wether cda terms should be used by the function or not.</param>
-        public NBAttractConfig(bool useCda = true) : this(TokenLanguageType.Plain, useCda)
+        public NBAttractConfig(bool useCda = true) : this(AntlrLanguageType.Plain, useCda)
         {
         }
 
@@ -62,7 +64,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         /// <param name="language">Token language used by the ADCAttract function</param>
         /// <param name="useCda">Wether cda terms should be used by the function or not.</param>
-        public NBAttractConfig(TokenLanguageType language, bool useCda = true) : this(language, useCda, true)
+        public NBAttractConfig(AntlrLanguageType language, bool useCda = true) : this(language, useCda, true)
         {
         }
 
@@ -72,7 +74,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="language">Token language used by the ADCAttract function</param>
         /// <param name="useCda">Wether cda terms should be used by the function or not.</param>
         /// <param name="useStandardTerms">Wether standard terms should be used by the function or not.</param>
-        public NBAttractConfig(TokenLanguageType language, bool useCda, bool useStandardTerms)
+        public NBAttractConfig(AntlrLanguageType language, bool useCda, bool useStandardTerms)
         {
             this.UseCDA = useCda;
             this.UseStandardTerms = useStandardTerms;

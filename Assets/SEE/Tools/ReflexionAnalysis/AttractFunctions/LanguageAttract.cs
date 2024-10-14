@@ -1,6 +1,7 @@
 ﻿using Accord.MachineLearning.Text.Stemmers;
 using SEE.DataModel.DG;
 using SEE.Scanner;
+using SEE.Scanner.Antlr;
 using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
@@ -25,7 +26,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// TokenLanguage used by the node reader to read the source code region associated with a node
         /// </summary>
-        public TokenLanguage TokenLanguage { get; set; }
+        public AntlrLanguage Language { get; set; }
 
         /// <summary>
         /// Node reader object used to read a source code region of a node
@@ -52,7 +53,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                                   LanguageAttractConfig config,
                                   bool useDocumentsAsSet = false) : base(reflexionGraph, candidateRecommendation, config)
         {
-            TokenLanguage = TokenLanguage.GetTokenLanguageByType(config.TokenLanguageType);
+            Language = AntlrLanguage.GetTokenLanguageByType(config.TokenLanguageType);
             nodeReader = new NodeReader();
             this.useDocumentsAsSet = useDocumentsAsSet;
         }
@@ -220,7 +221,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// and StringLiteral tokens are then splitted by whitespaces
         /// and code casing and then stemmed. The read tokens which have 
         /// more than 3 chars are then add to the document as terms. 
-        /// Keywords of the current <see cref="TokenLanguage"/> are filtered.
+        /// Keywords of the current <see cref="Language"/> are filtered.
         ///  
         /// </summary>
         /// <param name="node"></param>
@@ -235,18 +236,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             
             string codeRegion = nodeReader.ReadRegion(node);
 
-            IList<SEEToken> tokens = SEEToken.FromString(codeRegion, TokenLanguage);
+            IList<AntlrToken> tokens = AntlrToken.FromString(codeRegion, Language);
 
             List<string> words = new List<string>();
 
-            foreach (SEEToken token in tokens)
+            foreach (AntlrToken token in tokens)
             {
-                if ((token.TokenType == SEEToken.Type.Comment ||
-                   token.TokenType == SEEToken.Type.Identifier ||
-                   token.TokenType == SEEToken.Type.StringLiteral) 
-                   && !TokenLanguage.Keywords.Contains(token.Text))
+                if ((token.TokenType == AntlrTokenType.Comment ||
+                   token.TokenType == AntlrTokenType.Identifier ||
+                   token.TokenType == AntlrTokenType.StringLiteral) 
+                   && !Language.Keywords.Contains(token.Text))
                 {
-                    if (token.TokenType == SEEToken.Type.Comment)
+                    if (token.TokenType == AntlrTokenType.Comment)
                     {
                         words = this.SplitWhiteSpaces(new string[] { token.Text });
                     } 

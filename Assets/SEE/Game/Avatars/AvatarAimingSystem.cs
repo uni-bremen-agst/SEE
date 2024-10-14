@@ -119,12 +119,9 @@ namespace SEE.Game.Avatars
             {
                 aimIK.solver.target.gameObject.SetActive(IsPointing);
             }
-            if (IsLocallyControlled)
+            if (IsLocallyControlled && gameObject.TryGetComponentOrLog(out networkObject))
             {
-                if (gameObject.TryGetComponentOrLog(out networkObject))
-                {
-                    new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
-                }
+                new TogglePointingNetAction(networkObject.NetworkObjectId, IsPointing).Execute();
             }
         }
 

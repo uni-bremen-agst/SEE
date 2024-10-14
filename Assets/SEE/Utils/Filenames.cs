@@ -56,9 +56,21 @@ namespace SEE.Utils
 
         /// <summary>
         /// File extension of filenames for configuration files in which attributes
+        /// of drawables are persisted.
+        /// </summary>
+        public const string DrawableConfigExtension = ".drw";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
+        /// of metric boards are persisted.
+        /// </summary>
+        public const string MetricBoardConfigExtension = ".mbc";
+
+        /// <summary>
+        /// File extension of filenames for configuration files in which attributes
         /// of AbstractSEECity instances are persisted.
         /// </summary>
-        public const string ConfigExtension = ".cfg";
+        public const string CityConfigExtension = ".cfg";
 
         /// <summary>
         /// File extension for Speech Recognition Grammar Specifications (SRGS).
@@ -71,9 +83,24 @@ namespace SEE.Utils
         public const string SolutionExtension = ".sln";
 
         /// <summary>
-        /// File extension for LZMA compressed GXL files.
+        /// File extension for LZMA compressed data streams/files.
         /// </summary>
-        public const string CompressedGXLExtension = GXLExtension + ".xz";
+        public const string CompressedExtension = ".xz";
+
+        /// <summary>
+        /// File extension of PNG filenames.
+        /// </summary>
+        public const string PNGExtension = ".png";
+
+        /// <summary>
+        /// File extension of JPG filenames.
+        /// </summary>
+        public const string JPGExtension = ".jpg";
+
+        /// <summary>
+        /// Alternative file extension of JPG filenames.
+        /// </summary>
+        public const string JPEGExtension = ".jpeg";
 
         /// <summary>
         /// Returns the last part of the given <paramref name="extension"/>
@@ -156,7 +183,7 @@ namespace SEE.Utils
         public static IEnumerable<string> GXLFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(GXLExtension))
-                .Concat(FilenamesInDirectory(directory, Globbing(CompressedGXLExtension)));
+                .Concat(FilenamesInDirectory(directory, Globbing(GXLExtension + CompressedExtension)));
         }
 
         /// <summary>
@@ -169,7 +196,7 @@ namespace SEE.Utils
         /// <returns>sorted list of CSV filenames</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
-            return FilenamesInDirectory(directory, Globbing(CSVExtension));
+            return FilenamesInDirectory(directory, Globbing(CSVExtension + CompressedExtension));
         }
 
         /// <summary>
@@ -221,6 +248,57 @@ namespace SEE.Utils
             // directory has at least one character
             return directory[^1] == UnixDirectorySeparator ?
                 directory + filename : directory + UnixDirectorySeparator + filename;
+        }
+
+        /// <summary>
+        /// Recursively deletes a directory as well as any subdirectories and files.
+        /// If the files are read-only, they are flagged as normal and then deleted.
+        /// </summary>
+        /// <param name="directory">The name of the directory to remove.</param>
+        /// <remarks>Source: https://stackoverflow.com/questions/25549589/programmatically-delete-local-repository-with-libgit2sharp
+        /// by AJ Richardson</remarks>
+        public static void DeleteReadOnlyDirectory(string directory)
+        {
+            foreach (string subdirectory in Directory.EnumerateDirectories(directory))
+            {
+                DeleteReadOnlyDirectory(subdirectory);
+            }
+            foreach (string fileName in Directory.EnumerateFiles(directory))
+            {
+                FileInfo fileInfo = new(fileName)
+                {
+                    Attributes = FileAttributes.Normal
+                };
+                fileInfo.Delete();
+            }
+            Directory.Delete(directory);
+        }
+
+        /// <summary>
+        /// Returns the innermost directory name of the given <paramref name="directoryPath"/>
+        /// where <paramref name="directoryPath"/> is a (possibly nested) platform-dependent
+        /// path to a directory
+        /// </summary>
+        /// <param name="directoryPath">platform-dependent directory path</param>
+        /// <returns>innermost directory name</returns>
+        /// <exception cref="ArgumentException">if <paramref name="directoryPath"/> is null or empty</exception>
+        /// <example>If <paramref name="directoryPath"/> is C:\Users\someone\develop\SEE\
+        /// while running on a Windows computer, then SEE will be returned; likewise if it
+        /// is C:\Users\someone\develop\SEE. If <paramref name="directoryPath"/> is
+        /// /home/someone/develop/SEE/ while running on a Unix computer, then SEE will be returned;
+        /// likewise if it is /home/someone/develop/SEE.
+        /// </example>
+        public static string InnermostDirectoryName(string directoryPath)
+        {
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                throw new ArgumentException("Directory path must neither be null nor empty.");
+            }
+            string path = directoryPath[^1] == Path.DirectorySeparatorChar ?
+                directoryPath[..^1] : directoryPath;
+
+            return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
+                .Split(Path.DirectorySeparatorChar).Last();
         }
     }
 }

@@ -33,11 +33,6 @@ namespace SEE.UI.Menu
         protected ModalWindowManager MenuManager { get; private set; }
 
         /// <summary>
-        /// The menu tooltip.
-        /// </summary>
-        protected Tooltip.Tooltip MenuTooltip { get; private set; }
-
-        /// <summary>
         /// Initializes the menu.
         /// </summary>
         protected override void StartDesktop()
@@ -49,9 +44,6 @@ namespace SEE.UI.Menu
 
             // sets the icon
             Icon = Resources.Load<Sprite>(IconSprite);
-
-            // creates the tooltip
-            MenuTooltip = Menu.AddComponent<Tooltip.Tooltip>();
         }
 
         /// <summary>
@@ -143,7 +135,7 @@ namespace SEE.UI.Menu
             else
             {
                 MenuManager.CloseWindow();
-                MenuTooltip.Hide();
+                Tooltip.Deactivate();
 
                 // We cannot disable the menu immediately, otherwise the animation will be cut short.
                 DisableSoon().Forget();

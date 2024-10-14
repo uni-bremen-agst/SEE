@@ -31,7 +31,7 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
-        public FilePath LayoutPath = new();
+        public DataPath LayoutPath = new();
 
         public override void Save(ConfigWriter writer, string label)
         {

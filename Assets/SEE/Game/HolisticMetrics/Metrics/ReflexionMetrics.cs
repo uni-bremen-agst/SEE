@@ -14,6 +14,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
     {
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             ReflexionGraph graph;
             if (city is SEEReflexionCity reflexionCity)
             {

@@ -1,6 +1,41 @@
 ﻿namespace SEE.DataModel.DG
 {
     /// <summary>
+    /// Standard names for LSP concepts.
+    /// </summary>
+    public static class LSP
+    {
+        /// <summary>
+        /// Name of edge type for LSP references.
+        /// </summary>
+        public const string Reference = "Reference";
+        /// <summary>
+        /// Name of edge type for LSP declarations.
+        /// </summary>
+        public const string Declaration = "Declaration";
+        /// <summary>
+        /// Name of edge type for LSP definitions.
+        /// </summary>
+        public const string Definition = "Definition";
+        /// <summary>
+        /// Name of edge type for LSP of-type relation.
+        /// </summary>
+        public const string OfType = "Of_Type";
+        /// <summary>
+        /// Name of edge type for LSP implementation-of relation.
+        /// </summary>
+        public const string ImplementationOf = "Implementation_Of";
+        /// <summary>
+        /// Name of edge type for LSP call relation.
+        /// </summary>
+        public const string Call = "Call";
+        /// <summary>
+        /// Name of edge type for LSP extend relation.
+        /// </summary>
+        public const string Extend = "Extend";
+    }
+
+    /// <summary>
     /// Names of node attributes provided by the Axivion Suite.
     /// </summary>
     public enum NumericAttributeNames
@@ -16,6 +51,10 @@
         Metric,
         Style,
         Universal,
+        LspError,
+        LspWarning,
+        LspInfo,
+        LspHint,
         IssuesTotal
     }
 
@@ -59,6 +98,10 @@
                 NumericAttributeNames.Style => Metrics.Prefix + "Style",
                 NumericAttributeNames.Universal => Metrics.Prefix + "Universal",
                 NumericAttributeNames.IssuesTotal => Metrics.Prefix + "IssuesTotal",
+                NumericAttributeNames.LspError => Metrics.Prefix + "LSP_Error",
+                NumericAttributeNames.LspWarning => Metrics.Prefix + "LSP_Warning",
+                NumericAttributeNames.LspInfo => Metrics.Prefix + "LSP_Info",
+                NumericAttributeNames.LspHint => Metrics.Prefix + "LSP_Hint",
                 _ => throw new System.Exception("Unknown attribute name " + numericAttributeName)
             };
         }
@@ -211,9 +254,14 @@
     public static class VCS
     {
         /// <summary>
+        /// Prefix for VCS data (metrics and other kinds of VCS related attributes).
+        /// </summary>
+        public const string VCSPrefix = "VCS.";
+        /// <summary>
         /// Prefix for VCS metrics.
         /// </summary>
-        public const string Prefix = Metrics.Prefix + "VCS.";
+        public const string Prefix = Metrics.Prefix + VCSPrefix;
+
         /// <summary>
         /// The number of lines of code added for a file that was changed between two commits.
         /// </summary>
@@ -223,6 +271,10 @@
         /// </summary>
         public const string LinesDeleted = Prefix + "Lines_Deleted";
         /// <summary>
+        /// The churn of a file, that is, the number of lines added and deleted.
+        /// </summary>
+        public const string Churn = Prefix + "Churn";
+        /// <summary>
         /// The number of unique developers who contributed to a file that was changed between two commits.
         /// </summary>
         public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
@@ -230,6 +282,30 @@
         /// The number of times a file was changed between two commits.
         /// </summary>
         public const string CommitFrequency = Prefix + "Commit_Frequency";
+        /// <summary>
+        /// The truck factor of a file (core-devs metric).
+        /// </summary>
+        public const string TruckNumber = Prefix + "Truck_Number";
+
+        /// <summary>
+        /// String attribute for the list of authors of a file.
+        /// </summary>
+        /// <remarks>Note that this is not actually a numeric metric but a list of
+        /// author names seperated by a comma.</remarks>
+        public const string AuthorAttributeName = VCSPrefix + "Authors";
+
+        /// <summary>
+        /// Name of node type used for files.
+        /// </summary>
+        public const string FileType = "File";
+        /// <summary>
+        /// Name of node type used for directories.
+        /// </summary>
+        public const string DirectoryType = "Directory";
+        /// <summary>
+        /// Name of node type used for repositories.
+        /// </summary>
+        public const string RepositoryType = "Repository";
     }
 
     /// <summary>

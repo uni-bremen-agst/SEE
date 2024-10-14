@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -51,11 +51,11 @@ namespace SEE.Net.Dashboard.Model.Issues
         [JsonConstructor]
         protected DeadEntityIssue(string entity, string entityType, string path, int line, string linkName)
         {
-            this.Entity = entity;
-            this.EntityType = entityType;
-            this.Path = path;
-            this.Line = line;
-            this.LinkName = linkName;
+            Entity = entity;
+            EntityType = entityType;
+            Path = path;
+            Line = line;
+            LinkName = linkName;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

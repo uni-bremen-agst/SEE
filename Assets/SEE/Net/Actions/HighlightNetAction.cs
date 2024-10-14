@@ -14,6 +14,11 @@ namespace SEE.Net.Actions
         public string GameObjectID;
 
         /// <summary>
+        /// Should not be sent to newly connecting clients
+        /// </summary>
+        public override bool ShouldBeSentToNewClient { get => false; }
+
+        /// <summary>
         /// If true, the game object identified by <see cref="GameObjectID"/>
         /// will be highlighted; otherwise its highlighting will be turned off.
         /// </summary>
@@ -36,18 +41,15 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Setting the highlighting in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                Highlighter.SetHighlight(Find(GameObjectID), Highlight);
-            }
+            Highlighter.SetHighlight(Find(GameObjectID), Highlight);
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

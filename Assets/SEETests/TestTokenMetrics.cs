@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using System.Collections.Generic;
+using SEE.Scanner.Antlr;
 
 namespace SEE.Scanner
 {
@@ -43,7 +44,7 @@ namespace SEE.Scanner
         [TestCase("public class DoesNotCompile\n{\n break; continue; case 2: while do if else foreach for switch try catch }", 7)]
         public void TestCalculateMcCabeComplexity(string code, int expected)
         {
-            IEnumerable<SEEToken> tokens = SEEToken.FromString(code, TokenLanguage.CSharp);
+            IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CSharp);
             int complexity = TokenMetrics.CalculateMcCabeComplexity(tokens);
             Assert.AreEqual(expected, complexity);
         }
@@ -59,7 +60,7 @@ namespace SEE.Scanner
             // Test case for empty code, in case DistinctOperators, DistinctOperands and/or ProgramVocabulary values are zero.
             string emptyCode = "";
 
-            IEnumerable<SEEToken> tokensEmptyCode = SEEToken.FromString(emptyCode, TokenLanguage.Plain);
+            IList<AntlrToken> tokensEmptyCode = AntlrToken.FromString(emptyCode, AntlrLanguage.Plain);
             TokenMetrics.HalsteadMetrics expectedEmptyCode = new(DistinctOperators: 0,
                                                                  DistinctOperands: 0,
                                                                  TotalOperators: 0,
@@ -85,7 +86,7 @@ namespace SEE.Scanner
                                 }
                             }";
 
-            IEnumerable<SEEToken> tokens = SEEToken.FromString(code, TokenLanguage.Java);
+            IList<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.Java);
             TokenMetrics.HalsteadMetrics expected = new(DistinctOperators: 11,
                                                         DistinctOperands: 16,
                                                         TotalOperators: 17,
@@ -116,7 +117,7 @@ namespace SEE.Scanner
             // Test case for code with no operators to test Plain Text.
             string codeWithNoOperators = "This arbitary file has no code.\nJust plain words."; // "." is its own operand.
 
-            IEnumerable<SEEToken> tokensNoOperators = SEEToken.FromString(codeWithNoOperators, TokenLanguage.Plain);
+            IList<AntlrToken> tokensNoOperators = AntlrToken.FromString(codeWithNoOperators, AntlrLanguage.Plain);
             TokenMetrics.HalsteadMetrics expectedNoOperators = new(DistinctOperators: 0,
                                                                    DistinctOperands: 10,
                                                                    TotalOperators: 0,
@@ -164,7 +165,7 @@ namespace SEE.Scanner
         [TestCase(" ", 0)]
         public void TestCalculateLinesOfCode(string code, int expected)
         {
-            IEnumerable<SEEToken> tokens = SEEToken.FromString(code, TokenLanguage.CPP);
+            IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CPP);
             int linesOfCode = TokenMetrics.CalculateLinesOfCode(tokens);
             Assert.AreEqual(expected, linesOfCode);
         }

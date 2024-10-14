@@ -21,6 +21,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>The average lines of code of the given <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             int totalNodes = 0;
             float totalLines = 0.0f;
 

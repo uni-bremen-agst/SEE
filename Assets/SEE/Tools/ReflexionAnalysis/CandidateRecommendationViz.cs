@@ -979,8 +979,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (syncWithView)
                 {
                     Debug.Log($"move candidate {candidate.ID} Into cluster {cluster.ID}");
+
+                    // TODO: How to visually move the node, when the node automatically mapped?
                     // GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
-                    GameNodeMover.PutOn(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
+                    // GameNodeMover.PutOn(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
                     // GameNodeMover.PutOnAndFit(candidateInViz.GameObject().transform, clusterInViz.GameObject(), candidateInViz.Parent.GameObject() , candidateInViz.GameObject().transform.localScale);
                     // GameNodeMover.PutOn2(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
                     // city.ReDrawGraph();

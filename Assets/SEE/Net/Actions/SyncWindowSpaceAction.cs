@@ -38,22 +38,17 @@ namespace SEE.Net.Actions
             }
         }
 
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Nothing needs to be done on the server
         }
 
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
+            // If no space manager exists, there is nothing we can (or should) do.
+            if (WindowSpaceManager.ManagerInstance)
             {
-                if (!WindowSpaceManager.ManagerInstance)
-                {
-                    // If no space manager exists, there is nothing we can (or should) do.
-                    return;
-                }
-
-                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(RequesterIPAddress, space);
+                WindowSpaceManager.ManagerInstance.UpdateSpaceFromValueObject(Requester.ToString(), space);
             }
         }
     }

@@ -613,10 +613,7 @@ namespace SEE.Game.Charts
                 Debug.LogWarning("There are no nodes for showing metrics.\n");
             }
 #endif
-            foreach (string cname in Attributable.NumericAttributeNames.Where(cname => cname.StartsWith(Metrics.Prefix)))
-            {
-                AllMetricNames.Add(cname);
-            }
+            AllMetricNames.UnionWith(Attributable.NumericAttributeNames.Where(cname => cname.StartsWith(Metrics.Prefix)));
 #if UNITY_EDITOR
             if (AllMetricNames.Count == 0)
             {

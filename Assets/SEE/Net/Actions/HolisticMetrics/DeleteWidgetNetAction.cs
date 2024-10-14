@@ -31,7 +31,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// This method does nothing.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -39,12 +39,9 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// Executes the action on all clients except the requester, i.e., deletes the widget on all clients.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                FindWidgetsManager(BoardName).Delete(WidgetID);
-            }
+            FindWidgetsManager(BoardName).Delete(WidgetID);
         }
     }
 }

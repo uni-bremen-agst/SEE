@@ -49,7 +49,7 @@ namespace SEE.DataModel.DG.GraphSearch
         /// <param name="graph">The graph to be searched.</param>
         public GraphSearch(Graph graph)
         {
-            this.Graph = graph;
+            Graph = graph;
             elements = graph.Nodes().GroupBy(ElementToString).ToDictionary(g => g.Key, g => g.ToList());
             graph.Subscribe(this);
         }

@@ -2,6 +2,8 @@
 using System.Xml.Linq;
 using UnityEngine;
 using static Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions.Document;
+using SEE.Scanner.Antlr;
+using static SEE.Scanner.Antlr.AntlrLanguage;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -31,7 +33,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// </summary>
         /// <param name="language">Token language used by the ADCAttract function</param>
         /// <param name="mergingType">merging type used by the ADCAttract function</param>
-        public ADCAttractConfig(TokenLanguageType language, DocumentMergingType mergingType) 
+        public ADCAttractConfig(AntlrLanguageType language, DocumentMergingType mergingType) 
         {
             this.MergingType = mergingType;
             this.TokenLanguageType = language;
@@ -41,7 +43,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// This constructor initializes a new instance of <see cref="ADCAttractConfig"/>.
         /// </summary>
         /// <param name="mergingType">merging type used by the ADCAttract function</param>
-        public ADCAttractConfig(DocumentMergingType mergingType = DocumentMergingType.Intersection) : this(TokenLanguageType.Plain, mergingType)
+        public ADCAttractConfig(DocumentMergingType mergingType = DocumentMergingType.Intersection) : this(AntlrLanguageType.Plain, mergingType)
         {
         }
 

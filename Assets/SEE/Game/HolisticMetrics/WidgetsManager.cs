@@ -94,7 +94,7 @@ namespace SEE.Game.HolisticMetrics
             citySelection.dropdownEvent.AddListener(CitySelectionChanged);
             OnCitySelectionClick();
 
-            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -234,7 +234,7 @@ namespace SEE.Game.HolisticMetrics
         /// </summary>
         public void OnCitySelectionClick()
         {
-            cities = FindObjectsOfType<SEECity>();
+            cities = FindObjectsOfType<SEECity>().Where(c => c?.LoadedGraph != null).ToArray();
             string oldSelection = citySelection.selectedText.text;
             citySelection.dropdownItems.Clear();
             foreach (SEECity city in cities)
@@ -333,10 +333,13 @@ namespace SEE.Game.HolisticMetrics
         private void CitySelectionChanged(int itemIndex)
         {
             SEECity selectedCity = GetSelectedCity();
-            string cityName = selectedCity.name;
-            new SwitchCityNetAction(title, cityName).Execute();
-            graphDisposable?.Dispose();
-            graphDisposable = selectedCity.LoadedGraph?.Subscribe(this);
+            if (selectedCity != null)
+            {
+                string cityName = selectedCity.name;
+                new SwitchCityNetAction(title, cityName).Execute();
+                graphDisposable?.Dispose();
+                graphDisposable = selectedCity.LoadedGraph?.Subscribe(this);
+            }
         }
 
         /// <summary>
@@ -364,7 +367,7 @@ namespace SEE.Game.HolisticMetrics
 
             // Start listening to changes in the newly selected city
             graphDisposable?.Dispose();
-            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
         }
 
         /// <summary>
@@ -373,7 +376,7 @@ namespace SEE.Game.HolisticMetrics
         internal void OnGraphDraw()
         {
             graphDisposable?.Dispose();
-            graphDisposable = GetSelectedCity().LoadedGraph?.Subscribe(this);
+            graphDisposable = GetSelectedCity()?.LoadedGraph?.Subscribe(this);
             Redraw();
         }
 

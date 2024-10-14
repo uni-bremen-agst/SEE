@@ -1,9 +1,12 @@
-﻿using NUnit.Framework;
+﻿using Cysharp.Threading.Tasks;
+using NUnit.Framework;
 using SEE.DataModel.DG.IO;
+using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG
 {
@@ -19,27 +22,25 @@ namespace SEE.DataModel.DG
         private const string hierarchicalEdgeType = "Enclosing";
 
         /// <summary>
-        /// Load Graph from GXL file <paramref name="filename"/>.
+        /// Load Graph from GXL file <paramref name="path"/>.
         /// </summary>
-        /// <param name="filename">GXL file</param>
+        /// <param name="path">data path of GXL file</param>
         /// <returns>loaded graph</returns>
-        private static async UniTask<Graph> LoadGraphAsync(string filename)
+        private static async UniTask<Graph> LoadGraphAsync(DataPath path)
         {
-            GraphReader graphReader = new(filename, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
-            await graphReader.LoadAsync();
-            return graphReader.GetGraph();
+            return await GraphReader.LoadAsync(path, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
         }
 
         /// <summary>
-        /// The graph that was loaded by <see cref="SetUp"/> before each test case is executed.
+        /// The graph that was loaded by <see cref="SetUpAsync"/> before each test case is executed.
         /// </summary>
         private Graph graph;
 
         [SetUp]
         public async Task SetUpAsync()
         {
-            string gxlPath = Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz";
-            string xmlPath = Application.streamingAssetsPath + "/JLGExample/jacoco.xml";
+            DataPath gxlPath = new(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz");
+            DataPath xmlPath = new(Application.streamingAssetsPath + "/JLGExample/jacoco.xml");
 
             graph = await LoadGraphAsync(gxlPath);
             await JaCoCoImporter.LoadAsync(graph, xmlPath);
@@ -157,6 +158,59 @@ namespace SEE.DataModel.DG
 
             Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.MethodMissed));
             Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+        }
+
+        /// <summary>
+        /// Here we only test whether data can be read from a URL. The nodes in the
+        /// referenced file are not actually in the graph. So we expect error
+        /// messages. Yet, we will add one package node to the graph that we
+        /// know is contained in the JaCoCo XML file. We will then check whether
+        /// the metrics are set correctly. There are more nodes in the file, but
+        /// we will ignore these.
+        /// </summary>
+        [Test]
+        public async Task TestLoadAsyncMethodAsync()
+        {
+            // Note: LogAssert.Expect(LogType.Error, new Regex(".*No node found for.*"))
+            // does not work as expected in combination with awaiting an asynchronous
+            // message. So we have to ignore all error messages.
+            LogAssert.ignoreFailingMessages = true;
+
+            DataPath path = new()
+            {
+                Root = DataPath.RootKind.Url,
+                Path = "https://raw.githubusercontent.com/vokal/jacoco-parse/master/test/assets/sample.xml"
+            };
+
+            // We know this package node exists in the JaCoCo XML file.
+            Node nodeToTest = new()
+            {
+                // Note: In the graph, the separator for qualified names is a dot, whereas a / is used in the
+                // JaCoCo XML file.
+                ID = "com.wmbest.myapplicationtest",
+                Type = "package"
+            };
+            graph.AddNode(nodeToTest);
+
+            await JaCoCoImporter.LoadAsync(graph, path);
+
+            Assert.AreEqual(30, nodeToTest.GetInt(JaCoCo.InstructionMissed));
+            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.InstructionCovered));
+
+            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.BranchMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.BranchCovered));
+
+            Assert.AreEqual(10, nodeToTest.GetInt(JaCoCo.LineMissed));
+            Assert.AreEqual(3, nodeToTest.GetInt(JaCoCo.LineCovered));
+
+            Assert.AreEqual(6, nodeToTest.GetInt(JaCoCo.ComplexityMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ComplexityCovered));
+
+            Assert.AreEqual(4, nodeToTest.GetInt(JaCoCo.MethodMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.MethodCovered));
+
+            Assert.AreEqual(0, nodeToTest.GetInt(JaCoCo.ClassMissed));
+            Assert.AreEqual(1, nodeToTest.GetInt(JaCoCo.ClassCovered));
         }
     }
 }

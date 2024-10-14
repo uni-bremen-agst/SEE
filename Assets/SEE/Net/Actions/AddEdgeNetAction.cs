@@ -40,7 +40,7 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Stuff to execute on the Server. Nothing to be done here.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -48,12 +48,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates the new edge on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameEdgeAdder.Add(Find(FromId), GraphElementIDMap.Find(ToId), EdgeType);
-            }
+            GameEdgeAdder.Add(Find(FromId), GraphElementIDMap.Find(ToId), EdgeType);
         }
     }
 }

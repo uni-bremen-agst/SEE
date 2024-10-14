@@ -32,3 +32,8 @@ Assets/StreamingAssets/Videos.meta filter=lfs diff=lfs merge=lfs -text
 Assets/StreamingAssets/Videos/** filter=lfs diff=lfs merge=lfs -text
 Assets/Trailer/** filter=lfs diff=lfs merge=lfs -text
 Assets/Resources/External/** filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/CC_Unity_Tools/** filter=lfs diff=lfs merge=lfs -text
+Assets/Plugins/CC_Unity_Tools.meta filter=lfs diff=lfs merge=lfs -text
+Assets/Resources/Materials/CC4/** filter=lfs diff=lfs merge=lfs -text
+Assets/Resources/Materials/CC4.meta filter=lfs diff=lfs merge=lfs -text
+Assets/StreamingAssets/HelpSystem/Videos/** filter=lfs diff=lfs merge=lfs -text

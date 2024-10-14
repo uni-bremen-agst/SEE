@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -143,25 +143,25 @@ namespace SEE.Net.Dashboard.Model.Issues
                                              string targetEntityType, string targetPath, int targetLine,
                                              string targetLinkName)
         {
-            this.ArchitectureSource = architectureSource;
-            this.ArchitectureSourceType = architectureSourceType;
-            this.ArchitectureSourceLinkName = architectureSourceLinkName;
-            this.ArchitectureTarget = architectureTarget;
-            this.ArchitectureTargetType = architectureTargetType;
-            this.ArchitectureTargetLinkName = architectureTargetLinkName;
-            this.ErrorNumber = errorNumber;
-            this.ViolationType = violationType;
-            this.DependencyType = dependencyType;
-            this.SourceEntity = sourceEntity;
-            this.SourceEntityType = sourceEntityType;
-            this.SourcePath = sourcePath;
-            this.SourceLine = sourceLine;
-            this.SourceLinkName = sourceLinkName;
-            this.TargetEntity = targetEntity;
-            this.TargetEntityType = targetEntityType;
-            this.TargetPath = targetPath;
-            this.TargetLine = targetLine;
-            this.TargetLinkName = targetLinkName;
+            ArchitectureSource = architectureSource;
+            ArchitectureSourceType = architectureSourceType;
+            ArchitectureSourceLinkName = architectureSourceLinkName;
+            ArchitectureTarget = architectureTarget;
+            ArchitectureTargetType = architectureTargetType;
+            ArchitectureTargetLinkName = architectureTargetLinkName;
+            ErrorNumber = errorNumber;
+            ViolationType = violationType;
+            DependencyType = dependencyType;
+            SourceEntity = sourceEntity;
+            SourceEntityType = sourceEntityType;
+            SourcePath = sourcePath;
+            SourceLine = sourceLine;
+            SourceLinkName = sourceLinkName;
+            TargetEntity = targetEntity;
+            TargetEntityType = targetEntityType;
+            TargetPath = targetPath;
+            TargetLine = targetLine;
+            TargetLinkName = targetLinkName;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

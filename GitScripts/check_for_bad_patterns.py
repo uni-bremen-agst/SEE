@@ -225,6 +225,9 @@ def main():
                 # Nonetheless, this is not a fatal error, so we can continue.
                 continue
             filename = split[1]
+            if split[1].startswith("b/"):
+                # We need to remove the 'b/' prefix from the filename.
+                filename = filename[2:]
             skip_file = filename == "dev/null"
         elif skip_file:
             continue

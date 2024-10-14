@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using SEE.DataModel.DG;
 using SEE.Game;
+using SEE.Game.Avatars;
 using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
@@ -22,12 +23,12 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// True if the object is currently being hovered over.
         /// </summary>
-        private bool isHovered = false;
+        private bool isHovered;
 
         /// <summary>
         /// True if the object is currently selected.
         /// </summary>
-        private bool isSelected = false;
+        private bool isSelected;
 
         /// <summary>
         /// Operator component for this object.
@@ -35,9 +36,9 @@ namespace SEE.Controls.Actions
         private NodeOperator nodeOperator;
 
         /// <summary>
-        /// List of operators of currently displayed node labels.
+        /// The laser pointer component of the local player.
         /// </summary>
-        public static IList<NodeOperator> DisplayedLabelOperators = new List<NodeOperator>();
+        private readonly Lazy<LaserPointer> pointer = new(() => SceneQueries.GetLocalPlayer().MustGetComponent<LaserPointer>());
 
         /// <summary>
         /// Registers On() and Off() for the respective hovering and selection events.
@@ -126,11 +127,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = true;
-                // if the object is currently selected, the label is already shown
-                if (!isSelected)
-                {
-                    On();
-                }
+                On();
             }
         }
 
@@ -146,10 +143,7 @@ namespace SEE.Controls.Actions
             if (isInitiator)
             {
                 isHovered = false;
-                if (!isSelected)
-                {
-                    Off();
-                }
+                Off();
             }
         }
 
@@ -166,10 +160,9 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                if (settings.Show)
+                if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
                 {
-                    DisplayedLabelOperators.Add(nodeOperator);
-                    nodeOperator.FadeLabel(settings.LabelAlpha, settings.AnimationFactor);
+                    nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
                 }
             }
         }
@@ -183,8 +176,7 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                nodeOperator.FadeLabel(0f, settings.AnimationFactor);
-                DisplayedLabelOperators.Remove(nodeOperator);
+                nodeOperator.FadeLabel(0f, null, settings.AnimationFactor);
             }
         }
 
@@ -212,6 +204,14 @@ namespace SEE.Controls.Actions
             if (gameObject.TryGetComponent(out ShowLabel showLabel))
             {
                 showLabel.Off();
+            }
+        }
+
+        private void Update()
+        {
+            if ((isHovered || isSelected) && nodeOperator != null && nodeOperator.Node != null)
+            {
+                nodeOperator.UpdateLabelLayout(pointer.Value.LastHit);
             }
         }
     }

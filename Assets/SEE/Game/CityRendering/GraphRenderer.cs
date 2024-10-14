@@ -1,8 +1,11 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -10,6 +13,7 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
@@ -347,8 +351,14 @@ namespace SEE.Game.CityRendering
             // need to start listening for change events from that graph.
             BoardsManager.OnGraphDraw();
 
+            if (Settings is BranchCity)
+            {
+                DrawAuthorSpheres(nodeMap, rootGameNode);
+            }
+
             updateProgress?.Invoke(1.0f);
             return;
+
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {

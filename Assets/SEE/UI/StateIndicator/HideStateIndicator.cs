@@ -57,20 +57,6 @@ namespace SEE.UI.StateIndicator
         public Color ButtonColorBack;
 
         /// <summary>
-        /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
-        /// be displayed when hovering above it.
-        /// Used for <see cref="doneButton"/>.
-        /// </summary>
-        private Tooltip.Tooltip tooltipDone;
-
-        /// <summary>
-        /// The tooltip containing the <see cref=description"/> of this <see cref="Property"/>, which will
-        /// be displayed when hovering above it.
-        /// Used for <see cref="backButton"/>.
-        /// </summary>
-        private Tooltip.Tooltip tooltipBack;
-
-        /// <summary>
         /// Saves the description of <see cref="doneButton"/>
         /// </summary>
         public string DescriptionDone;
@@ -103,12 +89,12 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Used to store the icon of <see cref="doneButton"/>
         /// </summary>
-        private Sprite iconSpriteDone;
+        private readonly Sprite iconSpriteDone;
 
         /// <summary>
         /// Used to store the icon of <see cref="backButton"/>
         /// </summary>
-        private Sprite iconSpriteBack;
+        private readonly Sprite iconSpriteBack;
 
         /// <summary>
         /// Event triggered when the user presses the button.
@@ -146,8 +132,8 @@ namespace SEE.UI.StateIndicator
             buttonManager.buttonText = ButtonNameDone;
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeDone));
-            pointerHelper.EnterEvent.AddListener(_ => tooltipDone.Show(DescriptionDone));
-            pointerHelper.ExitEvent.AddListener(_ => tooltipDone.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionDone));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
 
         /// <summary>
@@ -181,8 +167,8 @@ namespace SEE.UI.StateIndicator
             buttonManager.buttonText = ButtonNameBack;
 
             buttonManager.clickEvent.AddListener(() => SetSelectionType(SelectionTypeBack));
-            pointerHelper.EnterEvent.AddListener(_ => tooltipBack.Show(DescriptionBack));
-            pointerHelper.ExitEvent.AddListener(_ => tooltipBack.Hide());
+            pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionBack));
+            pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
 
         /// <summary>
@@ -192,12 +178,11 @@ namespace SEE.UI.StateIndicator
         private void SetupTooltipDone(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button_Done").gameObject;
-            tooltipDone = gameObject.AddComponent<Tooltip.Tooltip>();
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(_ => tooltipDone.Show(DescriptionDone));
-                pointerHelper.ExitEvent.AddListener(_ => tooltipDone.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionDone));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }
         }
 
@@ -208,12 +193,11 @@ namespace SEE.UI.StateIndicator
         private void SetupTooltipBack(GameObject indicator)
         {
             GameObject button = indicator.transform.Find("Button_Back").gameObject;
-            tooltipBack = gameObject.AddComponent<Tooltip.Tooltip>();
             if (button.TryGetComponentOrLog(out PointerHelper pointerHelper))
             {
                 // Register listeners on entry and exit events, respectively
-                pointerHelper.EnterEvent.AddListener(_ => tooltipBack.Show(DescriptionBack));
-                pointerHelper.ExitEvent.AddListener(_ => tooltipBack.Hide());
+                pointerHelper.EnterEvent.AddListener(_ => Tooltip.ActivateWith(DescriptionBack));
+                pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
             }
         }
 

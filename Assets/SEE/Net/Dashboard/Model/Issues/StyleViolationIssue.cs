@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using Newtonsoft.Json;
 
 namespace SEE.Net.Dashboard.Model.Issues
 {
@@ -64,13 +64,13 @@ namespace SEE.Net.Dashboard.Model.Issues
         public StyleViolationIssue(string severity, string provider, string errorNumber, string message, string entity,
                                    string path, int line)
         {
-            this.Severity = severity;
-            this.Provider = provider;
-            this.ErrorNumber = errorNumber;
-            this.Message = message;
-            this.Entity = entity;
-            this.Path = path;
-            this.Line = line;
+            Severity = severity;
+            Provider = provider;
+            ErrorNumber = errorNumber;
+            Message = message;
+            Entity = entity;
+            Path = path;
+            Line = line;
         }
 
         public override async UniTask<string> ToDisplayStringAsync()

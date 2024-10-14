@@ -21,6 +21,42 @@ namespace SEE.Utils
         public static int MainThreadId = 0;
 
         /// <summary>
+        /// Converts the given <paramref name="task"/> of enumerables to an asynchronous UniTask enumerable.
+        /// </summary>
+        /// <param name="task">The task of enumerables to convert.</param>
+        /// <param name="logErrors">Whether to log errors that occur during conversion instead of throwing them.</param>
+        /// <typeparam name="T">The type of the elements in the enumerable.</typeparam>
+        /// <returns>An asynchronous UniTask enumerable that emits the elements of the enumerable.</returns>
+        public static IUniTaskAsyncEnumerable<T> AsUniTaskAsyncEnumerable<T>(this UniTask<IEnumerable<T>> task,
+                                                                             bool logErrors = false)
+        {
+            return task.ToUniTaskAsyncEnumerable().SelectMany(x =>
+            {
+                if (x == null)
+                {
+                    return UniTaskAsyncEnumerable.Empty<T>();
+                }
+
+                if (!logErrors)
+                {
+                    return x.ToUniTaskAsyncEnumerable();
+                }
+                else
+                {
+                    try
+                    {
+                        return x.ToUniTaskAsyncEnumerable();
+                    }
+                    catch (Exception e)
+                    {
+                        Debug.LogError($"Error converting enumerable to UniTaskAsyncEnumerable: {e}");
+                        return UniTaskAsyncEnumerable.Empty<T>();
+                    }
+                }
+            });
+        }
+
+        /// <summary>
         /// Runs the given <paramref name="task"/> with a <paramref name="timeout"/> and returns the result.
         /// Note that a timeout of <see cref="TimeSpan.Zero"/> will cause no timeout to be applied.
         ///
@@ -53,7 +89,7 @@ namespace SEE.Utils
             {
                 if (throwOnTimeout)
                 {
-                    throw new TimeoutException($"Task did not complete within {timeout}.");
+                    throw new TimeoutException($"Task did not complete within {timeout}. (This may also be due to an exception that can't be caught here.)");
                 }
                 else
                 {
@@ -181,6 +217,8 @@ namespace SEE.Utils
         /// <p>
         /// <b>Important:</b> This method should only be used if the caller is running on the thread pool.
         /// Additionally, be aware that switching between threads can be very expensive.
+        /// If you're using this from inside a MonoBehaviour, it's recommended to use a ConcurrentQueue of Actions
+        /// instead, which you can then run on the main thread in <see cref="MonoBehaviour.Update"/>.
         /// </p>
         /// </summary>
         /// <param name="action">The action to run on the main thread.</param>

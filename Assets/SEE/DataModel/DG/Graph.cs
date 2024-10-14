@@ -1254,6 +1254,7 @@ namespace SEE.DataModel.DG
         {
             // The following will also clone the graph attributes.
             Graph subgraph = (Graph)CloneAttributes();
+            subgraph.BasePath = BasePath;  // This is not an actual attribute, so we need to set it manually.
             Dictionary<Node, Node> mapsTo = AddNodesToSubgraph(subgraph, includeElement);
             AddEdgesToSubgraph(subgraph, mapsTo, includeElement, ignoreSelfLoops);
             return subgraph;

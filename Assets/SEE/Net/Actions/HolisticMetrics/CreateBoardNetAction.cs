@@ -24,7 +24,7 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// This method does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }
@@ -32,12 +32,9 @@ namespace SEE.Net.Actions.HolisticMetrics
         /// <summary>
         /// Executes the action on each client except the requester, i.e., creates the board on each client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                BoardsManager.Create(BoardConfig);
-            }
+            BoardsManager.Create(BoardConfig);
         }
     }
 }

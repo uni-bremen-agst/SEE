@@ -1,6 +1,10 @@
 using System;
 using System.Linq;
+using Cysharp.Threading.Tasks;
 using DG.Tweening;
+using MoreLinq;
+using SEE.Tools.LSP;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -38,7 +42,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Size of the font used in the code window.
         /// </summary>
-        public float FontSize = 20f;
+        public float FontSize = 16f;
 
         /// <summary>
         /// An event which gets called whenever the scrollbar is used to scroll to a different line.
@@ -52,23 +56,82 @@ namespace SEE.UI.Window.CodeWindow
         private int lines;
 
         /// <summary>
+        /// The LSP handler for this code window.
+        ///
+        /// Will only be set if the LSP feature is enabled and active for this code window.
+        /// </summary>
+        private LSPHandler lspHandler;
+
+        /// <summary>
+        /// The handler for the context menu of this code window, which provides various navigation options,
+        /// such as "Go to Definition" or "Find References".
+        /// </summary>
+        private ContextMenuHandler contextMenu;
+
+        /// <summary>
         /// Path to the code window content prefab.
         /// </summary>
         private const string codeWindowPrefab = "Prefabs/UI/CodeWindowContent";
 
         /// <summary>
-        /// Visually marks the line at the given <paramref name="lineNumber"/> and scrolls to it.
-        /// Will also unmark any other line. Sets <see cref="markedLine"/> to
-        /// <paramref name="lineNumber"/>.
+        /// Path to the breakpoint prefab.
         /// </summary>
-        /// <param name="line">The line number of the line to mark and scroll to (1-indexed)</param>
-        private void MarkLine(int lineNumber)
+        private const string breakpointPrefab = "Prefabs/UI/BreakpointButton";
+
+        /// <summary>
+        /// The color for active breakpoints.
+        /// </summary>
+        private static readonly Color breakpointColorActive = Color.red.WithAlpha(0.5f);
+
+        /// <summary>
+        /// The color for inactive breakpoints.
+        /// </summary>
+        private static readonly Color breakpointColorInactive = Color.gray.WithAlpha(0.25f);
+
+        /// <summary>
+        /// The user begins to hover over a word.
+        /// </summary>
+        public static event Action<CodeWindow, TMP_WordInfo> OnWordHoverBegin;
+
+        /// <summary>
+        /// The user stops to hover over a word.
+        /// </summary>
+        public static event Action<CodeWindow, TMP_WordInfo> OnWordHoverEnd;
+
+        /// <summary>
+        /// The word that was hovered last frame.
+        /// </summary>
+        private static TMP_WordInfo? lastHoveredWord;
+
+        /// <summary>
+        /// Whether the code window contains text.
+        /// </summary>
+        public bool ContainsText => text != null;
+
+        /// <summary>
+        /// Visually highlights the line number at the given <paramref name="lineNumber"/> and scrolls to it.
+        /// Will also unhighlight any other line. Sets <see cref="markedLine"/> to <paramref name="lineNumber"/>.
+        /// Clears the markers for line numbers smaller than 1.
+        /// </summary>
+        /// <param name="line">The line number of the line to highlight and scroll to (1-indexed)</param>
+        public void MarkLine(int lineNumber)
         {
+            const string markColor = "<color=#FF0000>";
+            int markColorLength = markColor.Length;
             markedLine = lineNumber;
-            string[] allLines = textMesh.text.Split('\n').Select(x => x.EndsWith("</mark>") ? x.Substring(16, x.Length - 16 - 7) : x).ToArray();
-            string markLine = $"<mark=#ff000044>{allLines[lineNumber - 1]}</mark>\n";
-            textMesh.text = string.Join("", allLines.Select(x => x + "\n").Take(lineNumber - 1).Append(markLine)
-                                                    .Concat(allLines.Select(x => x + "\n").Skip(lineNumber).Take(lines - lineNumber - 2)));
+            string[] allLines = textMesh.text.Split('\n')
+                                        .Select(x => x.StartsWith(markColor) ? $"<color=#CCCCCC>{x[markColorLength..]}" : x)
+                                        .ToArray();
+            if (lineNumber < 1)
+            {
+                text = string.Join("\n", allLines);
+            }
+            else
+            {
+                string markLine = $"{markColor}{allLines[lineNumber - 1][markColorLength..]}";
+                text = string.Join("\n", allLines.Exclude(lineNumber - 1, 1).Insert(new[] { markLine }, lineNumber - 1));
+            }
+            textMesh.text = text;
         }
 
         #region Visible Line Calculation
@@ -127,13 +190,7 @@ namespace SEE.UI.Window.CodeWindow
                     DOTween.Sequence().Append(DOTween.To(() => ImmediateVisibleLine, f => ImmediateVisibleLine = f, value - 1, 1f))
                            .AppendCallback(() => scrollingTo = 0);
 
-                    // FIXME (#250): TMP bug: Large files cause issues with highlighting text. This is just a workaround.
-                    // See https://github.com/uni-bremen-agst/SEE/issues/250#issuecomment-819653373
-                    if (text.Length < 16382)
-                    {
-                        MarkLine(value);
-                    }
-
+                    MarkLine(value);
                     ScrollEvent.Invoke();
                 }
             }
@@ -162,7 +219,8 @@ namespace SEE.UI.Window.CodeWindow
                 }
                 else
                 {
-                    scrollRect.verticalNormalizedPosition = 1 - value / (lines - 1 - excessLines);
+                    scrollRect.verticalNormalizedPosition = 1 - (value-1) / (lines - 1 - excessLines);
+                    scrollRect.horizontalNormalizedPosition = 0;
                 }
             }
         }
@@ -170,6 +228,7 @@ namespace SEE.UI.Window.CodeWindow
         public override void RebuildLayout()
         {
             RecalculateExcessLines();
+            SetupBreakpoints();
         }
 
         #endregion
@@ -185,17 +244,17 @@ namespace SEE.UI.Window.CodeWindow
 
             if (codeValues.Path != null)
             {
-                EnterFromFile(codeValues.Path);
+                EnterFromFileAsync(codeValues.Path).ContinueWith(() => ScrolledVisibleLine = codeValues.VisibleLine).Forget();
             }
             else if (codeValues.Text != null)
             {
                 EnterFromText(codeValues.Text.Split('\n'));
+                ScrolledVisibleLine = codeValues.VisibleLine;
             }
             else
             {
                 throw new ArgumentException("Invalid value object. Either FilePath or Text must not be null.");
             }
-            ScrolledVisibleLine = codeValues.VisibleLine;
         }
 
         public override void UpdateFromNetworkValueObject(WindowValues valueObject)
@@ -275,5 +334,15 @@ namespace SEE.UI.Window.CodeWindow
         }
 
         #endregion
+
+        /// <summary>
+        /// Data container for a word hover event
+        /// </summary>
+        /// <param name="Word">The hovered word.</param>
+        /// <param name="CodeWindow">The code window containing the hovered word.</param>
+        /// <param name="FilePath">The file path of the code window.</param>
+        /// <param name="Line">The line of the hovered word.</param>
+        /// <param name="Column">The column of the hovered word.</param>
+        public record WordHoverEvent(string Word, CodeWindow CodeWindow, string FilePath, int Line, int Column);
     }
 }

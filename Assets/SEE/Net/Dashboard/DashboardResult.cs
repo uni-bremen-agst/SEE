@@ -15,7 +15,7 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// Whether the API call has been successful.
         /// </summary>
-        public bool Success { get; private set; }
+        public bool Success { get; private init; }
 
         /// <summary>
         /// This contains the error object which has been returned from the dashboard, if the call was not successful
@@ -115,7 +115,7 @@ namespace SEE.Net.Dashboard
                     MissingMemberHandling = strict ? MissingMemberHandling.Error : MissingMemberHandling.Ignore
                 });
             }
-            catch (Exception e) when (e is JsonSerializationException || e is JsonReaderException)
+            catch (Exception e) when (e is JsonSerializationException or JsonReaderException)
             {
                 Debug.LogError($"Error encountered: {e.Message}.\nGiven JSON was: {JSON}");
                 throw;

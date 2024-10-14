@@ -12,6 +12,7 @@
 /[Bb]uilds/
 /[Ll]ogs/
 /[Uu]ser[Ss]ettings/
+/[Aa]dapters/
 
 # MemoryCaptures can get excessive in size.
 # They also could contain extremely sensitive data
@@ -49,7 +50,6 @@ ExportedObj/
 *.mdb
 *.opendb
 *.VC.db
-.vsconfig
 
 # Java class files
 **/*.class
@@ -116,6 +116,15 @@ ManagedThreadPoolCallBackError*.txt
 PacketHandlerErrorGlobal*.txt
 GlobalConnectionShutdownDelegate*.txt
 
+# MacOS
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+# VSCode
+.vsconfig
+
 # Custom entries
 LinuxPlayer_s.debug
 UnityPlayer_s.debug
@@ -141,3 +150,7 @@ Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/install.ps1
 Packages/Microsoft.CodeAnalysis.Analyzers.3.3.4/tools/uninstall.ps1
 Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/install.ps1
 Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/uninstall.ps1
+
+# Files downloaded from backend server
+/Assets/StreamingAssets/Multiplayer
+/Assets/StreamingAssets/Multiplayer.meta

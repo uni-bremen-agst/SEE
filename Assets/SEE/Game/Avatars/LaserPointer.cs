@@ -2,6 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
+using UnityEngine.Serialization;
 
 namespace SEE.Game.Avatars
 {
@@ -36,6 +37,11 @@ namespace SEE.Game.Avatars
         public Color MissColor = Color.red;
 
         /// <summary>
+        /// The last point where the laser beam hit something.
+        /// </summary>
+        public Vector3 LastHit;
+
+        /// <summary>
         /// The origin of the laser beam.
         /// </summary>
         public Transform Source;
@@ -52,7 +58,7 @@ namespace SEE.Game.Avatars
         private LineRenderer laserLine;
 
         /// <summary>
-        /// As to whether the leaser beam is turned on.
+        /// Whether the leaser beam is turned on.
         /// </summary>
         public bool On
         {
@@ -69,9 +75,9 @@ namespace SEE.Game.Avatars
         private void Awake()
         {
             laserMaterial = Materials.New(Materials.ShaderType.PortalFree, MissColor);
-            GameObject laserBeam = new GameObject
+            GameObject laserBeam = new()
             {
-                name = "Laser " + Guid.NewGuid().ToString()
+                name = $"Laser {Guid.NewGuid()}"
             };
             laserBeam.transform.SetParent(gameObject.transform);
             laserLine = LineFactory.Draw(laserBeam, from: Vector3.zero, to: Vector3.zero, width: LaserWidth, laserMaterial);
@@ -100,7 +106,7 @@ namespace SEE.Game.Avatars
         /// line is <see cref="LaserLength"/> units away from the pointing device's
         /// origin (again into the direction the pointing device is pointing to).
         /// </summary>
-        /// <returns>the end of the line drawn (i.e., the point where it hit
+        /// <returns>the end of the line drawn, that is, the point where it hit
         /// anything or the end point of the length-restricted beam, respectively</returns>
         /// <remarks>This method is intended for local interaction of the local player.</remarks>
         internal Vector3 Point()
@@ -109,7 +115,7 @@ namespace SEE.Game.Avatars
             Color color;
             if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
             {
-                result = raycastHit.point;
+                result = LastHit = raycastHit.point;
                 color = HitColor;
             }
             else

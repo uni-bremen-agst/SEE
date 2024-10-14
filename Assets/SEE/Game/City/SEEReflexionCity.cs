@@ -5,7 +5,6 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
-using UnityEngine;
 using Sirenix.OdinInspector;
 using Assets.SEE.Tools.ReflexionAnalysis;
 using SEE.GraphProviders;
@@ -44,10 +43,10 @@ namespace SEE.Game.City
         /// A provider of the data shown as code city.
         /// </summary>
         [OdinSerialize, ShowInInspector,
-            Tooltip("A graph provider yielding the oracle mapping for a corresponding reflexion graph"),
+            // Tooltip("A graph provider yielding the oracle mapping for a corresponding reflexion graph"),
             TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
             HideReferenceObjectPicker]
-        public PipelineGraphProvider OracleMappingProvider { get; set; }
+        public SingleGraphPipelineProvider OracleMappingProvider { get; set; }
 
         /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
@@ -104,7 +103,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             if (attributes.ContainsKey(oracleProviderPathLabel))
             {
-                OracleMappingProvider = GraphProvider.Restore(attributes, oracleProviderPathLabel) as PipelineGraphProvider; 
+                OracleMappingProvider = SingleGraphProvider.Restore(attributes, oracleProviderPathLabel) as SingleGraphPipelineProvider; 
             } 
             else
             {
@@ -125,7 +124,7 @@ namespace SEE.Game.City
         /// TODO:
         /// </summary>
         [OdinSerialize, ShowInInspector,
-        Tooltip("Settings that are used to calculate candidate recommendations within the reflexion graph."),
+        // Tooltip("Settings that are used to calculate candidate recommendations within the reflexion graph."),
         TabGroup(RecommendationsFoldoutGroup), RuntimeTab(RecommendationsFoldoutGroup),
         HideReferenceObjectPicker]
         [PropertyOrder(2)]

@@ -511,7 +511,7 @@ namespace SEE.Game.CityRendering
         /// for inner node kinds and nodelayout.
         /// </summary>
         /// <param name="gameNode"></param>
-        protected void AddDecorations(GameObject gameNode)
+        public void AddDecorations(GameObject gameNode)
         {
             AddDecorations(new List<GameObject> { gameNode });
         }
@@ -529,25 +529,23 @@ namespace SEE.Game.CityRendering
                 AddGeneralDecorations(node);
             }
 
-            IEnumerable<GameObject> leafNodes = FindLeafNodes(gameNodes);
-            IEnumerable<GameObject> innerNodes = FindInnerNodes(gameNodes);
-
             AddMarkers(gameNodes);
 
             // Add software erosion decorators for all nodes if requested.
-            if (Settings.ErosionSettings.ShowInnerErosions)
-            {
-                //FIXME: This should instead check whether each node has non-aggregated metrics available,
-                // and use those instead of the aggregated ones, because they are usually more accurate (see MetricImporter).
-                ErosionIssues issueDecorator = new(Settings.InnerIssueMap(),
-                                                   scaler, Settings.ErosionSettings.ErosionScalingFactor);
-                issueDecorator.Add(innerNodes);
-            }
             if (Settings.ErosionSettings.ShowLeafErosions)
             {
-                ErosionIssues issueDecorator = new(Settings.LeafIssueMap(),
-                                                   scaler, Settings.ErosionSettings.ErosionScalingFactor * 5);
-                issueDecorator.Add(leafNodes);
+                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                                                   Settings.ErosionSettings.ErosionScalingFactor * 5);
+                // Leaf erosions can even be present on inner nodes, hence, we add all nodes.
+                // "Leaf" just refers to the lowest level the erosion type can be present on, which may not be
+                // the lowest level of the graph.
+                issueDecorator.Add(gameNodes);
+            }
+            if (Settings.ErosionSettings.ShowInnerErosions)
+            {
+                ErosionIssues issueDecorator = new(Settings.IssueMap(), scaler,
+                                                   Settings.ErosionSettings.ErosionScalingFactor, aggregated: true);
+                issueDecorator.Add(FindInnerNodes(gameNodes));
             }
         }
 

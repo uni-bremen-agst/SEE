@@ -33,27 +33,27 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "12574c32f658fa23c194357141abc3fc157ea362"
+      "hash": "a011c51ed65c9abc3151a7a408bc70d408352933"
     },
     "com.openai.unity": {
-      "version": "7.7.9",
+      "version": "8.3.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "2.5.6",
-        "com.utilities.encoder.wav": "1.1.5"
+        "com.utilities.rest": "3.2.3",
+        "com.utilities.encoder.wav": "1.2.2"
       },
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.9",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.12.12",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "15115347b80179b483f7f4022c18fe48604dee8d"
+      "hash": "56b69dfe27d695bee44ce09f419003c3c4ca9731"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -80,7 +80,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.burst": {
-      "version": "1.8.14",
+      "version": "1.8.18",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -90,12 +90,14 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "1.2.4",
-      "depth": 2,
+      "version": "2.5.1",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.burst": "1.6.6",
-        "com.unity.test-framework": "1.1.31"
+        "com.unity.burst": "1.8.17",
+        "com.unity.test-framework": "1.4.5",
+        "com.unity.nuget.mono-cecil": "1.11.4",
+        "com.unity.test-framework.performance": "3.0.3"
       },
       "url": "https://packages.unity.com"
     },
@@ -108,7 +110,7 @@
     },
     "com.unity.ext.nunit": {
       "version": "2.0.3",
-      "depth": 4,
+      "depth": 2,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
@@ -118,13 +120,13 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.timeline": "1.7.1",
-        "com.autodesk.fbx": "4.2.1"
+        "com.autodesk.fbx": "4.2.1",
+        "com.unity.timeline": "1.7.1"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.ide.rider": {
-      "version": "3.0.28",
+      "version": "3.0.31",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -149,8 +151,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.inputsystem": {
-      "version": "1.8.1",
-      "depth": 1,
+      "version": "1.11.1",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.uielements": "1.0.0"
@@ -158,19 +160,19 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.mathematics": {
-      "version": "1.2.6",
+      "version": "1.3.1",
       "depth": 1,
       "source": "registry",
       "dependencies": {},
       "url": "https://packages.unity.com"
     },
     "com.unity.netcode.gameobjects": {
-      "version": "1.9.1",
+      "version": "1.11.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.nuget.mono-cecil": "1.10.1",
-        "com.unity.transport": "1.4.0"
+        "com.unity.transport": "1.4.0",
+        "com.unity.nuget.mono-cecil": "1.10.1"
       },
       "url": "https://packages.unity.com"
     },
@@ -248,8 +250,8 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.test-framework": {
-      "version": "1.3.5",
-      "depth": 3,
+      "version": "1.4.5",
+      "depth": 1,
       "source": "registry",
       "dependencies": {
         "com.unity.ext.nunit": "2.0.3",
@@ -258,8 +260,18 @@
       },
       "url": "https://packages.unity.com"
     },
+    "com.unity.test-framework.performance": {
+      "version": "3.0.3",
+      "depth": 1,
+      "source": "registry",
+      "dependencies": {
+        "com.unity.test-framework": "1.1.31",
+        "com.unity.modules.jsonserialize": "1.0.0"
+      },
+      "url": "https://packages.unity.com"
+    },
     "com.unity.testtools.codecoverage": {
-      "version": "1.2.5",
+      "version": "1.2.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -269,7 +281,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.textmeshpro": {
-      "version": "3.0.8",
+      "version": "3.0.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -282,9 +294,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"
@@ -300,13 +312,13 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "1.4.1",
-      "depth": 1,
+      "version": "2.3.0",
+      "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.collections": "1.2.4",
-        "com.unity.burst": "1.6.6",
-        "com.unity.mathematics": "1.2.6"
+        "com.unity.burst": "1.8.12",
+        "com.unity.collections": "2.2.1",
+        "com.unity.mathematics": "1.3.1"
       },
       "url": "https://packages.unity.com"
     },
@@ -333,19 +345,19 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.modules.xr": "1.0.0",
         "com.unity.inputsystem": "1.8.1",
         "com.unity.mathematics": "1.2.6",
-        "com.unity.ugui": "1.0.0",
-        "com.unity.xr.core-utils": "2.2.3",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.imgui": "1.0.0",
-        "com.unity.modules.physics": "1.0.0",
-        "com.unity.modules.xr": "1.0.0"
+        "com.unity.xr.core-utils": "2.2.3",
+        "com.unity.modules.physics": "1.0.0"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.legacyinputhelpers": {
-      "version": "2.1.10",
+      "version": "2.1.11",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -355,62 +367,62 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.management": {
-      "version": "4.4.1",
+      "version": "4.5.0",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.modules.subsystems": "1.0.0",
         "com.unity.modules.vr": "1.0.0",
         "com.unity.modules.xr": "1.0.0",
+        "com.unity.modules.subsystems": "1.0.0",
         "com.unity.xr.legacyinputhelpers": "2.1.7"
       },
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
-      "version": "1.10.0",
+      "version": "1.12.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.unity.xr.management": "4.4.0",
-        "com.unity.xr.legacyinputhelpers": "2.1.2",
         "com.unity.inputsystem": "1.6.3",
-        "com.unity.xr.core-utils": "2.1.1"
+        "com.unity.xr.core-utils": "2.1.1",
+        "com.unity.xr.management": "4.4.0",
+        "com.unity.xr.legacyinputhelpers": "2.1.2"
       },
       "url": "https://packages.unity.com"
     },
     "com.utilities.async": {
-      "version": "2.1.3",
+      "version": "2.1.7",
       "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.editorcoroutines": "1.0.0",
-        "com.unity.test-framework": "1.3.5",
+        "com.unity.test-framework": "1.4.2",
         "com.unity.nuget.mono-cecil": "1.11.4"
       },
       "url": "https://package.openupm.com"
     },
     "com.utilities.audio": {
-      "version": "1.1.3",
+      "version": "1.2.2",
       "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.unitywebrequestaudio": "1.0.0",
-        "com.utilities.async": "2.1.3"
+        "com.utilities.async": "2.1.7"
       },
       "url": "https://package.openupm.com"
     },
     "com.utilities.encoder.wav": {
-      "version": "1.1.5",
+      "version": "1.2.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.utilities.audio": "1.1.3"
+        "com.utilities.audio": "1.2.2"
       },
       "url": "https://package.openupm.com"
     },
     "com.utilities.extensions": {
-      "version": "1.1.15",
+      "version": "1.1.16",
       "depth": 2,
       "source": "registry",
       "dependencies": {
@@ -420,12 +432,12 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "2.5.6",
+      "version": "3.2.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.utilities.async": "2.1.3",
-        "com.utilities.extensions": "1.1.15",
+        "com.utilities.async": "2.1.7",
+        "com.utilities.extensions": "1.1.16",
         "com.unity.modules.unitywebrequest": "1.0.0",
         "com.unity.modules.unitywebrequestassetbundle": "1.0.0",
         "com.unity.modules.unitywebrequestaudio": "1.0.0",
@@ -434,6 +446,13 @@
         "com.unity.nuget.newtonsoft-json": "3.2.1"
       },
       "url": "https://package.openupm.com"
+    },
+    "io.livekit.livekit-sdk": {
+      "version": "https://github.com/livekit/client-sdk-unity.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9f9bfdf84f2e28b50d5e0c708b4ccabcefdc38bf"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",

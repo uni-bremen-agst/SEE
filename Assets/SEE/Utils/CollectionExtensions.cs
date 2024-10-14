@@ -29,15 +29,15 @@ namespace SEE.Utils
         /// <summary>
         /// Gets the value for the given <paramref name="key"/> from the given <paramref name="dict"/>.
         /// If the key is not present in the dictionary, the given <paramref name="defaultValue"/>
-        /// will be added to the dictionary and returned.
+        /// will be evaluated and its result added to the dictionary and returned.
         /// </summary>
         /// <param name="dict">The dictionary from which the value shall be retrieved.</param>
         /// <param name="key">The key for which the value shall be retrieved.</param>
-        /// <param name="defaultValue">The default value which shall be added to the dictionary if the key is not present.</param>
+        /// <param name="defaultValue">A lambda returning the default value which shall be added to the dictionary if the key is not present.</param>
         /// <typeparam name="K">The type of the keys in the dictionary.</typeparam>
         /// <typeparam name="V">The type of the values in the dictionary.</typeparam>
         /// <returns>The value for the given <paramref name="key"/> from the given <paramref name="dict"/>.</returns>
-        public static V GetOrAdd<K,V>(this IDictionary<K, V> dict, K key, V defaultValue)
+        public static V GetOrAdd<K,V>(this IDictionary<K, V> dict, K key, Func<V> defaultValue)
         {
             if (dict.TryGetValue(key, out V value))
             {
@@ -45,7 +45,7 @@ namespace SEE.Utils
             }
             else
             {
-                return dict[key] = defaultValue;
+                return dict[key] = defaultValue();
             }
         }
 

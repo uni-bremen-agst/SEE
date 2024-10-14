@@ -10,6 +10,13 @@ namespace SEE.Game
     internal static class Highlighter
     {
         /// <summary>
+        /// The default quality level for the glow effect (<see cref="HighlightEffect.glowQuality"/>.
+        /// </summary>
+        /// <remarks>The value <see cref="HighlightPlus.QualityLevel.Highest"/> does not work
+        /// in Highlight Plus version 21.0 anymore.</remarks>
+        public const HighlightPlus.QualityLevel DefaultGlowQuality = HighlightPlus.QualityLevel.Highest;
+
+        /// <summary>
         /// Whether or not the <paramref name="gameObject"/> should be highlighted.
         /// </summary>
         /// <param name="gameObject">the game object whose highlighting is to be set</param>
@@ -38,7 +45,7 @@ namespace SEE.Game
                 highlight.outlineColor = inverted;
                 highlight.SetGlowColor(Color.yellow);
                 highlight.glow = 2;
-                highlight.glowQuality = HighlightPlus.QualityLevel.Highest;
+                highlight.glowQuality = DefaultGlowQuality;
                 highlight.effectGroup = TargetOptions.OnlyThisObject;
                 highlight.glowDownsampling = 1;
                 highlight.hitFxColor = inverted;

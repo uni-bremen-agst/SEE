@@ -2,8 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
@@ -190,6 +192,76 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Moves and scales the node at the same time.
+        /// <para>
+        /// If <paramref name="reparentChildren"/> is <c>true></c> (default), children are not scaled and moved along.
+        /// For this purpose they are reparented to their grandparent during the animation and back to the original
+        /// parent after the animation has completed.
+        /// </para>
+        /// </summary>
+        /// <param name="newLocalScale">the desired new local scale</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ResizeTo
+            (Vector3 newLocalScale,
+            Vector3 newPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool reparentChildren = true)
+        {
+            float duration = ToDuration(factor);
+            updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
+
+            List<Transform> children = null;
+            Transform originalParent = transform;
+            Transform tempParent = transform.parent;
+            if (reparentChildren)
+            {
+                children = new(transform.childCount);
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.IsNodeAndActiveSelf())
+                    {
+                        children.Add(child);
+                    }
+                }
+                reparent(tempParent);
+            }
+
+            IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
+                (new[]
+                  {
+                    positionX.AnimateTo(newPosition.x, duration),
+                    positionY.AnimateTo(newPosition.y, duration),
+                    positionZ.AnimateTo(newPosition.z, duration),
+                    scale.AnimateTo(newLocalScale, duration)
+                  },
+                 a => a);
+            animation.OnComplete(() => reparent(originalParent));
+            animation.OnKill(() => reparent(originalParent));
+            return animation;
+
+            void reparent(Transform newParent)
+            {
+                if (!reparentChildren)
+                {
+                    return;
+                }
+                foreach (Transform child in children)
+                {
+                    child.SetParent(newParent);
+                }
+            }
+        }
+
+        /// <summary>
         /// Rotates the node to the given quaternion <paramref name="newRotation"/>.
         /// </summary>
         /// <param name="newRotation">the desired new target rotation in world space</param>
@@ -248,9 +320,14 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> FadeLabel(float alpha, float factor = 1)
+        public IOperationCallback<Action> FadeLabel(float alpha, Vector3? labelBase = null, float factor = 1)
         {
             float duration = ToDuration(factor);
+
+            if (labelBase.HasValue)
+            {
+                DesiredLabelStartLinePosition = labelBase.Value;
+            }
             return new AndCombinedOperationCallback<Action>(new[]
             {
                 // NOTE: Order is important, because the line's end position target depends on the text position target,
@@ -272,7 +349,7 @@ namespace SEE.Game.Operator
         {
             if (Node != null)
             {
-                Assert.IsNotNull(Node, $"[{nameof(NodeOperator)}]{gameObject.FullName()} has undefined graph node");
+                Assert.IsNotNull(Node, $"[{nameof(NodeOperator)}]{gameObject.FullName()} has undefined graph node.");
                 if (!Node.IsRoot())
                 {
                     // If we are moving the root node, the whole graph will be moved,
@@ -281,9 +358,30 @@ namespace SEE.Game.Operator
                     {
                         // The edge layout needs to be updated only if we actually have an edge layout.
                         UpdateEdgeLayout(duration);
+
+                        // If the operator was invoked in a BranchCity, the author-sphere edges should be moved, too.
+                        if (City is BranchCity)
+                        {
+                            if (gameObject.TryGetComponent(out AuthorRef authorRef))
+                            {
+                                foreach ((GameObject, int) edge in authorRef.Edges)
+                                {
+                                    SEESpline seeSpline = edge.Item1.GetComponent<SEESpline>();
+                                    seeSpline.UpdateEndPosition(gameObject.transform.position);
+                                }
+                            }
+                            else
+                            {
+                                foreach (AuthorRef child in gameObject.GetComponentsInChildren<AuthorRef>())
+                                {
+                                    child.Edges.ForEach(x =>
+                                        x.Item1.GetComponent<SEESpline>()
+                                            .UpdateEndPosition(child.gameObject.transform.position));
+                                }
+                            }
+                        }
                     }
                 }
-                UpdateLabelLayout(duration);
             }
         }
 

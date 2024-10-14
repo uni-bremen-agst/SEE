@@ -27,18 +27,15 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Version change in all clients except the requesting client.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                GameNodeMover.NewMovementVersion(Find(GameObjectID));
-            }
+            GameNodeMover.NewMovementVersion(Find(GameObjectID));
         }
 
         /// <summary>
         /// Does not do anything.
         /// </summary>
-        protected override void ExecuteOnServer()
+        public override void ExecuteOnServer()
         {
             // Intentionally left blank.
         }

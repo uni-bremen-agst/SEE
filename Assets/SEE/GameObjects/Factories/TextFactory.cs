@@ -21,12 +21,22 @@ namespace SEE.GO
         /// <summary>
         /// Name of the font used for the text. This must be a font with portal information.
         /// </summary>
-        private const string portalFontName = "Fonts & Materials/LiberationSans SDF - Portal";
+        private const string portalFontName = "Fonts/LiberationSans SDF - Portal";
+
+        /// <summary>
+        /// Name of the font used for the text. This must be a font with portal information.
+        /// </summary>
+        private const string portalOverlayFontName = "Fonts/LiberationSans SDF - Portal Overlay";
 
         /// <summary>
         /// The font asset used for all texts created by this <see cref="TextFactory"/>.
         /// </summary>
-        private static readonly TMP_FontAsset fontAsset = NewFont();
+        private static readonly TMP_FontAsset fontAsset = NewFont(overlay: false);
+
+        /// <summary>
+        /// The font asset used for all texts created by this <see cref="TextFactory"/>.
+        /// </summary>
+        private static readonly TMP_FontAsset fontOverlayAsset = NewFont(overlay: true);
 
         /// <summary>
         /// Retrieves the font asset <see cref="portalFontName"/> that should be used for all texts
@@ -34,9 +44,9 @@ namespace SEE.GO
         /// asset will be used instead and an error message will be logged.
         /// </summary>
         /// <returns>font asset to be used for all texts</returns>
-        private static TMP_FontAsset NewFont()
+        private static TMP_FontAsset NewFont(bool overlay)
         {
-            TMP_FontAsset fontAsset = Resources.Load<TMP_FontAsset>(portalFontName);
+            TMP_FontAsset fontAsset = Resources.Load<TMP_FontAsset>(overlay ? portalOverlayFontName : portalFontName);
             if (fontAsset == null)
             {
                 Debug.LogError($"Font {portalFontName} not found. Using default font.\n");
@@ -87,11 +97,12 @@ namespace SEE.GO
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: black)</param>
+        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithSize(AbstractSEECity city, string text, Vector3 position, float fontSize, bool lift = true,
-                                                 Color? textColor = null)
+        public static GameObject GetTextWithSize(AbstractSEECity city, string text, Vector3 position, float fontSize,
+                                                 bool lift = true, Color? textColor = null, bool overlay = false)
         {
-            CreateText(city, text, position, textColor, out TextMeshPro tm, out GameObject textObject);
+            CreateText(city, text, position, textColor, overlay, out TextMeshPro tm, out GameObject textObject);
 
             tm.fontSize = fontSize;
 
@@ -113,11 +124,12 @@ namespace SEE.GO
         /// <param name="lift">if true, the text will be lifted up by its extent; that is, its y position is actually
         /// the bottom line (position.y + extents.y)</param>
         /// <param name="textColor">the color of the text (default: <see cref="textColorDefault"/>)</param>
+        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
         /// <returns>the game object representing the text</returns>
-        public static GameObject GetTextWithWidth(AbstractSEECity city, string text, Vector3 position, float width, bool lift = true,
-            Color? textColor = null)
+        public static GameObject GetTextWithWidth(AbstractSEECity city, string text, Vector3 position, float width,
+                                                  bool lift = true, Color? textColor = null, bool overlay = false)
         {
-            CreateText(city, text, position, textColor, out TextMeshPro tm, out GameObject textObject);
+            CreateText(city, text, position, textColor, overlay, out TextMeshPro tm, out GameObject textObject);
 
             RectTransform rect = tm.GetComponent<RectTransform>();
             // We set width and height of the rectangle and leave the actual size to Unity,
@@ -187,19 +199,23 @@ namespace SEE.GO
         /// <param name="text">The text to be used</param>
         /// <param name="position">the center position at which to create the GameObject</param>
         /// <param name="textColor">the color of the text</param>
+        /// <param name="overlay">if true, the text will be drawn on top of everything else</param>
         /// <param name="tm">the TextMeshPro component which will be attached to <paramref name="textObject"/></param>
         /// <param name="textObject">the GameObject containing the <see cref="TextMeshPro"/> component <paramref name="tm"/></param>
-        private static void CreateText(AbstractSEECity city, string text, Vector3 position, Color? textColor, out TextMeshPro tm,
-            out GameObject textObject)
+        private static void CreateText(AbstractSEECity city, string text, Vector3 position, Color? textColor,
+                                       bool overlay, out TextMeshPro tm, out GameObject textObject)
         {
             textObject = new GameObject("Text " + text)
             {
-                tag = Tags.Text
+                tag = Tags.Text,
+                transform =
+                {
+                    position = position
+                }
             };
-            textObject.transform.position = position;
 
             tm = textObject.AddComponent<TextMeshPro>();
-            tm.font = fontAsset;
+            tm.font = overlay ? fontOverlayAsset : fontAsset;
             tm.text = text;
             tm.color = textColor ?? textColorDefault;
             tm.alignment = TextAlignmentOptions.Center;
@@ -211,6 +227,15 @@ namespace SEE.GO
         /// for a particular city (key) will receive the same material (value).
         /// </summary>
         private static readonly Dictionary<AbstractSEECity, Material> seenCities = new();
+
+        /// <summary>
+        /// A mapping of seen cities to the overlay materials used for their texts. Every text created
+        /// for a particular city (key) will receive the same overlay material (value).
+        ///
+        /// This differs from <see cref="seenCities"/> in that the overlay material is used for texts that
+        /// should be drawn on top of everything else.
+        /// </summary>
+        private static readonly Dictionary<AbstractSEECity, Material> seenCitiesOverlay = new();
 
         /// <summary>
         /// Assigns a font material to <paramref name="tm"/> based on <paramref name="city"/>.
@@ -226,10 +251,12 @@ namespace SEE.GO
         /// <param name="tm">the text whose fontMaterial might need to be set</param>
         private static void AssignFontMaterial(AbstractSEECity city, TextMeshPro tm)
         {
-            if (!seenCities.TryGetValue(city, out Material material))
+            bool overlay = tm.font == fontOverlayAsset;
+            IDictionary<AbstractSEECity, Material> materials = overlay ? seenCities : seenCitiesOverlay;
+            if (!materials.TryGetValue(city, out Material material))
             {
-                material = new Material(fontAsset.material);
-                seenCities[city] = material;
+                material = new Material((overlay ? fontOverlayAsset : fontAsset).material);
+                materials[city] = material;
             }
             tm.fontMaterial = material;
         }

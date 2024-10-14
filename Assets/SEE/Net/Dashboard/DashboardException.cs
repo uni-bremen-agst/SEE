@@ -27,7 +27,7 @@ namespace SEE.Net.Dashboard
         /// Instantiates a new <see cref="DashboardException"/> with the given <see cref="inner"/> exception.
         /// </summary>
         /// <param name="inner">Exception which occurred when accessing the dashboard API.</param>
-        public DashboardException(Exception inner) : this("An error occurred while retrieving dashboard data.", inner)
+        public DashboardException(Exception inner) : this($"An error occurred while retrieving dashboard data ({inner.Message}).", inner)
         {
             // Intentionally empty, the other constructor that's being called is already doing all the work.
         }

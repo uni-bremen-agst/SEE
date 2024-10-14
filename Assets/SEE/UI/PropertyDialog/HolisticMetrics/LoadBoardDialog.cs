@@ -2,6 +2,7 @@ using SEE.Controls;
 using SEE.Game.HolisticMetrics;
 using UnityEngine;
 using SEE.Utils;
+using SEE.UI.Notification;
 
 namespace SEE.UI.PropertyDialog.HolisticMetrics
 {
@@ -25,20 +26,30 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         public void Open()
         {
+            string[] savedFileNames = ConfigManager.GetSavedFileNames();
+            if (savedFileNames.Length == 0)
+            {
+                ShowNotification.Error("No saved boards", "There are no saved files to load a board from.");
+                return;
+            }
+
+            const string title = "Select file";
+            const string description = "Select the file to load the board configuration from.";
+
             Dialog = new GameObject("Load board configuration dialog");
             PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Load board configuration dialog";
 
             selectedFile = Dialog.AddComponent<SelectionProperty>();
-            selectedFile.Name = "Select file";
-            selectedFile.Description = "Select the file to load the board configuration from";
-            selectedFile.AddOptions(ConfigManager.GetSavedFileNames());
-            selectedFile.Value = ConfigManager.GetSavedFileNames()[0];
+            selectedFile.Name = title;
+            selectedFile.Description = description;
+            selectedFile.AddOptions(savedFileNames);
+            selectedFile.Value = savedFileNames[0];
             group.AddProperty(selectedFile);
 
             PropertyDialog = Dialog.AddComponent<PropertyDialog>();
-            PropertyDialog.Title = "Select file";
-            PropertyDialog.Description = "Select file to load the board configuration from";
+            PropertyDialog.Title = title;
+            PropertyDialog.Description = description;
             PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Document");
             PropertyDialog.AddGroup(group);
 

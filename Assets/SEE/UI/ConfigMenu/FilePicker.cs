@@ -100,7 +100,7 @@ namespace SEE.UI.ConfigMenu
                                            allowMultiSelection: false,
                                            pickMode: PickMode,
                                            title: "Pick a file/folder",
-                                           initialPath: DataPathInstance.RootPath
+                                           initialPath: DataPathInstance.RootFileSystemPath
                 );
 
                 // Find the newly opened file browser and optimize it for VR.
@@ -144,7 +144,7 @@ namespace SEE.UI.ConfigMenu
                throw new Exception("Received no paths from file browser.");
             }
             // There should only be a single path since multiple selections are forbidden.
-            DataPathInstance.Set(paths[0]);
+            DataPathInstance.Path = paths[0];
             UpdateDropdownAndInput();
         }
 

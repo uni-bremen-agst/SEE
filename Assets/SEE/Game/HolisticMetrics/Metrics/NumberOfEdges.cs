@@ -15,6 +15,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <returns>The edge count of the given <paramref name="city"/></returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
+            base.Refresh(city);
+
             return new MetricValueRange
             {
                 DecimalPlaces = 0,

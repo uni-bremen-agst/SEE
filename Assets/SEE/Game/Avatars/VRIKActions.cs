@@ -1,7 +1,6 @@
 ﻿using RootMotion.FinalIK;
 using SEE.GO;
 using SEE.Utils;
-using UMA.CharacterSystem;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -22,51 +21,48 @@ namespace SEE.Game.Avatars
         /// If executed by the remote avatar, the usual positional and rotational model
         /// connections are established.
         /// </summary>
-        public static void ExecuteOnClient(bool isRequester, ulong networkObjectID, string animatorForVrik,
+        public static void ExecuteOnClient(ulong networkObjectID, string animatorForVrik,
             Vector3 remoteHeadPosition, Vector3 remoteRightHandPosition, Vector3 remoteLeftHandPosition,
             Quaternion remoteHeadRotation, Quaternion remoteRightHandRotation, Quaternion remoteLeftHandRotation)
         {
-            if (!isRequester)
+            NetworkManager networkManager = NetworkManager.Singleton;
+
+            if (networkManager != null)
             {
-                NetworkManager networkManager = NetworkManager.Singleton;
-
-                if (networkManager != null)
+                NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
+                if (networkSpawnManager.SpawnedObjects.TryGetValue(networkObjectID,
+                        out NetworkObject networkObject))
                 {
-                    NetworkSpawnManager networkSpawnManager = networkManager.SpawnManager;
-                    if (networkSpawnManager.SpawnedObjects.TryGetValue(networkObjectID,
-                            out NetworkObject networkObject))
+                    if (networkObject.gameObject.TryGetComponent(out VRIK vrik))
                     {
-                        if (networkObject.gameObject.TryGetComponent(out VRIK vrik))
-                        {
-                            //Setup usual positional and rotational model connections.
-                            GameObject headTarget = vrik.solver.spine.headTarget.gameObject;
-                            GameObject rightArm = vrik.solver.rightArm.target.gameObject;
-                            GameObject leftArm = vrik.solver.leftArm.target.gameObject;
+                        //Setup usual positional and rotational model connections.
+                        GameObject headTarget = vrik.solver.spine.headTarget.gameObject;
+                        GameObject rightArm = vrik.solver.rightArm.target.gameObject;
+                        GameObject leftArm = vrik.solver.leftArm.target.gameObject;
 
-                            headTarget.transform.position = remoteHeadPosition;
-                            leftArm.transform.position = remoteLeftHandPosition;
-                            rightArm.transform.position = remoteRightHandPosition;
+                        headTarget.transform.position = remoteHeadPosition;
+                        leftArm.transform.position = remoteLeftHandPosition;
+                        rightArm.transform.position = remoteRightHandPosition;
 
-                            headTarget.gameObject.transform.rotation = remoteHeadRotation;
-                            leftArm.transform.rotation = remoteLeftHandRotation;
-                            rightArm.transform.rotation = remoteRightHandRotation;
-                        }
-                        else
-                        {
-                            SetupRemotePlayer(networkObject, animatorForVrik,
-                                remoteHeadPosition, remoteRightHandPosition, remoteLeftHandPosition,
-                                remoteHeadRotation, remoteRightHandRotation, remoteLeftHandRotation);
-                        }
+                        headTarget.gameObject.transform.rotation = remoteHeadRotation;
+                        leftArm.transform.rotation = remoteLeftHandRotation;
+                        rightArm.transform.rotation = remoteRightHandRotation;
                     }
                     else
                     {
-                        Debug.LogError($"There is no network object with ID {networkObjectID}.\n");
+                        SetupRemotePlayer(networkObject, animatorForVrik,
+                            remoteHeadPosition, remoteRightHandPosition, remoteLeftHandPosition,
+                            remoteHeadRotation, remoteRightHandRotation, remoteLeftHandRotation);
                     }
                 }
                 else
                 {
-                    Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
+                    Debug.LogError($"There is no network object with ID {networkObjectID}.\n");
                 }
+            }
+            else
+            {
+                Debug.LogError($"There is no component {typeof(NetworkManager)} in the scene.\n");
             }
         }
 
@@ -212,24 +208,16 @@ namespace SEE.Game.Avatars
         /// <param name="animatorForVrik">The to be replaced Animator</param>
         public static void ReplaceAnimator(GameObject gameObject, string animatorForVrik)
         {
-            if (gameObject.TryGetComponentOrLog(out DynamicCharacterAvatar avatar))
-            {
-                RuntimeAnimatorController animationController =
-                    Resources.Load<RuntimeAnimatorController>(animatorForVrik);
-                if (animationController != null)
-                {
-                    avatar.raceAnimationControllers.defaultAnimationController = animationController;
+            RuntimeAnimatorController animationController = Resources.Load<RuntimeAnimatorController>(animatorForVrik);
 
-                    if (gameObject.TryGetComponentOrLog(out Animator animator))
-                    {
-                        animator.runtimeAnimatorController = animationController;
-                        Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
-                    }
-                }
-                else
-                {
-                    Debug.LogError($"Could not load the animation controller at '{animatorForVrik}.'\n");
-                }
+            if (gameObject.TryGetComponentOrLog(out Animator animator))
+            {
+                animator.runtimeAnimatorController = animationController;
+                Debug.Log($"Loaded animation controller {animator.name} is human: {animator.isHuman}\n");
+            }
+            else
+            {
+                Debug.LogError($"Could not load the animation controller at '{animatorForVrik}.'\n");
             }
         }
     }

@@ -20,12 +20,9 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// <summary>
         /// Triggers 'SyncPath' on <see cref="RuntimeTabMenu"/>.
         /// </summary>
-        protected override void ExecuteOnClient()
+        public override void ExecuteOnClient()
         {
-            if (!IsRequester())
-            {
-                RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
-            }
+            RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncPath?.Invoke(WidgetPath, Value, IsAbsolute);
         }
     }
 }

@@ -1,5 +1,4 @@
 using SEE.Utils.Config;
-using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,6 +91,12 @@ namespace SEE.Game.City
         /// </summary>
         private const string deletionBeamColorLabel = "DeletionBeamColor";
 
+        /// <summary>
+        /// Saves the attributes to the configuration file under the given <paramref name="label"/>
+        /// using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">used to write the attributes</param>
+        /// <param name="label">the label under which the attributes are written</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -103,13 +108,21 @@ namespace SEE.Game.City
             writer.EndGroup();
         }
 
-        public void Restore(Dictionary<string, object> attributes)
+        /// <summary>
+        /// Restores the marker values from the given <paramref name="attributes"/> looked up
+        /// under the given <paramref name="label"/>
+        /// </summary>
+        public void Restore(Dictionary<string, object> attributes, string label)
         {
-            ConfigIO.Restore(attributes, markerHeightLabel, ref MarkerHeight);
-            ConfigIO.Restore(attributes, markerWidthLabel, ref MarkerWidth);
-            ConfigIO.Restore(attributes, additionBeamColorLabel, ref AdditionBeamColor);
-            ConfigIO.Restore(attributes, changeBeamColorLabel, ref ChangeBeamColor);
-            ConfigIO.Restore(attributes, deletionBeamColorLabel, ref DeletionBeamColor);
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                ConfigIO.Restore(values, markerHeightLabel, ref MarkerHeight);
+                ConfigIO.Restore(values, markerWidthLabel, ref MarkerWidth);
+                ConfigIO.Restore(values, additionBeamColorLabel, ref AdditionBeamColor);
+                ConfigIO.Restore(values, changeBeamColorLabel, ref ChangeBeamColor);
+                ConfigIO.Restore(values, deletionBeamColorLabel, ref DeletionBeamColor);
+            }
         }
         #endregion
     }

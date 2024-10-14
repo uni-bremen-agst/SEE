@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Tools;
 using UnityEngine;
 
 namespace SEE.GO
@@ -17,11 +19,12 @@ namespace SEE.GO
         /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
         /// <param name="erosionScalingFactor">the factor by which the erosion icons shall be scaled</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
-                             IScale scaler, float erosionScalingFactor)
+                             IScale scaler, float erosionScalingFactor, bool aggregated = false)
         {
             this.issueMap = issueMap;
             this.scaler = scaler;
             this.erosionScalingFactor = erosionScalingFactor;
+            this.aggregated = aggregated;
         }
 
         /// <summary>
@@ -45,6 +48,11 @@ namespace SEE.GO
         private readonly float erosionScalingFactor;
 
         /// <summary>
+        /// Whether to use aggregated metrics for the erosion issues if the original metric is not available.
+        /// </summary>
+        private readonly bool aggregated;
+
+        /// <summary>
         /// Creates sprites for software-erosion indicators for all given game nodes as children.
         /// </summary>
         /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
@@ -55,6 +63,29 @@ namespace SEE.GO
                 NodeRef nodeRef = block.GetComponent<NodeRef>();
                 AddErosionIssues(nodeRef);
             }
+        }
+
+        /// <summary>
+        /// Whether the given <paramref name="gameNode"/> already has an icon for the given erosion <paramref name="issue"/>.
+        /// </summary>
+        /// <param name="gameNode">The game node to check for the icon</param>
+        /// <param name="issue">The erosion issue to check for</param>
+        /// <returns>Whether the icon is already present</returns>
+        private static bool HasIconAlready(NodeRef gameNode, IconFactory.Erosion issue)
+        {
+            return gameNode.transform.Find(GetIconName(gameNode, issue)) != null;
+        }
+
+        /// <summary>
+        /// Returns the name of the icon for the given erosion <paramref name="issue"/> and the given <paramref name="gameNode"/>.
+        /// This refers to the game object's name, not the filename of the sprite.
+        /// </summary>
+        /// <param name="gameNode">The game node to get the icon name for</param>
+        /// <param name="issue">The erosion issue to get the icon name for</param>
+        /// <returns>The name of the icon</returns>
+        private static string GetIconName(NodeRef gameNode, IconFactory.Erosion issue)
+        {
+            return $"{ErosionSpritePrefix} {IconFactory.ToString(issue)} {gameNode.Value.SourceName}";
         }
 
         /// <summary>
@@ -69,16 +100,24 @@ namespace SEE.GO
             Node node = gameNode.Value;
 
             // The list of sprites for the erosion issues.
-            List<GameObject> sprites = new List<GameObject>();
+            List<GameObject> sprites = new();
 
             // Create and scale the sprites and add them to the list of sprites.
-            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap)
+            foreach (KeyValuePair<string, IconFactory.Erosion> issue in issueMap.Where(issue => !HasIconAlready(gameNode, issue.Value)))
             {
-                if (node.TryGetNumeric(issue.Key, out float value) && value > 1.0)
+                string key = issue.Key;
+                bool hasIssue = node.TryGetNumeric(key, out float value);
+                if (!hasIssue && aggregated)
+                {
+                    // In this case, we try to get an aggregated value instead (if configured).
+                    key += MetricAggregator.SumExtension;
+                    hasIssue = node.TryGetNumeric(key, out value);
+                }
+                if (hasIssue && value >= 1.0)
                 {
                     // Scale the erosion issue by normalization set in relation to the
                     // maximum value of the normalized metric. Hence, this value is in [0,1].
-                    float metricScale = scaler.GetRelativeNormalizedValueInLevel(issue.Key, node);
+                    float metricScale = scaler.GetRelativeNormalizedValueInLevel(key, node);
 
                     GameObject sprite = IconFactory.Instance.GetIcon(Vector3.zero, issue.Value,
                                                                      value.ToString(CultureInfo.InvariantCulture),
@@ -86,8 +125,8 @@ namespace SEE.GO
                                                                                Mathf.Lerp(0.75f, 1f, metricScale)));
 
                     // NOTE: The EROSION_SPRITE_PREFIX must be present here,
-                    // otherwise partial erosion display won't work!
-                    sprite.name = $"{ErosionSpritePrefix} {sprite.name} {node.SourceName}";
+                    //       otherwise partial erosion display won't work!
+                    sprite.name = GetIconName(gameNode, issue.Value);
 
                     Vector3 spriteSize = GetSizeOfSprite(sprite);
                     // Scale the sprite to one Unity unit.

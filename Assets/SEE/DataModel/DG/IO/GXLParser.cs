@@ -15,24 +15,12 @@ namespace SEE.DataModel.DG.IO
     public class GXLParser : GraphIO, IDisposable
     {
         /// <summary>
-        /// Creates a new GXL Parser for the given <paramref name="filename"/>.
+        /// Creates a new GXL Parser.
         /// </summary>
-        /// <param name="gxl">Content of the GXL file that shall be parsed, given as a stream</param>
-        /// <param name="name">Name of the GXL file. Only used for display purposes in log messages</param>
         /// <param name="logger">Logger to use for log messages</param>
-        protected GXLParser(Stream gxl, string name = "[unknown]", ILogger logger = null)
+        protected GXLParser(ILogger logger = null)
         {
-            Name = name;
             Logger = logger;
-            XmlReaderSettings settings = new()
-            {
-                CloseInput = true,
-                IgnoreWhitespace = true,
-                IgnoreComments = true,
-                Async = true,
-                DtdProcessing = DtdProcessing.Parse
-            };
-            Reader = XmlReader.Create(gxl, settings);
         }
 
         /// <summary>
@@ -182,10 +170,25 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Loads the GXL file and parses it.
+        /// Processes the GXL data provided in the <paramref name="gxl"/> stream.
         /// </summary>
-        public virtual async UniTask LoadAsync(CancellationToken token = default)
+        /// <param name="gxl">Stream containing GXL data that shall be processed</param>
+        /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
+        public virtual async UniTask LoadAsync(Stream gxl, string name, CancellationToken token = default)
         {
+            Name = name;
+
+            XmlReaderSettings settings = new()
+            {
+                CloseInput = true,
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+                DtdProcessing = DtdProcessing.Ignore,
+                Async = true
+            };
+            Reader = XmlReader.Create(gxl, settings);
+
             // Preserves the last text content of an XML node seen,
             // e.g., "mystring" in <string>mystring</string>.
             // Defined only at the EndElement, e.g. </string> here.

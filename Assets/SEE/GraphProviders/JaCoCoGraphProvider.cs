@@ -12,7 +12,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from a JaCoCo XML report file and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class JaCoCoGraphProvider : FileBasedGraphProvider
+    public class JaCoCoGraphProvider : FileBasedSingleGraphProvider
     {
         /// <summary>
         /// Reads metrics from a JaCoCo XML report file and adds these to <paramref name="graph"/>.
@@ -28,8 +28,8 @@ namespace SEE.GraphProviders
         /// <exception cref="NotImplementedException">thrown in case <paramref name="graph"/> is
         /// null; this is currently not supported.</exception>
         public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
-                                                    Action<float> changePercentage = null,
-                                                    CancellationToken token = default)
+                                                          Action<float> changePercentage = null,
+                                                          CancellationToken token = default)
         {
             CheckArguments(city);
             if (graph == null)
@@ -39,15 +39,15 @@ namespace SEE.GraphProviders
             else
             {
                 await UniTask.SwitchToThreadPool();
-                await JaCoCoImporter.LoadAsync(graph, Path.Path);
+                await JaCoCoImporter.LoadAsync(graph, Path);
                 await UniTask.SwitchToMainThread();
                 return graph;
             }
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.JaCoCo;
+            return SingleGraphProviderKind.JaCoCo;
         }
     }
 }

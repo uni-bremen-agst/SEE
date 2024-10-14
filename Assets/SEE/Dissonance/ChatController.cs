@@ -1,4 +1,5 @@
 ﻿using Dissonance;
+using Dissonance.Config;
 using UnityEngine;
 
 namespace SEE.Dissonance
@@ -45,7 +46,8 @@ namespace SEE.Dissonance
                 return;
             }
 
-            Comms = Comms ?? FindObjectOfType<DissonanceComms>();
+            Comms ??= FindObjectOfType<DissonanceComms>();
+            DebugSettings.Instance.SetLevel((int) LogCategory.Recording, LogLevel.Error);
         }
 
         /// <summary>

@@ -18,6 +18,7 @@
 using System.Collections.Generic;
 using System.IO;
 using SEE.UI.Menu;
+using SEE.Utils;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Video;
@@ -107,24 +108,19 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
-        /// The path to the default-icon for an HelpSystemEntry in the nested menu.
+        /// The path to the default-icon for a <see cref="HelpSystemEntry"/> in the nested menu.
         /// </summary>
-        private const string entryIcon = "Materials/ModernUIPack/Eye";
+        private const char entryIcon = Icons.Eye;
 
         /// <summary>
-        /// The path to the default-icon for an RefEntry in the nested menu.
+        /// The path to the default-icon for a RefEntry in the nested menu.
         /// </summary>
-        private const string refIcon = "Materials/ModernUIPack/Plus";
+        private const char refIcon = '+';
 
         /// <summary>
         /// The LinkedListEntries of the currently selected HelpSystemEntry.
         /// </summary>
         public static LinkedList<HelpEntry> CurrentEntries;
-
-        /// <summary>
-        /// The space where the entry is inside.
-        /// </summary>
-        public static GameObject EntrySpace;
 
         /// <summary>
         /// The headline gameObject of the helpSystemEntry or rather the headline which is inside of the dynamicPanel.
@@ -150,20 +146,19 @@ namespace SEE.UI.HelpSystem
          LinkedList<HelpEntry> keywords,
          HelpSystemEntry entry = null)
         {
-            return new MenuEntry(selectAction: () => { Execute(entry, title, keywords, videoPath); },
-                                 unselectAction: null,
-                                 title: title,
-                                 description: description,
-                                 entryColor: entryColor,
-                                 icon: Resources.Load<Sprite>(entryIcon));
+            return new MenuEntry(SelectAction: () => Execute(entry, title, keywords, videoPath),
+                                 Title: title,
+                                 Description: description,
+                                 EntryColor: entryColor,
+                                 Icon: entryIcon);
         }
 
         /// <summary>
         /// Creates a new Ref-Entry for the HelpSystemMenu. That means, this entry contains a list of further entries,
-        /// which are opened as the lower hierachy-layer onclick. These entries are only responsible for the structure of the HelpSystemMenu,
+        /// which are opened as the lower hierarchy-layer onclick. These entries are only responsible for the structure of the HelpSystemMenu,
         /// they are not executing an HelpSystemEntry.
         /// </summary>
-        /// <param name="innerEntries">The inner Entries, which are displayed onclick as the lower hierachy-layer.</param>
+        /// <param name="innerEntries">The inner Entries, which are displayed onclick as the lower hierarchy-layer.</param>
         /// <param name="title">The title of the RefEntry.</param>
         /// <param name="description">The description of the RefEntry, displayed as a tooltip.</param>
         /// <param name="entryColor">The color of the Ref-Entry.</param>
@@ -174,18 +169,18 @@ namespace SEE.UI.HelpSystem
                                                   title: title,
                                                   description: description,
                                                   entryColor: entryColor,
-                                                  icon: Resources.Load<Sprite>(refIcon));
+                                                  icon: refIcon);
         }
 
         /// <summary>
         /// Creates the Main-Menu of the HelpSystemMenu.
-        /// More specific, it creates the highest Hierachy-Layer,
+        /// More specific, it creates the highest Hierarchy-Layer,
         /// where new Layers can be attached to with the functions above.
         /// </summary>
         /// <param name="title">The title of the HelpSystem-MainMenu.</param>
         /// <param name="description">The description of the HelpSystem-MainMenu.</param>
         /// <param name="icon">The icon of the HelpSystem-MainMenu.</param>
-        /// <param name="mainMenuEntries">The MenuEntries which are displayed inside of the MainMenu for more hierachy-layers.</param>
+        /// <param name="mainMenuEntries">The MenuEntries which are displayed inside of the MainMenu for more hierarchy-layers.</param>
         /// <returns>The Main-Menu as a NestedMenu.</returns>
         public static NestedListMenu CreateMainMenu(string title, string description, string icon, List<MenuEntry> mainMenuEntries)
         {
@@ -208,7 +203,7 @@ namespace SEE.UI.HelpSystem
         /// <param name="entryTitle">The title of the HelpSystemEntry.</param>
         /// <param name="videoPath">The path of the video which should be displayed.</param>
         /// <param name="instructions">All instructions which should be displayed and spoken aloud.</param>
-        public static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<HelpEntry> instructions, string videoPath)
+        private static void Execute(HelpSystemEntry helpSystem, string entryTitle, LinkedList<HelpEntry> instructions, string videoPath)
         {
             helpSystem.EntryShown = true;
             helpSystem.ShowEntry();

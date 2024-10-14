@@ -1,6 +1,4 @@
-using System.Linq;
 using DG.Tweening;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -34,19 +32,27 @@ namespace SEE.Game.Operator
         private const string labelPrefix = "Label ";
 
         /// <summary>
-        /// Updates the position of the attached label, including its text and line.
+        /// Updates the position of the attached label to the given <paramref name="labelBase"/>,
+        /// including its text and line.
         /// </summary>
-        /// <param name="duration">The duration of the animation.</param>
-        private static void UpdateLabelLayout(float duration)
+        /// <param name="labelBase">The position on the surface of the node where the label should be placed.</param>
+        public void UpdateLabelLayout(Vector3 labelBase)
         {
-            // Assumption: There are only very few active labels, compared to all active and inactive labels
-            //             that may exist in the descendants of this node. Hence, we go through all active ones.
-            foreach (NodeOperator nodeOperator in ShowLabel.DisplayedLabelOperators.Where(x => x.labelAlpha.TargetValue > 0f))
-            {
-                nodeOperator.labelTextPosition.AnimateTo(nodeOperator.DesiredLabelTextPosition, duration);
-                nodeOperator.labelStartLinePosition.AnimateTo(nodeOperator.DesiredLabelStartLinePosition, duration);
-                nodeOperator.labelEndLinePosition.AnimateTo(nodeOperator.DesiredLabelEndLinePosition, duration);
-            }
+            DesiredLabelStartLinePosition = labelBase;
+            // Adding a small duration to make the label appear more smoothly.
+            float duration = ToDuration(0.2f);
+            labelTextPosition.AnimateTo(DesiredLabelTextPosition, duration);
+            labelStartLinePosition.AnimateTo(DesiredLabelStartLinePosition, duration);
+            labelEndLinePosition.AnimateTo(DesiredLabelEndLinePosition, duration);
+        }
+
+        /// <summary>
+        /// Returns true if the label is not empty.
+        /// </summary>
+        /// <returns>True if the label is not empty.</returns>
+        public bool LabelIsNotEmpty()
+        {
+            return !string.IsNullOrWhiteSpace(labelText?.text);
         }
 
         /// <summary>
@@ -74,6 +80,7 @@ namespace SEE.Game.Operator
                                                         startLabelPosition,
                                                         fontSize,
                                                         lift: true,
+                                                        overlay: true,
                                                         textColor: textColor);
                 nodeLabel.name = labelPrefix + shownText;
                 nodeLabel.transform.SetParent(gameObject.transform);
@@ -112,7 +119,7 @@ namespace SEE.Game.Operator
         {
             get
             {
-                Vector3 endLabelPosition = gameObject.GetTop(t => !t.name.StartsWith(labelPrefix));
+                Vector3 endLabelPosition = DesiredLabelStartLinePosition;
                 if (labelAlpha.TargetValue > 0)
                 {
                     // Only put line and label up if the label should actually be shown.
@@ -126,7 +133,7 @@ namespace SEE.Game.Operator
         /// <summary>
         /// Desired starting position of the label's line.
         /// </summary>
-        private Vector3 DesiredLabelStartLinePosition => gameObject.GetRoofCenter();
+        private Vector3 DesiredLabelStartLinePosition;
 
         /// <summary>
         /// Desired end position of the label's line.

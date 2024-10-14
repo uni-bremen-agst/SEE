@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -75,7 +76,13 @@ namespace SEE.Tools.LSP
         /// Whether to log the communication between the language server and SEE to a temporary file.
         /// </summary>
         [field: SerializeField, HideInInspector]
-        public bool LogLSP { get; set; }
+        public bool LogLSP { get; set; } = true;
+
+        /// <summary>
+        /// Whether to use LSP capabilities in code windows.
+        /// </summary>
+        [field: SerializeField, HideInInspector]
+        public bool UseInCodeWindows { get; set; }
 
         /// <summary>
         /// The language client that is used to communicate with the language server.
@@ -103,9 +110,24 @@ namespace SEE.Tools.LSP
         public TimeSpan TimeoutSpan = TimeSpan.FromSeconds(2);
 
         /// <summary>
+        /// The URI of the project.
+        /// </summary>
+        public Uri ProjectUri => new(ProjectPath, UriKind.Absolute);
+
+        /// <summary>
         /// The capabilities of the language server.
         /// </summary>
         public IServerCapabilities ServerCapabilities => Client?.ServerSettings.Capabilities;
+
+        /// <summary>
+        /// The server-published diagnostics that have not been handled yet.
+        /// </summary>
+        private readonly ConcurrentQueue<PublishDiagnosticsParams> unhandledDiagnostics = new();
+
+        /// <summary>
+        /// A dictionary mapping from file paths to the diagnostics that have been published for that file.
+        /// </summary>
+        private readonly Dictionary<string, List<PublishDiagnosticsParams>> savedDiagnostics = new();
 
         /// <summary>
         /// The capabilities of the language client.
@@ -152,6 +174,74 @@ namespace SEE.Tools.LSP
                         ValueSet = Container.From(SymbolTag.Deprecated)
                     },
                     LabelSupport = false
+                },
+                Diagnostic = new DiagnosticClientCapabilities
+                {
+                    RelatedDocumentSupport = true
+                },
+                PublishDiagnostics = new PublishDiagnosticsCapability
+                {
+                    RelatedInformation = true,
+                    VersionSupport = false,
+                    TagSupport = new Supports<PublishDiagnosticsTagSupportCapabilityOptions>(new PublishDiagnosticsTagSupportCapabilityOptions
+                    {
+                        ValueSet = Container.From(DiagnosticTag.Unnecessary, DiagnosticTag.Deprecated)
+                    })
+                },
+                SemanticTokens = new SemanticTokensCapability()
+                {
+                    Requests = new SemanticTokensCapabilityRequests()
+                    {
+                        Full = new Supports<SemanticTokensCapabilityRequestFull>()
+                    },
+                    Formats = new[]
+                    {
+                        SemanticTokenFormat.Relative
+                    },
+                    TokenModifiers = new[]
+                    {
+                        SemanticTokenModifier.Deprecated,
+                        SemanticTokenModifier.Static,
+                        SemanticTokenModifier.Abstract,
+                        SemanticTokenModifier.Readonly,
+                        SemanticTokenModifier.Async,
+                        SemanticTokenModifier.Declaration,
+                        SemanticTokenModifier.Definition,
+                        SemanticTokenModifier.Documentation,
+                        SemanticTokenModifier.Modification,
+                        SemanticTokenModifier.DefaultLibrary
+                    },
+                    TokenTypes = new[]
+                    {
+                        SemanticTokenType.Comment,
+                        SemanticTokenType.Keyword,
+                        SemanticTokenType.String,
+                        SemanticTokenType.Number,
+                        SemanticTokenType.Regexp,
+                        SemanticTokenType.Operator,
+                        SemanticTokenType.Namespace,
+                        SemanticTokenType.Type,
+                        SemanticTokenType.Struct,
+                        SemanticTokenType.Class,
+                        SemanticTokenType.Interface,
+                        SemanticTokenType.Enum,
+                        SemanticTokenType.TypeParameter,
+                        SemanticTokenType.Function,
+                        SemanticTokenType.Method,
+                        SemanticTokenType.Property,
+                        SemanticTokenType.Macro,
+                        SemanticTokenType.Variable,
+                        SemanticTokenType.Parameter,
+                        SemanticTokenType.Label,
+                        SemanticTokenType.Modifier,
+                        SemanticTokenType.Event,
+                        SemanticTokenType.EnumMember,
+                        SemanticTokenType.Decorator
+                    },
+                    OverlappingTokenSupport = false,
+                    MultilineTokenSupport = false,
+                    ServerCancelSupport = false,
+                    AugmentsSyntaxTokens = false
                 }
             },
             Window = new WindowClientCapabilities
@@ -189,6 +279,8 @@ namespace SEE.Tools.LSP
                 return;
             }
 
+            savedDiagnostics.Clear();
+            unhandledDiagnostics.Clear();
             HashSet<ProgressToken> initialWork = new();
             IDisposable spinner = LoadingSpinner.ShowIndeterminate("Starting language server...");
             try
@@ -223,14 +315,8 @@ namespace SEE.Tools.LSP
                     string tempDir = Path.GetTempPath();
                     string outputPath = Path.Combine(tempDir, "outputLogLsp.txt");
                     string inputPath = Path.Combine(tempDir, "inputLogLsp.txt");
-                    if (File.Exists(outputPath))
-                    {
-                        File.Delete(outputPath);
-                    }
-                    if (File.Exists(inputPath))
-                    {
-                        File.Delete(inputPath);
-                    }
+                    FileIO.DeleteIfExists(outputPath);
+                    FileIO.DeleteIfExists(inputPath);
                     outputLog = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                     inputLog = new FileStream(inputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
                 }
@@ -256,6 +342,7 @@ namespace SEE.Tools.LSP
                                                           .WithInitializationOptions(Server.InitOptions)
                                                           .DisableProgressTokens()
                                                           .WithWorkspaceFolder(ProjectPath, "Main")
+                                                          .OnPublishDiagnostics(HandleDiagnostics)
                                                           .OnLogMessage(LogMessage)
                                                           .OnShowMessage(ShowMessage)
                                                           .OnWorkDoneProgressCreate(HandleInitialWorkDoneProgress));
@@ -296,14 +383,26 @@ namespace SEE.Tools.LSP
                 }
             }
 
-            async UniTaskVoid MonitorInitialWorkDoneProgress(ProgressToken token)
+            async UniTaskVoid MonitorInitialWorkDoneProgress(ProgressToken progressToken)
             {
-                await foreach (WorkDoneProgress _ in Client.WorkDoneManager.Monitor(token).ToUniTaskAsyncEnumerable()
+                await foreach (WorkDoneProgress _ in Client.WorkDoneManager.Monitor(progressToken).ToUniTaskAsyncEnumerable()
                                                            .Where(x => x.Kind == WorkDoneProgressKind.End))
                 {
-                    initialWork.Remove(token);
+                    initialWork.Remove(progressToken);
                 }
             }
+        }
+
+        /// <summary>
+        /// Handles the diagnostics published by the language server by storing them
+        /// in the <see cref="unhandledDiagnostics"/> queue, as well as
+        /// in the <see cref="savedDiagnostics"/> dictionary.
+        /// </summary>
+        /// <param name="diagnosticsParams">The parameters of the diagnostics.</param>
+        private void HandleDiagnostics(PublishDiagnosticsParams diagnosticsParams)
+        {
+            unhandledDiagnostics.Enqueue(diagnosticsParams);
+            savedDiagnostics.GetOrAdd(diagnosticsParams.Uri.GetFileSystemPath(), () => new()).Add(diagnosticsParams);
         }
 
         /// <summary>
@@ -313,6 +412,12 @@ namespace SEE.Tools.LSP
         /// <param name="showMessageParams">The parameters of the ShowMessage notification.</param>
         private void ShowMessage(ShowMessageParams showMessageParams)
         {
+            if (showMessageParams.Message.Contains("window/workDoneProgress/cancel"))
+            {
+                // Cancellation messages are sometimes sent to the language server even when they don't support them.
+                // We can safely ignore any failing cancellations.
+                return;
+            }
             string languageServerName = Server?.Name ?? "Language Server";
             switch (showMessageParams.Type)
             {
@@ -425,6 +530,53 @@ namespace SEE.Tools.LSP
         }
 
         /// <summary>
+        /// Requests diagnostics for the document at the given <paramref name="path"/>.
+        /// If the diagnostics are not available, or the diagnostics for the given document are unchanged
+        /// compared to the last call, the method returns <c>null</c>.
+        ///
+        /// Note that this is a very new feature (LSP 3.17) and not all language servers support it.
+        /// An alternative is to use the <see cref="GetUnhandledPublishedDiagnostics"/> method to
+        /// retrieve the diagnostics that have been published by the language server.
+        /// </summary>
+        /// <param name="path">The path to the document.</param>
+        /// <returns>The diagnostics for the document at the given path,
+        /// or <c>null</c> if the diagnostics are unchanged/unavailable.</returns>
+        public async UniTask<IEnumerable<Diagnostic>> PullDocumentDiagnosticsAsync(string path)
+        {
+            DocumentDiagnosticParams diagnosticsParams = new()
+            {
+                TextDocument = new TextDocumentIdentifier(path)
+            };
+            RelatedDocumentDiagnosticReport report = await Client.RequestDocumentDiagnostic(diagnosticsParams).AsTask();
+            DocumentDiagnosticReport diagnostics = report?.RelatedDocuments?[diagnosticsParams.TextDocument.Uri];
+            return (diagnostics as FullDocumentDiagnosticReport)?.Items;
+        }
+
+        /// <summary>
+        /// Retrieves the unhandled diagnostics that have been published by the language server.
+        /// </summary>
+        /// <returns>An enumerable of the unhandled published diagnostics.</returns>
+        public IEnumerable<PublishDiagnosticsParams> GetUnhandledPublishedDiagnostics()
+        {
+            while (unhandledDiagnostics.TryDequeue(out PublishDiagnosticsParams diagnostics))
+            {
+                yield return diagnostics;
+            }
+        }
+
+        /// <summary>
+        /// Returns the diagnostics that were saved for the given <paramref name="path"/>.
+        /// Note that this may not include every diagnostic the language server would have sent,
+        /// as we only listen to published diagnostics for a certain timeframe (see <see cref="LSPImporter"/>).
+        /// </summary>
+        /// <param name="path">The path for which to retrieve the diagnostics.</param>
+        /// <returns>The published diagnostics for the given path.</returns>
+        public IEnumerable<PublishDiagnosticsParams> GetPublishedDiagnosticsForPath(string path)
+        {
+            return savedDiagnostics.GetValueOrDefault(path) ?? Enumerable.Empty<PublishDiagnosticsParams>();
+        }
+
+        /// <summary>
         /// Retrieves all references to the symbol in the document with the given <paramref name="path"/> at the given
         /// <paramref name="line"/> and <paramref name="character"/>.
         /// </summary>
@@ -526,8 +678,20 @@ namespace SEE.Tools.LSP
                 {
                     Item = item
                 };
-                return AsyncUtils.ObserveUntilTimeout(t => Client.RequestCallHierarchyOutgoing(outgoingParams, t), TimeoutSpan).Select(x => x.To);
+                // We can not use the built-in method here and have to make the request manually,
+                // as the specialized method contains a bug (issue #1303 in OmniSharp/csharp-language-server-protocol).
+                // return AsyncUtils.ObserveUntilTimeout(t => Client.RequestCallHierarchyOutgoing(outgoingParams, t), TimeoutSpan).Select(x => x.To);
+                return AsyncUtils.RunWithTimeoutAsync(MakeOutgoingCallRequest(outgoingParams), TimeoutSpan)
+                                 .AsUniTaskAsyncEnumerable(logErrors: true)
+                                 .Select(y => y.To);
             });
+
+            Func<CancellationToken, UniTask<IEnumerable<CallHierarchyOutgoingCall>>> MakeOutgoingCallRequest(CallHierarchyOutgoingCallsParams outgoingParams)
+            {
+                return token => Client.SendRequest("callHierarchy/outgoingCalls", outgoingParams)
+                                      .Returning<IEnumerable<CallHierarchyOutgoingCall>>(token)
+                                      .AsUniTask(useCurrentSynchronizationContext: false);
+            }
         }
 
         /// <summary>
@@ -582,6 +746,22 @@ namespace SEE.Tools.LSP
                 Position = new Position(line, character),
             };
             return AsyncUtils.ObserveUntilTimeout(t => lspFunction(parameters, t), TimeoutSpan);
+        }
+
+        /// <summary>
+        /// Retrieves semantic tokens for the document at the given <paramref name="path"/>.
+        ///
+        /// Note that the returned semantic tokens may be empty if the document has not been fully analyzed yet.
+        /// </summary>
+        /// <param name="path">The path to the document.</param>
+        /// <returns>The semantic tokens for the document at the given path.</returns>
+        public async UniTask<SemanticTokens> GetSemanticTokensAsync(string path)
+        {
+            SemanticTokensParams parameters = new()
+            {
+                TextDocument = new TextDocumentIdentifier(path)
+            };
+            return await Client.RequestSemanticTokensFull(parameters);
         }
 
         /// <summary>

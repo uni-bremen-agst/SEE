@@ -15,7 +15,7 @@ namespace SEE.GraphProviders
     /// Reads metrics from the Axivion Dashboard and adds these to a graph.
     /// </summary>
     [Serializable]
-    public class DashboardGraphProvider: GraphProvider
+    public class DashboardGraphProvider: SingleGraphProvider
     {
         /// <summary>
         /// Whether metrics retrieved from the dashboard shall override existing metrics.
@@ -48,9 +48,9 @@ namespace SEE.GraphProviders
             return await MetricImporter.LoadDashboardAsync(graph, OverrideMetrics, startVersion, changePercentage, token);
         }
 
-        public override GraphProviderKind GetKind()
+        public override SingleGraphProviderKind GetKind()
         {
-            return GraphProviderKind.Dashboard;
+            return SingleGraphProviderKind.Dashboard;
         }
 
         #region Configuration file input/output

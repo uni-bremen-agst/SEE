@@ -21,7 +21,6 @@
         "GUID:343deaaf83e0cee4ca978e7df0b80d21",
         "GUID:0aaf0e45a00efed438c28168ee53a889",
         "GUID:efd4fd8bc6c56104a96b6054c7a775d6",
-        "GUID:f4cb6d2c24715bd4884385645277f011",
         "GUID:ad04e4f5949be9644989a3ea11bdc60e",
         "GUID:e40ba710768534012815d3193fa296cb",
         "GUID:3248779d86bd31747b5d2214f30b01ac",
@@ -34,7 +33,10 @@
         "GUID:3b8ed52f1b5c64994af4c4e0aa4b6c4b",
         "GUID:4d1e63f328d08c14b8f0029b5bb1aa40",
         "GUID:fe685ec1767f73d42b749ea8045bfe43",
-        "GUID:5c01796d064528144a599661eaab93a6"
+        "GUID:5c01796d064528144a599661eaab93a6",
+        "GUID:e0cd26848372d4e5c891c569017e11f1",
+        "GUID:13e34609dade4964e97712dc04b1cc6a",
+        "GUID:702f733b4deb246808c6ce84d93b5c9c"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -61,7 +63,6 @@
 		"Accord.Math.Core.dll",
         "Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.dll",
         "Newtonsoft.Json.dll",
-        "NetworkCommsDotNet.dll",
         "LibGit2Sharp.dll",
         "CsvHelper.dll",
         "OmniSharp.Extensions.LanguageClient.dll",
@@ -73,7 +74,9 @@
         "Markdig.dll",
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
-        "Microsoft.Extensions.FileSystemGlobbing.dll"
+        "Microsoft.Extensions.FileSystemGlobbing.dll",
+        "MediatR.dll",
+        "MediatR.Contracts.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
