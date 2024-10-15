@@ -11,8 +11,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 using SEE.Utils;
 
 /// <summary>
-/// This class is used, to open a
-/// radial menu in VR.
+/// This component is used to open a radial menu in VR.
 /// This script is based on this tutorial: https://www.youtube.com/watch?v=n-xPN1v3dvA
 /// </summary>
 public class RadialSelection : MonoBehaviour
@@ -20,74 +19,94 @@ public class RadialSelection : MonoBehaviour
     /// <summary>
     /// The number of radial-parts.
     /// </summary>
-    int numberOfRadialPart = 0;
+    private int numberOfRadialParts = 0;
+
     /// <summary>
     /// The prefab for the single radial-parts.
     /// </summary>
     public GameObject radialPartPrefab;
+
     /// <summary>
     /// The canvas on which the radial should be shown.
     /// </summary>
     public Transform radialPartCanvas;
+
     /// <summary>
     /// The angle between the radial-parts.
     /// </summary>
     public float angleBetweenPart = 10;
+
     /// <summary>
     /// The radial-parts which got spawned.
     /// </summary>
-    private List<GameObject> spawnedParts = new List<GameObject>();
+    private List<GameObject> spawnedParts = new();
+
     /// <summary>
     /// The transform of the controller.
     /// </summary>
     public Transform handTransform;
+
     /// <summary>
     /// The currently selected radial-part.
     /// </summary>
     private int currentSelectedRadialPart = -1;
+
     /// <summary>
     /// The selected radial-part.
     /// </summary>
     public UnityEvent<int> OnPartSelected;
+
     /// <summary>
-    /// The button, which triggers the radial-menu.
+    /// The button that triggers the radial-menu.
     /// </summary>
-    public InputActionReference radialMenu;
+    public InputActionReference RadialMenuActionRef;
+
     /// <summary>
     /// All actions, which are currently available.
     /// </summary>
     List<string> actions = new();
+
     /// <summary>
     /// Alle submenus and their entries.
     /// </summary>
-    List<(string, List<string>)> subMenus = new List<(string, List<string>)>();
+    List<(string, List<string>)> subMenus = new();
+
     /// <summary>
     /// All entry of a submenu.
+    /// This list is used, to swap between the main-menu and sub-menus.
+    /// The main menu contains all "main-actions" and the sub-menus more
+    /// specific sub-actions. We safe the main-actions here for the case,
+    /// that the user wants to go back to the main-menu.
     /// </summary>
-    List<string> menuEntrys = new();
+    List<string> menuEntries = new();
+
     /// <summary>
     /// This is used for the rotate-action, because in this case we
     /// have a dial, which is getting spawned, and should be despawned, when the action changes.
     /// </summary>
     GameObject actionObject;
+
     /// <summary>
     /// The position of the submenu.
     /// It should be the same, as the position from the mainmenu.
     /// </summary>
     Vector3? subMenuPosition;
+
     /// <summary>
     /// The rotation of the submenu.
     /// It should be the same, as the rotation from the mainmenu.
     /// </summary>
     Quaternion? subMenuRotation;
+
     /// <summary>
+    /// The selected HideMode.
     /// The hide-action is a special action, because it has sub-actions, which we need to access.
     /// </summary>
     public static HideModeSelector HideMode { get; set; }
-    // Awake is always called before any Start functions.
+
     private void Awake()
     {
-        radialMenu.action.performed += RadialMenu;
+        RadialMenuActionRef.action.performed += RadialMenu;
         ActionStateTypes.AllRootTypes.PreorderTraverse(Visit);
         bool Visit(AbstractActionStateType child, AbstractActionStateType parent)
         {
@@ -107,8 +126,8 @@ public class RadialSelection : MonoBehaviour
             }
 
             // If child is not a root (i.e., has a parent), we will add the entry to
-            // the InnerEntries of the NestedMenuEntry corresponding to the parent.
-            // We know that such a NestedMenuEntry must exist, because we are doing a
+            // the InnerEntries of the menu corresponding to the parent.
+            // We know that such a menu must exist, because we are doing a
             // preorder traversal.
             if (parent != null)
             {
@@ -137,16 +156,18 @@ public class RadialSelection : MonoBehaviour
             {
                 subMenus.Add((name, null));
                 actions.Add(name);
-                numberOfRadialPart += 1;
+                numberOfRadialParts += 1;
             }
             // Continue with the traversal.
             return true;
         }
     }
+
     /// <summary>
-    /// Is true, when the radial menu is open.
+    /// Whether the radial menu is open.
     /// </summary>
     bool radialMenuTrigger;
+
     /// <summary>
     /// This method gets called, when the button for the radial-menu is pressed.
     /// </summary>
@@ -156,8 +177,7 @@ public class RadialSelection : MonoBehaviour
         radialMenuTrigger = true;
     }
 
-    // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (radialMenuTrigger && !spawned)
         {
@@ -166,7 +186,7 @@ public class RadialSelection : MonoBehaviour
         }
         if (spawned)
         {
-            GetSelectedRadialPart();
+            UpdateSelectedRadialPart();
         }
         if (radialMenuTrigger && spawned)
         {
@@ -175,11 +195,13 @@ public class RadialSelection : MonoBehaviour
             HideAndTriggerSelected();
         }
     }
+
     /// <summary>
-    /// Is true, when the current action changed.
-    /// It is being used, to trigger the update for the GlobalActionHistory.
+    /// Whether the current action changed.
+    /// It is used to trigger the update for the GlobalActionHistory.
     /// </summary>
     public static bool IndicatorChange { set; get; }
+
     /// <summary>
     /// This method activates the selected action and deactivates the radial menu.
     /// </summary>
@@ -189,10 +211,13 @@ public class RadialSelection : MonoBehaviour
         OnPartSelected.Invoke(currentSelectedRadialPart);
         IndicatorChange = true;
     }
+
     /// <summary>
-    /// This method calculates, at which radial-part the user is aiming at.
+    /// This method calculates at which radial-part the user is aiming at.
+    /// The selected radial part is saved in currentSelectedRadialPart, so that
+    /// if the user decides to activate this part, the matching action gets triggered.
     /// </summary>
-    public void GetSelectedRadialPart()
+    public void UpdateSelectedRadialPart()
     {
         Vector3 centerToHand = handTransform.position - radialPartCanvas.position;
         Vector3 centerToHandProjected = Vector3.ProjectOnPlane(centerToHand, radialPartCanvas.forward);
@@ -204,7 +229,7 @@ public class RadialSelection : MonoBehaviour
             angle += 360;
         }
 
-        currentSelectedRadialPart = (int)angle * numberOfRadialPart / 360;
+        currentSelectedRadialPart = (int)angle * numberOfRadialParts / 360;
 
         for (int i = 0; i < spawnedParts.Count; i++)
         {
@@ -212,90 +237,112 @@ public class RadialSelection : MonoBehaviour
             {
                 spawnedParts[i].GetComponent<Image>().color = Color.yellow;
                 spawnedParts[i].transform.localScale = 1.1f * Vector3.one;
-                spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().color = Color.yellow;
-                spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().fontStyle = (FontStyles)FontStyle.Bold;
+                TextMeshProUGUI tmpGUI = spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>();
+                tmpGUI.color = Color.yellow;
+                tmpGUI.fontStyle = (FontStyles)FontStyle.Bold;
             }
             else
             {
                 spawnedParts[i].GetComponent<Image>().color = Color.white;
                 spawnedParts[i].transform.localScale = Vector3.one;
-                spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().color = Color.black;
-                spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().fontStyle = (FontStyles)FontStyle.Normal;
+                TextMeshProUGUI tmpGUI = spawnedParts[i].gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>();
+                tmpGUI.color = Color.black;
+                tmpGUI.fontStyle = (FontStyles)FontStyle.Normal;
             }
         }
     }
+
     /// <summary>
-    /// Is true if the radial menu is open or not.
+    /// Is true if the radial menu is open.
     /// </summary>
     bool spawned;
+
+    /// <summary>
+    /// This list represents all hideActions.
+    /// </summary>
+    static List<string> hideActions = new()
+    {
+        "HideAll",
+        "HideSelected",
+        "HideUnselected",
+        "HideOutgoing",
+        "HideIncoming",
+        "HideAllEdgesOfSelected",
+        "HideForwardTransitiveClosure",
+        "HideBackwardTransitiveClosure",
+        "HideAllTransitiveClosure",
+        "HighlightEdges",
+        "Back"
+    };
+
+
     /// <summary>
     /// This method activates the selected action, or opens a submenu/mainmenu.
     /// </summary>
-    /// <param name="i"></param>
+    /// <param name="i">the current selected radialPart.</param>
     public void SelectAction(int i)
     {
-        if (menuEntrys.Count != 0)
+        if (menuEntries.Count != 0)
         {
             if (actions[i] == "Back")
             {
                 actions.Clear();
-                actions.AddRange(menuEntrys);
-                numberOfRadialPart = actions.Count();
+                actions.AddRange(menuEntries);
+                numberOfRadialParts = actions.Count();
                 radialMenuTrigger = true;
-                menuEntrys.Clear();
+                menuEntries.Clear();
                 subMenuPosition = radialPartCanvas.position;
                 subMenuRotation = radialPartCanvas.rotation;
             }
-            if (actions[i] == "HideAll")
+            else if (actions[i] == "HideAll")
             {
                 HideMode = HideModeSelector.HideAll;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
-                return;
+                TriggerHideAction();
             }
-            if (actions[i] == "HideSelected")
+            else if (actions[i] == "HideSelected")
             {
                 HideMode = HideModeSelector.HideSelected;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideUnselected")
+            else if (actions[i] == "HideUnselected")
             {
                 HideMode = HideModeSelector.HideUnselected;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideOutgoing")
+            else if (actions[i] == "HideOutgoing")
             {
                 HideMode = HideModeSelector.HideOutgoing;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideIncoming")
+            else if (actions[i] == "HideIncoming")
             {
                 HideMode = HideModeSelector.HideIncoming;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideAllEdgesOfSelected")
+            else if (actions[i] == "HideAllEdgesOfSelected")
             {
                 HideMode = HideModeSelector.HideAllEdgesOfSelected;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideForwardTransitiveClosure")
+            else if (actions[i] == "HideForwardTransitiveClosure")
             {
                 HideMode = HideModeSelector.HideForwardTransitiveClosure;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideBackwardTransitiveClosure")
+            else if (actions[i] == "HideBackwardTransitiveClosure")
             {
                 HideMode = HideModeSelector.HideBackwardTransitiveClosure;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HideAllTransitiveClosure")
+            else if (actions[i] == "HideAllTransitiveClosure")
             {
                 HideMode = HideModeSelector.HideAllTransitiveClosure;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
-            if (actions[i] == "HighlightEdges")
+            else if (actions[i] == "HighlightEdges")
             {
                 HideMode = HideModeSelector.HighlightEdges;
-                GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+                TriggerHideAction();
             }
             else
             {
@@ -308,20 +355,10 @@ public class RadialSelection : MonoBehaviour
             {
                 if (subMenus[i].Item1 == "Hide")
                 {
-                    numberOfRadialPart = 11;
-                    menuEntrys.AddRange(actions);
+                    numberOfRadialParts = hideActions.Count();
+                    menuEntries.AddRange(actions);
                     actions.Clear();
-                    actions.Add("HideAll");
-                    actions.Add("HideSelected");
-                    actions.Add("HideUnselected");
-                    actions.Add("HideOutgoing");
-                    actions.Add("HideIncoming");
-                    actions.Add("HideAllEdgesOfSelected");
-                    actions.Add("HideForwardTransitiveClosure");
-                    actions.Add("HideBackwardTransitiveClosure");
-                    actions.Add("HideAllTransitiveClosure");
-                    actions.Add("HighlightEdges");
-                    actions.Add("Back");
+                    actions.AddRange(hideActions);
                     radialMenuTrigger = true;
                     subMenuPosition = radialPartCanvas.position;
                     subMenuRotation = radialPartCanvas.rotation;
@@ -336,19 +373,16 @@ public class RadialSelection : MonoBehaviour
                     actionObject.transform.position = handTransform.position;
                     actionObject.SetActive(true);
                 }
-                else
+                else if (actionObject != null)
                 {
-                    if (actionObject != null)
-                    {
-                        actionObject.SetActive(false);
-                    }
+                    actionObject.SetActive(false);
                 }
                 GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == subMenus[i].Item1));
             }
             else
             {
-                numberOfRadialPart = subMenus[i].Item2.Count() + 1;
-                menuEntrys.AddRange(actions);
+                numberOfRadialParts = subMenus[i].Item2.Count() + 1;
+                menuEntries.AddRange(actions);
                 actions.Clear();
                 actions.AddRange(subMenus[i].Item2);
                 actions.Add("Back");
@@ -358,6 +392,15 @@ public class RadialSelection : MonoBehaviour
             }
         }
     }
+
+    /// <summary>
+    /// This triggers the HideAction.
+    /// </summary>
+    private void TriggerHideAction()
+    {
+        GlobalActionHistory.Execute((ActionStateType)ActionStateTypes.AllRootTypes.AllElements().FirstOrDefault(a => a.Name == "Hide"));
+    }
+
     /// <summary>
     /// This method spawns all radial-parts for the current menu.
     /// </summary>
@@ -385,23 +428,24 @@ public class RadialSelection : MonoBehaviour
 
         spawnedParts.Clear();
 
-        for (int i = 0; i < numberOfRadialPart; i++)
+        for (int i = 0; i < numberOfRadialParts; i++)
         {
-            float angle = -i * 360 / numberOfRadialPart - angleBetweenPart / 2;
+            float angle = -i * 360 / numberOfRadialParts - angleBetweenPart / 2;
             Vector3 radialPartEulerAngle = new Vector3(0, 0, angle);
 
             GameObject spawnRadialPart = Instantiate(radialPartPrefab, radialPartCanvas);
             spawnRadialPart.transform.position = radialPartCanvas.position;
             spawnRadialPart.transform.localEulerAngles = radialPartEulerAngle;
 
-            spawnRadialPart.GetComponent<Image>().fillAmount = (1 / (float)numberOfRadialPart) - (angleBetweenPart / 360);
-            if (i > (numberOfRadialPart / 2))
+            spawnRadialPart.GetComponent<Image>().fillAmount = (1 / (float)numberOfRadialParts) - (angleBetweenPart / 360);
+            TextMeshProUGUI tmpUGUI = spawnRadialPart.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>();
+            if (i > (numberOfRadialParts / 2))
             {
-                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation =
-                    spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>().rotation * Quaternion.Euler(0, 0, 180);
-                spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().alignment = TextAlignmentOptions.Right;
+                RectTransform rectTransform = spawnRadialPart.transform.Find("TextField").gameObject.MustGetComponent<RectTransform>();
+                rectTransform.rotation *= Quaternion.Euler(0, 0, 180);
+                tmpUGUI.alignment = TextAlignmentOptions.Right;
             }
-            spawnRadialPart.gameObject.transform.Find("TextField").gameObject.MustGetComponent<TextMeshProUGUI>().text = actions[i];
+            tmpUGUI.text = actions[i];
             spawnedParts.Add(spawnRadialPart);
         }
         spawned = true;
