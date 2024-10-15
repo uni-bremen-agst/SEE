@@ -6,6 +6,7 @@ using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

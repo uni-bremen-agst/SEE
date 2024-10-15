@@ -7,6 +7,7 @@ using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Utils.History;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

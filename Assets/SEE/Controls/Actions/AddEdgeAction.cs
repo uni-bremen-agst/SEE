@@ -10,6 +10,7 @@ using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

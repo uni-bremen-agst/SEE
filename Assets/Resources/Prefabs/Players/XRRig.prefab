@@ -3324,7 +3324,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  radialMenu: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f,
+  RadialMenuActionRef: {fileID: -5982496924579745919, guid: c348712bda248c246b8c49b3db54643f,
     type: 3}
 --- !u!1 &7806924667908141112
 GameObject:
@@ -5196,7 +5196,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df5e8c7d8b96d6944aaafef73a15f5b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_RayInteractor: {fileID: 645861538944586177}
   inputAction: {fileID: -1379689384741821685, guid: c348712bda248c246b8c49b3db54643f,
     type: 3}
   undo: {fileID: -989603093121905207, guid: c348712bda248c246b8c49b3db54643f, type: 3}

@@ -7,6 +7,7 @@ using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
+using SEE.XR;
 
 namespace SEE.Utils
 {

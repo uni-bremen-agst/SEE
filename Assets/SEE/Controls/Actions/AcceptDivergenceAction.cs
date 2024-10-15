@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -116,7 +117,7 @@ namespace SEE.Controls.Actions
         {
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.Selected 
+                if (XRSEEActions.Selected
                     && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
                 {
                     // find the edge representing the divergence that should be solved.

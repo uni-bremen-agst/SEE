@@ -9,6 +9,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.XR;
 
 namespace SEE.UI.Window.PropertyWindow
 {

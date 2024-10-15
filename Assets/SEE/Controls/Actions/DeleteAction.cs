@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

@@ -8,6 +8,7 @@ using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.GO.Menu
 {

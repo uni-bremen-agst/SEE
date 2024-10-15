@@ -2,6 +2,7 @@
 using SEE.Utils;
 using UnityEngine;
 using SEE.GO;
+using SEE.XR;
 
 namespace SEE.Controls
 {

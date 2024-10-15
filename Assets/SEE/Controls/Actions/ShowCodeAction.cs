@@ -14,6 +14,7 @@ using SEE.UI.Window;
 using SEE.Utils.History;
 using SEE.Game.City;
 using SEE.VCS;
+using SEE.XR;
 using GraphElementRef = SEE.GO.GraphElementRef;
 using Range = SEE.DataModel.DG.Range;
 

@@ -9,6 +9,7 @@ using SEE.Utils;
 using System;
 using SEE.UI.PropertyDialog;
 using SEE.DataModel.DG;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
