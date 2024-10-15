@@ -221,7 +221,7 @@ namespace SEE.Utils
                     raycastHit = ray;
                     if (ray.transform.TryGetComponent(out InteractableObject io))
                     {
-                        DetermineHit(io);
+                        result = DetermineHit(io);
                         obj = io;
                     }
                 }
@@ -233,7 +233,7 @@ namespace SEE.Utils
                     raycastHit = hit;
                     if (hit.transform.TryGetComponent(out InteractableObject io))
                     {
-                        DetermineHit(io);
+                        result = DetermineHit(io);
                         obj = io;
                     }
                 }
