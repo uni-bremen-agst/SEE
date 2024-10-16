@@ -151,8 +151,29 @@ namespace SEE.XR
                 {
                     if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
                     {
-                        RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
-                        RotateObject = hit.collider.transform.gameObject;
+                        if (Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
+                        {
+                            GameObject rotationObject = hit.collider.transform.gameObject;
+                            rotationObject.TryGetNodeRef(out NodeRef nodeRef);
+                            if (rotationObject.ContainingCity().NodeTypes[nodeRef.Value.Type].AllowManualNodeManipulation)
+                            {
+                                RotateObject = hit.collider.transform.gameObject;
+                            }
+                            else
+                            {
+                                Selected = false;
+                                SelectedFlag = false;
+                                RotateObject = null;
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            Selected = false;
+                            SelectedFlag = false;
+                            RotateObject = null;
+                            return;
+                        }
                     }
                     Selected = true;
                     if (GlobalActionHistory.Current() != ActionStateTypes.Move)

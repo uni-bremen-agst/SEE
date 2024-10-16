@@ -80,6 +80,7 @@ namespace SEE.Controls.Actions
                     {
                         // the hit object is the parent in which to create the new node
                         GameObject parent = res.collider.gameObject;
+                        XRSEEActions.Selected = false;
                         AddNode(res.collider.gameObject, res.point);
                     }
                     else if (ExecuteViaContextMenu)

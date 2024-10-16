@@ -609,7 +609,8 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                gameObject.TryGetNodeRef(out NodeRef nodeRef);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer && gameObject.ContainingCity().NodeTypes[nodeRef.Value.Type].AllowManualNodeManipulation)
                 {
                     PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.position = gameObject.transform.position + Vector3.up;
                     XRSEEActions.RotateObject = gameObject;

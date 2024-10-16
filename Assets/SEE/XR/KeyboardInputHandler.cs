@@ -21,7 +21,10 @@ namespace SEE.XR
         private void Start()
         {
             // Cache the reference to the keyboard GameObject
-            keyboardGameObject = KeyboardManager.instance.gameObject.transform.Find("Keyboard").gameObject;
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                keyboardGameObject = KeyboardManager.instance.gameObject.transform.Find("Keyboard").gameObject;
+            }
         }
 
         /// <summary>

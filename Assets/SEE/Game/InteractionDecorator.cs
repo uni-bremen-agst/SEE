@@ -40,10 +40,7 @@ namespace SEE.Game
             gameObject.AddComponentIfNecessary<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
             // because they require the presence of an InteractableObject.
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
-            {
-                gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
-            }
+            gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
             gameObject.AddComponentIfNecessary<ShowHovering>();
             gameObject.AddComponentIfNecessary<ShowSelection>();
             gameObject.AddComponentIfNecessary<ShowGrabbing>();

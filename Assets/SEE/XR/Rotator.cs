@@ -189,8 +189,11 @@ namespace SEE.XR
         private void RotateDialClockwise()
         {
             linkedDial.localEulerAngles = new Vector3(linkedDial.localEulerAngles.x, linkedDial.localEulerAngles.y + snapRotationAmount, linkedDial.localEulerAngles.z);
-            Transform rotateObject = XRSEEActions.RotateObject.transform;
-            rotateObject.localEulerAngles = new Vector3(rotateObject.localEulerAngles.x, linkedDial.localEulerAngles.y, rotateObject.localEulerAngles.z);
+            if (XRSEEActions.RotateObject != null)
+            {
+                Transform rotateObject = XRSEEActions.RotateObject.transform;
+                rotateObject.localEulerAngles = new Vector3(rotateObject.localEulerAngles.x, linkedDial.localEulerAngles.y, rotateObject.localEulerAngles.z);
+            }
         }
 
         /// <summary>
@@ -199,8 +202,11 @@ namespace SEE.XR
         private void RotateDialAntiClockwise()
         {
             linkedDial.localEulerAngles = new Vector3(linkedDial.localEulerAngles.x, linkedDial.localEulerAngles.y - snapRotationAmount, linkedDial.localEulerAngles.z);
-            Transform rotateObject = XRSEEActions.RotateObject.transform;
-            rotateObject.localEulerAngles = new Vector3(rotateObject.localEulerAngles.x, linkedDial.localEulerAngles.y, rotateObject.localEulerAngles.z);
+            if (XRSEEActions.RotateObject != null)
+            {
+                Transform rotateObject = XRSEEActions.RotateObject.transform;
+                rotateObject.localEulerAngles = new Vector3(rotateObject.localEulerAngles.x, linkedDial.localEulerAngles.y, rotateObject.localEulerAngles.z);
+            }
         }
 
     }
