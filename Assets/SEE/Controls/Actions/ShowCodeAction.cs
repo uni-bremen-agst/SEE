@@ -318,7 +318,7 @@ namespace SEE.Controls.Actions
         {
             // Only allow local player to open new code windows
             if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
-                && SEEInput.Select()
+                && (SEEInput.Select() || XRSEEActions.Selected)
                 && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
                 // If nothing is selected, there's nothing more we need to do

@@ -217,7 +217,12 @@ namespace SEE.GO.Menu
                 SetPlayerMenu(currentAction.Name);
                 indicator.ChangeActionState(currentAction);
             }
-
+            if (RadialSelection.IndicatorChange)
+            {
+                ActionStateType currentAction = GlobalActionHistory.Current();
+                indicator.ChangeActionState(currentAction);
+                RadialSelection.IndicatorChange = false;
+            }
             GlobalActionHistory.Update();
         }
 

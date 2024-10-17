@@ -1,4 +1,5 @@
 using RTG;
+using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils.History;
 using UnityEngine;
@@ -40,7 +41,10 @@ namespace SEE.Controls.Actions
         private void Initialize()
         {
             CurrentState = IReversibleAction.Progress.NoEffect;
-            UsedGizmo = new RotateGizmo();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo = new RotateGizmo();
+            }
         }
 
         #endregion Constructors

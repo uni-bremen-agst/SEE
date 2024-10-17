@@ -102,6 +102,11 @@ namespace SEE.UI.Window
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Shows or hides the window, depending on the <see cref="show"/> parameter.
         /// </summary>
@@ -119,7 +124,7 @@ namespace SEE.UI.Window
                     ShowDesktop(show);
                     break;
                 case PlayerInputType.VRPlayer:
-                    PlatformUnsupported();
+                    ShowDesktop(show);
                     break;
                 case PlayerInputType.None: // nothing needs to be done
                     break;
