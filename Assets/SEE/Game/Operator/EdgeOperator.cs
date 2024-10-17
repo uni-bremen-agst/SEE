@@ -149,14 +149,13 @@ namespace SEE.Game.Operator
         /// <param name="enable">Enable or disable animation.</param>
         public void AnimateDataFlow(bool enable = true)
         {
-            if (enable)
+            if (gameObject.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
             {
-                gameObject.AddOrGetComponent<EdgeDirectionVisualizer>();
+                meshRenderer.material.SetFloat("_EdgeFlowEnabled", enable ? 1.0f : 0.0f);
             }
             else
             {
-                EdgeDirectionVisualizer edfv = gameObject.GetComponent<EdgeDirectionVisualizer>();
-                Destroyer.Destroy(edfv);
+                Debug.LogWarning($"No MeshRenderer found to enable data flow animation on: {gameObject.FullName()}");
             }
         }
 
