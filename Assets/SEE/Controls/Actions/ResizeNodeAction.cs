@@ -302,7 +302,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The minimal size of a node in world space.
             /// </summary>
-            private const float minSize = 0.04f;
+            private static readonly Vector3 minSize = new (0.04f, 0.001f, 0.04f);
 
             /// <summary>
             /// The minimal world-space distance between nodes while resizing.
@@ -415,7 +415,8 @@ namespace SEE.Controls.Actions
 
                 Vector3[] directions = new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back,
                                                Vector3.right + Vector3.forward, Vector3.right + Vector3.back,
-                                               Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
+                                               Vector3.left + Vector3.forward, Vector3.left + Vector3.back,
+                                               Vector3.up };
                 Vector3 position = transform.position;
                 Vector3 size = gameObject.WorldSpaceSize();
                 foreach (Vector3 direction in directions)
@@ -432,6 +433,12 @@ namespace SEE.Controls.Actions
             /// <param name="parentWorldScale">The cached parent world-space scale.</param>
             private GameObject CreateHandle(Vector3 direction, Vector3 parentWorldPosition, Vector3 parentWorldScale)
             {
+                // Move base handles down
+                if (direction.y == 0f)
+                {
+                    direction.y = -1f;
+                }
+
                 GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 handle.GetComponent<Renderer>().material.color = handleColor;
                 handle.transform.localScale = handleScale;
@@ -468,7 +475,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             void UpdateSize()
             {
-                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node hitNode, nodeRef);
+                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out _, nodeRef);
                 if (!targetObjectHit.HasValue)
                 {
                     return;
@@ -499,7 +506,9 @@ namespace SEE.Controls.Actions
 
                 // Calculate new scale and position
                 Vector3 hitPoint = targetObjectHit.Value.point;
-                Vector3 cursorMovement = Vector3.Scale(currentResizeStep.InitialHitPoint - hitPoint, currentResizeStep.Direction);
+                Vector3 cursorMovement = currentResizeStep.Up
+                        ? new(0f, (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) / Screen.height, 0f)
+                        : Vector3.Scale(currentResizeStep.InitialHitPoint - hitPoint, currentResizeStep.Direction);
                 Vector3 newLocalSize = currentResizeStep.InitialLocalSize - Vector3.Scale(currentResizeStep.LocalScaleFactor, cursorMovement);
                 Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition
                     - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
@@ -635,7 +644,9 @@ namespace SEE.Controls.Actions
                 newLocalPosition.z = bounds.Back + newLocalSize.z / 2;
 
                 // Ensure minimal size
-                if (newLocalSize.x < currentResizeStep.MinLocalSize.x || newLocalSize.z < currentResizeStep.MinLocalSize.z)
+                if (newLocalSize.x < currentResizeStep.MinLocalSize.x
+                        || newLocalSize.y < currentResizeStep.MinLocalSize.y
+                        || newLocalSize.z < currentResizeStep.MinLocalSize.z)
                 {
                     return;
                 }
@@ -680,6 +691,11 @@ namespace SEE.Controls.Actions
                 /// The initial raycast hit from which the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialHitPoint;
+
+                /// <summary>
+                /// The initial mouse position.
+                /// </summary>
+                public readonly Vector2 InitialMousePosition;
 
                 /// <summary>
                 /// The resize direction.
@@ -740,11 +756,17 @@ namespace SEE.Controls.Actions
                 public readonly bool Back;
 
                 /// <summary>
+                /// Does <see cref="Direction"/> point upward?
+                /// </summary>
+                public readonly bool Up;
+
+                /// <summary>
                 /// Initializes the struct.
                 /// </summary>
                 public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Transform transform)
                 {
                     InitialHitPoint = initialHitPoint;
+                    InitialMousePosition = Input.mousePosition;
                     Direction = direction;
                     InitialLocalPosition = transform.localPosition;
                     InitialLocalSize = transform.gameObject.LocalSize();
@@ -761,12 +783,13 @@ namespace SEE.Controls.Actions
                         localScale.z / lossyScale.z
                     );
                     IsSet = true;
-                    MinLocalSize = minSize * LocalScaleFactor;
+                    MinLocalSize = Vector3.Scale(minSize, LocalScaleFactor);
                     LocalPadding = padding * LocalScaleFactor;
                     Left    = Direction.x < 0;
                     Right   = Direction.x > 0;
                     Back    = Direction.z < 0;
                     Forward = Direction.z > 0;
+                    Up      = Direction.y > 0;
                 }
             }
 
