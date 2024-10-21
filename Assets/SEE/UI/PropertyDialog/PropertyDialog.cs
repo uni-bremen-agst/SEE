@@ -82,6 +82,7 @@ namespace SEE.UI.PropertyDialog
                 case PlayerInputType.TouchGamepadPlayer:
                     break;
                 case PlayerInputType.VRPlayer:
+                    AllowClosingDesktop(allow);
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;
@@ -105,6 +106,7 @@ namespace SEE.UI.PropertyDialog
                 case PlayerInputType.TouchGamepadPlayer:
                     break;
                 case PlayerInputType.VRPlayer:
+                    CloseDesktop();
                     break;
                 case PlayerInputType.None: // no UI has to be rendered
                     break;

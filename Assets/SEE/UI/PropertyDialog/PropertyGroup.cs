@@ -100,6 +100,11 @@ namespace SEE.UI.PropertyDialog
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Returns a new instantiation of prefab <see cref="configurationGroupPrefabPath"/>
         /// with given <paramref name="name"/>.

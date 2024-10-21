@@ -9,6 +9,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -23,7 +24,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         public NodeManipulationAction() : base()
         {
-            RTGInitializer.Enable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Enable();
+            }
         }
 
         #region ReversibleAction Overrides
@@ -46,7 +50,10 @@ namespace SEE.Controls.Actions
         public override void Start()
         {
             base.Start();
-            RTGInitializer.Enable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Enable();
+            }
         }
 
         /// <summary>
@@ -55,8 +62,11 @@ namespace SEE.Controls.Actions
         public override void Stop()
         {
             base.Stop();
-            RTGInitializer.Disable();
-            UsedGizmo.Disable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                RTGInitializer.Disable();
+                UsedGizmo.Disable();
+            }
         }
 
         #endregion ReversibleAction Overrides
@@ -102,23 +112,30 @@ namespace SEE.Controls.Actions
         /// </summary>
         protected GameObject GameNodeToBeContinuedInNextAction;
 
+        /// <summary>
+        /// This is true if the user is rotating an object.
+        /// We use this in VR to finish this action.
+        /// </summary>
+        bool inProgress;
+
         /// <summary
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (UsedGizmo.IsHovered())
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && UsedGizmo.IsHovered()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && Rotator.ShouldGetHandRotation))
             {
                 // Transformation via the gizmo is in progress.
                 if (GameNodeSelected && HasChanges())
                 {
+                    inProgress = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
                 return false;
             }
 
-            if (SEEInput.Select())
+            if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && SEEInput.Select()) || (SceneSettings.InputType == PlayerInputType.VRPlayer && (XRSEEActions.Selected || (!Rotator.ShouldGetHandRotation && inProgress))))
             {
                 if (Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.Node)
                 {
@@ -127,6 +144,7 @@ namespace SEE.Controls.Actions
                     {
                         // An object to be manipulated was selected already and it was changed.
                         // The action is finished.
+                        inProgress = false;
                         FinalizeAction();
                         return true;
                     }
@@ -173,6 +191,7 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
+                        XRSEEActions.Selected = false;
                         // It's the first time, a game node was selected. The action starts.
                         StartAction(raycastHit.collider.gameObject);
                         return false;
@@ -208,7 +227,10 @@ namespace SEE.Controls.Actions
 
             GameNodeSelected = gameNode;
             GameNodeMemento = CreateMemento(GameNodeSelected);
-            UsedGizmo.Enable(GameNodeSelected);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo.Enable(GameNodeSelected);
+            }
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, GameNodeSelected);
         }
 
@@ -221,7 +243,10 @@ namespace SEE.Controls.Actions
         protected virtual void FinalizeAction()
         {
             UnityEngine.Assertions.Assert.IsNotNull(GameNodeSelected);
-            UsedGizmo.Disable();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo.Disable();
+            }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, GameNodeSelected);
         }

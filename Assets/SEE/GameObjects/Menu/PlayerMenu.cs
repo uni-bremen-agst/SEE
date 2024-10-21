@@ -8,6 +8,7 @@ using SEE.UI.Menu;
 using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.GO.Menu
 {
@@ -217,7 +218,12 @@ namespace SEE.GO.Menu
                 SetPlayerMenu(currentAction.Name);
                 indicator.ChangeActionState(currentAction);
             }
-
+            if (RadialSelection.IndicatorChange)
+            {
+                ActionStateType currentAction = GlobalActionHistory.Current();
+                indicator.ChangeActionState(currentAction);
+                RadialSelection.IndicatorChange = false;
+            }
             GlobalActionHistory.Update();
         }
 

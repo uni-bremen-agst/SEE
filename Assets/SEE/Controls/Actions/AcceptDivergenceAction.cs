@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -114,64 +115,126 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
-                && Raycasting.RaycastGraphElement(
-                    out RaycastHit raycastHit,
-                    out GraphElementRef _) != HitGraphElement.None)
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                // find the edge representing the divergence that should be solved.
-                GameObject divergentEdge = raycastHit.collider.gameObject;
-
-                // check whether the object selected is an edge.
-                if (divergentEdge.TryGetEdge(out Edge selectedEdge))
+                if (XRSEEActions.Selected
+                    && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit))
                 {
-                    // check if the selected edge represents a divergence
-                    if (selectedEdge.ItsGraph is ReflexionGraph graph && ReflexionGraph.IsDivergent(selectedEdge))
+                    // find the edge representing the divergence that should be solved.
+                    GameObject divergentEdge = hit.collider.gameObject;
+
+                    // check whether the object selected is an edge.
+                    if (divergentEdge.TryGetEdge(out Edge selectedEdge))
                     {
-                        // find that node in the architecture graph,
-                        // which the divergence's source node is
-                        // explicitly or implicitly mapped to
-                        Node source = graph.MapsTo(selectedEdge.Source);
+                        // check if the selected edge represents a divergence
+                        if (selectedEdge.ItsGraph is ReflexionGraph graph && ReflexionGraph.IsDivergent(selectedEdge))
+                        {
+                            // find that node in the architecture graph,
+                            // which the divergence's source node is
+                            // explicitly or implicitly mapped to
+                            Node source = graph.MapsTo(selectedEdge.Source);
 
-                        // find that node in the ArchitectureGraph,
-                        // which the divergence's target is explicitly
-                        // or implicitly mapped to
-                        Node target = graph.MapsTo(selectedEdge.Target);
+                            // find that node in the ArchitectureGraph,
+                            // which the divergence's target is explicitly
+                            // or implicitly mapped to
+                            Node target = graph.MapsTo(selectedEdge.Target);
 
-                        // we have both source and target of the edge and use a memento struct
-                        // to remember which edge we have added
-                        memento = new Memento(source, target, Edge.SourceDependency);
-                        mementoList.Add(memento);
-                        // create the edge
-                        createdEdgeList.Add(CreateConvergentEdge(memento));
+                            // we have both source and target of the edge and use a memento struct
+                            // to remember which edge we have added
+                            memento = new Memento(source, target, Edge.SourceDependency);
+                            mementoList.Add(memento);
+                            // create the edge
+                            createdEdgeList.Add(CreateConvergentEdge(memento));
 
-                        // check whether edge creation was successful
-                        bool divergenceSolved = createdEdgeList[0] != null;
+                            // check whether edge creation was successful
+                            bool divergenceSolved = createdEdgeList[0] != null;
 
-                        // add audio cue to the appearance of the new architecture edge
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
+                            // add audio cue to the appearance of the new architecture edge
+                            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
 
-                        // update the current state depending on whether the divergence has been solved
-                        // (required in order to register as an undo-able action)
-                        CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                            // update the current state depending on whether the divergence has been solved
+                            // (required in order to register as an undo-able action)
+                            CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
 
-                        // the selected object is synced and this action is done
-                        return true;
+                            // the selected object is synced and this action is done
+                            XRSEEActions.Selected = false;
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        XRSEEActions.Selected = false;
+                        ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
                     }
                 }
-                else
+                if (ExecuteViaContextMenu)
                 {
-                    ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
+                    bool divergenceSolved = createdEdgeList.All(e => e != null);
+                    CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                    return true;
                 }
+                return false;
             }
-            if (ExecuteViaContextMenu)
+            else
             {
-                bool divergenceSolved = createdEdgeList.All(e => e != null);
-                CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
-                return true;
+                if (Input.GetMouseButtonDown(0)
+                    && Raycasting.RaycastGraphElement(
+                        out RaycastHit raycastHit,
+                        out GraphElementRef _) != HitGraphElement.None)
+                {
+                    // find the edge representing the divergence that should be solved.
+                    GameObject divergentEdge = raycastHit.collider.gameObject;
+
+                    // check whether the object selected is an edge.
+                    if (divergentEdge.TryGetEdge(out Edge selectedEdge))
+                    {
+                        // check if the selected edge represents a divergence
+                        if (selectedEdge.ItsGraph is ReflexionGraph graph && ReflexionGraph.IsDivergent(selectedEdge))
+                        {
+                            // find that node in the architecture graph,
+                            // which the divergence's source node is
+                            // explicitly or implicitly mapped to
+                            Node source = graph.MapsTo(selectedEdge.Source);
+
+                            // find that node in the ArchitectureGraph,
+                            // which the divergence's target is explicitly
+                            // or implicitly mapped to
+                            Node target = graph.MapsTo(selectedEdge.Target);
+
+                            // we have both source and target of the edge and use a memento struct
+                            // to remember which edge we have added
+                            memento = new Memento(source, target, Edge.SourceDependency);
+                            mementoList.Add(memento);
+                            // create the edge
+                            createdEdgeList.Add(CreateConvergentEdge(memento));
+
+                            // check whether edge creation was successful
+                            bool divergenceSolved = createdEdgeList[0] != null;
+
+                            // add audio cue to the appearance of the new architecture edge
+                            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
+
+                            // update the current state depending on whether the divergence has been solved
+                            // (required in order to register as an undo-able action)
+                            CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+
+                            // the selected object is synced and this action is done
+                            return true;
+                        }
+                    }
+                    else
+                    {
+                        ShowNotification.Warn("Not an edge", $"Selected Element {divergentEdge.name} is not an edge.\n");
+                    }
+                }
+                if (ExecuteViaContextMenu)
+                {
+                    bool divergenceSolved = createdEdgeList.All(e => e != null);
+                    CurrentState = divergenceSolved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                    return true;
+                }
+                return false;
             }
-            return false;
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 ﻿using SEE.Controls.KeyActions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.GO;
+using SEE.XR;
 
 namespace SEE.Controls
 {
@@ -124,6 +126,12 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Undo()
         {
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.UndoToggle)
+            {
+                bool undo = XRSEEActions.UndoToggle;
+                XRSEEActions.UndoToggle = false;
+                return undo;
+            }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -145,6 +153,12 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Redo()
         {
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.RedoToggle)
+            {
+                bool redo = XRSEEActions.RedoToggle;
+                XRSEEActions.RedoToggle = false;
+                return redo;
+            }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))

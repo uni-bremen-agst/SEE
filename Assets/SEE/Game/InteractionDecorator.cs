@@ -7,6 +7,7 @@ using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 namespace SEE.Game
 {
@@ -39,6 +40,7 @@ namespace SEE.Game
             gameObject.AddComponentIfNecessary<InteractableObject>();
             // The following additions of components must come after the addition of InteractableObject
             // because they require the presence of an InteractableObject.
+            gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
             gameObject.AddComponentIfNecessary<ShowHovering>();
             gameObject.AddComponentIfNecessary<ShowSelection>();
             gameObject.AddComponentIfNecessary<ShowGrabbing>();

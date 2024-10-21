@@ -1,4 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -53,6 +54,10 @@ namespace SEE.UI.PropertyDialog
             try
             {
                 dialog = PrefabInstantiator.InstantiatePrefab(dialogPrefab, Canvas.transform, false);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    dialog.transform.Find("Background").gameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                }
             }
             catch (Exception e)
             {
@@ -105,6 +110,11 @@ namespace SEE.UI.PropertyDialog
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Enables or disables the dialog depending on <see cref="DialogShouldBeShown"/>.
         /// </summary>
@@ -126,6 +136,11 @@ namespace SEE.UI.PropertyDialog
                 }
                 dialogIsShown = !dialogIsShown;
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         /// <summary>
