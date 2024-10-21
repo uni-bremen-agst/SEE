@@ -9,6 +9,12 @@ namespace SEE.Game.SceneManipulation
     public static class GameNodeMover
     {
         /// <summary>
+        /// Empty space on the y-axis bewteen the top of the target object and the bottom of the child
+        /// object in world space units, used in <see cref="GetCoordinatesOn"/>.
+        /// </summary>
+        public const float TopPadding = 0.0001f;
+
+        /// <summary>
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the
         /// game-object hierarchy and in the underlying graph. If <paramref name="newParent"/>
         /// is null, the <paramref name="child"/> becomes a root in the underlying graph
@@ -52,14 +58,12 @@ namespace SEE.Game.SceneManipulation
         /// <param name="childWorldScale">the world-space scale of a node</param>
         /// <param name="childPosition">the world position of a node</param>
         /// <param name="target">the target node's <c>GameObject</c></param>
-        /// <param name="topPadding">additional amount of empty space on the Y-axis that should be between
-        /// <paramref name="parent"/> and <paramref name="child"/> in absolute world-space units</param>
         /// <returns>the new world position after the correction</returns>
         ///
-        public static Vector3 GetCoordinatesOn(Vector3 childWorldScale, Vector3 childPosition, GameObject target, float topPadding = 0.0001f)
+        public static Vector3 GetCoordinatesOn(Vector3 childWorldScale, Vector3 childPosition, GameObject target)
         {
             Vector3 childWorldExtent = childWorldScale / 2;
-            childPosition.y = target.GetRoof() + childWorldExtent.y + topPadding;
+            childPosition.y = target.GetRoof() + childWorldExtent.y + TopPadding;
 
             // Make sure mappingTarget stays within the roof of parent.
             {
