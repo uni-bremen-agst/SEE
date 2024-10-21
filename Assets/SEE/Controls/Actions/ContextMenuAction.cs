@@ -545,7 +545,7 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     VisualNodeAttributes gameNodeAttributes = gameObject.ContainingCity().NodeTypes[node.Type];
-                    if (gameNodeAttributes.AllowManualNodeManipulation)
+                    if (gameNodeAttributes.AllowManualResize)
                     {
                         actions.Add(new PopupMenuAction("Resize Node", ResizeNode, Icons.Resize));
                     }

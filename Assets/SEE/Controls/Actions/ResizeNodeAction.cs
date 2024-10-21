@@ -153,7 +153,7 @@ namespace SEE.Controls.Actions
         /// <param name="go">The object to be resize</param>
         /// <remarks>
         /// This method does not check if the object's type has
-        /// <see cref="VisualNodeAttributes.AllowManualNodeManipulation"/> flag set.
+        /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
         /// </remarks>
         public void ContextMenuExecution(GameObject go)
         {
@@ -193,7 +193,7 @@ namespace SEE.Controls.Actions
             // Incompatible type
             GameObject selectedGameObject = interactableObject.gameObject;
             if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef)
-                || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualNodeManipulation)
+                || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualResize)
             {
                 return;
             }
