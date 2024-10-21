@@ -547,9 +547,7 @@ namespace SEE.Controls.Actions
                     VisualNodeAttributes gameNodeAttributes = gameObject.ContainingCity().NodeTypes[node.Type];
                     if (gameNodeAttributes.AllowManualNodeManipulation)
                     {
-                        actions.Add(new PopupMenuAction("Rotate", RotateNode, Icons.Rotate, Priority: 4));
                         actions.Add(new PopupMenuAction("Resize Node", ResizeNode, Icons.Resize));
-                        actions.Add(new PopupMenuAction("Scale Node", ScaleNode, Icons.Scale));
                     }
                 }
             }
@@ -565,16 +563,6 @@ namespace SEE.Controls.Actions
                 UpdatePlayerMenu();
                 MoveAction action = (MoveAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject, raycastHitPosition);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
-            }
-
-            void RotateNode()
-            {
-                ActionStateType previousAction = GlobalActionHistory.Current();
-                GlobalActionHistory.Execute(ActionStateTypes.Rotate);
-                UpdatePlayerMenu();
-                RotateAction action = (RotateAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(gameObject);
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
 
@@ -613,16 +601,6 @@ namespace SEE.Controls.Actions
                 GlobalActionHistory.Execute(ActionStateTypes.ResizeNode);
                 UpdatePlayerMenu();
                 ResizeNodeAction action = (ResizeNodeAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(gameObject);
-                ExcecutePreviousActionAsync(action, previousAction).Forget();
-            }
-
-            void ScaleNode()
-            {
-                ActionStateType previousAction = GlobalActionHistory.Current();
-                GlobalActionHistory.Execute(ActionStateTypes.ScaleNode);
-                UpdatePlayerMenu();
-                ScaleNodeAction action = (ScaleNodeAction)GlobalActionHistory.CurrentAction();
                 action.ContextMenuExecution(gameObject);
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
