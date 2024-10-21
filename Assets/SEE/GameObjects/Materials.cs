@@ -19,12 +19,13 @@ namespace SEE.GO
         /// </summary>
         public enum ShaderType
         {
-            Opaque = 0,          // fully drawn with no transparency
-            TransparentLine = 1, // for lines with transparency
-            OpaqueMetallic = 2,  // for opaque meshes with a more realistic metallic effect
-            PortalFree = 3,       // not limited by a portal (seen everywhere)
-            DrawableLine = 4,       // for drawable lines
-            DrawableDashedLine = 5, // for drawable dashed lines
+            Opaque             = 0, // fully drawn with no transparency
+            TransparentLine    = 1, // for lines with transparency (LineRenderer)
+            TransparentEdge    = 2, // for edge meshes with transparency (MeshRenderer)
+            OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect
+            PortalFree         = 4, // not limited by a portal (seen everywhere)
+            DrawableLine       = 5, // for drawable lines
+            DrawableDashedLine = 6, // for drawable dashed lines
         }
 
         /// <summary>
@@ -32,9 +33,13 @@ namespace SEE.GO
         /// </summary>
         private const string opaqueMaterialName = "Materials/OpaquePortalMaterial";
         /// <summary>
-        /// Name of the material for transparent lines (located in folder Resources).
+        /// Name of the material for transparent lines using LineRenderer (located in folder Resources).
         /// </summary>
         private const string transparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
+        /// <summary>
+        /// Name of the material for transparent 3D edges (located in folder Resources).
+        /// </summary>
+        private const string transparentEdgeMaterialName = "Materials/TransparentEdgePortalMaterial";
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
@@ -258,13 +263,16 @@ namespace SEE.GO
                 case ShaderType.TransparentLine:
                     name = transparentLineMaterialName;
                     break;
+                case ShaderType.TransparentEdge:
+                    name = transparentEdgeMaterialName;
+                    break;
                 case ShaderType.OpaqueMetallic:
                     name = opaqueMetallicMaterialName;
                     break;
                 case ShaderType.PortalFree:
                     name = portalFreeMaterialName;
                     break;
-                case ShaderType.DrawableLine: 
+                case ShaderType.DrawableLine:
                     name = drawableLineMaterialName;
                     break;
                 case ShaderType.DrawableDashedLine:
