@@ -277,6 +277,15 @@ namespace SEE.GO
             }
         }
 
+        /// Shader property that defines the (start) color.
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+
+        /// Shader property that defines the end color of the color gradient.
+        private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
+
+        /// Shader property that enables or disables the color gradient.
+        private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
+
         /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
@@ -584,9 +593,9 @@ namespace SEE.GO
                 return;
             }
 
-            meshRenderer.material.SetColor("_Color", gradientColors.start);
-            meshRenderer.material.SetColor("_EndColor", gradientColors.end);
-            meshRenderer.material.SetFloat("_ColorGradientEnabled", 1.0f);
+            meshRenderer.material.SetColor(ColorProperty, gradientColors.start);
+            meshRenderer.material.SetColor(EndColorProperty, gradientColors.end);
+            meshRenderer.material.SetFloat(ColorGradientEnabledProperty, 1.0f);
         }
 
         /// <summary>

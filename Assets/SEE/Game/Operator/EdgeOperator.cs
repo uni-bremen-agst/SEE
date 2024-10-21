@@ -32,6 +32,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private SEESpline spline;
 
+        /// Shader property that enables or disables the edge direction (data flow) animation.
+        private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
+
         #region Public API
 
         /// <summary>
@@ -149,13 +152,9 @@ namespace SEE.Game.Operator
         /// <param name="enable">Enable or disable animation.</param>
         public void AnimateDataFlow(bool enable = true)
         {
-            if (gameObject.TryGetComponent<MeshRenderer>(out MeshRenderer meshRenderer))
+            if (gameObject.TryGetComponentOrLog(out MeshRenderer meshRenderer))
             {
-                meshRenderer.material.SetFloat("_EdgeFlowEnabled", enable ? 1.0f : 0.0f);
-            }
-            else
-            {
-                Debug.LogWarning($"No MeshRenderer found to enable data flow animation on: {gameObject.FullName()}");
+                meshRenderer.material.SetFloat(EdgeFlowEnabledProperty, enable ? 1.0f : 0.0f);
             }
         }
 
