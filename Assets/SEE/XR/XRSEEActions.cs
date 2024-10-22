@@ -30,12 +30,12 @@ namespace SEE.XR
         /// <summary>
         /// The GameObject the user is currently hovering over.
         /// </summary>
-        public static GameObject hoveredGameObject { get; private set; }
+        private static GameObject hoveredGameObject { get; set; }
 
         /// <summary>
         /// The old parent of a node. We need this for the MoveAction.
         /// </summary>
-        public static Transform oldParent { get; set; }
+        public static Transform OldParent { get; set; }
 
         /// <summary>
         /// The button that's used for the primary actions.
@@ -76,7 +76,7 @@ namespace SEE.XR
         }
 
         /// <summary>
-        /// This method gets called, when the user begins to hover over an interactable.
+        /// This method gets called when the user begins to hover over an interactable.
         /// It provides the input data from the controller with regard to the start of a hover over an object in the CodeCity.
         /// </summary>
         /// <param name="args">Event data associated with the event when an Interactor first initiates hovering over an Interactable.</param>
@@ -86,7 +86,7 @@ namespace SEE.XR
             hoveredGameObject = args.interactableObject.transform.gameObject;
             if (GlobalActionHistory.Current() == ActionStateTypes.Move)
             {
-                oldParent = args.interactableObject.transform.parent;
+                OldParent = args.interactableObject.transform.parent;
             }
             if (hoveredGameObject.transform.TryGetComponent(out showLabel))
             {
@@ -176,7 +176,7 @@ namespace SEE.XR
                         }
                     }
                     Selected = true;
-                    if (GlobalActionHistory.Current() != ActionStateTypes.Move)
+                    if (GlobalActionHistory.Current() != ActionStateTypes.Move && GlobalActionHistory.Current() != ActionStateTypes.Delete)
                     {
                         SelectedFlag = true;
                     }
@@ -191,7 +191,7 @@ namespace SEE.XR
         /// <summary>
         /// Whether the TreeView is open while the user tries to move a node.
         /// We need to know if the user has the TreeView open, while moving a node,
-        /// because this can caus lags, which we prevent by closing the TreeView, befor
+        /// because this can cause lags, which we prevent by closing the TreeView before
         /// the node gets moved.
         /// </summary>
         public static bool CloseTreeView { get; set; }
@@ -262,7 +262,7 @@ namespace SEE.XR
         public static bool RedoToggle { get; set; }
 
         /// <summary>
-        /// This method gets called, when the button for the redo-action is pressed.
+        /// This method gets called when the button for the redo-action is pressed.
         /// It will redo the last action that was undone.
         /// </summary>
         /// <param name="context">Information provided to action callbacks about what triggered an action.</param>

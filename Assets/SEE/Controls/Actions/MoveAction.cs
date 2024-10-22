@@ -258,7 +258,7 @@ namespace SEE.Controls.Actions
                     GrabbedGameObject = gameObject;
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                     {
-                        originalParent = XRSEEActions.oldParent;
+                        originalParent = XRSEEActions.OldParent;
                     }
                     else
                     {
@@ -307,7 +307,7 @@ namespace SEE.Controls.Actions
                 {
                     // Node does not fit, resetting…
                     UnReparent();
-                    XRSEEActions.oldParent = null;
+                    XRSEEActions.OldParent = null;
                     wasMoved = false;
                 }
                 else

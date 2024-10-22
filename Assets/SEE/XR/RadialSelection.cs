@@ -8,6 +8,7 @@ using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 using SEE.Utils;
+using System;
 
 namespace SEE.XR
 {
@@ -63,41 +64,41 @@ namespace SEE.XR
         public InputActionReference RadialMenuActionRef;
 
         /// <summary>
-        /// All actions, which are currently available.
+        /// All actions which are currently available.
         /// </summary>
-        List<string> actions = new();
+        private List<string> actions = new();
 
         /// <summary>
-        /// Alle submenus and their entries.
+        /// All submenus and their entries.
         /// </summary>
-        List<(string, List<string>)> subMenus = new();
+        private List<(string, List<string>)> subMenus = new();
 
         /// <summary>
-        /// All entry of a submenu.
-        /// This list is used, to swap between the main-menu and sub-menus.
+        /// All entries of a submenu.
+        /// This list is used to swap between the main-menu and sub-menus.
         /// The main menu contains all "main-actions" and the sub-menus more
-        /// specific sub-actions. We safe the main-actions here for the case,
+        /// specific sub-actions. We save the main-actions here for the case
         /// that the user wants to go back to the main-menu.
         /// </summary>
-        List<string> menuEntries = new();
+        private List<string> menuEntries = new();
 
         /// <summary>
         /// This is used for the rotate-action, because in this case we
         /// have a dial, which is getting spawned, and should be despawned, when the action changes.
         /// </summary>
-        GameObject actionObject;
+        private GameObject actionObject;
 
         /// <summary>
         /// The position of the submenu.
-        /// It should be the same, as the position from the mainmenu.
+        /// It should be the same as the position from the mainmenu.
         /// </summary>
-        Vector3? subMenuPosition;
+        private Vector3? subMenuPosition;
 
         /// <summary>
         /// The rotation of the submenu.
-        /// It should be the same, as the rotation from the mainmenu.
+        /// It should be the same as the rotation from the mainmenu.
         /// </summary>
-        Quaternion? subMenuRotation;
+        private Quaternion? subMenuRotation;
 
         /// <summary>
         /// The selected HideMode.
@@ -134,7 +135,7 @@ namespace SEE.XR
                 {
                     if (parent is ActionStateTypeGroup parentGroup)
                     {
-                        var search = subMenus.FirstOrDefault(item => item.Item1 == parent.Name);
+                        (string, List<string>) search = subMenus.FirstOrDefault(item => item.Item1 == parent.Name);
                         for (int i = 0; i < subMenus.Count; i++)
                         {
                             if (subMenus[i].Item1 == parent.Name && subMenus[i].Item2 == null)
@@ -167,10 +168,10 @@ namespace SEE.XR
         /// <summary>
         /// Whether the radial menu is open.
         /// </summary>
-        bool radialMenuTrigger;
+        private bool radialMenuTrigger;
 
         /// <summary>
-        /// This method gets called, when the button for the radial-menu is pressed.
+        /// This method gets called when the button for the radial-menu is pressed.
         /// </summary>
         /// <param name="context">Information provided to action callbacks about what triggered an action.</param>
         private void RadialMenu(InputAction.CallbackContext context)
@@ -256,12 +257,12 @@ namespace SEE.XR
         /// <summary>
         /// Is true if the radial menu is open.
         /// </summary>
-        bool spawned;
+        private bool spawned;
 
         /// <summary>
         /// This list represents all hideActions.
         /// </summary>
-        static List<string> hideActions = new()
+        private static List<string> hideActions = new()
         {
             "HideAll",
             "HideSelected",
@@ -295,54 +296,9 @@ namespace SEE.XR
                     subMenuPosition = radialPartCanvas.position;
                     subMenuRotation = radialPartCanvas.rotation;
                 }
-                else if (actions[i] == "HideAll")
+                else if (Enum.TryParse(actions[i], out HideModeSelector mode))
                 {
-                    HideMode = HideModeSelector.HideAll;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideSelected")
-                {
-                    HideMode = HideModeSelector.HideSelected;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideUnselected")
-                {
-                    HideMode = HideModeSelector.HideUnselected;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideOutgoing")
-                {
-                    HideMode = HideModeSelector.HideOutgoing;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideIncoming")
-                {
-                    HideMode = HideModeSelector.HideIncoming;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideAllEdgesOfSelected")
-                {
-                    HideMode = HideModeSelector.HideAllEdgesOfSelected;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideForwardTransitiveClosure")
-                {
-                    HideMode = HideModeSelector.HideForwardTransitiveClosure;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideBackwardTransitiveClosure")
-                {
-                    HideMode = HideModeSelector.HideBackwardTransitiveClosure;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HideAllTransitiveClosure")
-                {
-                    HideMode = HideModeSelector.HideAllTransitiveClosure;
-                    TriggerHideAction();
-                }
-                else if (actions[i] == "HighlightEdges")
-                {
-                    HideMode = HideModeSelector.HighlightEdges;
+                    HideMode = mode;
                     TriggerHideAction();
                 }
                 else

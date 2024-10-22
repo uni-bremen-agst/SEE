@@ -26,7 +26,7 @@ namespace SEE.XR
         public Button deleteButton;
 
         /// <summary>
-        /// The spacebuttom, which adds a space.
+        /// The spacebutton, which adds a space.
         /// </summary>
         public Button spaceButton;
 

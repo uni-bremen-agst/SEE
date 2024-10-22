@@ -124,7 +124,7 @@ namespace SEE.Controls.Actions
             else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected)
             {
                 // the hit object is the one to be deleted
-                hitGraphElements.Add(XRSEEActions.hoveredGameObject);
+                hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
                 XRSEEActions.Selected = false;
                 return Delete(); // the selected objects are deleted and this action is done now
             }

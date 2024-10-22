@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions
                         GameObject parent = raycastHit.collider.gameObject;
                         AddNode(raycastHit.collider.gameObject, raycastHit.point);
                     }
-                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.hoveredGameObject != null && XRSEEActions.Selected && XRSEEActions.hoveredGameObject.HasNodeRef() &&
+                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef() &&
                         XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res))
                     {
                         // the hit object is the parent in which to create the new node

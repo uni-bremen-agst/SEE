@@ -137,19 +137,18 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            // FIXME: We need an interaction for VR, too.
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.hoveredGameObject != null && XRSEEActions.Selected && XRSEEActions.hoveredGameObject.HasNodeRef())
+                if (XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
                 {
                     if (from == null)
                     {
-                        from = XRSEEActions.hoveredGameObject;
+                        from = InteractableObject.HoveredObjectWithWorldFlag.gameObject;
                         XRSEEActions.Selected = false;
                     }
                     else if (to == null)
                     {
-                        to = XRSEEActions.hoveredGameObject;
+                        to = InteractableObject.HoveredObjectWithWorldFlag.gameObject;
                         XRSEEActions.Selected = false;
                     }
                 }

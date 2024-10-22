@@ -103,7 +103,7 @@ namespace SEE.XR
             if (ShouldGetHandRotation)
             {
                 float rotationAngle = GetInteractorRotation();
-                GetRotationDistance(rotationAngle);
+                DetermineRotationDistance(rotationAngle);
             }
         }
 
@@ -117,7 +117,7 @@ namespace SEE.XR
         /// Determines in which direction and how much the dial/node should be rotated.
         /// </summary>
         /// <param name="currentAngle">The current angle from the controller.</param>
-        private void GetRotationDistance(float currentAngle)
+        private void DetermineRotationDistance(float currentAngle)
         {
             if (!firstRotation)
             {
@@ -126,11 +126,9 @@ namespace SEE.XR
                 {
                     if (angleDifference > 270f)
                     {
-                        float angleCheck;
                         if (startAngle < currentAngle)
                         {
-                            angleCheck = CheckAngle(currentAngle, startAngle);
-                            if (angleCheck < angleTolerance)
+                            if (!CheckAngle(currentAngle, startAngle, angleTolerance))
                             {
                                 return;
                             }
@@ -142,8 +140,7 @@ namespace SEE.XR
                         }
                         else if (startAngle > currentAngle)
                         {
-                            angleCheck = CheckAngle(currentAngle, startAngle);
-                            if (angleCheck < angleTolerance)
+                            if (!CheckAngle(currentAngle, startAngle, angleTolerance))
                             {
                                 return;
                             }
@@ -176,12 +173,24 @@ namespace SEE.XR
         }
 
         /// <summary>
-        /// Calculates the current rotation angle of the controller.
+        /// Checks if the rotation was significant enough (bigger than the angleTolerance).
+        /// If so, the selected object will be rotated, otherwise nothing will happen.
         /// </summary>
         /// <param name="currentAngle">The current angle of the controller.</param>
         /// <param name="startAngle">The base angle.</param>
+        /// <param name="angleTolerance">The minimum angle, which needs to be reached to cause a rotation of the selected object.</param>
         /// <returns>the amount of rotation</returns>
-        private float CheckAngle(float currentAngle, float startAngle) => (360f - currentAngle) + startAngle;
+        private bool CheckAngle(float currentAngle, float startAngle, float angleTolerance)
+        {
+            if (((360f - currentAngle) + startAngle) < angleTolerance)
+            {
+                return false;
+            }
+            else
+            {
+                return true;
+            }
+        }
 
         /// <summary>
         /// Rotates the dial/node clockwise.

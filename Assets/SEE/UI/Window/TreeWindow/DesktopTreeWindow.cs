@@ -452,7 +452,7 @@ namespace SEE.UI.Window.TreeWindow
                     });
                 }
 
-                IEnumerable<PopupMenuEntry> CreateContextMenuActions (TreeWindowContextMenu contextMenu, Vector2 position, GraphElement representedGraphElement, GameObject representedGameObject)
+                IEnumerable<PopupMenuEntry> CreateContextMenuActions(TreeWindowContextMenu contextMenu, Vector2 position, GraphElement representedGraphElement, GameObject representedGameObject)
                 {
                     List<PopupMenuAction> appends = new()
                     {
