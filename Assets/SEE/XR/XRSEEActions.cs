@@ -40,22 +40,26 @@ namespace SEE.XR
         /// <summary>
         /// The button that's used for the primary actions.
         /// </summary>
-        public InputActionReference inputAction;
+        [SerializeField]
+        private InputActionReference inputAction;
 
         /// <summary>
         /// The button that's used for the undo-action.
         /// </summary>
-        public InputActionReference undo;
+        [SerializeField]
+        private InputActionReference undo;
 
         /// <summary>
         /// The button that's used for the redo-action.
         /// </summary>
-        public InputActionReference redo;
+        [SerializeField]
+        private InputActionReference redo;
 
         /// <summary>
         /// The button that's used to open the tooltip.
         /// </summary>
-        public InputActionReference tooltip;
+        [SerializeField]
+        private InputActionReference tooltip;
 
         /// <summary>
         /// Shows the source name of the hovered or selected object as a text label above the

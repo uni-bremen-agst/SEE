@@ -50,6 +50,7 @@ namespace SEE.XR
 
         /// <summary>
         /// The currently selected radial-part.
+        /// (-1 is just a placeholder, it won't occur in practice.)
         /// </summary>
         private int currentSelectedRadialPart = -1;
 
@@ -61,7 +62,8 @@ namespace SEE.XR
         /// <summary>
         /// The button that triggers the radial-menu.
         /// </summary>
-        public InputActionReference RadialMenuActionRef;
+        [SerializeField]
+        private InputActionReference RadialMenuActionRef;
 
         /// <summary>
         /// All actions which are currently available.
