@@ -173,7 +173,7 @@ namespace SEE.XR
         }
 
         /// <summary>
-        /// Checks if the rotation was significant enough (bigger than the angleTolerance).
+        /// Checks if the rotation was significant enough (bigger than the <paramref name="angleTolerance"/>).
         /// If so, the selected object will be rotated, otherwise nothing will happen.
         /// </summary>
         /// <param name="currentAngle">The current angle of the controller.</param>
@@ -182,14 +182,7 @@ namespace SEE.XR
         /// <returns>the amount of rotation</returns>
         private bool CheckAngle(float currentAngle, float startAngle, float angleTolerance)
         {
-            if (((360f - currentAngle) + startAngle) < angleTolerance)
-            {
-                return false;
-            }
-            else
-            {
-                return true;
-            }
+            return ((360f - currentAngle) + startAngle) >= angleTolerance;
         }
 
         /// <summary>

@@ -1,3 +1,4 @@
+using SEE.GO;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,15 +53,24 @@ namespace SEE.XR
 
         private void Awake()
         {
-            if (instance == null)
+            if (FindObjectsOfType<KeyboardManager>().Length > 1)
+            {
+                Debug.LogError($"More than one {nameof(KeyboardManager)} is present in the scene! "
+                               + "This will lead to undefined behaviours\n");
+                foreach (KeyboardManager manager in FindObjectsOfType<KeyboardManager>())
+                {
+                    Debug.LogError($"{typeof(KeyboardManager)} at game object {manager.gameObject.FullName()}.\n");
+                }
+            }
+            else
             {
                 instance = this;
+                spaceButton.onClick.AddListener(Space);
+                deleteButton.onClick.AddListener(Delete);
+                shiftButton.onClick.AddListener(Shifted);
+                enterButton.onClick.AddListener(Enter);
+                shiftButtonImage = shiftButton.gameObject.GetComponent<Image>();
             }
-            spaceButton.onClick.AddListener(Space);
-            deleteButton.onClick.AddListener(Delete);
-            shiftButton.onClick.AddListener(Shifted);
-            enterButton.onClick.AddListener(Enter);
-            shiftButtonImage = shiftButton.gameObject.GetComponent<Image>();
         }
 
         /// <summary>
