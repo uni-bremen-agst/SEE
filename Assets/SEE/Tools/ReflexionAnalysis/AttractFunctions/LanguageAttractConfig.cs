@@ -1,6 +1,8 @@
 using SEE.Scanner;
 using SEE.Scanner.Antlr;
+using System;
 using System.Xml.Linq;
+using UnityEngine;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 {
@@ -12,6 +14,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <summary>
         /// Token language used by the attract function
         /// </summary>
+        [SerializeField]
         public AntlrLanguage.AntlrLanguageType TokenLanguageType { get; set; }
 
         /// <summary>

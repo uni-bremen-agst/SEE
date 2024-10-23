@@ -13,7 +13,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Scaling factor for wanted coupling used in the calculation of <see cref="CountAttract"/>
         /// </summary>
         [SerializeField]
-        private float phi;
+        [RangeAttribute(0,1)]
+        public float phi;
 
         /// <summary>
         /// Scaling factor for wanted coupling used in the calculation of <see cref="CountAttract"/>

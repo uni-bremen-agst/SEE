@@ -65,7 +65,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// Determines if all mapping pairs should be recorded during each 
         /// mapping step or only the mapped one.
         /// </summary>
-        private bool recordAllMappingPairs;
+        // private bool recordAllMappingPairs;
 
         /// <summary>
         /// Construction initializes a new instance of <see cref="CandidateRecommendationStatistics"/>
@@ -85,7 +85,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         {
             this.mappingResult.AddConfigInformation(config);
             this.config = config;
-            this.recordAllMappingPairs = config.measurePercentileRanks;
+            // this.recordAllMappingPairs = config.measurePercentileRanks;
         }
 
         /// <summary>
@@ -109,13 +109,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// Records a given list of mapping pairs for the current mapping step.
         /// </summary>
         /// <param name="mappingPairs">Given list of mapping pairs</param>
-        public void RecordMappingPairs(IEnumerable<MappingPair> mappingPairs)
-        {
-            if (recordAllMappingPairs)
-            {
-                mappingProcess[mappingStep].AddRange(mappingPairs); 
-            }
-        }
+        //public void RecordMappingPairs(IEnumerable<MappingPair> mappingPairs)
+        //{
+        //    // TODO: Measure all mapping pairs to calculate percentile ranks, delete later, 
+        //    //if (recordAllMappingPairs)
+        //    //{
+        //    //    mappingProcess[mappingStep].AddRange(mappingPairs); 
+        //    //}
+        //}
 
         /// <summary>
         /// Records the changed mapping pair during the mapping process.
@@ -226,18 +227,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     // only use remaining mappingPairs without chosen mapping
                     mappingPairs = mappingPairs.GetRange(1, mappingPairs.Count - 1);
 
-                    if (recordAllMappingPairs)
-                    {
-                        List<Node> candidates = CandidateRecommendation.GetCandidates();
-                        foreach (Node candidate in candidates)
-                        {
-                            if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
-                            {
-                                double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
-                                mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank);
-                            }
-                        } 
-                    }
+                    // TODO: code for measuring percentile ranks, still necessary?
+                    //if (recordAllMappingPairs)
+                    //{
+                    //    List<Node> candidates = CandidateRecommendation.GetCandidates();
+                    //    foreach (Node candidate in candidates)
+                    //    {
+                    //        if (mappingResult.ContainsCandidateStatisticResult(candidate.ID))
+                    //        {
+                    //            double percentileRank = CandidateRecommendation.CalculatePercentileRank(candidate.ID, mappingPairs);
+                    //            mappingResult.GetCandidateStatisticResult(candidate.ID).AddPercentileRank(percentileRank);
+                    //        }
+                    //    } 
+                    //}
 
                     if (chosenMappingPair.ChangeType == ChangeType.Addition)
                     {

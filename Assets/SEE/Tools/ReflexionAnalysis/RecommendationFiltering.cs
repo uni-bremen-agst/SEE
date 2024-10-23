@@ -5,6 +5,7 @@ using System.Linq;
 
 namespace Assets.SEE.Tools.ReflexionAnalysis
 {
+    // TODO: Delete class?
     /// <summary>
     /// This class provides automatic sorting and filtering for 
     /// add mapping pairs to find recommendations and candidate sets.
@@ -66,9 +67,15 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// </summary>
         /// <returns></returns>
         /// <exception cref="NotImplementedException"></exception>
-        public IEnumerable<MappingPair> GetRecommendations()
+        public IEnumerable<MappingPair> GetAutomaticMappings()
         {
             return this.Recommendations;
+        }
+
+        public IEnumerable<MappingPair> GetRecommendations()
+        {
+            // TODO:
+            return new List<MappingPair>();
         }
 
         /// <summary>

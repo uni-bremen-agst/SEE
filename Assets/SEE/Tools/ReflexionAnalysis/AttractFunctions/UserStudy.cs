@@ -217,10 +217,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             {
                 RecommendationSettings settings = new();
                 settings.OutputPath = city.RecommendationSettings.OutputPath;
-                settings.RootSeed = 5788925;
-                settings.syncExperimentWithView = true;
+                settings.rootSeed = 5788925;
+                settings.syncWithView = true;
                 settings.IgnoreTieBreakers = false;
-                settings.InitialMappingPercentage = 0.80;
+                settings.initialMappingPercentage = 0.80f;
                 settings.ADCAttractConfig.MergingType = Document.DocumentMergingType.Intersection;
                 return settings;
             }

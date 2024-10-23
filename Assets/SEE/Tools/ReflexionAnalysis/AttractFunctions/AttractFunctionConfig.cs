@@ -12,27 +12,26 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     [System.Serializable]
     public abstract class AttractFunctionConfig
     {
-        /// <summary>
-        /// Node type determining which nodes are considered to be candidates
-        /// </summary>
-        [SerializeField]
+       
+       /// <summary>
+       /// Node type determining which nodes are considered to be candidates
+       /// </summary>
         private string candidateType = "Class";
 
         /// <summary>
         /// Node type determining which nodes are considered to be candidates
         /// </summary>
-        public string CandidateType { get => candidateType; set => candidateType = value; }
+         public string CandidateType { get => candidateType; set => candidateType = value; }
 
         /// <summary>
         /// Node type determining which nodes are considered to be clusters
         /// </summary>
-        [SerializeField]
         private string clusterType = "Cluster";
 
         /// <summary>
         /// Node type determining which nodes are considered to be clusters
         /// </summary>
-        public string ClusterType { get => clusterType; set => clusterType = value; }
+         public string ClusterType { get => clusterType; set => clusterType = value; }
 
         /// <summary>
         /// Attract function type defining the concrete <see cref="AttractFunction"/> object.

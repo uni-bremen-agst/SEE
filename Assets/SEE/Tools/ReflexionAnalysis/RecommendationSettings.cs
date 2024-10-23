@@ -14,46 +14,65 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         public AttractFunction.AttractFunctionType AttractFunctionType { get => attractFunctionType; set => attractFunctionType = value; }
 
+        // TODO: Range attribute is only forwared towards the corresponding slider, if the fields are public
         [SerializeField]
-        private int iterations = 1;
+        [Range(1, 1000)]
+        public int iterations = 1;
 
         [SerializeField]
         private string experimentName = "experiment";
 
         public string ExperimentName { get => experimentName; set => experimentName = value; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         [SerializeField]
-        public int Delta { get; private set; }
-
-        [SerializeField]
-        public bool syncExperimentWithView { get; set; }
+        public bool syncWithView { get; set; }
 
         [SerializeField]
         public bool IgnoreTieBreakers { get; set; }
 
-        public int Iterations { get => iterations; set => iterations = value; }
+        [SerializeField]
+        [Range(1, 999999)]
+        public int rootSeed = 593946;
 
         [SerializeField]
-        private int masterSeed = 593946;
-
-        public int RootSeed { get => masterSeed; set => masterSeed = value; }
-
-        [SerializeField]
-        private double initialMappingPercentage = 0.9;
-
-        public double InitialMappingPercentage { get => initialMappingPercentage; set => initialMappingPercentage = value; }
+        [Range(0, 1)]
+        public float initialMappingPercentage = 0.5f;
 
         [SerializeField]
-        // private DirectoryPath outputPath;
         private DataPath outputPath;
 
+        /// <summary>
+        /// Node type determining which nodes are considered to be candidates
+        /// </summary>
         [SerializeField]
-        public bool measurePercentileRanks;
+        private string candidateType = "Class";
 
-        // public DirectoryPath OutputPath { get => outputPath; set => outputPath = value; }
+        /// <summary>
+        /// Node type determining which nodes are considered to be candidates
+        /// </summary>
+         public string CandidateType { get => candidateType; set => candidateType = value; }
+
+        /// <summary>
+        /// Node type determining which nodes are considered to be clusters
+        /// </summary>
+        [SerializeField]
+        private string clusterType = "Cluster";
+
+        /// <summary>
+        /// Node type determining which nodes are considered to be clusters
+        /// </summary>
+        public string ClusterType { get => clusterType; set => clusterType = value; }
+
+        /// <summary>
+        /// Determines if the training data of a attract function is logged to a file during an experiment
+        /// </summary>
+        [SerializeField]
+        public bool logTrainingData = false;
+
+        // TODO: Delete this field, measuring of percentile ranks was not fully implemented 
+        //[SerializeField]
+        //public bool measurePercentileRanks;
+
         public DataPath OutputPath { get => outputPath; set => outputPath = value; }
 
         public INodeReader NodeReader { get; set; }
@@ -95,7 +114,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         } 
         
         public static RecommendationSettings CreateGroup(int n, 
-                                                        double initialMapping, 
+                                                        float initialMapping, 
                                                         string name, 
                                                         AttractFunctionType attractFunction,
                                                         float phi = 1.0f)
@@ -103,15 +122,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             RecommendationSettings settings = new RecommendationSettings();
             settings.iterations = n;
             settings.IgnoreTieBreakers = true;
-            settings.syncExperimentWithView = false;
-            settings.RootSeed = 258506098;
+            settings.syncWithView = false;
+            settings.rootSeed = 258506098;
             settings.initialMappingPercentage = initialMapping;
             settings.attractFunctionType = attractFunction;
             settings.CountAttractConfig.Phi = phi;
-            settings.AttractFunctionConfig.CandidateType = "Class";
-            settings.AttractFunctionConfig.ClusterType = "Cluster";
+            settings.CandidateType = "Class";
+            settings.ClusterType = "Cluster";
             settings.OutputPath = new DataPath();
-            // settings.OutputPath = new DirectoryPath();
             settings.ExperimentName = name;
             return settings;
         }

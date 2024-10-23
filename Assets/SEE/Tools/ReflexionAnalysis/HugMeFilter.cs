@@ -24,7 +24,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             return mappingPair;
         }
 
-        public IEnumerable<MappingPair> GetRecommendations()
+        public IEnumerable<MappingPair> GetAutomaticMappings()
         {
             List<MappingPair> recommendations = new List<MappingPair>();
             foreach (string candidateId in knownCandidates)
@@ -34,6 +34,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 {
                     recommendations.AddRange(recommendationsForCandidate);
                 }
+            }
+
+            return recommendations;
+        }
+
+        public IEnumerable<MappingPair> GetRecommendations()
+        {
+            List<MappingPair> recommendations = new List<MappingPair>();
+            foreach (string candidateId in knownCandidates)
+            {
+                IEnumerable<MappingPair> recommendationsForCandidate = this.GetRecommendationForCandidate(candidateId);
+                recommendations.AddRange(recommendationsForCandidate);
             }
 
             return recommendations;

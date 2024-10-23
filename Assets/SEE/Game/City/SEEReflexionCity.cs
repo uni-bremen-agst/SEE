@@ -13,6 +13,7 @@ using Sirenix.Serialization;
 using SEE.UI.Notification;
 using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using System.IO;
+using SEE.Utils.Config;
 
 namespace SEE.Game.City
 {
@@ -97,6 +98,13 @@ namespace SEE.Game.City
                 scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
         }
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            OracleMappingProvider?.Save(writer, oracleProviderPathLabel);
+        }
+
         protected override void Restore(Dictionary<string, object> attributes)
         {
             UnityEngine.Debug.Log($"Restore: attributes.ContainsKey(oracleProviderPathLabel)={attributes.ContainsKey(oracleProviderPathLabel)} ");
@@ -168,8 +176,8 @@ namespace SEE.Game.City
 
         protected const string RecommendationsFoldoutGroup = "Recommendations";
 
-        [Button("Update MappingChoice Settings", ButtonSizes.Small)]
-        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Attract function")]
+        [Button("Update Recommendations", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Recommendations")]
         // TODO: Property order?
         // necessary regarding disabling enabling?
         [PropertyOrder(2)]
@@ -215,8 +223,9 @@ namespace SEE.Game.City
 
                 if (candidateRecommendationViz != null)
                 {
-                    await candidateRecommendationViz.CreateInitialMappingAsync(RecommendationSettings.InitialMappingPercentage, 
-                                                                               RecommendationSettings.RootSeed);
+                    await candidateRecommendationViz.CreateInitialMappingAsync(RecommendationSettings.initialMappingPercentage, 
+                                                                               RecommendationSettings.rootSeed,
+                                                                               RecommendationSettings.syncWithView);
                 }
             }
         }
@@ -228,10 +237,12 @@ namespace SEE.Game.City
             using (LoadingSpinner.ShowDeterminate($"automate mapping...",
                                        out Action<float> reportProgress))
             {
-                await candidateRecommendationViz.StartAutomatedMappingAsync(null,
-                                                                    syncWithView: true,
+                UnityEngine.Debug.Log($"syncWithView: {RecommendationSettings.syncWithView}");
+                await candidateRecommendationViz.StartAutomatedMappingAsync(
+                                                                    candidateRecommendationViz.CandidateRecommendation,
+                                                                    syncWithView: RecommendationSettings.syncWithView,
                                                                     ignoreTieBreakers: RecommendationSettings.IgnoreTieBreakers,
-                                                                    new System.Random(RecommendationSettings.RootSeed)); 
+                                                                    new System.Random(RecommendationSettings.rootSeed)); 
             }
         }
 
@@ -241,7 +252,7 @@ namespace SEE.Game.City
         {
             try
             {
-                if (!this.RecommendationSettings.syncExperimentWithView)
+                if (!this.RecommendationSettings.syncWithView)
                 {
                     await candidateRecommendationViz.RunExperimentInBackground(this.RecommendationSettings, oracleMapping);
                 }

@@ -113,18 +113,21 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         #region button labels
 
-        private const string showRecommendationLabel = "Show MappingChoice";
+        private const string showMappingChoicesLabel = "Show MappingChoices";
         private const string startRecordingLabel = "Start Recording";
         private const string stopRecordingLabel = "Stop Recording";
         private const string calculateResultsLabel = "Calculate Results";
         private const string dumbTrainingDataLabel = "Dump Training Data";
         private const string debugScenarioLabel = "Debug Scenario";
         private const string dumpOracleLabel = "Dump Oracle";
-        private const string generateOracleMappingLabel = "Generate Oracle";
+        private const string createOracleMappingLabel = "Create Oracle GXLs";
+        private const string createMappingGXLMappingLabel = "Create Mapping GXL";
+        private const string dumpSystemStatisticsLabel = "Dump System Statistics";
 
         private const string statisticButtonGroup = "statisticButtonsGroup";
         private const string mappingButtonGroup = "mappingButtonsGroup";
         private const string debugButtonGroup = "debugButtonGroup"; 
+        private const string gxlButtonGroup = "gxlButtonGroup"; 
 
         #endregion
 
@@ -174,7 +177,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             if (!ProcessingEvents && value is EdgeEvent edgeEvent && edgeEvent.Affected == ReflexionSubgraphs.Mapping)
             {
                 ProcessingEvents = true;
-                ProcessEvents().ContinueWith(() => TriggerBlinkAnimation().Forget()).Forget();         
+                ProcessEvents().Forget();         
             }
         }
 
@@ -419,14 +422,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// This operations is synchronized with the processing of events.
         /// </summary>
         /// <returns>IEnumerable object containing the recommendations for the next mapping</returns>
-        private async Task<IEnumerable<MappingPair>> GetRecommendationsAsync()
+        private async Task<IEnumerable<MappingPair>> GetAutomaticMappingsAsync()
         {
             await UniTask.WaitWhile(() => ProcessingEvents);
             return await UniTask.RunOnThreadPool(() =>
             {
                 lock (calculationReflexionGraphLock)
                 {
-                    return this.CandidateRecommendation.GetRecommendations();
+                    return this.CandidateRecommendation.GetAutomaticMappings();
                 }
             });
         }
@@ -458,18 +461,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             List<RecommendationSettings> settings = new()
             {
-                RecommendationSettings.CreateGroup(n, 0.5, "CAAttract_Zero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.5, "CAAttract_One_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
-                RecommendationSettings.CreateGroup(n, 0.5, "ADCAttract_05", AttractFunction.AttractFunctionType.ADCAttract),
-                RecommendationSettings.CreateGroup(n, 0.5, "NBAttract_05", AttractFunction.AttractFunctionType.NBAttract),
-                RecommendationSettings.CreateGroup(n, 0.7, "CAAttract_Zero_07", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.7, "CAAttract_One_07", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
-                RecommendationSettings.CreateGroup(n, 0.7, "ADCAttract_07", AttractFunction.AttractFunctionType.ADCAttract),
-                RecommendationSettings.CreateGroup(n, 0.7, "NBAttract_07", AttractFunction.AttractFunctionType.NBAttract),
-                RecommendationSettings.CreateGroup(n, 0.9, "CAAttract_Zero_09", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.9, "CAAttract_One_09", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
-                RecommendationSettings.CreateGroup(n, 0.9, "ADCAttract_09", AttractFunction.AttractFunctionType.ADCAttract),
-                RecommendationSettings.CreateGroup(n, 0.9, "NBAttract_09", AttractFunction.AttractFunctionType.NBAttract)
+                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttract_Zero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttract_One_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.5f, "ADCAttract_05", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.5f, "NBAttract_05", AttractFunction.AttractFunctionType.NBAttract),
+                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttract_Zero_07", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttract_One_07", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.7f, "ADCAttract_07", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.7f, "NBAttract_07", AttractFunction.AttractFunctionType.NBAttract),
+                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttract_Zero_09", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttract_One_09", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.9f, "ADCAttract_09", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.9f, "NBAttract_09", AttractFunction.AttractFunctionType.NBAttract)
             };
 
             city.Reset();
@@ -478,7 +481,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             foreach(RecommendationSettings setting in settings)
             {
                 UnityEngine.Debug.Log($"iterate group {setting.ExperimentName}...");
-                setting.Iterations = n;
+                setting.iterations = n;
                 await city.UpdateRecommendationSettings(setting);
                 city.RecommendationSettings = setting;
                 setting.OutputPath.Path = Path.Combine(Path.Combine(GetConfigPath(), "Results"), setting.ExperimentName);
@@ -499,7 +502,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>Awaitable UniTask</returns>
         public async UniTask CreateInitialMappingAsync(double initialMappingPercentage,
                                                        int seed,
-                                                       bool syncWithView = true,
+                                                       bool syncWithView = false,
                                                        int delay = 500,
                                                        Action<float> reportProgress = null)
         {
@@ -554,25 +557,28 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 unmappedNodes = reflexionGraphViz.ResetMapping();
             }
 
-            foreach (Node unmappedNode in unmappedNodes)
+            if (RecommendationSettings.syncWithView)
             {
-                GameNodeMover.MoveTo(unmappedNode.GameObject(), unmappedNode.Parent.GameObject().GetGroundCenter(), 1.0f);
-                new MoveNetAction(unmappedNode.GameObject().name, unmappedNode.Parent.GameObject().GetGroundCenter(), 1.0f).Execute();
-                await UniTask.Delay(delay);
+                foreach (Node unmappedNode in unmappedNodes)
+                {
+                    GameNodeMover.MoveTo(unmappedNode.GameObject(), unmappedNode.Parent.GameObject().GetGroundCenter(), 1.0f);
+                    new MoveNetAction(unmappedNode.GameObject().name, unmappedNode.Parent.GameObject().GetGroundCenter(), 1.0f).Execute();
+                    await UniTask.Delay(delay);
+                } 
             }
         }
 
         public async UniTask RunExperimentInBackground(RecommendationSettings recommendationSettings,
                                 Graph oracleMapping)
         {
-            if (recommendationSettings.syncExperimentWithView)
+            if (recommendationSettings.syncWithView)
             {
-                throw new Exception($"Cannot run experiment in background if the experiment shall be synced with view. recommendationSettings.syncExperimentWithView={recommendationSettings.syncExperimentWithView}");
+                throw new Exception($"Cannot run experiment in background if the experiment shall be synced with view. recommendationSettings.syncExperimentWithView={recommendationSettings.syncWithView}");
             }
       
-            System.Random rand = new System.Random(recommendationSettings.RootSeed);
+            System.Random rand = new System.Random(recommendationSettings.rootSeed);
             int currentSeed = rand.Next(int.MaxValue);
-            double initialMappingPercentage = recommendationSettings.InitialMappingPercentage;
+            double initialMappingPercentage = recommendationSettings.initialMappingPercentage;
             string experimentName = recommendationSettings.ExperimentName;
 
             ReflexionGraph graph;
@@ -600,7 +606,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             Directory.CreateDirectory(recommendationSettings.OutputPath.Path);
 
-            for (int i = 0; i < recommendationSettings.Iterations; ++i)
+            for (int i = 0; i < recommendationSettings.iterations; ++i)
             {
                 UnityEngine.Debug.Log($"Experiment run={i}...");
                 // STEPS
@@ -642,7 +648,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 // 6. Process Data and keep result object
                 MappingExperimentResult result = await UniTask.RunOnThreadPool(() => recommendations.Statistics.CalculateResults(csvFile));
                 result.CurrentSeed = currentSeed;
-                result.MasterSeed = recommendationSettings.RootSeed;
+                result.MasterSeed = recommendationSettings.rootSeed;
                 results.Add(result);
                 string xmlFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_output_{currentSeed}.xml");
                 stream = new FileStream(xmlFile, FileMode.Create);
@@ -668,13 +674,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             MappingExperimentResult averageResult = await UniTask.RunOnThreadPool(() => MappingExperimentResult.AverageResults(results, recommendationSettings));
-            averageResult.MasterSeed = recommendationSettings.RootSeed;
-            averageResult.Iterations = recommendationSettings.Iterations;
+            averageResult.MasterSeed = recommendationSettings.rootSeed;
+            averageResult.Iterations = recommendationSettings.iterations;
             string resultXml = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_result.xml");
             stream = new FileStream(resultXml, FileMode.Create);
             averageResult.CreateXml().Save(stream);
             stream.Close();
-            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.RootSeed}. Saved averaged result to {resultXml}");
+            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.rootSeed}. Saved averaged result to {resultXml}");
         }
 
         /// <summary>
@@ -701,10 +707,20 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public async UniTask RunExperimentAsync(RecommendationSettings recommendationSettings,
                                         Graph oracleMapping)
         {
-            bool syncWithView = recommendationSettings.syncExperimentWithView;
-            System.Random rand = new System.Random(recommendationSettings.RootSeed);
-            int currentSeed = rand.Next(int.MaxValue);
-            double initialMappingPercentage = recommendationSettings.InitialMappingPercentage;
+            bool syncWithView = recommendationSettings.syncWithView;
+
+            int currentSeed;
+            System.Random rand = new System.Random(recommendationSettings.rootSeed);
+            if (recommendationSettings.iterations <= 1)
+            {
+                currentSeed = recommendationSettings.rootSeed;
+            } 
+            else
+            {
+                currentSeed = rand.Next(int.MaxValue);
+            }
+
+            double initialMappingPercentage = recommendationSettings.initialMappingPercentage;
             string experimentName = recommendationSettings.ExperimentName;
 
             CandidateRecommendation recommendations;
@@ -717,6 +733,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             else
             {
                 ReflexionGraph graph;
+
                 // Calculate experiment in the background
                 lock (visualizedReflexionGraphLock)
                 {
@@ -731,13 +748,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             Debug.Log($"Start Experiment {experimentName} for graph {recommendations.ReflexionGraph.Name}({recommendations.ReflexionGraph.Nodes().Count} nodes, candidates={recommendations.ReflexionGraph.Nodes().Where(n => recommendations.IsCandidate(n))} {recommendations.ReflexionGraph.Edges().Count} edges)");
 
-            if (!syncWithView)
+            if (syncWithView)
             {
-                recommendations.ReflexionGraph.ResetMapping();
+                await this.ResetMappingAsync();
             }
             else
             {
-                await this.ResetMappingAsync();
+                recommendations.ReflexionGraph.ResetMapping();
             }
 
             FileStream stream;
@@ -745,17 +762,27 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             Directory.CreateDirectory(recommendationSettings.OutputPath.Path);
 
-            for (int i = 0; i < recommendationSettings.Iterations; ++i)
+            for (int i = 0; i < recommendationSettings.iterations; ++i)
             {
-                // STEPS
-                // 1. Create initial mapping based on current seed
+                //Create initial mapping based on current seed
                 Dictionary<Node, HashSet<Node>> initialMapping = recommendations.CreateInitialMapping(initialMappingPercentage, currentSeed);
 
                 UnityEngine.Debug.Log($"Experiment run={i} initialMapping keys={initialMapping.Keys.Count} values={initialMapping.Values.Count}");
 
-                // case 1.1 create initial mapping for calc graph
-                if (!syncWithView)
+
+                if (syncWithView)
+                {   // create initial mapping to viz graph
+                    foreach (Node cluster in initialMapping.Keys)
+                    {
+                        foreach (Node candidate in initialMapping[cluster])
+                        {
+                            await this.MapRecommendationInVizAsync(candidate, cluster, syncWithView);
+                        }
+                    }
+                }
+                else
                 {
+                    // create initial mapping for calc graph
                     foreach (Node cluster in initialMapping.Keys)
                     {
                         foreach (Node candidate in initialMapping[cluster])
@@ -765,59 +792,41 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                             recommendations.ReflexionGraph.ReleaseCaching();
                         }
                     }
+
                 }
-                // case 1.2 create initial mapping to viz graph
-                else
+
+                if (recommendationSettings.logTrainingData)
                 {
-                    foreach (Node cluster in initialMapping.Keys)
-                    {
-                        foreach (Node candidate in initialMapping[cluster])
-                        {
-                            await this.MapRecommendationInVizAsync(candidate, cluster);
-                        }
-                    }
+                    string trainingData = recommendations.AttractFunction.DumpTrainingData();
+                    string trainingDataFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_trainingData_{currentSeed}.txt");
+                    File.WriteAllText(trainingDataFile, trainingData); 
                 }
 
-                //string trainingData = recommendations.AttractFunction.DumpTrainingData();
-                //UnityEngine.Debug.Log($"Initial mapping:" + System.Environment.NewLine + trainingData);
-                //string trainingDataFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_trainingData_{currentSeed}.txt");
-                //File.WriteAllText(trainingDataFile, trainingData);
-
-                // 2. Generate csv file based on seed name/output path
+                //Generate .csv-file based on seed name/output path
                 string csvFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_output_{currentSeed}.csv");
 
                 recommendations.UpdateRecommendations();
 
-                // 3. Start Recording to csv file
+                //Start Recording to csv file
                 recommendations.Statistics.StartRecording(csvFile);
 
-                // 4. Start automated mapping
-                // TODO:
-                // case 4.1 sync with viz
-                // case 4.2 sync not with viz
+                //Start automated mapping
                 bool ignoreTieBreakers = !syncWithView || recommendationSettings.IgnoreTieBreakers;
                 await StartAutomatedMappingAsync(recommendations, syncWithView, ignoreTieBreakers, new System.Random(currentSeed));
-                
-                //trainingData = recommendations.AttractFunction.DumpTrainingData();
-                //UnityEngine.Debug.Log($"After automated mapping:" + System.Environment.NewLine + trainingData);
-
-                // 5. Stop Recording
+            
+                //Stop Recording
                 recommendations.Statistics.StopRecording();
 
-                // 6. Process Data and keep result object
+                //Process Data and keep result object
                 MappingExperimentResult result = recommendations.Statistics.CalculateResults(csvFile);
                 result.CurrentSeed = currentSeed;
-                result.MasterSeed = recommendationSettings.RootSeed;
+                result.MasterSeed = recommendationSettings.rootSeed;
                 results.Add(result);
                 string xmlFile = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_output_{currentSeed}.xml");
                 stream = new FileStream(xmlFile, FileMode.Create);
                 result.CreateXml().Save(stream);
                 stream.Close();
                 Debug.Log($"Saved Result of Run to {xmlFile}");
-
-                // 6. Delete csv File?
-                // case 6.1 keep csv File
-                // case 6.3 keep csv File
 
                 // ResetMapping
                 if (!syncWithView)
@@ -831,9 +840,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     await this.ResetMappingAsync();
                 }
 
-                //trainingData = recommendations.AttractFunction.DumpTrainingData();
-                //UnityEngine.Debug.Log($"After Reset:" + System.Environment.NewLine + trainingData);
-
                 if (!recommendations.AttractFunction.EmptyTrainingData())
                 {
                     throw new Exception("Training Data was not resetted correctly after resetting mapping during experiment.");
@@ -844,19 +850,19 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     throw new Exception("Handled candidates left despite mapping was resetted.");
                 }
 
-                // 8. Create next seed
+                // Create next seed
                 currentSeed = rand.Next(int.MaxValue);
             }
 
-            // 9. save Average Results
+            // Save Average Results
             MappingExperimentResult averageResult = MappingExperimentResult.AverageResults(results, recommendationSettings);
-            averageResult.MasterSeed = recommendationSettings.RootSeed;
-            averageResult.Iterations = recommendationSettings.Iterations;
+            averageResult.MasterSeed = recommendationSettings.rootSeed;
+            averageResult.Iterations = recommendationSettings.iterations;
             string resultXml = Path.Combine(recommendationSettings.OutputPath.Path, $"{experimentName}_result.xml");
             stream = new FileStream(resultXml, FileMode.Create);
             averageResult.CreateXml().Save(stream);
             stream.Close();
-            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.RootSeed}. Saved averaged result to {resultXml}");
+            UnityEngine.Debug.Log($"Finished Experiment for seed {recommendationSettings.rootSeed}. Saved averaged result to {resultXml}");
         }
 
         /// <summary>
@@ -871,7 +877,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>Awaitable UniTask</returns>
         /// <exception cref="Exception">Throws if parameters are inconsistent.</exception>
         public async UniTask StartAutomatedMappingAsync(CandidateRecommendation candidateRecommendation,
-                                                        bool syncWithView = true,
+                                                        bool syncWithView = false,
                                                         bool ignoreTieBreakers = true,
                                                         System.Random random = null)
         {
@@ -885,16 +891,22 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 throw new Exception("No candidate recommendation object was given. This parameter is required if syncWithView is set to false.");
             }
 
-            List<MappingPair> recommendations = (syncWithView ? (await this.GetRecommendationsAsync()) : candidateRecommendation.GetRecommendations()).ToList();
+            // Get recommendations which can be mapped automatically
+            // List<MappingPair> recommendations = (await this.GetAutomaticMappingsAsync()).ToList();
+            List<MappingPair> recommendations = (syncWithView ? await this.GetAutomaticMappingsAsync() : candidateRecommendation.GetAutomaticMappings()).ToList();
 
-            // PrintMappingsPairs(recommendations);
-
-            while (recommendations.Count() > 0)
+            while (true)
             {
-                if (recommendations.Count() > 1 && !ignoreTieBreakers)
+                UnityEngine.Debug.Log($"Number retrieved recommendations: {recommendations.Count()}");
+                if (recommendations.Count() == 0 && !ignoreTieBreakers)
                 {
-                    recommendations = (await StartMappingChoiceDialog(recommendations)).ToList();
-                    UnityEngine.Debug.Log($"Number of chosen recommendations after dialog: {recommendations.Count()}");
+                    // Get recommendations and show them to the users
+                    recommendations = candidateRecommendation.GetRecommendations().ToList();
+                    if (recommendations.Count > 0)
+                    {
+                        recommendations = (await StartMappingChoiceDialog(recommendations)).ToList();
+                        UnityEngine.Debug.Log($"Number of chosen recommendations after dialog: {recommendations.Count()}"); 
+                    }
                 }
 
                 if (recommendations.Count() == 0)
@@ -905,12 +917,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 while (recommendations.Count() > 0)
                 {
                     MappingPair chosenMappingPair = recommendations[random.Next(recommendations.Count())];
-                    //MappingPair chosenMappingPair = MoreLinq.Extensions.MaximaExtension.Maxima(recommendations,(pair => pair.AttractionValue)).FirstOrDefault();
-                    // UnityEngine.Debug.Log($"Chosen Mapping Pair {chosenMappingPair.CandidateID} --> {chosenMappingPair.CandidateID}");
 
                     if (syncWithView)
                     {
-                        await MapRecommendationInVizAsync(chosenMappingPair.Candidate, chosenMappingPair.Cluster);
+                        await MapRecommendationInVizAsync(chosenMappingPair.Candidate, chosenMappingPair.Cluster, syncWithView);
                         await UniTask.WaitWhile(() => Processing);
                     }
                     else
@@ -927,13 +937,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                     recommendations.RemoveAll(m => m.CandidateID.Equals(chosenMappingPair.CandidateID));
                 }
                 candidateRecommendation.UpdateRecommendations();
-                recommendations = (syncWithView ? (await this.GetRecommendationsAsync()) : candidateRecommendation.GetRecommendations()).ToList();
-                // PrintMappingsPairs(recommendations);
+                recommendations = (syncWithView ? (await this.GetAutomaticMappingsAsync()) : candidateRecommendation.GetAutomaticMappings()).ToList();
             }
 
             Debug.Log("Automatic Mapping stopped.");
         }
 
+        /// <summary>
+        /// Debug function to print mapping pairs
+        /// </summary>
+        /// <param name="mappingPairs">printed mapping pairs</param>
         private void PrintMappingsPairs(IEnumerable<MappingPair> mappingPairs)
         {
             StringBuilder sb = new();
@@ -955,7 +968,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="cluster">Cluster to which the cancidate should be mapped.</param>
         /// <param name="delay">Delay waited after the execution to let the animation finish.</param>
         /// <returns>Awaitable UniTask</returns>
-        private async UniTask MapRecommendationInVizAsync(Node candidate, Node cluster, bool syncWithView = true, int delay = 500)
+        private async UniTask MapRecommendationInVizAsync(Node candidate, Node cluster, bool syncWithView = false, int delay = 500)
         {
             await UniTask.WaitWhile(() => ProcessingEvents);
             await UniTask.SwitchToMainThread();
@@ -963,8 +976,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Node clusterInViz;
             lock (visualizedReflexionGraphLock)
             {
-                // TODO: Wrap automatic mapping in action?
-                // TODO: Implement as action to visualize mapping/ Trigger Animation.
                 UnityEngine.Debug.Log($"About to map: candidate {candidate.ID} Into cluster {cluster.ID}");
 
                 candidateInViz = reflexionGraphViz.GetNode(candidate.ID);
@@ -979,14 +990,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 if (syncWithView)
                 {
                     Debug.Log($"move candidate {candidate.ID} Into cluster {cluster.ID}");
-
-                    // TODO: How to visually move the node, when the node automatically mapped?
-                    // GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
-                    // GameNodeMover.PutOn(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
-                    // GameNodeMover.PutOnAndFit(candidateInViz.GameObject().transform, clusterInViz.GameObject(), candidateInViz.Parent.GameObject() , candidateInViz.GameObject().transform.localScale);
-                    // GameNodeMover.PutOn2(candidateInViz.GameObject().transform, clusterInViz.GameObject(), true);
-                    // city.ReDrawGraph();
-                    
+                    GameNodeMover.MoveTo(candidateInViz.GameObject(), clusterInViz.GameObject().GetGroundCenter(), 1.0f);
                     new MoveNetAction(candidateInViz.GameObject().name, clusterInViz.GameObject().GetGroundCenter(), 1.0f).Execute(); 
                     ReflexionMapper.SetParent(candidateInViz.GameObject(), clusterInViz.GameObject());
                 } 
@@ -1091,45 +1095,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Starts a blink effect for the current recommendations. 
-        /// All recommended candidates and clusters start to blink. 
-        /// </summary>
-        /// <returns>UniTaskVoid</returns>
-        public async UniTaskVoid TriggerBlinkAnimation()
-        {
-            // TODO: the blink animation is not used this way anymore.
-
-            //IEnumerable<MappingPair> recommendations = await this.GetRecommendationsAsync();
-            //await UniTask.SwitchToMainThread();
-
-            //List<NodeOperator> nodeOperators = new List<NodeOperator>();
-
-            //// TODO: Distinction between different clusters is required(different color intensity)
-            //foreach (MappingPair mappingPair in recommendations)
-            //{
-            //    // sync node objects
-            //    Node cluster = this.reflexionGraphViz.GetNode(mappingPair.ClusterID);
-            //    Node candidate = this.reflexionGraphViz.GetNode(mappingPair.CandidateID);
-
-            //    if(cluster != null && candidate != null)
-            //    {
-            //        nodeOperators.Add(cluster.GameObject().AddOrGetComponent<NodeOperator>());
-            //        nodeOperators.Add(candidate.GameObject().AddOrGetComponent<NodeOperator>());
-            //    }
-            //}
-
-            //if (!ProcessingEvents && nodeOperators.Count > 0)
-            //{
-            //    // blink effect
-            //    if (blinkEffectCoroutine != null)
-            //    {
-            //        StopCoroutine(blinkEffectCoroutine);
-            //    }
-            //    blinkEffectCoroutine = StartCoroutine(StartBlinkEffect(nodeOperators));
-            //}
-        }
-
-        /// <summary>
         /// Starts the blink effect for a given node and its recommendations. 
         /// If no recommendations can be found for the given node or the node 
         /// is either a current candidate or cluster, nothing will happen.
@@ -1173,7 +1138,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Starts the recording of the mapping process within the visualized reflexion graph 
         /// to a .csv file located within the output path of the recommendation settings.
-        /// TODO: Keep as a Button?
         /// </summary>
         [Button(startRecordingLabel, ButtonSizes.Small)]
         [ButtonGroup(statisticButtonGroup)]
@@ -1183,10 +1147,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             CandidateRecommendation.Statistics.StartRecording(csvFile);
         }
 
-        // TODO: Does this button work? Use DumpOracle instead.
-        [Button("Check Oracle Mapping", ButtonSizes.Small)]
+        [Button("Log Oracle", ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
-        private void CheckOracleMapping()
+        private void LogOracle()
         {
             Dictionary<Node, HashSet<Node>> initialMapping = new Dictionary<Node, HashSet<Node>>();
 
@@ -1195,13 +1158,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             int unknownCandidates = 0;
             foreach(Node candidate in candidates)
             {
-                string oracleMapsTo = CandidateRecommendation.GetExpectedClusterID(candidate.ID);
+                string expectedCluster = CandidateRecommendation.GetExpectedClusterID(candidate.ID);
 
-                if (oracleMapsTo == null)
+                if (expectedCluster == null)
                 {
-                    Debug.LogWarning($"There is no information where to map node {candidate.ID} " +
-                                     $"within the oracle graph {Environment.NewLine}{candidate}");
+                    Debug.LogWarning($"There is no information where to map node {candidate.ID} within the oracle graph.");
                     unknownCandidates++;
+                } 
+                else
+                {
+                    Debug.Log($"Candidate {candidate.ID} expected to map to {expectedCluster}");
                 }
             }
 
@@ -1210,7 +1176,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Stops the recording of the mapping process.
-        /// TODO: Keep as a Button?
         /// </summary>
         [Button(stopRecordingLabel, ButtonSizes.Small)]
         [ButtonGroup(statisticButtonGroup)]
@@ -1221,7 +1186,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
         /// <summary>
         /// Processes the data recorded between the call of <see cref="StartRecording"/> and <see cref="StopRecording"/>
-        /// TODO: Keep as a Button?
         /// </summary>
         [Button(calculateResultsLabel, ButtonSizes.Small)]
         [ButtonGroup(statisticButtonGroup)]
@@ -1241,11 +1205,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
-        [Button(showRecommendationLabel, ButtonSizes.Small)]
+        [Button(showMappingChoicesLabel, ButtonSizes.Small)]
         [ButtonGroup(mappingButtonGroup)]
-        public void ShowRecommendation()
+        public void ShowMappingChoices()
         {
-            TriggerBlinkAnimation().Forget();
+            
         }
 
         /// <summary>
@@ -1253,13 +1217,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// based on a instructions .txt file. 
         /// The instruction file is expected to be located within the same folder as the configuration 
         /// file currently loaded within the reflexion city.
-        /// 
-        /// 
         /// </summary>
         /// <exception cref="Exception">Throws if the reflexion city could not be retrieved.</exception>
-        [Button(generateOracleMappingLabel, ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void GenerateOracleMapping()
+        [Button(createOracleMappingLabel, ButtonSizes.Small)]
+        [ButtonGroup(gxlButtonGroup)]
+        public void CreateOracleGXLs()
         {
             string configPath = GetConfigPath();
 
@@ -1272,7 +1234,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             (Graph implementation, _, _) = this.reflexionGraphViz.Disassemble();
-            ReflexionGraph oracleGraph = GenerateOracleMapping(implementation, instructions);
+            ReflexionGraph oracleGraph = GenerateOracleGraph(implementation, instructions);
             (_, Graph architecture, Graph mapping) = oracleGraph.Disassemble();
             string architectureGxl = Path.Combine(configPath, "Architecture.gxl");
             string oracleMappingGxl = Path.Combine(configPath, "OracleMapping.gxl");
@@ -1282,7 +1244,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             UnityEngine.Debug.Log($"Saved architecture to {architectureGxl}");
         }
 
-        [Button("Dump System Statistics", ButtonSizes.Small)]
+        [Button(dumpSystemStatisticsLabel, ButtonSizes.Small)]
         [ButtonGroup(debugButtonGroup)]
         public async UniTask Generate()
         {
@@ -1322,9 +1284,9 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             await File.WriteAllTextAsync(Path.Combine(path, "SystemStatistics.csv"), csvContent.ToString());
         }
 
-        [Button("Generate initial mapping with instructions", ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
-        public void GenerateInitialMappingWithInstructions()
+        [Button(createMappingGXLMappingLabel, ButtonSizes.Small)]
+        [ButtonGroup(gxlButtonGroup)]
+        public void CreateMappingGXL()
         {
             string configPath = GetConfigPath();
 
@@ -1337,11 +1299,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
 
             ReflexionGraph clone = new ReflexionGraph(this.reflexionGraphViz);
+            clone.ResetMapping();
             Graph mapping = GenerateInitialMappingGxl(clone, instructions);
 
             string mappingGxl = Path.Combine(configPath, "Mapping.gxl");
             GraphWriter.Save(mappingGxl, mapping, AbstractSEECity.HierarchicalEdgeTypes().First());
-            UnityEngine.Debug.Log($"Saved mapping to {mapping}");
+            UnityEngine.Debug.Log($"Saved Mapping.gxl to {mapping}");
         }
 
         /// <summary>
@@ -1383,7 +1346,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <param name="oracleInstructions">string containing instructions</param>
         /// <returns>An assembled oracle reflexion graph</returns>
         /// <exception cref="Exception">Throws if the instructions wrong</exception>
-        public static ReflexionGraph GenerateOracleMapping(Graph implementation, string oracleInstructions)
+        public static ReflexionGraph GenerateOracleGraph(Graph implementation, string oracleInstructions)
         {
             string currentMode = string.Empty;
 
@@ -1491,6 +1454,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             }
         }
 
+        /// <summary>
+        /// This method is used to generate a initial mapping graph based on given node names, 
+        /// a given graph and the loaded oracle graph.
+        /// </summary>
+        /// <param name="graph">the given graph</param>
+        /// <param name="instructions">a string representing the nodes that should be mapped.</param>
+        /// <returns>A mapping graph that contains the mapping between the specified nodes and their expected cluster</returns>
         private Graph GenerateInitialMappingGxl(ReflexionGraph graph, string instructions)
         {
             graph.ResetMapping();
@@ -1581,10 +1551,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 sb.Append(oracleClusterID.PadRight(20));
                 string type = $"Type:{node.Type}";
                 sb.Append(type.PadRight(35));
-                //string isArtificial = $"Element.Is_Artificial:{node.ToggleAttributes.Contains("Element.Is_Artificial")}";
-                //sb.Append(isArtificial.PadRight(35));
-                //string isAnonymous = $"Element.Is_Anonymous:{node.ToggleAttributes.Contains("Element.Is_Anonymous")}";
-                //sb.Append(isAnonymous.PadRight(35));
                 sb.Append(Environment.NewLine);
             }
 
@@ -1606,8 +1572,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             Debug.Log(CandidateRecommendation.AttractFunction.DumpTrainingData());
         }
 
-        [Button(debugScenarioLabel, ButtonSizes.Small)]
-        [ButtonGroup(debugButtonGroup)]
+        // [Button(debugScenarioLabel, ButtonSizes.Small)]
+        // [ButtonGroup(debugButtonGroup)]
         public void StartDebugScenario()
         {
             // Empty method for debugging

@@ -11,6 +11,16 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
     {
         IEnumerable<MappingPair> GetMappingPairs();
 
+        /// <summary>
+        /// Returns the recommended mapping pairs the filter does allow to be mapped automatically
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<MappingPair> GetAutomaticMappings();
+
+        /// <summary>
+        /// Returns the recommended mapping pairss
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<MappingPair> GetRecommendations();
 
         IEnumerable<MappingPair> GetRecommendationForCluster(string clusterId);

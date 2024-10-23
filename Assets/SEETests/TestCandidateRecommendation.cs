@@ -92,7 +92,6 @@ namespace SEE.Tools.Architecture
             RecommendationSettings config = new RecommendationSettings();
             NBAttractConfig attractConfig = new NBAttractConfig();
             config.NodeReader = nodeReader;
-            attractConfig.UseCDA = useCda;
             attractConfig.CandidateType = "Candidate";
             attractConfig.ClusterType = "Cluster";
             attractConfig.AlphaSmoothing = 1.0;
@@ -812,7 +811,7 @@ namespace SEE.Tools.Architecture
 
             this.ResetMapping();
 
-            Assert.That(candidateRecommendation.GetRecommendations().Count() == 0);
+            Assert.That(candidateRecommendation.GetAutomaticMappings().Count() == 0);
 
             Assert.That(candidateRecommendation.AttractFunction.EmptyTrainingData());
 

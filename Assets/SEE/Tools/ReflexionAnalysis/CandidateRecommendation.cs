@@ -92,8 +92,18 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Returns all MappingPair objects which have currently the highest attraction,
+        /// Returns all recommended mapping pairs which the internal filter does allow to be mapped automatically
         /// </summary>
+        /// <returns>IEnumerable object containing the mapping pairs.</returns>
+        public IEnumerable<MappingPair> GetAutomaticMappings()
+        {
+            return this.recommendationFilter.GetAutomaticMappings();
+        }
+
+        /// <summary>
+        /// Returns all mapping pair objects which are currently recommended by the filter.
+        /// </summary>
+        /// <param name="node">Given Node</param>
         /// <returns>IEnumerable object containing the mapping pairs.</returns>
         public IEnumerable<MappingPair> GetRecommendations()
         {
@@ -101,7 +111,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         }
 
         /// <summary>
-        /// Returns all MappingPair objects which have currently the highest attraction for a given Node.
+        /// Returns all mapping pair objects which are currently recommended by the filter for the given node.
         /// </summary>
         /// <param name="node">Given Node</param>
         /// <returns>IEnumerable object containing the mapping pairs.</returns>
@@ -154,11 +164,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 OracleGraph = null;
             }
 
+            recommendationSettings.AttractFunctionConfig.CandidateType = recommendationSettings.CandidateType;
+            recommendationSettings.AttractFunctionConfig.ClusterType = recommendationSettings.ClusterType;
             attractFunction = AttractFunction.Create(recommendationSettings.AttractFunctionConfig, this, reflexionGraph);
 
             // TODO: Handle node reader initialization differently?
-            //(This set operation is only necessary for the test cases)
-            if (attractFunction is LanguageAttract && recommendationSettings.NodeReader != null)
+            // (This set operation is only necessary for the test cases)
+            if (recommendationSettings.NodeReader != null && attractFunction is LanguageAttract)
             {
                 ((LanguageAttract)attractFunction).SetNodeReader(recommendationSettings.NodeReader);
             }
@@ -440,11 +452,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 this.AttractFunction.RemoveClusterToUpdate(clusterId);
             }
 
-            if (Statistics?.Active ?? false)
-            {
-                // Keep track of all attraction values for statistical purposes
-                Statistics.RecordMappingPairs(MappingPairs);
-            }
+            // TODO: delete this(percentile rank calculation
+            //if (Statistics?.Active ?? false)
+            //{
+            //    // Keep track of all attraction values for statistical purposes
+            //    // 
+            //    // Statistics.RecordMappingPairs(MappingPairs);
+            //}
         }
 
         /// <summary>
