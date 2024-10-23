@@ -32,7 +32,9 @@ namespace SEE.Game.Operator
         /// </summary>
         private SEESpline spline;
 
+        /// <summary>
         /// Shader property that enables or disables the edge direction (data flow) animation.
+        /// </summary>
         private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
 
         #region Public API

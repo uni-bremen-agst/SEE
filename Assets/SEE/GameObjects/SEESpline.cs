@@ -277,13 +277,19 @@ namespace SEE.GO
             }
         }
 
+        /// <summary>
         /// Shader property that defines the (start) color.
+        /// </summary>
         private static readonly int ColorProperty = Shader.PropertyToID("_Color");
 
+        /// <summary>
         /// Shader property that defines the end color of the color gradient.
+        /// </summary>
         private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
 
+        /// <summary>
         /// Shader property that enables or disables the color gradient.
+        /// </summary>
         private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
 
         /// <summary>
