@@ -13,18 +13,6 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
     public class NBAttractConfig : LanguageAttractConfig
     {
         /// <summary>
-        /// Wether cda terms should be used or not.
-        /// </summary>
-        [SerializeField]
-        private bool useCDA;
-
-        /// <summary>
-        /// Wether cda terms should be used or not.
-        /// </summary>
-        [SerializeField]
-        public bool UseCDA { get => useCDA; set => useCDA = value; }
-
-        /// <summary>
         /// Wether standard terms should be used or not.
         /// </summary>
         [SerializeField]
@@ -39,7 +27,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// Alpha smoothing used within the classifier
         /// </summary>
         [SerializeField]
-        private double alphaSmoothing = 1.0;
+        [RangeAttribute(0, 1)]
+        public double alphaSmoothing = 1.0;
 
         /// <summary>
         /// Alpha smoothing used within the classifier
@@ -76,7 +65,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
         /// <param name="useStandardTerms">Wether standard terms should be used by the function or not.</param>
         public NBAttractConfig(AntlrLanguageType language, bool useCda, bool useStandardTerms)
         {
-            this.UseCDA = useCda;
+            // this.UseCDA = useCda;
             this.UseStandardTerms = useStandardTerms;
             this.TokenLanguageType = language;
         }
@@ -90,8 +79,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             XElement config = base.ToXElement();
             XAttribute useStandardTerms = new XAttribute("UseStandardTerms", UseStandardTerms);
             config.Add(useStandardTerms);
-            XAttribute useCda = new XAttribute("UseCda", UseCDA);
-            config.Add(useCda);
+            // XAttribute useCda = new XAttribute("UseCda", UseCDA);
+            // config.Add(useCda);
             return config;
         }
     }

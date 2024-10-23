@@ -49,7 +49,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                CandidateRecommendation candidateRecommendation, 
                NBAttractConfig config) : base(reflexionGraph, candidateRecommendation, config, useDocumentsAsSet: true)
         {
-            this.useCDA = config.UseCDA;
+            // this.useCDA = config.UseCDA;
             this.useStandardTerms = config.UseStandardTerms;
             this.naiveBayes = new NaiveBayesIncremental(config.AlphaSmoothing);   
         }
