@@ -53,7 +53,7 @@ namespace SEE.XR
 
         private void Awake()
         {
-            if (FindObjectsOfType<KeyboardManager>().Length > 1)
+            if (instance != null)
             {
                 Debug.LogError($"More than one {nameof(KeyboardManager)} is present in the scene! "
                                + "This will lead to undefined behaviours\n");
