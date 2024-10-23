@@ -325,7 +325,7 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// To ensure a object change.
-            if (Queries.MouseUp(MouseButton.Left) && !mouseWasReleased)
+            if (SEEInput.MouseUp(MouseButton.Left) && !mouseWasReleased)
             {
                 mouseWasReleased = true;
             }
@@ -344,7 +344,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void EnableObjectChange()
         {
-            if (Queries.LeftMouseInteraction()
+            if (SEEInput.LeftMouseInteraction()
                 && selectedObject != null && mouseWasReleased)
             {
                 Destroyer.Destroy(switchMenu);
@@ -408,7 +408,7 @@ namespace SEE.Controls.Actions.Drawable
                 MoveByKey(moveByMouse, speedUp, surface, surfaceParentName);
 
                 /// For switching the move by mouse option.
-                if (Queries.MouseDown(MouseButton.Middle))
+                if (SEEInput.MouseDown(MouseButton.Middle))
                 {
                     moveByMouse.isOn = !moveByMouse.isOn;
                     moveByMouse.UpdateUI();
@@ -421,13 +421,13 @@ namespace SEE.Controls.Actions.Drawable
                 MoveByMouse(moveByMouse, childInCollision, surface, surfaceParentName);
 
                 /// Initializes the end of the movement.
-                if (Queries.LeftMouseInteraction())
+                if (SEEInput.LeftMouseInteraction())
                 {
                     BlinkEffect.Deactivate(selectedObject);
                 }
             }
             /// Part 2 of initializing the end: The new position is saved, and the progress state is switched to finish.
-            if (Queries.MouseUp(MouseButton.Left))
+            if (SEEInput.MouseUp(MouseButton.Left))
             {
                 newObjectPosition = selectedObject.transform.localPosition;
                 progressState = ProgressState.Finish;
@@ -528,14 +528,14 @@ namespace SEE.Controls.Actions.Drawable
                 RotateByWheel();
 
                 /// Initializes the end of the rotation.
-                if (Queries.LeftMouseInteraction())
+                if (SEEInput.LeftMouseInteraction())
                 {
                     selectedObject.GetComponent<BlinkEffect>().Deactivate();
 
                 }
             }
             /// Part 2 of initializing the end: The progress state is switched to finish.
-            if (Queries.MouseUp(MouseButton.Left))
+            if (SEEInput.MouseUp(MouseButton.Left))
             {
                 progressState = ProgressState.Finish;
             }
@@ -553,21 +553,21 @@ namespace SEE.Controls.Actions.Drawable
             float degree = 0;
 
             /// Rotates forward with normal speed.
-            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.Rotate;
                 rotate = true;
             }
             /// Rotates forward with fast speed.
-            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.forward;
                 degree = ValueHolder.RotateFast;
                 rotate = true;
             }
             /// Rotates back with normal speed.
-            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.Rotate;
@@ -575,7 +575,7 @@ namespace SEE.Controls.Actions.Drawable
 
             }
             /// Rotates back with fast speed.
-            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 direction = Vector3.back;
                 degree = ValueHolder.RotateFast;

@@ -174,7 +174,7 @@ namespace SEE.Controls.Actions.Drawable
                 DrawableSelection();
 
                 /// Needed for selecting multiple drawables to save.
-                if (Queries.MouseUp(MouseButton.Left))
+                if (SEEInput.MouseUp(MouseButton.Left))
                 {
                     clicked = false;
                 }

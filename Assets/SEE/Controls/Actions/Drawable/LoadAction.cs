@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// It is needed to enable the switching of the drawable for the specific load.
-                if (Queries.MouseUp(MouseButton.Left))
+                if (SEEInput.MouseUp(MouseButton.Left))
                 {
                     clicked = false;
                 }

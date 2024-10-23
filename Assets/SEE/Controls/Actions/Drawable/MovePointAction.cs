@@ -185,7 +185,7 @@ namespace SEE.Controls.Actions.Drawable
                 Indices = matchedIndices;
                 oldPointPosition = positionsList[Indices[0]];
             }
-            if (Queries.MouseUp(MouseButton.Left) && selectedLine != null)
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedLine != null)
             {
                 progressState = ProgressState.MovePoint;
             }
@@ -210,14 +210,14 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
 
-                if (Queries.LeftMouseInteraction())
+                if (SEEInput.LeftMouseInteraction())
                 {
                     selectedLine.GetComponent<BlinkEffect>().Deactivate();
                 }
             }
             /// Left click when the desired point has been reached.
             /// Then the action will be completed in the next steps.
-            if (Queries.MouseUp(MouseButton.Left)
+            if (SEEInput.MouseUp(MouseButton.Left)
                 && selectedLine.GetComponent<BlinkEffect>() == null)
             {
                 progressState = ProgressState.Finish;

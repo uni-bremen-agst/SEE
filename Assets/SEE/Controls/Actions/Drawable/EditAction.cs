@@ -271,7 +271,7 @@ namespace SEE.Controls.Actions.Drawable
                 progressState = ProgressState.OpenEditMenu;
             }
 
-            if (Queries.MouseUp(MouseButton.Left))
+            if (SEEInput.MouseUp(MouseButton.Left))
             {
                 mouseWasReleased = true;
             }
@@ -314,7 +314,7 @@ namespace SEE.Controls.Actions.Drawable
                         "The menu cannot be opened because the type of the object was not recognized.");
                     break;
             }
-            if (Queries.MouseUp(MouseButton.Left))
+            if (SEEInput.MouseUp(MouseButton.Left))
             {
                 progressState = ProgressState.Edit;
             }
@@ -327,7 +327,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void Edit()
         {
-            if (Queries.LeftMouseInteraction()
+            if (SEEInput.LeftMouseInteraction()
                 && selectedObj.GetComponent<BlinkEffect>() != null)
             {
                 selectedObj.GetComponent<BlinkEffect>().Deactivate();

@@ -124,15 +124,15 @@ namespace SEE.Controls.Actions.Drawable
                     && GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
                     && raycastHit.collider.gameObject.GetComponent<OrderInLayerValueHolder>() != null)
                 {
-                    if (Queries.LeftMouseInteraction())
+                    if (SEEInput.LeftMouseInteraction())
                     {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Increase);
-                    } else if (Queries.RightMouseInteraction()) {
+                    } else if (SEEInput.RightMouseInteraction()) {
                         CalcOrder(raycastHit.collider.gameObject, GameLayerChanger.LayerChangerStates.Decrease);
                     }
                 }
                 /// It completes the action after a layer change if the user releases the pressed mouse button.
-                if ((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right)) && isInAction)
+                if ((SEEInput.MouseUp(MouseButton.Left) || SEEInput.MouseUp(MouseButton.Right)) && isInAction)
                 {
                     isInAction = false;
                     CurrentState = IReversibleAction.Progress.Completed;
