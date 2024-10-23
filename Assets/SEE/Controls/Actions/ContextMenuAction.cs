@@ -17,6 +17,7 @@ using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
+using SEE.Net.Actions;
 
 namespace SEE.Controls.Actions
 {
@@ -367,7 +368,13 @@ namespace SEE.Controls.Actions
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
-                    ShowNotification.Warn("Forbidden!", "You can't delete a root node.");
+                    //ShowNotification.Warn("Forbidden!", "You can't delete a root node.");
+                    ConfirmDialogMenu confirmDialog = new($"Do you really want to delete the city?\r\nThis action cannot be undone.");
+                    confirmDialog.ExecuteAfterConfirmAsync(() =>
+                    {
+                        Destroyer.Destroy(node.GameObject());
+                        new DeleteRootNetAction(graphElement.ID).Execute();
+                    }).Forget();
                     return;
                 }
                 if (gameObject != null)
