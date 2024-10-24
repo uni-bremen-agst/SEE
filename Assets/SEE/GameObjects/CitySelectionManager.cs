@@ -1,5 +1,6 @@
 ﻿using SEE.Controls;
 using SEE.Game.City;
+using SEE.GO;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
@@ -47,31 +48,42 @@ namespace SEE.GameObjects
                         progressState = ProgressState.ChoseCity;
                     }
                     break;
+
                 case ProgressState.ChoseCity:
                     if (citySelectionProperty.TryGetCity(out CityTypes? cityType))
                     {
                         switch(cityType)
                         {
                             case CityTypes.ReflexionCity:
+                                SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
+                                gameObject.AddComponent<ReflexionVisualization>();
+                                gameObject.AddComponent<EdgeMeshScheduler>();
+                                gameObject.GetComponent<CityCursor>().enabled = true;
+
+                                // TODO: draw initial city (root -> (file root / arch root))
+                                //reflexionCity.LoadAndDrawGraphAsync();
+                                enabled = false;
+                                break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
                             case CityTypes.EvolutionCity:
                             case CityTypes.BranchCity:
                             case CityTypes.DynamicCity:
-                                ShowNotification.Info("City selected", $"{cityType} was selected");
-                                progressState = ProgressState.Start;
-                                enabled = false;
                                 break;
                             default:
                                 ShowNotification.Warn("Error", "Error in city selection; The city cannot be added.");
-                                break;
+                                progressState = ProgressState.Start;
+                                return;
                         }
+                        ShowNotification.Info("City selected", $"{cityType} was selected");
+                        progressState = ProgressState.Start;
                     }
                     if (citySelectionProperty.WasCanceled())
                     {
                         progressState = ProgressState.Start;
                     }
                     break;
+
                 default:
                     ShowNotification.Warn("Error", "Error in city selection");
                     break;
