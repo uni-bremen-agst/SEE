@@ -1,4 +1,5 @@
 ﻿using SEE.Controls;
+using SEE.Game.City;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
@@ -47,16 +48,16 @@ namespace SEE.GameObjects
                     }
                     break;
                 case ProgressState.ChoseCity:
-                    if (citySelectionProperty.TryGetCity(out string cityType))
+                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType))
                     {
                         switch(cityType)
                         {
-                            case "ReflexionCity":
-                            case "CodeCity":
-                            case "DiffCity":
-                            case "EvolutionCity":
-                            case "BranchCity":
-                            case "DynamicCity":
+                            case CityTypes.ReflexionCity:
+                            case CityTypes.CodeCity:
+                            case CityTypes.DiffCity:
+                            case CityTypes.EvolutionCity:
+                            case CityTypes.BranchCity:
+                            case CityTypes.DynamicCity:
                                 ShowNotification.Info("City selected", $"{cityType} was selected");
                                 progressState = ProgressState.Start;
                                 enabled = false;

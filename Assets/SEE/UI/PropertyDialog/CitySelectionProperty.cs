@@ -1,6 +1,8 @@
 ﻿using SEE.Controls;
+using SEE.Game.City;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog
@@ -13,7 +15,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The city which the player selected.
         /// </summary>
-        private static string city;
+        private static CityTypes city;
 
         /// <summary>
         /// This input field lets the player pick a city type.
@@ -29,13 +31,11 @@ namespace SEE.UI.PropertyDialog
             PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
             group.Name = "Add city dialog";
 
-            string[] cities = { "ReflexionCity", "CodeCity", "DiffCity", "EvolutionCity", "BranchCity", "DynamicCity" };
-
             selectedCity = Dialog.AddComponent<SelectionProperty>();
             selectedCity.Name = "Select a city type.";
             selectedCity.Description = "Select a city type to be added.";
-            selectedCity.AddOptions(cities);
-            selectedCity.Value = cities[0];
+            selectedCity.AddOptions(Enum.GetNames(typeof(CityTypes)));
+            selectedCity.Value = Enum.GetValues(typeof(CityTypes)).GetValue(0).ToString();
             group.AddProperty(selectedCity);
 
             /// Adds the property dialog to the dialog.
@@ -59,7 +59,7 @@ namespace SEE.UI.PropertyDialog
         private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
-            city = selectedCity.Value;
+            city = (CityTypes)Enum.Parse(typeof(CityTypes), selectedCity.Value);
             GotInput = true;
             Destroyer.Destroy(Dialog);
         }
@@ -70,7 +70,7 @@ namespace SEE.UI.PropertyDialog
         /// <param name="cityType">If given and not yet fetched, this will be the city type the player selected.
         /// </param>
         /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
-        internal bool TryGetCity(out string cityType)
+        internal bool TryGetCity(out CityTypes? cityType)
         {
             if (GotInput)
             {
