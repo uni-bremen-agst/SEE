@@ -294,9 +294,19 @@ namespace SEE.Controls.Actions
             private NodeRef nodeRef;
 
             /// <summary>
+            /// Reference to the main camera transform.
+            /// </summary>
+            private Transform mainCameraTransform;
+
+            /// <summary>
             /// Stores the directional vectors that belong to the individual handles.
             /// </summary>
             private Dictionary<GameObject, Vector3> handles;
+
+            /// <summary>
+            /// Transform of the up/down handle.
+            /// </summary>
+            private Transform upDownHandleTransform;
 
             /// <summary>
             /// Used to remember if a click was detected in an earlier frame.
@@ -362,6 +372,7 @@ namespace SEE.Controls.Actions
                 }
 
                 this.nodeRef = nodeRef;
+                mainCameraTransform = Camera.main.transform;
                 InitHandles();
             }
 
@@ -414,6 +425,7 @@ namespace SEE.Controls.Actions
                 {
                     UpdateSize();
                 }
+                UpdateUpDownHandlePosition();
             }
 
             /// <summary>
@@ -426,14 +438,16 @@ namespace SEE.Controls.Actions
 
                 Vector3[] directions = new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back,
                                                Vector3.right + Vector3.forward, Vector3.right + Vector3.back,
-                                               Vector3.left + Vector3.forward, Vector3.left + Vector3.back,
-                                               Vector3.up };
+                                               Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
                 Vector3 position = transform.position;
                 Vector3 size = gameObject.WorldSpaceSize();
                 foreach (Vector3 direction in directions)
                 {
                     handles[CreateHandle(direction, position, size)] = direction;
                 }
+                GameObject upDownHandle = CreateHandle(Vector3.up, position, size);
+                upDownHandleTransform = upDownHandle.transform;
+                handles[upDownHandle] = Vector3.up;
             }
 
             /// <summary>
@@ -459,11 +473,8 @@ namespace SEE.Controls.Actions
                     handle.GetComponent<Renderer>().material = material;
 
                     handle.transform.localScale = spriteScale;
-                    handle.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
-                    // TODO Handle can be occluded by child nodes
+                    handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                     handle.transform.localPosition = parentWorldPosition + 0.5f * (Vector3.Scale(parentWorldScale, direction) + new Vector3(0f, handle.WorldSpaceSize().y, 0f));
-
-                    handle.AddOrGetComponent<Billboard>();
                 }
                 else
                 {
@@ -478,6 +489,53 @@ namespace SEE.Controls.Actions
                 }
                 handle.transform.SetParent(transform);
                 return handle;
+            }
+
+            /// <summary>
+            /// Update the up/down handle's position so that it faces the camera.
+            /// </summary>
+            private void UpdateUpDownHandlePosition()
+            {
+                if (mainCameraTransform == null || upDownHandleTransform == null)
+                {
+                    return;
+                }
+
+                Vector3 directionToCamera = mainCameraTransform.position - transform.position;
+                if (Mathf.Abs(directionToCamera.x) > Mathf.Abs(directionToCamera.z))
+                {
+                    directionToCamera = Vector3.Normalize(new(directionToCamera.x, 0f, 0f));
+                    if (upDownHandleTransform.localRotation.eulerAngles.y == 0f)
+                    {
+                        upDownHandleTransform.localRotation = Quaternion.Euler(90f, 90f, 0f);
+                        flipScales();
+                    }
+                }
+                else
+                {
+                    directionToCamera = Vector3.Normalize(new(0f, 0f, directionToCamera.z));
+                    if (upDownHandleTransform.localRotation.eulerAngles.y != 0f)
+                    {
+                        upDownHandleTransform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                        flipScales();
+                    }
+                }
+
+                // The height is updated during the resize process
+                upDownHandleTransform.localPosition = new(
+                        0.5001f * directionToCamera.x,
+                        upDownHandleTransform.localPosition.y,
+                        0.5001f * directionToCamera.z);
+
+
+                void flipScales()
+                {
+                    // Note: Z and Y axes are swapped because the plane is rotated 90° on the X-axis to get it upright.
+                        upDownHandleTransform.localScale = new(
+                                upDownHandleTransform.localScale.y,
+                                upDownHandleTransform.localScale.x,
+                                upDownHandleTransform.localScale.z);
+                }
             }
 
             /// <summary>
@@ -730,7 +788,7 @@ namespace SEE.Controls.Actions
                 foreach (Transform child in children)
                 {
                     // Non-sprite handles
-                    if (handles.TryGetValue(child.gameObject, out Vector3 direction) && !child.gameObject.TryGetComponent<Billboard>(out _))
+                    if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
                     {
                         // Adapt handle position
                         child.localPosition = new(
@@ -738,7 +796,6 @@ namespace SEE.Controls.Actions
                                 child.localPosition.y,
                                 transform.localPosition.z + 0.5f * transform.localScale.z * direction.z);
                     }
-                    // TODO Update up/down handle position
                     else if (currentResizeStep.Up)
                     {
                         // Update children's position to adapt for changed height
@@ -915,48 +972,6 @@ namespace SEE.Controls.Actions
                 public override readonly string ToString()
                 {
                     return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
-                }
-            }
-
-            /// <summary>
-            /// Implements billboarding, rotating a game object around the Y-axis to face the main camera.
-            /// </summary>
-            class Billboard : MonoBehaviour
-            {
-                /// <summary>
-                /// Reference to the main camera.
-                /// </summary>
-                private Camera mainCamera;
-
-                /// <summary>
-                /// The initial rotation is combined with the direction that faces the main camera.
-                /// <para>
-                /// To discard the initial rotation, set it to <c>Quaternion.Euler(0f, 0f, 0f)</c> after adding the component
-                /// (or simply reset the object's rotation before adding the component).
-                /// </para>
-                /// </summary>
-                public Quaternion initialRotation;
-
-                void Start()
-                {
-                    mainCamera = Camera.main;
-                    initialRotation = transform.rotation;
-                }
-
-                void LateUpdate()
-                {
-                    if (mainCamera == null)
-                        return;
-
-                    Transform parent = transform.parent;
-                    transform.SetParent(null);
-
-                    Vector3 direction = mainCamera.transform.position - transform.position;
-                    // Do not use height information to rotate around Y-axis
-                    direction.y = 0f;
-                    transform.rotation = Quaternion.LookRotation(direction) * initialRotation;
-
-                    transform.SetParent(parent);
                 }
             }
         }
