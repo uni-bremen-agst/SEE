@@ -12,7 +12,7 @@ namespace SEE.Game.SceneManipulation
         /// Empty space on the y-axis bewteen the top of the target object and the bottom of the child
         /// object in world space units, used in <see cref="GetCoordinatesOn"/>.
         /// </summary>
-        public const float TopPadding = 0.0001f;
+        private const float TopPadding = 0.0001f;
 
         /// <summary>
         /// Sets the <paramref name="newParent"/> for <paramref name="child"/> both in the

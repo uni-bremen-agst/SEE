@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
+using UnityEngine.Rendering;
 using SEE.Game.City;
-using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -278,6 +279,11 @@ namespace SEE.Controls.Actions
         private class ResizeGizmo : MonoBehaviour
         {
             /// <summary>
+            /// Path to the texture for the up/down resize handle.
+            /// </summary>
+            private static readonly string resizeUpDownTexture = "Assets/Resources/Textures/ResizeArrowUpDown.png";
+
+            /// <summary>
             /// The data of the resize step that is in action.
             /// </summary>
             private ResizeStepData currentResizeStep;
@@ -319,6 +325,11 @@ namespace SEE.Controls.Actions
             /// The size of the handles.
             /// </summary>
             private static readonly Vector3 handleScale = new(0.02f, 0.02f, 0.02f);
+
+            /// <summary>
+            /// The size of the sprite handles, e.g., up/down arrow.
+            /// </summary>
+            private static readonly Vector3 spriteScale = new(0.006f, 0.006f, 0.006f);
 
             /// <summary>
             /// The color of the handles.
@@ -431,21 +442,61 @@ namespace SEE.Controls.Actions
             /// <param name="direction">The direction for which the handle is created.</param>
             /// <param name="parentWorldPosition">The cached parent world-space position.</param>
             /// <param name="parentWorldScale">The cached parent world-space scale.</param>
+            /// <returns>The handle game object.</returns>
             private GameObject CreateHandle(Vector3 direction, Vector3 parentWorldPosition, Vector3 parentWorldScale)
             {
-                // Move base handles down
-                if (direction.y == 0f)
+                GameObject handle;
+                if (direction == Vector3.up)
                 {
-                    direction.y = -1f;
-                }
+                    handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                    handle.name = new("handle__height");
+                    // TODO Add dedicated portal shader for textures with transparency?
+                    Material material = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                    material.renderQueue = (int)RenderQueue.Overlay;
 
-                GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                handle.GetComponent<Renderer>().material.color = handleColor;
-                handle.transform.localScale = handleScale;
-                handle.transform.localPosition = parentWorldPosition + 0.5f * Vector3.Scale(parentWorldScale, direction);
-                handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
+                    material.mainTexture = LoadTexture(resizeUpDownTexture);
+                    material.color = Color.cyan;
+                    handle.GetComponent<Renderer>().material = material;
+
+                    handle.transform.localScale = spriteScale;
+                    handle.transform.rotation = Quaternion.Euler(90f, 0f, 0f);
+                    // TODO Handle can be occluded by child nodes
+                    handle.transform.localPosition = parentWorldPosition + 0.5f * (Vector3.Scale(parentWorldScale, direction) + new Vector3(0f, handle.WorldSpaceSize().y, 0f));
+
+                    handle.AddOrGetComponent<Billboard>();
+                }
+                else
+                {
+                    // Position handles at baseline
+                    direction.y = -1f;
+
+                    handle = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    handle.GetComponent<Renderer>().material.color = handleColor;
+                    handle.transform.localScale = handleScale;
+                    handle.transform.localPosition = parentWorldPosition + 0.5f * Vector3.Scale(parentWorldScale, direction);
+                    handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
+                }
                 handle.transform.SetParent(transform);
                 return handle;
+            }
+
+            /// <summary>
+            /// Load a texture from file.
+            /// </summary>
+            /// <param name="texturePath">The path to the image file.</param>
+            /// <returns>The loaded texture.</returns>
+            private Texture2D LoadTexture(string texturePath)
+            {
+                if (File.Exists(texturePath))
+                {
+                    byte[] fileData = File.ReadAllBytes(texturePath);
+                    Texture2D texture = new (1, 1);
+                    if (texture.LoadImage(fileData))
+                    {
+                        return texture;
+                    }
+                }
+                return null;
             }
 
             /// <summary>
@@ -500,10 +551,7 @@ namespace SEE.Controls.Actions
                 List<Transform> children = new(transform.childCount);
                 foreach (Transform child in transform)
                 {
-                    if (child.gameObject.IsNodeAndActiveSelf())
-                    {
-                        children.Add(child);
-                    }
+                    children.Add(child);
                 }
 
                 Transform parent = transform.parent;
@@ -618,6 +666,11 @@ namespace SEE.Controls.Actions
                     // Contain all children
                     foreach (Transform child in children)
                     {
+                        if (!child.gameObject.IsNodeAndActiveSelf())
+                        {
+                            continue;
+                        }
+
                         // Child position and scale on common parent
                         Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                         Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
@@ -667,8 +720,7 @@ namespace SEE.Controls.Actions
                 {
                     child.SetParent(parent);
                 }
-
-                // TODO Prevent labels from getting scaled
+                float yDiff = 2 * (newLocalPosition.y - transform.localPosition.y);
 
                 // Apply new scale and position
                 transform.localScale = Vector3.Scale(newLocalSize, currentResizeStep.ScaleSizeFactor);
@@ -677,23 +729,26 @@ namespace SEE.Controls.Actions
                 // Reparent children
                 foreach (Transform child in children)
                 {
-                    // Update children's position to adapt for changed height
-                    if (currentResizeStep.Up)
+                    // Non-sprite handles
+                    if (handles.TryGetValue(child.gameObject, out Vector3 direction) && !child.gameObject.TryGetComponent<Billboard>(out _))
                     {
+                        // Adapt handle position
+                        child.localPosition = new(
+                                transform.localPosition.x + 0.5f * transform.localScale.x * direction.x,
+                                child.localPosition.y,
+                                transform.localPosition.z + 0.5f * transform.localScale.z * direction.z);
+                    }
+                    // TODO Update up/down handle position
+                    else if (currentResizeStep.Up)
+                    {
+                        // Update children's position to adapt for changed height
                         child.localPosition = new(
                                 child.localPosition.x,
-                                newLocalPosition.y + 0.5f * (newLocalSize.y + child.gameObject.LocalSize().y) + currentResizeStep.TopPadding,
+                                child.localPosition.y + yDiff,
                                 child.localPosition.z);
                     }
-                    child.SetParent(transform);
-                }
 
-                // Restore handle scale
-                foreach (GameObject handle in handles.Keys)
-                {
-                    handle.transform.SetParent(null);
-                    handle.transform.localScale = handleScale;
-                    handle.transform.SetParent(transform);
+                    child.SetParent(transform);
                 }
             }
 
@@ -742,11 +797,6 @@ namespace SEE.Controls.Actions
                 /// coordinate system for the resize step.
                 /// </summary>
                 public readonly Vector3 LocalScaleFactor;
-
-                /// <summary>
-                /// Padding between the resized objects and its child objects in parent's local coordiante system.
-                /// </summary>
-                public readonly float TopPadding;
 
                 /// <summary>
                 /// The <see cref="minSize"/> scaled by <see cref="LocalScaleFactor"/>.
@@ -807,7 +857,6 @@ namespace SEE.Controls.Actions
                         localScale.y / lossyScale.y,
                         localScale.z / lossyScale.z
                     );
-                    TopPadding = LocalScaleFactor.y * GameNodeMover.TopPadding;
                     MinLocalSize = Vector3.Scale(minSize, LocalScaleFactor);
                     LocalPadding = padding * LocalScaleFactor;
                     Left    = Direction.x < 0;
@@ -866,6 +915,48 @@ namespace SEE.Controls.Actions
                 public override readonly string ToString()
                 {
                     return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
+                }
+            }
+
+            /// <summary>
+            /// Implements billboarding, rotating a game object around the Y-axis to face the main camera.
+            /// </summary>
+            class Billboard : MonoBehaviour
+            {
+                /// <summary>
+                /// Reference to the main camera.
+                /// </summary>
+                private Camera mainCamera;
+
+                /// <summary>
+                /// The initial rotation is combined with the direction that faces the main camera.
+                /// <para>
+                /// To discard the initial rotation, set it to <c>Quaternion.Euler(0f, 0f, 0f)</c> after adding the component
+                /// (or simply reset the object's rotation before adding the component).
+                /// </para>
+                /// </summary>
+                public Quaternion initialRotation;
+
+                void Start()
+                {
+                    mainCamera = Camera.main;
+                    initialRotation = transform.rotation;
+                }
+
+                void LateUpdate()
+                {
+                    if (mainCamera == null)
+                        return;
+
+                    Transform parent = transform.parent;
+                    transform.SetParent(null);
+
+                    Vector3 direction = mainCamera.transform.position - transform.position;
+                    // Do not use height information to rotate around Y-axis
+                    direction.y = 0f;
+                    transform.rotation = Quaternion.LookRotation(direction) * initialRotation;
+
+                    transform.SetParent(parent);
                 }
             }
         }
