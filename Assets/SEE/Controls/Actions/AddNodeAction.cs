@@ -9,6 +9,7 @@ using SEE.Utils;
 using System;
 using SEE.UI.PropertyDialog;
 using SEE.DataModel.DG;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -67,12 +68,20 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (Input.GetMouseButtonDown(0)
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
                         // the hit object is the parent in which to create the new node
                         GameObject parent = raycastHit.collider.gameObject;
                         AddNode(raycastHit.collider.gameObject, raycastHit.point);
+                    }
+                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef() &&
+                        XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res))
+                    {
+                        // the hit object is the parent in which to create the new node
+                        GameObject parent = res.collider.gameObject;
+                        XRSEEActions.Selected = false;
+                        AddNode(res.collider.gameObject, res.point);
                     }
                     else if (ExecuteViaContextMenu)
                     {
@@ -241,8 +250,8 @@ namespace SEE.Controls.Actions
             base.Undo();
             if (addedGameNode != null)
             {
-                new DeleteNetAction(addedGameNode.name).Execute();
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
+                new DeleteNetAction(addedGameNode.name).Execute();
                 Destroyer.Destroy(addedGameNode);
                 addedGameNode = null;
             }
