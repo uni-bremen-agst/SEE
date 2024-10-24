@@ -166,7 +166,7 @@ namespace SEE.Tools.Livekit
                 }
 
                 // Get the saved camera or default to the first available camera.
-                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices.Length > 0 ? devices[0].name : null);
+                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices[0].name);
 
                 // Set the dropdown value to the saved or default camera.
                 int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
@@ -194,6 +194,9 @@ namespace SEE.Tools.Livekit
             webCamTexture?.Stop();
 
             string selectedDeviceName = devices[index].name;
+
+            // Saves the selected camera.
+            PlayerPrefs.SetString("selectedCamera", selectedDeviceName);
 
             // Initialize a new WebCamTexture with the selected camera device.
             webCamTexture = new WebCamTexture(selectedDeviceName);
