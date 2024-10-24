@@ -78,6 +78,7 @@ namespace SEE.UI.RuntimeConfigMenu
         public static AbstractSEECity[] GetCities()
         {
             return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
+                             .Where(component => component != null)
                              .OrderBy(go => go.name).ToArray();
         }
 
