@@ -1,5 +1,7 @@
 ﻿using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
+using SEE.GameObjects;
 using SEE.Utils;
 using UnityEngine;
 
@@ -44,6 +46,17 @@ namespace SEE.Net.Actions
         {
             GameObject gameObject = GraphElementIDMap.Find(GameObjectID, mustFindElement: true);
 #pragma warning disable VSTHRD110
+            Transform cityHolder = gameObject.transform.parent;
+            if (cityHolder.GetComponent<CitySelectionManager>() != null)
+            {
+                cityHolder.GetComponent<CitySelectionManager>().enabled = true;
+            }
+            if (cityHolder.GetComponent<AbstractSEECity>() is SEEReflexionCity)
+            {
+                Destroyer.Destroy(cityHolder.GetComponent<ReflexionVisualization>());
+                // TODO: what is with the EdgeMeshScheduler component?
+                Destroyer.Destroy(cityHolder.GetComponent<EdgeMeshScheduler>());
+            }
             Destroyer.Destroy(gameObject);
 #pragma warning restore VSTHRD110
         }

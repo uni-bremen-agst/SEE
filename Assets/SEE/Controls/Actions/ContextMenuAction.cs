@@ -18,6 +18,7 @@ using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
 using SEE.Net.Actions;
+using SEE.GameObjects;
 
 namespace SEE.Controls.Actions
 {
@@ -372,6 +373,18 @@ namespace SEE.Controls.Actions
                     ConfirmDialogMenu confirmDialog = new($"Do you really want to delete the city?\r\nThis action cannot be undone.");
                     confirmDialog.ExecuteAfterConfirmAsync(() =>
                     {
+                        Transform cityHolder = node.GameObject().transform.parent;
+                        if (cityHolder.GetComponent<CitySelectionManager>() != null)
+                        {
+                            cityHolder.GetComponent<CitySelectionManager>().enabled = true;
+                        }
+                        if (cityHolder.GetComponent<AbstractSEECity>() is SEEReflexionCity)
+                        {
+                            Destroyer.Destroy(cityHolder.GetComponent<ReflexionVisualization>());
+                            // TODO: what is with the EdgeMeshScheduler component?
+                            Destroyer.Destroy(cityHolder.GetComponent<EdgeMeshScheduler>());
+                        }
+                        Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
                         Destroyer.Destroy(node.GameObject());
                         new DeleteRootNetAction(graphElement.ID).Execute();
                     }).Forget();
