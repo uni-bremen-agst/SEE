@@ -155,6 +155,11 @@ namespace SEE.UI.HelpSystem
             instructionsDisplay = GetTextField();
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Instantiates the help system entry and the space if necessary, that is,
         /// if <see cref="helpSystemEntry"/> is null.
@@ -228,6 +233,11 @@ namespace SEE.UI.HelpSystem
                     }
                 }
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         /// <summary>

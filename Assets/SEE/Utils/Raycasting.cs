@@ -7,6 +7,7 @@ using UnityEngine.Assertions;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
+using SEE.XR;
 
 namespace SEE.Utils
 {
@@ -66,7 +67,7 @@ namespace SEE.Utils
         /// </returns>
         public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
         {
-            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+            if (((SceneSettings.InputType == PlayerInputType.DesktopPlayer && !IsMouseOverGUI()) || SceneSettings.InputType == PlayerInputType.VRPlayer) && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
             {
                 raycastHit = hit;
                 if (hit.transform.TryGetComponent(out NodeRef nodeRef))
@@ -106,7 +107,14 @@ namespace SEE.Utils
         {
             raycastHit = new RaycastHit();
             Physics.queriesHitBackfaces = true;
-            return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            }
+            else
+            {
+                return Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
+            }
         }
 
         /// <summary>
@@ -193,21 +201,42 @@ namespace SEE.Utils
         {
             HitGraphElement result = HitGraphElement.None;
 
+            static HitGraphElement DetermineHit(InteractableObject element)
+            {
+                HitGraphElement result = element.GraphElemRef.Elem switch
+                {
+                    null => HitGraphElement.None,
+                    Node => HitGraphElement.Node,
+                    Edge => HitGraphElement.Edge,
+                    _ => throw new System.ArgumentOutOfRangeException()
+                };
+                return result;
+            }
+
             raycastHit = new RaycastHit();
             obj = null;
-            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                raycastHit = hit;
-                if (hit.transform.TryGetComponent(out InteractableObject io))
+                if (XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray))
                 {
-                    result = io.GraphElemRef.Elem switch
+                    raycastHit = ray;
+                    if (ray.transform.TryGetComponent(out InteractableObject io))
                     {
-                        null => HitGraphElement.None,
-                        Node => HitGraphElement.Node,
-                        Edge => HitGraphElement.Edge,
-                        _ => throw new System.ArgumentOutOfRangeException()
-                    };
-                    obj = io;
+                        result = DetermineHit(io);
+                        obj = io;
+                    }
+                }
+            }
+            else
+            {
+                if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+                {
+                    raycastHit = hit;
+                    if (hit.transform.TryGetComponent(out InteractableObject io))
+                    {
+                        result = DetermineHit(io);
+                        obj = io;
+                    }
                 }
             }
             return result;
@@ -295,8 +324,19 @@ namespace SEE.Utils
         {
             // FIXME: We need to an interaction for VR, too.
             Camera mainCamera = MainCamera.Camera;
+            Vector3 screenPoint;
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
+                screenPoint = mainCamera.WorldToScreenPoint(hit.point);
+            }
+            else
+            {
+                screenPoint = Input.mousePosition;
+            }
+
             return mainCamera != null
-                ? mainCamera.ScreenPointToRay(Input.mousePosition)
+                ? mainCamera.ScreenPointToRay(screenPoint)
                 : new Ray(origin: Vector3.zero, direction: Vector3.zero);
         }
     }
