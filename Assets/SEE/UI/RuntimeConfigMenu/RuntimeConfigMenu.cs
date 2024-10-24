@@ -29,7 +29,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private void Start()
         {
-            int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Length;
+            int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity)
+                .Select(go => go.GetComponent<AbstractSEECity>())
+                .Where(component => component != null).Count();
             cityMenus = new RuntimeTabMenu[cityCount];
             for (int i = 0; i < cityCount; i++)
             {
