@@ -299,7 +299,7 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
         }
 
-        // IMPORTANT NOTE: The order of the following field declarations must be exaclty the same
+        // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
         // as the order of their assignments in the static constructor above.
 
         public static readonly ActionStateType Move;
@@ -312,7 +312,6 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType ScaleNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
-        public static readonly ActionStateType Draw;
         public static readonly ActionStateType AcceptDivergence;
 
         public static readonly ActionStateTypeGroup MetricBoard;

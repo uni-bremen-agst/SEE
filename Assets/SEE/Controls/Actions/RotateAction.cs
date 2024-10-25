@@ -1,6 +1,8 @@
 using RTG;
+using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils.History;
+using SEE.XR;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -40,7 +42,10 @@ namespace SEE.Controls.Actions
         private void Initialize()
         {
             CurrentState = IReversibleAction.Progress.NoEffect;
-            UsedGizmo = new RotateGizmo();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                UsedGizmo = new RotateGizmo();
+            }
         }
 
         #endregion Constructors
@@ -135,6 +140,9 @@ namespace SEE.Controls.Actions
         protected override void FinalizeAction()
         {
             base.FinalizeAction();
+            XRSEEActions.RotateObject = null;
+            XRSEEActions.Selected = false;
+            XRSEEActions.SelectedFlag = false;
             GameNodeMemento.Finalize(GameNodeSelected.transform.rotation);
         }
 

@@ -7,6 +7,7 @@ using SEE.UI.PropertyDialog;
 using UnityEngine;
 using UnityEngine.Assertions;
 using SEE.Utils.History;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -78,8 +79,11 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            base.Stop();
-            OpenDialog();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                base.Stop();
+                OpenDialog();
+            }
             InteractableObject.LocalAnySelectIn += LocalAnySelectIn;
             InteractableObject.LocalAnySelectOut += LocalAnySelectOut;
         }
@@ -127,7 +131,14 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            MakeUnselectedTransparent();
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                MakeUnselectedTransparent();
+            }
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                mode = RadialSelection.HideMode;
+            }
             switch (mode)
             {
                 case HideModeSelector.HideAll:

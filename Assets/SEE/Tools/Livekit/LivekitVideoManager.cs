@@ -9,6 +9,7 @@ using UnityEngine.UI;
 using TMPro;
 using Unity.Netcode;
 using SEE.Controls;
+using SEE.GO;
 
 namespace SEE.Tools.Livekit
 {
@@ -89,8 +90,15 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void Start()
         {
-            SetupCameraDropdown();
-            StartCoroutine(GetToken());
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                SetupCameraDropdown();
+                StartCoroutine(GetToken());
+            }
+            else
+            {
+                gameObject.SetActive(false);
+            }
         }
 
         /// <summary>
