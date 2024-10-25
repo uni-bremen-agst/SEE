@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CompilerArchitecture" edgeids="true">
+  <node id="N1337">
+      <type xlink:href="ArchT"/>
+      <attr name="Source.Name">
+        <string>Test1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Test1</string>
+      </attr>
+    </node>
+    <node id="N1338">
+      <type xlink:href="ArchT"/>
+      <attr name="Source.Name">
+        <string>Test</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>Test</string>
+      </attr>
+    </node>       
+  </graph>
+</gxl>

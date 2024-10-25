@@ -13,6 +13,10 @@ namespace SEE.GameObjects
     /// </summary>
     public class CitySelectionManager : MonoBehaviour
     {
+        #region Initial Cities Configuration Paths
+        private const string reflexionCityPath = "Assets/StreamingAssets/reflexion/initial/Reflexion.cfg";
+
+        #endregion
         /// <summary>
         /// The progress states for selecting and adding a city to a table.
         /// </summary>
@@ -60,8 +64,9 @@ namespace SEE.GameObjects
                                 gameObject.AddComponent<EdgeMeshScheduler>();
                                 gameObject.GetComponent<CityCursor>().enabled = true;
 
-                                // TODO: draw initial city (root -> (file root / arch root))
-                                //reflexionCity.LoadAndDrawGraphAsync();
+                                reflexionCity.ConfigurationPath = new(reflexionCityPath);
+                                reflexionCity.LoadConfiguration();
+                                reflexionCity.LoadAndDrawGraphAsync();
                                 enabled = false;
                                 break;
                             case CityTypes.CodeCity:
