@@ -6,6 +6,7 @@ using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using Sirenix.OdinInspector;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -40,6 +41,10 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask LoadDataAsync()
         {
+            // Makes the necessary changes for the inital types of a reflexion city.
+            AddAndSetInitialType(ReflexionGraph.ArchitectureType, Color.black);
+            AddAndSetInitialType(ReflexionGraph.ImplementationType, Color.cyan);
+
             if (LoadedGraph != null)
             {
                 Reset();
@@ -69,6 +74,32 @@ namespace SEE.Game.City
             {
                 scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
+        }
+
+        /// <summary>
+        /// Add the node type if it does not already exist, and then configure the settings.
+        /// </summary>
+        /// <param name="type">The type to be added</param>
+        /// <param name="color">The node color.</param>
+        private void AddAndSetInitialType(string type, Color color)
+        {
+            if (!NodeTypes.TryGetValue(type, out VisualNodeAttributes _))
+            {
+                NodeTypes[type] = new VisualNodeAttributes();
+            }
+            SetInitialType(NodeTypes[type], color);
+        }
+
+        /// <summary>
+        /// Set the necessary properties for the initial type.
+        /// </summary>
+        /// <param name="type">The type whose properties are to be set.</param>
+        /// <param name="color">The node color.</param>
+        private void SetInitialType(VisualNodeAttributes type, Color color)
+        {
+            type.AllowManualNodeManipulation = true;
+            type.ColorProperty.TypeColor = color;
+            type.ShowNames = false;
         }
     }
 }
