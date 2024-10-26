@@ -18,7 +18,7 @@ namespace SEE.Tools.Livekit
     /// Handles publishing/unpublishing local video, subscribing/unsubscribing to remote video,
     /// and switching between available camera devices.
     /// </summary>
-    public class LivekitVideoManager : NetworkBehaviour
+    public class LivekitVideoManager : MonoBehaviour
     {
         /// <summary>
         /// The URL of the LiveKit server to connect to.
@@ -51,11 +51,6 @@ namespace SEE.Tools.Livekit
         private WebCamTexture webCamTexture = null;
 
         /// <summary>
-        /// The index of the currently selected camera.
-        /// </summary>
-        private int currentCameraIndex = 0;
-
-        /// <summary>
         /// An array containing the available webcam devices.
         /// </summary>
         private WebCamDevice[] devices;
@@ -63,7 +58,17 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// The dropdown UI component used to select between different available cameras.
         /// </summary>
-        public TMP_Dropdown CameraDropdown;
+        public Dropdown CameraDropdown;
+
+        /// <summary>
+        /// The image UI component that shows whether the video chat is active.
+        /// </summary>
+        public RawImage LivekitStatusImage;
+
+        /// <summary>
+        /// The text UI component that shows whether the video chat is active.
+        /// </summary>
+        public Text LivekitStatusText;
 
         /// <summary>
         /// A dictionary that maps participant identities to the GameObjects that represent their video streams.
@@ -157,25 +162,28 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void SetupCameraDropdown()
         {
-            // Retrieve the list of available camera devices.
+            // Load available cameras and populate the dropdown.
             devices = WebCamTexture.devices;
 
             if (devices.Length > 0)
             {
-                List<string> cameraNames = new();
-
-                // Iterate through each device and add its name to the list.
+                CameraDropdown.options.Clear();
                 foreach (WebCamDevice device in devices)
                 {
-                    cameraNames.Add(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name);
+                    CameraDropdown.options.Add(new Dropdown.OptionData(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name));
                 }
 
-                CameraDropdown.ClearOptions();
-                CameraDropdown.AddOptions(cameraNames);
+                // Get the saved camera or default to the first available camera.
+                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices[0].name);
+
+                // Set the dropdown value to the saved or default camera.
+                int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
+                CameraDropdown.value = selectedIndex >= 0 ? selectedIndex : 0;
+
+                // Add a listener for dropdown changes.
                 CameraDropdown.onValueChanged.AddListener(OpenSelectedCamera);
 
-                // Open the first camera by default.
-                OpenSelectedCamera(0);
+                OpenSelectedCamera(selectedIndex);
             }
             else
             {
@@ -191,19 +199,21 @@ namespace SEE.Tools.Livekit
         /// <param name="index">The index of the selected camera device in the dropdown list.</param>
         private void OpenSelectedCamera(int index)
         {
-            if (index >= 0 && index < devices.Length)
+            webCamTexture?.Stop();
+
+            string selectedDeviceName = devices[index].name;
+
+            // Saves the selected camera.
+            PlayerPrefs.SetString("selectedCamera", selectedDeviceName);
+
+            // Initialize a new WebCamTexture with the selected camera device.
+            webCamTexture = new WebCamTexture(selectedDeviceName);
+
+            if (publishedTrack != null)
             {
-                webCamTexture?.Stop();
-
-                string selectedDeviceName = devices[index].name;
-
-                // Initialize a new WebCamTexture with the selected camera device.
-                webCamTexture = new WebCamTexture(selectedDeviceName);
-                webCamTexture.Play();
-
-                StartCoroutine(RepublishVideo());
-                Debug.Log($"[Livekit] Switched to camera: {selectedDeviceName}");
+                StartCoroutine(UnpublishVideo());
             }
+            Debug.Log($"[Livekit] Switched to camera: {selectedDeviceName}");
         }
         #endregion
 
@@ -272,63 +282,65 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous publishing process.</returns>
         private IEnumerator PublishVideo()
         {
-            // Check if the room is initialized.
-            if (room != null)
+            // Start camera device.
+            webCamTexture?.Play();
+
+            // Create a video source from the current webcam texture.
+            TextureVideoSource source = new TextureVideoSource(webCamTexture);
+
+            // Create a local video track with the video source.
+            LocalVideoTrack track = LocalVideoTrack.CreateVideoTrack("my-video-track", source, room);
+
+            // Define options for publishing the video track.
+            TrackPublishOptions options = new TrackPublishOptions
             {
-                // Create a video source from the current webcam texture.
-                TextureVideoSource source = new TextureVideoSource(webCamTexture);
-
-                // Create a local video track with the video source.
-                LocalVideoTrack track = LocalVideoTrack.CreateVideoTrack("my-video-track", source, room);
-
-                // Define options for publishing the video track.
-                TrackPublishOptions options = new TrackPublishOptions
+                VideoCodec = VideoCodec.H264, // Codec to be used for video.
+                VideoEncoding = new VideoEncoding
                 {
-                    VideoCodec = VideoCodec.H264, // Codec to be used for video.
-                    VideoEncoding = new VideoEncoding
-                    {
-                        MaxBitrate = 512000, // Maximum bitrate in bits per second.
-                                             // Higher values improve the quality, but require more bandwidth.
-                        MaxFramerate = 30 // Maximum frames per second.
-                    },
-                    Simulcast = true, // Enable simulcast for better scalability.
-                                      // Allows participants different quality levels, but increases the server load.
-                    Source = TrackSource.SourceCamera // Specify the source as the camera.
-                };
+                    MaxBitrate = 512000, // Maximum bitrate in bits per second.
+                                         // Higher values improve the quality, but require more bandwidth.
+                    MaxFramerate = 30 // Maximum frames per second.
+                },
+                Simulcast = true, // Enable simulcast for better scalability.
+                                  // Allows participants different quality levels, but increases the server load.
+                Source = TrackSource.SourceCamera // Specify the source as the camera.
+            };
 
-                // Publish the video track to the room.
-                PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(track, options);
-                yield return publish;
+            // Publish the video track to the room.
+            PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(track, options);
+            yield return publish;
 
-                // Check if the publishing was successful.
-                if (!publish.IsError)
+            // Check if the publishing was successful.
+            if (!publish.IsError)
+            {
+                Debug.Log("[Livekit] Video track published!");
+                publishedTrack = track;
+
+                // Find and update the mesh object for the local client with the video.
+                string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
+                GameObject meshObject = GameObject.Find("LivekitVideo_" + localClientId);
+
+                if (meshObject != null)
                 {
-                    Debug.Log("[Livekit] Video track published!");
-                    publishedTrack = track;
-
-                    // Find and update the mesh object for the local client with the video.
-                    string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                    GameObject meshObject = GameObject.Find("LivekitVideo_" + localClientId);
-
-                    if (meshObject != null)
+                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
+                    if (renderer != null)
                     {
-                        MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-                        if (renderer != null)
-                        {
-                            // Enable the renderer and set the texture.
-                            renderer.material.mainTexture = webCamTexture;
-                            renderer.enabled = true;
-                        }
+                        // Enable the renderer and set the texture.
+                        renderer.material.mainTexture = webCamTexture;
+                        renderer.enabled = true;
                     }
-
-                    // Store the mesh object in the dictionary.
-                    videoObjects[localClientId] = meshObject;
                 }
+
+                // Store the mesh object in the dictionary.
+                videoObjects[localClientId] = meshObject;
 
                 // Start capturing and updating the video source.
                 source.Start();
                 StartCoroutine(source.Update());
                 rtcVideoSources.Add(source);
+
+                LivekitStatusImage.color = Color.green;
+                LivekitStatusText.text = "Video live";
             }
         }
 
@@ -339,48 +351,37 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous unpublishing process.</returns>
         private IEnumerator UnpublishVideo()
         {
-            // Check if the room is initialized.
-            if (room != null)
-            {
-                // Unpublish the video track from the room.
-                UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedTrack, true);
-                yield return unpublish;
+            // Stop camera device.
+            webCamTexture?.Stop();
 
-                // Check if the unpublishing was successful.
-                if (!unpublish.IsError)
+            // Unpublish the video track from the room.
+            UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedTrack, true);
+            yield return unpublish;
+
+            // Check if the unpublishing was successful.
+            if (!unpublish.IsError)
+            {
+                Debug.Log("[Livekit] Video track unpublished.");
+                publishedTrack = null;
+
+                // Find and update the mesh object for the local client.
+                string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
+                if (videoObjects.TryGetValue(localClientId, out GameObject meshObject) && meshObject != null)
                 {
-                    Debug.Log("[Livekit] Video track unpublished.");
-                    publishedTrack = null;
-
-                    // Find and update the mesh object for the local client.
-                    string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                    if (videoObjects.TryGetValue(localClientId, out GameObject meshObject) && meshObject != null)
+                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
+                    if (renderer != null)
                     {
-                        MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-                        if (renderer != null)
-                        {
-                            // Disable the renderer and clear the texture.
-                            renderer.enabled = false;
-                            renderer.material.mainTexture = null;
-                        }
-
-                        // Remove the mesh object from the dictionary.
-                        videoObjects.Remove(localClientId);
+                        // Disable the renderer and clear the texture.
+                        renderer.enabled = false;
+                        renderer.material.mainTexture = null;
                     }
-                }
-            }
-        }
 
-        /// <summary>
-        /// Republishes the video track, typically used after switching the camera.
-        /// </summary>
-        /// <returns>Coroutine that handles the republishing of the video.</returns>
-        private IEnumerator RepublishVideo()
-        {
-            if (publishedTrack != null)
-            {
-                yield return StartCoroutine(UnpublishVideo());
-                StartCoroutine(PublishVideo());
+                    // Remove the mesh object from the dictionary.
+                    videoObjects.Remove(localClientId);
+
+                    LivekitStatusImage.color = Color.red;
+                    LivekitStatusText.text = "Video offline";
+                }
             }
         }
         #endregion
