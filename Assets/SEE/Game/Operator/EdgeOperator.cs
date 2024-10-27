@@ -218,6 +218,8 @@ namespace SEE.Game.Operator
 
         protected override TweenOperation<(Color start, Color end)> InitializeColorOperation()
         {
+            return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+
             Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
             {
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
@@ -228,8 +230,6 @@ namespace SEE.Game.Operator
                                             colors.end, d);
                 return new[] { startTween.Play(), endTween.Play() };
             }
-
-            return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
         }
 
         protected override Tween[] BlinkAction(int count, float duration)
