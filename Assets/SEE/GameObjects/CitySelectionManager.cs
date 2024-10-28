@@ -17,6 +17,7 @@ namespace SEE.GameObjects
         private const string reflexionCityPath = "Assets/StreamingAssets/reflexion/initial/Reflexion.cfg";
 
         #endregion
+
         /// <summary>
         /// The progress states for selecting and adding a city to a table.
         /// </summary>
@@ -66,7 +67,7 @@ namespace SEE.GameObjects
 
                                 reflexionCity.ConfigurationPath = new(reflexionCityPath);
                                 reflexionCity.LoadConfiguration();
-                                reflexionCity.LoadAndDrawGraphAsync();
+                                reflexionCity.LoadAndDrawGraphAsync().Forget();
                                 enabled = false;
                                 break;
                             case CityTypes.CodeCity:
@@ -74,13 +75,13 @@ namespace SEE.GameObjects
                             case CityTypes.EvolutionCity:
                             case CityTypes.BranchCity:
                             case CityTypes.DynamicCity:
+                                ShowNotification.Warn("Not available", "This type of city cannot be added yet.");
                                 break;
                             default:
                                 ShowNotification.Warn("Error", "Error in city selection; The city cannot be added.");
                                 progressState = ProgressState.Start;
                                 return;
                         }
-                        ShowNotification.Info("City selected", $"{cityType} was selected");
                         progressState = ProgressState.Start;
                     }
                     if (citySelectionProperty.WasCanceled())
