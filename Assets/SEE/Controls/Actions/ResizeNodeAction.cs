@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using SEE.Game.City;
@@ -279,10 +279,18 @@ namespace SEE.Controls.Actions
         private class ResizeGizmo : MonoBehaviour
         {
             /// <summary>
-            /// Path to the texture for the up/down resize handle.
+            /// Path to the texture for the BOTTOM-RIGHT resize handle.
             /// </summary>
-            private static readonly string resizeUpDownTexture = "Assets/Resources/Textures/ResizeArrowUpDown.png";
+            private static readonly string resizeArrowBottomRightTexture = "Assets/Resources/Textures/ResizeArrowBottomRight.png";
+            /// <summary>
+            /// Path to the texture for the RIGHT resize handle.
+            /// </summary>
+            private static readonly string resizeArrowRightTexture = "Assets/Resources/Textures/ResizeArrowRight.png";
 
+            /// <summary>
+            /// Path to the texture for the UP/DOWN resize handle.
+            /// </summary>
+            private static readonly string resizeArrowUpDownTexture = "Assets/Resources/Textures/ResizeArrowUpDown.png";
             /// <summary>
             /// The data of the resize step that is in action.
             /// </summary>
@@ -318,7 +326,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The minimal size of a node in world space.
             /// </summary>
-            private static readonly Vector3 minSize = new (0.04f, 0.001f, 0.04f);
+            private static readonly Vector3 minSize = new (0.06f, 0.001f, 0.06f);
 
             /// <summary>
             /// The minimal world-space distance between nodes while resizing.
@@ -334,12 +342,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The size of the handles.
             /// </summary>
-            private static readonly Vector3 handleScale = new(0.02f, 0.02f, 0.02f);
-
-            /// <summary>
-            /// The size of the sprite handles, e.g., up/down arrow.
-            /// </summary>
-            private static readonly Vector3 spriteScale = new(0.006f, 0.006f, 0.006f);
+            private static readonly Vector3 handleScale = new(0.005f, 0.005f, 0.005f);
 
             /// <summary>
             /// The color of the handles.
@@ -459,40 +462,50 @@ namespace SEE.Controls.Actions
             /// <returns>The handle game object.</returns>
             private GameObject CreateHandle(Vector3 direction, Vector3 parentWorldPosition, Vector3 parentWorldScale)
             {
-                GameObject handle;
+                GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                handle.transform.localScale = handleScale;
+
+                Material material;
                 if (direction == Vector3.up)
                 {
-                    handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                    handle.name = new("handle__height");
-                    // TODO Add dedicated portal shader for textures with transparency?
-                    Material material = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
-                    material.renderQueue = (int)RenderQueue.Overlay;
-
-                    material.mainTexture = LoadTexture(resizeUpDownTexture);
-                    material.color = Color.cyan;
-                    handle.GetComponent<Renderer>().material = material;
-
-                    handle.transform.localScale = spriteScale;
                     handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                    handle.transform.localPosition = parentWorldPosition + 0.5f * (Vector3.Scale(parentWorldScale, direction) + new Vector3(0f, handle.WorldSpaceSize().y, 0f));
+                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowUpDownTexture);
+                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
+                }
+                else if (direction.x != 0f && direction.z != 0f)
+                {
+                    if (direction.x > 0f)
+                    {
+                        handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 90f : 180f, 0f);
+                    }
+                    else
+                    {
+                        handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
+                    }
+                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowBottomRightTexture);
+                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
                 else
                 {
-                    // Position handles at baseline
-                    direction.y = -1f;
-
-                    handle = GameObject.CreatePrimitive(PrimitiveType.Cube);
-                    handle.GetComponent<Renderer>().material.color = handleColor;
-                    handle.transform.localScale = handleScale;
-                    handle.transform.localPosition = parentWorldPosition + 0.5f * Vector3.Scale(parentWorldScale, direction);
-                    handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
+                    handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
+                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowRightTexture);
+                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
+                // TODO apply portal?
+                handle.GetComponent<Renderer>().material = material;
+                handle.transform.localPosition = new(
+                        parentWorldPosition.x + 0.5f * parentWorldScale.x * direction.x,
+                        parentWorldPosition.y
+                                + (direction == Vector3.up ? 0.5f * parentWorldScale.y * direction.y + 0.5001f * handle.WorldSpaceSize().y : 0f),
+                        parentWorldPosition.z + 0.5f * parentWorldScale.z * direction.z);
+
+                handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                 handle.transform.SetParent(transform);
                 return handle;
             }
 
             /// <summary>
-            /// Update the up/down handle's position so that it faces the camera.
+            /// Update the up/down handle's position and rotation so that it faces the camera.
             /// </summary>
             private void UpdateUpDownHandlePosition()
             {
@@ -531,30 +544,11 @@ namespace SEE.Controls.Actions
                 void flipScales()
                 {
                     // Note: Z and Y axes are swapped because the plane is rotated 90° on the X-axis to get it upright.
-                        upDownHandleTransform.localScale = new(
-                                upDownHandleTransform.localScale.y,
-                                upDownHandleTransform.localScale.x,
-                                upDownHandleTransform.localScale.z);
+                    upDownHandleTransform.localScale = new(
+                            upDownHandleTransform.localScale.y,
+                            upDownHandleTransform.localScale.x,
+                            upDownHandleTransform.localScale.z);
                 }
-            }
-
-            /// <summary>
-            /// Load a texture from file.
-            /// </summary>
-            /// <param name="texturePath">The path to the image file.</param>
-            /// <returns>The loaded texture.</returns>
-            private Texture2D LoadTexture(string texturePath)
-            {
-                if (File.Exists(texturePath))
-                {
-                    byte[] fileData = File.ReadAllBytes(texturePath);
-                    Texture2D texture = new (1, 1);
-                    if (texture.LoadImage(fileData))
-                    {
-                        return texture;
-                    }
-                }
-                return null;
             }
 
             /// <summary>
@@ -766,11 +760,21 @@ namespace SEE.Controls.Actions
                 }
 
                 // Ensure minimal size
-                if (newLocalSize.x < currentResizeStep.MinLocalSize.x
-                        || newLocalSize.y < currentResizeStep.MinLocalSize.y
-                        || newLocalSize.z < currentResizeStep.MinLocalSize.z)
+                if (newLocalSize.x < currentResizeStep.MinLocalSize.x)
                 {
-                    return;
+                    newLocalPosition.x += 0.5f * (currentResizeStep.MinLocalSize.x - newLocalSize.x) * currentResizeStep.Direction.x;
+                    newLocalSize.x = currentResizeStep.MinLocalSize.x;
+                }
+                if (newLocalSize.y < currentResizeStep.MinLocalSize.y)
+                {
+                    // We only resize in positive direction on this axis
+                    newLocalPosition.y += 0.5f * (currentResizeStep.MinLocalSize.y - newLocalSize.y);
+                    newLocalSize.y = currentResizeStep.MinLocalSize.y;
+                }
+                if (newLocalSize.z < currentResizeStep.MinLocalSize.z)
+                {
+                    newLocalPosition.z += 0.5f * (currentResizeStep.MinLocalSize.z - newLocalSize.z) * currentResizeStep.Direction.z;
+                    newLocalSize.z = currentResizeStep.MinLocalSize.z;
                 }
 
                 // Prevent child nodes from getting scaled
