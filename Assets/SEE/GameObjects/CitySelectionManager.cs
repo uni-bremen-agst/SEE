@@ -1,6 +1,10 @@
-﻿using SEE.Controls;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.Game.City;
+using SEE.Game.CityRendering;
 using SEE.GO;
+using SEE.Layout.NodeLayouts;
+using SEE.Layout;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
@@ -67,7 +71,8 @@ namespace SEE.GameObjects
 
                                 reflexionCity.ConfigurationPath = new(reflexionCityPath);
                                 reflexionCity.LoadConfiguration();
-                                reflexionCity.LoadAndDrawGraphAsync().Forget();
+                                CreateReflexionCityAsync(reflexionCity).Forget();
+                                //reflexionCity.LoadAndDrawGraphAsync().Forget();
                                 enabled = false;
                                 break;
                             case CityTypes.CodeCity:
@@ -94,6 +99,12 @@ namespace SEE.GameObjects
                     ShowNotification.Warn("Error", "Error in city selection");
                     break;
             }
+        }
+
+        private async UniTask CreateReflexionCityAsync(SEEReflexionCity city)
+        {
+            await city.LoadDataAsync();
+            city.DrawGraph();
         }
     }
 }
