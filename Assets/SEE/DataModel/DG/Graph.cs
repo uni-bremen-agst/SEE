@@ -304,34 +304,25 @@ namespace SEE.DataModel.DG
         public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
         {
             List<Node> roots = GetRoots();
-            if (roots.Count > 1)
+            string id = name;
+            string sourceName = name;
+            if (string.IsNullOrWhiteSpace(id))
             {
-                string id = name;
-                string sourceName = name;
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    id = $"{Name}#ROOT";
-                    sourceName = $"{Name} (root)";
-                }
-                if (string.IsNullOrWhiteSpace(type))
-                {
-                    type = UnknownType;
-                }
-                root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
-                AddNode(root);
-                foreach (Node oldRoot in roots)
-                {
-                    root.AddChild(oldRoot);
-                }
-
-                NodeHierarchyHasChanged = true;
-                return true;
+                id = $"{Name}#ROOT";
+                sourceName = $"{Name} (root)";
             }
-            else
+            if (string.IsNullOrWhiteSpace(type))
             {
-                root = roots.FirstOrDefault();
-                return false;
+                type = UnknownType;
             }
+            root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
+            AddNode(root);
+            foreach (Node oldRoot in roots)
+            {
+                root.AddChild(oldRoot);
+            }
+            NodeHierarchyHasChanged = true;
+            return true;
         }
 
         /// <summary>
@@ -774,7 +765,7 @@ namespace SEE.DataModel.DG
         /// <typeparam name="T">Type of the graph.</typeparam>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
-        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T: Graph
+        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T : Graph
         {
             if (other == null)
             {
