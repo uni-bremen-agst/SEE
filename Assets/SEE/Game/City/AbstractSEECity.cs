@@ -318,7 +318,7 @@ namespace SEE.Game.City
         /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
         protected static void UpdateGraphElementIDMap(GameObject root)
         {
-            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
+            if ((root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge)) && !GraphElementIDMap.Has(root.name))
             {
                 GraphElementIDMap.Add(root);
             }
