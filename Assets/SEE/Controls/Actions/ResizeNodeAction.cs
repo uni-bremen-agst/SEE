@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
-using SEE.Game.City;
+using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -491,7 +491,6 @@ namespace SEE.Controls.Actions
                     Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowRightTexture);
                     material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
-                // TODO apply portal?
                 handle.GetComponent<Renderer>().material = material;
                 handle.transform.localPosition = new(
                         parentWorldPosition.x + 0.5f * parentWorldScale.x * direction.x,
@@ -501,6 +500,7 @@ namespace SEE.Controls.Actions
 
                 handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                 handle.transform.SetParent(transform);
+                Portal.InheritPortal(from: transform.gameObject, to: handle);
                 return handle;
             }
 
