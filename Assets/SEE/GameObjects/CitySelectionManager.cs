@@ -64,15 +64,7 @@ namespace SEE.GameObjects
                         switch(cityType)
                         {
                             case CityTypes.ReflexionCity:
-                                SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
-                                gameObject.AddComponent<ReflexionVisualization>();
-                                gameObject.AddComponent<EdgeMeshScheduler>();
-                                gameObject.GetComponent<CityCursor>().enabled = true;
-
-                                reflexionCity.ConfigurationPath = new(reflexionCityPath);
-                                reflexionCity.LoadConfiguration();
-                                CreateReflexionCityAsync(reflexionCity).Forget();
-                                //reflexionCity.LoadAndDrawGraphAsync().Forget();
+                                CreateReflexionCityAsync().Forget();
                                 enabled = false;
                                 break;
                             case CityTypes.CodeCity:
@@ -101,10 +93,21 @@ namespace SEE.GameObjects
             }
         }
 
-        private async UniTask CreateReflexionCityAsync(SEEReflexionCity city)
+        /// <summary>
+        /// Creates and loads an initial reflexion city.
+        /// </summary>
+        /// <returns>Needed for asynchrony.</returns>
+        private async UniTask CreateReflexionCityAsync()
         {
-            await city.LoadDataAsync();
-            city.DrawGraph();
+            SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
+            gameObject.AddComponent<ReflexionVisualization>();
+            gameObject.AddComponent<EdgeMeshScheduler>();
+            gameObject.GetComponent<CityCursor>().enabled = true;
+
+            reflexionCity.ConfigurationPath = new(reflexionCityPath);
+            reflexionCity.LoadConfiguration();
+            await reflexionCity.LoadDataAsync();
+            reflexionCity.DrawGraph();
         }
     }
 }
