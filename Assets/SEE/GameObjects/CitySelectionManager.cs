@@ -65,7 +65,7 @@ namespace SEE.GameObjects
                         {
                             case CityTypes.ReflexionCity:
                                 CreateReflexionCityAsync().Forget();
-                                enabled = false;
+                                CityComponentsSettings();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -102,12 +102,21 @@ namespace SEE.GameObjects
             SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
             gameObject.AddComponent<ReflexionVisualization>();
             gameObject.AddComponent<EdgeMeshScheduler>();
-            gameObject.GetComponent<CityCursor>().enabled = true;
 
             reflexionCity.ConfigurationPath = new(reflexionCityPath);
             reflexionCity.LoadConfiguration();
             await reflexionCity.LoadDataAsync();
             reflexionCity.DrawGraph();
+        }
+
+        /// <summary>
+        /// Activation and deactivation of the additionally required components of the
+        /// city game object.
+        /// </summary>
+        private void CityComponentsSettings()
+        {
+            gameObject.GetComponent<CityCursor>().enabled = true;
+            enabled = false;
         }
     }
 }
