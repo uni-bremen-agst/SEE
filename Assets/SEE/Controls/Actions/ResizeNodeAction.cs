@@ -782,7 +782,7 @@ namespace SEE.Controls.Actions
                 {
                     child.SetParent(parent);
                 }
-                float yDiff = 2 * (newLocalPosition.y - transform.localPosition.y);
+                Vector3 posDiff = 2 * (newLocalPosition - transform.localPosition);
 
                 // Apply new scale and position
                 transform.localScale = Vector3.Scale(newLocalSize, currentResizeStep.ScaleSizeFactor);
@@ -791,22 +791,23 @@ namespace SEE.Controls.Actions
                 // Reparent children
                 foreach (Transform child in children)
                 {
-                    // Non-sprite handles
+                    // Adapt position
                     if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
                     {
-                        // Adapt handle position
+                        // Reposition base handles
                         child.localPosition = new(
                                 transform.localPosition.x + 0.5f * transform.localScale.x * direction.x,
-                                child.localPosition.y,
+                                child.localPosition.y, // don't move handles up or down
                                 transform.localPosition.z + 0.5f * transform.localScale.z * direction.z);
                     }
-                    else if (currentResizeStep.Up)
+                    else
                     {
-                        // Update children's position to adapt for changed height
+                        // Adapt other children's position based on changed position and size
+                        bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
                         child.localPosition = new(
-                                child.localPosition.x,
-                                child.localPosition.y + yDiff,
-                                child.localPosition.z);
+                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x * currentResizeStep.Direction.x: 0f),
+                                child.localPosition.y + posDiff.y, // we always resize height in positiove direction
+                                child.localPosition.z + (shift2D ? 0.5f * posDiff.z  * currentResizeStep.Direction.z : 0f));
                     }
 
                     child.SetParent(transform);
