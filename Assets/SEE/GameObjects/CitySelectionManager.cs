@@ -179,7 +179,7 @@ namespace SEE.GameObjects
                 float diff = oldScale.z - newScale.z;
                 diff = diff < 0 ? diff : -diff;
                 Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
-                obj.NodeOperator().ResizeTo(newScale, newPosition, 1, reparentChildren: false);
+                obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
             }
         }
     }
