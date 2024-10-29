@@ -311,6 +311,11 @@ namespace SEE.UI
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         protected override void UpdateDesktop()
         {
             if (text == null)
@@ -338,6 +343,11 @@ namespace SEE.UI
             {
                 FadeIn();
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         private void OnDestroy()

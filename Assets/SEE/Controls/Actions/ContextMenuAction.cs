@@ -17,6 +17,7 @@ using SEE.Utils.History;
 using SEE.GO.Menu;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -55,24 +56,39 @@ namespace SEE.Controls.Actions
             popupMenu = gameObject.AddComponent<PopupMenu>();
         }
 
+        /// <summary>
+        /// Is true when the context-menu is open.
+        /// This is used in VR to open and close the menu.
+        /// </summary>
+        bool onSelect;
+
         private void Update()
         {
-            if (SEEInput.OpenContextMenuStart())
+            if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle))
             {
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                     startObject = o;
-                    startMousePosition = Input.mousePosition;
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    {
+                        startMousePosition = Input.mousePosition;
+                    }
                     multiselection = false;
+                    XRSEEActions.TooltipToggle = false;
+                    XRSEEActions.OnSelectToggle = true;
+                    onSelect = true;
                 }
                 else
                 {
                     startObject = null;
                     multiselection = true;
+                    XRSEEActions.TooltipToggle = false;
+                    XRSEEActions.OnSelectToggle = true;
+                    onSelect = true;
                 }
             }
-            if (SEEInput.OpenContextMenuEnd())
+            if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
             {
                 if (!multiselection)
                 {
@@ -81,10 +97,19 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1)
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
-                        position = Input.mousePosition;
+                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
+                        onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
@@ -97,8 +122,17 @@ namespace SEE.Controls.Actions
                     }
                     if (InteractableObject.SelectedObjects.Contains(o))
                     {
-                        position = Input.mousePosition;
+                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        {
+                            position = Input.mousePosition;
+                        }
+                        else
+                        {
+                            XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
+                            position = res.point;
+                        }
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
+                        onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
