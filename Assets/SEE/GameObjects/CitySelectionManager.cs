@@ -9,6 +9,9 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
+using System.Collections.Generic;
+using System;
+using LibGit2Sharp;
 
 namespace SEE.GameObjects
 {
@@ -29,6 +32,7 @@ namespace SEE.GameObjects
         {
             Start,
             ChoseCity,
+            RelfexionCity,
         }
 
         /// <summary>
@@ -65,7 +69,6 @@ namespace SEE.GameObjects
                         {
                             case CityTypes.ReflexionCity:
                                 CreateReflexionCityAsync().Forget();
-                                CityComponentsSettings();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -73,16 +76,27 @@ namespace SEE.GameObjects
                             case CityTypes.BranchCity:
                             case CityTypes.DynamicCity:
                                 ShowNotification.Warn("Not available", "This type of city cannot be added yet.");
+                                progressState = ProgressState.Start;
                                 break;
                             default:
                                 ShowNotification.Warn("Error", "Error in city selection; The city cannot be added.");
                                 progressState = ProgressState.Start;
                                 return;
                         }
-                        progressState = ProgressState.Start;
                     }
                     if (citySelectionProperty.WasCanceled())
                     {
+                        progressState = ProgressState.Start;
+                    }
+                    break;
+
+                case ProgressState.RelfexionCity:
+                    if (gameObject.GetComponent<SEEReflexionCity>() != null
+                        && gameObject.IsCodeCityDrawn())
+                    {
+                        SEEReflexionCity reflexionCity = gameObject.GetComponent<SEEReflexionCity>();
+                        FitInitalReflexionCity(reflexionCity);
+                        CityComponentsSettings();
                         progressState = ProgressState.Start;
                     }
                     break;
@@ -107,6 +121,7 @@ namespace SEE.GameObjects
             reflexionCity.LoadConfiguration();
             await reflexionCity.LoadDataAsync();
             reflexionCity.DrawGraph();
+            progressState = ProgressState.RelfexionCity;
         }
 
         /// <summary>
@@ -117,6 +132,55 @@ namespace SEE.GameObjects
         {
             gameObject.GetComponent<CityCursor>().enabled = true;
             enabled = false;
+        }
+
+        /// <summary>
+        /// Ensures that the architecture root is always positioned on the right side
+        /// and the implementation root on the left side.
+        /// Additionally, the roots are scaled to a ratio of 60 (architecture)
+        /// to 40 (implementation).
+        /// </summary>
+        /// <param name="city">The reflexion city.</param>
+        /// <exception cref="ArgumentException">If the city is null.</exception>
+        private void FitInitalReflexionCity(SEEReflexionCity city)
+        {
+            if (city == null)
+            {
+                throw new ArgumentException("The city is null.");
+            }
+
+            GameObject arch = city.ReflexionGraph.ArchitectureRoot.GameObject(true);
+            GameObject impl = city.ReflexionGraph.ImplementationRoot.GameObject(true);
+
+            /// Changes the position of the architecture and implementation roots.
+            /// The result is that the architecture root is on the right side,
+            /// and the implementation root is on the left side.
+            if (arch.transform.position.z < impl.transform.position.z)
+            {
+                Vector3 oldPosition = arch.transform.position;
+                arch.transform.position = impl.transform.position;
+                impl.transform.position = oldPosition;
+            }
+
+            /// Adjusting the initial size.
+            /// The architecture root should occupy approximately 60% of the table,
+            /// and the implementation root 40%.
+            float currenScale = 0.5f;
+            float targetArchScale = 0.6f;
+            float targetImplScale = 0.4f;
+            ApplyScale(arch, targetArchScale / currenScale);
+            ApplyScale(impl, targetImplScale / currenScale);
+
+            return;
+            void ApplyScale(GameObject obj, float factor)
+            {
+                Vector3 oldScale = obj.transform.localScale;
+                Vector3 newScale = new (oldScale.x, oldScale.y, oldScale.z * factor);
+                float diff = oldScale.z - newScale.z;
+                diff = diff < 0 ? diff : -diff;
+                Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
+                obj.NodeOperator().ResizeTo(newScale, newPosition, 1, reparentChildren: false);
+            }
         }
     }
 }
