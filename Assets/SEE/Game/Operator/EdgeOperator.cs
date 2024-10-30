@@ -82,7 +82,16 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Construct(float factor = 1)
         {
-            return construction.AnimateTo(true, ToDuration(factor));
+            return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => UpdateCollider(true));
+        }
+
+        /// <summary>
+        /// Enable/disable the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
+        /// </summary>
+        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is <c>false</c>.</param>
+        private void UpdateCollider(bool enableCollider)
+        {
+            spline.IsSelectable = enableCollider;
         }
 
         /// <summary>
@@ -95,7 +104,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Destruct(float factor = 1)
         {
-            return construction.AnimateTo(false, ToDuration(factor));
+            return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => UpdateCollider(false));
         }
 
         /// <summary>
@@ -142,7 +151,7 @@ namespace SEE.Game.Operator
             return animationKind switch
             {
                 EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
-                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor).OnComplete(() => UpdateCollider(show)),
                 EdgeAnimationKind.Buildup => show ? Construct(factor) : Destruct(factor),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
