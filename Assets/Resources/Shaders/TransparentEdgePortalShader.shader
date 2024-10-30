@@ -15,8 +15,7 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         _GrowthAmount("Growth Amount", Range(0, 0.04)) = 0.005
 
         // Clipping
-        _PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-        _PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+        _Portal("Portal", vector) = (-10, -10, 10, 10)
     }
     SubShader
     {
@@ -74,8 +73,7 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
             float _GrowthAmount;
 
             // Clipping
-            float2 _PortalMin;
-            float2 _PortalMax;
+            float4 _Portal;
 
             v2f vert (appdata v)
             {
@@ -111,10 +109,10 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // Clipping
-                // Note: We use a 2D portal (x, y) that spans over a (x, z) plane in the Unity 3D space.
-                if (i.worldPos.x < _PortalMin.x || i.worldPos.x > _PortalMax.x ||
-                    i.worldPos.z < _PortalMin.y || i.worldPos.z > _PortalMax.y)
+                // Discard coordinates if transparent or outside portal
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                if (i.worldPos.x < _Portal.x || i.worldPos.z < _Portal.y ||
+                    i.worldPos.x > _Portal.z || i.worldPos.z > _Portal.w)
                 {
                     discard;
                 }

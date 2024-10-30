@@ -55,8 +55,7 @@ Properties {
 
 	_Cutoff				("Cutoff", Range(0, 1)) = 0.5
 
-	_PortalMin			("Portal Minimum", vector) = (-10, -10, 0, 0)
-	_PortalMax			("Portal Maximum", vector) = (10, 10, 0, 0)
+	_Portal			("Portal", vector) = (-10, -10, 10, 10)
 }
 
 SubShader {
@@ -103,8 +102,7 @@ SubShader {
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 
-		uniform float2 _PortalMin;
-		uniform float2 _PortalMax;
+		uniform float4 _Portal;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -231,9 +229,9 @@ SubShader {
 		fixed4 PixShader(pixel_t input) : SV_Target
 		{
 			// Discard coordinates if outside portal
-			// Note: We use a 2D portal (x, y) that spans over a (x, z) plane in the Unity 3D space.
-			if (input.worldPos.x < _PortalMin.x || input.worldPos.x > _PortalMax.x ||
-				input.worldPos.z < _PortalMin.y || input.worldPos.z > _PortalMax.y)
+			// Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+			if (input.worldPos.x < _Portal.x || input.worldPos.z < _Portal.y ||
+				input.worldPos.x > _Portal.z || input.worldPos.z > _Portal.w)
 			{
 				discard;
 			}
