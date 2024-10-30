@@ -356,6 +356,20 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the control point at <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">Index of the control point to be returned</param>
+        /// <returns>The control point at <paramref name="index"/></returns>
+        private Vector3 GetControlPoint(uint index) => TinySplineInterop.VectorToVector(spline.ControlPointVec3At(index));
+
+        /// <summary>
+        /// Returns the control point in the middle of the spline.
+        /// If the number of control points is even, the control point will not be exactly in the middle.
+        /// </summary>
+        /// <returns>The control point in the middle of the spline</returns>
+        public Vector3 GetMiddleControlPoint() => GetControlPoint(spline.NumControlPoints / 2);
+
+        /// <summary>
         /// Updates the <see cref="LineRenderer"/> of the
         /// <see cref="GameObject"/> this component is attached to
         /// (<see cref="Component.gameObject"/>) and marks the internal state

@@ -145,7 +145,6 @@ namespace SEE.Game.Operator
             }
 
             // Display marker above the element
-            // FIXME: marker is not displayed above edge.
             MarkerFactory marker = new(new MarkerAttributes(height: 1f, width: 0.01f, GetHighlightColor(), default, default));
             marker.MarkBorn(gameObject);
             // The factor of 1.3 causes the element to blink slightly more than once per second,
