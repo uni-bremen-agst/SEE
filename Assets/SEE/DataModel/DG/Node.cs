@@ -158,7 +158,7 @@ namespace SEE.DataModel.DG
         /// True iff node has the <see cref="Graph.RootToggle"/> marking.
         /// </summary>
         /// <returns>true iff node has the <see cref="Graph.RootToggle"/> marking.</returns>
-        public bool HasRootAttribute()
+        public bool HasRootToogle()
         {
             return HasToggle(Graph.RootToggle);
         }
