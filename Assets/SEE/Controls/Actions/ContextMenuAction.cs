@@ -574,9 +574,12 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            return node.IsRoot() ? new List<PopupMenuEntry>() { } :
-                new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
-                    "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
+            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Node Options", Icons.Node,
+                    node.IsRoot()?
+                        new List<PopupMenuEntry>() {new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1)}
+                        : actions,
+                    node, gameObject, 2, appendActions) };
 
             void MoveNode()
             {
