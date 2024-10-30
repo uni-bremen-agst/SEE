@@ -2,7 +2,7 @@ Shader "Unlit/TransparentSpritePortalShader"
 {
     Properties
     {
-        _MainTex ("Texture", 2D) = "white" {}
+        _MainTex("Texture", 2D) = "white" {}
 
         // Clipping
         _PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
@@ -11,8 +11,8 @@ Shader "Unlit/TransparentSpritePortalShader"
     SubShader
     {
         Tags {
-            "Queue"="Transparent"
-            "RenderType"="Transparent"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
             "IgnoreProjector"="True"
             "ForceNoShadowCasting" = "True"
             "PreviewType" = "Plane"

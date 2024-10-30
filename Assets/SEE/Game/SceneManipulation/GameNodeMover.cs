@@ -9,7 +9,7 @@ namespace SEE.Game.SceneManipulation
     public static class GameNodeMover
     {
         /// <summary>
-        /// Empty space on the y-axis bewteen the top of the target object and the bottom of the child
+        /// Empty space on the y-axis between the top of the target object and the bottom of the child
         /// object in world space units, used in <see cref="GetCoordinatesOn"/>.
         /// </summary>
         private const float TopPadding = 0.0001f;

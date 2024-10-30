@@ -321,6 +321,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             private bool clicked = false;
 
+            /// <summary>
+            /// The sprite handles are placed just outside the parent object to prevent z-fighting.
+            /// </summary>
+            private static readonly float halfAndABit = 0.5001f;
+
             #region Configurations
 
             /// <summary>
@@ -375,7 +380,7 @@ namespace SEE.Controls.Actions
                 }
 
                 this.nodeRef = nodeRef;
-                mainCameraTransform = Camera.main.transform;
+                mainCameraTransform = MainCamera.Camera.transform;
                 InitHandles();
             }
 
@@ -495,7 +500,7 @@ namespace SEE.Controls.Actions
                 handle.transform.localPosition = new(
                         parentWorldPosition.x + 0.5f * parentWorldScale.x * direction.x,
                         parentWorldPosition.y
-                                + (direction == Vector3.up ? 0.5f * parentWorldScale.y * direction.y + 0.5001f * handle.WorldSpaceSize().y : 0f),
+                                + (direction == Vector3.up ? 0.5f * parentWorldScale.y * direction.y + halfAndABit * handle.WorldSpaceSize().y : 0f),
                         parentWorldPosition.z + 0.5f * parentWorldScale.z * direction.z);
 
                 handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
@@ -536,9 +541,9 @@ namespace SEE.Controls.Actions
 
                 // The height is updated during the resize process
                 upDownHandleTransform.localPosition = new(
-                        0.5001f * directionToCamera.x,
+                        halfAndABit * directionToCamera.x,
                         upDownHandleTransform.localPosition.y,
-                        0.5001f * directionToCamera.z);
+                        halfAndABit * directionToCamera.z);
 
 
                 void flipScales()
@@ -805,8 +810,8 @@ namespace SEE.Controls.Actions
                         // Adapt other children's position based on changed position and size
                         bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
                         child.localPosition = new(
-                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x * currentResizeStep.Direction.x: 0f),
-                                child.localPosition.y + posDiff.y, // we always resize height in positiove direction
+                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x * currentResizeStep.Direction.x : 0f),
+                                child.localPosition.y + posDiff.y, // we always resize height in positive direction
                                 child.localPosition.z + (shift2D ? 0.5f * posDiff.z  * currentResizeStep.Direction.z : 0f));
                     }
 
