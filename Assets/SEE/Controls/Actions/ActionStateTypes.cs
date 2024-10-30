@@ -293,13 +293,11 @@ namespace SEE.Controls.Actions
         // as the order of their assignments in the static constructor above.
 
         public static readonly ActionStateType Move;
-        public static readonly ActionStateType Rotate;
         public static readonly ActionStateType Hide;
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
         public static readonly ActionStateType ResizeNode;
-        public static readonly ActionStateType ScaleNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
