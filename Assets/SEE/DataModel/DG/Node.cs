@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SEE.DataModel.DG
@@ -159,7 +160,7 @@ namespace SEE.DataModel.DG
         /// <returns>true iff node has the <see cref="Graph.RootToggle"/> marking.</returns>
         public bool HasRootAttribute()
         {
-            return ToggleAttributes.Contains(Graph.RootToggle);
+            return HasToggle(Graph.RootToggle);
         }
 
         /// <summary>
