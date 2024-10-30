@@ -95,7 +95,7 @@
                 {
                     discard;
                 }
-                fixed4 c = SampleSpriteTexture (IN.texcoord) * IN.color;
+                fixed4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
                 c.rgb *= c.a;
                 return c;
             }

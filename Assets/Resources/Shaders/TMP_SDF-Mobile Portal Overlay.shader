@@ -153,7 +153,7 @@ SubShader {
 			// The following two variables will make sure that the localScale is correctly applied to the billboarded text.
 			// Source: https://forum.unity.com/threads/billboard-shader-that-respects-gameobjects-transform-localscale.451431
 			float scaleX = length(float4(UNITY_MATRIX_M[0].r, UNITY_MATRIX_M[1].r, UNITY_MATRIX_M[2].r, UNITY_MATRIX_M[3].r));
-            float scaleY = length(float4(UNITY_MATRIX_M[0].g, UNITY_MATRIX_M[1].g, UNITY_MATRIX_M[2].g, UNITY_MATRIX_M[3].g));
+			float scaleY = length(float4(UNITY_MATRIX_M[0].g, UNITY_MATRIX_M[1].g, UNITY_MATRIX_M[2].g, UNITY_MATRIX_M[3].g));
 			float3 objectCenterInView = UnityObjectToViewPos(float3(0.0, 0.0, 0.0));
 			float4 newViewPos = float4(
 					objectCenterInView.x + vert.x * scaleX,

@@ -76,11 +76,11 @@ namespace SEE.Game
         /// Returns the portal of <paramref name="material"/>, a rectangle on the x/z plane,
         /// defined by its <paramref name="leftFront"/> and <paramref name="rightBack"/> corners.
         /// <para>
-        /// Precondition: <paramref name="material"/> must have the <c>_Portal</c> attribute
+        /// Precondition: <paramref name="material"/> must have the <c>_Portal</c> attribute.
         /// If it does not exist, the result is undefined.
         /// </para>
         /// </summary>
-        /// <param name="gameObject">game objects whose portal is requested</param>
+        /// <param name="material">the material from which the portal coordinates should be extracted</param>
         /// <param name="leftFront">the left front corner of the rectangular portal</param>
         /// <param name="rightBack">the right back corner of the rectangular portal</param>
         private static void GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
