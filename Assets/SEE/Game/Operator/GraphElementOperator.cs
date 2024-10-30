@@ -56,7 +56,18 @@ namespace SEE.Game.Operator
 
         protected override float BaseAnimationDuration => City.BaseAnimationDuration;
 
+        /// <summary>
+        /// Calculates a value for the <see cref="glow"/> operation according to the following formula:
+        /// <c>min(1, colorAlpha) * fullGlow</c>
+        /// </summary>
+        /// <returns>Glow value which doesn't exceed alpha value</returns>
         protected abstract float GetTargetGlow();
+
+        /// <summary>
+        /// Returns the color to use for the spear highlighting the element.
+        /// </summary>
+        /// <returns>the color to use for the spear highlighting the element</returns>
+        protected abstract Color GetHighlightColor();
 
         /// <summary>
         /// Returns an array of tweens that animate the element to blink <paramref name="blinkCount"/> times
@@ -135,7 +146,7 @@ namespace SEE.Game.Operator
 
             // Display marker above the element
             // FIXME: marker is not displayed above edge.
-            MarkerFactory marker = new(new MarkerAttributes(height: 1f, width: 0.01f, Color.red, default, default));
+            MarkerFactory marker = new(new MarkerAttributes(height: 1f, width: 0.01f, GetHighlightColor(), default, default));
             marker.MarkBorn(gameObject);
             // The factor of 1.3 causes the element to blink slightly more than once per second,
             // which seems visually fitting.
@@ -229,6 +240,12 @@ namespace SEE.Game.Operator
                 });
             }
             return Color.AnimateTo(targetColor, ToDuration(factor));
+        }
+
+        protected override Color GetHighlightColor()
+        {
+            List<Color> colors = AsEnumerable(TargetColor).ToList();
+            return colors.Aggregate((x, y) => x + y) / colors.Count;
         }
 
         /// <summary>
