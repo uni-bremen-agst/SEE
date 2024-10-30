@@ -3,7 +3,6 @@ using SEE.Game.Avatars;
 using SEE.GO;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -114,11 +113,11 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
+        /// Starts the co-routine <see cref="SpawnPlayer"/>.
         /// </summary>
         private void OnEnable()
         {
-            StartCoroutine(SpawnPlayerCoroutine());
+            SpawnPlayer();
         }
 
         /// <summary>
@@ -134,24 +133,19 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="ClientConnects(ulong)"/>
+        /// This method sets <see cref="dissonanceComms"/>, registers <see cref="ClientConnects(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
         /// the first local client.
         /// </summary>
-        /// <returns>enumerator as to how to continue this co-routine</returns>
-        private IEnumerator SpawnPlayerCoroutine()
+        private void SpawnPlayer()
         {
             Net.Network networkConfig = FindObjectOfType<Net.Network>()
                 ?? throw new Exception("Network configuration not found.\n");
 
             // Wait until Dissonance is created.
-            while (ReferenceEquals(dissonanceComms, null))
+            if (ReferenceEquals(dissonanceComms, null))
             {
                 dissonanceComms = FindObjectOfType<DissonanceComms>();
-                if (ReferenceEquals(dissonanceComms, null))
-                {
-                    yield return null;
-                }
                 // We need to set the local player name in DissonanceComms
                 // before Dissonance is started. That is why we cannot afford
                 // to wait until the next frame.
@@ -168,7 +162,7 @@ namespace SEE.Game.Worlds
                 // nor host. A pure client is to request spawning a player
                 // via the following call back.
                 networkManager.OnClientConnectedCallback += OnClientIsConnected;
-                yield break;
+                return;
             }
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -223,7 +217,7 @@ namespace SEE.Game.Worlds
 
         /// <summary>
         /// Requests to spawn a player on the server. Is used as callback registered
-        /// at <see cref="SpawnPlayerCoroutine"/>. The player name and avatar index
+        /// at <see cref="SpawnPlayer"/>. The player name and avatar index
         /// are retrieved from the local configuration on the client side.
         /// </summary>
         /// <param name="clientId">the network ID of the connecting client</param>
