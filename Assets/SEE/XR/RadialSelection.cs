@@ -322,17 +322,7 @@ namespace SEE.XR
                         subMenuPosition = radialPartCanvas.position;
                         subMenuRotation = radialPartCanvas.rotation;
                     }
-                    if (actions[i] == ActionStateTypes.Rotate.Name)
-                    {
-                        if (actionObject != null)
-                        {
-                            Destroyer.Destroy(actionObject);
-                        }
-                        actionObject = PrefabInstantiator.InstantiatePrefab("Prefabs/Dial").transform.gameObject;
-                        actionObject.transform.position = handTransform.position;
-                        actionObject.SetActive(true);
-                    }
-                    else if (actionObject != null)
+                    if (actionObject != null)
                     {
                         actionObject.SetActive(false);
                     }
