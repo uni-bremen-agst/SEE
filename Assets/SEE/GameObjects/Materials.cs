@@ -26,6 +26,7 @@ namespace SEE.GO
             PortalFree         = 4, // not limited by a portal (seen everywhere)
             DrawableLine       = 5, // for drawable lines
             DrawableDashedLine = 6, // for drawable dashed lines
+            Sprite             = 7, // for sprites (planes with textures with transparency) visible within portal
         }
 
         /// <summary>
@@ -59,11 +60,15 @@ namespace SEE.GO
         /// (located in folder Resources).
         /// </summary>
         private const string drawableDashedLineMaterialName = "Materials/DrawableDashedLineMaterial";
+        /// <summary>
+        /// Name of the material for sprites with transparency within a portal (located in Resources folder).
+        /// </summary>
+        private const string spriteMaterialName = "Materials/TransparentSpritePortalMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
         /// </summary>
-        private static readonly int texturePropertyID = Shader.PropertyToID("_Texture");
+        private static readonly int texturePropertyID = Shader.PropertyToID("_MainTex");
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -277,6 +282,9 @@ namespace SEE.GO
                     break;
                 case ShaderType.DrawableDashedLine:
                     name = drawableDashedLineMaterialName;
+                    break;
+                case ShaderType.Sprite:
+                    name = spriteMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();
