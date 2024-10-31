@@ -15,8 +15,7 @@ Shader "Custom/Outline"
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTestFill("ZTest Fill", Float) = 0
         _OutlineColor("Outline Color", Color) = (1, 1, 1, 1)
         _OutlineWidth("Outline Width", Range(0, 10)) = 2
-        _PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-        _PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+        _Portal("Portal", vector) = (-10, -10, 10, 10)
     }
 
     SubShader
@@ -83,8 +82,7 @@ Shader "Custom/Outline"
             uniform fixed4 _OutlineColor;
             uniform float _OutlineWidth;
 
-            float2 _PortalMin;
-            float2 _PortalMax;
+            float4 _Portal;
 
             v2f vert(appdata input)
             {
@@ -99,8 +97,7 @@ Shader "Custom/Outline"
 
                 output.position = UnityViewToClipPos(
                     viewPosition + viewNormal * -viewPosition.z * _OutlineWidth / 1000.0);
-                output.worldPos = mul(unity_ObjectToWorld,
-                                      float4(input.vertex.x, input.vertex.y, input.vertex.z, 1.0)).xyz;
+                output.worldPos = mul(unity_ObjectToWorld, input.vertex);
                 output.color = _OutlineColor;
 
                 return output;
@@ -108,14 +105,15 @@ Shader "Custom/Outline"
 
             fixed4 frag(v2f input) : SV_Target
             {
-                fixed4 c = input.color;
-                if (input.worldPos.x < _PortalMin.x || input.worldPos.z < _PortalMin.y ||
-                    input.worldPos.x > _PortalMax.x || input.worldPos.z > _PortalMax.y
-                )
+                // Discard coordinates if outside portal
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                if (input.worldPos.x < _Portal.x || input.worldPos.z < _Portal.y ||
+                    input.worldPos.x > _Portal.z || input.worldPos.z > _Portal.w)
                 {
-                    c.a = 0.0f;
+                    discard;
                 }
-                return c;
+
+                return input.color;
             }
             ENDCG
         }

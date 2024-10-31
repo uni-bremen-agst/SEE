@@ -2,11 +2,8 @@ Shader "Unlit/TransparentSpritePortalShader"
 {
     Properties
     {
-        _MainTex("Texture", 2D) = "white" {}
-
-        // Clipping
-        _PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-        _PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+        _MainTex ("Texture", 2D) = "white" {}
+        _Portal ("Portal", vector) = (-10, -10, 10, 10)
     }
     SubShader
     {
@@ -50,10 +47,7 @@ Shader "Unlit/TransparentSpritePortalShader"
 
             sampler2D _MainTex;
             float4 _MainTex_ST;
-
-            // Clipping
-            float2 _PortalMin;
-            float2 _PortalMax;
+            float4 _Portal;
 
             v2f vert (appdata v)
             {
@@ -70,10 +64,10 @@ Shader "Unlit/TransparentSpritePortalShader"
                 fixed4 col = tex2D(_MainTex, i.uv);
 
                 // Discard coordinates if transparent or outside portal
-                // Note: We use a 2D portal (x, y) that spans over a (x, z) plane in the Unity 3D space.
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
                 if ( col.a <= 0 ||
-                    i.worldPos.x < _PortalMin.x || i.worldPos.x > _PortalMax.x ||
-                    i.worldPos.z < _PortalMin.y || i.worldPos.z > _PortalMax.y)
+                    i.worldPos.x < _Portal.x || i.worldPos.z < _Portal.y ||
+                    i.worldPos.x > _Portal.z || i.worldPos.z > _Portal.w)
                 {
                     discard;
                 }
