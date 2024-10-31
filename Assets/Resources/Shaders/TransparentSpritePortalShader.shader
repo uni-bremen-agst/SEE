@@ -8,8 +8,8 @@ Shader "Unlit/TransparentSpritePortalShader"
     SubShader
     {
         Tags {
-            "Queue"="Transparent"
-            "RenderType"="Transparent"
+            "Queue" = "Transparent"
+            "RenderType" = "Transparent"
             "IgnoreProjector"="True"
             "ForceNoShadowCasting" = "True"
             "PreviewType" = "Plane"

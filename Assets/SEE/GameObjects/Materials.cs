@@ -63,7 +63,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of the material for sprites with transparency within a portal (located in Resources folder).
         /// </summary>
-        private const string spriteName = "Materials/TransparentSpritePortalMaterial";
+        private const string spriteMaterialName = "Materials/TransparentSpritePortalMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
@@ -284,7 +284,7 @@ namespace SEE.GO
                     name = drawableDashedLineMaterialName;
                     break;
                 case ShaderType.Sprite:
-                    name = spriteName;
+                    name = spriteMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

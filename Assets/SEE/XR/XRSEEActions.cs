@@ -153,32 +153,6 @@ namespace SEE.XR
                 }
                 else
                 {
-                    if (GlobalActionHistory.Current() == ActionStateTypes.Rotate)
-                    {
-                        if (Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef _) == HitGraphElement.Node)
-                        {
-                            GameObject rotationObject = hit.collider.transform.gameObject;
-                            rotationObject.TryGetNodeRef(out NodeRef nodeRef);
-                            if (rotationObject.ContainingCity().NodeTypes[nodeRef.Value.Type].AllowManualResize)
-                            {
-                                RotateObject = hit.collider.transform.gameObject;
-                            }
-                            else
-                            {
-                                Selected = false;
-                                SelectedFlag = false;
-                                RotateObject = null;
-                                return;
-                            }
-                        }
-                        else
-                        {
-                            Selected = false;
-                            SelectedFlag = false;
-                            RotateObject = null;
-                            return;
-                        }
-                    }
                     Selected = true;
                     if (GlobalActionHistory.Current() != ActionStateTypes.Move && GlobalActionHistory.Current() != ActionStateTypes.Delete)
                     {

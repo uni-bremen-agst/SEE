@@ -162,7 +162,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Defines if node type may be manually resized by users.
         /// </summary>
-        [Tooltip("May users resize this type of node?.")]
+        [Tooltip("May users resize this type of node?")]
         public bool AllowManualResize = false;
 
         /// <summary>
