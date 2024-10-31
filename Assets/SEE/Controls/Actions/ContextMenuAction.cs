@@ -465,7 +465,7 @@ namespace SEE.Controls.Actions
             }
 
             GameObject city = SceneQueries.GetCodeCity(gameObject.transform).gameObject;
-            CandidateRecommendationViz candidateRecommendationViz = city.GetComponent<CandidateRecommendationViz>();
+            RecommendationsViz candidateRecommendationViz = city.GetComponent<RecommendationsViz>();
 
             if (!openViaTreeView && candidateRecommendationViz != null)
             {
@@ -760,7 +760,7 @@ namespace SEE.Controls.Actions
             WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
 
             GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
-            CandidateRecommendation candidateRecommendation = city.GetComponent<CandidateRecommendationViz>().CandidateRecommendation;
+            Recommendations candidateRecommendation = city.GetComponent<RecommendationsViz>().Recommendations;
             Graph recommendationTree = candidateRecommendation.GetRecommendationTree((Node)graphElement);
 
             // TODO: Can this actually happen? Talk to falko51

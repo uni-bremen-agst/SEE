@@ -355,7 +355,10 @@ namespace SEE.Scanner.Antlr
         private static readonly HashSet<string> plainBranchKeywords = new();
 
         /// <summary> Set of antlr type names for numbers. </summary>
-        private static readonly HashSet<string> plainNumbers = new();
+        private static readonly HashSet<string> plainNumbers = new()
+        {
+             "NUMBER"
+        };
 
         /// <summary>Set of antlr type names for character and string literals. There are none here.
         private static readonly HashSet<string> plainStrings = new();

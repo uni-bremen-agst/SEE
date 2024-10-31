@@ -11,7 +11,6 @@ using SEE.GraphProviders;
 using System.Collections.Generic;
 using Sirenix.Serialization;
 using SEE.UI.Notification;
-using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
 using System.IO;
 using SEE.Utils.Config;
 
@@ -118,7 +117,7 @@ namespace SEE.Game.City
                 // TODO: Maybe a provider returning an empty graph would be the better approach
                 OracleMappingProvider = null;
             }
-            RecommendationSettings.OutputPath.Path = Path.GetDirectoryName(ConfigurationPath.Path);
+            RecommendationSettings.OutputPath.Path = Path.Combine(Path.GetDirectoryName(ConfigurationPath.Path), "Results");
         }
 
         #region CandidateRecommendation
@@ -126,7 +125,7 @@ namespace SEE.Game.City
         /// <summary>
         /// 
         /// </summary>
-        private CandidateRecommendationViz candidateRecommendationViz;
+        private RecommendationsViz candidateRecommendationViz;
 
         /// <summary>
         /// TODO:
@@ -140,12 +139,20 @@ namespace SEE.Game.City
 
         private async UniTask UpdateRecommendationSettings(ReflexionGraph loadedGraph, RecommendationSettings recommendationSettings, Graph oracleMapping)
         {
-            candidateRecommendationViz = gameObject.AddOrGetComponent<CandidateRecommendationViz>();
+            candidateRecommendationViz = gameObject.AddOrGetComponent<RecommendationsViz>();
             this.RecommendationSettings = recommendationSettings;
             if (candidateRecommendationViz != null)
             {
                 loadedGraph.Subscribe(candidateRecommendationViz);
-                await candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, this, oracleMapping);
+                try
+                {
+                    await candidateRecommendationViz.UpdateConfiguration(loadedGraph, recommendationSettings, this, oracleMapping);
+                }
+                catch (Exception e)
+                {
+
+                    UnityEngine.Debug.LogException(e);
+                }
             }
         }
 
@@ -167,7 +174,7 @@ namespace SEE.Game.City
         #endregion
 
 
-        #region CandidateRecommendationButtons
+        #region RecommendationButtons
 
         /// <summary>
         /// The name of the group for the Inspector buttons managing the candidate recommendation.
@@ -176,42 +183,71 @@ namespace SEE.Game.City
 
         protected const string RecommendationsFoldoutGroup = "Recommendations";
 
-        [Button("Update Recommendations", ButtonSizes.Small)]
-        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Recommendations")]
-        // TODO: Property order?
-        // necessary regarding disabling enabling?
+        [Button("Update Attract Config", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Update Attract Config")]
         [PropertyOrder(2)]
         public async UniTask UpdateRecommendationSettings()
         {
-            await UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, RecommendationSettings, oracleMapping);
+            using (LoadingSpinner.ShowDeterminate($"Update attract config...",
+                           out Action<float> reportProgress))
+            {
+                void UpdateProgress(float progress)
+                {
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
+                if (VisualizedSubGraph != null)
+                {
+                    await UpdateRecommendationSettings(VisualizedSubGraph as ReflexionGraph, RecommendationSettings, oracleMapping);
+                    ShowNotification.Info("Updated Attract config.", "Updated Attract config.");
+                }
+                else
+                {
+                    ShowNotification.Warn("Couldn't update Attract config.", "Couldn't update Attract config. No graph has been loaded.");
+                }
+
+                UpdateProgress(1.0f);
+            }
         }
 
         [Button("Reset Mapping", ButtonSizes.Small)]
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Reset Mapping")]
-        // TODO: Property order?
-        // necessary regarding disabling enabling?
-        // TODO: Make this call async?
         [PropertyOrder(3)]
         public async UniTask ResetMappingAsync()
         {
-            using (LoadingSpinner.ShowDeterminate($"reset mapping...",
+            if (VisualizedSubGraph == null)
+            {
+                ShowNotification.Warn("Cannot reset mapping.", "Cannot reset mapping. No graph has been loaded.");
+                return;
+            }
+
+            using (LoadingSpinner.ShowDeterminate($"Reset mapping...",
                                        out Action<float> reportProgress))
             {
-                if (VisualizedSubGraph != null)
+                void UpdateProgress(float progress)
                 {
-                    await this.candidateRecommendationViz.ResetMappingAsync();
+                    reportProgress(progress);
+                    ProgressBar = progress;
                 }
-                else
-                {
-                    ShowNotification.Warn("Cannot reset Mapping.", "Cannot reset Mapping. No Graph has been loaded.");
-                } 
+
+                await this.candidateRecommendationViz.ResetMappingAsync();
+                ShowNotification.Info("Resetted Mapping.", "Resetted Mapping.");
+
+                UpdateProgress(1.0f);
             }
         }
 
-        [Button("Generate initial mapping", ButtonSizes.Small)]
-        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Generate initial mapping")]
+        [Button("Create Initial Mapping", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Create Initial mapping")]
         public async UniTask GenerateInitialMappingAsync()
         {
+            if (VisualizedSubGraph == null)
+            {
+                ShowNotification.Warn("Couldn't start automated mapping.", "Couldn't start automated mapping. No graph has been loaded.");
+                return;
+            }
+
             using (LoadingSpinner.ShowDeterminate($"Generate initial mapping...",
                                        out Action<float> reportProgress))
             {
@@ -221,28 +257,44 @@ namespace SEE.Game.City
                     ProgressBar = progress;
                 }
 
-                if (candidateRecommendationViz != null)
-                {
-                    await candidateRecommendationViz.CreateInitialMappingAsync(RecommendationSettings.initialMappingPercentage, 
-                                                                               RecommendationSettings.rootSeed,
-                                                                               RecommendationSettings.syncWithView);
-                }
-            }
+
+                await candidateRecommendationViz.CreateInitialMappingAsync(RecommendationSettings.initialMappingPercentage,
+                                                                                RecommendationSettings.rootSeed,
+                                                                                RecommendationSettings.moveNodes);
+
+                ShowNotification.Info("Created initial mapping.", "Created initial mapping.");
+                
+                UpdateProgress(1.0f);
+            }      
         }
 
-        [Button("Start automated mapping", ButtonSizes.Small)]
-        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Start automated mapping")]
+        [Button("Start Automated Mapping", ButtonSizes.Small)]
+        [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Start Automated Mapping")]
         public async UniTask StartAutomatedMappingAsync()
         {
-            using (LoadingSpinner.ShowDeterminate($"automate mapping...",
+            if (VisualizedSubGraph == null)
+            {
+                ShowNotification.Warn("Couldn't start automated mapping.", "Couldn't start automated mapping. No graph has been loaded.");
+                return;
+            }
+
+            using (LoadingSpinner.ShowDeterminate($"Automate mapping...",
                                        out Action<float> reportProgress))
             {
-                UnityEngine.Debug.Log($"syncWithView: {RecommendationSettings.syncWithView}");
+                void UpdateProgress(float progress)
+                {
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
                 await candidateRecommendationViz.StartAutomatedMappingAsync(
-                                                                    candidateRecommendationViz.CandidateRecommendation,
-                                                                    syncWithView: RecommendationSettings.syncWithView,
-                                                                    ignoreTieBreakers: RecommendationSettings.IgnoreTieBreakers,
-                                                                    new System.Random(RecommendationSettings.rootSeed)); 
+                                                    candidateRecommendation: candidateRecommendationViz.Recommendations,
+                                                    ignoreTieBreakers: RecommendationSettings.IgnoreTieBreakers,
+                                                    mapInViz: true,
+                                                    random: new System.Random(RecommendationSettings.rootSeed));
+
+                ShowNotification.Info("Automated mapping stopped.", "Automated mapping stopped.");
+                UpdateProgress(1.0f);
             }
         }
 
@@ -250,20 +302,36 @@ namespace SEE.Game.City
         [ButtonGroup(RecommendationsButtonsGroup), RuntimeButton(RecommendationsButtonsGroup, "Run Experiment")]
         public async UniTask RunMappingExperiment()
         {
-            try
+            if (VisualizedSubGraph == null)
             {
-                if (!this.RecommendationSettings.syncWithView)
-                {
-                    await candidateRecommendationViz.RunExperimentInBackground(this.RecommendationSettings, oracleMapping);
-                }
-                else
-                {
-                    await candidateRecommendationViz.RunExperimentAsync(this.RecommendationSettings, oracleMapping);
-                }
+                ShowNotification.Warn("Couldn't start experiment.", "Couldn't start experiment. No graph has been loaded.");
+                return;
             }
-            catch (Exception e)
+
+            using (LoadingSpinner.ShowDeterminate($"Run experiment...",
+                           out Action<float> reportProgress))
             {
-                UnityEngine.Debug.LogException(e);
+                void UpdateProgress(float progress)
+                {
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
+                try
+                {
+                    await candidateRecommendationViz.RunExperimentInBackground(this.RecommendationSettings, 
+                                                                                             oracleMapping, 
+                                                                                             UpdateProgress);
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
+                    ShowNotification.Info("Experiment failed.", "Experiment failed. Please check output.");
+                    return;
+                }
+                ShowNotification.Info("Experiment finished.", $"Experiment finished. {System.Environment.NewLine} Results are located in {this.RecommendationSettings.OutputPath.Path}");
+
+                UpdateProgress(1.0f);
             }
         }
 
@@ -272,6 +340,7 @@ namespace SEE.Game.City
         public async UniTask Evaluation()
         {
             await candidateRecommendationViz.Evaluation();
+            ShowNotification.Info("finished Evaluation.", "finished Evaluation.", duration:1000);
         }
 
         [Button("Dump Tree", ButtonSizes.Small)]

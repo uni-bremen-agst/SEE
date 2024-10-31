@@ -40,12 +40,12 @@ namespace SEE.Tools.Architecture
         /// <summary>
         /// 
         /// </summary>
-        CandidateRecommendation candidateRecommendation;
+        Recommendations candidateRecommendation;
 
         /// <summary>
         /// 
         /// </summary>
-        NodeReaderTest nodeReader;
+        TestNodeReader nodeReader;
 
         /// <summary>
         /// Sets up all three graphs (implementation, architecture,
@@ -70,7 +70,7 @@ namespace SEE.Tools.Architecture
 
         private void SetupCandidateRecommendation()
         {
-            candidateRecommendation = new CandidateRecommendation();
+            candidateRecommendation = new Recommendations();
         }
 
         private void SetupCountAttract(float phi = 1.0f, Dictionary<string, double> edgeWeights = null)
@@ -78,8 +78,8 @@ namespace SEE.Tools.Architecture
             RecommendationSettings config = new RecommendationSettings();
             CountAttractConfig attractConfig = new CountAttractConfig();
             attractConfig.Phi = phi;
-            attractConfig.CandidateType = "Candidate";
-            attractConfig.ClusterType = "Cluster";
+            config.CandidateType = "Candidate";
+            config.ClusterType = "Cluster";
             attractConfig.EdgeWeights = edgeWeights != null ? edgeWeights : attractConfig.EdgeWeights;
             config.CountAttractConfig = attractConfig;
             config.AttractFunctionType = AttractFunction.AttractFunctionType.CountAttract;
@@ -92,8 +92,8 @@ namespace SEE.Tools.Architecture
             RecommendationSettings config = new RecommendationSettings();
             NBAttractConfig attractConfig = new NBAttractConfig();
             config.NodeReader = nodeReader;
-            attractConfig.CandidateType = "Candidate";
-            attractConfig.ClusterType = "Cluster";
+            config.CandidateType = "Candidate";
+            config.ClusterType = "Cluster";
             attractConfig.AlphaSmoothing = 1.0;
             config.NBAttractConfig = attractConfig;
             config.AttractFunctionType = AttractFunction.AttractFunctionType.NBAttract;
@@ -113,8 +113,8 @@ namespace SEE.Tools.Architecture
         {
             RecommendationSettings config = new RecommendationSettings();
             ADCAttractConfig attractConfig = new ADCAttractConfig(mergingType);
-            attractConfig.CandidateType = "Candidate";
-            attractConfig.ClusterType = "Cluster";
+            config.CandidateType = "Candidate";
+            config.ClusterType = "Cluster";
             config.ADCAttractConfig = attractConfig;
             config.AttractFunctionType = AttractFunction.AttractFunctionType.ADCAttract;
             return config;
@@ -239,7 +239,7 @@ namespace SEE.Tools.Architecture
             this.AddArchitecture(numberNodes: 3, edgesFromTo);
             this.AddImplementation(numberNodes: 5, edgesFromTo);
 
-            this.nodeReader = new NodeReaderTest();
+            this.nodeReader = new TestNodeReader();
             this.nodeReader.SetLookUp(i[1].ID, "word1");
             this.nodeReader.SetLookUp(i[2].ID, "word1");
             this.nodeReader.SetLookUp(i[3].ID, "word1");
@@ -357,7 +357,7 @@ namespace SEE.Tools.Architecture
              * 
              * */
 
-            this.nodeReader = new NodeReaderTest();
+            this.nodeReader = new TestNodeReader();
             this.nodeReader.SetLookUp(i[3].ID, "word2");
             this.nodeReader.SetLookUp(i[5].ID, "word1 word2");
             SetupADCAttract(this.nodeReader, Document.DocumentMergingType.Intersection);
@@ -522,7 +522,7 @@ namespace SEE.Tools.Architecture
 
             this.AddImplementation(numberNodes: 7, edgesFromTo);
 
-            this.nodeReader = new NodeReaderTest();
+            this.nodeReader = new TestNodeReader();
             this.nodeReader.SetLookUp(i[5].ID, "word2");
             this.nodeReader.SetLookUp(i[7].ID, "word1 word2");
             SetupADCAttract(this.nodeReader, Document.DocumentMergingType.Intersection);
@@ -907,7 +907,7 @@ namespace SEE.Tools.Architecture
 
             this.AddHierarchy(edgesFromTo, ReflexionSubgraphs.Implementation);
 
-            this.nodeReader = new NodeReaderTest();
+            this.nodeReader = new TestNodeReader();
             SetupADCAttract(this.nodeReader, Document.DocumentMergingType.Intersection);
 
             // setup initial mapping to train the abstract dependencies:
