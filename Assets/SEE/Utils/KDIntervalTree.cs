@@ -82,7 +82,7 @@ namespace SEE.Utils
                 List<int> comparisons = results.Select(x => navigator.Node.Range.CompareTo(x.Range)).ToList();
                 if (comparisons.Count(x => x < 0) > 0)
                 {
-                    // If this range is smaller than some other ranges, we remove those smaller ranges and add this one.
+                    // If this range is smaller than some other ranges, we remove those bigger ranges and add this one.
                     results.RemoveWhere(x => navigator.Node.Range.CompareTo(x.Range) < 0);
                     results.Add(navigator.Node);
                 }

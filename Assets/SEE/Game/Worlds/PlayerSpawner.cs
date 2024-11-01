@@ -113,7 +113,7 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// Starts the co-routine <see cref="SpawnPlayer"/>.
+        /// Runs <see cref="SpawnPlayer"/>.
         /// </summary>
         private void OnEnable()
         {
