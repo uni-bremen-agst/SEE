@@ -5,7 +5,7 @@ using SEE.Utils;
 using System;
 using UnityEngine;
 
-namespace SEE.UI.PropertyDialog
+namespace SEE.UI.PropertyDialog.CitySelection
 {
     /// <summary>
     /// This class manages the dialog for adding a city.

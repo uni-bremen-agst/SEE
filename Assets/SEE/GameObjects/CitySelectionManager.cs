@@ -1,17 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Game.City;
-using SEE.Game.CityRendering;
 using SEE.GO;
-using SEE.Layout.NodeLayouts;
-using SEE.Layout;
 using SEE.UI.Notification;
-using SEE.UI.PropertyDialog;
+using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
-using UnityEngine;
-using System.Collections.Generic;
 using System;
-using LibGit2Sharp;
+using UnityEngine;
 
 namespace SEE.GameObjects
 {

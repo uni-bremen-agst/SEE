@@ -19,6 +19,7 @@ using SEE.UI.Menu.Drawable;
 using SEE.UI.Window.PropertyWindow;
 using SEE.Net.Actions;
 using SEE.GameObjects;
+using SEE.UI.PropertyDialog.CitySelection;
 
 namespace SEE.Controls.Actions
 {
@@ -286,7 +287,7 @@ namespace SEE.Controls.Actions
             return options.Concat(graphElement switch
             {
                 Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
-                    .Concat(node.Type == ReflexionGraph.ImplementationType && !node.GameObject().IsCodeCityDrawn()?
+                    .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph && !node.GameObject().IsCodeCityDrawn()?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
                         : new(){ }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
@@ -295,7 +296,8 @@ namespace SEE.Controls.Actions
 
             void LoadImplementation()
             {
-
+                LoadImplementationProperty dialog = new();
+                dialog.Open();
             }
         }
 
