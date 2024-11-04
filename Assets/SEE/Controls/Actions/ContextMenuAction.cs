@@ -282,12 +282,21 @@ namespace SEE.Controls.Actions
         {
             IEnumerable<PopupMenuEntry> options
                 = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+
             return options.Concat(graphElement switch
             {
-                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions),
+                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
+                    .Concat(node.Type == ReflexionGraph.ImplementationType && !node.GameObject().IsCodeCityDrawn()?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
+                        : new(){ }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
                 _ => throw new ArgumentOutOfRangeException()
             });
+
+            void LoadImplementation()
+            {
+
+            }
         }
 
         /// <summary>

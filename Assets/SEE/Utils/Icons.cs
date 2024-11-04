@@ -79,6 +79,7 @@ namespace SEE.Utils
         public const char Text = '\uF031';
         public const char Trash = '\uF1F8';
         public const char TreeView = '\uF802';
+        public const char Upload = '\uE09A';
         public const char VR = '\uF729';
         public const char Whiteboard = '\uF51B';
     }
