@@ -103,5 +103,17 @@ namespace SEE.UI.PropertyDialog.CitySelection
             projectFolder = string.Empty;
             return false;
         }
+
+        /// <summary>
+        /// Indicator of whether input data is available
+        /// or if the dialog has been canceled.
+        /// </summary>
+        /// <returns>True iff no input is available and the dialog was not canceled.</returns>
+        internal bool WaitForInputOrCancel()
+        {
+            bool isCanceled = WasCanceled();
+            bool waiting = !GotInput && !isCanceled;
+            return waiting;
+        }
     }
 }

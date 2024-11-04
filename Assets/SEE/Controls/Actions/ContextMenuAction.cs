@@ -20,6 +20,7 @@ using SEE.UI.Window.PropertyWindow;
 using SEE.Net.Actions;
 using SEE.GameObjects;
 using SEE.UI.PropertyDialog.CitySelection;
+using SEE.GraphProviders;
 
 namespace SEE.Controls.Actions
 {
@@ -298,6 +299,16 @@ namespace SEE.Controls.Actions
             {
                 LoadImplementationProperty dialog = new();
                 dialog.Open();
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            async UniTask WaitForInputAsync(LoadImplementationProperty dialog)
+            {
+                await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
+                if(dialog.TryGetImplementation(out string gxl, out string projectFolder))
+                {
+                    // TODO load the implementation
+                }
             }
         }
 
