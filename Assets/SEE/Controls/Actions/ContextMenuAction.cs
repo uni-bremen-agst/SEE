@@ -21,6 +21,7 @@ using SEE.Net.Actions;
 using SEE.GameObjects;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.GraphProviders;
+using SEE.Utils.Paths;
 
 namespace SEE.Controls.Actions
 {
@@ -305,9 +306,13 @@ namespace SEE.Controls.Actions
             async UniTask WaitForInputAsync(LoadImplementationProperty dialog)
             {
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
-                if(dialog.TryGetImplementation(out string gxl, out string projectFolder))
+                if(dialog.TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder))
                 {
-                    // TODO load the implementation
+                    // TODO draw the implementation
+                    SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                    city.SourceCodeDirectory = projectFolder;
+                    ReflexionGraphProvider graphProvider = new();
+                    Graph implementationGraph = await graphProvider.LoadGraphAsync(gxl, city);
                 }
             }
         }

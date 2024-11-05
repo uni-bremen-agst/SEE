@@ -2,6 +2,7 @@
 using SEE.Game.City;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
+using SEE.Utils.Paths;
 using System;
 using UnityEngine;
 
@@ -87,20 +88,20 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// <summary>
         /// Fetches the implementation data given by the player.
         /// </summary>
-        /// <param name="gxl">The fetched gxl path.</param>
-        /// <param name="projectFolder">The fetched project folder path.</param>
+        /// <param name="gxl">The fetched gxl as data path.</param>
+        /// <param name="projectFolder">The fetched project folder as data path.</param>
         /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
-        internal bool TryGetImplementation(out string gxl, out string projectFolder)
+        internal bool TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder)
         {
             if (GotInput)
             {
-                gxl = implementationGXL;
-                projectFolder = implProjectFolder;
+                gxl = new(implementationGXL);
+                projectFolder = new(implProjectFolder);
                 GotInput = false;
                 return true;
             }
-            gxl = string.Empty;
-            projectFolder = string.Empty;
+            gxl = null;
+            projectFolder = null;
             return false;
         }
 
