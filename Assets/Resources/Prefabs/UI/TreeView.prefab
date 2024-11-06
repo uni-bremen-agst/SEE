@@ -2623,7 +2623,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 20
+  m_ScrollSensitivity: 0.1
   m_Viewport: {fileID: 6104944427379572325}
   m_HorizontalScrollbar: {fileID: 7161509444652221816}
   m_VerticalScrollbar: {fileID: 8823517661645426696}
@@ -2790,7 +2790,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8823517660152590211}
   m_HandleRect: {fileID: 8823517660152590212}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2953,7 +2953,7 @@ PrefabInstance:
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
@@ -2963,12 +2963,12 @@ PrefabInstance:
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 1233
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
@@ -3013,12 +3013,12 @@ PrefabInstance:
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -5
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
