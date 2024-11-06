@@ -278,12 +278,27 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Shader property that defines the (start) color.
+        /// </summary>
+        private static readonly int ColorProperty = Shader.PropertyToID("_Color");
+
+        /// <summary>
+        /// Shader property that defines the end color of the color gradient.
+        /// </summary>
+        private static readonly int EndColorProperty = Shader.PropertyToID("_EndColor");
+
+        /// <summary>
+        /// Shader property that enables or disables the color gradient.
+        /// </summary>
+        private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
+
+        /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
         private void Awake()
         {
             // Corresponds to the material of the LineRenderer.
-            defaultMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+            defaultMaterial = Materials.New(Materials.ShaderType.TransparentEdge, Color.white);
             defaultMaterial.renderQueue = (int)(RenderQueue.Transparent + 1);
         }
 
@@ -339,6 +354,20 @@ namespace SEE.GO
             spline.SetControlPointVec3At(index, new Vec3(newControlPoint.x, newControlPoint.y, newControlPoint.z));
             needsUpdate = true;
         }
+
+        /// <summary>
+        /// Returns the control point at <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">Index of the control point to be returned</param>
+        /// <returns>The control point at <paramref name="index"/></returns>
+        private Vector3 GetControlPoint(uint index) => TinySplineInterop.VectorToVector(spline.ControlPointVec3At(index));
+
+        /// <summary>
+        /// Returns the control point in the middle of the spline.
+        /// If the number of control points is even, the control point will not be exactly in the middle.
+        /// </summary>
+        /// <returns>The control point in the middle of the spline</returns>
+        public Vector3 GetMiddleControlPoint() => GetControlPoint(spline.NumControlPoints / 2);
 
         /// <summary>
         /// Updates the <see cref="LineRenderer"/> of the
@@ -515,18 +544,12 @@ namespace SEE.GO
 
             // Set up the mesh components.
             Mesh mesh; // The mesh to work on.
-            bool updateMaterial; // Whether to call `UpdateMaterial'.
 
+            // Does this game object already have a mesh which we can reuse?
             if (gameObject.TryGetComponent(out MeshFilter filter))
             {
-                // Does this game object already have a mesh which we can reuse?
                 mesh = filter.mesh;
-                updateMaterial = // The geometrics of the mesh have changed.
-                    mesh.vertices.Length != vertices.Length ||
-                    mesh.normals.Length != normals.Length ||
-                    mesh.tangents.Length != tangents.Length ||
-                    mesh.uv.Length != uvs.Length ||
-                    needsColorUpdate; // Or the color of the mesh has been changed.
+                mesh.Clear();
             }
             else
             {
@@ -535,14 +558,9 @@ namespace SEE.GO
                 mesh.MarkDynamic(); // May improve performance.
                 filter = gameObject.AddComponent<MeshFilter>();
                 filter.sharedMesh = mesh;
-                updateMaterial = true;
             }
 
             // IMPORTANT: Set mesh vertices, normals, tangents etc. before updating the shared mesh of the collider.
-            if (updateMaterial)
-            {
-                mesh.Clear();
-            }
             mesh.vertices = vertices;
             mesh.normals = normals;
             mesh.tangents = tangents;
@@ -562,15 +580,10 @@ namespace SEE.GO
             }
 
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
-            if (updateMaterial)
-            {
-                // Needs the meshRenderer.
-                UpdateMaterial();
-            }
+            UpdateMaterial();
 
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                // Remove line meshRenderer.
                 Destroyer.Destroy(lineRenderer);
             }
 
@@ -582,29 +595,27 @@ namespace SEE.GO
         /// </summary>
         protected virtual void UpdateMaterial()
         {
+            if (meshRenderer == null)
+            {
+                Debug.LogWarning("Trying to update MeshRenderer material, but there is none!");
+                return;
+            }
+
             if (meshRenderer.sharedMaterial == null)
             {
                 meshRenderer.sharedMaterial = defaultMaterial;
                 Portal.SetPortal(transform.parent.parent.gameObject, gameObject);
             }
 
-            if (!gameObject.TryGetComponent(out MeshFilter filter) || meshRenderer == null)
+            if (meshRenderer.sharedMaterial.shader != defaultMaterial.shader)
             {
+                Debug.LogWarning("Cannot update MeshRenderer because the shader does not match!");
                 return;
             }
 
-            if (meshRenderer.sharedMaterial.shader == defaultMaterial.shader)
-            {
-                // Don't re-color non-default material.
-                Mesh mesh = filter.mesh;
-                Vector2[] uv = mesh.uv;
-                Color[] colors = new Color[uv.Length];
-                for (int i = 0; i < uv.Length; i++)
-                {
-                    colors[i] = Color.Lerp(gradientColors.start, gradientColors.end, uv[i].y);
-                }
-                mesh.colors = colors;
-            }
+            meshRenderer.material.SetColor(ColorProperty, gradientColors.start);
+            meshRenderer.material.SetColor(EndColorProperty, gradientColors.end);
+            meshRenderer.material.SetFloat(ColorGradientEnabledProperty, 1.0f);
         }
 
         /// <summary>

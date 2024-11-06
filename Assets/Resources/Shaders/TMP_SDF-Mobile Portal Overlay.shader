@@ -1,4 +1,4 @@
-// NOTE: Shader copied from TextMeshPro's Mobile Distance Field shader, with modifications to support portal clipping.
+// NOTE: Shader copied from TextMeshPro's Mobile Distance Field shader, with modifications to support portal clipping and billboarding.
 //       The difference to the non-overlay version is that this shader uses the Overlay render queue, which means
 //       that the text will be rendered on top of everything else.
 
@@ -55,16 +55,15 @@ Properties {
 
 	_ColorMask			("Color Mask", Float) = 15
 
-	_Cutoff             ("Cutoff", Range(0, 1)) = 0.5
+	_Cutoff				("Cutoff", Range(0, 1)) = 0.5
 
-	_PortalMin          ("Portal Minimum", vector) = (-10, -10, 0, 0)
-	_PortalMax          ("Portal Maximum", vector) = (10, 10, 0, 0)
+	_Portal			("Portal", vector) = (-10, -10, 10, 10)
 }
 
 SubShader {
 	Tags
 	{
-		"Queue"="Overlay"
+		"Queue"="Transparent+999"
 		"IgnoreProjector"="True"
 		"RenderType"="Transparent"
 		"DisableBatching"="True"  // Required for the portal.
@@ -105,8 +104,7 @@ SubShader {
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 
-		uniform float2 _PortalMin;
-		uniform float2 _PortalMax;
+		uniform float4 _Portal;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -131,7 +129,7 @@ SubShader {
 			half2	underlayParam	: TEXCOORD4;			// Scale(x), Bias(y)
 			#endif
 
-			float3  v               : TEXCOORD5;
+			float3 worldPos : TEXCOORD5;
 		};
 
 
@@ -149,7 +147,27 @@ SubShader {
 			float4 vert = input.vertex;
 			vert.x += _VertexOffsetX;
 			vert.y += _VertexOffsetY;
+
+#ifdef SEE_TEXT_FACING_CAMERA
+			// Apply billboarding in view-space
+			// The following two variables will make sure that the localScale is correctly applied to the billboarded text.
+			// Source: https://forum.unity.com/threads/billboard-shader-that-respects-gameobjects-transform-localscale.451431
+			float scaleX = length(float4(UNITY_MATRIX_M[0].r, UNITY_MATRIX_M[1].r, UNITY_MATRIX_M[2].r, UNITY_MATRIX_M[3].r));
+			float scaleY = length(float4(UNITY_MATRIX_M[0].g, UNITY_MATRIX_M[1].g, UNITY_MATRIX_M[2].g, UNITY_MATRIX_M[3].g));
+			float3 objectCenterInView = UnityObjectToViewPos(float3(0.0, 0.0, 0.0));
+			float4 newViewPos = float4(
+					objectCenterInView.x + vert.x * scaleX,
+					objectCenterInView.y + vert.y * scaleY,
+					objectCenterInView.z,
+					1.0);
+
+			output.worldPos = mul(UNITY_MATRIX_I_V, newViewPos);
+			float4 vPosition = mul(UNITY_MATRIX_P, newViewPos);
+#else
+			// No billboarding here
+			output.worldPos = mul(unity_ObjectToWorld, vert).xyz;
 			float4 vPosition = UnityObjectToClipPos(vert);
+#endif
 
 			float2 pixelSize = vPosition.w;
 			pixelSize /= float2(_ScaleX, _ScaleY) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
@@ -157,16 +175,6 @@ SubShader {
 			float scale = rsqrt(dot(pixelSize, pixelSize));
 			scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
 			if(UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
-
-#ifdef SEE_TEXT_FACING_CAMERA
-			// The following two variables will make sure that the localScale is correctly applied to the billboarded text.
-			// Source: https://forum.unity.com/threads/billboard-shader-that-respects-gameobjects-transform-localscale.451431
-            float scaleX = length(float4(UNITY_MATRIX_M[0].r, UNITY_MATRIX_M[1].r, UNITY_MATRIX_M[2].r, UNITY_MATRIX_M[3].r));
-            float scaleY = length(float4(UNITY_MATRIX_M[0].g, UNITY_MATRIX_M[1].g, UNITY_MATRIX_M[2].g, UNITY_MATRIX_M[3].g));
-			vPosition = mul(UNITY_MATRIX_P, float4(UnityObjectToViewPos(
-				float3(0.0, 0.0, 0.0)), 1.0)
-				+ float4(input.vertex.x, input.vertex.y, 0.0, 0.0) * float4(scaleX, scaleY, 1.0, 1.0));
-#endif
 
 			float weight = lerp(_WeightNormal, _WeightBold, bold) / 4.0;
 			weight = (weight + _FaceDilate) * _ScaleRatioA * 0.5;
@@ -215,8 +223,6 @@ SubShader {
 			output.underlayParam = half2(layerScale, layerBias);
 			#endif
 
-			output.v = mul(unity_ObjectToWorld, input.vertex);
-
 			return output;
 		}
 
@@ -224,6 +230,14 @@ SubShader {
 		// PIXEL SHADER
 		fixed4 PixShader(pixel_t input) : SV_Target
 		{
+			// Discard coordinates if outside portal
+			// Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+			if (input.worldPos.x < _Portal.x || input.worldPos.z < _Portal.y ||
+				input.worldPos.x > _Portal.z || input.worldPos.z > _Portal.w)
+			{
+				discard;
+			}
+
 			UNITY_SETUP_INSTANCE_ID(input);
 
 			half d = tex2D(_MainTex, input.texcoord0.xy).a * input.param.x;
@@ -258,13 +272,6 @@ SubShader {
 			#if UNITY_UI_ALPHACLIP
 			clip(c.a - 0.001);
 			#endif
-
-			if (input.v.x < _PortalMin.x || input.v.z < _PortalMin.y ||
-				input.v.x > _PortalMax.x || input.v.z > _PortalMax.y
-				)
-			{
-				c = fixed4(0.0f, 0.0f, 0.0f, 0.0f);
-			}
 
 			return c;
 		}

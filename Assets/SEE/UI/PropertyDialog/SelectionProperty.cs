@@ -105,6 +105,11 @@ namespace SEE.UI.PropertyDialog
             #endregion
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Sets <paramref name="parent"/> as the parent of the <see cref="inputField"/>.
         /// </summary>

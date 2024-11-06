@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -113,11 +114,18 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             // FIXME: Needs adaptation for VR where no mouse is available.
-            if (Input.GetMouseButtonDown(0)
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(raycastHit.collider.gameObject);
+                return Delete(); // the selected objects are deleted and this action is done now
+            }
+            else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected)
+            {
+                // the hit object is the one to be deleted
+                hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
+                XRSEEActions.Selected = false;
                 return Delete(); // the selected objects are deleted and this action is done now
             }
             else if (ExecuteViaContextMenu)

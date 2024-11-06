@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
+using SEE.XR;
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -86,8 +87,17 @@ namespace SEE.UI.Window.PropertyWindow
             ResetGroup();
 
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
+            this.filterButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             this.sortButton.clickEvent.AddListener(ShowSortMenu);
+            this.sortButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             this.groupButton.clickEvent.AddListener(ShowGroupMenu);
+            this.groupButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
         }
 
         #region Filter menu

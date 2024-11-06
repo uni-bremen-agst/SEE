@@ -11,14 +11,9 @@ namespace SEE.Game
     public static class Portal
     {
         /// <summary>
-        /// Cached property index for the _PortalMin shader property (Portal Left Front Corner).
+        /// Cached property index for the <c>_Portal</c> shader property.
         /// </summary>
-        private static readonly int portalMin = Shader.PropertyToID("_PortalMin");
-
-        /// <summary>
-        /// Cached property index for the _PortalMax shader property (Portal Right Back Corner).
-        /// </summary>
-        private static readonly int portalMax = Shader.PropertyToID("_PortalMax");
+        private static readonly int portalProp = Shader.PropertyToID("_Portal");
 
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
@@ -78,27 +73,25 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the portal of <paramref name="material"/> a rectangle in the x/z plane
-        /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
-        ///
-        /// Precondition: <paramref name="material"/> must have a the attributes
-        /// <see cref="portalMin"/> and <see cref="portalMax"/>. If they do not
-        /// exist, the result is undefined.
+        /// Returns the portal of <paramref name="material"/>, a rectangle on the x/z plane,
+        /// defined by its <paramref name="leftFront"/> and <paramref name="rightBack"/> corners.
+        /// <para>
+        /// Precondition: <paramref name="material"/> must have the <c>_Portal</c> attribute.
+        /// If it does not exist, the result is undefined.
+        /// </para>
         /// </summary>
-        /// <param name="gameObject">game objects whose portal is requested</param>
+        /// <param name="material">the material from which the portal coordinates should be extracted</param>
         /// <param name="leftFront">the left front corner of the rectangular portal</param>
         /// <param name="rightBack">the right back corner of the rectangular portal</param>
         private static void GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
-            // Although PortalMin and PortalMax are Vector4, only their x and y component
-            // is set. The x component is the x axis in Unity space, but the y component
-            // is the z axis in Unity space.
-            Vector4 portalLeftFrontCorner = material.GetVector(portalMin);
-            Vector4 portalRightBackCorner = material.GetVector(portalMax);
-            leftFront.x = portalLeftFrontCorner.x;
-            leftFront.y = portalLeftFrontCorner.y;
-            rightBack.x = portalRightBackCorner.x;
-            rightBack.y = portalRightBackCorner.y;
+            // The _Portal property contains both the min and the max position of the portal plane
+            // that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+            Vector4 portal = material.GetVector(portalProp);
+            leftFront.x = portal.x;
+            leftFront.y = portal.y;
+            rightBack.x = portal.z;
+            rightBack.y = portal.w;
         }
 
         /// <summary>
@@ -273,16 +266,15 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Sets <see cref="portalMin"/> of <paramref name="material"/> to <paramref name="leftFrontCorner"/>
-        /// and <see cref="portalMax"/> of <paramref name="material"/> to <paramref name="rightBackCorner"/>.
+        /// Sets <c>_Portal</c> property of <paramref name="material"/> to the XZ rectangle defined by
+        /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
         /// <param name="material">the material whose portal is to be set</param>
         /// <param name="leftFrontCorner">left front corner of the portal</param>
         /// <param name="rightBackCorner">right back corner of the portal</param>
         private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
-            material.SetVector(portalMin, new Vector4(leftFrontCorner.x, leftFrontCorner.y));
-            material.SetVector(portalMax, new Vector4(rightBackCorner.x, rightBackCorner.y));
+            material.SetVector(portalProp, new Vector4(leftFrontCorner.x, leftFrontCorner.y, rightBackCorner.x, rightBackCorner.y));
         }
     }
 }

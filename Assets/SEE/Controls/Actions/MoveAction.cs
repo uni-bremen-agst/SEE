@@ -15,6 +15,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using SEE.XR;
 
 
 namespace SEE.Controls.Actions
@@ -75,6 +76,12 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// This is true if the user is dragging an object.
+        /// We use this in VR to activate/deactivate this action.
+        /// </summary>
+        bool activeAction;
+
+        /// <summary>
         /// Reacts to the user interactions. An object can be grabbed and moved
         /// around. If it is put onto another node, it will be re-parented onto this
         /// node. If we are operating in a <see cref="SEEReflexionCity"/>, re-parenting
@@ -96,7 +103,7 @@ namespace SEE.Controls.Actions
             bool mouseHeldDown = Queries.LeftMouseInteraction();
             if (!grabbedObject.IsGrabbed) // grab object
             {
-                if (Queries.LeftMouseDown() && !ExecuteViaContextMenu)
+                if ((Queries.LeftMouseDown() || (XRSEEActions.Selected && !activeAction)) && !ExecuteViaContextMenu)
                 {
                     // User starts dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
@@ -105,26 +112,33 @@ namespace SEE.Controls.Actions
                         return false;
                     }
 
-                    if (Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _)
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Raycasting.RaycastGraphElement(out RaycastHit grabbedObjectHit, out GraphElementRef _)
                         == HitGraphElement.Node)
                     {
                         cursorOffset = grabbedObjectHit.point - hoveredObject.transform.position;
+                    }
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit))
+                    {
+                        cursorOffset = raycasthit.point - hoveredObject.transform.position;
                     }
 
                     // An object to be grabbed must be representing a node that is not the root.
                     if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
                     {
+                        XRSEEActions.Selected = false;
+                        activeAction = true;
                         grabbedObject.Grab(hoveredObject.gameObject);
                         AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
                         CurrentState = IReversibleAction.Progress.InProgress;
                     }
                     else
                     {
+                        XRSEEActions.Selected = false;
                         return false;
                     }
 
                 }
-                else if (ExecuteViaContextMenu && !mouseHeldDown)
+                else if ((SceneSettings.InputType == PlayerInputType.VRPlayer && ExecuteViaContextMenu) || (ExecuteViaContextMenu && !mouseHeldDown))
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -139,12 +153,13 @@ namespace SEE.Controls.Actions
                         anchorPosition.z = Mathf.Clamp(anchorPosition.z, objectPosition.z - 0.5f * objectSize.z, objectPosition.z + 0.5f * objectSize.z);
                         cursorOffset = anchorPosition - objectPosition;
                     }
-
+                    XRSEEActions.Selected = false;
                     grabbedObject.Grab(contextMenuObjectToMove);
+                    activeAction = true;
                     CurrentState = IReversibleAction.Progress.InProgress;
                 }
             }
-            else if (mouseHeldDown ^ ExecuteViaContextMenu) // drag grabbed object
+            else if ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && (mouseHeldDown ^ ExecuteViaContextMenu)) || (SceneSettings.InputType == PlayerInputType.VRPlayer && !XRSEEActions.Selected && activeAction)) // drag grabbed object
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node);
                 if (targetObjectHit.HasValue)
@@ -164,7 +179,8 @@ namespace SEE.Controls.Actions
                 {
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
                 }
-
+                XRSEEActions.Selected = false;
+                activeAction = false;
                 bool wasMoved = grabbedObject.UnGrab();
                 // Action is finished.
                 // Prevent instant re-grab if the action was started via context menu and is not completed
@@ -240,7 +256,14 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
-                    originalParent = gameObject.transform.parent;
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    {
+                        originalParent = XRSEEActions.OldParent;
+                    }
+                    else
+                    {
+                        originalParent = gameObject.transform.parent;
+                    }
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
@@ -284,6 +307,7 @@ namespace SEE.Controls.Actions
                 {
                     // Node does not fit, resetting…
                     UnReparent();
+                    XRSEEActions.OldParent = null;
                     wasMoved = false;
                 }
                 else
