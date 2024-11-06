@@ -22,6 +22,9 @@ using SEE.GameObjects;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.GraphProviders;
 using SEE.Utils.Paths;
+using MoreLinq;
+using SEE.Game.CityRendering;
+using static TreeEditor.TreeEditorHelper;
 
 namespace SEE.Controls.Actions
 {
@@ -289,7 +292,8 @@ namespace SEE.Controls.Actions
             return options.Concat(graphElement switch
             {
                 Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
-                    .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph && !node.GameObject().IsCodeCityDrawn()?
+                    .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawn()?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
                         : new(){ }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
@@ -308,11 +312,26 @@ namespace SEE.Controls.Actions
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
                 if(dialog.TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder))
                 {
-                    // TODO draw the implementation
                     SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
                     city.SourceCodeDirectory = projectFolder;
                     ReflexionGraphProvider graphProvider = new();
                     Graph implementationGraph = await graphProvider.LoadGraphAsync(gxl, city);
+
+                    if (city.Renderer is GraphRenderer renderer)
+                    {
+                        foreach (string type in implementationGraph.AllNodeTypes())
+                        {
+                            if (!city.NodeTypes.TryGetValue(type, out VisualNodeAttributes _))
+                            {
+                                city.NodeTypes[type] = new VisualNodeAttributes();
+                                renderer.AddNewNodeType(type);
+                            }
+                        }
+                        await renderer.DrawGraphAsync(implementationGraph, city.ReflexionGraph.ImplementationRoot.GameObject(), loadReflexionFiles: false);
+                        // Ensures that the new drawn implementation graph is displayed.
+                        city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
+                        city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
+                    }
                 }
             }
         }
