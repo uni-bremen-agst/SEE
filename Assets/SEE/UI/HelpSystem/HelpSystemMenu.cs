@@ -47,11 +47,7 @@ namespace SEE.UI.HelpSystem
         private void Start()
         {
             mainMenu = CreateStartMenu(jsonFilePath);
-            if (KeyBindings.TryGetKeyCode(KeyAction.Help, out KeyCode helpKey))
-            {
-                ShowNotification.Info("Help System", $"Press {helpKey} to open help system.");
-            }
-            else
+            if (!KeyBindings.TryGetKeyCode(KeyAction.Help, out KeyCode helpKey))
             {
                 ShowNotification.Warn("Help System", "No keybinding for help system found.");
             }
