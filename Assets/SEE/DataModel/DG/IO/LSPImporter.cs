@@ -309,11 +309,25 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        await HandleCallHierarchyAsync(node, graph, token);
+                        try
+                        {
+                            await HandleCallHierarchyAsync(node, graph, token);
+                        }
+                        catch (TimeoutException e)
+                        {
+                            Debug.LogWarning(e);
+                        }
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
                     {
-                        await HandleTypeHierarchyAsync(node, graph, token);
+                        try
+                        {
+                            await HandleTypeHierarchyAsync(node, graph, token);
+                        }
+                        catch (TimeoutException e)
+                        {
+                            Debug.LogWarning(e);
+                        }
                     }
 
                     // The remaining 80% of the progress is made by connecting the nodes.
@@ -470,7 +484,7 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
-                edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
             return;
 
