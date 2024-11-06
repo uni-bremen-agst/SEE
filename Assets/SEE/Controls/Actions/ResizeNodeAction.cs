@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 using SEE.Game;
@@ -281,16 +280,18 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Path to the texture for the BOTTOM-RIGHT resize handle.
             /// </summary>
-            private static readonly string resizeArrowBottomRightTexture = "Assets/Resources/Textures/ResizeArrowBottomRight.png";
+            private static readonly string resizeArrowBottomRightTexture = "Textures/ResizeArrowBottomRight";
+
             /// <summary>
             /// Path to the texture for the RIGHT resize handle.
             /// </summary>
-            private static readonly string resizeArrowRightTexture = "Assets/Resources/Textures/ResizeArrowRight.png";
+            private static readonly string resizeArrowRightTexture = "Textures/ResizeArrowRight";
 
             /// <summary>
             /// Path to the texture for the UP/DOWN resize handle.
             /// </summary>
-            private static readonly string resizeArrowUpDownTexture = "Assets/Resources/Textures/ResizeArrowUpDown.png";
+            private static readonly string resizeArrowUpDownTexture = "Textures/ResizeArrowUpDown";
+
             /// <summary>
             /// The data of the resize step that is in action.
             /// </summary>
@@ -474,7 +475,7 @@ namespace SEE.Controls.Actions
                 if (direction == Vector3.up)
                 {
                     handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowUpDownTexture);
+                    Texture texture = LoadTexture(resizeArrowUpDownTexture);
                     material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
                 else if (direction.x != 0f && direction.z != 0f)
@@ -487,13 +488,13 @@ namespace SEE.Controls.Actions
                     {
                         handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
                     }
-                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowBottomRightTexture);
+                    Texture texture = LoadTexture(resizeArrowBottomRightTexture);
                     material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
                 else
                 {
                     handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
-                    Texture texture = AssetDatabase.LoadAssetAtPath<Texture2D>(resizeArrowRightTexture);
+                    Texture texture = LoadTexture(resizeArrowRightTexture);
                     material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
                 }
                 handle.GetComponent<Renderer>().material = material;
@@ -507,6 +508,18 @@ namespace SEE.Controls.Actions
                 handle.transform.SetParent(transform);
                 Portal.InheritPortal(from: transform.gameObject, to: handle);
                 return handle;
+
+                // Loads and return a texture with given path from the resources folder.
+                // If no such path exists, an exception is thrown.
+                static Texture LoadTexture(string path)
+                {
+                    Texture result = Resources.Load<Texture2D>(path);
+                    if (result == null)
+                    {
+                        throw new Exception($"Could not load texture at path: {path}");
+                    }
+                    return result;
+                }
             }
 
             /// <summary>
