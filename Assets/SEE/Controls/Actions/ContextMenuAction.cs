@@ -327,7 +327,7 @@ namespace SEE.Controls.Actions
                                 renderer.AddNewNodeType(type);
                             }
                         }
-                        await renderer.DrawGraphAsync(implementationGraph, city.ReflexionGraph.ImplementationRoot.GameObject(), loadReflexionFiles: false);
+                        await renderer.DrawGraphAsync(implementationGraph, city.ReflexionGraph.ImplementationRoot.GameObject(), loadReflexionFiles: true);
                         // Ensures that the new drawn implementation graph is displayed.
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
