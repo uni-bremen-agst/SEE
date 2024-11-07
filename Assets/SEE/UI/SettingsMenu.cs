@@ -54,7 +54,7 @@ namespace SEE.UI
             settingsMenuGameObject = PrefabInstantiator.InstantiatePrefab(SettingsPrefab, Canvas.transform, false);
             // adds the ExitGame method to the exit button
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
-                .onClick.AddListener(ExitGame);
+                                  .onClick.AddListener(ExitGame);
 
             // Displays all bindings grouped by their category.
             foreach (var group in KeyBindings.AllBindings())
@@ -66,7 +66,7 @@ namespace SEE.UI
                 TextMeshProUGUI groupTitle = scrollView.transform.Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
                 groupTitle.text = $"{group.Key}";
 
-                foreach (var binding in group)
+                foreach ((_, KeyActionDescriptor descriptor) in group)
                 {
                     GameObject keyBindingContent = PrefabInstantiator.InstantiatePrefab(KeyBindingContent, Canvas.transform, false).transform.gameObject;
                     keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
@@ -74,14 +74,14 @@ namespace SEE.UI
                     // set the text to the short name of the binding
                     TextMeshProUGUI bindingText = keyBindingContent.transform.Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
                     // The short name of the binding.
-                    bindingText.text = binding.Value.Name;
+                    bindingText.text = descriptor.Name;
                     // set the label of the key button
                     TextMeshProUGUI key = keyBindingContent.transform.Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
                     // The name of the key code bound.
-                    key.text = binding.Value.KeyCode.ToString();
-                    shortNameOfBindingToLabel[binding.Value.Name] = key;
+                    key.text = descriptor.KeyCode.ToString();
+                    shortNameOfBindingToLabel[descriptor.Name] = key;
                     // add the actionlistener to be able to change the key code of a binding.
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => StartRebindFor(binding.Value));
+                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => StartRebindFor(descriptor));
                 }
             }
         }
@@ -103,7 +103,7 @@ namespace SEE.UI
                     {
                         if (Input.GetKeyDown(key) && KeyBindings.AssignableKeyCode(key))
                         {
-                           try
+                            try
                             {
                                 KeyBindings.SetBindingForKey(bindingToRebind, key);
                                 // TODO (#683): We need to open a modal dialog and ask the user
