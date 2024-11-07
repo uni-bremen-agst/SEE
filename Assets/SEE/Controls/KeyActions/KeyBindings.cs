@@ -115,8 +115,8 @@ namespace SEE.Controls.KeyActions
             }
             catch (Exception ex)
             {
-                // Because this method is called by the static initializer, it represent an internal
-                // problem. The user is not responsible for it. We do not show a notification
+                // Because this method is called by the static initializer, it represents an internal
+                // problem. The user is not responsible for it. We do not show a notification.
                 Debug.LogError(ex.Message);
             }
         }

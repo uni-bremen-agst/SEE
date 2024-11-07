@@ -309,11 +309,11 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        await HandleCallHierarchyAsync(node, graph, token);
+                        await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
                     {
-                        await HandleTypeHierarchyAsync(node, graph, token);
+                        await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
                     }
 
                     // The remaining 80% of the progress is made by connecting the nodes.
@@ -345,6 +345,18 @@ namespace SEE.DataModel.DG.IO
             changePercentage?.Invoke(1);
 
             return;
+
+            async UniTask HandleEdgeHierarchy(Func<UniTask> hierarchyFunction)
+            {
+                try
+                {
+                    await hierarchyFunction();
+                }
+                catch (TimeoutException e)
+                {
+                    Debug.LogWarning(e);
+                }
+            }
 
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
@@ -470,7 +482,7 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
-                edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
             return;
 

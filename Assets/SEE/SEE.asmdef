@@ -24,7 +24,6 @@
         "GUID:ad04e4f5949be9644989a3ea11bdc60e",
         "GUID:e40ba710768534012815d3193fa296cb",
         "GUID:3248779d86bd31747b5d2214f30b01ac",
-        "GUID:de77a0e64339fbc47b51a11858912a47",
         "GUID:7958db66189566541a6363568aee1575",
         "GUID:7166fda719c99694d9297ead935e2a9d",
         "GUID:cef0e9dabbfe59a4790acbf31c21f33e",
@@ -69,8 +68,7 @@
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
         "Microsoft.Extensions.FileSystemGlobbing.dll",
-        "MediatR.dll",
-        "MediatR.Contracts.dll"
+        "MediatR.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

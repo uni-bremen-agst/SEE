@@ -248,6 +248,14 @@ namespace SEE.UI.Window.CodeWindow
                     RemoveUnderline(lastHoveredWord.Value);
                     GoToDefinition(lastHoveredWord.Value);
                 }
+
+                if (Input.GetKey(KeyCode.LeftControl) && Input.mouseScrollDelta.y is float delta and not 0)
+                {
+                    // Change font size by scrolled amount.
+                    FontSize = Mathf.Clamp(FontSize + delta, 5, 72);
+                    textMesh.fontSize = FontSize;
+                    RecalculateExcessLines();
+                }
             }
 
             const string startUnderline = "</noparse><u><color=\"orange\"><noparse>";
