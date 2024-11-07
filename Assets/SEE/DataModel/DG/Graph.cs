@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Sirenix.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -233,6 +233,21 @@ namespace SEE.DataModel.DG
                 {
                     child.Reparent(parent);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
+        /// </summary>
+        /// <param name="children">children to be re-parented</param>
+        /// <param name="parent">new parent of <see cref="children"/></param>
+        public void Reparent(IEnumerable<Node> children, Node parent)
+        {
+            foreach (Node child in children)
+            {
+                child.Reparent(parent);
+                nodes[child.ID] = child;
+                child.ItsGraph.NodeHierarchyHasChanged = false;
             }
         }
 

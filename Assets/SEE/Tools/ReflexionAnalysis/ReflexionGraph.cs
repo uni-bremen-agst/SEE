@@ -249,7 +249,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <exception cref="NotSupportedException">If the precondition of this method is not met</exception>
         public override void AddNode(Node node)
         {
-            if (!AnalysisInitialized)
+            if (!AnalysisInitialized || node.IsRoot())
             {
                 base.AddNode(node);
                 return;
@@ -287,7 +287,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// nor the implementation graph.</exception>
         public override void RemoveNode(Node node, bool orphansBecomeRoots = false)
         {
-            if (!AnalysisInitialized)
+            if (!AnalysisInitialized || node.IsRoot())
             {
                 base.RemoveNode(node, orphansBecomeRoots);
                 return;
