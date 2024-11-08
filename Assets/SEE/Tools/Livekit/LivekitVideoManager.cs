@@ -6,10 +6,10 @@ using LiveKit;
 using LiveKit.Proto;
 using RoomOptions = LiveKit.RoomOptions;
 using UnityEngine.UI;
-using TMPro;
 using Unity.Netcode;
 using SEE.Controls;
 using SEE.GO;
+using SEE.UI.Notification;
 
 namespace SEE.Tools.Livekit
 {
@@ -111,7 +111,7 @@ namespace SEE.Tools.Livekit
             {
                 webCamTexture.Stop();
             }
-            room.Disconnect();
+            room?.Disconnect();
             CleanUp();
             room = null;
         }
@@ -227,18 +227,20 @@ namespace SEE.Tools.Livekit
         private IEnumerator GetToken()
         {
             // Send a GET request to the token server to retrieve the token for this client.
-            using (UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(
-                $"{TokenUrl}/getToken?roomName={RoomName}&participantName={NetworkManager.Singleton.LocalClientId.ToString()}"))
-            {
-                // Wait for the request to complete.
-                yield return www.SendWebRequest();
+            string uri = $"{TokenUrl}/getToken?roomName={RoomName}&participantName={NetworkManager.Singleton.LocalClientId}";
+            using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
+            // Wait for the request to complete.
+            yield return www.SendWebRequest();
 
-                // Check if the request was successful.
-                if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
-                {
-                    // Token received, proceed to join the room using the received token.
-                    StartCoroutine(JoinRoom(www.downloadHandler.text));
-                }
+            // Check if the request was successful.
+            if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
+            {
+                // Token received, proceed to join the room using the received token.
+                StartCoroutine(JoinRoom(www.downloadHandler.text));
+            }
+            else
+            {
+                ShowNotification.Error("Livekit", $"Failed to get token from {uri}: {www.error}.");
             }
         }
 
@@ -268,6 +270,10 @@ namespace SEE.Tools.Livekit
             {
                 Debug.Log("[Livekit] Connected to " + room.Name);
             }
+            else
+            {
+                throw new System.Exception($"[Livekit] Failed to connect to room: {room.Name}.");
+            }
         }
         #endregion
 
@@ -282,17 +288,22 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous publishing process.</returns>
         private IEnumerator PublishVideo()
         {
+            if (room == null)
+            {
+                ShowNotification.Error("Livekit", "Not connected.");
+                yield break;
+            }
             // Start camera device.
             webCamTexture?.Play();
 
             // Create a video source from the current webcam texture.
-            TextureVideoSource source = new TextureVideoSource(webCamTexture);
+            TextureVideoSource source = new(webCamTexture);
 
             // Create a local video track with the video source.
             LocalVideoTrack track = LocalVideoTrack.CreateVideoTrack("my-video-track", source, room);
 
             // Define options for publishing the video track.
-            TrackPublishOptions options = new TrackPublishOptions
+            TrackPublishOptions options = new()
             {
                 VideoCodec = VideoCodec.H264, // Codec to be used for video.
                 VideoEncoding = new VideoEncoding
