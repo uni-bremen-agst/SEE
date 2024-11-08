@@ -332,37 +332,23 @@ namespace SEE.Controls.Actions
                                 renderer.AddNewNodeType(type);
                             }
                         }
+                        /// Attention: At this point, the implementation root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                        /// If the <see cref="ReflexionGraph.ImplementationRoot"/> is used, loading doesn't work because, the children are not aded to
+                        /// <see cref="Graph.nodes"/>.
+                        Node implementationRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID);
                         // Draws the implementation graph.
-                        await renderer.DrawGraphAsync(implementationGraph, city.ReflexionGraph.ImplementationRoot.GameObject(), loadReflexionFiles: true);
+                        await renderer.DrawGraphAsync(implementationGraph, implementationRoot.GameObject(), loadReflexionFiles: true);
                         // Adds the implementation graph to the existing reflexion graph.
                         implementationGraph.Nodes().ForEach(node =>
                         {
                             node.ItsGraph = null;
                             city.ReflexionGraph.AddToImplementation(node);
                         });
-                        implementationGraph.GetRoots().ForEach(root => city.ReflexionGraph.ImplementationRoot.AddChild(root));
-/*
-                        Node oldRoot = city.ReflexionGraph.GetRoots()[0];
-                        city.ReflexionGraph.RemoveNode(oldRoot, true);
-                        ReflexionGraph merged = city.ReflexionGraph.MergeWith<ReflexionGraph>(implementationGraph);
+                        implementationGraph.GetRoots().ForEach(root => implementationRoot.AddChild(root));
 
-                        city.ReflexionGraph.AddNode(oldRoot);
-                        city.ReflexionGraph.Reparent(new List<Node>(){ city.ReflexionGraph.ArchitectureRoot, city.ReflexionGraph.ImplementationRoot}, oldRoot);
-*/
-
-                        Debug.Log("---------------------------------------");
-                        //city.ReflexionGraph.ArchitectureRoot.Reparent(oldRoot);
-                        //city.ReflexionGraph.ImplementationRoot.Reparent(oldRoot);
-                        city.ReflexionGraph.NodeHierarchyHasChanged = true;
-                        city.ReflexionGraph.FinalizeNodeHierarchy();
                         // Ensures that the new drawn implementation graph is displayed.
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
-
-                        city.ReflexionGraph.DumpTree();
-                        Debug.Log("-----------------------");
-                        city.ReflexionGraph.DumpMapping();
-
                     }
                 }
             }
