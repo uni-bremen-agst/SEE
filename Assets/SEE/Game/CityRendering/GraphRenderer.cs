@@ -1,11 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -13,12 +6,14 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using UnityEngine;
-using static TreeEditor.TreeEditorHelper;
 using Plane = SEE.GO.Plane;
 
 namespace SEE.Game.CityRendering

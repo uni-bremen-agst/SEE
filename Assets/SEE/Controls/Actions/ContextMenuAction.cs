@@ -24,7 +24,6 @@ using SEE.GraphProviders;
 using SEE.Utils.Paths;
 using MoreLinq;
 using SEE.Game.CityRendering;
-using static TreeEditor.TreeEditorHelper;
 
 namespace SEE.Controls.Actions
 {
