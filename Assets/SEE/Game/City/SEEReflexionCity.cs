@@ -42,8 +42,8 @@ namespace SEE.Game.City
         public override async UniTask LoadDataAsync()
         {
             // Makes the necessary changes for the inital types of a reflexion city.
-            AddAndSetInitialType(ReflexionGraph.ArchitectureType, new(1f, 0.65f, 0f, 1f));
-            AddAndSetInitialType(ReflexionGraph.ImplementationType, Color.cyan);
+            AddAndSetInitialType(ReflexionGraph.ArchitectureType, new(1.0f, 0.7569f, 0.0275f));
+            AddAndSetInitialType(ReflexionGraph.ImplementationType, new(0.3922f, 0.7843f, 0.3922f));
 
             if (LoadedGraph != null)
             {

@@ -752,7 +752,7 @@ namespace SEE.Game.City
             }
             VisualNodeAttributes root = NodeTypes[Graph.RootType];
             root.ShowNames = false;
-            root.ColorProperty.TypeColor = new Color(0.2549f, 0.4118f, 0.8824f);
+            root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
         #region Odin Inspector Attributes
