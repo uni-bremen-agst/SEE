@@ -156,6 +156,7 @@ namespace SEE.UI.PropertyDialog
         private ISet<string> GetNonRootTypes()
         {
             ISet<string> types = node.GameObject().ContainingCity().NodeTypes.Types;
+            types.Remove(Graph.RootType);
             types.Remove(ReflexionGraph.ArchitectureType);
             types.Remove(ReflexionGraph.ImplementationType);
             return types;
