@@ -30,6 +30,7 @@ namespace SEE.Game.City
         protected virtual void Awake()
         {
             LabelLineMaterial = new Material(LineMaterial(Color.white));
+            AddRootNodeType();
         }
 
         protected virtual void Start()
@@ -737,6 +738,17 @@ namespace SEE.Game.City
                 CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
                                                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
+        }
+
+        private void AddRootNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
+            {
+                NodeTypes[Graph.RootType] = new VisualNodeAttributes();
+            }
+            VisualNodeAttributes root = NodeTypes[Graph.RootType];
+            root.ShowNames = false;
+            root.ColorProperty.TypeColor = new Color(0.2549f, 0.4118f, 0.8824f);
         }
 
         #region Odin Inspector Attributes

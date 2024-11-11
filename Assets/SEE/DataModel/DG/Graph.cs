@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -28,10 +29,16 @@ namespace SEE.DataModel.DG
         private Dictionary<string, Edge> edges = new();
 
         /// <summary>
-        /// Name of the artificial node type used for artificial root nodes added
+        /// Name of the artificial node type used for artificial nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string UnknownType = "UNKNOWNTYPE";
+
+        /// <summary>
+        /// Name of the artificial node type used for artificial root nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string RootType = "ROOT";
 
         /// <summary>
         /// A toggle marking artificial root nodes as such.
@@ -310,7 +317,7 @@ namespace SEE.DataModel.DG
         ///
         /// If <paramref name="name"/> is null or empty, the <see cref="Name"/> of the graph
         /// concatenated with "#ROOT" will be used.
-        /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> will be used.
         /// </summary>
         /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
         /// <param name="name">ID of new root node</param>
@@ -328,7 +335,7 @@ namespace SEE.DataModel.DG
             }
             if (string.IsNullOrWhiteSpace(type))
             {
-                type = UnknownType;
+                type = RootType;
             }
             root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
             AddNode(root);
