@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Tools.ReflexionAnalysis;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -161,6 +162,16 @@ namespace SEE.DataModel.DG
         public bool HasRootToogle()
         {
             return HasToggle(Graph.RootToggle);
+        }
+
+        /// <summary>
+        /// True iff node is the implementation or the architecture root of a reflexion city.
+        /// </summary>
+        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the implementation or architecture marking.</returns>
+        public bool IsArchitectureOrImplmentationRoot()
+        {
+            return HasToggle(Graph.RootToggle) &&
+                (HasToggle(ReflexionSubgraphs.Implementation.GetLabel()) || HasToggle(ReflexionSubgraphs.Architecture.GetLabel()));
         }
 
         /// <summary>

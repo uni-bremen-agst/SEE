@@ -124,6 +124,20 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// True if <paramref name="gameNode"/> represents the implementation or architecture root of
+        /// the graph.
+        ///
+        /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
+        /// attached to it that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is an implementation or architecture root</param>
+        /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
+        public static bool IsArchitectureOrImplmentationRoot(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplmentationRoot() ?? false;
+        }
+
+        /// <summary>
         /// Returns all game objects tagged as <see cref="Tags.Edge"/> that are descendants
         /// of <paramref name="gameObject"/>.
         /// </summary>
