@@ -148,6 +148,9 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 
+                // Architecture and implementation root nodes should only be cleared (all children deleted)
+                // instead of deleting the entire node, as it is not possible to add new architecture or
+                // implementation root nodes.
                 if (go.IsArchitectureOrImplmentationRoot())
                 {
                     Node root = go.GetNode();
