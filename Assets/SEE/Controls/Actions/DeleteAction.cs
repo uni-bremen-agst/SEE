@@ -8,6 +8,7 @@ using UnityEngine.Assertions;
 using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
+using SEE.DataModel.DG;
 
 namespace SEE.Controls.Actions
 {
@@ -145,8 +146,21 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
-                deletedGameObjects.UnionWith(deleted);
+
+                if (go.IsArchitectureOrImplmentationRoot())
+                {
+                    Node root = go.GetNode();
+                    foreach (Node child in root.Children().ToList())
+                    {
+                        (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(child.GameObject());
+                        deletedGameObjects.UnionWith(deleted);
+                    }
+                }
+                else
+                {
+                    (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
+                    deletedGameObjects.UnionWith(deleted);
+                }
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
@@ -198,9 +212,21 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                new DeleteNetAction(go.name).Execute();
 #pragma warning disable VSTHRD110
-                GameElementDeleter.Delete(go);
+                if (go.IsArchitectureOrImplmentationRoot())
+                {
+                    Node root = go.GetNode();
+                    foreach (Node child in root.Children().ToList())
+                    {
+                        new DeleteNetAction(child.GameObject().name).Execute();
+                        GameElementDeleter.Delete(child.GameObject());
+                    }
+                }
+                else
+                {
+                    new DeleteNetAction(go.name).Execute();
+                    GameElementDeleter.Delete(go);
+                }
 #pragma warning restore VSTHRD110
             }
         }
