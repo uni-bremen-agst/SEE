@@ -319,6 +319,7 @@ namespace SEE.Controls.Actions
                     Graph implementationGraph = await graphProvider.LoadGraphAsync(gxl, city);
                     // Marks the nodes in the graph as implementation-nodes.
                     implementationGraph.MarkGraphNodesIn(ReflexionSubgraphs.Implementation);
+                    implementationGraph.Edges().ForEach(edge => edge.SetInImplementation());
 
                     if (city.Renderer is GraphRenderer renderer)
                     {
@@ -344,6 +345,11 @@ namespace SEE.Controls.Actions
                             city.ReflexionGraph.AddToImplementation(node);
                         });
                         implementationGraph.GetRoots().ForEach(root => implementationRoot.AddChild(root));
+                        implementationGraph.Edges().ForEach((edge) =>
+                        {
+                            edge.ItsGraph = null;
+                            city.ReflexionGraph.AddToImplementation(edge);
+                        });
 
                         // Ensures that the new drawn implementation graph is displayed.
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
