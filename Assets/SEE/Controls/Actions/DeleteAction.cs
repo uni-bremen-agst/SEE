@@ -9,6 +9,7 @@ using SEE.Audio;
 using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
 using SEE.DataModel.DG;
+using static RootMotion.FinalIK.RagdollUtility;
 
 namespace SEE.Controls.Actions
 {
@@ -152,12 +153,14 @@ namespace SEE.Controls.Actions
                     Node root = go.GetNode();
                     foreach (Node child in root.Children().ToList())
                     {
+                        new DeleteNetAction(child.GameObject().name).Execute();
                         (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(child.GameObject());
                         deletedGameObjects.UnionWith(deleted);
                     }
                 }
                 else
                 {
+                    new DeleteNetAction(go.name).Execute();
                     (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
                     deletedGameObjects.UnionWith(deleted);
                 }
