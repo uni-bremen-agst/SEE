@@ -25,6 +25,7 @@ using SEE.Utils.Paths;
 using MoreLinq;
 using SEE.Game.CityRendering;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
+using System.Threading.Tasks;
 
 namespace SEE.Controls.Actions
 {
@@ -293,9 +294,9 @@ namespace SEE.Controls.Actions
             {
                 Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
                     .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
-                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive()?
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
-                        : new(){ })
+                        : new() { })
                     .Concat(node.Type == ReflexionGraph.ArchitectureType && node.ItsGraph is ReflexionGraph
                             && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Architecture", LoadArchitecture, Icons.Upload, Priority: 3) }
@@ -323,94 +324,95 @@ namespace SEE.Controls.Actions
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
                 if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
                 {
-                    SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                    (SEEReflexionCity city, Graph implementationGraph, GraphRenderer renderer) = await LoadGraphAsync(implGXL, false);
                     // Sets the project directory.
                     city.SourceCodeDirectory = projectFolder;
-                    // Loads the graph from the given implementation GXL.
-                    ReflexionGraphProvider graphProvider = new();
-                    Graph implementationGraph = await graphProvider.LoadGraphAsync(implGXL, city);
-                    // Marks the nodes in the graph as implementation-nodes.
-                    implementationGraph.MarkGraphNodesIn(ReflexionSubgraphs.Implementation);
-                    implementationGraph.Edges().ForEach(edge => edge.SetInImplementation());
+                    // Adds the missing node types with default values to the existing reflexion graph.
+                    AddMissingNodeTypes(city, implementationGraph, renderer);
+                    /// Attention: At this point, the implementation root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                    /// If the <see cref="ReflexionGraph.ImplementationRoot"/> is used, loading doesn't work because, the children are not aded to
+                    /// <see cref="Graph.nodes"/>.
+                    Node implementationRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID);
 
-                    if (city.Renderer is GraphRenderer renderer)
+                    // Draws the implementation graph.
+                    await renderer.DrawGraphAsync(implementationGraph, implementationRoot.GameObject(), loadReflexionFiles: true);
+                    // Adds the implementation graph to the existing reflexion graph.
+                    implementationGraph.Nodes().ForEach(node =>
                     {
-                        // Adds the missing node types with default values to the existing reflexion graph.
-                        foreach (string type in implementationGraph.AllNodeTypes())
-                        {
-                            if (!city.NodeTypes.TryGetValue(type, out _))
-                            {
-                                city.NodeTypes[type] = new VisualNodeAttributes();
-                                renderer.AddNewNodeType(type);
-                            }
-                        }
-                        /// Attention: At this point, the implementation root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
-                        /// If the <see cref="ReflexionGraph.ImplementationRoot"/> is used, loading doesn't work because, the children are not aded to
-                        /// <see cref="Graph.nodes"/>.
-                        Node implementationRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID);
-                        // Draws the implementation graph.
-                        await renderer.DrawGraphAsync(implementationGraph, implementationRoot.GameObject(), loadReflexionFiles: true);
-                        // Adds the implementation graph to the existing reflexion graph.
-                        implementationGraph.Nodes().ForEach(node =>
-                        {
-                            node.ItsGraph = null;
-                            city.ReflexionGraph.AddToImplementation(node);
-                        });
-                        implementationGraph.GetRoots().ForEach(root => implementationRoot.AddChild(root));
-                        implementationGraph.Edges().ForEach((edge) =>
-                        {
-                            edge.ItsGraph = null;
-                            city.ReflexionGraph.AddToImplementation(edge);
-                        });
+                        node.ItsGraph = null;
+                        city.ReflexionGraph.AddToImplementation(node);
+                    });
+                    implementationGraph.GetRoots().ForEach(root => implementationRoot.AddChild(root));
+                    implementationGraph.Edges().ForEach((edge) =>
+                    {
+                        edge.ItsGraph = null;
+                        city.ReflexionGraph.AddToImplementation(edge);
+                    });
 
-                        // Ensures that the new drawn implementation graph is displayed.
-                        city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
-                        city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
-                    }
+                    // Ensures that the new drawn implementation graph is displayed.
+                    city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
+                    city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
                 }
 
-                if (dialog.TryGetArchitectureDataPath(out DataPath archGXL)) {
-                    SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
-                    // Loads the graph from the given data GXL.
-                    ReflexionGraphProvider graphProvider = new();
-                    Graph architectureGraph = await graphProvider.LoadGraphAsync(archGXL, city);
-                    // Marks the nodes in the graph as architecture-nodes.
-                    architectureGraph.MarkGraphNodesIn(ReflexionSubgraphs.Architecture);
-                    architectureGraph.Edges().ForEach(edge => edge.SetInArchitecture());
-
-                    if (city.Renderer is GraphRenderer renderer)
+                if (dialog.TryGetArchitectureDataPath(out DataPath archGXL))
+                {
+                    (SEEReflexionCity city, Graph architectureGraph, GraphRenderer renderer) = await LoadGraphAsync(archGXL, true);
+                    // Adds the missing node types with default values to the existing reflexion graph.
+                    AddMissingNodeTypes(city, architectureGraph, renderer);
+                    /// Attention: At this point, the architecture root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                    /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not aded to
+                    /// <see cref="Graph.nodes"/>.
+                    Node architectureRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
+                    // Draws the architecture graph.
+                    await renderer.DrawGraphAsync(architectureGraph, architectureRoot.GameObject(), loadReflexionFiles: true);
+                    // Adds the architecture graph to the existing reflexion graph.
+                    architectureGraph.Nodes().ForEach(node =>
                     {
-                        // Adds the missing node types with default values to the existing reflexion graph.
-                        foreach (string type in architectureGraph.AllNodeTypes())
-                        {
-                            if (!city.NodeTypes.TryGetValue(type, out _))
-                            {
-                                city.NodeTypes[type] = new VisualNodeAttributes();
-                                renderer.AddNewNodeType(type);
-                            }
-                        }
-                        /// Attention: At this point, the architecture root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
-                        /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not aded to
-                        /// <see cref="Graph.nodes"/>.
-                        Node architectureRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
-                        // Draws the architecture graph.
-                        await renderer.DrawGraphAsync(architectureGraph, architectureRoot.GameObject(), loadReflexionFiles: true);
-                        // Adds the architecture graph to the existing reflexion graph.
-                        architectureGraph.Nodes().ForEach(node =>
-                        {
-                            node.ItsGraph = null;
-                            city.ReflexionGraph.AddToArchitecture(node);
-                        });
-                        architectureGraph.GetRoots().ForEach(root => architectureRoot.AddChild(root));
-                        architectureGraph.Edges().ForEach((edge) =>
-                        {
-                            edge.ItsGraph = null;
-                            city.ReflexionGraph.AddToArchitecture(edge);
-                        });
+                        node.ItsGraph = null;
+                        city.ReflexionGraph.AddToArchitecture(node);
+                    });
+                    architectureGraph.GetRoots().ForEach(root => architectureRoot.AddChild(root));
+                    architectureGraph.Edges().ForEach((edge) =>
+                    {
+                        edge.ItsGraph = null;
+                        city.ReflexionGraph.AddToArchitecture(edge);
+                    });
+                    // Ensures that the new drawn architecture graph is displayed.
+                    city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(false);
+                    city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(true);
+                }
+            }
 
-                        // Ensures that the new drawn architecture graph is displayed.
-                        city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(false);
-                        city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(true);
+            async UniTask<(SEEReflexionCity, Graph, GraphRenderer)> LoadGraphAsync(DataPath gxl, bool loadArchitecture)
+            {
+                SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                // Loads the graph from the given GXL.
+                ReflexionGraphProvider graphProvider = new();
+                Graph graph = await graphProvider.LoadGraphAsync(gxl, city);
+                // Marks the nodes in the graph as architecture-/implementation-nodes.
+                graph.MarkGraphNodesIn(loadArchitecture ? ReflexionSubgraphs.Architecture : ReflexionSubgraphs.Implementation);
+                graph.Edges().ForEach(edge =>
+                {
+                    if (loadArchitecture)
+                    {
+                        edge.SetInArchitecture();
+                    }
+                    else
+                    {
+                        edge.SetInImplementation();
+                    }
+                });
+                return (city, graph, (GraphRenderer)city.Renderer);
+            }
+
+            void AddMissingNodeTypes(SEEReflexionCity city, Graph graph, GraphRenderer renderer)
+            {
+                foreach (string type in graph.AllNodeTypes())
+                {
+                    if (!city.NodeTypes.TryGetValue(type, out _))
+                    {
+                        city.NodeTypes[type] = new VisualNodeAttributes();
+                        renderer.AddNewNodeType(type);
                     }
                 }
             }
@@ -578,20 +580,20 @@ namespace SEE.Controls.Actions
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
         {
-                if (appendActions != null)
-                {
-                    List<PopupMenuAction> actions = new(GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                        graphElement, gameObject, appendActions)
-                        .OfType<PopupMenuAction>()
-                        .Where(x => !x.Name.Contains("TreeWindow")));
-                    actions.AddRange(appendActions);
-                    UpdateEntries(popupMenu, position, actions);
-                }
-                else
-                {
-                    UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                        graphElement, gameObject));
-                }
+            if (appendActions != null)
+            {
+                List<PopupMenuAction> actions = new(GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject, appendActions)
+                    .OfType<PopupMenuAction>()
+                    .Where(x => !x.Name.Contains("TreeWindow")));
+                actions.AddRange(appendActions);
+                UpdateEntries(popupMenu, position, actions);
+            }
+            else
+            {
+                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject));
+            }
         }
 
         /// <summary>
