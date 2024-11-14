@@ -9,14 +9,14 @@ using UnityEngine;
 namespace SEE.UI.PropertyDialog.CitySelection
 {
     /// <summary>
-    /// This class manages the dialog for loading the implementation for a reflexion city.
+    /// This class manages the dialog for loading the data for a reflexion city.
     /// </summary>
-    internal class LoadImplementationProperty : HolisticMetricsDialog
+    internal class LoadReflexionDataProperty : HolisticMetricsDialog
     {
         /// <summary>
-        /// The implementation GXL which the player selected.
+        /// The data GXL which the player selected.
         /// </summary>
-        private static string implementationGXL;
+        private static string dataGXL;
 
         /// <summary>
         /// The implementation project folder.
@@ -24,7 +24,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         private static string implProjectFolder;
 
         /// <summary>
-        /// This file picker lets the player pick an implementation GXL.
+        /// This file picker lets the player pick an data GXL.
         /// </summary>
         private FilePathProperty selectedGXL;
 
@@ -34,34 +34,58 @@ namespace SEE.UI.PropertyDialog.CitySelection
         private FilePathProperty selectedProject;
 
         /// <summary>
+        /// The input types
+        /// </summary>
+        private enum InputType
+        {
+            NULL,
+            Architecture,
+            Implementation
+        }
+
+        /// <summary>
+        /// The selected input type.
+        /// </summary>
+        private InputType inputType = InputType.NULL;
+
+        /// <summary>
         /// This method instantiates the dialog and then displays it to the player.
         /// </summary>
-        public void Open()
+        /// <param name="openForImplementation">If the dialog is intended to be opened
+        /// for selecting the implementation data.</param>
+        public void Open(bool openForImplementation = true)
         {
-            Dialog = new GameObject("Load implementation dialog");
+            string type = openForImplementation ? "implementation" : "architecture";
+            string upperType = char.ToUpper(type[0]) + type.Substring(1);
+            Dialog = new GameObject($"Load {type} dialog");
             PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
-            group.Name = "Load implementation dialog";
+            group.Name = $"Load {type} dialog";
 
             selectedGXL = Dialog.AddComponent<FilePathProperty>();
-            selectedGXL.Name = "Implementation GXL.";
-            selectedGXL.Description = "The implementation GXL.";
+            selectedGXL.Name = $"{upperType} GXL.";
+            selectedGXL.Description = $"The {type} GXL.";
             selectedGXL.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Files;
             selectedGXL.FallbackDirectory = Application.streamingAssetsPath;
             selectedGXL.Value = Application.streamingAssetsPath + "/reflexion/";
             group.AddProperty(selectedGXL);
 
-            selectedProject = Dialog.AddComponent<FilePathProperty>();
-            selectedProject.Name = "Project Folder.";
-            selectedProject.Description = "The project folder of the implementation GXL.";
-            selectedProject.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Folders;
-            selectedProject.FallbackDirectory = Application.streamingAssetsPath;
-            selectedProject.Value = Application.streamingAssetsPath + "/reflexion/";
-            group.AddProperty(selectedProject);
+            if (openForImplementation)
+            {
+                selectedProject = Dialog.AddComponent<FilePathProperty>();
+                selectedProject.Name = "Project Folder.";
+                selectedProject.Description = "The project folder of the implementation GXL.";
+                selectedProject.PickMode = SimpleFileBrowser.FileBrowser.PickMode.Folders;
+                selectedProject.FallbackDirectory = Application.streamingAssetsPath;
+                selectedProject.Value = Application.streamingAssetsPath + "/reflexion/";
+                group.AddProperty(selectedProject);
+            }
 
             /// Adds the property dialog to the dialog.
             PropertyDialog = Dialog.AddComponent<PropertyDialog>();
-            PropertyDialog.Title = "Load the implementation";
-            PropertyDialog.Description = "Select an implementation GXL and the project folder; then hit the OK button.";
+            PropertyDialog.Title = $"Load the {type}";
+            PropertyDialog.Description = openForImplementation
+                ? $"Select an {type} GXL and the project folder; then hit the OK button."
+                : $"Select an {type} GXL; then hit the OK button.";
             PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Picker");
             PropertyDialog.AddGroup(group);
 
@@ -79,8 +103,15 @@ namespace SEE.UI.PropertyDialog.CitySelection
         private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
-            implementationGXL = selectedGXL.Value;
-            implProjectFolder = selectedProject.Value;
+            dataGXL = selectedGXL.Value;
+            if (selectedProject != null)
+            {
+                implProjectFolder = selectedProject.Value;
+                inputType = InputType.Implementation;
+            } else
+            {
+                inputType = InputType.Architecture;
+            }
             GotInput = true;
             Destroyer.Destroy(Dialog);
         }
@@ -93,15 +124,32 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
         internal bool TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder)
         {
-            if (GotInput)
+            if (GotInput && inputType == InputType.Implementation)
             {
-                gxl = new(implementationGXL);
+                gxl = new(dataGXL);
                 projectFolder = new(implProjectFolder);
                 GotInput = false;
                 return true;
             }
             gxl = null;
             projectFolder = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Fetches the architecture data given by the player.
+        /// </summary>
+        /// <param name="gxl">The fetched gxl as data path.</param>
+        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        internal bool TryGetArchitectureDataPath(out DataPath gxl)
+        {
+            if (GotInput && inputType == InputType.Architecture)
+            {
+                gxl = new(dataGXL);
+                GotInput = false;
+                return true;
+            }
+            gxl = null;
             return false;
         }
 

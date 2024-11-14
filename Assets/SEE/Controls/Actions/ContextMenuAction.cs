@@ -24,6 +24,7 @@ using SEE.GraphProviders;
 using SEE.Utils.Paths;
 using MoreLinq;
 using SEE.Game.CityRendering;
+using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 
 namespace SEE.Controls.Actions
 {
@@ -294,29 +295,40 @@ namespace SEE.Controls.Actions
                     .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
                             && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive()?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
-                        : new(){ }),
+                        : new(){ })
+                    .Concat(node.Type == ReflexionGraph.ArchitectureType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Architecture", LoadArchitecture, Icons.Upload, Priority: 3) }
+                        : new() { }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
                 _ => throw new ArgumentOutOfRangeException()
             });
 
             void LoadImplementation()
             {
-                LoadImplementationProperty dialog = new();
+                LoadReflexionDataProperty dialog = new();
                 dialog.Open();
                 WaitForInputAsync(dialog).Forget();
             }
 
-            async UniTask WaitForInputAsync(LoadImplementationProperty dialog)
+            void LoadArchitecture()
+            {
+                LoadReflexionDataProperty dialog = new();
+                dialog.Open(false);
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            async UniTask WaitForInputAsync(LoadReflexionDataProperty dialog)
             {
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
-                if(dialog.TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder))
+                if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
                 {
                     SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
                     // Sets the project directory.
                     city.SourceCodeDirectory = projectFolder;
                     // Loads the graph from the given implementation GXL.
                     ReflexionGraphProvider graphProvider = new();
-                    Graph implementationGraph = await graphProvider.LoadGraphAsync(gxl, city);
+                    Graph implementationGraph = await graphProvider.LoadGraphAsync(implGXL, city);
                     // Marks the nodes in the graph as implementation-nodes.
                     implementationGraph.MarkGraphNodesIn(ReflexionSubgraphs.Implementation);
                     implementationGraph.Edges().ForEach(edge => edge.SetInImplementation());
@@ -354,6 +366,51 @@ namespace SEE.Controls.Actions
                         // Ensures that the new drawn implementation graph is displayed.
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
                         city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
+                    }
+                }
+
+                if (dialog.TryGetArchitectureDataPath(out DataPath archGXL)) {
+                    SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                    // Loads the graph from the given data GXL.
+                    ReflexionGraphProvider graphProvider = new();
+                    Graph architectureGraph = await graphProvider.LoadGraphAsync(archGXL, city);
+                    // Marks the nodes in the graph as architecture-nodes.
+                    architectureGraph.MarkGraphNodesIn(ReflexionSubgraphs.Architecture);
+                    architectureGraph.Edges().ForEach(edge => edge.SetInArchitecture());
+
+                    if (city.Renderer is GraphRenderer renderer)
+                    {
+                        // Adds the missing node types with default values to the existing reflexion graph.
+                        foreach (string type in architectureGraph.AllNodeTypes())
+                        {
+                            if (!city.NodeTypes.TryGetValue(type, out _))
+                            {
+                                city.NodeTypes[type] = new VisualNodeAttributes();
+                                renderer.AddNewNodeType(type);
+                            }
+                        }
+                        /// Attention: At this point, the architecture root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                        /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not aded to
+                        /// <see cref="Graph.nodes"/>.
+                        Node architectureRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
+                        // Draws the architecture graph.
+                        await renderer.DrawGraphAsync(architectureGraph, architectureRoot.GameObject(), loadReflexionFiles: true);
+                        // Adds the architecture graph to the existing reflexion graph.
+                        architectureGraph.Nodes().ForEach(node =>
+                        {
+                            node.ItsGraph = null;
+                            city.ReflexionGraph.AddToArchitecture(node);
+                        });
+                        architectureGraph.GetRoots().ForEach(root => architectureRoot.AddChild(root));
+                        architectureGraph.Edges().ForEach((edge) =>
+                        {
+                            edge.ItsGraph = null;
+                            city.ReflexionGraph.AddToArchitecture(edge);
+                        });
+
+                        // Ensures that the new drawn architecture graph is displayed.
+                        city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(false);
+                        city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(true);
                     }
                 }
             }
