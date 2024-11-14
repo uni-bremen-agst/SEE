@@ -292,7 +292,7 @@ namespace SEE.Controls.Actions
             {
                 Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
                     .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
-                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawn()?
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive()?
                         new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
                         : new(){ }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),

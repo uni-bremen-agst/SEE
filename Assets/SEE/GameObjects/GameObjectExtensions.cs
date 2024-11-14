@@ -61,6 +61,23 @@ namespace SEE.GO
         }
 
         /// <summary>
+        ///Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
+        /// A code city is assumed to be drawn in there is at least one immediate child
+        /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>.
+        ///
+        /// This predicate can be queried for game objects representing a code city,
+        /// that is, game objects that have a <see cref="AbstractSEECity"/> attached to
+        /// them.
+        /// </summary>
+        /// <returns>true if a code city was drawn and is active.</returns>
+        public static bool IsCodeCityDrawnAndActive(this GameObject gameObject)
+        {
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+                    && child.gameObject.activeInHierarchy);
+        }
+
+        /// <summary>
         /// If <paramref name="gameObject"/> represents a graph node or edge, the city this
         /// object is contained in will be returned. Otherwise null is returned.
         /// </summary>
