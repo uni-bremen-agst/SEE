@@ -136,6 +136,9 @@ namespace SEE.UI
         /// <param name="newKey">The new key code to assign to the key binding.</param>
         private async UniTaskVoid ReassignKeyAsync(KeyActionDescriptor descriptor, KeyCode newKey)
         {
+            bindingToRebind = null;
+            SEEInput.KeyboardShortcutsEnabled = true;
+            bindingNotification.Close();
             string question = $"Do you really want to reassign action \"{descriptor.Name}\" to key {newKey}?";
             if (!await ConfirmDialog.ConfirmAsync(new(question, title: "Change Key?")))
             {
@@ -150,22 +153,24 @@ namespace SEE.UI
             {
                 ShowNotification.Error("Key code already bound", ex.Message, log: false);
             }
-
-            bindingToRebind = null;
-            SEEInput.KeyboardShortcutsEnabled = true;
         }
 
         /// <summary>
         /// The key binding that gets updated.
         /// </summary>
-        private KeyActionDescriptor bindingToRebind = null;
+        private KeyActionDescriptor bindingToRebind;
+
+        /// <summary>
+        /// The notification telling the user to press a key to rebind the key binding.
+        /// </summary>
+        private Notification.Notification bindingNotification;
 
         /// <summary>
         /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
         private void StartRebindFor(KeyActionDescriptor binding)
         {
-            ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
+            bindingNotification = ShowNotification.Info("Bind action to key", "Press a key to bind this action.");
             bindingToRebind = binding;
         }
 
