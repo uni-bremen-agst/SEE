@@ -89,7 +89,7 @@ namespace SEE.UI.DebugAdapterProtocol
             base.Start();
             if (cities == null)
             {
-                cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.MustGetComponent<AbstractSEECity>()).OrderBy(c => c.name).ToList();
+                cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>()).Where(component => component != null).OrderBy(c => c.name).ToList();
                 city = cities.First();
             }
         }
