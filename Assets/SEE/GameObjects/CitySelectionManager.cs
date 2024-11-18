@@ -2,10 +2,12 @@
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -39,6 +41,16 @@ namespace SEE.GameObjects
         /// The dialog for selecting a city type.
         /// </summary>
         private readonly CitySelectionProperty citySelectionProperty = new();
+
+        /// <summary>
+        /// Adds the game object to which the <see cref="AbstractSEECity"/> comonent
+        /// is attached to the list of all such objects.
+        /// Is required to create the component across the network.
+        /// </summary>
+        void Awake()
+        {
+            CitiesHolder.Cities.Add(this.gameObject);
+        }
 
         /// <summary>
         /// Provides the selection and addition of a city.
