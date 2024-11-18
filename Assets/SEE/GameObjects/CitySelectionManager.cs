@@ -84,6 +84,7 @@ namespace SEE.GameObjects
                         } else
                         {
                             cityType = typeOfNetworkCall;
+                            typeOfNetworkCall = null;
                         }
 
                         switch(cityType)
