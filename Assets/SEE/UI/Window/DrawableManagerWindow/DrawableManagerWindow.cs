@@ -143,7 +143,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
         /// If the menu is destroyed, disposes the observers and closes any open <see cref="SurfaceColorMenu"/>
         /// if necessary.
         /// </summary>
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             foreach (IDisposable subscription in subscriptions)
             {
@@ -154,6 +154,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             {
                 SurfaceColorMenu.Instance.Destroy();
             }
+            base.OnDestroy();
         }
 
         #region BaseWindow & Observer

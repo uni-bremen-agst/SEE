@@ -72,6 +72,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The dialog menu game object.
         /// </summary>
+        [ManagedUI]
         private GameObject Dialog { get; set; }
 
         /// <summary>
@@ -150,14 +151,6 @@ namespace SEE.UI.Menu
             NoButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(false));
             CloseButton.clickEvent.AddListener(() => OnChoiceMade.Invoke(false));
             OnChoiceMade.AddListener(_ => CloseMenu());
-        }
-
-        private void OnDestroy()
-        {
-            if (Dialog != null)
-            {
-                Destroyer.Destroy(Dialog);
-            }
         }
 
         /// <summary>

@@ -43,6 +43,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// GameObject containing the actual UI for the window.
         /// </summary>
+        [ManagedUI(toggleEnabled: true, destroy: false)]
         public GameObject Window { get; protected set; }
 
         /// <summary>
@@ -80,8 +81,8 @@ namespace SEE.UI.Window
 
         /// <summary>
         /// Disables the window dragger buttons.
-        /// </summary>dd
-        public void DisableWindowDraggerButtons()
+        /// </summary>
+        private void DisableWindowDraggerButtons()
         {
             Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>();
             foreach (Button button in buttons)
@@ -93,7 +94,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Activates the window dragger buttons.
         /// </summary>
-        public void ActivateWindowDraggerButtons()
+        protected void ActivateWindowDraggerButtons()
         {
             Button[] buttons = Window.transform.Find("Dragger").GetComponentsInChildren<Button>(true);
             foreach (Button button in buttons)
@@ -105,67 +106,6 @@ namespace SEE.UI.Window
         protected override void StartVR()
         {
             StartDesktop();
-        }
-
-        /// <summary>
-        /// Shows or hides the window, depending on the <see cref="show"/> parameter.
-        /// </summary>
-        /// <param name="show">Whether the window should be shown.</param>
-        /// <remarks>If this window is used in a <see cref="WindowSpace"/>, this method
-        /// needn't (and shouldn't) be used.</remarks>
-        public void Show(bool show)
-        {
-            switch (Platform)
-            {
-                case PlayerInputType.DesktopPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.TouchGamepadPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.VRPlayer:
-                    ShowDesktop(show);
-                    break;
-                case PlayerInputType.None: // nothing needs to be done
-                    break;
-                default:
-                    Debug.LogError($"Platform {Platform} not handled in switch case.\n");
-                    break;
-            }
-        }
-
-        /// <summary>
-        /// When disabling the window, its controlled UI objects will also be disabled.
-        /// </summary>
-        public void OnDisable()
-        {
-            if (Window)
-            {
-                Window.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// When enabling the window, its controlled UI objects will also be enabled.
-        /// </summary>
-        public void OnEnable()
-        {
-            if (Window)
-            {
-                Window.SetActive(true);
-            }
-        }
-
-        /// <summary>
-        /// Shows or hides the window on Desktop platforms.
-        /// </summary>
-        /// <param name="show">Whether the window should be shown.</param>
-        private void ShowDesktop(bool show)
-        {
-            if (Window)
-            {
-                Window.SetActive(show);
-            }
         }
 
         /// <summary>
