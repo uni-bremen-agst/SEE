@@ -44,9 +44,9 @@ namespace SEE.GameObjects
         private readonly CitySelectionProperty citySelectionProperty = new();
 
         /// <summary>
-        /// The type of city that should be created via a network call.
+        /// The type of city that should be created via a network execution.
         /// </summary>
-        private CityTypes? typeOfNetworkCall = null;
+        private CityTypes? typeOfNetworkExecution = null;
 
         /// <summary>
         /// Adds the game object to which the <see cref="AbstractSEECity"/> comonent
@@ -76,15 +76,16 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.ChoseCity:
-                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType) || typeOfNetworkCall != null)
+                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType) || typeOfNetworkExecution != null)
                     {
                         if (cityType != null)
                         {
                             new AddCityNetAction(transform.parent.name, cityType.Value).Execute();
                         } else
                         {
-                            cityType = typeOfNetworkCall;
-                            typeOfNetworkCall = null;
+                            cityType = typeOfNetworkExecution;
+                            // If the variable is not reset, there will be multiple attempts to add the city, which leads to errors.
+                            typeOfNetworkExecution = null;
                         }
 
                         switch(cityType)
@@ -206,12 +207,12 @@ namespace SEE.GameObjects
         }
 
         /// <summary>
-        /// Creates a city through a network call.
+        /// Creates a city through a network execution.
         /// </summary>
         /// <param name="cityType">The type of city that should be added.</param>
         internal void CreateCity(CityTypes cityType)
         {
-            typeOfNetworkCall = cityType;
+            typeOfNetworkExecution = cityType;
             progressState = ProgressState.ChoseCity;
         }
     }
