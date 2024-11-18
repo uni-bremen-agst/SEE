@@ -11,14 +11,24 @@ namespace SEE.GameObjects
     public class CitiesHolder : MonoBehaviour
     {
         /// The list of game objects
-        public readonly static List<GameObject> Cities = new();
+        public readonly static List<(GameObject city, GameObject table)> Cities = new();
 
         /// <summary>
-        /// Ensures that the list is reset at each start.
+        /// Finds the City game object corresponding to the associated <paramref name="tableID"/>.
         /// </summary>
-        private void Awake()
+        /// <param name="tableID">The table ID</param>
+        /// <returns>The city game object, it found, otherwise null.</returns>
+        public static GameObject Find(string tableID)
         {
-            Cities.Clear();
+            GameObject result = null;
+            foreach((GameObject city, GameObject table) in Cities)
+            {
+                if (table.name == tableID)
+                {
+                    result = city;
+                }
+            }
+            return result;
         }
     }
 }

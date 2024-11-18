@@ -2,6 +2,7 @@
 using SEE.Controls;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
@@ -43,13 +44,18 @@ namespace SEE.GameObjects
         private readonly CitySelectionProperty citySelectionProperty = new();
 
         /// <summary>
+        /// The type of city that should be created via a network call.
+        /// </summary>
+        private CityTypes? typeOfNetworkCall = null;
+
+        /// <summary>
         /// Adds the game object to which the <see cref="AbstractSEECity"/> comonent
-        /// is attached to the list of all such objects.
+        /// will be attached and his table to the list of all such objects.
         /// Is required to create the component across the network.
         /// </summary>
         void Awake()
         {
-            CitiesHolder.Cities.Add(this.gameObject);
+            CitiesHolder.Cities.Add((this.gameObject, transform.parent.gameObject));
         }
 
         /// <summary>
@@ -70,8 +76,16 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.ChoseCity:
-                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType))
+                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType) || typeOfNetworkCall != null)
                     {
+                        if (cityType != null)
+                        {
+                            new AddCityNetAction(transform.parent.name, cityType.Value).Execute();
+                        } else
+                        {
+                            cityType = typeOfNetworkCall;
+                        }
+
                         switch(cityType)
                         {
                             case CityTypes.ReflexionCity:
@@ -188,6 +202,16 @@ namespace SEE.GameObjects
                 Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
                 obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
             }
+        }
+
+        /// <summary>
+        /// Creates a city through a network call.
+        /// </summary>
+        /// <param name="cityType">The type of city that should be added.</param>
+        internal void CreateCity(CityTypes cityType)
+        {
+            typeOfNetworkCall = cityType;
+            progressState = ProgressState.ChoseCity;
         }
     }
 }
