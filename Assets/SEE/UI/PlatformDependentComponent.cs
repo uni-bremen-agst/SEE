@@ -382,7 +382,6 @@ namespace SEE.UI
             {
                 Integral = integral;
                 Destroy = destroy;
-                // TODO: Should the default value for ToggleEnabled be true or false?
                 ToggleEnabled = toggleEnabled;
             }
 
