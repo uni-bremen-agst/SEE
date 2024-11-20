@@ -1,11 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Controls;
+using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -31,6 +33,7 @@ namespace SEE.GameObjects
             Start,
             ChoseCity,
             RelfexionCity,
+            AddRuntimeMenu,
         }
 
         /// <summary>
@@ -55,7 +58,17 @@ namespace SEE.GameObjects
         /// </summary>
         void Awake()
         {
-            CitiesHolder.Cities.Add((this.gameObject, transform.parent.gameObject));
+            WaitForLocalPlayerInstantiation().Forget();
+            return;
+
+            async UniTask WaitForLocalPlayerInstantiation()
+            {
+                await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
+                if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citysHolder))
+                {
+                    citysHolder.Cities.Add((gameObject, transform.parent.gameObject));
+                }
+            }
         }
 
         /// <summary>
@@ -119,9 +132,14 @@ namespace SEE.GameObjects
                     {
                         SEEReflexionCity reflexionCity = gameObject.GetComponent<SEEReflexionCity>();
                         FitInitalReflexionCity(reflexionCity);
-                        CityComponentsSettings();
-                        progressState = ProgressState.Start;
+                        progressState = ProgressState.AddRuntimeMenu;
                     }
+                    break;
+
+                case ProgressState.AddRuntimeMenu:
+                    AddCityToRuntimeMenu();
+                    CityComponentsSettings();
+                    progressState = ProgressState.Start;
                     break;
 
                 default:
@@ -130,6 +148,42 @@ namespace SEE.GameObjects
             }
         }
 
+        /// <summary>
+        /// Adds the created city to the <see cref="RuntimeConfigMenu"/>
+        /// </summary>
+        private void AddCityToRuntimeMenu()
+        {
+            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+            {
+                runtimeConfigMenu.BuildTabMenus();
+            }
+            else
+            {
+                ShowNotification.Warn("Error", "Error the city can't be added to the runtime config menu.");
+            }
+        }
+
+        /// <summary>
+        /// Creates a city through a network execution.
+        /// </summary>
+        /// <param name="cityType">The type of city that should be added.</param>
+        internal void CreateCity(CityTypes cityType)
+        {
+            typeOfNetworkExecution = cityType;
+            progressState = ProgressState.ChoseCity;
+        }
+
+        /// <summary>
+        /// Activation and deactivation of the additionally required components of the
+        /// city game object.
+        /// </summary>
+        private void CityComponentsSettings()
+        {
+            gameObject.GetComponent<CityCursor>().enabled = true;
+            enabled = false;
+        }
+
+        #region Reflexion City
         /// <summary>
         /// Creates and loads an initial reflexion city.
         /// </summary>
@@ -145,16 +199,6 @@ namespace SEE.GameObjects
             await reflexionCity.LoadDataAsync();
             reflexionCity.DrawGraph();
             progressState = ProgressState.RelfexionCity;
-        }
-
-        /// <summary>
-        /// Activation and deactivation of the additionally required components of the
-        /// city game object.
-        /// </summary>
-        private void CityComponentsSettings()
-        {
-            gameObject.GetComponent<CityCursor>().enabled = true;
-            enabled = false;
         }
 
         /// <summary>
@@ -205,15 +249,6 @@ namespace SEE.GameObjects
                 obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
             }
         }
-
-        /// <summary>
-        /// Creates a city through a network execution.
-        /// </summary>
-        /// <param name="cityType">The type of city that should be added.</param>
-        internal void CreateCity(CityTypes cityType)
-        {
-            typeOfNetworkExecution = cityType;
-            progressState = ProgressState.ChoseCity;
-        }
+        #endregion
     }
 }

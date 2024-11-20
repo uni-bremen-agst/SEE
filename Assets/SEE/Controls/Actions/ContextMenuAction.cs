@@ -26,6 +26,7 @@ using MoreLinq;
 using SEE.Game.CityRendering;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using System.Threading.Tasks;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Controls.Actions
 {
@@ -514,6 +515,7 @@ namespace SEE.Controls.Actions
                         }
                         Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
                         Destroyer.Destroy(node.GameObject());
+                        RemoveFromRuntimeConfigMenu(cityHolder).Forget();
                         new DeleteRootNetAction(graphElement.ID).Execute();
                     }).Forget();
                     return;
@@ -530,6 +532,15 @@ namespace SEE.Controls.Actions
                 {
                     ConfirmDialogMenu confirm = new($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
                     confirm.ExecuteAfterConfirmAsync(() => graphElement.ItsGraph.RemoveElement(graphElement)).Forget();
+                }
+            }
+
+            async UniTask RemoveFromRuntimeConfigMenu(Transform cityHolder)
+            {
+                await UniTask.WaitUntil(() => { return cityHolder.GetComponent<AbstractSEECity>() == null; });
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.BuildTabMenus();
                 }
             }
 

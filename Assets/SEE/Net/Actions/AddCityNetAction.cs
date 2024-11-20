@@ -4,6 +4,7 @@ using SEE.GameObjects;
 using SEE.Utils;
 using System.Collections;
 using UnityEngine;
+using System;
 
 namespace SEE.Net.Actions
 {
@@ -47,8 +48,15 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject city = CitiesHolder.Find(TableID);
-            city.GetComponent<CitySelectionManager>().CreateCity(CityType);
+            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            {
+                GameObject city = citiesHolder.Find(TableID);
+                city.GetComponent<CitySelectionManager>().CreateCity(CityType);
+            }
+            else
+            {
+                throw new Exception($"The city can't be added because there is no CitieHolder component.");
+            }
         }
     }
 }

@@ -1,7 +1,13 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
+using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GameObjects;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -29,18 +35,42 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private void Start()
         {
-            int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity)
-                .Select(go => go.GetComponent<AbstractSEECity>())
-                .Where(component => component != null).Count();
-            cityMenus = new RuntimeTabMenu[cityCount];
-            for (int i = 0; i < cityCount; i++)
+            WaitForLocalPlayerInstantiation().Forget();
+            return;
+            async UniTask WaitForLocalPlayerInstantiation()
             {
-                cityMenus[i] = gameObject.AddComponent<RuntimeTabMenu>();
-                cityMenus[i].Title = "City Configuration";
-                cityMenus[i].HideAfterSelection = false;
-                cityMenus[i].CityIndex = i;
-                cityMenus[i].OnSwitchCity += SwitchCity;
+                await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
+                BuildTabMenus();
             }
+        }
+
+        /// <summary>
+        /// Builds the menu.
+        /// </summary>
+        public void BuildTabMenus()
+        {
+            if (cityMenus != null)
+            {
+                cityMenus.ForEach(c => Destroyer.Destroy(c));
+            }
+            cityMenus = new RuntimeTabMenu[GetCities().Length];
+            for (int i = 0; i < GetCities().Length; i++)
+            {
+                AddCity(i);
+            }
+        }
+
+        /// <summary>
+        /// Adds a <see cref="RuntimeTabMenu"/> for the city with the given <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">The city index.</param>
+        private void AddCity(int index)
+        {
+            cityMenus[index] = gameObject.AddComponent<RuntimeTabMenu>();
+            cityMenus[index].Title = "City Configuration";
+            cityMenus[index].HideAfterSelection = false;
+            cityMenus[index].CityIndex = index;
+            cityMenus[index].OnSwitchCity += SwitchCity;
         }
 
         /// <summary>
@@ -52,6 +82,10 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             if (SEEInput.ToggleConfigMenu())
             {
+                if (cityMenus.Length <= currentCity)
+                {
+                    currentCity = cityMenus.Length - 1;
+                }
                 cityMenus[currentCity].ToggleMenu();
             }
         }
@@ -79,9 +113,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <returns>table list</returns>
         public static AbstractSEECity[] GetCities()
         {
-            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
-                             .Where(component => component != null)
-                             .OrderBy(go => go.name).ToArray();
+            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            {
+                return citiesHolder.Cities
+                    .Select(pair => pair.city.GetComponent<AbstractSEECity>())
+                    .Where(component => component != null)
+                    .OrderBy(go => go.name).ToArray();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
