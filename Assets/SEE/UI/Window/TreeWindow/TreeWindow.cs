@@ -74,9 +74,10 @@ namespace SEE.UI.Window.TreeWindow
             base.Start();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             subscription.Dispose();
+            base.OnDestroy();
         }
 
         /// <summary>

@@ -214,7 +214,7 @@ namespace SEE.UI.HelpSystem
 
                     if (currentHelpEntry.Index <= currentEntries.Count)
                     {
-                        if (Mathf.Round((float)videoPlayer.time) == currentHelpEntry.CumulatedTime && !isAdded)
+                        if (Mathf.Approximately(Mathf.Round((float)videoPlayer.time), currentHelpEntry.CumulatedTime) && !isAdded)
                         {
                             if (currentHelpEntry?.Index - 1 == HelpSystemBuilder.CurrentEntries.Count)
                             {

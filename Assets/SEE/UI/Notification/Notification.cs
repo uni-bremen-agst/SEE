@@ -83,17 +83,12 @@ namespace SEE.UI.Notification
         /// Whether to destroy the notification's game object as well as
         /// <b>the game object this component is attached to (!)</b> after the notification is done playing.
         /// </summary>
-        public bool DestroyAfterPlaying = false;
+        public bool DestroyAfterPlaying;
 
         /// <summary>
         /// Path to the notification prefab.
         /// </summary>
         private const string notificationPrefab = "Prefabs/UI/Notification";
-
-        /// <summary>
-        /// The number of frames this notification has been active.
-        /// </summary>
-        private int frames;
 
         /// <summary>
         /// The target y coordinate for the notification. May be null.
@@ -103,6 +98,7 @@ namespace SEE.UI.Notification
         /// <summary>
         /// The game object on the <see cref="Canvas"/> containing the actual notification UI components.
         /// </summary>
+        [ManagedUI]
         private GameObject ManagedNotification
         {
             get;
@@ -129,14 +125,6 @@ namespace SEE.UI.Notification
             {
                 OnFinished?.Invoke();
                 manager.CloseNotification();
-            }
-        }
-
-        private void OnDestroy()
-        {
-            if (manager != null)
-            {
-                Destroyer.Destroy(manager.gameObject);
             }
         }
 
@@ -236,7 +224,7 @@ namespace SEE.UI.Notification
         protected override void UpdateDesktop()
         {
             // We only perform this expensive comparison once every 50 frames, if necessary
-            if (DestroyAfterPlaying && ++frames % 50 == 0 && manager == null)
+            if (DestroyAfterPlaying && Frames % 50 == 0 && manager == null)
             {
                 OnFinished?.Invoke();
                 // We finally destroy ourselves once we're done

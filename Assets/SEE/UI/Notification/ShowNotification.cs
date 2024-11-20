@@ -72,14 +72,15 @@ namespace SEE.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Info(string title, string description, float duration = defaultDuration,
+        /// <returns>The notification object representing the newly created notification.</returns>
+        public static Notification Info(string title, string description, float duration = defaultDuration,
                                         bool log = true)
         {
             if (log)
             {
                 Debug.Log($"{title}: {description}\n");
             }
-            Show(title, description, infoIcon, infoColor, duration);
+            return Show(title, description, infoIcon, infoColor, duration);
         }
 
         /// <summary>
@@ -89,14 +90,15 @@ namespace SEE.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Warn(string title, string description, float duration = defaultDuration,
+        /// <returns>The notification object representing the newly created notification.</returns>
+        public static Notification Warn(string title, string description, float duration = defaultDuration,
                                 bool log = true)
         {
             if (log)
             {
                 Debug.LogWarning($"{title}: {description}\n");
             }
-            Show(title, description, warningIcon, warningColor, duration);
+            return Show(title, description, warningIcon, warningColor, duration);
         }
 
         /// <summary>
@@ -106,14 +108,15 @@ namespace SEE.UI.Notification
         /// <param name="description">Description of the notification.</param>
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
-        public static void Error(string title, string description, float duration = defaultDuration,
+        /// <returns>The notification object representing the newly created notification.</returns>
+        public static Notification Error(string title, string description, float duration = defaultDuration,
                                  bool log = true)
         {
             if (log)
             {
                 Debug.LogError($"{title}: {description}\n");
             }
-            Show(title, description, errorIcon, errorColor, duration);
+            return Show(title, description, errorIcon, errorColor, duration);
         }
 
         /// <summary>
@@ -124,14 +127,16 @@ namespace SEE.UI.Notification
         /// <param name="icon">The icon of the notification.</param>
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
-        private static void Show(string title, string description, Lazy<Sprite> icon, Color color,
-                                 float duration = defaultDuration)
+        /// <returns>The notification object representing the newly created notification.</returns>
+        private static Notification Show(string title, string description, Lazy<Sprite> icon, Color color,
+                                         float duration = defaultDuration)
         {
             // Only show the notification if we are on the main thread.
             if (AsyncUtils.IsRunningOnMainThread)
             {
-                manager.Value.Show(title, description, icon.Value, color, duration);
+                return manager.Value.Show(title, description, icon.Value, color, duration);
             }
+            return null;
         }
     }
 }

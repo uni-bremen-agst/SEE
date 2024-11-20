@@ -96,16 +96,13 @@ namespace SEE.UI.Menu
         /// Lets <see cref="KeywordListener"/> stop listening.
         /// </summary>
         /// <remarks>Called by Unity when this object is destroyed.</remarks>
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
             KeywordListener?.Stop();
             KeywordListener?.Dispose();
             KeywordListener = null;
 
-            if (Menu != null)
-            {
-                Destroyer.Destroy(Menu);
-            }
+            base.OnDestroy();
         }
 
         /// <summary>

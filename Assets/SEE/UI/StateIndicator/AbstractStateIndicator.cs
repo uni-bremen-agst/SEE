@@ -15,7 +15,7 @@ namespace SEE.UI.StateIndicator
         /// <summary>
         /// Path to the prefab of the panel.
         /// </summary>
-        protected string PREFAB;
+        protected string Prefab;
 
         /// <summary>
         /// The normalized position in the canvas that the upper right corner is anchored to.
@@ -50,6 +50,12 @@ namespace SEE.UI.StateIndicator
         protected Image ModePanelImage;
 
         /// <summary>
+        /// The mode panel game object.
+        /// </summary>
+        [ManagedUI(toggleEnabled: true, destroy: false)]
+        protected GameObject Indicator;
+
+        /// <summary>
         /// The color of the state indicator after it has been instantiated.
         /// </summary>
         protected Color StartColor = Color.gray.WithAlpha(0.5f);
@@ -79,47 +85,29 @@ namespace SEE.UI.StateIndicator
             }
         }
 
-        protected GameObject StartDesktopInit()
+        protected void StartDesktopInit()
         {
-            GameObject indicator = PrefabInstantiator.InstantiatePrefab(PREFAB, Canvas.transform, false);
-            indicator.name = Title;
+            Indicator = PrefabInstantiator.InstantiatePrefab(Prefab, Canvas.transform, false);
+            Indicator.name = Title;
 
-            RectTransform rectTransform = (RectTransform)indicator.transform;
+            RectTransform rectTransform = (RectTransform)Indicator.transform;
             rectTransform.anchorMin = AnchorMin;
             rectTransform.anchorMax = AnchorMax;
             rectTransform.pivot = Pivot;
             rectTransform.anchoredPosition = Vector2.zero;
 
-            if (indicator.TryGetComponentOrLog(out ModePanelImage))
+            if (Indicator.TryGetComponentOrLog(out ModePanelImage))
             {
                 ModePanelImage.color = StartColor;
             }
 
-            if (indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
+            if (Indicator.transform.Find("ModeText")?.gameObject.TryGetComponentOrLog(out ModePanelText) != null)
             {
                 ModePanelText.SetText(StartText);
             }
             else
             {
                 Debug.LogError("Couldn't find ModeText game object in ModePanel\n");
-            }
-
-            return indicator;
-        }
-
-        protected virtual void OnDisable()
-        {
-            if (ModePanelImage != null)
-            {
-                ModePanelImage.gameObject.SetActive(false);
-            }
-        }
-
-        protected virtual void OnEnable()
-        {
-            if (ModePanelImage != null)
-            {
-                ModePanelImage.gameObject.SetActive(true);
             }
         }
     }

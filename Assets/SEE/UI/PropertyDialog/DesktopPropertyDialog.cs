@@ -28,6 +28,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// The instantiation of <see cref="dialogPrefab"/>.
         /// </summary>
+        [ManagedUI(toggleEnabled: true)]
         private GameObject dialog;
         /// <summary>
         /// The component <see cref="ModalWindowManager"/> attached to the instantiated <see cref="dialog"/>.
