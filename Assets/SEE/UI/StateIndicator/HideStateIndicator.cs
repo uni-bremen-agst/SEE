@@ -22,7 +22,7 @@ namespace SEE.UI.StateIndicator
         private void Awake()
         {
             Title = "Hide Selection Panel";
-            PREFAB = "Prefabs/UI/HideModePanel";
+            Prefab = "Prefabs/UI/HideModePanel";
             StartText = "Select Objects";
         }
 
@@ -226,11 +226,11 @@ namespace SEE.UI.StateIndicator
         /// </summary>
         protected override void StartDesktop()
         {
-            GameObject indicator = StartDesktopInit();
-            SetupTooltipDone(indicator);
-            SetupTooltipBack(indicator);
-            SetUpButtonDone(indicator);
-            SetUpButtonBack(indicator);
+            StartDesktopInit();
+            SetupTooltipDone(Indicator);
+            SetupTooltipBack(Indicator);
+            SetUpButtonDone(Indicator);
+            SetUpButtonBack(Indicator);
         }
 
         /// <summary>

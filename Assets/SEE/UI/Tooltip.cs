@@ -110,6 +110,7 @@ namespace SEE.UI
         /// <summary>
         /// The GameObject which contains the Tooltip UI element.
         /// </summary>
+        [ManagedUI(toggleEnabled: true)]
         private GameObject tooltipGameObject;
 
         /// <summary>
@@ -350,26 +351,9 @@ namespace SEE.UI
             UpdateDesktop();
         }
 
-        private void OnDestroy()
-        {
-            Destroyer.Destroy(tooltipGameObject);
-        }
-
-        private void OnDisable()
+        protected override void OnDisable()
         {
             fadeIn?.Kill();
-            if (tooltipGameObject != null)
-            {
-                tooltipGameObject.SetActive(false);
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (tooltipGameObject != null)
-            {
-                tooltipGameObject.SetActive(true);
-            }
         }
     }
 }

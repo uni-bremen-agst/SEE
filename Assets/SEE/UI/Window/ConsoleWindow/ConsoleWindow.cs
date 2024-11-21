@@ -130,9 +130,9 @@ namespace SEE.UI.Window.ConsoleWindow
         /// <summary>
         /// The channels and their levels.
         /// </summary>
-        private static Dictionary<string, Channel> channels = new() {
+        private static readonly Dictionary<string, Channel> channels = new() {
             {"User Input", new Channel("User Input", '\uf007', new () {
-                {"Log", new ChannelLevel("Log", Color.gray.Darker(), true)},
+                {"Log", new ChannelLevel("Log", Color.gray.Darker())},
             })},
         };
 
@@ -214,7 +214,7 @@ namespace SEE.UI.Window.ConsoleWindow
         {
             if (channels.TryGetValue(channel, out Channel c))
             {
-                c.Levels[level] = new(level, color, true);
+                c.Levels[level] = new(level, color);
                 OnConsoleEvent?.Invoke(ConsoleEvent.ChannelChanged);
             }
             else
@@ -359,18 +359,16 @@ namespace SEE.UI.Window.ConsoleWindow
                     consoleEvent &= ~ConsoleEvent.ChannelChanged;
                     UpdateFilters();
                     break;
-                default:
-                    // do nothing
-                    break;
             }
         }
 
         /// <summary>
         /// Removes listeners.
         /// </summary>
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             OnConsoleEvent -= HandleConsoleEvent;
+            base.OnDestroy();
         }
 
         private void HandleConsoleEvent(ConsoleEvent consoleEvent)
@@ -399,7 +397,7 @@ namespace SEE.UI.Window.ConsoleWindow
             iconMesh.color = color.IdealTextColor();
 
             item.transform.Find("Background").GetComponent<UIGradient>().EffectGradient.SetKeys(
-                new Color[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(),
+                new[] { color, color.Darker(0.3f) }.ToGradientColorKeys().ToArray(),
                 new GradientAlphaKey[] { new(1, 0), new(1, 1) });
 
             UpdateFilter(message, item);

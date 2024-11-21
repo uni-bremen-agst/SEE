@@ -10,7 +10,7 @@ using SEE.Game.Drawable.ValueHolders;
 using SEE.Net.Actions.Drawable;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu;
 
 namespace SEE.UI.Window.DrawableManagerWindow
 {
@@ -410,7 +410,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
                     {
                         if (removeIndicator)
                         {
-                            RemovePage(pageNumber);
+                            RemovePage(pageNumber).Forget();
                         }
                         else
                         {
@@ -439,16 +439,16 @@ namespace SEE.UI.Window.DrawableManagerWindow
             }
 
             /// Removes the page.
-            void RemovePage(int page)
+            async UniTaskVoid RemovePage(int page)
             {
                 if (GameFinder.GetDrawableTypesOfPage(surface, page).Count > 0)
                 {
-                    ConfirmDialogMenu confirm = new($"Do you really want to delete the page {page}?\r\nThis action cannot be undone.");
-                    confirm.ExecuteAfterConfirmAsync(() =>
+                    string deleteMessage = $"Do you really want to delete page {page}?\nThis action cannot be undone.";
+                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
                     {
                         GameDrawableManager.RemovePage(surface, page);
                         new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
-                    }).Forget();
+                    }
                 }
                 else
                 {
