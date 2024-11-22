@@ -30,6 +30,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private int currentCity;
 
+        /// <summary>
+        /// The list of cities on which the current RuntimeConfigMenu is based.
+        /// </summary>
         private AbstractSEECity[] currentMenuCities;
 
         /// <summary>
