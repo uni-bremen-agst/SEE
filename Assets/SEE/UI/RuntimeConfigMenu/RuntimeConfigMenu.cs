@@ -30,6 +30,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private int currentCity;
 
+        private AbstractSEECity[] currentMenuCities;
+
         /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
@@ -58,6 +60,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 AddCity(i);
             }
+            currentMenuCities = GetCities();
         }
 
         /// <summary>
@@ -85,6 +88,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (cityMenus.Length <= currentCity)
                 {
                     currentCity = cityMenus.Length - 1;
+                }
+                if (!currentMenuCities.SequenceEqual(GetCities()))
+                {
+                    BuildTabMenus();
                 }
                 cityMenus[currentCity].ToggleMenu();
             }

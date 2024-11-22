@@ -137,7 +137,7 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.AddRuntimeMenu:
-                    AddCityToRuntimeMenu();
+                    //AddCityToRuntimeMenu();
                     CityComponentsSettings();
                     progressState = ProgressState.Start;
                     break;

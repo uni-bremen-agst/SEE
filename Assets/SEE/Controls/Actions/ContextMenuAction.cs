@@ -515,7 +515,7 @@ namespace SEE.Controls.Actions
                         }
                         Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
                         Destroyer.Destroy(node.GameObject());
-                        RemoveFromRuntimeConfigMenu(cityHolder).Forget();
+                        //RemoveFromRuntimeConfigMenu(cityHolder).Forget();
                         new DeleteRootNetAction(graphElement.ID).Execute();
                     }).Forget();
                     return;
