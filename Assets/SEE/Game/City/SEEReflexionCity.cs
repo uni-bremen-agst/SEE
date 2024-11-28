@@ -7,6 +7,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.GraphProviders;
 
 namespace SEE.Game.City
 {
@@ -100,6 +101,23 @@ namespace SEE.Game.City
             type.AllowManualNodeManipulation = true;
             type.ColorProperty.TypeColor = color;
             type.ShowNames = false;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ReflexionGraphProvider"/> of this city.
+        /// </summary>
+        /// <returns>The <see cref="ReflexionGraphProvider"/> if it exists, otherwise null.</returns>
+        public ReflexionGraphProvider GetReflexionGraphProvider()
+        {
+            ReflexionGraphProvider provider = null;
+            DataProvider.Pipeline.ForEach(p =>
+            {
+                if (p is ReflexionGraphProvider)
+                {
+                    provider = (ReflexionGraphProvider)p;
+                }
+            });
+            return provider;
         }
     }
 }

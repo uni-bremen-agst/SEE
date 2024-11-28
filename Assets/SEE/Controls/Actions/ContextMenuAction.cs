@@ -27,6 +27,7 @@ using SEE.Game.CityRendering;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using System.Threading.Tasks;
 using SEE.UI.RuntimeConfigMenu;
+using System.Reflection;
 
 namespace SEE.Controls.Actions
 {
@@ -388,7 +389,7 @@ namespace SEE.Controls.Actions
             {
                 SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
                 // Loads the graph from the given GXL.
-                ReflexionGraphProvider graphProvider = new();
+                ReflexionGraphProvider graphProvider = city.GetReflexionGraphProvider();
                 Graph graph = await graphProvider.LoadGraphAsync(gxl, city);
                 // Marks the nodes in the graph as architecture-/implementation-nodes.
                 graph.MarkGraphNodesIn(loadArchitecture ? ReflexionSubgraphs.Architecture : ReflexionSubgraphs.Implementation);
@@ -403,6 +404,16 @@ namespace SEE.Controls.Actions
                         edge.SetInImplementation();
                     }
                 });
+
+                /// Add the GXL to the <see cref="SEECity.DataProvider"/>
+                if (loadArchitecture)
+                {
+                    graphProvider.Architecture = gxl;
+                }
+                else
+                {
+                    graphProvider.Implementation = gxl;
+                }
                 return (city, graph, (GraphRenderer)city.Renderer);
             }
 
