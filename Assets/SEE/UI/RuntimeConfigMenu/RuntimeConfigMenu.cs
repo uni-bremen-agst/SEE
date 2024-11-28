@@ -36,6 +36,11 @@ namespace SEE.UI.RuntimeConfigMenu
         private AbstractSEECity[] currentMenuCities;
 
         /// <summary>
+        /// If the menu needs a rebuild.
+        /// </summary>
+        private bool needRebuild;
+
+        /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
         private void Start()
@@ -92,9 +97,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     currentCity = cityMenus.Length - 1;
                 }
-                if (!currentMenuCities.SequenceEqual(GetCities()))
+                if (!currentMenuCities.SequenceEqual(GetCities()) || needRebuild)
                 {
                     BuildTabMenus();
+                    needRebuild = false;
                 }
                 cityMenus[currentCity].ToggleMenu();
             }
@@ -144,6 +150,14 @@ namespace SEE.UI.RuntimeConfigMenu
         public static RuntimeTabMenu GetMenuForCity(int i)
         {
             return cityMenus[i];
+        }
+
+        /// <summary>
+        /// Sets the notification that a rebuild is required.
+        /// </summary>
+        public void PerformRebuildOnNextOpening()
+        {
+            needRebuild = true;
         }
     }
 }
