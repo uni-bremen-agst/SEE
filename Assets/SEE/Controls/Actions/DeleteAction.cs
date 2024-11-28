@@ -10,6 +10,8 @@ using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
 using SEE.DataModel.DG;
 using static RootMotion.FinalIK.RagdollUtility;
+using SEE.Game;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Controls.Actions
 {
@@ -160,6 +162,11 @@ namespace SEE.Controls.Actions
                         (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(child.GameObject());
                         deletedGameObjects.UnionWith(deleted);
                     }
+                    /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    }
                 }
                 else
                 {
@@ -202,6 +209,13 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+
+            /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+            if (hitGraphElements.Any(obj => obj.IsArchitectureOrImplmentationRoot())
+                && LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+            {
+                runtimeConfigMenu.PerformRebuildOnNextOpening();
+            }
             GameElementDeleter.Revive(deletedGameObjects);
             new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
         }
@@ -226,6 +240,11 @@ namespace SEE.Controls.Actions
                     {
                         new DeleteNetAction(child.GameObject().name).Execute();
                         GameElementDeleter.Delete(child.GameObject());
+                    }
+                    /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.PerformRebuildOnNextOpening();
                     }
                 }
                 else
