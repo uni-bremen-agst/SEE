@@ -12,6 +12,9 @@ using SEE.DataModel.DG;
 using static RootMotion.FinalIK.RagdollUtility;
 using SEE.Game;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.Game.City;
+using MoreLinq;
+using SEE.Tools.ReflexionAnalysis;
 
 namespace SEE.Controls.Actions
 {
@@ -111,6 +114,12 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
+        /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow them to be restored.
+        /// This is only needed in the case of deleting an implementation- or architecutre-root.
+        /// </summary>
+        private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
+
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -156,6 +165,7 @@ namespace SEE.Controls.Actions
                 if (go.IsArchitectureOrImplmentationRoot())
                 {
                     Node root = go.GetNode();
+                    CaptureNodeTypesToRemove(root);
                     foreach (Node child in root.Children().ToList())
                     {
                         new DeleteNetAction(child.GameObject().name).Execute();
@@ -178,6 +188,44 @@ namespace SEE.Controls.Actions
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             return true;
+        }
+
+        /// <summary>
+        /// Identifies the node types belonging to this subgraph and removes them from the graph.
+        /// </summary>
+        /// <param name="root">The root of this subgraph.</param>
+        /// <param name="rememberRemovedNodeTypes">Wheter the deleted node types need to be remembered.
+        /// Should be switchable for the redo case.</param>
+        private void CaptureNodeTypesToRemove(Node root, bool rememberRemovedNodeTypes = true)
+        {
+            IEnumerable<string> typesToRemove = GetNodeTypesFromSubgraph(root);
+            SEEReflexionCity city = root.GameObject().ContainingCity<SEEReflexionCity>();
+            IEnumerable<string> remainingTypes = GetRemainingGraphNodeTypes(root, city);
+            IEnumerable<string> typesDifference = typesToRemove.Except(remainingTypes);
+            typesDifference.ForEach(type =>
+            {
+                if (rememberRemovedNodeTypes)
+                {
+                    deletedNodeTypes.Add(type, city.NodeTypes[type]);
+                }
+                city.NodeTypes.Remove(type);
+            });
+
+            return;
+
+            IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph) {
+                return subgraph.PostOrderDescendantsWithoutItself().Select(node => node.Type).Distinct();
+            }
+
+            IEnumerable<string> GetRemainingGraphNodeTypes(Node subgraph, SEEReflexionCity city)
+            {
+                /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> or <see cref="ReflexionGraph.ImplementationRoot"/> is used,
+                /// it doesn't work because, the children are not added to this root nodes reference.
+                return subgraph.Type == ReflexionGraph.ArchitectureType ?
+                    GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID))
+                    : GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID));
+            }
         }
 
         /// <summary>
@@ -218,6 +266,19 @@ namespace SEE.Controls.Actions
             }
             GameElementDeleter.Revive(deletedGameObjects);
             new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
+            deletedGameObjects.ForEach(go =>
+            {
+
+                if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
+                {
+                    SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
+                    Node node = go.GetNode();
+                    if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes vna))
+                    {
+                        city.NodeTypes[node.Type] = deletedNodeTypes[node.Type];
+                    }
+                }
+            });
         }
 
         /// <summary>
@@ -236,6 +297,7 @@ namespace SEE.Controls.Actions
                 if (go.IsArchitectureOrImplmentationRoot())
                 {
                     Node root = go.GetNode();
+                    CaptureNodeTypesToRemove(root, false);
                     foreach (Node child in root.Children().ToList())
                     {
                         new DeleteNetAction(child.GameObject().name).Execute();

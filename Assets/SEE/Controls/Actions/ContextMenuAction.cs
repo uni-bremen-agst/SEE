@@ -362,7 +362,7 @@ namespace SEE.Controls.Actions
                     // Adds the missing node types with default values to the existing reflexion graph.
                     AddMissingNodeTypes(city, architectureGraph, renderer);
                     /// Attention: At this point, the architecture root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
-                    /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not aded to
+                    /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not added to
                     /// <see cref="Graph.nodes"/>.
                     Node architectureRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
                     // Draws the architecture graph.

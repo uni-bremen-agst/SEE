@@ -215,6 +215,18 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// Returns all transitive descendants of this node in a post-order traversal of the
+        /// node hierarchy rooted by this node, excluding this node itself.
+        /// </summary>
+        /// <returns>transitive descendants of this node in post order without itself.</returns>
+        public IList<Node> PostOrderDescendantsWithoutItself()
+        {
+            IList<Node> result = PostOrderDescendants();
+            result.RemoveAt(result.Count - 1);
+            return result;
+        }
+
+        /// <summary>
         /// Returns the set of IDs of all given <paramref name="graphElements"/>.
         /// </summary>
         /// <typeparam name="T">a GraphElement type</typeparam>
