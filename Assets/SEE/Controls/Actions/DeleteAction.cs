@@ -167,6 +167,21 @@ namespace SEE.Controls.Actions
                 {
                     Node root = go.GetNode();
                     CaptureNodeTypesToRemove(root);
+                    IEnumerable<Node> children = root.IsInArchitecture() ?
+                        root.ItsGraph.Nodes().Where(node => node.IsInArchitecture()
+                                                            && !node.HasRootToogle()
+                                                            && node.Parent != null
+                                                            && (!node.Parent.IsInArchitecture()
+                                                                || node.Parent.IsArchitectureOrImplmentationRoot())) :
+                        root.ItsGraph.Nodes().Where(node => node.IsInImplementation()
+                                                            && !node.HasRootToogle()
+                                                            && node.Parent != null
+                                                            && (!node.Parent.IsInImplementation()
+                                                                || node.Parent.IsArchitectureOrImplmentationRoot()));
+
+                    children.ForEach(node => Debug.Log($"{node.ID} ist im Graphen der entfernt werden soll"));
+                    Debug.Log($"Children-Count: {children.Count()}");
+                    Debug.Log($"Children-Count von root aus: {root.Children().Count()}");
                     foreach (Node child in root.Children().ToList())
                     {
                         new DeleteNetAction(child.GameObject().name).Execute();
@@ -214,7 +229,8 @@ namespace SEE.Controls.Actions
 
             return;
 
-            IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph) {
+            IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph)
+            {
                 return subgraph.PostOrderDescendantsWithoutItself().Select(node => node.Type).Distinct();
             }
 
