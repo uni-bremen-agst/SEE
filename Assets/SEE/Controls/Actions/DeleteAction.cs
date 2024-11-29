@@ -135,6 +135,7 @@ namespace SEE.Controls.Actions
             }
             else if (ExecuteViaContextMenu)
             {
+                ExecuteViaContextMenu = false;
                 return Delete();
             }
             else
@@ -204,9 +205,9 @@ namespace SEE.Controls.Actions
             IEnumerable<string> typesDifference = typesToRemove.Except(remainingTypes);
             typesDifference.ForEach(type =>
             {
-                if (rememberRemovedNodeTypes)
+                if (rememberRemovedNodeTypes && city.NodeTypes.TryGetValue(type, out VisualNodeAttributes visualNodeAttribute))
                 {
-                    deletedNodeTypes.Add(type, city.NodeTypes[type]);
+                    deletedNodeTypes.Add(type, visualNodeAttribute);
                 }
                 city.NodeTypes.Remove(type);
             });
