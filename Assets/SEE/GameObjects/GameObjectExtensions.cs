@@ -509,6 +509,33 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the bounds of the given <paramref name="gameObject"/> in its own
+        /// local coordinate system.
+        /// <para>
+        /// Note: A primitive cube has a size of (1,1,1), and a coordinate center (pivot)
+        /// of (0,0,0).
+        /// However, that does not apply for all primitives or models in general.
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">The game object.</param>
+        /// <returns>Local-space bounds of <paramref name="gameObject"/>.</returns>
+        public static Bounds LocalBounds(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out MeshFilter meshFilter))
+            {
+                return meshFilter.sharedMesh.bounds;
+            }
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return new(
+                        gameObject.transform.InverseTransformPoint(renderer.bounds.center),
+                        gameObject.transform.InverseTransformVector(renderer.bounds.size));
+            }
+            // This fallback works for uniform primitives like cubes, but not for non-uniforms like cylinders.
+            return new(Vector3.zero, Vector3.one);
+        }
+
+        /// <summary>
         /// Returns true if this <paramref name="block"/> is within the spatial area of <paramref name="parentBlock"/>,
         /// that is, if the bounding box of <paramref name="block"/> plus the extra padding <paramref name="outerEdgeMargin"/>
         /// is fully contained in the bounding box of <paramref name="parentBlock"/>.

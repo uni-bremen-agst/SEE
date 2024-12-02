@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 using SEE.Game;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -328,16 +329,6 @@ namespace SEE.Controls.Actions
             private static readonly float halfAndABit = 0.5001f;
 
             #region Configurations
-
-            /// <summary>
-            /// The minimal size of a node in world space.
-            /// </summary>
-            private static readonly Vector3 minSize = new (0.06f, 0.001f, 0.06f);
-
-            /// <summary>
-            /// The minimal world-space distance between nodes while resizing.
-            /// </summary>
-            private const float padding = 0.004f;
 
             /// <summary>
             /// A small offset is used as a difference between the detection and the set value
@@ -937,64 +928,14 @@ namespace SEE.Controls.Actions
                         localScale.y / lossyScale.y,
                         localScale.z / lossyScale.z
                     );
-                    MinLocalSize = Vector3.Scale(minSize, LocalScaleFactor);
-                    LocalPadding = padding * LocalScaleFactor;
+                    MinLocalSize = Vector3.Scale(SpatialMetrics.MinNodeSize, LocalScaleFactor);
+                    LocalPadding = SpatialMetrics.Padding.x * LocalScaleFactor;
                     Left    = Direction.x < 0;
                     Right   = Direction.x > 0;
                     Back    = Direction.z < 0;
                     Forward = Direction.z > 0;
                     Up      = Direction.y > 0;
                     IsSet = true;
-                }
-            }
-
-            /// <summary>
-            /// Data structure for 2-dimensional bounds.
-            /// </summary>
-            private struct Bounds2D
-            {
-                /// <summary>
-                /// The left side of the area.
-                /// </summary>
-                public float Left;
-                /// <summary>
-                /// The right side of the area.
-                /// </summary>
-                public float Right;
-                /// <summary>
-                /// The back side of the area.
-                /// </summary>
-                public float Back;
-                /// <summary>
-                /// The front side of the area.
-                /// </summary>
-                public float Front;
-
-                /// <summary>
-                /// Initializes the struct.
-                /// </summary>
-                public Bounds2D (float left, float right, float back, float front)
-                {
-                    Left = left;
-                    Right = right;
-                    Back = back;
-                    Front = front;
-                }
-
-                /// <summary>
-                /// Implicit conversion to string.
-                /// <summary>
-                public static implicit operator string(Bounds2D bounds)
-                {
-                    return bounds.ToString();
-                }
-
-                /// <summary>
-                /// Returns a printable string with the struct's values.
-                /// <summary>
-                public override readonly string ToString()
-                {
-                    return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
                 }
             }
         }
