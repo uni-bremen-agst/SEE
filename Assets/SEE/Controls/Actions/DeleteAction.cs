@@ -182,6 +182,7 @@ namespace SEE.Controls.Actions
                     if (root.Children().Count() != children.Count()
                         || go.transform.GetComponentsInChildren<NodeRef>().Count() != root.PostOrderDescendants().Count)
                     {
+                        ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
                         continue;
                     }
                     CaptureNodeTypesToRemove(root);
