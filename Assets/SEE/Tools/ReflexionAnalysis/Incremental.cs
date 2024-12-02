@@ -124,7 +124,6 @@ namespace SEE.Tools.ReflexionAnalysis
                     // A convergence exists that must be handled (i.e. by decreasing the matching specified edge's counter).
                     if (!Lift(propagated.Source, propagated.Target, propagated.Type, -GetImplCounter(edge), out Edge _))
                     {
-                        UnityEngine.Debug.Log($"Es geht um Edge {propagated.ID}");
                         throw new InvalidOperationException($"Since this edge is {propagated.State()} and not "
                                                             + "Divergent, it must have a matching specified edge.");
                     }
