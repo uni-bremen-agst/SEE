@@ -16,6 +16,7 @@ using SEE.Game.City;
 using MoreLinq;
 using SEE.Tools.ReflexionAnalysis;
 using Cysharp.Threading.Tasks;
+using SEE.UI.Notification;
 
 namespace SEE.Controls.Actions
 {
@@ -167,7 +168,6 @@ namespace SEE.Controls.Actions
                 if (go.IsArchitectureOrImplmentationRoot())
                 {
                     Node root = go.GetNode();
-                    CaptureNodeTypesToRemove(root);
                     IEnumerable<Node> children = root.IsInArchitecture() ?
                         root.ItsGraph.Nodes().Where(node => node.IsInArchitecture()
                                                             && !node.HasRootToogle()
@@ -179,10 +179,12 @@ namespace SEE.Controls.Actions
                                                             && node.Parent != null
                                                             && (!node.Parent.IsInImplementation()
                                                                 || node.Parent.IsArchitectureOrImplmentationRoot()));
-
-                    children.ForEach(node => Debug.Log($"{node.ID} ist im Graphen der entfernt werden soll"));
-                    Debug.Log($"Children-Count: {children.Count()}");
-                    Debug.Log($"Children-Count von root aus: {root.Children().Count()}");
+                    if (root.Children().Count() != children.Count()
+                        || go.transform.GetComponentsInChildren<NodeRef>().Count() != root.PostOrderDescendants().Count)
+                    {
+                        continue;
+                    }
+                    CaptureNodeTypesToRemove(root);
                     foreach (Node child in root.Children().ToList())
                     {
                         new DeleteNetAction(child.GameObject().name).Execute();
