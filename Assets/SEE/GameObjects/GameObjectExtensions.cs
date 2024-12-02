@@ -1060,10 +1060,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Checks if <paramref name="gameObject"/> overlaps with any other direct child node of its parent.
+        /// Checks if <paramref name="gameObject"/> overlaps with any other acrtive direct child node of its parent.
         /// <para>
         /// Overlap is checked based on the <c>Collider</c> components. Objects with no <c>Collider</c>
-        /// component are ignored.
+        /// component and inactive nodes are ignored.
         /// </para>
         /// </summary>
         /// <remarks>
@@ -1071,7 +1071,7 @@ namespace SEE.GO
         /// </remarks>
         /// <param name="gameObject">The game object whose operator to retrieve.</param>
         /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <c>Collider</c> component,
-        /// or does not overlap with its siblings</returns>
+        /// or does not overlap with its siblings.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the object the method is called on is not a node, i.e., has no <c>NodeRef</c>
         /// component.
@@ -1088,7 +1088,7 @@ namespace SEE.GO
             }
             foreach (Transform sibling in gameObject.transform.parent)
             {
-                if (sibling.gameObject == gameObject || !sibling.gameObject.HasNodeRef() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
+                if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
                 {
                     continue;
                 }
