@@ -15,6 +15,7 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Game.City;
 using MoreLinq;
 using SEE.Tools.ReflexionAnalysis;
+using Cysharp.Threading.Tasks;
 
 namespace SEE.Controls.Actions
 {
@@ -224,10 +225,19 @@ namespace SEE.Controls.Actions
                 {
                     deletedNodeTypes.Add(type, visualNodeAttribute);
                 }
-                city.NodeTypes.Remove(type);
             });
-
+            if (root.Children().Count > 0)
+            {
+                RemoveTypesAfterDeletion().Forget();
+            }
             return;
+
+            async UniTask RemoveTypesAfterDeletion()
+            {
+                GameObject firstChild = root.Children().First()?.GameObject();
+                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
+                typesDifference.ForEach(type => city.NodeTypes.Remove(type));
+            }
 
             IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph)
             {
