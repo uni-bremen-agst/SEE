@@ -36,5 +36,22 @@ namespace SEE.GameObjects
             }
             return result;
         }
+
+        /// <summary>
+        /// Checks if a city with the given <paramref name="name"/> already exists.
+        /// </summary>
+        /// <param name="name">The name to be checked.</param>
+        /// <returns>True, if already a city with that name exists, otherwise false.</returns>
+        public bool IsNameAlreadyUsed(string name)
+        {
+            foreach((GameObject city, _) in Cities)
+            {
+                if (city.name == name)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

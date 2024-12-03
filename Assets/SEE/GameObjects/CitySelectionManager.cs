@@ -89,7 +89,7 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.ChoseCity:
-                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType) || typeOfNetworkExecution != null)
+                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType, out string cityName) || typeOfNetworkExecution != null)
                     {
                         if (cityType != null)
                         {
