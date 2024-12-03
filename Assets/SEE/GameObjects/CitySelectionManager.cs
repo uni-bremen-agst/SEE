@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using MathNet.Numerics;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
@@ -52,6 +53,11 @@ namespace SEE.GameObjects
         private CityTypes? typeOfNetworkExecution = null;
 
         /// <summary>
+        /// The name for the city that should be created via a network execution.
+        /// </summary>
+        private string nameOfNetworkExecution = null;
+
+        /// <summary>
         /// Adds the game object to which the <see cref="AbstractSEECity"/> comonent
         /// will be attached and his table to the list of all such objects.
         /// Is required to create the component across the network.
@@ -93,18 +99,20 @@ namespace SEE.GameObjects
                     {
                         if (cityType != null)
                         {
-                            new AddCityNetAction(transform.parent.name, cityType.Value).Execute();
+                            new AddCityNetAction(transform.parent.name, cityType.Value, cityName).Execute();
                         } else
                         {
                             cityType = typeOfNetworkExecution;
+                            cityName = nameOfNetworkExecution;
                             // If the variable is not reset, there will be multiple attempts to add the city, which leads to errors.
                             typeOfNetworkExecution = null;
+                            nameOfNetworkExecution = null;
                         }
 
                         switch(cityType)
                         {
                             case CityTypes.ReflexionCity:
-                                CreateReflexionCityAsync().Forget();
+                                CreateReflexionCityAsync(cityName).Forget();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -167,9 +175,10 @@ namespace SEE.GameObjects
         /// Creates a city through a network execution.
         /// </summary>
         /// <param name="cityType">The type of city that should be added.</param>
-        internal void CreateCity(CityTypes cityType)
+        internal void CreateCity(CityTypes cityType, string cityName)
         {
             typeOfNetworkExecution = cityType;
+            nameOfNetworkExecution = cityName;
             progressState = ProgressState.ChoseCity;
         }
 
@@ -187,9 +196,11 @@ namespace SEE.GameObjects
         /// <summary>
         /// Creates and loads an initial reflexion city.
         /// </summary>
+        /// <param name="cityName">The name for the city.</param>
         /// <returns>Needed for asynchrony.</returns>
-        private async UniTask CreateReflexionCityAsync()
+        private async UniTask CreateReflexionCityAsync(string cityName)
         {
+            gameObject.name = cityName;
             SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
             gameObject.AddComponent<ReflexionVisualization>();
             gameObject.AddComponent<EdgeMeshScheduler>();

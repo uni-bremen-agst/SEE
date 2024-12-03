@@ -24,14 +24,20 @@ namespace SEE.Net.Actions
         public CityTypes CityType;
 
         /// <summary>
+        /// The name for the added city.
+        /// </summary>
+        public string CityName;
+
+        /// <summary>
         /// Creates a new AddCityNetAction.
         /// </summary>
         /// <param name="tableID">the unique name of the table to which the city should be added.</param>
         /// <param name="cityType">The city type that should be added.</param>
-        public AddCityNetAction(string tableID, CityTypes cityType) : base()
+        public AddCityNetAction(string tableID, CityTypes cityType, string cityName) : base()
         {
             TableID = tableID;
             CityType = cityType;
+            CityName = cityName;
         }
 
         /// <summary>
@@ -51,7 +57,7 @@ namespace SEE.Net.Actions
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 GameObject city = citiesHolder.Find(TableID);
-                city.GetComponent<CitySelectionManager>().CreateCity(CityType);
+                city.GetComponent<CitySelectionManager>().CreateCity(CityType, CityName);
             }
             else
             {
