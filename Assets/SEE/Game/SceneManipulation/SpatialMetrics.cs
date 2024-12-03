@@ -9,13 +9,7 @@ namespace SEE.Game.SceneManipulation
     public class SpatialMetrics
     {
         /// <summary>
-        /// A small offset used as a difference between the detection and the set value
-        /// to prevent instant re-detection.
-        /// </summary>
-        public const float DetectionOffset = 0.0001f;
-
-        /// <summary>
-        /// A small offset used for handle placement just outside its parent to prevent Z-fighting.
+        /// A small offset used for placement just outside specific bounds to prevent Z-fighting.
         /// </summary>
         public const float PlacementOffset = 0.0001f;
 

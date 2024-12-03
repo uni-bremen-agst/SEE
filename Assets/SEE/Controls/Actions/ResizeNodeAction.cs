@@ -447,9 +447,7 @@ namespace SEE.Controls.Actions
                                                Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
                 Vector3 parentPosition = transform.position;
                 Vector3 parentSize = gameObject.WorldSpaceSize();
-                // Prevent Z-fighting
-                float localOffset = Mathf.Max(SpatialMetrics.PlacementOffset * parentSize.y / gameObject.transform.localScale.y, SpatialMetrics.PlacementOffset);
-                float yPos = parentPosition.y + 0.5f * parentSize.y + localOffset;
+                float yPos = parentPosition.y + 0.5f * parentSize.y + SpatialMetrics.PlacementOffset;
                 foreach (Vector3 direction in directions)
                 {
                     handles[CreateHandle(direction)] = direction;
@@ -540,9 +538,9 @@ namespace SEE.Controls.Actions
 
                 // The height is updated during the resize process
                 upDownHandleTransform.localPosition = new(
-                        (0.5f + SpatialMetrics.DetectionOffset) * directionToCamera.x,
+                        (0.5f + SpatialMetrics.PlacementOffset) * directionToCamera.x,
                         upDownHandleTransform.localPosition.y,
-                        (0.5f + SpatialMetrics.DetectionOffset) * directionToCamera.z);
+                        (0.5f + SpatialMetrics.PlacementOffset) * directionToCamera.z);
 
 
                 // Swap Z and Y axes because the plane is rotated 90° on the X-axis to get it upright.
@@ -688,10 +686,10 @@ namespace SEE.Controls.Actions
                     {
                         Vector3 siblingSize = sibling.gameObject.LocalSize();
                         Vector3 siblingPos = sibling.localPosition;
-                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x + SpatialMetrics.DetectionOffset;
-                        otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x - SpatialMetrics.DetectionOffset;
-                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z + SpatialMetrics.DetectionOffset;
-                        otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z - SpatialMetrics.DetectionOffset;
+                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x;
+                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
                                 || bounds.Left > otherBounds.Right || bounds.Right < otherBounds.Left)
@@ -724,22 +722,22 @@ namespace SEE.Controls.Actions
                         {
                             if (currentResizeStep.Right)
                             {
-                                bounds.Right = otherBounds.Left - SpatialMetrics.DetectionOffset;
+                                bounds.Right = SEEMath.BitDecrement(otherBounds.Left);
                             }
                             else
                             {
-                                bounds.Left = otherBounds.Right + SpatialMetrics.DetectionOffset;
+                                bounds.Left = SEEMath.BitIncrement(otherBounds.Right);
                             }
                         }
                         else if (newLocalSize.z - overlap[1] > currentResizeStep.MinLocalSize.z)
                         {
                             if (currentResizeStep.Forward)
                             {
-                                bounds.Front = otherBounds.Back - SpatialMetrics.DetectionOffset;
+                                bounds.Front = SEEMath.BitDecrement(otherBounds.Back);
                             }
                             else
                             {
-                                bounds.Back = otherBounds.Front + SpatialMetrics.DetectionOffset;
+                                bounds.Back = SEEMath.BitIncrement(otherBounds.Front);
                             }
                         }
                     }
@@ -755,30 +753,30 @@ namespace SEE.Controls.Actions
                         // Child position and scale on common parent
                         Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                         Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
-                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + SpatialMetrics.DetectionOffset;
-                        otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - SpatialMetrics.DetectionOffset;
-                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + SpatialMetrics.DetectionOffset;
-                        otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z - SpatialMetrics.DetectionOffset;
+                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x;
+                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
                         {
-                            bounds.Right = otherBounds.Right + SpatialMetrics.DetectionOffset;
+                            bounds.Right = SEEMath.BitIncrement(otherBounds.Right);
                         }
 
                         if (currentResizeStep.Left && bounds.Left > otherBounds.Left)
                         {
-                            bounds.Left = otherBounds.Left - SpatialMetrics.DetectionOffset;
+                            bounds.Left = SEEMath.BitDecrement(otherBounds.Left);
                         }
 
 
                         if (currentResizeStep.Forward && bounds.Front < otherBounds.Front)
                         {
-                            bounds.Front = otherBounds.Front + SpatialMetrics.DetectionOffset;
+                            bounds.Front = SEEMath.BitIncrement(otherBounds.Front);
                         }
 
                         if (currentResizeStep.Back && bounds.Back > otherBounds.Back)
                         {
-                            bounds.Back = otherBounds.Back - SpatialMetrics.DetectionOffset;
+                            bounds.Back = SEEMath.BitDecrement(otherBounds.Back);
                         }
                     }
 
