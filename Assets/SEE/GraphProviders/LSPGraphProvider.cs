@@ -60,7 +60,7 @@ namespace SEE.GraphProviders
                  InfoMessageType.Info, "@" + nameof(SourcePaths) + ".Length == 0"),
          ValidateInput(nameof(ValidSourcePaths), "The source paths must be within the project path."),
          RuntimeTab(GraphProviderFoldoutGroup)]
-        public string[] SourcePaths = Array.Empty<string>();
+        public List<string> SourcePaths = new();
 
         /// <summary>
         /// The paths within the project whose contents should be excluded from the analysis.
@@ -69,7 +69,7 @@ namespace SEE.GraphProviders
              + "Inputs ending with $ will be considered as regular expressions."),
          FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path"),
          RuntimeTab(GraphProviderFoldoutGroup)]
-        public string[] ExcludedSourcePaths = Array.Empty<string>();
+        public List<string> ExcludedSourcePaths = new();
 
         // By default, all edge types are included, except for <see cref="EdgeKind.Definition"/>
         // and <see cref="EdgeKind.Declaration"/>, since nodes would otherwise often get a self-reference.
@@ -264,14 +264,14 @@ namespace SEE.GraphProviders
             }
             changePercentage?.Invoke(0.0001f);
 
-            if (SourcePaths.Length == 0)
+            if (SourcePaths.Count == 0)
             {
-                SourcePaths = new[] { ProjectPath.Path };
+                SourcePaths = new List<string> { ProjectPath.Path };
             }
 
             try
             {
-                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? Array.Empty<string>(),
+                LSPImporter importer = new(handler, SourcePaths, ExcludedSourcePaths ?? new(),
                                            IncludedNodeTypes, IncludedDiagnosticLevels,
                                            IncludedEdgeTypes, AvoidSelfReferences, AvoidParentReferences);
                 using (LoadingSpinner.ShowDeterminate("Creating graph using LSP...", out Action<float> updateProgress))
