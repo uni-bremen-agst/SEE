@@ -298,12 +298,11 @@ namespace SEE.Controls.Actions
             new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
             deletedGameObjects.ForEach(go =>
             {
-
                 if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
                 {
                     SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
                     Node node = go.GetNode();
-                    if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes vna))
+                    if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
                     {
                         city.NodeTypes[node.Type] = deletedNodeTypes[node.Type];
                     }
