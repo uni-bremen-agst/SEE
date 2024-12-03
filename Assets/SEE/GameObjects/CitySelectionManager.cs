@@ -1,10 +1,14 @@
 ﻿using Cysharp.Threading.Tasks;
 using MathNet.Numerics;
+using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using SEE.Controls;
+using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
@@ -34,7 +38,7 @@ namespace SEE.GameObjects
             Start,
             ChoseCity,
             RelfexionCity,
-            AddRuntimeMenu,
+            Finish,
         }
 
         /// <summary>
@@ -108,11 +112,11 @@ namespace SEE.GameObjects
                             typeOfNetworkExecution = null;
                             nameOfNetworkExecution = null;
                         }
-
-                        switch(cityType)
+                        gameObject.name = cityName;
+                        switch (cityType)
                         {
                             case CityTypes.ReflexionCity:
-                                CreateReflexionCityAsync(cityName).Forget();
+                                CreateReflexionCityAsync().Forget();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -140,11 +144,12 @@ namespace SEE.GameObjects
                     {
                         SEEReflexionCity reflexionCity = gameObject.GetComponent<SEEReflexionCity>();
                         FitInitalReflexionCity(reflexionCity);
-                        progressState = ProgressState.AddRuntimeMenu;
+                        Rename(reflexionCity);
+                        progressState = ProgressState.Finish;
                     }
                     break;
 
-                case ProgressState.AddRuntimeMenu:
+                case ProgressState.Finish:
                     //AddCityToRuntimeMenu();
                     CityComponentsSettings();
                     progressState = ProgressState.Start;
@@ -196,11 +201,9 @@ namespace SEE.GameObjects
         /// <summary>
         /// Creates and loads an initial reflexion city.
         /// </summary>
-        /// <param name="cityName">The name for the city.</param>
         /// <returns>Needed for asynchrony.</returns>
-        private async UniTask CreateReflexionCityAsync(string cityName)
+        private async UniTask CreateReflexionCityAsync()
         {
-            gameObject.name = cityName;
             SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
             gameObject.AddComponent<ReflexionVisualization>();
             gameObject.AddComponent<EdgeMeshScheduler>();
@@ -258,6 +261,30 @@ namespace SEE.GameObjects
                 diff = diff < 0 ? diff : -diff;
                 Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
                 obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
+            }
+        }
+
+        /// <summary>
+        /// Replaces the keyword "initial" in the root node with the selected city name.
+        /// Currently, the <see cref="Node.ID"/> and the <see cref="GameObject.name"> are not updated.
+        /// This would be necessary to load the initial <see cref="SEEReflexionCity"/> twice.
+        /// </summary>
+        /// <param name="city">The reflexion city.</param>
+        private void Rename(SEEReflexionCity city)
+        {
+            string cityName = gameObject.name;
+            foreach (Node node in GatherRoots())
+            {
+                GameNodeEditor.ChangeName(node, node.SourceName.Replace("initial", gameObject.name));
+            }
+            return;
+            List<Node> GatherRoots()
+            {
+                ReflexionGraph graph = city.ReflexionGraph;
+                List<Node> roots = graph.GetRoots();
+                roots.Add(graph.GetNode(graph.ArchitectureRoot.ID));
+                roots.Add(graph.GetNode(graph.ImplementationRoot.ID));
+                return roots;
             }
         }
         #endregion
