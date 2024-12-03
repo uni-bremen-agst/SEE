@@ -54,7 +54,7 @@ namespace SEE.GraphProviders
         /// The paths within the project (recursively) containing the source code to be analyzed.
         /// </summary>
         [Tooltip("The paths within the project (recursively) containing the source code to be analyzed."),
-         FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path", RequireExistingPath = true),
+         FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path"),
          InfoBox("If no source paths are specified, all directories within the project path "
                  + "containing source code will be considered.",
                  InfoMessageType.Info, "@" + nameof(SourcePaths) + ".Length == 0"),
@@ -65,9 +65,9 @@ namespace SEE.GraphProviders
         /// <summary>
         /// The paths within the project whose contents should be excluded from the analysis.
         /// </summary>
-        [Tooltip("The paths within the project whose contents should be excluded from the analysis."),
-         FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path", RequireExistingPath = true),
-         ValidateInput(nameof(ValidSourcePaths), "The source paths must be within the project path."),
+        [Tooltip("The paths within the project whose contents should be excluded from the analysis. "
+             + "Inputs ending with $ will be considered as regular expressions."),
+         FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path"),
          RuntimeTab(GraphProviderFoldoutGroup)]
         public string[] ExcludedSourcePaths = Array.Empty<string>();
 
