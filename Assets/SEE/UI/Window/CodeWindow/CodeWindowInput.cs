@@ -94,7 +94,7 @@ namespace SEE.UI.Window.CodeWindow
             // However, we need to also add "hidden" newlines contained in other tokens, e.g. block comments.
             int assumedLines = tokenList.Count(x => x.TokenType.Equals(TokenType.Newline))
                 + tokenList.Where(x => !x.TokenType.Equals(TokenType.Newline))
-                           .Aggregate(0, (_, token) => token.Text.Count(x => x == '\n'));
+                           .Aggregate(0, (i, token) => i + token.Text.Count(x => x == '\n'));
             // Needed padding is the number of lines, because the line number will be at most this long.
             neededPadding = Mathf.FloorToInt(Mathf.Log10(assumedLines)) + 1;
             text = $"<color=#CCCCCC>{string.Join("", Enumerable.Repeat(" ", neededPadding - 1))}1</color> ";
@@ -398,6 +398,7 @@ namespace SEE.UI.Window.CodeWindow
                     // Usage of LSP in code windows must be configured in the LSPHandler,
                     // the language server must support semantic tokens, and the language of the file
                     // (inferred from the file extension) must be supported by the server.
+                    lspHandler = null;
                     if (go.TryGetComponent(out lspHandler) && lspHandler.UseInCodeWindows
                         && lspHandler.ServerCapabilities.SemanticTokensProvider != null
                         && TryGetLanguageOrLog(lspHandler, out LSPLanguage language))
@@ -408,7 +409,6 @@ namespace SEE.UI.Window.CodeWindow
                     }
                     else
                     {
-                        lspHandler = null;
                         tokens = await AntlrToken.FromFileAsync(filename);
                     }
                 }
