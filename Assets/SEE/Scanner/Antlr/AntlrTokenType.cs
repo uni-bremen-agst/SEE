@@ -75,6 +75,11 @@ namespace SEE.Scanner.Antlr
         /// </summary>
         public static readonly AntlrTokenType Comment = new("Comments", "#6F708E"); // dark bluish gray
 
+        /// <summary>
+        /// Tokens that are not part of the language, but are still recognized by the lexer.
+        /// </summary>
+        public static readonly AntlrTokenType Ignored = new("Ignored", "#FF0000"); // red, should not be rendered
+
         #endregion
 
         private AntlrTokenType(string name, string color) : base(name, color)

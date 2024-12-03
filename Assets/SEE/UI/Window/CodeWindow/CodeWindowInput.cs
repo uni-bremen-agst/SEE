@@ -83,7 +83,7 @@ namespace SEE.UI.Window.CodeWindow
             }
 
             // Avoid multiple enumeration in case iteration over the data source is expensive.
-            tokenList = tokens.ToList();
+            tokenList = tokens.Where(x => x.TokenType != AntlrTokenType.Ignored).ToList();
             if (!tokenList.Any())
             {
                 text = "<i>This file is empty.</i>";

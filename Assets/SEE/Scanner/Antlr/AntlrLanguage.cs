@@ -61,6 +61,11 @@ namespace SEE.Scanner.Antlr
         /// </summary>
         public ISet<string> Newline { get; }
 
+        /// <summary>
+        /// Symbolic names for ignored tokens in a language.
+        /// </summary>
+        public ISet<string> Ignored { get; }
+
         #region Java Language
 
         /// <summary>
@@ -429,10 +434,11 @@ namespace SEE.Scanner.Antlr
         private AntlrLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, ISet<string> branchKeywords,
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
-                              ISet<string> comments, int tabWidth = defaultTabWidth) : base(lexerFileName, fileExtensions, tabWidth)
+                              ISet<string> comments, ISet<string> ignored = null,
+                              int tabWidth = defaultTabWidth) : base(lexerFileName, fileExtensions, tabWidth)
         {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-            if (AllAntlrLanguages.Except(new []{this}).Any(x => x.LexerFileName == lexerFileName || x.FileExtensions.Overlaps(fileExtensions)))
+            if (AllAntlrLanguages.Except(new[] { this }).Any(x => x.LexerFileName == lexerFileName || x.FileExtensions.Overlaps(fileExtensions)))
             {
                 throw new ArgumentException("Lexer file name and file extensions must be unique per language!");
             }
@@ -451,6 +457,7 @@ namespace SEE.Scanner.Antlr
             Whitespace = whitespace;
             Newline = newline;
             Comments = comments;
+            Ignored = ignored ?? new HashSet<string>();
 
             return;
 
@@ -575,6 +582,10 @@ namespace SEE.Scanner.Antlr
             if (Newline.Contains(token))
             {
                 return nameof(Newline);
+            }
+            if (Ignored.Contains(token))
+            {
+                return nameof(Ignored);
             }
             return eof.Equals(token) ? nameof(eof) : null;
         }
