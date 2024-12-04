@@ -472,7 +472,8 @@ namespace SEE.Controls.Actions
                 entries.Add(new PopupMenuHeading("Source: " + source, Priority: int.MaxValue));
                 entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
             }
-            entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash, Priority: 0));
+            entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplmentationRoot() ?
+                "Clear" : "Delete", DeleteElement, Icons.Trash, Priority: 0));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
@@ -515,7 +516,6 @@ namespace SEE.Controls.Actions
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
-                    //ShowNotification.Warn("Forbidden!", "You can't delete a root node.");
                     ConfirmDialogMenu confirmDialog = new($"Do you really want to delete the city?\r\nThis action cannot be undone.");
                     confirmDialog.ExecuteAfterConfirmAsync(() =>
                     {
