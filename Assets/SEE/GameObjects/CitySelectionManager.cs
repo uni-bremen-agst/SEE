@@ -272,7 +272,6 @@ namespace SEE.GameObjects
         /// <param name="city">The reflexion city.</param>
         private void Rename(SEEReflexionCity city)
         {
-            string cityName = gameObject.name;
             foreach (Node node in GatherRoots())
             {
                 GameNodeEditor.ChangeName(node, node.SourceName.Replace("initial", gameObject.name));
