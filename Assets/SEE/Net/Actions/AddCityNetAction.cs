@@ -1,10 +1,6 @@
-﻿using SEE.Game.City;
-using SEE.Game;
+﻿using SEE.Game;
+using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.Utils;
-using System.Collections;
-using UnityEngine;
-using System;
 
 namespace SEE.Net.Actions
 {
@@ -31,8 +27,9 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Creates a new AddCityNetAction.
         /// </summary>
-        /// <param name="tableID">the unique name of the table to which the city should be added.</param>
+        /// <param name="tableID">The unique name of the table to which the city should be added.</param>
         /// <param name="cityType">The city type that should be added.</param>
+        /// <param name="cityName">The name to be assigned to the created city.</param>
         public AddCityNetAction(string tableID, CityTypes cityType, string cityName) : base()
         {
             TableID = tableID;
