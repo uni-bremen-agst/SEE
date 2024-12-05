@@ -328,13 +328,14 @@ namespace SEE.Controls.Actions
                 if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
                 {
                     city.LoadAndDrawSubgraphAsync(implGXL, projectFolder).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implGXL, projectFolder).Execute();
 
                 }
 
                 if (dialog.TryGetArchitectureDataPath(out DataPath archGXL))
                 {
                     city.LoadAndDrawSubgraphAsync(archGXL).Forget();
-
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, true, archGXL).Execute();
                 }
             }
         }
