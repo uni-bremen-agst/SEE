@@ -61,13 +61,17 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Adds the city of type <see cref="CityType"/> identified by <see cref="TableID"/> on each client.
+        /// Loads the given GXL file into the city on the specified table on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 GameObject city = citiesHolder.Find(TableID);
+                if (city == null)
+                {
+                    throw new Exception($"The city can't be found");
+                }
                 if (city.GetComponent<SEEReflexionCity>() != null)
                 {
                     city.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GXL, LoadArchitecture? null : ProjectFolder).Forget();

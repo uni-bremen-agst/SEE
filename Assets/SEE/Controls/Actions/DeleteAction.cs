@@ -239,7 +239,11 @@ namespace SEE.Controls.Actions
             {
                 GameObject firstChild = root.Children().First()?.GameObject();
                 await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
-                typesDifference.ForEach(type => city.NodeTypes.Remove(type));
+                typesDifference.ForEach(type =>
+                {
+                    city.NodeTypes.Remove(type);
+                    new RemoveNodeTypeNetAction(city.transform.parent.name, type).Execute();
+                });
             }
 
             IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph)
@@ -294,8 +298,6 @@ namespace SEE.Controls.Actions
             {
                 runtimeConfigMenu.PerformRebuildOnNextOpening();
             }
-            GameElementDeleter.Revive(deletedGameObjects);
-            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
             deletedGameObjects.ForEach(go =>
             {
                 if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
@@ -305,9 +307,13 @@ namespace SEE.Controls.Actions
                     if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
                     {
                         city.NodeTypes[node.Type] = deletedNodeTypes[node.Type];
+                        new AddNodeTypeNetAction(city.transform.parent.name, node.Type, deletedNodeTypes[node.Type]).Execute();
                     }
                 }
             });
+            GameElementDeleter.Revive(deletedGameObjects);
+            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
+
         }
 
         /// <summary>

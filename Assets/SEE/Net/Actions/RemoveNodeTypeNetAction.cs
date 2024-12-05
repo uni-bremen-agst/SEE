@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
+using SEE.UI.RuntimeConfigMenu;
 using System;
 using UnityEngine;
 
@@ -9,34 +10,27 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Adds a City to all clients.
     /// </summary>
-    public class AddCityNetAction : AbstractNetAction
+    public class RemoveNodeTypeNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the table to which the city should be added.
+        /// The unique name of the table to which city the node type should be removed.
         /// </summary>
         public string TableID;
 
         /// <summary>
-        /// The city type that should be added.
+        /// The name of the ro removed node type.
         /// </summary>
-        public CityTypes CityType;
+        public string NodeType;
 
         /// <summary>
-        /// The name for the added city.
+        /// Creates a new AddNodeTypeNetAction.
         /// </summary>
-        public string CityName;
-
-        /// <summary>
-        /// Creates a new AddCityNetAction.
-        /// </summary>
-        /// <param name="tableID">The unique name of the table to which the city should be added.</param>
-        /// <param name="cityType">The city type that should be added.</param>
-        /// <param name="cityName">The name to be assigned to the created city.</param>
-        public AddCityNetAction(string tableID, CityTypes cityType, string cityName) : base()
+        /// <param name="tableID">The unique name of the table to which city the node type should be removed.</param>
+        /// <param name="nodeType">The name of the to removed node type.</param>
+        public RemoveNodeTypeNetAction(string tableID, string nodeType) : base()
         {
             TableID = tableID;
-            CityType = cityType;
-            CityName = cityName;
+            NodeType = nodeType;
         }
 
         /// <summary>
@@ -49,7 +43,7 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Adds the city of type <see cref="CityType"/> identified by <see cref="TableID"/> on each client.
+        /// Removes the node type of the given table city on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
@@ -60,11 +54,16 @@ namespace SEE.Net.Actions
                 {
                     throw new Exception($"The city can't be found");
                 }
-                city.GetComponent<CitySelectionManager>().CreateCity(CityType, CityName);
+                city.GetComponent<AbstractSEECity>().NodeTypes.Remove(NodeType);
+                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                }
             }
             else
             {
-                throw new Exception($"The city can't be added because there is no CitieHolder component.");
+                throw new Exception($"The node type can't be added because there is no CitieHolder component.");
             }
         }
     }
