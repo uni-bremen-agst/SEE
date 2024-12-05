@@ -252,21 +252,6 @@ namespace SEE.Controls.Actions
                 /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.nodes"/>.
                 /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> or <see cref="ReflexionGraph.ImplementationRoot"/> is used,
                 /// it doesn't work because, the children are not added to this root nodes reference.
-                Debug.Log($"City not null {city != null}");
-                Debug.Log($"City Graph not null {city.ReflexionGraph != null}");
-
-                Debug.Log($"ImplRoot {city.ReflexionGraph.ImplementationRoot != null}");
-                Debug.Log($"ArchRoot {city.ReflexionGraph.ArchitectureRoot != null}");
-
-                Debug.Log($"ImplRoot ID {city.ReflexionGraph.ImplementationRoot.ID}");
-                Debug.Log($"ImplRoot Node is not null {city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID)}");
-                Debug.Log($"ImplRoot is not null {city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID) != null}");
-
-                Debug.Log($"ArchRoot ID {city.ReflexionGraph.ArchitectureRoot.ID}");
-                Debug.Log($"ArchRoot Node is not null {city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID)}");
-                Debug.Log($"ArchRoot is not null {city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID) != null}");
-
-                Debug.Log($"Subgraph not null {subgraph != null}, Type not null {subgraph.Type != null}");
                 return subgraph.Type == ReflexionGraph.ArchitectureType ?
                     GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID))
                     : GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID));
