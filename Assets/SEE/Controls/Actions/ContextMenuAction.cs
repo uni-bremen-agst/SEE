@@ -324,114 +324,17 @@ namespace SEE.Controls.Actions
             async UniTask WaitForInputAsync(LoadReflexionDataProperty dialog)
             {
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
+                SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
                 if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
                 {
-                    (SEEReflexionCity city, Graph implementationGraph, GraphRenderer renderer) = await LoadGraphAsync(implGXL, false);
-                    // Sets the project directory.
-                    city.SourceCodeDirectory = projectFolder;
-                    // Adds the missing node types with default values to the existing reflexion graph.
-                    AddMissingNodeTypes(city, implementationGraph, renderer);
-                    /// Attention: At this point, the implementation root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
-                    /// If the <see cref="ReflexionGraph.ImplementationRoot"/> is used, loading doesn't work because, the children are not aded to
-                    /// <see cref="Graph.nodes"/>.
-                    Node implementationRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID);
+                    city.LoadAndDrawSubgraphAsync(implGXL, projectFolder).Forget();
 
-                    // Draws the implementation graph.
-                    await renderer.DrawGraphAsync(implementationGraph, implementationRoot.GameObject(), loadReflexionFiles: true);
-                    // Adds the implementation graph to the existing reflexion graph.
-                    implementationGraph.Nodes().ForEach(node =>
-                    {
-                        node.ItsGraph = null;
-                        city.ReflexionGraph.AddToImplementation(node);
-                    });
-                    implementationGraph.GetRoots().ForEach(root => implementationRoot.AddChild(root));
-                    implementationGraph.Edges().ForEach((edge) =>
-                    {
-                        edge.ItsGraph = null;
-                        city.ReflexionGraph.AddToImplementation(edge);
-                    });
-
-                    // Ensures that the new drawn implementation graph is displayed.
-                    city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(false);
-                    city.ReflexionGraph.ImplementationRoot.GameObject().SetActive(true);
                 }
 
                 if (dialog.TryGetArchitectureDataPath(out DataPath archGXL))
                 {
-                    (SEEReflexionCity city, Graph architectureGraph, GraphRenderer renderer) = await LoadGraphAsync(archGXL, true);
-                    // Adds the missing node types with default values to the existing reflexion graph.
-                    AddMissingNodeTypes(city, architectureGraph, renderer);
-                    /// Attention: At this point, the architecture root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
-                    /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> is used, loading doesn't work because, the children are not added to
-                    /// <see cref="Graph.nodes"/>.
-                    Node architectureRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
-                    // Draws the architecture graph.
-                    await renderer.DrawGraphAsync(architectureGraph, architectureRoot.GameObject(), loadReflexionFiles: true);
-                    // Adds the architecture graph to the existing reflexion graph.
-                    architectureGraph.Nodes().ForEach(node =>
-                    {
-                        node.ItsGraph = null;
-                        city.ReflexionGraph.AddToArchitecture(node);
-                    });
-                    architectureGraph.GetRoots().ForEach(root => architectureRoot.AddChild(root));
-                    architectureGraph.Edges().ForEach((edge) =>
-                    {
-                        edge.ItsGraph = null;
-                        city.ReflexionGraph.AddToArchitecture(edge);
-                    });
-                    // Ensures that the new drawn architecture graph is displayed.
-                    city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(false);
-                    city.ReflexionGraph.ArchitectureRoot.GameObject().SetActive(true);
-                }
-            }
+                    city.LoadAndDrawSubgraphAsync(archGXL).Forget();
 
-            async UniTask<(SEEReflexionCity, Graph, GraphRenderer)> LoadGraphAsync(DataPath gxl, bool loadArchitecture)
-            {
-                SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
-                // Loads the graph from the given GXL.
-                ReflexionGraphProvider graphProvider = city.GetReflexionGraphProvider();
-                Graph graph = await graphProvider.LoadGraphAsync(gxl, city);
-                // Marks the nodes in the graph as architecture-/implementation-nodes.
-                graph.MarkGraphNodesIn(loadArchitecture ? ReflexionSubgraphs.Architecture : ReflexionSubgraphs.Implementation);
-                graph.Edges().ForEach(edge =>
-                {
-                    if (loadArchitecture)
-                    {
-                        edge.SetInArchitecture();
-                    }
-                    else
-                    {
-                        edge.SetInImplementation();
-                    }
-                });
-
-                /// Add the GXL to the <see cref="SEECity.DataProvider"/>
-                if (loadArchitecture)
-                {
-                    graphProvider.Architecture = gxl;
-                }
-                else
-                {
-                    graphProvider.Implementation = gxl;
-                }
-
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
-                return (city, graph, (GraphRenderer)city.Renderer);
-            }
-
-            void AddMissingNodeTypes(SEEReflexionCity city, Graph graph, GraphRenderer renderer)
-            {
-                foreach (string type in graph.AllNodeTypes())
-                {
-                    if (!city.NodeTypes.TryGetValue(type, out _))
-                    {
-                        city.NodeTypes[type] = new VisualNodeAttributes();
-                        renderer.AddNewNodeType(type);
-                    }
                 }
             }
         }

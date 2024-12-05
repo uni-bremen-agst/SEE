@@ -8,6 +8,10 @@ using SEE.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.GraphProviders;
+using SEE.Utils.Paths;
+using SEE.Game.CityRendering;
+using MoreLinq;
+using SEE.Utils;
 
 namespace SEE.Game.City
 {
@@ -118,6 +122,112 @@ namespace SEE.Game.City
                 }
             });
             return provider;
+        }
+
+        /// <summary>
+        /// Loads a part of the ReflexionCity.
+        /// If the <paramref name="projectFolder"/> is null,
+        /// an architectur graph is loaded, otherwise, an implementation graph is loaded.
+        /// </summary>
+        /// <param name="gxl">The GXL file of thegraph to be loaded.</param>
+        /// <param name="projectFolder">The project folder associated with the implementation graph.</param>
+        /// <returns>Nothing, it is an asynchronous method that needs to wait.</returns>
+        public async UniTask LoadAndDrawSubgraphAsync(DataPath gxl, DataPath projectFolder = null)
+        {
+            (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(gxl, projectFolder == null);
+            if (projectFolder != null)
+            {
+                // Sets the project directory.
+                SourceCodeDirectory = projectFolder;
+            }
+            // Adds the missing node types with default values to the existing reflexion graph.
+            AddMissingNodeTypes(graph, renderer);
+            /// Attention: At this point, the root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
+            /// If the <see cref="ReflexionGraph.ImplementationRoot"/> or <see cref="ReflexionGraph.ArchitectureRoot"/> is used,
+            /// loading doesn't work because, the children are not aded to <see cref="Graph.nodes"/>.
+            Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
+
+            // Draws the graph.
+            await renderer.DrawGraphAsync(graph, root.GameObject(), loadReflexionFiles: true);
+            // Adds the graph to the existing reflexion graph.
+            graph.Nodes().ForEach(node =>
+            {
+                node.ItsGraph = null;
+                if (projectFolder != null)
+                {
+                    ReflexionGraph.AddToImplementation(node);
+                } else
+                {
+                    ReflexionGraph.AddToArchitecture(node);
+                }
+            });
+            graph.GetRoots().ForEach(subRoot => root.AddChild(subRoot));
+            graph.Edges().ForEach((edge) =>
+            {
+                edge.ItsGraph = null;
+                if (projectFolder != null)
+                {
+                    ReflexionGraph.AddToImplementation(edge);
+                }
+                else
+                {
+                    ReflexionGraph.AddToArchitecture(edge);
+                }
+            });
+
+            // Ensures that the new drawn graph is displayed.
+            root.GameObject().SetActive(false);
+            root.GameObject().SetActive(true);
+
+            return;
+            async UniTask<(Graph, GraphRenderer)> LoadGraphAsync(DataPath gxl, bool loadArchitecture)
+            {
+                // Loads the graph from the given GXL.
+                ReflexionGraphProvider graphProvider = GetReflexionGraphProvider();
+                Graph graph = await graphProvider.LoadGraphAsync(gxl, this);
+                // Marks the nodes in the graph as architecture-/implementation-nodes.
+                graph.MarkGraphNodesIn(loadArchitecture ? ReflexionSubgraphs.Architecture : ReflexionSubgraphs.Implementation);
+                graph.Edges().ForEach(edge =>
+                {
+                    if (loadArchitecture)
+                    {
+                        edge.SetInArchitecture();
+                    }
+                    else
+                    {
+                        edge.SetInImplementation();
+                    }
+                });
+
+                /// Add the GXL to the <see cref="SEECity.DataProvider"/>
+                if (loadArchitecture)
+                {
+                    graphProvider.Architecture = gxl;
+                }
+                else
+                {
+                    graphProvider.Implementation = gxl;
+                }
+
+                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                }
+                return (graph, (GraphRenderer)Renderer);
+            }
+
+            void AddMissingNodeTypes(Graph graph, GraphRenderer renderer)
+            {
+                foreach (string type in graph.AllNodeTypes())
+                {
+                    if (!NodeTypes.TryGetValue(type, out _))
+                    {
+                        NodeTypes[type] = new VisualNodeAttributes();
+                        renderer.AddNewNodeType(type);
+                    }
+                }
+            }
         }
     }
 }
