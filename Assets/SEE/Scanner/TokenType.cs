@@ -29,7 +29,6 @@ namespace SEE.Scanner
         /// </summary>
         public static readonly TokenType EOF = new("eof", "#000000"); // color doesn't matter
 
-
         #endregion
 
         protected TokenType(string name, string color)
