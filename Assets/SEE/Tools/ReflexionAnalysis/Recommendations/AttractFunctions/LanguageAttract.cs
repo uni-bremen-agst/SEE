@@ -174,11 +174,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
             }
             
             string codeRegion = nodeReader.ReadRegion(node);
-            UnityEngine.Debug.Log($"Read code region of node {node.ID} with Language {Language.Name}{System.Environment.NewLine}{codeRegion}"); 
+            // UnityEngine.Debug.Log($"Read code region of node {node.ID} with Language {Language.Name}{System.Environment.NewLine}{codeRegion}"); 
 
             IList<AntlrToken> tokens = AntlrToken.FromString(codeRegion, Language);
 
-            UnityEngine.Debug.Log($"Read {tokens.Count} tokens.");
+            // UnityEngine.Debug.Log($"Read {tokens.Count} tokens.");
 
             List<string> words = new List<string>();
 
@@ -200,7 +200,7 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
                 }
             }
 
-            UnityEngine.Debug.Log($"Found {words.Count} words.");
+            // UnityEngine.Debug.Log($"Found {words.Count} words.");
 
             // Maybe treat comments separately in a more complex way(depends on language)
             words = this.SplitCasing(words);
@@ -210,13 +210,13 @@ namespace Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions
 
             words = words.Where(x => x.Length > 3).Select(x => x.ToLower()).ToList();
 
-            UnityEngine.Debug.Log($"After filtering: {words.Count} words.");
+            // UnityEngine.Debug.Log($"After filtering: {words.Count} words.");
 
             Document cachedDocument = new Document();
             cachedDocument.AddWords(words);
             document.AddWords(cachedDocument);
             cachedDocument.UseAsSet = useDocumentsAsSet;
-            UnityEngine.Debug.Log($"Add To Cache for node {node.ID}:{System.Environment.NewLine}{cachedDocument.ToString()}");
+            // UnityEngine.Debug.Log($"Add To Cache for node {node.ID}:{System.Environment.NewLine}{cachedDocument.ToString()}");
             cachedDocuments.Add(node.ID, cachedDocument);
         }
 

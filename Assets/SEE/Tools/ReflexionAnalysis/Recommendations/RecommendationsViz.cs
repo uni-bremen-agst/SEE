@@ -456,20 +456,23 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             gameobject.TryGetComponent(out SEEReflexionCity city);
 
-            int n = 200;
+            int n = 5;
 
             List<RecommendationSettings> settings = new()
             {
-                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttract_Zero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttract_One_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.3f, "CAAttractZero_03", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.3f, "CAAttractOne_03", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.3f, "ADCAttract_03", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttractZero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.5f, "CAAttractOne_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
                 RecommendationSettings.CreateGroup(n, 0.5f, "ADCAttract_05", AttractFunction.AttractFunctionType.ADCAttract),
                 RecommendationSettings.CreateGroup(n, 0.5f, "NBAttract_05", AttractFunction.AttractFunctionType.NBAttract),
-                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttract_Zero_07", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttract_One_07", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttractZero_07", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.7f, "CAAttractOne_07", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
                 RecommendationSettings.CreateGroup(n, 0.7f, "ADCAttract_07", AttractFunction.AttractFunctionType.ADCAttract),
                 RecommendationSettings.CreateGroup(n, 0.7f, "NBAttract_07", AttractFunction.AttractFunctionType.NBAttract),
-                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttract_Zero_09", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
-                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttract_One_09", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
+                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttractZero_09", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
+                RecommendationSettings.CreateGroup(n, 0.9f, "CAAttractOne_09", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
                 RecommendationSettings.CreateGroup(n, 0.9f, "ADCAttract_09", AttractFunction.AttractFunctionType.ADCAttract),
                 RecommendationSettings.CreateGroup(n, 0.9f, "NBAttract_09", AttractFunction.AttractFunctionType.NBAttract)
             };
@@ -1068,7 +1071,33 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         public async UniTask DumpSystemStatistics()
         {
             await this.ResetMappingAsync();
-            await this.CreateInitialMappingAsync(1, 245345, syncWithView: false);
+
+            // await this.CreateInitialMappingAsync(1, 245345, syncWithView: false);
+
+            UnityEngine.Debug.Log("Create full mapping...");
+            try
+            {
+                foreach (Node candidate in this.Recommendations.GetCandidates())
+                {
+                    string expectedClusterID = this.Recommendations.GetExpectedClusterID(candidate.ID);
+
+                    if(expectedClusterID.IsNullOrWhitespace())
+                    {
+                        continue;
+                    }
+
+                    Node expectedCluster = this.ReflexionGraphVisualized.GetNode(expectedClusterID);
+                    Node candidateInViz = this.ReflexionGraphVisualized.GetNode(candidate.ID);
+                    this.ReflexionGraphVisualized.AddToMapping(candidateInViz, expectedCluster);
+                }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.Log("Could not create full mapping...");
+                UnityEngine.Debug.Log(e);
+                return;
+            }
+            UnityEngine.Debug.Log("Created full mapping...");
 
             int CadidatesTotal = this.ReflexionGraphVisualized.Nodes().Where(n => Recommendations.IsCandidate(n)).Count();
             int ClusterTotal = this.ReflexionGraphVisualized.Nodes().Where(n => Recommendations.IsCluster(n)).Count();
@@ -1077,6 +1106,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             int impliticlyConvergentEdges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation() && e.State() == State.ImplicitlyAllowed).Count();
             int divergentEdges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation() && e.State() == State.Divergent).Count();
             int Edges = this.ReflexionGraphVisualized.Edges().Where(e => e.IsInImplementation()).Count();
+
+            UnityEngine.Debug.Log("Read edge states..");
 
             string path = this.GetConfigPath();
 
@@ -1099,8 +1130,10 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             csvContent.AppendLine(string.Join(",", headers));
             csvContent.AppendLine(string.Join(",", data));
 
+            UnityEngine.Debug.Log("Start writing statistics to file..");
             // Write CSV to file
             await File.WriteAllTextAsync(Path.Combine(path, "SystemStatistics.csv"), csvContent.ToString());
+            UnityEngine.Debug.Log("Finished writing statistics to file..");
         }
 
         [Button(createMappingGXLMappingLabel, ButtonSizes.Small)]

@@ -120,15 +120,8 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
         /// <returns>HugMe-Set of candidate represented as mapping pairs</returns>
         public IEnumerable<MappingPair> GetRecommendationForCluster(string clusterId)
         {
-            var clusterPairs = mappingPairs.Values.Where(mp => mp.ClusterID.Equals(clusterId)).ToList();
-            if (!clusterPairs.Any())
-                return Enumerable.Empty<MappingPair>();
-
-            double avg = clusterPairs.Average(mp => mp.AttractionValue);
-            double stdDev = Math.Sqrt(clusterPairs.Average(mp => Math.Pow(mp.AttractionValue - avg, 2)));
-
-            var result = clusterPairs.Where(mp => mp.AttractionValue > avg + stdDev).ToList();
-            return result.Any() ? result : clusterPairs.Where(mp => mp.AttractionValue > avg).ToList();
+            IEnumerable<MappingPair> recommendations = this.GetRecommendations();
+            return recommendations.Where(m => m.ClusterID.Equals(clusterId));
         }
 
         /// <summary>
