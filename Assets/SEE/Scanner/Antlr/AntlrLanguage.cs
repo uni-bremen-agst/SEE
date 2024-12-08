@@ -61,6 +61,11 @@ namespace SEE.Scanner.Antlr
         /// </summary>
         public ISet<string> Newline { get; }
 
+        /// <summary>
+        /// Symbolic names for ignored tokens in a language.
+        /// </summary>
+        public ISet<string> Ignored { get; }
+
         #region Java Language
 
         /// <summary>
@@ -335,6 +340,82 @@ namespace SEE.Scanner.Antlr
 
         #endregion
 
+        #region Python Language
+
+        /// <summary>
+        /// Name of the Python antlr grammar lexer.
+        /// </summary>
+        private const string pythonFileName = "PythonLexer.g4";
+
+        /// <summary>
+        /// Set of Python file extensions.
+        /// </summary>
+        private static readonly HashSet<string> pythonExtensions = new()
+        {
+            "py", "py3", "pyi"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for Python keywords excluding <see cref="pythonBranchKeywords"/>.
+        /// </summary>
+        private static readonly HashSet<string> pythonKeywords = new()
+        {
+            "DEF", "RETURN", "RAISE", "FROM", "IMPORT", "NONLOCAL", "AS", "GLOBAL", "ASSERT",
+            "IN", "NONE", "FINALLY", "WITH", "EXCEPT", "LAMBDA", "OR", "AND", "NOT", "IS",
+            "CLASS", "YIELD", "DEL", "PASS", "CONTINUE", "BREAK", "ASYNC", "AWAIT", "PRINT", "EXEC", "TRUE", "FALSE",
+        };
+
+        /// <summary>
+        /// Set of antlr type names for Python branch keywords.
+        /// </summary>
+        private static readonly HashSet<string> pythonBranchKeywords = new()
+        {
+            "FOR", "IF", "ELIF", "ELSE", "TRY", "WHILE"
+        };
+
+        /// <summary>
+        /// Set of antlr type names for Python integer and floating point literals.
+        /// </summary>
+        private static readonly HashSet<string> pythonNumbers = new()
+        {
+            "DECIMAL_INTEGER", "OCT_INTEGER", "HEX_INTEGER", "BIN_INTEGER", "IMAG_NUMBER", "FLOAT_NUMBER"
+        };
+
+        /// <summary>Set of antlr type names for Python character and string literals.</summary>
+        private static readonly HashSet<string> pythonStrings = new() { "STRING" };
+
+        /// <summary>Set of antlr type names for Python separators and operators.</summary>
+        private static readonly HashSet<string> pythonPunctuation = new()
+        {
+            "DOT", "ELLIPSIS", "REVERSE_QUOTE", "STAR", "COMMA", "COLON", "SEMI_COLON", "POWER", "ASSIGN", "OR_OP", "XOR", "AND_OP",
+            "LEFT_SHIFT", "RIGHT_SHIFT", "ADD", "MINUS", "DIV", "MOD", "IDIV", "NOT_OP", "LESS_THAN", "GREATER_THAN", "EQUALS", "GT_EQ",
+            "LT_EQ", "NOT_EQ_1", "NOT_EQ_2", "AT", "ARROW", "ADD_ASSIGN", "SUB_ASSIGN", "MULT_ASSIGN", "AT_ASSIGN", "DIV_ASSIGN", "MOD_ASSIGN",
+            "AND_ASSIGN", "OR_ASSIGN", "XOR_ASSIGN", "LEFT_SHIFT_ASSIGN", "RIGHT_SHIFT_ASSIGN", "POWER_ASSIGN", "IDIV_ASSIGN",
+            "OPEN_PAREN", "CLOSE_PAREN", "OPEN_BRACE", "CLOSE_BRACE", "OPEN_BRACKET", "CLOSE_BRACKET"
+        };
+
+        /// <summary>Set of antlr type names for Python identifiers.</summary>
+        private static readonly HashSet<string> pythonIdentifiers = new() { "NAME" };
+
+        /// <summary>
+        /// Set of antlr type names for Python whitespace.
+        /// </summary>
+        private static readonly HashSet<string> pythonWhitespace = new() { "WS" };
+
+        /// <summary>
+        /// Set of antlr type names for Python newlines.
+        /// </summary>
+        private static readonly HashSet<string> pythonNewlines = new() { "NEWLINE", "LINE_JOIN" };
+
+        /// <summary>
+        /// Set of antlr type names for Python comments.
+        /// </summary>
+        private static readonly HashSet<string> pythonComments = new() { "COMMENT" };
+
+        private static readonly HashSet<string> pythonIgnored = new() { "INDENT", "DEDENT", "LINE_BREAK" };
+
+        #endregion
+
         #region Plain Text "Language"
 
         /// <summary>
@@ -406,6 +487,12 @@ namespace SEE.Scanner.Antlr
         public static readonly AntlrLanguage Plain = new(plainFileName, plainExtensions, plainKeywords, plainBranchKeywords, plainNumbers,
                                                          plainStrings, plainPunctuation, plainIdentifiers, plainWhitespace, plainNewlines, plainComments);
 
+        /// <summary>
+        /// Token Language for Python.
+        /// </summary>
+        public static readonly AntlrLanguage Python = new(pythonFileName, pythonExtensions, pythonKeywords, pythonBranchKeywords, pythonNumbers,
+                                                          pythonStrings, pythonPunctuation, pythonIdentifiers, pythonWhitespace, pythonNewlines, pythonComments, pythonIgnored);
+
         #endregion
 
         public static IEnumerable<AntlrLanguage> AllAntlrLanguages => AllTokenLanguages.OfType<AntlrLanguage>();
@@ -429,10 +516,11 @@ namespace SEE.Scanner.Antlr
         private AntlrLanguage(string lexerFileName, ISet<string> fileExtensions, ISet<string> keywords, ISet<string> branchKeywords,
                               ISet<string> numberLiterals, ISet<string> stringLiterals, ISet<string> punctuation,
                               ISet<string> identifiers, ISet<string> whitespace, ISet<string> newline,
-                              ISet<string> comments, int tabWidth = defaultTabWidth) : base(lexerFileName, fileExtensions, tabWidth)
+                              ISet<string> comments, ISet<string> ignored = null,
+                              int tabWidth = defaultTabWidth) : base(lexerFileName, fileExtensions, tabWidth)
         {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-            if (AllAntlrLanguages.Except(new []{this}).Any(x => x.LexerFileName == lexerFileName || x.FileExtensions.Overlaps(fileExtensions)))
+            if (AllAntlrLanguages.Except(new[] { this }).Any(x => x.LexerFileName == lexerFileName || x.FileExtensions.Overlaps(fileExtensions)))
             {
                 throw new ArgumentException("Lexer file name and file extensions must be unique per language!");
             }
@@ -451,6 +539,7 @@ namespace SEE.Scanner.Antlr
             Whitespace = whitespace;
             Newline = newline;
             Comments = comments;
+            Ignored = ignored ?? new HashSet<string>();
 
             return;
 
@@ -523,6 +612,7 @@ namespace SEE.Scanner.Antlr
                 javaFileName => new Java9Lexer(input),
                 cSharpFileName => new CSharpLexer(input),
                 cppFileName => new CPP14Lexer(input),
+                pythonFileName => new PythonLexer(input),
                 plainFileName => new PlainTextLexer(input),
                 _ => throw new InvalidOperationException("No lexer defined for this language yet.")
             };
@@ -575,6 +665,10 @@ namespace SEE.Scanner.Antlr
             if (Newline.Contains(token))
             {
                 return nameof(Newline);
+            }
+            if (Ignored.Contains(token))
+            {
+                return nameof(Ignored);
             }
             return eof.Equals(token) ? nameof(eof) : null;
         }
