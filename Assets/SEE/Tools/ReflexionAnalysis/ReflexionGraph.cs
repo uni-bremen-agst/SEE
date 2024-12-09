@@ -20,7 +20,11 @@ namespace SEE.Tools.ReflexionAnalysis
         private Node architectureRoot;
 
         /// <summary>
-        ///
+        /// Property for the architecture root.
+        /// If the attribute has not been set,
+        /// the corresponding node is searched for,
+        /// and the attribute is assigned.
+        /// Assignment to the attribute is only possible once.
         /// </summary>
         public Node ArchitectureRoot
         {
@@ -52,7 +56,11 @@ namespace SEE.Tools.ReflexionAnalysis
         private Node implementationRoot;
 
         /// <summary>
-        ///
+        /// Property for the implementation root.
+        /// If the attribute has not been set,
+        /// the corresponding node is searched for,
+        /// and the attribute is assigned.
+        /// Assignment to the attribute is only possible once.
         /// </summary>
         public Node ImplementationRoot
         {
