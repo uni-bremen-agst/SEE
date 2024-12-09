@@ -29,17 +29,10 @@ namespace SEE.Tools.ReflexionAnalysis
         public Node ArchitectureRoot
         {
             get {
-                if (architectureRoot == null)
-                {
-                    architectureRoot = Nodes().FirstOrDefault(node => node.IsArchitectureRoot());
-                }
-                return architectureRoot;
+                return architectureRoot ??= Nodes().FirstOrDefault(node => node.IsArchitectureRoot());
             }
             set {
-                if (architectureRoot == null)
-                {
-                    architectureRoot = value;
-                }
+                architectureRoot ??= value;
             }
         }
 
@@ -66,18 +59,11 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             get
             {
-                if (implementationRoot == null)
-                {
-                    implementationRoot = Nodes().FirstOrDefault(node => node.IsImplementationRoot());
-                }
-                return implementationRoot;
+                return implementationRoot ??= Nodes().FirstOrDefault(node => node.IsImplementationRoot());
             }
             set
             {
-                if (implementationRoot == null)
-                {
-                    implementationRoot = value;
-                }
+                implementationRoot ??= value;
             }
         }
 
