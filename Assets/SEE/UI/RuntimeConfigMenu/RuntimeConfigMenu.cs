@@ -159,5 +159,23 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             needsRebuild = true;
         }
+
+        /// <summary>
+        /// Performs the rebuild if necessary.
+        /// </summary>
+        /// <returns>True if a rebuild was performed, otherwiese false.</returns>
+        public bool PerformRebuildIfRequired()
+        {
+            if (needsRebuild)
+            {
+                needsRebuild = false;
+                BuildTabMenus();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
