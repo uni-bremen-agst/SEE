@@ -456,13 +456,14 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
 
             gameobject.TryGetComponent(out SEEReflexionCity city);
 
-            int n = 5;
+            int n = 100;
 
             List<RecommendationSettings> settings = new()
             {
                 RecommendationSettings.CreateGroup(n, 0.3f, "CAAttractZero_03", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
                 RecommendationSettings.CreateGroup(n, 0.3f, "CAAttractOne_03", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
                 RecommendationSettings.CreateGroup(n, 0.3f, "ADCAttract_03", AttractFunction.AttractFunctionType.ADCAttract),
+                RecommendationSettings.CreateGroup(n, 0.3f, "NBAttract_03", AttractFunction.AttractFunctionType.NBAttract),
                 RecommendationSettings.CreateGroup(n, 0.5f, "CAAttractZero_05", AttractFunction.AttractFunctionType.CountAttract, 0.0f),
                 RecommendationSettings.CreateGroup(n, 0.5f, "CAAttractOne_05", AttractFunction.AttractFunctionType.CountAttract, 1.0f),
                 RecommendationSettings.CreateGroup(n, 0.5f, "ADCAttract_05", AttractFunction.AttractFunctionType.ADCAttract),

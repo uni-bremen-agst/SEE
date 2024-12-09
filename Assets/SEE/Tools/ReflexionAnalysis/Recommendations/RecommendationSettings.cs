@@ -1,4 +1,5 @@
 ﻿using Assets.SEE.Tools.ReflexionAnalysis.AttractFunctions;
+using SEE.Scanner.Antlr;
 using SEE.Utils.Paths;
 using System;
 using UnityEngine;
@@ -209,6 +210,12 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
             settings.ClusterType = "Cluster";
             settings.OutputPath = new DataPath();
             settings.ExperimentName = name;
+
+            if(settings.AttractFunctionConfig is LanguageAttractConfig)
+            {
+                ((LanguageAttractConfig)settings.AttractFunctionConfig).TokenLanguageType = AntlrLanguage.AntlrLanguageType.Java;
+            }
+
             return settings;
         }
 

@@ -375,9 +375,11 @@ namespace Assets.SEE.Tools.ReflexionAnalysis
                 HitRateMapped = 0;
             }
 
-            Precision = TotalHits / (TotalHits + TotalFails);
-            Recall = TotalHits / (TotalHits + CandidatesLeftOver);
-            FScore = (2 * Precision * Recall) / (Precision + Recall);
+            Precision = (TotalHits + TotalFails) > 0 ? TotalHits / (TotalHits + TotalFails) : 0;
+            
+            Recall = (TotalHits + CandidatesLeftOver) > 0 ? TotalHits / (TotalHits + CandidatesLeftOver) : 0;
+
+            FScore = (Precision + Recall) > 0 ? (2 * Precision * Recall) / (Precision + Recall) : 0;
 
             IEnumerable<double> validPercentileRankValues = resultsOrdered.Where(r => r.AveragePercentileRank >= 0)
                                                                          .Select(r => r.AveragePercentileRank);
