@@ -17,7 +17,27 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Root node of the architecture.
         /// Note that this isn't a root node of the whole graph, it only roots all architecture nodes.
         /// </summary>
-        public readonly Node ArchitectureRoot;
+        private Node architectureRoot;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public Node ArchitectureRoot
+        {
+            get {
+                if (architectureRoot == null)
+                {
+                    architectureRoot = Nodes().FirstOrDefault(node => node.IsArchitectureRoot());
+                }
+                return architectureRoot;
+            }
+            set {
+                if (architectureRoot == null)
+                {
+                    architectureRoot = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Name of the artificial node type used for the artificial architecture root nodes added
@@ -29,7 +49,29 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Root node of the implementation.
         /// Note that this isn't a root node of the whole graph, it only roots all implementation nodes.
         /// </summary>
-        public readonly Node ImplementationRoot;
+        private Node implementationRoot;
+
+        /// <summary>
+        ///
+        /// </summary>
+        public Node ImplementationRoot
+        {
+            get
+            {
+                if (implementationRoot == null)
+                {
+                    implementationRoot = Nodes().FirstOrDefault(node => node.IsImplementationRoot());
+                }
+                return implementationRoot;
+            }
+            set
+            {
+                if (implementationRoot == null)
+                {
+                    implementationRoot = value;
+                }
+            }
+        }
 
         /// <summary>
         /// Name of the artificial node type used for artificial implementation root nodes added
