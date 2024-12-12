@@ -22,53 +22,40 @@ concurrency:
 permissions: read-all
 
 jobs:
-  setup:
-    name: Setup Repository
+  conds:
+    name: Ensure Conditions
     # The following condition filters out pull requests that are closed, but not merged.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
-    runs-on: [self-hosted, see-ci]
-    outputs:
-      runner: ${{ steps.remember.outputs.runner }}
+    runs-on: ubuntu-latest
     steps:
-      - name: Fix permissions
-        shell: bash
-        run: sudo /mnt/scripts/set-work-permissions.sh
-      - name: Setup GitLab LFS
-        run: |
-          echo "$CREDENTIALS" > ~/.git-credentials
-          git config --global credential.helper store
-          git config --global lfs.url "${CREDENTIALS}project-see/see-lfs.git/info/lfs"
-        env:
-          # NOTE: must be of the form https://koschke:token-here@gitlab.informatik.uni-bremen.de/
-          CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
-      - uses: actions/checkout@v4
-        name: Checkout Repository
-        with:
-          lfs: true
-          fetch-depth: 0
-      - name: Confirm LFS pull
-        run: git lfs pull
-      - name: Remember runner
-        id: remember
-        # We remember this to make sure all jobs are run on the same machine.
-        run: echo "runner=${{ runner.name }}" >> $GITHUB_OUTPUT
+      - name: Do nothing
+        run: "echo 'Nothing to do in this job, job just ensures global conditions.'"
   gitscripts:
     name: Run GitScript checks
-    runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [setup]
+    needs: [conds]
+    runs-on: [self-hosted, sts5]
     if: ${{ github.event_name != 'workflow_dispatch' }}
     steps:
+      - uses: uni-bremen-agst/clone-see-action@main
+        with:
+          lfs-token: ${{ secrets.GITLAB_LFS_TOKEN }}
+          fetch-depth: "0"
       - name: Run GitScripts checks
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: [self-hosted, see-ci]
+    runs-on: ubuntu-latest
     if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' && !github.event.pull_request.merged }}
     permissions:
       contents: read
       issues: read
       pull-requests: write
     steps:
+      - name: Checkout actions
+        uses: actions/checkout@v4
+        with:
+          sparse-checkout: GitScripts
+          lfs: false
       - name: Collect bad patterns
         run: |
           if [ -n "$GITHUB_BASE_REF" ]; then
@@ -130,23 +117,22 @@ jobs:
 
   test:
     name: Run editmode tests
-    runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [setup, gitscripts]
+    needs: [conds]
+    runs-on: [self-hosted, sts5]
     if: ${{ ! github.event.pull_request.draft && github.event_name != 'workflow_dispatch' }}
     permissions: write-all
     steps:
-      - uses: actions/cache@v4
-        name: Cache Library
-        env:
-          SEGMENT_DOWNLOAD_TIMEOUT_MINS: 11
+      - uses: uni-bremen-agst/clone-see-action@main
         with:
-          path: ./Library
-          key: Library-SEE-Tests-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
-          restore-keys: |
-            Library-SEE-Tests
-            Library-SEE
+          lfs-token: ${{ secrets.GITLAB_LFS_TOKEN }}
+      - name: Restore Cache
+        shell: bash
+        env:
+          KEY: SEE-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
+          OPERATION: restore
+        run: ./.github/scripts/cache.sh
       - name: Restore NuGet packages
-        run: /home/see/.dotnet/tools/nugetforunity restore .
+        run: /home/falko1/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-test-runner@v4
         timeout-minutes: 60
         name: Run Tests
@@ -160,7 +146,7 @@ jobs:
           checkName: Test Results
           testMode: EditMode # PlayMode tests get stuck in batchmode
           runAsHostUser: true
-          customParameters: -testCategory "!NonDeterministic"
+          customParameters: -testCategory "!SkipOnCI"
           coverageOptions: "generateAdditionalMetrics;generateHtmlReport;assemblyFilters:+SEE"
       - uses: actions/upload-artifact@v4
         continue-on-error: true
@@ -177,11 +163,18 @@ jobs:
         with:
           name: Coverage results
           path: ${{ steps.tests.outputs.coveragePath }}
+      - name: Save Cache
+        shell: bash
+        env:
+          KEY: SEE-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
+          OPERATION: store
+        run: ./.github/scripts/cache.sh
 
   setup_build_targets:
     name: Setup build targets
+    needs: [conds]
     if: ${{ ! github.event.pull_request.draft }}
-    runs-on: [self-hosted, see-ci]
+    runs-on: ubuntu-latest
     outputs:
       targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
     steps:
@@ -205,22 +198,30 @@ jobs:
 
   build:
     name: Create build
-    runs-on: ${{ needs.setup.outputs.runner }}
-    needs: [setup, setup_build_targets, test, gitscripts]
+    runs-on: [self-hosted, sts5]
+    needs: [conds, setup_build_targets]
     strategy:
       matrix:
         targetPlatform: ${{ fromJson(needs.setup_build_targets.outputs.targetPlatforms) }}
     if: ${{ ! github.event.pull_request.draft }}
     steps:
+      - uses: uni-bremen-agst/clone-see-action@main
+        with:
+          lfs-token: ${{ secrets.GITLAB_LFS_TOKEN }}
+      - name: Restore Cache
+        shell: bash
+        env:
+          KEY: SEE-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
+          OPERATION: restore
+        run: ./.github/scripts/cache.sh
       - name: Cleanup any modifications
         run: |
-          sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
           git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
       - name: Restore NuGet packages
-        run: /home/see/.dotnet/tools/nugetforunity restore .
+        run: /home/falko1/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-builder@v4
         timeout-minutes: 90
         name: Build project
@@ -242,23 +243,32 @@ jobs:
       - uses: actions/upload-artifact@v4
         continue-on-error: true
         name: Upload build
-        # Upload only if manually triggered, because for master merges we create a release below anyway.
-        if: ${{ github.event_name == 'workflow_dispatch' }}
+        if: ${{ github.event_name == 'workflow_dispatch' || github.event.pull_request.merged }}
         with:
           name: SEE-${{ matrix.targetPlatform }}-${{ github.sha }}.zip
           path: build-${{ matrix.targetPlatform }}.zip
           retention-days: 7 # Due to high space usage.
+      - name: Store Cache
+        shell: bash
+        env:
+          KEY: SEE-${{ hashFiles('./ProjectSettings/ProjectVersion.txt') }}
+          OPERATION: store
+        run: ./.github/scripts/cache.sh
 
   release:
     name: Release
-    runs-on: ${{ needs.setup.outputs.runner }}
+    runs-on: ubuntu-latest
     permissions: write-all
-    needs: [setup, build]
+    needs: [build]
     # We only want to create a release after merging a PR into master.
     # Note that we will not create a release if the PR is labelled 'no release'.
     # This label should be set when a PR does not lead to a noticeable change in the build.
     if: ${{ github.event.pull_request.merged && !contains(github.event.pull_request.labels.*.name, 'no release') }}
     steps:
+      - uses: actions/download-artifact@v4
+        id: download
+        with:
+          pattern: SEE-*.zip
       - name: Create release tag
         uses: rickstaa/action-create-tag@v1
         with:
@@ -272,7 +282,7 @@ jobs:
           tag_name: pr-${{ github.event.pull_request.number }}
           fail_on_unmatched_files: true
           files: |
-            build-*.zip
+            ${{ steps.download.outputs.download-path }}/build-*.zip
           body: |
             This release incorporates the changes by @${{ github.event.pull_request.user.login }} from pull request #${{ github.event.pull_request.number }}.
             Builds for Windows and Linux are available below.
@@ -283,20 +293,3 @@ jobs:
             ---
 
             > [See original pull request for details.](${{ github.event.pull_request.html_url }})
-
-  cleanup:
-    name: Cleanup
-    runs-on: ${{ needs.setup.outputs.runner }}
-    if: ${{ always() }}
-    needs: [setup, test, build, release] # "test", "build" and "release" use docker and sometimes mess up permissions.
-    strategy:
-      fail-fast: false
-    steps:
-      - name: Kill Unity
-        if: always()
-        shell: bash
-        run: ./.github/scripts/stop-docker.sh
-      - name: Fix permissions
-        if: always()
-        shell: bash
-        run: sudo /mnt/scripts/set-work-permissions.sh
