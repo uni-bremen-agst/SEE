@@ -26,13 +26,13 @@ jobs:
     name: Setup Repository
     # The following condition filters out pull requests that are closed, but not merged.
     if: ${{ github.event_name != 'pull_request' || github.event.pull_request.state != 'closed' || github.event.pull_request.merged }}
-    runs-on: [self-hosted, see-ci]
+    runs-on: [self-hosted, see-ci-sts]
     outputs:
       runner: ${{ steps.remember.outputs.runner }}
     steps:
-      - name: Fix permissions
-        shell: bash
-        run: sudo /mnt/scripts/set-work-permissions.sh
+      # - name: Fix permissions
+      #   shell: bash
+      #   run: sudo /mnt/scripts/set-work-permissions.sh
       - name: Setup GitLab LFS
         run: |
           echo "$CREDENTIALS" > ~/.git-credentials
@@ -62,7 +62,7 @@ jobs:
         run: ./GitScripts/run_all
   static:
     name: Run static checks
-    runs-on: [self-hosted, see-ci]
+    runs-on: [self-hosted, see-ci-sts]
     if: ${{ !github.event.pull_request.draft && github.event_name != 'workflow_dispatch' && !github.event.pull_request.merged }}
     permissions:
       contents: read
@@ -146,7 +146,7 @@ jobs:
             Library-SEE-Tests
             Library-SEE
       - name: Restore NuGet packages
-        run: /home/see/.dotnet/tools/nugetforunity restore .
+        run: /home/falko1/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-test-runner@v4
         timeout-minutes: 60
         name: Run Tests
@@ -181,7 +181,7 @@ jobs:
   setup_build_targets:
     name: Setup build targets
     if: ${{ ! github.event.pull_request.draft }}
-    runs-on: [self-hosted, see-ci]
+    runs-on: [self-hosted, see-ci-sts]
     outputs:
       targetPlatforms: ${{ steps.rememberPlatforms.outputs.targetPlatforms }}
     steps:
@@ -214,13 +214,13 @@ jobs:
     steps:
       - name: Cleanup any modifications
         run: |
-          sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
+          # sudo /mnt/scripts/set-work-permissions.sh  # Permissions may be messed up here
           git reset --hard ${{ github.sha }}  # Test or previous build may have changed files
           # Try deleting any previous build, but not other zip files that we may need later.
           git clean -fd -e 'build-*.zip'
           rm -rf build "build-${{ matrix.targetPlatform }}.zip" || true
       - name: Restore NuGet packages
-        run: /home/see/.dotnet/tools/nugetforunity restore .
+        run: /home/falko1/.dotnet/tools/nugetforunity restore .
       - uses: game-ci/unity-builder@v4
         timeout-minutes: 90
         name: Build project
@@ -296,7 +296,7 @@ jobs:
         if: always()
         shell: bash
         run: ./.github/scripts/stop-docker.sh
-      - name: Fix permissions
-        if: always()
-        shell: bash
-        run: sudo /mnt/scripts/set-work-permissions.sh
+      # - name: Fix permissions
+      #   if: always()
+      #   shell: bash
+      #   run: sudo /mnt/scripts/set-work-permissions.sh
