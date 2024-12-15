@@ -57,7 +57,7 @@ namespace SEE.GraphProviders
          FolderPath(AbsolutePath = true, ParentFolder = "@" + nameof(ProjectPath) + ".Path"),
          InfoBox("If no source paths are specified, all directories within the project path "
                  + "containing source code will be considered.",
-                 InfoMessageType.Info, "@" + nameof(SourcePaths) + ".Length == 0"),
+                 InfoMessageType.Info, "@" + nameof(SourcePaths) + ".Count == 0"),
          ValidateInput(nameof(ValidSourcePaths), "The source paths must be within the project path."),
          RuntimeTab(GraphProviderFoldoutGroup)]
         public List<string> SourcePaths = new();
