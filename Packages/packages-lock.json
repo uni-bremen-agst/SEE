@@ -339,7 +339,7 @@
       }
     },
     "com.unity.xr.core-utils": {
-      "version": "2.3.0",
+      "version": "2.4.0",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -469,7 +469,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9f9bfdf84f2e28b50d5e0c708b4ccabcefdc38bf"
+      "hash": "9f274e1e90bcde869651e9510b4bfeb815b89318"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
