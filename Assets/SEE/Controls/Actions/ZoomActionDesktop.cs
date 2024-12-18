@@ -19,6 +19,8 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Update()
         {
+            // Whether the user wants to reset the currently focused city to the center of table.
+            bool reset = SEEInput.Reset();
             // Whether the user presses a keyboard shortcut to zoom into the city.
             bool zoomInto = SEEInput.ZoomInto();
             // Alternatively, the user can select the mouse wheel for zooming.
@@ -28,7 +30,7 @@ namespace SEE.Controls.Actions
             // Whether zooming per mouse wheel was requested.
             bool zoomTowards = Mathf.Abs(zoomSteps) >= 1;
 
-            if (!zoomInto && !zoomTowards)
+            if (!zoomInto && !zoomTowards && !reset)
             {
                 return;
             }
@@ -94,11 +96,19 @@ namespace SEE.Controls.Actions
                         }
                     }
 
-                    // Apply zoom steps towards the city containing the currently hovered element
-                    // as requested per mouse wheel.
-                    if (zoomTowards)
+                    if (reset)
                     {
-                        zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
+                        // Reset the city to its original non-zoomed size.
+                        zoomState.PushResetCommand(ZoomState.DefaultZoomDuration);
+                    }
+                    else
+                    {
+                        // Apply zoom steps towards the city containing the currently hovered element
+                        // as requested per mouse wheel.
+                        if (zoomTowards)
+                        {
+                            zoomState.PushZoomCommand(hitPointOnPlane.XZ(), zoomSteps, ZoomState.DefaultZoomDuration);
+                        }
                     }
 
                     UpdateZoomState(rootTransform, zoomState);
