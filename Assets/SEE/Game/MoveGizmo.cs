@@ -32,6 +32,9 @@ namespace SEE.UI3D
         /// </summary>
         private Material directLineMaterial;
 
+        /// <summary>
+        /// The cached shader property ID for the gizmo's color.
+        /// </summary>
         private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
@@ -59,6 +62,9 @@ namespace SEE.UI3D
             return p;
         }
 
+        /// <summary>
+        /// Renders the movement visualization.
+        /// </summary>
         private void OnRenderObject()
         {
             fillRectangleMaterial.SetPass(0);
