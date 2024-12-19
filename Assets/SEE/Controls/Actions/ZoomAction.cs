@@ -151,7 +151,6 @@ namespace SEE.Controls.Actions
             {
                 CurrentTargetZoomSteps = 0;
                 ZoomCommands.Add(new ZoomCommand(Vector2.zero, CurrentTargetZoomSteps, duration, true));
-
             }
         }
 
