@@ -99,20 +99,20 @@ namespace SEE.UI3D
             go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
             go.transform.position = Vector3.zero;
 
-            RotateGizmo p = go.AddComponent<RotateGizmo>();
+            RotateGizmo rotateGizmo = go.AddComponent<RotateGizmo>();
 
             int outer = textureResolution / 2;
             int inner = Mathf.RoundToInt(outer * 0.98f);
 
-            p.material = new Material(Shader.Find(rotateGizmoShaderName));
-            p.material.SetTexture(mainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
-            p.material.SetColor(colorProperty, UI3DProperties.DefaultColor);
-            p.material.SetFloat(alphaProperty, UI3DProperties.DefaultAlpha);
+            rotateGizmo.material = new Material(Shader.Find(rotateGizmoShaderName));
+            rotateGizmo.material.SetTexture(mainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
+            rotateGizmo.material.SetColor(colorProperty, UI3DProperties.DefaultColor);
+            rotateGizmo.material.SetFloat(alphaProperty, UI3DProperties.DefaultAlpha);
 
-            go.MustGetComponent<MeshRenderer>().sharedMaterial = p.material;
+            go.MustGetComponent<MeshRenderer>().sharedMaterial = rotateGizmo.material;
             go.SetActive(false);
 
-            return p;
+            return rotateGizmo;
         }
     }
 }

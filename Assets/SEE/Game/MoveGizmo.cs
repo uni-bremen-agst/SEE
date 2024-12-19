@@ -44,22 +44,22 @@ namespace SEE.UI3D
         internal static MoveGizmo Create()
         {
             GameObject go = new("MovePivot");
-            MoveGizmo p = go.AddComponent<MoveGizmo>();
+            MoveGizmo moveGizmo = go.AddComponent<MoveGizmo>();
 
-            p.start = Vector3.zero;
-            p.end = Vector3.zero;
+            moveGizmo.start = Vector3.zero;
+            moveGizmo.end = Vector3.zero;
 
             Shader shader = Shader.Find(UI3DProperties.PlainColorShaderName);
-            p.fillRectangleMaterial = new Material(shader);
-            p.outlineRectangleMaterial = new Material(shader);
-            p.directLineMaterial = new Material(shader);
-            p.fillRectangleMaterial.SetColor(colorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
-            p.outlineRectangleMaterial.SetColor(colorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
-            p.directLineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
+            moveGizmo.fillRectangleMaterial = new Material(shader);
+            moveGizmo.outlineRectangleMaterial = new Material(shader);
+            moveGizmo.directLineMaterial = new Material(shader);
+            moveGizmo.fillRectangleMaterial.SetColor(colorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
+            moveGizmo.outlineRectangleMaterial.SetColor(colorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
+            moveGizmo.directLineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
 
             go.SetActive(false);
 
-            return p;
+            return moveGizmo;
         }
 
         /// <summary>

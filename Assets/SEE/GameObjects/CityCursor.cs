@@ -67,8 +67,7 @@ namespace SEE.GO
         /// Called whenever an <see cref="InteractableObject"/> is selected.
         /// </summary>
         /// <param name="interactableObject">the selected object</param>
-        /// <param name="isInitiator">currently ignored</param>
-        private void AnyHoverIn(InteractableObject interactableObject, bool isInitiator)
+        private void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))
@@ -83,8 +82,7 @@ namespace SEE.GO
         /// Called whenever an <see cref="InteractableObject"/> is unselected.
         /// </summary>
         /// <param name="interactableObject">the unselected object</param>
-        /// <param name="isInitiator">currently ignored</param>
-        private void AnyHoverOut(InteractableObject interactableObject, bool isInitiator)
+        private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph.Equals(city.LoadedGraph))
