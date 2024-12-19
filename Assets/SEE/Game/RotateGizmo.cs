@@ -94,7 +94,7 @@ namespace SEE.UI3D
             p.material.SetColor(colorProperty, UI3DProperties.DefaultColor);
             p.material.SetFloat(alphaProperty, UI3DProperties.DefaultAlpha);
 
-            go.GetComponent<MeshRenderer>().sharedMaterial = p.material;
+            go.MustGetComponent<MeshRenderer>().sharedMaterial = p.material;
             go.SetActive(false);
 
             return p;
