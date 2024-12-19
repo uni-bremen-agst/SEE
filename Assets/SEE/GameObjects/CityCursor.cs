@@ -51,7 +51,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Unsubscribe from events when this object is destroyed
+        /// Unsubscribes from events when this object is destroyed
         /// and destroys the <see cref="Cursor"/>.
         /// </summary>
         private void OnDestroy()
