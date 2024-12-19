@@ -19,7 +19,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private void Update()
         {
-            // Whether the user wants to reset the currently focused city to the center of table.
+            // Whether the user wants to reset the currently focused city to the center of the table.
             bool reset = SEEInput.Reset();
             // Whether the user presses a keyboard shortcut to zoom into the city.
             bool zoomInto = SEEInput.ZoomInto();
