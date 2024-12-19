@@ -149,7 +149,6 @@ namespace SEE.Controls.Actions
             /// <param name="duration">The desired duration of the zooming.</param>
             internal void PushResetCommand(float duration)
             {
-                Debug.LogError("PushResetCommand not yet implemented.\n");
                 CurrentTargetZoomSteps = 0;
                 ZoomCommands.Add(new ZoomCommand(Vector2.zero, CurrentTargetZoomSteps, duration, true));
 
