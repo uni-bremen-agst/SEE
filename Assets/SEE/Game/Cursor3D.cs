@@ -64,7 +64,7 @@ namespace SEE.UI3D
         /// Creates a new cursor. The city name is only used in debug build.
         /// </summary>
         /// <param name="cityName">The name of the city, this cursor is used for.</param>
-        /// <returns></returns>
+        /// <returns>new cursor</returns>
 #if UNITY_EDITOR
         internal static Cursor3D Create(string cityName)
         {
@@ -74,9 +74,9 @@ namespace SEE.UI3D
         {
             GameObject go = new GameObject();
 #endif
-            Cursor3D c = go.AddComponent<Cursor3D>();
+            Cursor3D cursor3d = go.AddComponent<Cursor3D>();
 
-            c.focusses = new List<InteractableObject>();
+            cursor3d.focusses = new List<InteractableObject>();
 
             GameObject outlineGameObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroyer.Destroy(outlineGameObject.GetComponent<MeshCollider>());
@@ -88,14 +88,19 @@ namespace SEE.UI3D
             outlineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
             outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
 
-            c.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
-            c.axisMaterial.SetColor(colorProperty, Color.black);
+            cursor3d.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
+            cursor3d.axisMaterial.SetColor(colorProperty, Color.black);
 
-            c.gameObject.SetActive(false);
+            cursor3d.gameObject.SetActive(false);
 
-            return c;
+            return cursor3d;
         }
 
+        /// <summary>
+        /// Removes the destroyed transforms and updates the cursor's position.
+        /// Activates or deactivates the game object the cursor is attached
+        /// to depending on the number of focusses.
+        /// </summary>
         private void Update()
         {
             RemoveDestroyedTransforms();
@@ -107,6 +112,9 @@ namespace SEE.UI3D
             }
         }
 
+        /// <summary>
+        /// Renders the cursor as lines.
+        /// </summary>
         private void OnRenderObject()
         {
             if (HasFocus() && axisHalfLength > 0.0f)
