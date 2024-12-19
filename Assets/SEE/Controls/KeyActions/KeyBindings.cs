@@ -180,9 +180,7 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.MetricCharts, "Toggles the menu for holistic code metrics");
 
             // Browsing
-            Register(KeyAction.SearchMenu, KeyCode.F, "Search",
-                     KeyActionCategory.Browsing, "Opens the search menu.");
-            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view",
+            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view and Search",
                      KeyActionCategory.Browsing, "Opens/closes the tree view window.");
             Register(KeyAction.ToggleEdges, KeyCode.V, "Toggle edges",
                      KeyActionCategory.Browsing, "Toggles the visibility of all edges of a hovered code city.");

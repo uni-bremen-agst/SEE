@@ -137,6 +137,21 @@ namespace SEE.Controls.Actions
                     CurrentTargetZoomSteps = newZoomStepsInProgress;
                 }
             }
+
+            /// <summary>
+            /// Pushes a zoom command for execution that will reset the code city to its
+            /// original un-zoomed state. Zoom commands are automatically removed
+            /// once they are finished.
+            /// <para>
+            /// <see cref="CurrentTargetZoomSteps"/> will be reset to 0.
+            /// </para>
+            /// </summary>
+            /// <param name="duration">The desired duration of the zooming.</param>
+            internal void PushResetCommand(float duration)
+            {
+                CurrentTargetZoomSteps = 0;
+                ZoomCommands.Add(new ZoomCommand(Vector2.zero, CurrentTargetZoomSteps, duration, true));
+            }
         }
 
         /// <summary>

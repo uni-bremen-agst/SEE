@@ -8,37 +8,6 @@ using SEE.Controls;
 namespace SEE.UI3D
 {
     /// <summary>
-    /// Properties of 3d ui-elements.
-    /// </summary>
-    internal static class UI3DProperties
-    {
-        /// <summary>
-        /// A plain color shader used for single-colored objects.
-        /// </summary>
-        internal const string PlainColorShaderName = "Unlit/PlainColorShader";
-
-        /// <summary>
-        /// The default alpha value used for various transparent ui-elements.
-        /// </summary>
-        internal const float DefaultAlpha = 0.5f;
-
-        /// <summary>
-        /// The default color of every 3d ui-element.
-        /// </summary>
-        internal static readonly Color DefaultColor = new(1.0f, 0.25f, 0.0f, DefaultAlpha);
-
-        /// <summary>
-        /// The secondary default color of every 3d ui-element.
-        /// </summary>
-        internal static readonly Color DefaultColorSecondary = new(1.0f, 0.75f, 0.0f, DefaultAlpha);
-
-        /// <summary>
-        /// The tertiary color of every 3d ui-element.
-        /// </summary>
-        internal static readonly Color DefaultColorTertiary = new(1.0f, 0.0f, 0.5f, DefaultAlpha);
-    }
-
-    /// <summary>
     /// The cursor representing the center of the selected elements of a city visually. May be used
     /// as e.g. center of rotation.
     /// </summary>
@@ -64,7 +33,14 @@ namespace SEE.UI3D
         /// </summary>
         private Material axisMaterial;
 
+        /// <summary>
+        /// The cached shader property ID for the cursor's main texture.
+        /// </summary>
         private static readonly int mainTexProperty = Shader.PropertyToID("_MainTex");
+
+        /// <summary>
+        /// The cached shader property ID for the cursor's color.
+        /// </summary>
         private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
@@ -88,7 +64,7 @@ namespace SEE.UI3D
         /// Creates a new cursor. The city name is only used in debug build.
         /// </summary>
         /// <param name="cityName">The name of the city, this cursor is used for.</param>
-        /// <returns></returns>
+        /// <returns>new cursor</returns>
 #if UNITY_EDITOR
         internal static Cursor3D Create(string cityName)
         {
@@ -98,9 +74,9 @@ namespace SEE.UI3D
         {
             GameObject go = new GameObject();
 #endif
-            Cursor3D c = go.AddComponent<Cursor3D>();
+            Cursor3D cursor3d = go.AddComponent<Cursor3D>();
 
-            c.focusses = new List<InteractableObject>();
+            cursor3d.focusses = new List<InteractableObject>();
 
             GameObject outlineGameObject = GameObject.CreatePrimitive(PrimitiveType.Quad);
             Destroyer.Destroy(outlineGameObject.GetComponent<MeshCollider>());
@@ -112,14 +88,19 @@ namespace SEE.UI3D
             outlineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
             outlineGameObject.GetComponent<MeshRenderer>().sharedMaterial = outlineMaterial;
 
-            c.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
-            c.axisMaterial.SetColor(colorProperty, Color.black);
+            cursor3d.axisMaterial = new Material(Shader.Find(UI3DProperties.PlainColorShaderName));
+            cursor3d.axisMaterial.SetColor(colorProperty, Color.black);
 
-            c.gameObject.SetActive(false);
+            cursor3d.gameObject.SetActive(false);
 
-            return c;
+            return cursor3d;
         }
 
+        /// <summary>
+        /// Removes the destroyed transforms and updates the cursor's position.
+        /// Activates or deactivates the game object the cursor is attached
+        /// to depending on the number of focusses.
+        /// </summary>
         private void Update()
         {
             RemoveDestroyedTransforms();
@@ -131,6 +112,9 @@ namespace SEE.UI3D
             }
         }
 
+        /// <summary>
+        /// Renders the cursor as lines.
+        /// </summary>
         private void OnRenderObject()
         {
             if (HasFocus() && axisHalfLength > 0.0f)
@@ -359,208 +343,6 @@ namespace SEE.UI3D
                     }
                 }
             }
-        }
-    }
-
-    /// <summary>
-    /// This gizmo represents the movement of elements of a city visually.
-    /// </summary>
-    internal class MoveGizmo : MonoBehaviour
-    {
-        /// <summary>
-        /// The start position of the movement visualization.
-        /// </summary>
-        private Vector3 start;
-
-        /// <summary>
-        /// The end position of the movement visualization.
-        /// </summary>
-        private Vector3 end;
-
-        /// <summary>
-        /// The material of the filled rectangle.
-        /// </summary>
-        private Material fillRectangleMaterial;
-
-        /// <summary>
-        /// The material for the outlined rectangle.
-        /// </summary>
-        private Material outlineRectangleMaterial;
-
-        /// <summary>
-        /// The material of the line between the start- and end-position.
-        /// </summary>
-        private Material directLineMaterial;
-
-        private static readonly int colorProperty = Shader.PropertyToID("_Color");
-
-        /// <summary>
-        /// Creates a new move-gizmo.
-        /// </summary>
-        /// <returns>The gizmo.</returns>
-        internal static MoveGizmo Create()
-        {
-            GameObject go = new("MovePivot");
-            MoveGizmo p = go.AddComponent<MoveGizmo>();
-
-            p.start = Vector3.zero;
-            p.end = Vector3.zero;
-
-            Shader shader = Shader.Find(UI3DProperties.PlainColorShaderName);
-            p.fillRectangleMaterial = new Material(shader);
-            p.outlineRectangleMaterial = new Material(shader);
-            p.directLineMaterial = new Material(shader);
-            p.fillRectangleMaterial.SetColor(colorProperty, new Color(0.5f, 0.5f, 0.5f, 0.2f * UI3DProperties.DefaultAlpha));
-            p.outlineRectangleMaterial.SetColor(colorProperty, new Color(0.0f, 0.0f, 0.0f, 0.5f * UI3DProperties.DefaultAlpha));
-            p.directLineMaterial.SetColor(colorProperty, UI3DProperties.DefaultColor);
-
-            go.SetActive(false);
-
-            return p;
-        }
-
-        private void OnRenderObject()
-        {
-            fillRectangleMaterial.SetPass(0);
-            GL.Begin(GL.QUADS);
-            {
-                GL.Vertex(start);
-                GL.Vertex(new Vector3(end.x, end.y, start.z));
-                GL.Vertex(end);
-                GL.Vertex(new Vector3(start.x, end.y, end.z));
-            }
-            GL.End();
-
-            outlineRectangleMaterial.SetPass(0);
-            GL.Begin(GL.LINES);
-            {
-                GL.Vertex(start);
-                GL.Vertex(new Vector3(start.x, end.y, end.z));
-                GL.Vertex(new Vector3(start.x, end.y, end.z));
-                GL.Vertex(end);
-
-                GL.Vertex(start);
-                GL.Vertex(new Vector3(end.x, end.y, start.z));
-                GL.Vertex(new Vector3(end.x, end.y, start.z));
-                GL.Vertex(end);
-            }
-            GL.End();
-
-            directLineMaterial.SetPass(0);
-            GL.Begin(GL.LINES);
-            {
-                GL.Vertex(start);
-                GL.Vertex(end);
-            }
-            GL.End();
-        }
-
-        /// <summary>
-        /// Sets the start- and end-position of the movement visualization.
-        /// </summary>
-        /// <param name="startPoint">The new start point.</param>
-        /// <param name="endPoint">The new end point.</param>
-        internal void SetPositions(Vector3 startPoint, Vector3 endPoint)
-        {
-            start = startPoint;
-            end = endPoint;
-        }
-    }
-
-    /// <summary>
-    /// This gizmo visually represents a rotation of an object.
-    /// </summary>
-    public class RotateGizmo : MonoBehaviour
-    {
-        /// <summary>
-        /// The name of the material responsible for rendering the circular rotation visualization.
-        /// </summary>
-        private const string rotateGizmoShaderName = "Unlit/RotateGizmoShader";
-
-        /// <summary>
-        /// The center of the rotation.
-        /// </summary>
-        public Vector3 Center { get => transform.position; set => transform.position = value; }
-
-        /// <summary>
-        /// The radius of the gizmo.
-        /// </summary>
-        public float Radius { get => transform.localScale.x; set => transform.localScale = new Vector3(value, value, value); }
-
-        /// <summary>
-        /// The material responsible for rendering the circular rotation visualization.
-        /// </summary>
-        private Material material;
-
-        /// <summary>
-        /// <see cref="StartAngle"/>
-        /// </summary>
-        private float startAngle;
-
-        /// <summary>
-        /// The start angle of the rotation.
-        /// </summary>
-        internal float StartAngle
-        {
-            get => startAngle;
-            set
-            {
-                startAngle = value;
-                material.SetFloat(minAngleProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// <see cref="TargetAngle"/>
-        /// </summary>
-        private float targetAngle;
-
-        private static readonly int minAngleProperty = Shader.PropertyToID("_MinAngle");
-        private static readonly int maxAngleProperty = Shader.PropertyToID("_MaxAngle");
-        private static readonly int mainTexProperty = Shader.PropertyToID("_MainTex");
-        private static readonly int colorProperty = Shader.PropertyToID("_Color");
-        private static readonly int alphaProperty = Shader.PropertyToID("_Alpha");
-
-        /// <summary>
-        /// The target angle of the rotation.
-        /// </summary>
-        internal float TargetAngle
-        {
-            get => targetAngle;
-            set
-            {
-                targetAngle = value;
-                material.SetFloat(maxAngleProperty, value);
-            }
-        }
-
-        /// <summary>
-        /// Creates a rotation gizmo.
-        /// </summary>
-        /// <param name="textureResolution">The resolution of the outline texture.</param>
-        /// <returns>The gizmo.</returns>
-        internal static RotateGizmo Create(int textureResolution)
-        {
-            GameObject go = GameObject.CreatePrimitive(PrimitiveType.Quad);
-            Destroyer.Destroy(go.GetComponent<MeshCollider>());
-            go.name = "RotatePivot";
-            go.transform.rotation = Quaternion.Euler(90.0f, 0.0f, 0.0f);
-            go.transform.position = Vector3.zero;
-
-            RotateGizmo p = go.AddComponent<RotateGizmo>();
-
-            int outer = textureResolution / 2;
-            int inner = Mathf.RoundToInt(outer * 0.98f);
-
-            p.material = new Material(Shader.Find(rotateGizmoShaderName));
-            p.material.SetTexture(mainTexProperty, TextureGenerator.CreateCircleOutlineTextureR8(outer, inner, UI3DProperties.DefaultAlpha, 0.0f));
-            p.material.SetColor(colorProperty, UI3DProperties.DefaultColor);
-            p.material.SetFloat(alphaProperty, UI3DProperties.DefaultAlpha);
-
-            go.GetComponent<MeshRenderer>().sharedMaterial = p.material;
-            go.SetActive(false);
-
-            return p;
         }
     }
 }
