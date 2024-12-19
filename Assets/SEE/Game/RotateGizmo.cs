@@ -52,7 +52,7 @@ namespace SEE.UI3D
         /// </summary>
         private static readonly int minAngleProperty = Shader.PropertyToID("_MinAngle");
         /// <summary>
-        /// The cached shader property ID for the gizmo's minimal angle.
+        /// The cached shader property ID for the gizmo's maximum angle.
         /// </summary>
         private static readonly int maxAngleProperty = Shader.PropertyToID("_MaxAngle");
         /// <summary>
