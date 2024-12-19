@@ -30,10 +30,6 @@
         /// </summary>
         ToggleMirror,
         /// <summary>
-        /// Opens the search menu.
-        /// </summary>
-        SearchMenu,
-        /// <summary>
         /// Undoes the last action.
         /// </summary>
         Undo,
