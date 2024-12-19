@@ -33,7 +33,14 @@ namespace SEE.UI3D
         /// </summary>
         private Material axisMaterial;
 
+        /// <summary>
+        /// The cached shader property ID for the cursor's main texture.
+        /// </summary>
         private static readonly int mainTexProperty = Shader.PropertyToID("_MainTex");
+
+        /// <summary>
+        /// The cached shader property ID for the cursor's color.
+        /// </summary>
         private static readonly int colorProperty = Shader.PropertyToID("_Color");
 
         /// <summary>
