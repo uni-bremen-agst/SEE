@@ -3,7 +3,7 @@
 namespace SEE.UI3D
 {
     /// <summary>
-    /// Properties of 3d ui-elements.
+    /// Properties of 3D UI elements.
     /// </summary>
     internal static class UI3DProperties
     {
