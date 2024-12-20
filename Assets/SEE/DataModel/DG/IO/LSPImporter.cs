@@ -177,6 +177,9 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private const string SelectionRangeAttribute = "SelectionRange";
 
+        private Stopwatch stopWatch;
+        private const bool BruteForce = false;
+
         /// <summary>
         /// Whether the given <paramref name="checkPath"/> applies to the given <paramref name="actualPath"/>.
         /// </summary>
@@ -206,6 +209,8 @@ namespace SEE.DataModel.DG.IO
         public async UniTask LoadAsync(Graph graph, Action<float> changePercentage = null,
                                        CancellationToken token = default)
         {
+            stopWatch = new Stopwatch();
+            Performance perf = Performance.Begin("LSP Total");
             // Query all documents whose file extension is supported by the language server.
             List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.FileExtensions).ToList();
             List<string> relevantDocuments = SourcePaths.SelectMany(RelevantDocumentsForPath)
@@ -221,7 +226,7 @@ namespace SEE.DataModel.DG.IO
                                            .Count(x => x != EdgeKind.None && x != EdgeKind.All && IncludeEdgeTypes.HasFlag(x));
             float edgeProgressFactor = 0.9f - 0.9f / (activatedEdgeKinds + 1);
 
-            bool supportsPullDiagnostics = Handler.ServerCapabilities.DiagnosticProvider != null;
+            bool supportsPullDiagnostics = false; //Handler.ServerCapabilities.DiagnosticProvider != null;
             if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
             {
                 Debug.LogWarning("The language server does not support pull diagnostics. "
@@ -229,6 +234,7 @@ namespace SEE.DataModel.DG.IO
                                  + "hence, some diagnostics might be missing.\n");
             }
 
+            Performance perfNodes = Performance.Begin("LSP Nodes");
             int documentCount;
             for (documentCount = 0; documentCount < relevantDocuments.Count; documentCount++)
             {
@@ -254,7 +260,7 @@ namespace SEE.DataModel.DG.IO
                         IEnumerable<Diagnostic> diagnostics = await Handler.PullDocumentDiagnosticsAsync(path);
                         if (diagnostics != null)
                         {
-                            HandleDiagnostics(diagnostics, path);
+                            HandleDiagnostics(diagnostics, path, graph);
                         }
                     }
                 }
@@ -277,6 +283,7 @@ namespace SEE.DataModel.DG.IO
                 // ~20% of the progress is made by loading the documents and its symbols.
                 changePercentage?.Invoke((1 - edgeProgressFactor) * documentCount / relevantDocuments.Count);
             }
+            perfNodes.End();
 
             // Relevant nodes (for edges) are those that have a source range and are not already in the graph.
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
@@ -297,8 +304,14 @@ namespace SEE.DataModel.DG.IO
             // We build a range tree for each file, so that we can quickly find the nodes with the smallest size
             // that contain the given range.
             Dictionary<string, List<Node>> relevantNodesByPath = relevantNodes.GroupBy(x => x.Path()).ToDictionary(x => x.Key, x => x.ToList());
-            rangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange));
+            Performance perfTree = Performance.Begin("LSP Tree");
+            if (!BruteForce)
+            {
+                rangeTrees = relevantNodesByPath.ToDictionary(x => x.Key, x => new KDIntervalTree<Node>(x.Value, node => node.SourceRange));
+            }
+            perfTree.End();
 
+            Performance perfEdges = Performance.Begin("LSP Edges");
             int i = 0;
             foreach ((string path, List<Node> nodes) in relevantNodesByPath)
             {
@@ -328,7 +341,14 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Reference) && Handler.ServerCapabilities.ReferencesProvider.TrueOrValue())
                     {
-                        await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
+                        try
+                        {
+                            await ConnectNodeViaAsync((p, line, character) => Handler.References(p, line, character), LSP.Reference, node, graph, reverseDirection: true, token);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
@@ -344,8 +364,13 @@ namespace SEE.DataModel.DG.IO
                     changePercentage?.Invoke(1 - edgeProgressFactor + edgeProgressFactor * i++ / (relevantNodes.Count + 1));
                 }
             }
+            perfEdges.End();
+
+            await File.AppendAllTextAsync(Performance.path, $"find,{stopWatch.Elapsed.TotalMilliseconds.ToString(CultureInfo.InvariantCulture)}\n", token);
+
             Debug.Log($"LSPImporter: Imported {graph.Nodes().Except(originalNodes).Count()} new nodes and {newEdges} new edges.\n");
 
+            Performance perfDiagnostics = Performance.Begin("LSP Diagnostics");
             // Handle diagnostics if not pulled.
             if (!supportsPullDiagnostics && IncludeDiagnostics != DiagnosticKind.None)
             {
@@ -354,18 +379,22 @@ namespace SEE.DataModel.DG.IO
                 await UniTask.Delay(Handler.TimeoutSpan, cancellationToken: token);
                 foreach (PublishDiagnosticsParams diagnosticsParams in Handler.GetUnhandledPublishedDiagnostics())
                 {
-                    HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path);
+                    HandleDiagnostics(diagnosticsParams.Diagnostics, diagnosticsParams.Uri.Path, graph);
                 }
             }
+            perfDiagnostics.End();
 
+            Performance perfAgg = Performance.Begin("LSP Aggregate");
             // Aggregate LOC upwards.
             MetricAggregator.AggregateSum(graph, new[] { NumericAttributeNames.LOC.Name() }, withSuffix: false, asInt: true);
             // Aggregate diagnostics upwards. We do this with a suffix, since these metrics may be used for erosion icons.
             MetricAggregator.AggregateSum(graph, IncludeDiagnostics.ToDiagnosticSeverity().Select(x => x.Name()), withSuffix: true, asInt: true);
+            perfAgg.End();
 
             graph.BasePath = Handler.ProjectPath;
 
             changePercentage?.Invoke(1);
+            perf.End();
 
             return;
 
@@ -459,13 +488,13 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="diagnostics">The diagnostics to associate with the nodes.</param>
         /// <param name="path">The path of the file to which the diagnostics belong.</param>
-        private void HandleDiagnostics(IEnumerable<Diagnostic> diagnostics, string path)
+        private void HandleDiagnostics(IEnumerable<Diagnostic> diagnostics, string path, Graph graph)
         {
             foreach (Diagnostic diagnostic in diagnostics)
             {
                 if (diagnostic.Severity.HasValue && IncludeDiagnostics.HasFlag(diagnostic.Severity.Value.ToDiagnosticKind()))
                 {
-                    IEnumerable<Node> diagnosticNodes = FindNodesByLocation(path, Range.FromLspRange(diagnostic.Range));
+                    IEnumerable<Node> diagnosticNodes = FindNodesByLocation(path, Range.FromLspRange(diagnostic.Range), graph: graph);
                     foreach (Node node in diagnosticNodes)
                     {
                         DiagnosticSeverity severity = diagnostic.Severity.Value;
@@ -499,7 +528,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range), graph).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
@@ -531,7 +560,7 @@ namespace SEE.DataModel.DG.IO
                 {
                     throw new OperationCanceledException();
                 }
-                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
+                Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range), graph).FirstOrDefault();
                 if (targetNode == null)
                 {
                     continue;
@@ -718,14 +747,14 @@ namespace SEE.DataModel.DG.IO
                 if (location.IsLocation)
                 {
                     // NOTE: We assume only local files are used.
-                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri.Path, Range.FromLspRange(location.Location.Range)))
+                    foreach (Node targetNode in FindNodesByLocation(location.Location!.Uri.Path, Range.FromLspRange(location.Location.Range), graph))
                     {
                         AddEdge(node, targetNode, type, reverseDirection, graph);
                     }
                 }
                 else
                 {
-                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri.Path, Range.FromLspRange(location.LocationLink.TargetRange)))
+                    foreach (Node targetNode in FindNodesByLocation(location.LocationLink!.TargetUri.Path, Range.FromLspRange(location.LocationLink.TargetRange), graph))
                     {
                         Edge edge = AddEdge(node, targetNode, type, reverseDirection, graph);
                         edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(location.LocationLink.TargetSelectionRange));
@@ -795,17 +824,29 @@ namespace SEE.DataModel.DG.IO
         /// <param name="range">The range in the file at which to search for nodes.</param>
         /// <returns>The nodes that are located at the given range in the file.</returns>
         /// <seealso cref="KDIntervalTree{T}"/>
-        private IEnumerable<Node> FindNodesByLocation(string path, Range range)
-
+        private IEnumerable<Node> FindNodesByLocation(string path, Range range, Graph graph)
         {
-            if (rangeTrees.TryGetValue(path, out KDIntervalTree<Node> tree))
+            stopWatch.Start();
+            IEnumerable<Node> result = null;
+            if (BruteForce)
             {
-                // We need to do a stabbing query here, with the caveat that we want the tightest fitting range.
-                // We use our custom-made KDIntervalTree for this purpose.
-                return tree.Stab(range);
+                // Find all nodes which contain this range.
+                result = graph.Nodes().Where(x => x.Path() == path && x.SourceRange != null && x.SourceRange.Contains(range));
+                result = result.Minima(x => x.SourceRange.Lines).Minima(x => (x.SourceRange.EndCharacter ?? int.MaxValue) - (x.SourceRange.StartCharacter ?? 0));
+            }
+            else
+            {
+                if (rangeTrees.TryGetValue(path, out KDIntervalTree<Node> tree))
+                {
+                    // We need to do a stabbing query here, with the caveat that we want the tightest fitting range.
+                    // We use our custom-made KDIntervalTree for this purpose.
+                    result = tree.Stab(range);
+                }
             }
 
-            return Enumerable.Empty<Node>();
+            result ??= Enumerable.Empty<Node>();
+            stopWatch.Stop();
+            return result;
         }
 
         /// <summary>

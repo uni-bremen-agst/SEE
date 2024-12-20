@@ -291,7 +291,8 @@ namespace SEE.Game.City
                     edgeRef.Value = graph.GetEdge(child.name);
                     if (edgeRef.Value == null)
                     {
-                        Debug.LogWarning($"Could not resolve edge reference {child.name}.\n");
+                        Debug.LogWarning($"Could not resolve edge reference {child.name}. Destroying edge.\n");
+                        Destroyer.Destroy(child);
                     }
                 }
 #if UNITY_EDITOR

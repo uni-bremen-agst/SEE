@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Globalization;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Utils
@@ -50,10 +51,18 @@ namespace SEE.Utils
             stopWatch.Stop();
             TimeSpan ts = stopWatch.Elapsed;
             totalTimeInMilliSeconds = ts.TotalMilliseconds;
+            WriteToCsv();
             if (print)
             {
-                Debug.Log($"Action {action} finished in {GetElapsedTime()} [h:m:s:ms] elapsed time).\n");
+                Debug.Log($"Action {action} finished in {totalTimeInMilliSeconds} [h:m:s:ms] elapsed time).\n");
             }
+        }
+
+        public const string path = "Performance.csv";
+
+        private void WriteToCsv()
+        {
+            System.IO.File.AppendAllText(path, $"{action},{totalTimeInMilliSeconds.ToString(CultureInfo.InvariantCulture)}\n");
         }
 
         /// <summary>
