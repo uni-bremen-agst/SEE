@@ -107,10 +107,7 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void OnDestroy()
         {
-            if (webCamTexture != null)
-            {
-                webCamTexture.Stop();
-            }
+            webCamTexture?.Stop();
             room?.Disconnect();
             CleanUp();
             room = null;
@@ -331,15 +328,11 @@ namespace SEE.Tools.Livekit
                 string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
                 GameObject meshObject = GameObject.Find("LivekitVideo_" + localClientId);
 
-                if (meshObject != null)
+                if (meshObject != null && meshObject.TryGetComponent(out MeshRenderer renderer))
                 {
-                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-                    if (renderer != null)
-                    {
-                        // Enable the renderer and set the texture.
-                        renderer.material.mainTexture = webCamTexture;
-                        renderer.enabled = true;
-                    }
+                    // Enable the renderer and set the texture.
+                    renderer.material.mainTexture = webCamTexture;
+                    renderer.enabled = true;
                 }
 
                 // Store the mesh object in the dictionary.
@@ -379,8 +372,7 @@ namespace SEE.Tools.Livekit
                 string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
                 if (videoObjects.TryGetValue(localClientId, out GameObject meshObject) && meshObject != null)
                 {
-                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-                    if (renderer != null)
+                    if (meshObject.TryGetComponent(out MeshRenderer renderer))
                     {
                         // Disable the renderer and clear the texture.
                         renderer.enabled = false;
@@ -417,13 +409,11 @@ namespace SEE.Tools.Livekit
                 GameObject meshObject = GameObject.Find("LivekitVideo_" + participant.Identity);
                 if (meshObject != null)
                 {
-                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-
                     // Create a new VideoStream instance for the subscribed track.
-                    VideoStream stream = new VideoStream(videoTrack);
+                    VideoStream stream = new(videoTrack);
                     stream.TextureReceived += texture =>
                     {
-                        if (renderer != null)
+                        if (meshObject.TryGetComponent(out MeshRenderer renderer))
                         {
                             // Enable the renderer and set the texture.
                             renderer.material.mainTexture = texture;
@@ -450,15 +440,13 @@ namespace SEE.Tools.Livekit
         {
             if (track is RemoteVideoTrack videoTrack)
             {
-                if (videoObjects.TryGetValue(participant.Identity, out GameObject meshObject) && meshObject != null)
+                if (videoObjects.TryGetValue(participant.Identity, out GameObject meshObject)
+                    && meshObject != null
+                    && meshObject.TryGetComponent(out MeshRenderer renderer))
                 {
-                    MeshRenderer renderer = meshObject.GetComponent<MeshRenderer>();
-                    if (renderer != null)
-                    {
-                        // Disable the renderer and clear the texture.
-                        renderer.enabled = false;
-                        renderer.material.mainTexture = null;
-                    }
+                    // Disable the renderer and clear the texture.
+                    renderer.enabled = false;
+                    renderer.material.mainTexture = null;
                 }
 
                 // Remove the stream from the list of active video streams.
