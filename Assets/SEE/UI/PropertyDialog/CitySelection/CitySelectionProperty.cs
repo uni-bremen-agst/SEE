@@ -1,11 +1,13 @@
 ﻿using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using System;
+using TMPro;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog.CitySelection
@@ -82,11 +84,13 @@ namespace SEE.UI.PropertyDialog.CitySelection
             {
                 // TODO show validation failed.
                 ShowNotification.Warn("Name is empty", "You need to enter an name for the city.");
+                selectedName.ValidateFailed("The entered city name must not be empty.");
             }
             else if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder) && citiesHolder.IsNameAlreadyUsed(selectedName.Value))
             {
                 // TODO is name already in use.
                 ShowNotification.Warn("Name is already in use", "You need to enter an not used name for the city.");
+                selectedName.ValidateFailed("Name is already in use. You need to enter an not used city name.");
             }
             else
             {

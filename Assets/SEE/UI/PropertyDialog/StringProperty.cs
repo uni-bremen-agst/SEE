@@ -1,4 +1,5 @@
 ﻿using System;
+using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -38,6 +39,11 @@ namespace SEE.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
+        /// Indicator of whether the validation error message should be displayed.
+        /// </summary>
+        private bool showValidationFailedMessage = false;
+
+        /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="stringInputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
@@ -54,9 +60,9 @@ namespace SEE.UI.PropertyDialog
             textField = GetInputField(inputField);
             textField.text = savedValue;
             SetupTooltip(inputField);
+            SetupDisableValidationMessageOnValueChange(inputField, textField);
 
             #region Local Methods
-
             void SetupTooltip(GameObject field)
             {
                 if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -104,6 +110,18 @@ namespace SEE.UI.PropertyDialog
                 }
             }
 
+            void SetupDisableValidationMessageOnValueChange(GameObject inputField, TMP_InputField textField)
+            {
+                textField.onValueChanged.AddListener(value =>
+                {
+                    if (showValidationFailedMessage)
+                    {
+                        GameFinder.FindChild(inputField, "Validation Area").SetActive(false);
+                        showValidationFailedMessage = false;
+                    }
+                });
+            }
+
             #endregion
         }
 
@@ -148,6 +166,18 @@ namespace SEE.UI.PropertyDialog
                     textField.text = value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Displays the text field for the validaiton failed message with the given <paramref name="errorMessage"/>.
+        /// </summary>
+        /// <param name="errorMessage">The error message which should be displayed.</param>
+        public void ValidateFailed(string errorMessage)
+        {
+            GameObject validationArea = GameFinder.FindChild(inputField, "Validation Area");
+            validationArea.SetActive(true);
+            validationArea.GetComponentInChildren<TextMeshProUGUI>().text = errorMessage;
+            showValidationFailedMessage = true;
         }
     }
 }
