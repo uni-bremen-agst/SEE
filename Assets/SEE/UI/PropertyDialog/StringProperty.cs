@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
@@ -187,7 +188,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Changes the colors of the objects based on the validation status.
         /// Adjusts the caret, the input field text, the font color of the entered text,
-        /// and the placeholder.
+        /// the placeholder and the background images (background and filled).
         /// </summary>
         /// <param name="color">The color of the validation status.</param>
         private void ChangeColorOfValidation(Color color)
@@ -207,6 +208,9 @@ namespace SEE.UI.PropertyDialog
             TextMeshProUGUI textTMP = GameFinder.FindChild(inputField, "Text Area").GetComponentInChildren<TextMeshProUGUI>();
             textTMP.faceColor = color;
             GameFinder.FindChild(inputField, "Placeholder").GetComponent<TextMeshProUGUI>().color = color;
+
+            UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();
+            managerInputField.UIManagerAsset.inputFieldColor = color;
         }
     }
 }
