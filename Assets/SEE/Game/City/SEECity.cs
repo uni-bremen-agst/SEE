@@ -394,6 +394,10 @@ namespace SEE.Game.City
         /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
+        [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphLoaded))]
         public void ReDrawGraph()
         {
             if (LoadedGraph == null)
