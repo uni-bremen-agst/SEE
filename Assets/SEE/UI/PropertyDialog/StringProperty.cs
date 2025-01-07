@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Xml;
 using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -117,6 +119,7 @@ namespace SEE.UI.PropertyDialog
                     if (showValidationFailedMessage)
                     {
                         GameFinder.FindChild(inputField, "Validation Area").SetActive(false);
+                        ChangeColorOfValidation(Color.white);
                         showValidationFailedMessage = false;
                     }
                 });
@@ -178,6 +181,32 @@ namespace SEE.UI.PropertyDialog
             validationArea.SetActive(true);
             validationArea.GetComponentInChildren<TextMeshProUGUI>().text = errorMessage;
             showValidationFailedMessage = true;
+            ChangeColorOfValidation(Color.red);
+        }
+
+        /// <summary>
+        /// Changes the colors of the objects based on the validation status.
+        /// Adjusts the caret, the input field text, the font color of the entered text,
+        /// and the placeholder.
+        /// </summary>
+        /// <param name="color">The color of the validation status.</param>
+        private void ChangeColorOfValidation(Color color)
+        {
+            textField.caretColor = color;
+            // Change the color of the TMP_Inputfield.
+            textField.colors = new ColorBlock
+            {
+                normalColor = color,
+                highlightedColor = color,
+                pressedColor = color,
+                disabledColor = color,
+                colorMultiplier = 1f,
+                fadeDuration = 0.1f
+            };
+            // Change the color of the input text and of the placeholder text.
+            TextMeshProUGUI textTMP = GameFinder.FindChild(inputField, "Text Area").GetComponentInChildren<TextMeshProUGUI>();
+            textTMP.faceColor = color;
+            GameFinder.FindChild(inputField, "Placeholder").GetComponent<TextMeshProUGUI>().color = color;
         }
     }
 }
