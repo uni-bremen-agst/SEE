@@ -39,6 +39,7 @@ namespace SEE.GameObjects
 
         /// <summary>
         /// Checks if a city with the given <paramref name="name"/> already exists.
+        /// Case sensitivity is not relevant.
         /// </summary>
         /// <param name="name">The name to be checked.</param>
         /// <returns>True, if already a city with that name exists, otherwise false.</returns>
@@ -46,7 +47,7 @@ namespace SEE.GameObjects
         {
             foreach((GameObject city, _) in Cities)
             {
-                if (city.name == name)
+                if (city.name.ToLower() == name.ToLower())
                 {
                     return true;
                 }
