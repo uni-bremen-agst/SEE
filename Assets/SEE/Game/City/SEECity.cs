@@ -120,7 +120,7 @@ namespace SEE.Game.City
         /// <summary>
         /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
-        private bool IsPipelineRunning;
+        protected bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -408,7 +408,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns whether the graph has been loaded.
         /// </summary>
-        private bool IsGraphLoaded => loadedGraph != null;
+        protected bool IsGraphLoaded => loadedGraph != null;
 
         /// <summary>
         /// Draws the graph.
@@ -422,59 +422,51 @@ namespace SEE.Game.City
         {
             if (IsPipelineRunning)
             {
-                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
+                ShowNotification.Error("Graph Drawing", "Graph provider pipeline is still running.");
                 return;
             }
-
-            if (LoadedGraph == null)
+            if (LoadedGraph != null)
             {
-                Debug.LogError("No graph loaded.\n");
+                DrawGraphAsync(VisualizedSubGraph).Forget();
             }
             else
             {
-                Graph theVisualizedSubGraph = VisualizedSubGraph;
-                if (ReferenceEquals(theVisualizedSubGraph, null))
+                ShowNotification.Error("Graph Drawing", "No graph loaded.");
+            }
+        }
+
+        /// <summary>
+        /// Draws <paramref name="graph"/>.
+        /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
+        /// </summary>
+        /// <param name="graph">graph to be drawn</param>
+        protected async UniTaskVoid DrawGraphAsync(Graph graph)
+        {
+            GraphRenderer renderer = new(this, graph);
+            try
+            {
+                using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
                 {
-                    Debug.LogError("No graph loaded.\n");
-                }
-                else
-                {
-                    DrawAsync(theVisualizedSubGraph).Forget();
+                    void ReportProgress(float x)
+                    {
+                        ProgressBar = x;
+                        updateProgress(x);
+                    }
+
+                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
                 }
             }
-
-            return;
-
-            async UniTaskVoid DrawAsync(Graph subGraph)
+            catch (OperationCanceledException)
             {
-                graphRenderer = new GraphRenderer(this, subGraph);
-                // We assume here that this SEECity instance was added to a game object as
-                // a component. The inherited attribute gameObject identifies this game object.
-                try
-                {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
-                    {
-                        void ReportProgress(float x)
-                        {
-                            ProgressBar = x;
-                            updateProgress(x);
-                        }
+                ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                throw;
+            }
 
-                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
-                    throw;
-                }
-
-                // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                // game starts. Otherwise, in playmode, we have to call it ourselves.
-                if (Application.isPlaying)
-                {
-                    InitializeAfterDrawn();
-                }
+            // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+            // game starts. Otherwise, in playmode, we have to call it ourselves.
+            if (Application.isPlaying)
+            {
+                InitializeAfterDrawn();
             }
         }
 
