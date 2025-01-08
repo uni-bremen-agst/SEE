@@ -26712,8 +26712,12 @@ MonoBehaviour:
       Data: 69|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
-      Entry: 9
-      Data: 4
+      Entry: 7
+      Data: 70|System.Collections.Generic.GenericEqualityComparer`1[[System.String,
+        mscorlib]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 12
       Data: 0
@@ -26725,11 +26729,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeLayout
       Entry: 7
-      Data: 70|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
+      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeLayoutKind,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 4
+      Data: 70
     - Name: 
       Entry: 12
       Data: 0
@@ -26741,11 +26745,11 @@ MonoBehaviour:
       Data: 
     - Name: InnerNodeShape
       Entry: 7
-      Data: 71|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
+      Data: 72|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[SEE.Game.City.NodeShapes,
         SEE]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 4
+      Data: 70
     - Name: 
       Entry: 12
       Data: 0
@@ -26757,11 +26761,11 @@ MonoBehaviour:
       Data: 
     - Name: LoadedForNodeTypes
       Entry: 7
-      Data: 72|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
+      Data: 73|System.Collections.Generic.Dictionary`2[[System.String, mscorlib],[System.Boolean,
         mscorlib]], mscorlib
     - Name: comparer
       Entry: 9
-      Data: 4
+      Data: 70
     - Name: 
       Entry: 12
       Data: 0
@@ -26782,20 +26786,20 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 73|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 74|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 74|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 75|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 75|SEE.GraphProviders.ReflexionGraphProvider, SEE
+      Data: 76|SEE.GraphProviders.ReflexionGraphProvider, SEE
     - Name: Architecture
       Entry: 7
-      Data: 76|SEE.Utils.Paths.DataPath, SEE
+      Data: 77|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -26810,7 +26814,7 @@ MonoBehaviour:
       Data: 
     - Name: Implementation
       Entry: 7
-      Data: 77|SEE.Utils.Paths.DataPath, SEE
+      Data: 78|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -26825,7 +26829,7 @@ MonoBehaviour:
       Data: 
     - Name: Mapping
       Entry: 7
-      Data: 78|SEE.Utils.Paths.DataPath, SEE
+      Data: 79|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 3
@@ -26874,7 +26878,7 @@ MonoBehaviour:
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 8
+    Kind: 3
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
@@ -26928,6 +26932,19 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  ArchitectureNodeLayoutSettings:
+    Kind: 8
+    IncrementalTreeMap:
+      LocalMovesDepth: 3
+      LocalMovesBranchingLimit: 4
+      pNorm: 1
+      PaddingMm: 5
+      GradientDescentPrecision: -4
+    LayoutPath:
+      Root: 3
+      RelativePath: /reflexion/compiler/ArchitectureLayout.sld
+      AbsolutePath: 
+  ArchitectureLayoutProportion: 0.6
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26964,7 +26981,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.0015002489
+  HeightOffset: 0.0015009642
 --- !u!65 &2147363518
 BoxCollider:
   m_ObjectHideFlags: 0
