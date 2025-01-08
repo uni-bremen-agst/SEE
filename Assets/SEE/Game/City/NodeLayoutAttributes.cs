@@ -5,6 +5,7 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine;
+using Sirenix.OdinInspector;
 
 namespace SEE.Game.City
 {
@@ -24,6 +25,7 @@ namespace SEE.Game.City
         /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
         [Tooltip("Settings for the IncrementalTreeMap layout. Used only for this kind of layout.")]
+        [ShowIf("@this.Kind == NodeLayoutKind.IncrementalTreeMap")]
         public IncrementalTreeMapAttributes IncrementalTreeMap = new();
 
         /// <summary>
