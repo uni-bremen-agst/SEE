@@ -7,13 +7,14 @@ using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GraphProviders;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils.Paths;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEETests
+using static SEE.DataModel.DG.VCS;
+
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
@@ -146,25 +147,25 @@ namespace SEETests
 
                 Assert.AreEqual(
                     1,
-                    series[0].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]
+                    series[0].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
                 );
 
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]
+                    series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
                 );
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]
+                    series[1].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
                 );
 
                 Assert.AreEqual(
                     2,
-                    series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]
+                    series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
                 );
                 Assert.AreEqual(
                     1,
-                    series[2].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]
+                    series[2].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
                 );
             });
         }
@@ -186,13 +187,13 @@ namespace SEETests
                 Graph g = await ProvidingGraphAsync();
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n1 = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n1.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n1.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(1, n1.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n1.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("AnotherFile.cs"));
                 Node n2 = g.GetNode("AnotherFile.cs");
-                Assert.AreEqual(2, n2.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(2, n2.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n2.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n2.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("dir1/dir2/actualFile.cs"));
             });
@@ -207,13 +208,13 @@ namespace SEETests
 
                 Graph g = await ProvidingGraphAsync(date: "01/12/2024");
                 // This file should be too old by now
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[VCS.NumberOfDevelopers]);
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfDevelopers]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[CommitFrequency]);
                 Graph g2 = await ProvidingGraphAsync();
                 Assert.NotNull(g2.GetNode("firstFile.cs"));
                 Node n = g2.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -230,8 +231,8 @@ namespace SEETests
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(2, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -257,8 +258,8 @@ namespace SEETests
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -276,8 +277,8 @@ namespace SEETests
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
 
                 Assert.IsNull(g.GetNode("otherfile.notcs"));
             });
@@ -296,8 +297,8 @@ namespace SEETests
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -325,8 +326,8 @@ namespace SEETests
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
