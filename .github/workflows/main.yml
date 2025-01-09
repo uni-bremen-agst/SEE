@@ -16,7 +16,7 @@ on:
         type: boolean
 
 concurrency:
-  group: ${{ github.ref }}
+  group: main-${{ github.ref }}
   cancel-in-progress: true
 
 permissions: read-all
