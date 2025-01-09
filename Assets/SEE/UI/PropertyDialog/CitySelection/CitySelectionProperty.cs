@@ -1,13 +1,10 @@
 ﻿using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.GameObjects;
-using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using System;
-using TMPro;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog.CitySelection
@@ -58,7 +55,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
             selectedName.Description = "Enter a name for the city.";
             group.AddProperty(selectedName);
 
-            /// Adds the property dialog to the dialog.
+            // Adds the property dialog to the dialog.
             PropertyDialog = Dialog.AddComponent<PropertyDialog>();
             PropertyDialog.Title = "Select a city type";
             PropertyDialog.Description = "Select a city type; then hit the OK button.";
@@ -67,7 +64,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
 
             PropertyDialog.OnConfirm.AddListener(OnConfirm);
             PropertyDialog.OnCancel.AddListener(Cancel);
-            /// Prevents the dialog from closing automatically upon confirmation.
+            // Prevents the dialog from closing automatically upon confirmation.
             PropertyDialog.AllowClosing(false);
 
             SEEInput.KeyboardShortcutsEnabled = false;

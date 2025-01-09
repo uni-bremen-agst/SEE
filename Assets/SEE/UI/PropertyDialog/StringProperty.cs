@@ -209,6 +209,7 @@ namespace SEE.UI.PropertyDialog
             textTMP.faceColor = color;
             GameFinder.FindChild(inputField, "Placeholder").GetComponent<TextMeshProUGUI>().color = color;
 
+            // Change the color of the input field background (the underlaying line).
             UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();
             managerInputField.UIManagerAsset.inputFieldColor = color;
         }

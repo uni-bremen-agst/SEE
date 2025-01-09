@@ -1,6 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using MathNet.Numerics;
-using OmniSharp.Extensions.LanguageServer.Protocol.Client.Capabilities;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -9,7 +7,6 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.UI.RuntimeConfigMenu;
@@ -150,7 +147,6 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.Finish:
-                    //AddCityToRuntimeMenu();
                     CityComponentsSettings();
                     progressState = ProgressState.Start;
                     break;
@@ -158,21 +154,6 @@ namespace SEE.GameObjects
                 default:
                     ShowNotification.Warn("Error", "Error in city selection");
                     break;
-            }
-        }
-
-        /// <summary>
-        /// Adds the created city to the <see cref="RuntimeConfigMenu"/>
-        /// </summary>
-        private void AddCityToRuntimeMenu()
-        {
-            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-            {
-                runtimeConfigMenu.BuildTabMenus();
-            }
-            else
-            {
-                ShowNotification.Warn("Error", "Error the city can't be added to the runtime config menu.");
             }
         }
 
