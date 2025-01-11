@@ -16,7 +16,7 @@ namespace SEE.Game.City
     /// <summary>
     /// Component responsible for implementing the results reported by the <see cref="ReflexionAnalysis"/>
     /// in the scene.
-    /// Must be attached to a <see cref="SEECity"/>.
+    /// Must be attached to a <see cref="SEEReflexionCity"/>.
     /// <em><see cref="StartFromScratch"/> must be called when adding this component to a city!</em>
     /// </summary>
     [DisallowMultipleComponent]
