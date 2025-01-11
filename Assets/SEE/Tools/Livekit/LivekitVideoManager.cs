@@ -18,21 +18,26 @@ namespace SEE.Tools.Livekit
     /// Handles publishing/unpublishing local video, subscribing/unsubscribing to remote video,
     /// and switching between available camera devices.
     /// </summary>
+    /// <remarks>This component is attached to UI Canvas/SettingsMenu/LivekitVideoManager.
+    /// See the prefabs SettingsMenu.prefab.</remarks>
     public class LivekitVideoManager : MonoBehaviour
     {
         /// <summary>
-        /// The URL of the LiveKit server to connect to.
+        /// The URL of the LiveKit server to connect to. This is a websocket URL.
         /// </summary>
+        [Tooltip("The URL of the LiveKit server to connect to. A websocket URL.")]
         public string LivekitUrl = "ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
         /// </summary>
+        [Tooltip("The URL used to fetch the access token required for authentication.")]
         public string TokenUrl = "http://localhost:3000";
 
         /// <summary>
         /// The room name to join in LiveKit.
         /// </summary>
+        [Tooltip("The room name to join in LiveKit.")]
         public string RoomName = "development";
 
         /// <summary>
@@ -58,32 +63,35 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// The dropdown UI component used to select between different available cameras.
         /// </summary>
+        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
         public Dropdown CameraDropdown;
 
         /// <summary>
         /// The image UI component that shows whether the video chat is active.
         /// </summary>
+        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
         public RawImage LivekitStatusImage;
 
         /// <summary>
         /// The text UI component that shows whether the video chat is active.
         /// </summary>
+        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
         public Text LivekitStatusText;
 
         /// <summary>
         /// A dictionary that maps participant identities to the GameObjects that represent their video streams.
         /// </summary>
-        private Dictionary<string, GameObject> videoObjects = new();
+        private readonly Dictionary<string, GameObject> videoObjects = new();
 
         /// <summary>
         /// A list of video sources created from the local webcam that are currently being published to the room.
         /// </summary>
-        private List<RtcVideoSource> rtcVideoSources = new();
+        private readonly List<RtcVideoSource> rtcVideoSources = new();
 
         /// <summary>
         /// A list of video streams from remote participants in the LiveKit room.
         /// </summary>
-        private List<VideoStream> videoStreams = new();
+        private readonly List<VideoStream> videoStreams = new();
 
         /// <summary>
         /// Initializes the video manager by obtaining a token and setting up the camera dropdown.
@@ -259,17 +267,18 @@ namespace SEE.Tools.Livekit
             RoomOptions options = new();
 
             // Attempt to connect to the room using the LiveKit server URL and the provided token.
+            Debug.Log($"[Livekit] Connecting to room: \"{room.Name}\" at URL {LivekitUrl}...\n");
             ConnectInstruction connect = room.Connect(LivekitUrl, token, options);
             yield return connect;
 
             // Check if the connection was successful.
-            if (!connect.IsError)
+            if (connect.IsError)
             {
-                Debug.Log("[Livekit] Connected to " + room.Name);
+                ShowNotification.Error("Livekit", $"Failed to connect to room: \"{room.Name}\" {connect}.");
             }
             else
             {
-                throw new System.Exception($"[Livekit] Failed to connect to room: {room.Name}.");
+                Debug.Log($"[Livekit] Connected to \"{room.Name}\" \n");
             }
         }
         #endregion
@@ -285,7 +294,7 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous publishing process.</returns>
         private IEnumerator PublishVideo()
         {
-            if (room == null)
+            if (room == null || !room.IsConnected)
             {
                 ShowNotification.Error("Livekit", "Not connected.");
                 yield break;
@@ -315,6 +324,9 @@ namespace SEE.Tools.Livekit
             };
 
             // Publish the video track to the room.
+            Debug.Log($"[Livekit] Connection state: {room.IsConnected}\n");
+            UnityEngine.Assertions.Assert.IsNotNull(room, "Room is null");
+            UnityEngine.Assertions.Assert.IsNotNull(room.LocalParticipant, "Local participant is null");
             PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(track, options);
             yield return publish;
 
