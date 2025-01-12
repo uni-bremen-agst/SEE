@@ -187,7 +187,9 @@ namespace SEE.Game.Avatars
                     {
                         switch (value)
                         {
+                            // removed at this moment so there is no confusion with the conversational interface
                             // data, interact, time, about, goodBye
+                            /*
                             case "data":
                                 brain.Overview();
                                 break;
@@ -205,7 +207,7 @@ namespace SEE.Game.Avatars
                                 break;
                             case "project":
                                 brain.Project();
-                                break;
+                                break;*/
                         }
                     }
                 }
@@ -312,6 +314,8 @@ namespace SEE.Game.Avatars
 
         private void Update()
         {
+            // Change so there is no confusion with the conversational interface
+            /*
             if (SEEInput.ToggleVoiceControl() && input != null)
             {
                 if (currentlyListening)
@@ -324,7 +328,7 @@ namespace SEE.Game.Avatars
                     ShowNotification.Info("Started listening", "Enabled voice input.", 5f);
                     StartListening();
                 }
-            }
+            }*/
         }
     }
 }

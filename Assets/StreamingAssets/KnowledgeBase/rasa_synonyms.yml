@@ -1,0 +1,3898 @@
+version: "3.1"
+nlu:
+  - lookup: Place
+    examples: |
+      - SEE
+      - S E E
+      - Game
+      - UIColorScheme
+      - U I Color Scheme
+      - City
+      - NodelayoutModel
+      - Nodelayout Model
+      - InnerNodeKindsModel
+      - Inner Node Kinds Model
+      - AbstractSEECityExtension
+      - Abstract S E E City Extension
+      - EdgeMeshScheduler
+      - Edge Mesh Scheduler
+      - SEECityRandom
+      - S E E City Random
+      - SEEJlgCity
+      - S E E Jlg City
+      - StatementCounter
+      - Statement Counter
+      - ColorRangeMapping
+      - Color Range Mapping
+      - ColorProperty
+      - Color Property
+      - SEECity
+      - S E E City
+      - NodeTypeVisualsMap
+      - Node Type Visuals Map
+      - LayoutSettings
+      - Layout Settings
+      - AbstractSEECity
+      - Abstract S E E City
+      - VisualNodeAttributes
+      - Visual Node Attributes
+      - ReflexionVisualization
+      - Reflexion Visualization
+      - ColorMap
+      - Color Map
+      - SEECityEvolution
+      - S E E City Evolution
+      - BoardAttributes
+      - Board Attributes
+      - EdgeLayoutAttributes
+      - Edge Layout Attributes
+      - MarkerAttributes
+      - Marker Attributes
+      - EdgeSelectionAttributes
+      - Edge Selection Attributes
+      - ErosionAttributes
+      - Erosion Attributes
+      - AntennaAttributes
+      - Antenna Attributes
+      - SEEReflexionCity
+      - S E E Reflexion City
+      - IncrementalTreeMapAttributes
+      - Incremental Tree Map Attributes
+      - DiffCity
+      - Diff City
+      - NodeLayoutAttributes
+      - Node Layout Attributes
+      - VisualNodeAttributesMapping
+      - Visual Node Attributes Mapping
+      - VisualAttributes
+      - Visual Attributes
+      - HolisticMetrics
+      - Holistic Metrics
+      - Metrics
+      - AverageCommentDensity
+      - Average Comment Density
+      - Metric
+      - NumberOfEdges
+      - Number Of Edges
+      - AverageLinesOfCode
+      - Average Lines Of Code
+      - NumberOfLeafNodes
+      - Number Of Leaf Nodes
+      - ReflexionMetrics
+      - Reflexion Metrics
+      - LinesOfCode
+      - Lines Of Code
+      - NumberOfNodeTypes
+      - Number Of Node Types
+      - WidgetControllers
+      - Widget Controllers
+      - BarChartController
+      - Bar Chart Controller
+      - WaterCircleController
+      - Water Circle Controller
+      - PercentageController
+      - Percentage Controller
+      - SingleNumberDisplayController
+      - Single Number Display Controller
+      - CoordinatesController
+      - Coordinates Controller
+      - CircularProgressionController
+      - Circular Progression Controller
+      - WidgetController
+      - Widget Controller
+      - MetricValue
+      - Metric Value
+      - MetricValueRange
+      - Metric Value Range
+      - MetricValueCollection
+      - Metric Value Collection
+      - ActionHelpers
+      - Action Helpers
+      - WidgetAdder
+      - Widget Adder
+      - BoardMover
+      - Board Mover
+      - WidgetDeleter
+      - Widget Deleter
+      - WidgetMover
+      - Widget Mover
+      - BoardAdder
+      - Board Adder
+      - ConfigManager
+      - Config Manager
+      - WidgetsManager
+      - Widgets Manager
+      - BoardsManager
+      - Boards Manager
+      - BoardConfig
+      - Board Config
+      - WidgetConfig
+      - Widget Config
+      - SceneManipulation
+      - Scene Manipulation
+      - GameElementDeleter
+      - Game Element Deleter
+      - GameNodeMover
+      - Game Node Mover
+      - GameNodeAdder
+      - Game Node Adder
+      - GameEdgeAdder
+      - Game Edge Adder
+      - GameObjectFader
+      - Game Object Fader
+      - Callback
+      - AcceptDivergence
+      - Accept Divergence
+      - CityRendering
+      - City Rendering
+      - GraphRenderer
+      - Graph Renderer
+      - IGraphRenderer
+      - I Graph Renderer
+      - AbstractLayoutNode
+      - Abstract Layout Node
+      - LayoutGraphNode
+      - Layout Graph Node
+      - LayoutGraphEdge
+      - Layout Graph Edge
+      - LayoutGameNode
+      - Layout Game Node
+      - VRStatus
+      - V R Status
+      - Operator
+      - AndCombinedOperationCallback
+      - And Combined Operation Callback
+      - IOperationCallback
+      - I Operation Callback
+      - NotificationOperator
+      - Notification Operator
+      - AlwaysFalseEqualityComparer
+      - Always False Equality Comparer
+      - EdgeOperator
+      - Edge Operator
+      - MorphismOperation
+      - Morphism Operation
+      - NodeOperator
+      - Node Operator
+      - GraphElementOperator
+      - Graph Element Operator
+      - DummyOperationCallback
+      - Dummy Operation Callback
+      - TweenOperationCallback
+      - Tween Operation Callback
+      - AbstractOperator
+      - Abstract Operator
+      - IOperation
+      - I Operation
+      - Operation
+      - TweenOperation
+      - Tween Operation
+      - Evolution
+      - LaidOutGraph
+      - Laid Out Graph
+      - EvolutionRenderer
+      - Evolution Renderer
+      - SliderDrag
+      - Slider Drag
+      - ObjectManager
+      - Object Manager
+      - GetValue
+      - Get Value
+      - SetValue
+      - Set Value
+      - SliderMarker
+      - Slider Marker
+      - AnimationDataModel
+      - Animation Data Model
+      - RevisionSelectionDataModel
+      - Revision Selection Data Model
+      - ChangePanel
+      - Change Panel
+      - SliderMarkerContainer
+      - Slider Marker Container
+      - AnimationInteraction
+      - Animation Interaction
+      - SceneQueries
+      - Scene Queries
+      - Charts
+      - VR
+      - V R
+      - ChartMoveHandlerVr
+      - Chart Move Handler Vr
+      - VrCanvasSetup
+      - Vr Canvas Setup
+      - VrPointer
+      - Vr Pointer
+      - VrInputModule
+      - Vr Input Module
+      - ChartContentVr
+      - Chart Content Vr
+      - ChartDragHandlerVr
+      - Chart Drag Handler Vr
+      - ChartPositionVr
+      - Chart Position Vr
+      - ChartSizeHandlerVr
+      - Chart Size Handler Vr
+      - ChartMultiSelectHandlerVr
+      - Chart Multi Select Handler Vr
+      - ChartMultiSelectHandler
+      - Chart Multi Select Handler
+      - ChartCreator
+      - Chart Creator
+      - ChartSizeHandler
+      - Chart Size Handler
+      - ChartContent
+      - Chart Content
+      - ShowInChartCallbackFn
+      - Show In Chart Callback Fn
+      - NodeChangesBuffer
+      - Node Changes Buffer
+      - AxisContentDropdown
+      - Axis Content Dropdown
+      - ScrollViewEntryData
+      - Scroll View Entry Data
+      - EventHandler
+      - Event Handler
+      - ScrollViewEntry
+      - Scroll View Entry
+      - ChartDragHandler
+      - Chart Drag Handler
+      - ChartManager
+      - Chart Manager
+      - ChartMarker
+      - Chart Marker
+      - ChartMoveHandler
+      - Chart Move Handler
+      - Worlds
+      - PlayerSpawner
+      - Player Spawner
+      - SpawnInfo
+      - Spawn Info
+      - Avatars
+      - ExpressionPlayerSynchronizer
+      - Expression Player Synchronizer
+      - VRIKSynchronizer
+      - V R I K Synchronizer
+      - PersonalAssistantSpeechInput
+      - Personal Assistant Speech Input
+      - PersonalAssistantBrain
+      - Personal Assistant Brain
+      - AvatarMovementAnimator
+      - Avatar Movement Animator
+      - AvatarAdapter
+      - Avatar Adapter
+      - VRIKActions
+      - V R I K Actions
+      - AvatarSRanipalLipV2
+      - Avatar S Ranipal Lip V2
+      - AvatarBlendshapeExpressions
+      - Avatar Blendshape Expressions
+      - NetSynchronizer
+      - Net Synchronizer
+      - VRAvatarAimingSystem
+      - V R Avatar Aiming System
+      - LaserPointer
+      - Laser Pointer
+      - AvatarAimingSystem
+      - Avatar Aiming System
+      - RTGInitializer
+      - R T G Initializer
+      - Runtime
+      - FunctionCallSimulator
+      - Function Call Simulator
+      - GraphElementIDMap
+      - Graph Element I D Map
+      - LabelAttributes
+      - Label Attributes
+      - Portal
+      - ReflexionMapper
+      - Reflexion Mapper
+      - Highlighter
+      - Tags
+      - LocalPlayer
+      - Local Player
+      - InteractionDecorator
+      - Interaction Decorator
+      - ColorRange
+      - Color Range
+      - UI
+      - U I
+      - HelpSystem
+      - Help System
+      - HelpSystemBuilder
+      - Help System Builder
+      - HelpEntry
+      - Help Entry
+      - HelpSystemEntry
+      - Help System Entry
+      - HelpSystemMenu
+      - Help System Menu
+      - RuntimeConfigMenu
+      - Runtime Config Menu
+      - RuntimeTabMenu
+      - Runtime Tab Menu
+      - RuntimeButtonAttribute
+      - Runtime Button Attribute
+      - RuntimeTabAttribute
+      - Runtime Tab Attribute
+      - RuntimeSliderManager
+      - Runtime Slider Manager
+      - RuntimeSmallEditorButton
+      - Runtime Small Editor Button
+      - RuntimeConfigMenuCollapse
+      - Runtime Config Menu Collapse
+      - PropertyDialog
+      - Property Dialog
+      - NodePropertyDialog
+      - Node Property Dialog
+      - SelectionProperty
+      - Selection Property
+      - NetworkPropertyDialog
+      - Network Property Dialog
+      - OnClosed
+      - On Closed
+      - HidePropertyDialog
+      - Hide Property Dialog
+      - AddBoardDialog
+      - Add Board Dialog
+      - AddWidgetDialog
+      - Add Widget Dialog
+      - SaveBoardDialog
+      - Save Board Dialog
+      - HolisticMetricsDialog
+      - Holistic Metrics Dialog
+      - LoadBoardDialog
+      - Load Board Dialog
+      - ButtonProperty
+      - Button Property
+      - StringProperty
+      - String Property
+      - Property
+      - PropertyGroup
+      - Property Group
+      - FilePicker
+      - File Picker
+      - Window
+      - CodeWindow
+      - Code Window
+      - CodeWindowValues
+      - Code Window Values
+      - TokenLanguage
+      - Token Language
+      - SEEToken
+      - S E E Token
+      - Type
+      - BaseWindow
+      - Base Window
+      - WindowValues
+      - Window Values
+      - WindowSpace
+      - Window Space
+      - WindowSpaceValues
+      - Window Space Values
+      - TreeWindow
+      - Tree Window
+      - TreeWindowContextMenu
+      - Tree Window Context Menu
+      - TreeWindowGroup
+      - Tree Window Group
+      - ITreeWindowGroupAssigment
+      - I Tree Window Group Assigment
+      - TreeWindowGroupAssigment
+      - Tree Window Group Assigment
+      - TreeWindowGrouper
+      - Tree Window Grouper
+      - UnsupportedTypeException
+      - Unsupported Type Exception
+      - Menu
+      - MenuEntry
+      - Menu Entry
+      - SimpleListMenu
+      - Simple List Menu
+      - SimpleMenu
+      - Simple Menu
+      - TabMenu
+      - Tab Menu
+      - NestedMenuEntry
+      - Nested Menu Entry
+      - SelectionMenu
+      - Selection Menu
+      - NestedListMenu
+      - Nested List Menu
+      - MenuLevel
+      - Menu Level
+      - ConfigMenu
+      - Config Menu
+      - ConfigMenuFactory
+      - Config Menu Factory
+      - EditableInstance
+      - Editable Instance
+      - ColorPicker
+      - Color Picker
+      - ColorPickerBuilder
+      - Color Picker Builder
+      - Slider
+      - SliderBuilder
+      - Slider Builder
+      - TabController
+      - Tab Controller
+      - UpdateNotifier
+      - Update Notifier
+      - TabGroup
+      - Tab Group
+      - FilePickerBuilder
+      - File Picker Builder
+      - TabButton
+      - Tab Button
+      - ColorPickerControl
+      - Color Picker Control
+      - DynamicUIBehaviour
+      - Dynamic U I Behaviour
+      - Dictaphone
+      - OnDictationFinishedEventHandler
+      - On Dictation Finished Event Handler
+      - UIBuilder
+      - U I Builder
+      - PageController
+      - Page Controller
+      - Switch
+      - SwitchBuilder
+      - Switch Builder
+      - ComboSelect
+      - Combo Select
+      - ComboSelectBuilder
+      - Combo Select Builder
+      - StateIndicator
+      - State Indicator
+      - AbstractStateIndicator
+      - Abstract State Indicator
+      - ActionStateIndicator
+      - Action State Indicator
+      - HideStateIndicator
+      - Hide State Indicator
+      - PopupMenu
+      - Popup Menu
+      - PopupMenuEntry
+      - Popup Menu Entry
+      - PopupMenuAction
+      - Popup Menu Action
+      - PopupMenuHeading
+      - Popup Menu Heading
+      - LoadBoardButtonController
+      - Load Board Button Controller
+      - AddBoardSliderController
+      - Add Board Slider Controller
+      - Notification
+      - ShowNotification
+      - Show Notification
+      - SEENotificationManager
+      - S E E Notification Manager
+      - NotificationData
+      - Notification Data
+      - Tooltip
+      - PlatformDependentComponent
+      - Platform Dependent Component
+      - SettingsMenu
+      - Settings Menu
+      - LoadingSpinner
+      - Loading Spinner
+      - LoadingSpinnerDisposable
+      - Loading Spinner Disposable
+      - OpeningDialog
+      - Opening Dialog
+      - Utils
+      - MainCamera
+      - Main Camera
+      - OnCameraAvailableCallback
+      - On Camera Available Callback
+      - Config
+      - ConfigReader
+      - Config Reader
+      - Parser
+      - Scanner
+      - ConfigIO
+      - Config I O
+      - IPersistentConfigItem
+      - I Persistent Config Item
+      - ConfigWriter
+      - Config Writer
+      - SyntaxError
+      - Syntax Error
+      - Filenames
+      - Performance
+      - ColorExtensions
+      - Color Extensions
+      - ColorPalette
+      - Color Palette
+      - Assertions
+      - InvalidCodePathException
+      - Invalid Code Path Exception
+      - Icons
+      - BoundingBox
+      - Bounding Box
+      - CountingJoin
+      - Counting Join
+      - CallBackFunction
+      - Call Back Function
+      - TreeVisitor
+      - Tree Visitor
+      - Forest
+      - NodeVisitor
+      - Node Visitor
+      - Node
+      - Paths
+      - FilePath
+      - File Path
+      - DataPath
+      - Data Path
+      - DirectoryPath
+      - Directory Path
+      - ILogger
+      - I Logger
+      - Medians
+      - IdeRPC
+      - Ide R P C
+      - JsonRpcConnection
+      - Json Rpc Connection
+      - ConnectionEventHandler
+      - Connection Event Handler
+      - JsonRpcSocketServer
+      - Json Rpc Socket Server
+      - Client
+      - JsonRpcServer
+      - Json Rpc Server
+      - JsonRpcServerCreationFailedException
+      - Json Rpc Server Creation Failed Exception
+      - Arrays
+      - ArrayUtils
+      - Array Utils
+      - ArrayComparer
+      - Array Comparer
+      - GameObjectHierarchy
+      - Game Object Hierarchy
+      - TextualDiff
+      - Textual Diff
+      - PhysicsUtil
+      - Physics Util
+      - FloatUtils
+      - Float Utils
+      - DefaultDictionary
+      - Default Dictionary
+      - VectorOperations
+      - Vector Operations
+      - UIExtensions
+      - U I Extensions
+      - StringListSerializer
+      - String List Serializer
+      - Wrapper
+      - SEELogger
+      - S E E Logger
+      - History
+      - CreateReversibleAction
+      - Create Reversible Action
+      - IReversibleAction
+      - I Reversible Action
+      - UndoImpossible
+      - Undo Impossible
+      - RedoImpossible
+      - Redo Impossible
+      - ActionHistory
+      - Action History
+      - GlobalHistoryEntry
+      - Global History Entry
+      - Destroyer
+      - NumericalSortExtension
+      - Numerical Sort Extension
+      - MathExtensions
+      - Math Extensions
+      - Tweens
+      - SerializableSpline
+      - Serializable Spline
+      - TinySplineInterop
+      - Tiny Spline Interop
+      - GraphElementExtensions
+      - Graph Element Extensions
+      - CollectionExtensions
+      - Collection Extensions
+      - PrefabInstantiator
+      - Prefab Instantiator
+      - AsyncUtils
+      - Async Utils
+      - RandomTrees
+      - Random Trees
+      - FileIO
+      - File I O
+      - Raycasting
+      - PointerHelper
+      - Pointer Helper
+      - GXLParser
+      - G X L Parser
+      - StringExtensions
+      - String Extensions
+      - EnvironmentVariableAttribute
+      - Environment Variable Attribute
+      - EnvironmentVariableRetriever
+      - Environment Variable Retriever
+      - Layout
+      - NodeLayouts
+      - Node Layouts
+      - EvoStreets
+      - Evo Streets
+      - LayoutDescriptor
+      - Layout Descriptor
+      - Location
+      - Rectangle
+      - ENode
+      - E Node
+      - ELeaf
+      - E Leaf
+      - EInner
+      - E Inner
+      - ENodeFactory
+      - E Node Factory
+      - TreeMap
+      - Tree Map
+      - RectangleTiling
+      - Rectangle Tiling
+      - NodeSize
+      - Node Size
+      - IncrementalTreeMap
+      - Incremental Tree Map
+      - StretchMove
+      - Stretch Move
+      - LocalMove
+      - Local Move
+      - FlipMove
+      - Flip Move
+      - Segment
+      - CorrectAreas
+      - Correct Areas
+      - Dissect
+      - LocalMoves
+      - Local Moves
+      - Cose
+      - CoseGeometry
+      - Cose Geometry
+      - CoseNodeSublayoutValues
+      - Cose Node Sublayout Values
+      - CoseEdge
+      - Cose Edge
+      - CoseCoarsenEdge
+      - Cose Coarsen Edge
+      - SublayoutNode
+      - Sublayout Node
+      - AbstractSublayoutNode
+      - Abstract Sublayout Node
+      - CoseNode
+      - Cose Node
+      - IterationConstraint
+      - Iteration Constraint
+      - CoseLayout
+      - Cose Layout
+      - CoseHelper
+      - Cose Helper
+      - CoseCoarsenGraph
+      - Cose Coarsen Graph
+      - CoseGraphManager
+      - Cose Graph Manager
+      - CoseGraph
+      - Cose Graph
+      - CoseNodeLayoutValues
+      - Cose Node Layout Values
+      - CoseLayoutSettings
+      - Cose Layout Settings
+      - EdgesMeasurements
+      - Edges Measurements
+      - Measurements
+      - SublayoutLayoutNode
+      - Sublayout Layout Node
+      - LayoutSublayoutNode
+      - Layout Sublayout Node
+      - CoseCoarsenNode
+      - Cose Coarsen Node
+      - CoseGraphAttributes
+      - Cose Graph Attributes
+      - IncrementalTreeMapLayout
+      - Incremental Tree Map Layout
+      - NodeLayout
+      - Node Layout
+      - CirclePacking
+      - Circle Packing
+      - Circle
+      - CirclePacker
+      - Circle Packer
+      - EvoStreetsNodeLayout
+      - Evo Streets Node Layout
+      - CirclePackingNodeLayout
+      - Circle Packing Node Layout
+      - HierarchicalNodeLayout
+      - Hierarchical Node Layout
+      - IIncrementalNodeLayout
+      - I Incremental Node Layout
+      - RectanglePacking
+      - Rectangle Packing
+      - PTree
+      - P Tree
+      - PNode
+      - P Node
+      - PRectangle
+      - P Rectangle
+      - LoadedNodeLayout
+      - Loaded Node Layout
+      - ManhattanLayout
+      - Manhattan Layout
+      - FlatNodeLayout
+      - Flat Node Layout
+      - TreemapLayout
+      - Treemap Layout
+      - RectanglePackingNodeLayout
+      - Rectangle Packing Node Layout
+      - BalloonNodeLayout
+      - Balloon Node Layout
+      - NodeInfo
+      - Node Info
+      - EdgeLayouts
+      - Edge Layouts
+      - SplineEdgeLayout
+      - Spline Edge Layout
+      - IEdgeLayout
+      - I Edge Layout
+      - CurvyEdgeLayoutBase
+      - Curvy Edge Layout Base
+      - StraightEdgeLayout
+      - Straight Edge Layout
+      - BundledEdgeLayout
+      - Bundled Edge Layout
+      - ILayoutEdge
+      - I Layout Edge
+      - IO
+      - I O
+      - SLDReader
+      - S L D Reader
+      - GVLReader
+      - G V L Reader
+      - ParentNode
+      - Parent Node
+      - GVLWriter
+      - G V L Writer
+      - SLDWriter
+      - S L D Writer
+      - Pair
+      - LayoutGraphExtensions
+      - Layout Graph Extensions
+      - LCAFinder
+      - L C A Finder
+      - NodeToIntegerMap
+      - Node To Integer Map
+      - LinePoints
+      - Line Points
+      - LayoutNodes
+      - Layout Nodes
+      - Sublayout
+      - IHierarchyNode
+      - I Hierarchy Node
+      - IGameNode
+      - I Game Node
+      - IGraphNode
+      - I Graph Node
+      - ISublayoutNode
+      - I Sublayout Node
+      - ILayoutNode
+      - I Layout Node
+      - ILayoutNodeHierarchy
+      - I Layout Node Hierarchy
+      - LayoutVertex
+      - Layout Vertex
+      - LayoutEdge
+      - Layout Edge
+      - NodeTransform
+      - Node Transform
+      - GO
+      - G O
+      - PlayerMenu
+      - Player Menu
+      - TextGUIAndPaperResizer
+      - Text G U I And Paper Resizer
+      - TextFactory
+      - Text Factory
+      - NodeFactories
+      - Node Factories
+      - NodeFactory
+      - Node Factory
+      - CubeFactory
+      - Cube Factory
+      - CylinderFactory
+      - Cylinder Factory
+      - SpiderFactory
+      - Spider Factory
+      - BarsFactory
+      - Bars Factory
+      - Triangulator
+      - PolygonFactory
+      - Polygon Factory
+      - FaceCamera
+      - Face Camera
+      - GameObjectExtensions
+      - Game Object Extensions
+      - SEESpline
+      - S E E Spline
+      - SplineMorphism
+      - Spline Morphism
+      - Decorators
+      - AntennaDecorator
+      - Antenna Decorator
+      - GraphElementRef
+      - Graph Element Ref
+      - IScale
+      - I Scale
+      - TextureGenerator
+      - Texture Generator
+      - MarkerFactory
+      - Marker Factory
+      - GlobalGameObjectNames
+      - Global Game Object Names
+      - NodeRef
+      - Node Ref
+      - PlaneFactory
+      - Plane Factory
+      - EdgeRef
+      - Edge Ref
+      - Materials
+      - CityCursor
+      - City Cursor
+      - EdgeFactory
+      - Edge Factory
+      - ZScoreScale
+      - Z Score Scale
+      - Statistics
+      - IconFactory
+      - Icon Factory
+      - ErosionIssues
+      - Erosion Issues
+      - LineFactory
+      - Line Factory
+      - Plane
+      - LinearScale
+      - Linear Scale
+      - HideSourceCodeAndPaper
+      - Hide Source Code And Paper
+      - Net
+      - Actions
+      - NetActionHistory
+      - Net Action History
+      - VersionNetAction
+      - Version Net Action
+      - ZoomNetAction
+      - Zoom Net Action
+      - RuntimeConfig
+      - Runtime Config
+      - UpdateCityAttributeNetAction
+      - Update City Attribute Net Action
+      - UpdatePathCityFieldNetAction
+      - Update Path City Field Net Action
+      - UpdateCityMethodNetAction
+      - Update City Method Net Action
+      - RemoveListElementNetAction
+      - Remove List Element Net Action
+      - UpdateColorCityFieldNetAction
+      - Update Color City Field Net Action
+      - AddListElementNetAction
+      - Add List Element Net Action
+      - UpdateCityNetAction
+      - Update City Net Action
+      - Synchronizer
+      - CreateBoardNetAction
+      - Create Board Net Action
+      - MoveBoardNetAction
+      - Move Board Net Action
+      - HolisticMetricsNetAction
+      - Holistic Metrics Net Action
+      - DeleteBoardNetAction
+      - Delete Board Net Action
+      - SwitchCityNetAction
+      - Switch City Net Action
+      - MoveWidgetNetAction
+      - Move Widget Net Action
+      - DeleteWidgetNetAction
+      - Delete Widget Net Action
+      - CreateWidgetNetAction
+      - Create Widget Net Action
+      - AddNodeNetAction
+      - Add Node Net Action
+      - ExecuteActionPacket
+      - Execute Action Packet
+      - MoveNetAction
+      - Move Net Action
+      - VRIKNetAction
+      - V R I K Net Action
+      - ExpressionPlayerNetAction
+      - Expression Player Net Action
+      - ShuffleNetAction
+      - Shuffle Net Action
+      - AcceptDivergenceNetAction
+      - Accept Divergence Net Action
+      - TogglePointingNetAction
+      - Toggle Pointing Net Action
+      - PutOnAndFitNetAction
+      - Put On And Fit Net Action
+      - SetSelectNetAction
+      - Set Select Net Action
+      - SetHoverNetAction
+      - Set Hover Net Action
+      - AddEdgeNetAction
+      - Add Edge Net Action
+      - SyncWindowSpaceAction
+      - Sync Window Space Action
+      - EditNodeNetAction
+      - Edit Node Net Action
+      - DeleteNetAction
+      - Delete Net Action
+      - SetParentNetAction
+      - Set Parent Net Action
+      - RotateNodeNetAction
+      - Rotate Node Net Action
+      - SetGrabNetAction
+      - Set Grab Net Action
+      - ScaleNodeNetAction
+      - Scale Node Net Action
+      - HighlightNetAction
+      - Highlight Net Action
+      - AbstractNetAction
+      - Abstract Net Action
+      - ActionSerializer
+      - Action Serializer
+      - SynchronizeInteractableNetAction
+      - Synchronize Interactable Net Action
+      - ReviveNetAction
+      - Revive Net Action
+      - PacketSequencePacket
+      - Packet Sequence Packet
+      - Network
+      - CallBack
+      - Call Back
+      - OnShutdownFinished
+      - On Shutdown Finished
+      - AddressInfo
+      - Address Info
+      - Dashboard
+      - Model
+      - Issues
+      - CloneIssue
+      - Clone Issue
+      - CycleIssue
+      - Cycle Issue
+      - IssueTable
+      - Issue Table
+      - DeadEntityIssue
+      - Dead Entity Issue
+      - ArchitectureViolationIssue
+      - Architecture Violation Issue
+      - MetricViolationIssue
+      - Metric Violation Issue
+      - StyleViolationIssue
+      - Style Violation Issue
+      - Issue
+      - IssueTag
+      - Issue Tag
+      - IssueComment
+      - Issue Comment
+      - SourceCodeEntity
+      - Source Code Entity
+      - Entity
+      - MetricValueTableRow
+      - Metric Value Table Row
+      - EntityList
+      - Entity List
+      - MetricList
+      - Metric List
+      - MetricValueTable
+      - Metric Value Table
+      - UserRef
+      - User Ref
+      - DashboardInfo
+      - Dashboard Info
+      - ProjectReference
+      - Project Reference
+      - DashboardError
+      - Dashboard Error
+      - DashboardErrorData
+      - Dashboard Error Data
+      - AnalysisVersion
+      - Analysis Version
+      - ToolsVersion
+      - Tools Version
+      - VersionKindCount
+      - Version Kind Count
+      - DashboardVersion
+      - Dashboard Version
+      - DashboardException
+      - Dashboard Exception
+      - DashboardRetriever
+      - Dashboard Retriever
+      - AxivionCertificateHandler
+      - Axivion Certificate Handler
+      - DashboardResult
+      - Dashboard Result
+      - ClientNetworkTransform
+      - Client Network Transform
+      - Util
+      - Invoker
+      - Logger
+      - NetworkCommsLogger
+      - Network Comms Logger
+      - AbstractPacket
+      - Abstract Packet
+      - PacketSerializer
+      - Packet Serializer
+      - NetworkException
+      - Network Exception
+      - NoServerConnection
+      - No Server Connection
+      - CannotStartServer
+      - Cannot Start Server
+      - PacketHandler
+      - Packet Handler
+      - SerializedPendingPacket
+      - Serialized Pending Packet
+      - TranslatedPendingPacket
+      - Translated Pending Packet
+      - Server
+      - DataModel
+      - Data Model
+      - CallTreeCategory
+      - Call Tree Category
+      - CallTreeCategories
+      - Call Tree Categories
+      - CallTreeFunctionCall
+      - Call Tree Function Call
+      - CallTree
+      - Call Tree
+      - FunctionInformation
+      - Function Information
+      - DYNParser
+      - D Y N Parser
+      - CallTreeReader
+      - Call Tree Reader
+      - NotEnoughCategoriesException
+      - Not Enough Categories Exception
+      - IncorrectAttributeCountException
+      - Incorrect Attribute Count Exception
+      - DG
+      - D G
+      - SourceRange
+      - Source Range
+      - FileRanges
+      - File Ranges
+      - SourceRangeIndex
+      - Source Range Index
+      - SortedRanges
+      - Sorted Ranges
+      - Range
+      - GraphReader
+      - Graph Reader
+      - MetricExporter
+      - Metric Exporter
+      - GraphWriter
+      - Graph Writer
+      - AsString
+      - As String
+      - JaCoCoImporter
+      - Ja Co Co Importer
+      - GraphsReader
+      - Graphs Reader
+      - MetricImporter
+      - Metric Importer
+      - MetricsIO
+      - Metrics I O
+      - EdgeMemento
+      - Edge Memento
+      - UnknownAttribute
+      - Unknown Attribute
+      - AttributeNamesExtensions
+      - Attribute Names Extensions
+      - JaCoCo
+      - Ja Co Co
+      - ChangeMarkers
+      - Change Markers
+      - SubgraphMemento
+      - Subgraph Memento
+      - IGraphElementDiff
+      - I Graph Element Diff
+      - Attributable
+      - Edge
+      - GraphElement
+      - Graph Element
+      - Graph
+      - AllAttributeNames
+      - All Attribute Names
+      - GraphElementsMemento
+      - Graph Elements Memento
+      - GraphElementEqualityComparer
+      - Graph Element Equality Comparer
+      - NodeEqualityComparer
+      - Node Equality Comparer
+      - EdgeEqualityComparer
+      - Edge Equality Comparer
+      - NumericAttributeDiff
+      - Numeric Attribute Diff
+      - MergeDiffGraphExtension
+      - Merge Diff Graph Extension
+      - TryGet
+      - Try Get
+      - AttributeDiff
+      - Attribute Diff
+      - TryGetValue
+      - Try Get Value
+      - GraphExtensions
+      - Graph Extensions
+      - Observable
+      - ProxyObserver
+      - Proxy Observer
+      - Unsubscriber
+      - GraphSearch
+      - Graph Search
+      - GraphFilter
+      - Graph Filter
+      - IGraphModifier
+      - I Graph Modifier
+      - GraphSorter
+      - Graph Sorter
+      - ChangeEvent
+      - Change Event
+      - EdgeChange
+      - Edge Change
+      - GraphElementIDComparer
+      - Graph Element I D Comparer
+      - GraphEvent
+      - Graph Event
+      - VersionChangeEvent
+      - Version Change Event
+      - EdgeEvent
+      - Edge Event
+      - HierarchyEvent
+      - Hierarchy Event
+      - NodeEvent
+      - Node Event
+      - IAttributeEvent
+      - I Attribute Event
+      - AttributeEvent
+      - Attribute Event
+      - GraphElementTypeEvent
+      - Graph Element Type Event
+      - Tools
+      - MetricAggregator
+      - Metric Aggregator
+      - FaceCam
+      - Face Cam
+      - ReflexionAnalysis
+      - Reflexion Analysis
+      - ReflexionGraph
+      - Reflexion Graph
+      - HandleMappingChange
+      - Handle Mapping Change
+      - PartitionedDependencies
+      - Partitioned Dependencies
+      - ArchitectureAnalysisException
+      - Architecture Analysis Exception
+      - CyclicHierarchyException
+      - Cyclic Hierarchy Exception
+      - CorruptStateException
+      - Corrupt State Exception
+      - RedundantSpecifiedEdgeException
+      - Redundant Specified Edge Exception
+      - NotInSubgraphException
+      - Not In Subgraph Exception
+      - ExpectedSpecifiedEdgeException
+      - Expected Specified Edge Exception
+      - ExpectedPropagatedEdgeException
+      - Expected Propagated Edge Exception
+      - AlreadyPropagatedException
+      - Already Propagated Exception
+      - AlreadyExplicitlyMappedException
+      - Already Explicitly Mapped Exception
+      - NotExplicitlyMappedException
+      - Not Explicitly Mapped Exception
+      - AlreadyContainedException
+      - Already Contained Exception
+      - NotAnOrphanException
+      - Not An Orphan Exception
+      - IsAnOrphanException
+      - Is An Orphan Exception
+      - ReflexionGraphTools
+      - Reflexion Graph Tools
+      - RandomGraphs
+      - Random Graphs
+      - RandomAttributeDescriptor
+      - Random Attribute Descriptor
+      - Constraint
+      - Controls
+      - ShowEdgesAction
+      - Show Edges Action
+      - ShuffleAction
+      - Shuffle Action
+      - ShowEdges
+      - Show Edges
+      - ShowGrabbing
+      - Show Grabbing
+      - DrawAction
+      - Draw Action
+      - HighlightedInteractableObjectAction
+      - Highlighted Interactable Object Action
+      - NodeManipulationAction
+      - Node Manipulation Action
+      - Memento
+      - Gizmo
+      - AcceptDivergenceAction
+      - Accept Divergence Action
+      - LoadBoardAction
+      - Load Board Action
+      - SaveBoardAction
+      - Save Board Action
+      - AddBoardAction
+      - Add Board Action
+      - MoveWidgetAction
+      - Move Widget Action
+      - MoveBoardAction
+      - Move Board Action
+      - DeleteBoardAction
+      - Delete Board Action
+      - AddWidgetAction
+      - Add Widget Action
+      - DeleteWidgetAction
+      - Delete Widget Action
+      - ZoomActionDesktop
+      - Zoom Action Desktop
+      - ShowTree
+      - Show Tree
+      - ScaleNodeAction
+      - Scale Node Action
+      - ScaleMemento
+      - Scale Memento
+      - ScaleGizmo
+      - Scale Gizmo
+      - ActionStateType
+      - Action State Type
+      - SelectAction
+      - Select Action
+      - DesktopChartAction
+      - Desktop Chart Action
+      - ChartAction
+      - Chart Action
+      - InteractableObjectAction
+      - Interactable Object Action
+      - RotateAction
+      - Rotate Action
+      - RotateMemento
+      - Rotate Memento
+      - RotateGizmo
+      - Rotate Gizmo
+      - ShowSelection
+      - Show Selection
+      - ActionStateTypeGroup
+      - Action State Type Group
+      - MoveAction
+      - Move Action
+      - GrabbedObject
+      - Grabbed Object
+      - AddEdgeAction
+      - Add Edge Action
+      - ShowLabel
+      - Show Label
+      - GlobalActionHistory
+      - Global Action History
+      - EditNodeAction
+      - Edit Node Action
+      - ContextMenuAction
+      - Context Menu Action
+      - ZoomAction
+      - Zoom Action
+      - ZoomCommand
+      - Zoom Command
+      - ZoomState
+      - Zoom State
+      - HideAction
+      - Hide Action
+      - ShowHovering
+      - Show Hovering
+      - DeleteAction
+      - Delete Action
+      - AbstractActionStateType
+      - Abstract Action State Type
+      - AddNodeAction
+      - Add Node Action
+      - ShowCodeAction
+      - Show Code Action
+      - AbstractPlayerAction
+      - Abstract Player Action
+      - ActionStateTypes
+      - Action State Types
+      - HighlightErosion
+      - Highlight Erosion
+      - KeywordInput
+      - Keyword Input
+      - XRInput
+      - X R Input
+      - PlayerMovement
+      - Player Movement
+      - Interactables
+      - Outline
+      - ListVector3
+      - List Vector3
+      - KeyActions
+      - Key Actions
+      - KeyBindings
+      - Key Bindings
+      - KeyActionDescriptor
+      - Key Action Descriptor
+      - KeyMap
+      - Key Map
+      - KeyData
+      - Key Data
+      - SEEInput
+      - S E E Input
+      - DictationInput
+      - Dictation Input
+      - SceneSettings
+      - Scene Settings
+      - DesktopPlayerMovement
+      - Desktop Player Movement
+      - CameraState
+      - Camera State
+      - WindowSpaceManager
+      - Window Space Manager
+      - GrammarInput
+      - Grammar Input
+      - SpeechInput
+      - Speech Input
+      - ToggleBrowser
+      - Toggle Browser
+      - InteractableObject
+      - Interactable Object
+      - MultiPlayerHoverAction
+      - Multi Player Hover Action
+      - LocalPlayerHoverAction
+      - Local Player Hover Action
+      - MultiPlayerSelectAction
+      - Multi Player Select Action
+      - MulitPlayerReplaceSelectAction
+      - Mulit Player Replace Select Action
+      - LocalPlayerSelectAction
+      - Local Player Select Action
+      - MultiPlayerGrabAction
+      - Multi Player Grab Action
+      - LocalPlayerGrabAction
+      - Local Player Grab Action
+      - Audio
+      - AudioGameObject
+      - Audio Game Object
+      - IAudioManager
+      - I Audio Manager
+      - SoundEffectNetAction
+      - Sound Effect Net Action
+      - AudioManagerImpl
+      - Audio Manager Impl
+      - SceneContext
+      - Scene Context
+      - GraphProviders
+      - Graph Providers
+      - ReflexionGraphProvider
+      - Reflexion Graph Provider
+      - FileBasedGraphProvider
+      - File Based Graph Provider
+      - GXLGraphProvider
+      - G X L Graph Provider
+      - DashboardGraphProvider
+      - Dashboard Graph Provider
+      - GraphProviderFactory
+      - Graph Provider Factory
+      - GraphProvider
+      - Graph Provider
+      - MergeDiffGraphProvider
+      - Merge Diff Graph Provider
+      - JaCoCoGraphProvider
+      - Ja Co Co Graph Provider
+      - PipelineGraphProvider
+      - Pipeline Graph Provider
+      - CSVGraphProvider
+      - C S V Graph Provider
+      - VCS
+      - V C S
+      - VersionControlFactory
+      - Version Control Factory
+      - GitVersionControl
+      - Git Version Control
+      - UnknownCommitID
+      - Unknown Commit I D
+      - IVersionControl
+      - I Version Control
+      - CameraPaths
+      - Camera Paths
+      - CameraRecorder
+      - Camera Recorder
+      - PathData
+      - Path Data
+      - CameraPath
+      - Camera Path
+      - PathReplay
+      - Path Replay
+      - XR
+      - X R
+      - ManualXRControl
+      - Manual X R Control
+      - XRCameraRigManager
+      - X R Camera Rig Manager
+      - JLG
+      - J L G
+      - MalformedStatement
+      - Malformed Statement
+      - ParsedJLG
+      - Parsed J L G
+      - JavaStatement
+      - Java Statement
+      - JLGParser
+      - J L G Parser
+      - IDE
+      - I D E
+      - VSPathFinder
+      - V S Path Finder
+      - IDEIntegration
+      - I D E Integration
+      - RemoteProcedureCalls
+      - Remote Procedure Calls
+      - IDECalls
+      - I D E Calls
+      - Dissonance
+      - ChatInputController
+      - Chat Input Controller
+      - UI3D
+      - U I3 D
+      - UI3DProperties
+      - U I3 D Properties
+      - Cursor3D
+      - Cursor3 D
+      - MoveGizmo
+      - Move Gizmo
+- synonym: SEE
+  examples: |
+    - S E E
+- synonym: UIColorScheme
+  examples: |
+    - U I Color Scheme
+- synonym: NodelayoutModel
+  examples: |
+    - Nodelayout Model
+- synonym: InnerNodeKindsModel
+  examples: |
+    - Inner Node Kinds Model
+- synonym: AbstractSEECityExtension
+  examples: |
+    - Abstract S E E City Extension
+- synonym: EdgeMeshScheduler
+  examples: |
+    - Edge Mesh Scheduler
+- synonym: SEECityRandom
+  examples: |
+    - S E E City Random
+- synonym: SEEJlgCity
+  examples: |
+    - S E E Jlg City
+- synonym: StatementCounter
+  examples: |
+    - Statement Counter
+- synonym: ColorRangeMapping
+  examples: |
+    - Color Range Mapping
+- synonym: ColorProperty
+  examples: |
+    - Color Property
+- synonym: SEECity
+  examples: |
+    - S E E City
+- synonym: NodeTypeVisualsMap
+  examples: |
+    - Node Type Visuals Map
+- synonym: LayoutSettings
+  examples: |
+    - Layout Settings
+- synonym: AbstractSEECity
+  examples: |
+    - Abstract S E E City
+- synonym: VisualNodeAttributes
+  examples: |
+    - Visual Node Attributes
+- synonym: ReflexionVisualization
+  examples: |
+    - Reflexion Visualization
+- synonym: ColorMap
+  examples: |
+    - Color Map
+- synonym: SEECityEvolution
+  examples: |
+    - S E E City Evolution
+- synonym: BoardAttributes
+  examples: |
+    - Board Attributes
+- synonym: EdgeLayoutAttributes
+  examples: |
+    - Edge Layout Attributes
+- synonym: MarkerAttributes
+  examples: |
+    - Marker Attributes
+- synonym: EdgeSelectionAttributes
+  examples: |
+    - Edge Selection Attributes
+- synonym: ErosionAttributes
+  examples: |
+    - Erosion Attributes
+- synonym: AntennaAttributes
+  examples: |
+    - Antenna Attributes
+- synonym: SEEReflexionCity
+  examples: |
+    - S E E Reflexion City
+- synonym: IncrementalTreeMapAttributes
+  examples: |
+    - Incremental Tree Map Attributes
+- synonym: DiffCity
+  examples: |
+    - Diff City
+- synonym: NodeLayoutAttributes
+  examples: |
+    - Node Layout Attributes
+- synonym: VisualNodeAttributesMapping
+  examples: |
+    - Visual Node Attributes Mapping
+- synonym: VisualAttributes
+  examples: |
+    - Visual Attributes
+- synonym: HolisticMetrics
+  examples: |
+    - Holistic Metrics
+- synonym: AverageCommentDensity
+  examples: |
+    - Average Comment Density
+- synonym: NumberOfEdges
+  examples: |
+    - Number Of Edges
+- synonym: AverageLinesOfCode
+  examples: |
+    - Average Lines Of Code
+- synonym: NumberOfLeafNodes
+  examples: |
+    - Number Of Leaf Nodes
+- synonym: ReflexionMetrics
+  examples: |
+    - Reflexion Metrics
+- synonym: LinesOfCode
+  examples: |
+    - Lines Of Code
+- synonym: NumberOfNodeTypes
+  examples: |
+    - Number Of Node Types
+- synonym: WidgetControllers
+  examples: |
+    - Widget Controllers
+- synonym: BarChartController
+  examples: |
+    - Bar Chart Controller
+- synonym: WaterCircleController
+  examples: |
+    - Water Circle Controller
+- synonym: PercentageController
+  examples: |
+    - Percentage Controller
+- synonym: SingleNumberDisplayController
+  examples: |
+    - Single Number Display Controller
+- synonym: CoordinatesController
+  examples: |
+    - Coordinates Controller
+- synonym: CircularProgressionController
+  examples: |
+    - Circular Progression Controller
+- synonym: WidgetController
+  examples: |
+    - Widget Controller
+- synonym: MetricValue
+  examples: |
+    - Metric Value
+- synonym: MetricValueRange
+  examples: |
+    - Metric Value Range
+- synonym: MetricValueCollection
+  examples: |
+    - Metric Value Collection
+- synonym: ActionHelpers
+  examples: |
+    - Action Helpers
+- synonym: WidgetAdder
+  examples: |
+    - Widget Adder
+- synonym: BoardMover
+  examples: |
+    - Board Mover
+- synonym: WidgetDeleter
+  examples: |
+    - Widget Deleter
+- synonym: WidgetMover
+  examples: |
+    - Widget Mover
+- synonym: BoardAdder
+  examples: |
+    - Board Adder
+- synonym: ConfigManager
+  examples: |
+    - Config Manager
+- synonym: WidgetsManager
+  examples: |
+    - Widgets Manager
+- synonym: BoardsManager
+  examples: |
+    - Boards Manager
+- synonym: BoardConfig
+  examples: |
+    - Board Config
+- synonym: WidgetConfig
+  examples: |
+    - Widget Config
+- synonym: SceneManipulation
+  examples: |
+    - Scene Manipulation
+- synonym: GameElementDeleter
+  examples: |
+    - Game Element Deleter
+- synonym: GameNodeMover
+  examples: |
+    - Game Node Mover
+- synonym: GameNodeAdder
+  examples: |
+    - Game Node Adder
+- synonym: GameEdgeAdder
+  examples: |
+    - Game Edge Adder
+- synonym: GameObjectFader
+  examples: |
+    - Game Object Fader
+- synonym: AcceptDivergence
+  examples: |
+    - Accept Divergence
+- synonym: CityRendering
+  examples: |
+    - City Rendering
+- synonym: GraphRenderer
+  examples: |
+    - Graph Renderer
+- synonym: IGraphRenderer
+  examples: |
+    - I Graph Renderer
+- synonym: AbstractLayoutNode
+  examples: |
+    - Abstract Layout Node
+- synonym: LayoutGraphNode
+  examples: |
+    - Layout Graph Node
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGameNode
+  examples: |
+    - Layout Game Node
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: LayoutGraphEdge
+  examples: |
+    - Layout Graph Edge
+- synonym: VRStatus
+  examples: |
+    - V R Status
+- synonym: AndCombinedOperationCallback
+  examples: |
+    - And Combined Operation Callback
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: NotificationOperator
+  examples: |
+    - Notification Operator
+- synonym: AlwaysFalseEqualityComparer
+  examples: |
+    - Always False Equality Comparer
+- synonym: EdgeOperator
+  examples: |
+    - Edge Operator
+- synonym: MorphismOperation
+  examples: |
+    - Morphism Operation
+- synonym: NodeOperator
+  examples: |
+    - Node Operator
+- synonym: GraphElementOperator
+  examples: |
+    - Graph Element Operator
+- synonym: GraphElementOperator
+  examples: |
+    - Graph Element Operator
+- synonym: DummyOperationCallback
+  examples: |
+    - Dummy Operation Callback
+- synonym: TweenOperationCallback
+  examples: |
+    - Tween Operation Callback
+- synonym: AbstractOperator
+  examples: |
+    - Abstract Operator
+- synonym: IOperation
+  examples: |
+    - I Operation
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: GraphElementOperator
+  examples: |
+    - Graph Element Operator
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: GraphElementOperator
+  examples: |
+    - Graph Element Operator
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: TweenOperation
+  examples: |
+    - Tween Operation
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: IOperationCallback
+  examples: |
+    - I Operation Callback
+- synonym: AndCombinedOperationCallback
+  examples: |
+    - And Combined Operation Callback
+- synonym: AlwaysFalseEqualityComparer
+  examples: |
+    - Always False Equality Comparer
+- synonym: DummyOperationCallback
+  examples: |
+    - Dummy Operation Callback
+- synonym: DummyOperationCallback
+  examples: |
+    - Dummy Operation Callback
+- synonym: DummyOperationCallback
+  examples: |
+    - Dummy Operation Callback
+- synonym: LaidOutGraph
+  examples: |
+    - Laid Out Graph
+- synonym: EvolutionRenderer
+  examples: |
+    - Evolution Renderer
+- synonym: SliderDrag
+  examples: |
+    - Slider Drag
+- synonym: ObjectManager
+  examples: |
+    - Object Manager
+- synonym: GetValue
+  examples: |
+    - Get Value
+- synonym: SetValue
+  examples: |
+    - Set Value
+- synonym: SliderMarker
+  examples: |
+    - Slider Marker
+- synonym: AnimationDataModel
+  examples: |
+    - Animation Data Model
+- synonym: RevisionSelectionDataModel
+  examples: |
+    - Revision Selection Data Model
+- synonym: ChangePanel
+  examples: |
+    - Change Panel
+- synonym: SliderMarkerContainer
+  examples: |
+    - Slider Marker Container
+- synonym: AnimationInteraction
+  examples: |
+    - Animation Interaction
+- synonym: GetValue
+  examples: |
+    - Get Value
+- synonym: SetValue
+  examples: |
+    - Set Value
+- synonym: SceneQueries
+  examples: |
+    - Scene Queries
+- synonym: VR
+  examples: |
+    - V R
+- synonym: ChartMoveHandlerVr
+  examples: |
+    - Chart Move Handler Vr
+- synonym: VrCanvasSetup
+  examples: |
+    - Vr Canvas Setup
+- synonym: VrPointer
+  examples: |
+    - Vr Pointer
+- synonym: VrInputModule
+  examples: |
+    - Vr Input Module
+- synonym: ChartContentVr
+  examples: |
+    - Chart Content Vr
+- synonym: ChartDragHandlerVr
+  examples: |
+    - Chart Drag Handler Vr
+- synonym: ChartPositionVr
+  examples: |
+    - Chart Position Vr
+- synonym: ChartSizeHandlerVr
+  examples: |
+    - Chart Size Handler Vr
+- synonym: ChartMultiSelectHandlerVr
+  examples: |
+    - Chart Multi Select Handler Vr
+- synonym: ChartMultiSelectHandler
+  examples: |
+    - Chart Multi Select Handler
+- synonym: ChartCreator
+  examples: |
+    - Chart Creator
+- synonym: ChartSizeHandler
+  examples: |
+    - Chart Size Handler
+- synonym: ChartContent
+  examples: |
+    - Chart Content
+- synonym: ShowInChartCallbackFn
+  examples: |
+    - Show In Chart Callback Fn
+- synonym: NodeChangesBuffer
+  examples: |
+    - Node Changes Buffer
+- synonym: AxisContentDropdown
+  examples: |
+    - Axis Content Dropdown
+- synonym: ScrollViewEntryData
+  examples: |
+    - Scroll View Entry Data
+- synonym: EventHandler
+  examples: |
+    - Event Handler
+- synonym: ScrollViewEntry
+  examples: |
+    - Scroll View Entry
+- synonym: ChartDragHandler
+  examples: |
+    - Chart Drag Handler
+- synonym: ChartManager
+  examples: |
+    - Chart Manager
+- synonym: ChartMarker
+  examples: |
+    - Chart Marker
+- synonym: ChartMoveHandler
+  examples: |
+    - Chart Move Handler
+- synonym: PlayerSpawner
+  examples: |
+    - Player Spawner
+- synonym: SpawnInfo
+  examples: |
+    - Spawn Info
+- synonym: ExpressionPlayerSynchronizer
+  examples: |
+    - Expression Player Synchronizer
+- synonym: VRIKSynchronizer
+  examples: |
+    - V R I K Synchronizer
+- synonym: PersonalAssistantSpeechInput
+  examples: |
+    - Personal Assistant Speech Input
+- synonym: PersonalAssistantBrain
+  examples: |
+    - Personal Assistant Brain
+- synonym: AvatarMovementAnimator
+  examples: |
+    - Avatar Movement Animator
+- synonym: AvatarAdapter
+  examples: |
+    - Avatar Adapter
+- synonym: VRIKActions
+  examples: |
+    - V R I K Actions
+- synonym: AvatarSRanipalLipV2
+  examples: |
+    - Avatar S Ranipal Lip V2
+- synonym: AvatarBlendshapeExpressions
+  examples: |
+    - Avatar Blendshape Expressions
+- synonym: NetSynchronizer
+  examples: |
+    - Net Synchronizer
+- synonym: VRAvatarAimingSystem
+  examples: |
+    - V R Avatar Aiming System
+- synonym: LaserPointer
+  examples: |
+    - Laser Pointer
+- synonym: AvatarAimingSystem
+  examples: |
+    - Avatar Aiming System
+- synonym: RTGInitializer
+  examples: |
+    - R T G Initializer
+- synonym: FunctionCallSimulator
+  examples: |
+    - Function Call Simulator
+- synonym: GraphElementIDMap
+  examples: |
+    - Graph Element I D Map
+- synonym: LabelAttributes
+  examples: |
+    - Label Attributes
+- synonym: ReflexionMapper
+  examples: |
+    - Reflexion Mapper
+- synonym: LocalPlayer
+  examples: |
+    - Local Player
+- synonym: InteractionDecorator
+  examples: |
+    - Interaction Decorator
+- synonym: ColorRange
+  examples: |
+    - Color Range
+- synonym: UI
+  examples: |
+    - U I
+- synonym: HelpSystem
+  examples: |
+    - Help System
+- synonym: HelpSystemBuilder
+  examples: |
+    - Help System Builder
+- synonym: HelpEntry
+  examples: |
+    - Help Entry
+- synonym: HelpSystemEntry
+  examples: |
+    - Help System Entry
+- synonym: HelpSystemMenu
+  examples: |
+    - Help System Menu
+- synonym: RuntimeConfigMenu
+  examples: |
+    - Runtime Config Menu
+- synonym: RuntimeTabMenu
+  examples: |
+    - Runtime Tab Menu
+- synonym: RuntimeConfigMenu
+  examples: |
+    - Runtime Config Menu
+- synonym: RuntimeButtonAttribute
+  examples: |
+    - Runtime Button Attribute
+- synonym: RuntimeTabAttribute
+  examples: |
+    - Runtime Tab Attribute
+- synonym: RuntimeSliderManager
+  examples: |
+    - Runtime Slider Manager
+- synonym: RuntimeSmallEditorButton
+  examples: |
+    - Runtime Small Editor Button
+- synonym: RuntimeConfigMenuCollapse
+  examples: |
+    - Runtime Config Menu Collapse
+- synonym: PropertyDialog
+  examples: |
+    - Property Dialog
+- synonym: NodePropertyDialog
+  examples: |
+    - Node Property Dialog
+- synonym: SelectionProperty
+  examples: |
+    - Selection Property
+- synonym: NetworkPropertyDialog
+  examples: |
+    - Network Property Dialog
+- synonym: OnClosed
+  examples: |
+    - On Closed
+- synonym: HidePropertyDialog
+  examples: |
+    - Hide Property Dialog
+- synonym: HolisticMetrics
+  examples: |
+    - Holistic Metrics
+- synonym: AddBoardDialog
+  examples: |
+    - Add Board Dialog
+- synonym: AddWidgetDialog
+  examples: |
+    - Add Widget Dialog
+- synonym: SaveBoardDialog
+  examples: |
+    - Save Board Dialog
+- synonym: HolisticMetricsDialog
+  examples: |
+    - Holistic Metrics Dialog
+- synonym: LoadBoardDialog
+  examples: |
+    - Load Board Dialog
+- synonym: ButtonProperty
+  examples: |
+    - Button Property
+- synonym: PropertyDialog
+  examples: |
+    - Property Dialog
+- synonym: StringProperty
+  examples: |
+    - String Property
+- synonym: PropertyGroup
+  examples: |
+    - Property Group
+- synonym: FilePicker
+  examples: |
+    - File Picker
+- synonym: FilePicker
+  examples: |
+    - File Picker
+- synonym: CodeWindow
+  examples: |
+    - Code Window
+- synonym: CodeWindow
+  examples: |
+    - Code Window
+- synonym: CodeWindowValues
+  examples: |
+    - Code Window Values
+- synonym: TokenLanguage
+  examples: |
+    - Token Language
+- synonym: SEEToken
+  examples: |
+    - S E E Token
+- synonym: BaseWindow
+  examples: |
+    - Base Window
+- synonym: WindowValues
+  examples: |
+    - Window Values
+- synonym: WindowSpace
+  examples: |
+    - Window Space
+- synonym: WindowSpaceValues
+  examples: |
+    - Window Space Values
+- synonym: TreeWindow
+  examples: |
+    - Tree Window
+- synonym: TreeWindow
+  examples: |
+    - Tree Window
+- synonym: TreeWindowContextMenu
+  examples: |
+    - Tree Window Context Menu
+- synonym: TreeWindowGroup
+  examples: |
+    - Tree Window Group
+- synonym: ITreeWindowGroupAssigment
+  examples: |
+    - I Tree Window Group Assigment
+- synonym: TreeWindowGroupAssigment
+  examples: |
+    - Tree Window Group Assigment
+- synonym: TreeWindowGrouper
+  examples: |
+    - Tree Window Grouper
+- synonym: TreeWindowGroupAssigment
+  examples: |
+    - Tree Window Group Assigment
+- synonym: TreeWindowGroupAssigment
+  examples: |
+    - Tree Window Group Assigment
+- synonym: TreeWindowGroupAssigment
+  examples: |
+    - Tree Window Group Assigment
+- synonym: TreeWindowGroupAssigment
+  examples: |
+    - Tree Window Group Assigment
+- synonym: UnsupportedTypeException
+  examples: |
+    - Unsupported Type Exception
+- synonym: MenuEntry
+  examples: |
+    - Menu Entry
+- synonym: SimpleListMenu
+  examples: |
+    - Simple List Menu
+- synonym: SimpleMenu
+  examples: |
+    - Simple Menu
+- synonym: TabMenu
+  examples: |
+    - Tab Menu
+- synonym: TabMenu
+  examples: |
+    - Tab Menu
+- synonym: NestedMenuEntry
+  examples: |
+    - Nested Menu Entry
+- synonym: SelectionMenu
+  examples: |
+    - Selection Menu
+- synonym: SelectionMenu
+  examples: |
+    - Selection Menu
+- synonym: NestedListMenu
+  examples: |
+    - Nested List Menu
+- synonym: NestedListMenu
+  examples: |
+    - Nested List Menu
+- synonym: MenuLevel
+  examples: |
+    - Menu Level
+- synonym: SimpleListMenu
+  examples: |
+    - Simple List Menu
+- synonym: NestedMenuEntry
+  examples: |
+    - Nested Menu Entry
+- synonym: TabMenu
+  examples: |
+    - Tab Menu
+- synonym: SimpleMenu
+  examples: |
+    - Simple Menu
+- synonym: SelectionMenu
+  examples: |
+    - Selection Menu
+- synonym: SelectionMenu
+  examples: |
+    - Selection Menu
+- synonym: NestedListMenu
+  examples: |
+    - Nested List Menu
+- synonym: NestedListMenu
+  examples: |
+    - Nested List Menu
+- synonym: NestedMenuEntry
+  examples: |
+    - Nested Menu Entry
+- synonym: SimpleListMenu
+  examples: |
+    - Simple List Menu
+- synonym: SimpleListMenu
+  examples: |
+    - Simple List Menu
+- synonym: ConfigMenu
+  examples: |
+    - Config Menu
+- synonym: ConfigMenuFactory
+  examples: |
+    - Config Menu Factory
+- synonym: EditableInstance
+  examples: |
+    - Editable Instance
+- synonym: ColorPicker
+  examples: |
+    - Color Picker
+- synonym: ColorPickerBuilder
+  examples: |
+    - Color Picker Builder
+- synonym: SliderBuilder
+  examples: |
+    - Slider Builder
+- synonym: TabController
+  examples: |
+    - Tab Controller
+- synonym: UpdateNotifier
+  examples: |
+    - Update Notifier
+- synonym: TabGroup
+  examples: |
+    - Tab Group
+- synonym: FilePicker
+  examples: |
+    - File Picker
+- synonym: FilePickerBuilder
+  examples: |
+    - File Picker Builder
+- synonym: TabButton
+  examples: |
+    - Tab Button
+- synonym: ConfigMenu
+  examples: |
+    - Config Menu
+- synonym: ColorPickerControl
+  examples: |
+    - Color Picker Control
+- synonym: DynamicUIBehaviour
+  examples: |
+    - Dynamic U I Behaviour
+- synonym: OnDictationFinishedEventHandler
+  examples: |
+    - On Dictation Finished Event Handler
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: PageController
+  examples: |
+    - Page Controller
+- synonym: SwitchBuilder
+  examples: |
+    - Switch Builder
+- synonym: ComboSelect
+  examples: |
+    - Combo Select
+- synonym: ComboSelectBuilder
+  examples: |
+    - Combo Select Builder
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: UIBuilder
+  examples: |
+    - U I Builder
+- synonym: StateIndicator
+  examples: |
+    - State Indicator
+- synonym: StateIndicator
+  examples: |
+    - State Indicator
+- synonym: AbstractStateIndicator
+  examples: |
+    - Abstract State Indicator
+- synonym: ActionStateIndicator
+  examples: |
+    - Action State Indicator
+- synonym: HideStateIndicator
+  examples: |
+    - Hide State Indicator
+- synonym: PopupMenu
+  examples: |
+    - Popup Menu
+- synonym: PopupMenu
+  examples: |
+    - Popup Menu
+- synonym: PopupMenuEntry
+  examples: |
+    - Popup Menu Entry
+- synonym: PopupMenuAction
+  examples: |
+    - Popup Menu Action
+- synonym: PopupMenuHeading
+  examples: |
+    - Popup Menu Heading
+- synonym: HolisticMetrics
+  examples: |
+    - Holistic Metrics
+- synonym: LoadBoardButtonController
+  examples: |
+    - Load Board Button Controller
+- synonym: AddBoardSliderController
+  examples: |
+    - Add Board Slider Controller
+- synonym: ShowNotification
+  examples: |
+    - Show Notification
+- synonym: SEENotificationManager
+  examples: |
+    - S E E Notification Manager
+- synonym: NotificationData
+  examples: |
+    - Notification Data
+- synonym: PlatformDependentComponent
+  examples: |
+    - Platform Dependent Component
+- synonym: SettingsMenu
+  examples: |
+    - Settings Menu
+- synonym: LoadingSpinner
+  examples: |
+    - Loading Spinner
+- synonym: LoadingSpinnerDisposable
+  examples: |
+    - Loading Spinner Disposable
+- synonym: OpeningDialog
+  examples: |
+    - Opening Dialog
+- synonym: MainCamera
+  examples: |
+    - Main Camera
+- synonym: OnCameraAvailableCallback
+  examples: |
+    - On Camera Available Callback
+- synonym: ConfigReader
+  examples: |
+    - Config Reader
+- synonym: ConfigIO
+  examples: |
+    - Config I O
+- synonym: IPersistentConfigItem
+  examples: |
+    - I Persistent Config Item
+- synonym: ConfigWriter
+  examples: |
+    - Config Writer
+- synonym: SyntaxError
+  examples: |
+    - Syntax Error
+- synonym: ColorExtensions
+  examples: |
+    - Color Extensions
+- synonym: ColorPalette
+  examples: |
+    - Color Palette
+- synonym: InvalidCodePathException
+  examples: |
+    - Invalid Code Path Exception
+- synonym: BoundingBox
+  examples: |
+    - Bounding Box
+- synonym: CountingJoin
+  examples: |
+    - Counting Join
+- synonym: CallBackFunction
+  examples: |
+    - Call Back Function
+- synonym: TreeVisitor
+  examples: |
+    - Tree Visitor
+- synonym: NodeVisitor
+  examples: |
+    - Node Visitor
+- synonym: FilePath
+  examples: |
+    - File Path
+- synonym: DataPath
+  examples: |
+    - Data Path
+- synonym: DirectoryPath
+  examples: |
+    - Directory Path
+- synonym: ILogger
+  examples: |
+    - I Logger
+- synonym: IdeRPC
+  examples: |
+    - Ide R P C
+- synonym: JsonRpcConnection
+  examples: |
+    - Json Rpc Connection
+- synonym: ConnectionEventHandler
+  examples: |
+    - Connection Event Handler
+- synonym: JsonRpcSocketServer
+  examples: |
+    - Json Rpc Socket Server
+- synonym: JsonRpcServer
+  examples: |
+    - Json Rpc Server
+- synonym: JsonRpcServerCreationFailedException
+  examples: |
+    - Json Rpc Server Creation Failed Exception
+- synonym: ConnectionEventHandler
+  examples: |
+    - Connection Event Handler
+- synonym: ArrayUtils
+  examples: |
+    - Array Utils
+- synonym: ArrayComparer
+  examples: |
+    - Array Comparer
+- synonym: GameObjectHierarchy
+  examples: |
+    - Game Object Hierarchy
+- synonym: TextualDiff
+  examples: |
+    - Textual Diff
+- synonym: PhysicsUtil
+  examples: |
+    - Physics Util
+- synonym: FloatUtils
+  examples: |
+    - Float Utils
+- synonym: DefaultDictionary
+  examples: |
+    - Default Dictionary
+- synonym: VectorOperations
+  examples: |
+    - Vector Operations
+- synonym: UIExtensions
+  examples: |
+    - U I Extensions
+- synonym: StringListSerializer
+  examples: |
+    - String List Serializer
+- synonym: SEELogger
+  examples: |
+    - S E E Logger
+- synonym: CreateReversibleAction
+  examples: |
+    - Create Reversible Action
+- synonym: IReversibleAction
+  examples: |
+    - I Reversible Action
+- synonym: UndoImpossible
+  examples: |
+    - Undo Impossible
+- synonym: RedoImpossible
+  examples: |
+    - Redo Impossible
+- synonym: ActionHistory
+  examples: |
+    - Action History
+- synonym: GlobalHistoryEntry
+  examples: |
+    - Global History Entry
+- synonym: NumericalSortExtension
+  examples: |
+    - Numerical Sort Extension
+- synonym: MathExtensions
+  examples: |
+    - Math Extensions
+- synonym: SerializableSpline
+  examples: |
+    - Serializable Spline
+- synonym: TinySplineInterop
+  examples: |
+    - Tiny Spline Interop
+- synonym: GraphElementExtensions
+  examples: |
+    - Graph Element Extensions
+- synonym: CollectionExtensions
+  examples: |
+    - Collection Extensions
+- synonym: PrefabInstantiator
+  examples: |
+    - Prefab Instantiator
+- synonym: AsyncUtils
+  examples: |
+    - Async Utils
+- synonym: RandomTrees
+  examples: |
+    - Random Trees
+- synonym: FileIO
+  examples: |
+    - File I O
+- synonym: PointerHelper
+  examples: |
+    - Pointer Helper
+- synonym: GXLParser
+  examples: |
+    - G X L Parser
+- synonym: SyntaxError
+  examples: |
+    - Syntax Error
+- synonym: StringExtensions
+  examples: |
+    - String Extensions
+- synonym: EnvironmentVariableAttribute
+  examples: |
+    - Environment Variable Attribute
+- synonym: EnvironmentVariableRetriever
+  examples: |
+    - Environment Variable Retriever
+- synonym: DefaultDictionary
+  examples: |
+    - Default Dictionary
+- synonym: TreeVisitor
+  examples: |
+    - Tree Visitor
+- synonym: NodeLayouts
+  examples: |
+    - Node Layouts
+- synonym: EvoStreets
+  examples: |
+    - Evo Streets
+- synonym: LayoutDescriptor
+  examples: |
+    - Layout Descriptor
+- synonym: ENode
+  examples: |
+    - E Node
+- synonym: ELeaf
+  examples: |
+    - E Leaf
+- synonym: EInner
+  examples: |
+    - E Inner
+- synonym: ENodeFactory
+  examples: |
+    - E Node Factory
+- synonym: TreeMap
+  examples: |
+    - Tree Map
+- synonym: RectangleTiling
+  examples: |
+    - Rectangle Tiling
+- synonym: NodeSize
+  examples: |
+    - Node Size
+- synonym: IncrementalTreeMap
+  examples: |
+    - Incremental Tree Map
+- synonym: StretchMove
+  examples: |
+    - Stretch Move
+- synonym: LocalMove
+  examples: |
+    - Local Move
+- synonym: FlipMove
+  examples: |
+    - Flip Move
+- synonym: CorrectAreas
+  examples: |
+    - Correct Areas
+- synonym: LocalMoves
+  examples: |
+    - Local Moves
+- synonym: CoseGeometry
+  examples: |
+    - Cose Geometry
+- synonym: CoseNodeSublayoutValues
+  examples: |
+    - Cose Node Sublayout Values
+- synonym: CoseEdge
+  examples: |
+    - Cose Edge
+- synonym: CoseCoarsenEdge
+  examples: |
+    - Cose Coarsen Edge
+- synonym: SublayoutNode
+  examples: |
+    - Sublayout Node
+- synonym: AbstractSublayoutNode
+  examples: |
+    - Abstract Sublayout Node
+- synonym: CoseNode
+  examples: |
+    - Cose Node
+- synonym: IterationConstraint
+  examples: |
+    - Iteration Constraint
+- synonym: CoseLayout
+  examples: |
+    - Cose Layout
+- synonym: CoseHelper
+  examples: |
+    - Cose Helper
+- synonym: CoseCoarsenGraph
+  examples: |
+    - Cose Coarsen Graph
+- synonym: CoseGraphManager
+  examples: |
+    - Cose Graph Manager
+- synonym: CoseGraph
+  examples: |
+    - Cose Graph
+- synonym: CoseNodeLayoutValues
+  examples: |
+    - Cose Node Layout Values
+- synonym: CoseLayoutSettings
+  examples: |
+    - Cose Layout Settings
+- synonym: EdgesMeasurements
+  examples: |
+    - Edges Measurements
+- synonym: SublayoutLayoutNode
+  examples: |
+    - Sublayout Layout Node
+- synonym: LayoutSublayoutNode
+  examples: |
+    - Layout Sublayout Node
+- synonym: CoseCoarsenNode
+  examples: |
+    - Cose Coarsen Node
+- synonym: CoseGraphAttributes
+  examples: |
+    - Cose Graph Attributes
+- synonym: AbstractSublayoutNode
+  examples: |
+    - Abstract Sublayout Node
+- synonym: AbstractSublayoutNode
+  examples: |
+    - Abstract Sublayout Node
+- synonym: IncrementalTreeMapLayout
+  examples: |
+    - Incremental Tree Map Layout
+- synonym: NodeLayout
+  examples: |
+    - Node Layout
+- synonym: CirclePacking
+  examples: |
+    - Circle Packing
+- synonym: CirclePacker
+  examples: |
+    - Circle Packer
+- synonym: EvoStreetsNodeLayout
+  examples: |
+    - Evo Streets Node Layout
+- synonym: CirclePackingNodeLayout
+  examples: |
+    - Circle Packing Node Layout
+- synonym: HierarchicalNodeLayout
+  examples: |
+    - Hierarchical Node Layout
+- synonym: IIncrementalNodeLayout
+  examples: |
+    - I Incremental Node Layout
+- synonym: RectanglePacking
+  examples: |
+    - Rectangle Packing
+- synonym: PTree
+  examples: |
+    - P Tree
+- synonym: PNode
+  examples: |
+    - P Node
+- synonym: PRectangle
+  examples: |
+    - P Rectangle
+- synonym: LoadedNodeLayout
+  examples: |
+    - Loaded Node Layout
+- synonym: ManhattanLayout
+  examples: |
+    - Manhattan Layout
+- synonym: FlatNodeLayout
+  examples: |
+    - Flat Node Layout
+- synonym: TreemapLayout
+  examples: |
+    - Treemap Layout
+- synonym: RectanglePackingNodeLayout
+  examples: |
+    - Rectangle Packing Node Layout
+- synonym: BalloonNodeLayout
+  examples: |
+    - Balloon Node Layout
+- synonym: NodeInfo
+  examples: |
+    - Node Info
+- synonym: EdgeLayouts
+  examples: |
+    - Edge Layouts
+- synonym: SplineEdgeLayout
+  examples: |
+    - Spline Edge Layout
+- synonym: IEdgeLayout
+  examples: |
+    - I Edge Layout
+- synonym: CurvyEdgeLayoutBase
+  examples: |
+    - Curvy Edge Layout Base
+- synonym: StraightEdgeLayout
+  examples: |
+    - Straight Edge Layout
+- synonym: BundledEdgeLayout
+  examples: |
+    - Bundled Edge Layout
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: IO
+  examples: |
+    - I O
+- synonym: SLDReader
+  examples: |
+    - S L D Reader
+- synonym: GVLReader
+  examples: |
+    - G V L Reader
+- synonym: ParentNode
+  examples: |
+    - Parent Node
+- synonym: SyntaxError
+  examples: |
+    - Syntax Error
+- synonym: GVLWriter
+  examples: |
+    - G V L Writer
+- synonym: SLDWriter
+  examples: |
+    - S L D Writer
+- synonym: LayoutGraphExtensions
+  examples: |
+    - Layout Graph Extensions
+- synonym: LCAFinder
+  examples: |
+    - L C A Finder
+- synonym: NodeToIntegerMap
+  examples: |
+    - Node To Integer Map
+- synonym: LinePoints
+  examples: |
+    - Line Points
+- synonym: LCAFinder
+  examples: |
+    - L C A Finder
+- synonym: LCAFinder
+  examples: |
+    - L C A Finder
+- synonym: LayoutNodes
+  examples: |
+    - Layout Nodes
+- synonym: IHierarchyNode
+  examples: |
+    - I Hierarchy Node
+- synonym: IGameNode
+  examples: |
+    - I Game Node
+- synonym: IGraphNode
+  examples: |
+    - I Graph Node
+- synonym: ISublayoutNode
+  examples: |
+    - I Sublayout Node
+- synonym: ILayoutNode
+  examples: |
+    - I Layout Node
+- synonym: ILayoutNodeHierarchy
+  examples: |
+    - I Layout Node Hierarchy
+- synonym: LayoutVertex
+  examples: |
+    - Layout Vertex
+- synonym: LayoutEdge
+  examples: |
+    - Layout Edge
+- synonym: LayoutEdge
+  examples: |
+    - Layout Edge
+- synonym: NodeTransform
+  examples: |
+    - Node Transform
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: LayoutEdge
+  examples: |
+    - Layout Edge
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: IGraphNode
+  examples: |
+    - I Graph Node
+- synonym: IHierarchyNode
+  examples: |
+    - I Hierarchy Node
+- synonym: ISublayoutNode
+  examples: |
+    - I Sublayout Node
+- synonym: LayoutEdge
+  examples: |
+    - Layout Edge
+- synonym: ILayoutEdge
+  examples: |
+    - I Layout Edge
+- synonym: GO
+  examples: |
+    - G O
+- synonym: PlayerMenu
+  examples: |
+    - Player Menu
+- synonym: TextGUIAndPaperResizer
+  examples: |
+    - Text G U I And Paper Resizer
+- synonym: TextFactory
+  examples: |
+    - Text Factory
+- synonym: NodeFactories
+  examples: |
+    - Node Factories
+- synonym: NodeFactory
+  examples: |
+    - Node Factory
+- synonym: CubeFactory
+  examples: |
+    - Cube Factory
+- synonym: CylinderFactory
+  examples: |
+    - Cylinder Factory
+- synonym: SpiderFactory
+  examples: |
+    - Spider Factory
+- synonym: BarsFactory
+  examples: |
+    - Bars Factory
+- synonym: PolygonFactory
+  examples: |
+    - Polygon Factory
+- synonym: FaceCamera
+  examples: |
+    - Face Camera
+- synonym: GameObjectExtensions
+  examples: |
+    - Game Object Extensions
+- synonym: SEESpline
+  examples: |
+    - S E E Spline
+- synonym: SplineMorphism
+  examples: |
+    - Spline Morphism
+- synonym: AntennaDecorator
+  examples: |
+    - Antenna Decorator
+- synonym: GraphElementRef
+  examples: |
+    - Graph Element Ref
+- synonym: IScale
+  examples: |
+    - I Scale
+- synonym: TextureGenerator
+  examples: |
+    - Texture Generator
+- synonym: MarkerFactory
+  examples: |
+    - Marker Factory
+- synonym: GlobalGameObjectNames
+  examples: |
+    - Global Game Object Names
+- synonym: NodeRef
+  examples: |
+    - Node Ref
+- synonym: PlaneFactory
+  examples: |
+    - Plane Factory
+- synonym: EdgeRef
+  examples: |
+    - Edge Ref
+- synonym: CityCursor
+  examples: |
+    - City Cursor
+- synonym: EdgeFactory
+  examples: |
+    - Edge Factory
+- synonym: ZScoreScale
+  examples: |
+    - Z Score Scale
+- synonym: IconFactory
+  examples: |
+    - Icon Factory
+- synonym: ErosionIssues
+  examples: |
+    - Erosion Issues
+- synonym: LineFactory
+  examples: |
+    - Line Factory
+- synonym: LinearScale
+  examples: |
+    - Linear Scale
+- synonym: HideSourceCodeAndPaper
+  examples: |
+    - Hide Source Code And Paper
+- synonym: NetActionHistory
+  examples: |
+    - Net Action History
+- synonym: VersionNetAction
+  examples: |
+    - Version Net Action
+- synonym: ZoomNetAction
+  examples: |
+    - Zoom Net Action
+- synonym: RuntimeConfig
+  examples: |
+    - Runtime Config
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: UpdatePathCityFieldNetAction
+  examples: |
+    - Update Path City Field Net Action
+- synonym: UpdateCityMethodNetAction
+  examples: |
+    - Update City Method Net Action
+- synonym: RemoveListElementNetAction
+  examples: |
+    - Remove List Element Net Action
+- synonym: UpdateColorCityFieldNetAction
+  examples: |
+    - Update Color City Field Net Action
+- synonym: AddListElementNetAction
+  examples: |
+    - Add List Element Net Action
+- synonym: UpdateCityNetAction
+  examples: |
+    - Update City Net Action
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: UpdateCityAttributeNetAction
+  examples: |
+    - Update City Attribute Net Action
+- synonym: HolisticMetrics
+  examples: |
+    - Holistic Metrics
+- synonym: CreateBoardNetAction
+  examples: |
+    - Create Board Net Action
+- synonym: MoveBoardNetAction
+  examples: |
+    - Move Board Net Action
+- synonym: HolisticMetricsNetAction
+  examples: |
+    - Holistic Metrics Net Action
+- synonym: DeleteBoardNetAction
+  examples: |
+    - Delete Board Net Action
+- synonym: SwitchCityNetAction
+  examples: |
+    - Switch City Net Action
+- synonym: MoveWidgetNetAction
+  examples: |
+    - Move Widget Net Action
+- synonym: DeleteWidgetNetAction
+  examples: |
+    - Delete Widget Net Action
+- synonym: CreateWidgetNetAction
+  examples: |
+    - Create Widget Net Action
+- synonym: AddNodeNetAction
+  examples: |
+    - Add Node Net Action
+- synonym: ExecuteActionPacket
+  examples: |
+    - Execute Action Packet
+- synonym: MoveNetAction
+  examples: |
+    - Move Net Action
+- synonym: VRIKNetAction
+  examples: |
+    - V R I K Net Action
+- synonym: ExpressionPlayerNetAction
+  examples: |
+    - Expression Player Net Action
+- synonym: ShuffleNetAction
+  examples: |
+    - Shuffle Net Action
+- synonym: AcceptDivergenceNetAction
+  examples: |
+    - Accept Divergence Net Action
+- synonym: TogglePointingNetAction
+  examples: |
+    - Toggle Pointing Net Action
+- synonym: PutOnAndFitNetAction
+  examples: |
+    - Put On And Fit Net Action
+- synonym: SetSelectNetAction
+  examples: |
+    - Set Select Net Action
+- synonym: SetHoverNetAction
+  examples: |
+    - Set Hover Net Action
+- synonym: AddEdgeNetAction
+  examples: |
+    - Add Edge Net Action
+- synonym: SyncWindowSpaceAction
+  examples: |
+    - Sync Window Space Action
+- synonym: EditNodeNetAction
+  examples: |
+    - Edit Node Net Action
+- synonym: DeleteNetAction
+  examples: |
+    - Delete Net Action
+- synonym: SetParentNetAction
+  examples: |
+    - Set Parent Net Action
+- synonym: RotateNodeNetAction
+  examples: |
+    - Rotate Node Net Action
+- synonym: SetGrabNetAction
+  examples: |
+    - Set Grab Net Action
+- synonym: ScaleNodeNetAction
+  examples: |
+    - Scale Node Net Action
+- synonym: HighlightNetAction
+  examples: |
+    - Highlight Net Action
+- synonym: AbstractNetAction
+  examples: |
+    - Abstract Net Action
+- synonym: ActionSerializer
+  examples: |
+    - Action Serializer
+- synonym: SynchronizeInteractableNetAction
+  examples: |
+    - Synchronize Interactable Net Action
+- synonym: ReviveNetAction
+  examples: |
+    - Revive Net Action
+- synonym: PacketSequencePacket
+  examples: |
+    - Packet Sequence Packet
+- synonym: CallBack
+  examples: |
+    - Call Back
+- synonym: OnShutdownFinished
+  examples: |
+    - On Shutdown Finished
+- synonym: AddressInfo
+  examples: |
+    - Address Info
+- synonym: CloneIssue
+  examples: |
+    - Clone Issue
+- synonym: CycleIssue
+  examples: |
+    - Cycle Issue
+- synonym: IssueTable
+  examples: |
+    - Issue Table
+- synonym: DeadEntityIssue
+  examples: |
+    - Dead Entity Issue
+- synonym: ArchitectureViolationIssue
+  examples: |
+    - Architecture Violation Issue
+- synonym: MetricViolationIssue
+  examples: |
+    - Metric Violation Issue
+- synonym: StyleViolationIssue
+  examples: |
+    - Style Violation Issue
+- synonym: IssueTag
+  examples: |
+    - Issue Tag
+- synonym: IssueComment
+  examples: |
+    - Issue Comment
+- synonym: SourceCodeEntity
+  examples: |
+    - Source Code Entity
+- synonym: IssueTable
+  examples: |
+    - Issue Table
+- synonym: MetricValueTableRow
+  examples: |
+    - Metric Value Table Row
+- synonym: EntityList
+  examples: |
+    - Entity List
+- synonym: MetricList
+  examples: |
+    - Metric List
+- synonym: MetricValueRange
+  examples: |
+    - Metric Value Range
+- synonym: MetricValueTable
+  examples: |
+    - Metric Value Table
+- synonym: UserRef
+  examples: |
+    - User Ref
+- synonym: DashboardInfo
+  examples: |
+    - Dashboard Info
+- synonym: ProjectReference
+  examples: |
+    - Project Reference
+- synonym: DashboardError
+  examples: |
+    - Dashboard Error
+- synonym: DashboardErrorData
+  examples: |
+    - Dashboard Error Data
+- synonym: AnalysisVersion
+  examples: |
+    - Analysis Version
+- synonym: ToolsVersion
+  examples: |
+    - Tools Version
+- synonym: VersionKindCount
+  examples: |
+    - Version Kind Count
+- synonym: DashboardVersion
+  examples: |
+    - Dashboard Version
+- synonym: DashboardException
+  examples: |
+    - Dashboard Exception
+- synonym: DashboardRetriever
+  examples: |
+    - Dashboard Retriever
+- synonym: AxivionCertificateHandler
+  examples: |
+    - Axivion Certificate Handler
+- synonym: DashboardResult
+  examples: |
+    - Dashboard Result
+- synonym: ClientNetworkTransform
+  examples: |
+    - Client Network Transform
+- synonym: NetworkCommsLogger
+  examples: |
+    - Network Comms Logger
+- synonym: AbstractPacket
+  examples: |
+    - Abstract Packet
+- synonym: PacketSerializer
+  examples: |
+    - Packet Serializer
+- synonym: NetworkException
+  examples: |
+    - Network Exception
+- synonym: NoServerConnection
+  examples: |
+    - No Server Connection
+- synonym: CannotStartServer
+  examples: |
+    - Cannot Start Server
+- synonym: PacketHandler
+  examples: |
+    - Packet Handler
+- synonym: SerializedPendingPacket
+  examples: |
+    - Serialized Pending Packet
+- synonym: TranslatedPendingPacket
+  examples: |
+    - Translated Pending Packet
+- synonym: DataModel
+  examples: |
+    - Data Model
+- synonym: CallTreeCategory
+  examples: |
+    - Call Tree Category
+- synonym: CallTreeCategories
+  examples: |
+    - Call Tree Categories
+- synonym: CallTreeFunctionCall
+  examples: |
+    - Call Tree Function Call
+- synonym: CallTree
+  examples: |
+    - Call Tree
+- synonym: FunctionInformation
+  examples: |
+    - Function Information
+- synonym: IO
+  examples: |
+    - I O
+- synonym: DYNParser
+  examples: |
+    - D Y N Parser
+- synonym: CallTreeReader
+  examples: |
+    - Call Tree Reader
+- synonym: NotEnoughCategoriesException
+  examples: |
+    - Not Enough Categories Exception
+- synonym: IncorrectAttributeCountException
+  examples: |
+    - Incorrect Attribute Count Exception
+- synonym: DG
+  examples: |
+    - D G
+- synonym: SourceRange
+  examples: |
+    - Source Range
+- synonym: FileRanges
+  examples: |
+    - File Ranges
+- synonym: SourceRangeIndex
+  examples: |
+    - Source Range Index
+- synonym: SortedRanges
+  examples: |
+    - Sorted Ranges
+- synonym: IO
+  examples: |
+    - I O
+- synonym: GraphReader
+  examples: |
+    - Graph Reader
+- synonym: MetricExporter
+  examples: |
+    - Metric Exporter
+- synonym: GraphWriter
+  examples: |
+    - Graph Writer
+- synonym: AsString
+  examples: |
+    - As String
+- synonym: JaCoCoImporter
+  examples: |
+    - Ja Co Co Importer
+- synonym: GraphsReader
+  examples: |
+    - Graphs Reader
+- synonym: MetricImporter
+  examples: |
+    - Metric Importer
+- synonym: MetricsIO
+  examples: |
+    - Metrics I O
+- synonym: AsString
+  examples: |
+    - As String
+- synonym: EdgeMemento
+  examples: |
+    - Edge Memento
+- synonym: UnknownAttribute
+  examples: |
+    - Unknown Attribute
+- synonym: AttributeNamesExtensions
+  examples: |
+    - Attribute Names Extensions
+- synonym: JaCoCo
+  examples: |
+    - Ja Co Co
+- synonym: ChangeMarkers
+  examples: |
+    - Change Markers
+- synonym: SubgraphMemento
+  examples: |
+    - Subgraph Memento
+- synonym: IGraphElementDiff
+  examples: |
+    - I Graph Element Diff
+- synonym: GraphElement
+  examples: |
+    - Graph Element
+- synonym: AllAttributeNames
+  examples: |
+    - All Attribute Names
+- synonym: GraphElementsMemento
+  examples: |
+    - Graph Elements Memento
+- synonym: GraphElementEqualityComparer
+  examples: |
+    - Graph Element Equality Comparer
+- synonym: NodeEqualityComparer
+  examples: |
+    - Node Equality Comparer
+- synonym: EdgeEqualityComparer
+  examples: |
+    - Edge Equality Comparer
+- synonym: NumericAttributeDiff
+  examples: |
+    - Numeric Attribute Diff
+- synonym: MergeDiffGraphExtension
+  examples: |
+    - Merge Diff Graph Extension
+- synonym: TryGet
+  examples: |
+    - Try Get
+- synonym: AttributeDiff
+  examples: |
+    - Attribute Diff
+- synonym: TryGetValue
+  examples: |
+    - Try Get Value
+- synonym: GraphExtensions
+  examples: |
+    - Graph Extensions
+- synonym: GraphElementEqualityComparer
+  examples: |
+    - Graph Element Equality Comparer
+- synonym: GraphElementEqualityComparer
+  examples: |
+    - Graph Element Equality Comparer
+- synonym: TryGet
+  examples: |
+    - Try Get
+- synonym: TryGetValue
+  examples: |
+    - Try Get Value
+- synonym: GraphElementEqualityComparer
+  examples: |
+    - Graph Element Equality Comparer
+- synonym: ProxyObserver
+  examples: |
+    - Proxy Observer
+- synonym: GraphSearch
+  examples: |
+    - Graph Search
+- synonym: GraphFilter
+  examples: |
+    - Graph Filter
+- synonym: GraphSearch
+  examples: |
+    - Graph Search
+- synonym: IGraphModifier
+  examples: |
+    - I Graph Modifier
+- synonym: GraphSorter
+  examples: |
+    - Graph Sorter
+- synonym: ChangeEvent
+  examples: |
+    - Change Event
+- synonym: EdgeChange
+  examples: |
+    - Edge Change
+- synonym: GraphElementIDComparer
+  examples: |
+    - Graph Element I D Comparer
+- synonym: GraphEvent
+  examples: |
+    - Graph Event
+- synonym: VersionChangeEvent
+  examples: |
+    - Version Change Event
+- synonym: EdgeEvent
+  examples: |
+    - Edge Event
+- synonym: HierarchyEvent
+  examples: |
+    - Hierarchy Event
+- synonym: NodeEvent
+  examples: |
+    - Node Event
+- synonym: IAttributeEvent
+  examples: |
+    - I Attribute Event
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: GraphElementTypeEvent
+  examples: |
+    - Graph Element Type Event
+- synonym: ProxyObserver
+  examples: |
+    - Proxy Observer
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: AttributeEvent
+  examples: |
+    - Attribute Event
+- synonym: MetricAggregator
+  examples: |
+    - Metric Aggregator
+- synonym: FaceCam
+  examples: |
+    - Face Cam
+- synonym: FaceCam
+  examples: |
+    - Face Cam
+- synonym: ReflexionAnalysis
+  examples: |
+    - Reflexion Analysis
+- synonym: ReflexionGraph
+  examples: |
+    - Reflexion Graph
+- synonym: HandleMappingChange
+  examples: |
+    - Handle Mapping Change
+- synonym: PartitionedDependencies
+  examples: |
+    - Partitioned Dependencies
+- synonym: ArchitectureAnalysisException
+  examples: |
+    - Architecture Analysis Exception
+- synonym: CyclicHierarchyException
+  examples: |
+    - Cyclic Hierarchy Exception
+- synonym: CorruptStateException
+  examples: |
+    - Corrupt State Exception
+- synonym: RedundantSpecifiedEdgeException
+  examples: |
+    - Redundant Specified Edge Exception
+- synonym: NotInSubgraphException
+  examples: |
+    - Not In Subgraph Exception
+- synonym: ExpectedSpecifiedEdgeException
+  examples: |
+    - Expected Specified Edge Exception
+- synonym: ExpectedPropagatedEdgeException
+  examples: |
+    - Expected Propagated Edge Exception
+- synonym: AlreadyPropagatedException
+  examples: |
+    - Already Propagated Exception
+- synonym: AlreadyExplicitlyMappedException
+  examples: |
+    - Already Explicitly Mapped Exception
+- synonym: NotExplicitlyMappedException
+  examples: |
+    - Not Explicitly Mapped Exception
+- synonym: AlreadyContainedException
+  examples: |
+    - Already Contained Exception
+- synonym: NotAnOrphanException
+  examples: |
+    - Not An Orphan Exception
+- synonym: IsAnOrphanException
+  examples: |
+    - Is An Orphan Exception
+- synonym: ReflexionGraphTools
+  examples: |
+    - Reflexion Graph Tools
+- synonym: RandomGraphs
+  examples: |
+    - Random Graphs
+- synonym: RandomAttributeDescriptor
+  examples: |
+    - Random Attribute Descriptor
+- synonym: RandomGraphs
+  examples: |
+    - Random Graphs
+- synonym: ShowEdgesAction
+  examples: |
+    - Show Edges Action
+- synonym: ShuffleAction
+  examples: |
+    - Shuffle Action
+- synonym: ShowEdges
+  examples: |
+    - Show Edges
+- synonym: ShowGrabbing
+  examples: |
+    - Show Grabbing
+- synonym: DrawAction
+  examples: |
+    - Draw Action
+- synonym: HighlightedInteractableObjectAction
+  examples: |
+    - Highlighted Interactable Object Action
+- synonym: NodeManipulationAction
+  examples: |
+    - Node Manipulation Action
+- synonym: AcceptDivergenceAction
+  examples: |
+    - Accept Divergence Action
+- synonym: HolisticMetrics
+  examples: |
+    - Holistic Metrics
+- synonym: LoadBoardAction
+  examples: |
+    - Load Board Action
+- synonym: SaveBoardAction
+  examples: |
+    - Save Board Action
+- synonym: AddBoardAction
+  examples: |
+    - Add Board Action
+- synonym: MoveWidgetAction
+  examples: |
+    - Move Widget Action
+- synonym: MoveBoardAction
+  examples: |
+    - Move Board Action
+- synonym: DeleteBoardAction
+  examples: |
+    - Delete Board Action
+- synonym: AddWidgetAction
+  examples: |
+    - Add Widget Action
+- synonym: DeleteWidgetAction
+  examples: |
+    - Delete Widget Action
+- synonym: ZoomActionDesktop
+  examples: |
+    - Zoom Action Desktop
+- synonym: ShowTree
+  examples: |
+    - Show Tree
+- synonym: ScaleNodeAction
+  examples: |
+    - Scale Node Action
+- synonym: ScaleMemento
+  examples: |
+    - Scale Memento
+- synonym: ScaleGizmo
+  examples: |
+    - Scale Gizmo
+- synonym: ActionStateType
+  examples: |
+    - Action State Type
+- synonym: SelectAction
+  examples: |
+    - Select Action
+- synonym: DesktopChartAction
+  examples: |
+    - Desktop Chart Action
+- synonym: ChartAction
+  examples: |
+    - Chart Action
+- synonym: InteractableObjectAction
+  examples: |
+    - Interactable Object Action
+- synonym: RotateAction
+  examples: |
+    - Rotate Action
+- synonym: RotateMemento
+  examples: |
+    - Rotate Memento
+- synonym: RotateGizmo
+  examples: |
+    - Rotate Gizmo
+- synonym: ShowSelection
+  examples: |
+    - Show Selection
+- synonym: ActionStateTypeGroup
+  examples: |
+    - Action State Type Group
+- synonym: MoveAction
+  examples: |
+    - Move Action
+- synonym: GrabbedObject
+  examples: |
+    - Grabbed Object
+- synonym: AddEdgeAction
+  examples: |
+    - Add Edge Action
+- synonym: ShowLabel
+  examples: |
+    - Show Label
+- synonym: GlobalActionHistory
+  examples: |
+    - Global Action History
+- synonym: EditNodeAction
+  examples: |
+    - Edit Node Action
+- synonym: ContextMenuAction
+  examples: |
+    - Context Menu Action
+- synonym: ZoomAction
+  examples: |
+    - Zoom Action
+- synonym: ZoomCommand
+  examples: |
+    - Zoom Command
+- synonym: ZoomState
+  examples: |
+    - Zoom State
+- synonym: HideAction
+  examples: |
+    - Hide Action
+- synonym: ShowHovering
+  examples: |
+    - Show Hovering
+- synonym: DeleteAction
+  examples: |
+    - Delete Action
+- synonym: AbstractActionStateType
+  examples: |
+    - Abstract Action State Type
+- synonym: AddNodeAction
+  examples: |
+    - Add Node Action
+- synonym: ShowCodeAction
+  examples: |
+    - Show Code Action
+- synonym: AbstractPlayerAction
+  examples: |
+    - Abstract Player Action
+- synonym: ActionStateTypes
+  examples: |
+    - Action State Types
+- synonym: HighlightErosion
+  examples: |
+    - Highlight Erosion
+- synonym: NodeManipulationAction
+  examples: |
+    - Node Manipulation Action
+- synonym: NodeManipulationAction
+  examples: |
+    - Node Manipulation Action
+- synonym: KeywordInput
+  examples: |
+    - Keyword Input
+- synonym: XRInput
+  examples: |
+    - X R Input
+- synonym: PlayerMovement
+  examples: |
+    - Player Movement
+- synonym: ListVector3
+  examples: |
+    - List Vector3
+- synonym: KeyActions
+  examples: |
+    - Key Actions
+- synonym: KeyBindings
+  examples: |
+    - Key Bindings
+- synonym: KeyActionDescriptor
+  examples: |
+    - Key Action Descriptor
+- synonym: KeyMap
+  examples: |
+    - Key Map
+- synonym: KeyData
+  examples: |
+    - Key Data
+- synonym: SEEInput
+  examples: |
+    - S E E Input
+- synonym: DictationInput
+  examples: |
+    - Dictation Input
+- synonym: SceneSettings
+  examples: |
+    - Scene Settings
+- synonym: DesktopPlayerMovement
+  examples: |
+    - Desktop Player Movement
+- synonym: CameraState
+  examples: |
+    - Camera State
+- synonym: WindowSpaceManager
+  examples: |
+    - Window Space Manager
+- synonym: GrammarInput
+  examples: |
+    - Grammar Input
+- synonym: SpeechInput
+  examples: |
+    - Speech Input
+- synonym: ToggleBrowser
+  examples: |
+    - Toggle Browser
+- synonym: InteractableObject
+  examples: |
+    - Interactable Object
+- synonym: MultiPlayerHoverAction
+  examples: |
+    - Multi Player Hover Action
+- synonym: LocalPlayerHoverAction
+  examples: |
+    - Local Player Hover Action
+- synonym: MultiPlayerSelectAction
+  examples: |
+    - Multi Player Select Action
+- synonym: MulitPlayerReplaceSelectAction
+  examples: |
+    - Mulit Player Replace Select Action
+- synonym: LocalPlayerSelectAction
+  examples: |
+    - Local Player Select Action
+- synonym: MultiPlayerGrabAction
+  examples: |
+    - Multi Player Grab Action
+- synonym: LocalPlayerGrabAction
+  examples: |
+    - Local Player Grab Action
+- synonym: AudioGameObject
+  examples: |
+    - Audio Game Object
+- synonym: IAudioManager
+  examples: |
+    - I Audio Manager
+- synonym: SoundEffectNetAction
+  examples: |
+    - Sound Effect Net Action
+- synonym: AudioManagerImpl
+  examples: |
+    - Audio Manager Impl
+- synonym: SceneContext
+  examples: |
+    - Scene Context
+- synonym: GraphProviders
+  examples: |
+    - Graph Providers
+- synonym: ReflexionGraphProvider
+  examples: |
+    - Reflexion Graph Provider
+- synonym: FileBasedGraphProvider
+  examples: |
+    - File Based Graph Provider
+- synonym: GXLGraphProvider
+  examples: |
+    - G X L Graph Provider
+- synonym: DashboardGraphProvider
+  examples: |
+    - Dashboard Graph Provider
+- synonym: GraphProviderFactory
+  examples: |
+    - Graph Provider Factory
+- synonym: GraphProvider
+  examples: |
+    - Graph Provider
+- synonym: MergeDiffGraphProvider
+  examples: |
+    - Merge Diff Graph Provider
+- synonym: JaCoCoGraphProvider
+  examples: |
+    - Ja Co Co Graph Provider
+- synonym: PipelineGraphProvider
+  examples: |
+    - Pipeline Graph Provider
+- synonym: CSVGraphProvider
+  examples: |
+    - C S V Graph Provider
+- synonym: VCS
+  examples: |
+    - V C S
+- synonym: VersionControlFactory
+  examples: |
+    - Version Control Factory
+- synonym: GitVersionControl
+  examples: |
+    - Git Version Control
+- synonym: UnknownCommitID
+  examples: |
+    - Unknown Commit I D
+- synonym: IVersionControl
+  examples: |
+    - I Version Control
+- synonym: CameraPaths
+  examples: |
+    - Camera Paths
+- synonym: CameraRecorder
+  examples: |
+    - Camera Recorder
+- synonym: PathData
+  examples: |
+    - Path Data
+- synonym: CameraPath
+  examples: |
+    - Camera Path
+- synonym: PathReplay
+  examples: |
+    - Path Replay
+- synonym: XR
+  examples: |
+    - X R
+- synonym: ManualXRControl
+  examples: |
+    - Manual X R Control
+- synonym: XRCameraRigManager
+  examples: |
+    - X R Camera Rig Manager
+- synonym: JLG
+  examples: |
+    - J L G
+- synonym: MalformedStatement
+  examples: |
+    - Malformed Statement
+- synonym: ParsedJLG
+  examples: |
+    - Parsed J L G
+- synonym: JavaStatement
+  examples: |
+    - Java Statement
+- synonym: JLGParser
+  examples: |
+    - J L G Parser
+- synonym: IDE
+  examples: |
+    - I D E
+- synonym: VSPathFinder
+  examples: |
+    - V S Path Finder
+- synonym: IDEIntegration
+  examples: |
+    - I D E Integration
+- synonym: RemoteProcedureCalls
+  examples: |
+    - Remote Procedure Calls
+- synonym: IDECalls
+  examples: |
+    - I D E Calls
+- synonym: ChatInputController
+  examples: |
+    - Chat Input Controller
+- synonym: UI3D
+  examples: |
+    - U I3 D
+- synonym: UI3DProperties
+  examples: |
+    - U I3 D Properties
+- synonym: Cursor3D
+  examples: |
+    - Cursor3 D
+- synonym: MoveGizmo
+  examples: |
+    - Move Gizmo
+- synonym: RotateGizmo
+  examples: |
+    - Rotate Gizmo

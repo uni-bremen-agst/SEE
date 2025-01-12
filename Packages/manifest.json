@@ -29,6 +29,7 @@
     "com.unity.xr.legacyinputhelpers": "2.1.11",
     "com.unity.xr.management": "4.5.0",
     "com.unity.xr.openxr": "1.13.2",
+    "com.whisper.unity": "file:C:/Users/Sarah/Downloads/whisper.unity-master(1)/whisper.unity-master/Packages/com.whisper.unity",
     "io.livekit.livekit-sdk": "https://github.com/livekit/client-sdk-unity.git",
     "judah4.hsvcolorpickerunity": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
     "com.unity.modules.accessibility": "1.0.0",

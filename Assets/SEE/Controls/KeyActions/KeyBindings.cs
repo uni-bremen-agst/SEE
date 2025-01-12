@@ -128,6 +128,9 @@ namespace SEE.Controls.KeyActions
         {
             // Note: The order of the key actions is important. They are displayed to the
             // user in the order of appearance here.
+            // only for testing
+            Register(KeyAction.LoadDB, KeyCode.F3, "Loads the Database for testing",
+                     KeyActionCategory.General, "Load database"); // TODO should be done via UI
 
             // General
             Register(KeyAction.Help, KeyCode.H, "Help",
