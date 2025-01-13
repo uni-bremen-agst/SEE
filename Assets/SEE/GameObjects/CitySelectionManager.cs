@@ -1,18 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Controls;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
-using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
-using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -23,7 +18,7 @@ namespace SEE.GameObjects
     public class CitySelectionManager : MonoBehaviour
     {
         #region Initial Cities Configuration Paths
-        private const string reflexionCityPath = "Assets/StreamingAssets/reflexion/initial/Reflexion.cfg";
+        public static readonly string InitialReflexionCityPath = Application.streamingAssetsPath + "/reflexion/initial/Reflexion.cfg";
 
         #endregion
 
@@ -110,6 +105,11 @@ namespace SEE.GameObjects
                             nameOfNetworkExecution = null;
                         }
                         gameObject.name = cityName;
+                        /// Delete existing <see cref="AbstractSEECity"/> component.
+                        if (GetComponent<AbstractSEECity>() != null)
+                        {
+                            Destroyer.Destroy(GetComponent<AbstractSEECity>());
+                        }
                         switch (cityType)
                         {
                             case CityTypes.ReflexionCity:
@@ -141,7 +141,6 @@ namespace SEE.GameObjects
                     {
                         SEEReflexionCity reflexionCity = gameObject.GetComponent<SEEReflexionCity>();
                         FitInitalReflexionCity(reflexionCity);
-                        Rename(reflexionCity);
                         progressState = ProgressState.Finish;
                     }
                     break;
@@ -189,7 +188,7 @@ namespace SEE.GameObjects
             gameObject.AddComponent<ReflexionVisualization>();
             gameObject.AddComponent<EdgeMeshScheduler>();
 
-            reflexionCity.ConfigurationPath = new(reflexionCityPath);
+            reflexionCity.ConfigurationPath = new(InitialReflexionCityPath);
             reflexionCity.LoadConfiguration();
             await reflexionCity.LoadDataAsync();
             reflexionCity.DrawGraph();
@@ -242,29 +241,6 @@ namespace SEE.GameObjects
                 diff = diff < 0 ? diff : -diff;
                 Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
                 obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
-            }
-        }
-
-        /// <summary>
-        /// Replaces the keyword "initial" in the root node with the selected city name.
-        /// Currently, the <see cref="Node.ID"/> and the <see cref="GameObject.name"> are not updated.
-        /// This would be necessary to load the initial <see cref="SEEReflexionCity"/> twice.
-        /// </summary>
-        /// <param name="city">The reflexion city.</param>
-        private void Rename(SEEReflexionCity city)
-        {
-            foreach (Node node in GatherRoots())
-            {
-                GameNodeEditor.ChangeName(node, node.SourceName.Replace("initial", gameObject.name));
-            }
-            return;
-            List<Node> GatherRoots()
-            {
-                ReflexionGraph graph = city.ReflexionGraph;
-                List<Node> roots = graph.GetRoots();
-                roots.Add(graph.GetNode(graph.ArchitectureRoot.ID));
-                roots.Add(graph.GetNode(graph.ImplementationRoot.ID));
-                return roots;
             }
         }
         #endregion

@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
+using SEE.GameObjects;
 
 namespace SEE.GraphProviders
 {
@@ -74,6 +75,15 @@ namespace SEE.GraphProviders
             {
                 mappingGraph = await LoadGraphAsync(Mapping, city, token);
                 changePercentage?.Invoke(1.0f);
+            }
+
+            // If the initial reflexion city is loaded, replace the initial key value in the name
+            // with the selected city name.
+            if (city.ConfigurationPath.Path.Equals(new DataPath(CitySelectionManager.InitialReflexionCityPath).Path))
+            {
+                CityName = CityName.Replace("initial", city.gameObject.name);
+                architectureGraph.Name = architectureGraph.Name.Replace("initial", city.gameObject.name);
+                implementationGraph.Name = implementationGraph.Name.Replace("initial", city.gameObject.name);
             }
 
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
