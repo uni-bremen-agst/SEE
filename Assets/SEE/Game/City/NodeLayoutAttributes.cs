@@ -4,6 +4,7 @@ using Sirenix.Serialization;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -16,11 +17,13 @@ namespace SEE.Game.City
         /// <summary>
         /// How to layout the nodes.
         /// </summary>
+        [Tooltip("How to layout the nodes.")]
         public NodeLayoutKind Kind = NodeLayoutKind.Balloon;
 
         /// <summary>
         /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
+        [Tooltip("Settings for the IncrementalTreeMap layout. Used only for this kind of layout.")]
         public IncrementalTreeMapAttributes IncrementalTreeMap = new();
 
         /// <summary>
@@ -31,6 +34,10 @@ namespace SEE.Game.City
         /// data of a game object.
         /// </summary>
         [OdinSerialize]
+        [Tooltip("The path to the layout file containing the node layout information. " +
+                 "If the file extension is GVL, the layout is expected to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. " +
+                 "Otherwise the layout format SDL is expected, which saves all three dimensions of a node. " +
+                 "This information is used only if 'From File' is selected as node layout.")]
         public DataPath LayoutPath = new();
 
         public override void Save(ConfigWriter writer, string label)

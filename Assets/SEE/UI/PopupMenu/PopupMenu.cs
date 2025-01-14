@@ -192,7 +192,7 @@ namespace SEE.UI.PopupMenu
                     AddHeading(heading);
                     break;
                 default:
-                    throw new System.ArgumentException($"Unknown entry type: {entry.GetType()}");
+                    throw new ArgumentException($"Unknown entry type: {entry.GetType()}");
             }
         }
 

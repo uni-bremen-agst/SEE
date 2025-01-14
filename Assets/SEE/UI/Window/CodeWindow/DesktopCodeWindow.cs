@@ -377,7 +377,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Removes listeners.
         /// </summary>
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointAdded;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointRemoved;
@@ -385,6 +385,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 lspHandler.CloseDocument(FilePath);
             }
+            base.OnDestroy();
         }
 
         /// <summary>

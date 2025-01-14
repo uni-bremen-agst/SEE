@@ -15,7 +15,7 @@ using UnityEngine;
 using SEE.Game.City;
 using SEE.Utils.History;
 using SEE.GO.Menu;
-using SEE.UI.Menu.Drawable;
+using SEE.UI.Menu;
 using SEE.UI.Window.PropertyWindow;
 using SEE.XR;
 
@@ -358,7 +358,7 @@ namespace SEE.Controls.Actions
                 entries.Add(new PopupMenuHeading("Source: " + source, Priority: int.MaxValue));
                 entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
             }
-            entries.Add(new PopupMenuAction("Delete", DeleteElement, Icons.Trash, Priority: 0));
+            entries.Add(new PopupMenuAction("Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
@@ -397,7 +397,7 @@ namespace SEE.Controls.Actions
 
             return entries;
 
-            void DeleteElement()
+            async UniTaskVoid DeleteElement()
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
@@ -414,8 +414,11 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    ConfirmDialogMenu confirm = new($"Do you really want to delete the element {graphElement.ID}?\r\nThis action cannot be undone.");
-                    confirm.ExecuteAfterConfirmAsync(() => graphElement.ItsGraph.RemoveElement(graphElement)).Forget();
+                    string message = $"Do you really want to delete the element {graphElement.ID}?\nThis action cannot be undone.";
+                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(message)))
+                    {
+                        graphElement.ItsGraph.RemoveElement(graphElement);
+                    }
                 }
             }
 

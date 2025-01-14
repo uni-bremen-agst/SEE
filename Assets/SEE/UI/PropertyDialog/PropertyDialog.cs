@@ -34,6 +34,7 @@ namespace SEE.UI.PropertyDialog
         /// A group could, for instance, be shown as a foldout or tab. The exact
         /// visual representation depends on the implementation.
         /// </summary>
+        [ManagedUI(toggleEnabled: true, destroy: false)]
         private readonly List<PropertyGroup> groups = new();
 
         /// <summary>
@@ -126,50 +127,5 @@ namespace SEE.UI.PropertyDialog
         /// register on this event to receive a notification when this happens.
         /// </summary>
         public UnityEvent OnCancel = new();
-
-        /// <summary>
-        /// Destroys <see cref="dialog"/>.
-        /// Called by Unity when an instance of <see cref="PropertyDialog"/> is destroyed.
-        /// </summary>
-        private void OnDestroy()
-        {
-            Destroyer.Destroy(dialog);
-        }
-
-        /// <summary>
-        /// Enables <see cref="dialog"/> and all <see cref="groups"/>.
-        /// Called by Unity when an instance of <see cref="PropertyDialog"/> is enabled.
-        /// </summary>
-        private void OnEnable()
-        {
-            Enable(true);
-        }
-
-        /// <summary>
-        /// Disables <see cref="dialog"/> and all <see cref="groups"/>.
-        /// Called by Unity when an instance of <see cref="PropertyDialog"/> is disabled.
-        /// </summary>
-        private void OnDisable()
-        {
-            Enable(false);
-        }
-
-        /// <summary>
-        /// Enables/disables <see cref="dialog"/> and all <see cref="groups"/>
-        /// depending on <paramref name="value"/>.
-        /// </summary>
-        /// <param name="value">whether enabling or disabling is requested</param>
-        private void Enable(bool value)
-        {
-            if (dialog != null)
-            {
-                dialog.SetActive(value);
-            }
-
-            foreach (PropertyGroup group in groups)
-            {
-                group.enabled = value;
-            }
-        }
     }
 }
