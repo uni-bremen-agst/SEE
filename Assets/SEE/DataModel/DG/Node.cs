@@ -168,7 +168,7 @@ namespace SEE.DataModel.DG
         /// True iff node is the implementation or the architecture root of a reflexion city.
         /// </summary>
         /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the implementation or architecture marking.</returns>
-        public bool IsArchitectureOrImplmentationRoot()
+        public bool IsArchitectureOrImplementationRoot()
         {
             return HasToggle(Graph.RootToggle) &&
                 (HasToggle(ReflexionSubgraphs.Implementation.GetLabel()) || HasToggle(ReflexionSubgraphs.Architecture.GetLabel()));

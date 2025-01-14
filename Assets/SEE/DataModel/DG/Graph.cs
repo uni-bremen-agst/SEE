@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -22,10 +21,14 @@ namespace SEE.DataModel.DG
             elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
         }
 
-        // The list of graph nodes indexed by their unique IDs
+        /// <summary>
+        /// The list of graph nodes indexed by their unique IDs.
+        /// </summary>
         private Dictionary<string, Node> nodes = new();
 
-        // The list of graph edges indexed by their unique IDs.
+        /// <summary>
+        /// The list of graph edges indexed by their unique IDs.
+        /// </summary>
         private Dictionary<string, Edge> edges = new();
 
         /// <summary>

@@ -151,7 +151,7 @@ namespace SEE.GO
         /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
         public static bool IsArchitectureOrImplmentationRoot(this GameObject gameNode)
         {
-            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplmentationRoot() ?? false;
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
         }
 
         /// <summary>

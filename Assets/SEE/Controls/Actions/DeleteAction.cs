@@ -115,10 +115,11 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
-        /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow them to be restored.
-        /// This is only needed in the case of deleting an implementation- or architecutre-root.
+        /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow
+        /// them to be restored.
+        /// This is needed only in the case of deleting an implementation or architecture root.
         /// </summary>
-        private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
+        private readonly Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
 
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
@@ -179,12 +180,12 @@ namespace SEE.Controls.Actions
                                                             && !node.HasRootToogle()
                                                             && node.Parent != null
                                                             && (!node.Parent.IsInArchitecture()
-                                                                || node.Parent.IsArchitectureOrImplmentationRoot())) :
+                                                                || node.Parent.IsArchitectureOrImplementationRoot())) :
                         root.ItsGraph.Nodes().Where(node => node.IsInImplementation()
                                                             && !node.HasRootToogle()
                                                             && node.Parent != null
                                                             && (!node.Parent.IsInImplementation()
-                                                                || node.Parent.IsArchitectureOrImplmentationRoot()));
+                                                                || node.Parent.IsArchitectureOrImplementationRoot()));
                     if (root.Children().Count() != children.Count()
                         || go.transform.GetComponentsInChildren<NodeRef>().Count() != root.PostOrderDescendants().Count)
                     {
@@ -220,7 +221,7 @@ namespace SEE.Controls.Actions
         /// Identifies the node types belonging to this subgraph and removes them from the graph.
         /// </summary>
         /// <param name="root">The root of this subgraph.</param>
-        /// <param name="rememberRemovedNodeTypes">Wheter the deleted node types need to be remembered.
+        /// <param name="rememberRemovedNodeTypes">Whether the deleted node types need to be remembered.
         /// Should be switchable for the redo case.</param>
         private void CaptureNodeTypesToRemove(Node root, bool rememberRemovedNodeTypes = true)
         {
@@ -259,9 +260,9 @@ namespace SEE.Controls.Actions
 
             IEnumerable<string> GetRemainingGraphNodeTypes(Node subgraph, SEEReflexionCity city)
             {
-                /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.nodes"/>.
+                /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.Nodes()"/>.
                 /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> or <see cref="ReflexionGraph.ImplementationRoot"/> is used,
-                /// it doesn't work because, the children are not added to this root nodes reference.
+                /// it doesn't work because the children are not added to these root nodes reference.
                 return subgraph.Type == ReflexionGraph.ArchitectureType ?
                     GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID))
                     : GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID));

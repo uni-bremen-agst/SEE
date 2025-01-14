@@ -412,7 +412,7 @@ namespace SEE.Controls.Actions
                 entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
             }
 
-            entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplmentationRoot() ?
+            entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
                 "Clear" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
