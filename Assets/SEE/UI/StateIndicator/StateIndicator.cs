@@ -11,7 +11,7 @@
         private void Awake()
         {
             Title = "StateIndicator";
-            PREFAB = "Prefabs/UI/ModePanel";
+            Prefab = "Prefabs/UI/ModePanel";
         }
 
         /// <summary>
@@ -20,6 +20,11 @@
         protected override void StartDesktop()
         {
             StartDesktopInit();
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
         }
     }
 }

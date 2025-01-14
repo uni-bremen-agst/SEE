@@ -120,6 +120,11 @@ namespace SEE.UI.Window.CodeWindow
             SetupBreakpoints();
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Sets up the breakpoints.
         /// </summary>
@@ -243,6 +248,14 @@ namespace SEE.UI.Window.CodeWindow
                     RemoveUnderline(lastHoveredWord.Value);
                     GoToDefinition(lastHoveredWord.Value);
                 }
+
+                if (Input.GetKey(KeyCode.LeftControl) && Input.mouseScrollDelta.y is float delta and not 0)
+                {
+                    // Change font size by scrolled amount.
+                    FontSize = Mathf.Clamp(FontSize + delta, 5, 72);
+                    textMesh.fontSize = FontSize;
+                    RecalculateExcessLines();
+                }
             }
 
             const string startUnderline = "</noparse><u><color=\"orange\"><noparse>";
@@ -333,6 +346,11 @@ namespace SEE.UI.Window.CodeWindow
             }
         }
 
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
+        }
+
         /// <summary>
         /// Recalculates the <see cref="excessLines"/> using the current window height and line height of the text.
         /// This method should be called every time the window height or the line height changes.
@@ -359,7 +377,7 @@ namespace SEE.UI.Window.CodeWindow
         /// <summary>
         /// Removes listeners.
         /// </summary>
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             DebugBreakpointManager.OnBreakpointAdded -= OnBreakpointAdded;
             DebugBreakpointManager.OnBreakpointRemoved -= OnBreakpointRemoved;
@@ -367,6 +385,7 @@ namespace SEE.UI.Window.CodeWindow
             {
                 lspHandler.CloseDocument(FilePath);
             }
+            base.OnDestroy();
         }
 
         /// <summary>

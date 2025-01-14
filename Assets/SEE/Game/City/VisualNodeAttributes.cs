@@ -160,10 +160,10 @@ namespace SEE.Game.City
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
         /// <summary>
-        /// Whether users may manipulate (e.g., resize) instances of this type of node.
+        /// Defines if node type may be manually resized by users.
         /// </summary>
-        [Tooltip("Whether users may manipulate (e.g., resize) instances of this type of node.")]
-        public bool AllowManualNodeManipulation = false;
+        [Tooltip("May users resize this type of node?")]
+        public bool AllowManualResize = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.
@@ -183,7 +183,7 @@ namespace SEE.Game.City
             AntennaSettings.Save(writer, antennaSettingsLabel);
             writer.Save(OutlineWidth, outlineWidthLabel);
             writer.Save(ShowNames, showNamesLabel);
-            writer.Save(AllowManualNodeManipulation, allowManualNodeManipulationLabel);
+            writer.Save(AllowManualResize, allowManualResizeLabel);
             writer.EndGroup();
         }
 
@@ -219,7 +219,7 @@ namespace SEE.Game.City
             AntennaSettings.Restore(values, antennaSettingsLabel);
             ConfigIO.Restore(values, outlineWidthLabel, ref OutlineWidth);
             ConfigIO.Restore(values, showNamesLabel, ref ShowNames);
-            ConfigIO.Restore(values, allowManualNodeManipulationLabel, ref AllowManualNodeManipulation);
+            ConfigIO.Restore(values, allowManualResizeLabel, ref AllowManualResize);
         }
 
         /// <summary>
@@ -264,8 +264,8 @@ namespace SEE.Game.City
         private const string showNamesLabel = "ShowNames";
 
         /// <summary>
-        /// Label in the configuration file for <see cref="AllowManualNodeManipulation"/>.
+        /// Label in the configuration file for <see cref="AllowManualResize"/>.
         /// </summary>
-        private const string allowManualNodeManipulationLabel = "AllowManualNodeManipulation";
+        private const string allowManualResizeLabel = "AllowManualResize";
     }
 }

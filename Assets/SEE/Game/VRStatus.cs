@@ -68,7 +68,7 @@ namespace SEE.Game
         public static bool IsVRRunning()
         {
             List<XRDisplaySubsystem> displays = new List<XRDisplaySubsystem>();
-            SubsystemManager.GetInstances(displays);
+            SubsystemManager.GetSubsystems(displays);
             return displays.Any(display => display.running);
         }
     }

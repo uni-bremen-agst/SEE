@@ -32,6 +32,11 @@ namespace SEE.Game.Operator
         /// </summary>
         private SEESpline spline;
 
+        /// <summary>
+        /// Shader property that enables or disables the edge direction (data flow) animation.
+        /// </summary>
+        private static readonly int EdgeFlowEnabledProperty = Shader.PropertyToID("_EdgeFlowEnabled");
+
         #region Public API
 
         /// <summary>
@@ -77,7 +82,16 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Construct(float factor = 1)
         {
-            return construction.AnimateTo(true, ToDuration(factor));
+            return construction.AnimateTo(true, ToDuration(factor)).OnComplete(() => UpdateCollider(true));
+        }
+
+        /// <summary>
+        /// Enable/disable the collider of the <see cref="spline"/> depending on <paramref name="enableCollider"/>.
+        /// </summary>
+        /// <param name="enableCollider">Whether to enable the collider. Will be disabled if this is <c>false</c>.</param>
+        private void UpdateCollider(bool enableCollider)
+        {
+            spline.IsSelectable = enableCollider;
         }
 
         /// <summary>
@@ -90,7 +104,7 @@ namespace SEE.Game.Operator
         /// <returns>An operation callback for the requested animation</returns>
         public IOperationCallback<Action> Destruct(float factor = 1)
         {
-            return construction.AnimateTo(false, ToDuration(factor));
+            return construction.AnimateTo(false, ToDuration(factor)).OnComplete(() => UpdateCollider(false));
         }
 
         /// <summary>
@@ -137,7 +151,7 @@ namespace SEE.Game.Operator
             return animationKind switch
             {
                 EdgeAnimationKind.None => new DummyOperationCallback<Action>(),
-                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor),
+                EdgeAnimationKind.Fading => FadeTo(show ? 1.0f : 0.0f, factor).OnComplete(() => UpdateCollider(show)),
                 EdgeAnimationKind.Buildup => show ? Construct(factor) : Destruct(factor),
                 _ => throw new ArgumentOutOfRangeException(nameof(animationKind), "Unknown edge animation kind supplied.")
             };
@@ -149,14 +163,9 @@ namespace SEE.Game.Operator
         /// <param name="enable">Enable or disable animation.</param>
         public void AnimateDataFlow(bool enable = true)
         {
-            if (enable)
+            if (gameObject.TryGetComponentOrLog(out MeshRenderer meshRenderer))
             {
-                gameObject.AddOrGetComponent<EdgeDirectionVisualizer>();
-            }
-            else
-            {
-                EdgeDirectionVisualizer edfv = gameObject.GetComponent<EdgeDirectionVisualizer>();
-                Destroyer.Destroy(edfv);
+                meshRenderer.material.SetFloat(EdgeFlowEnabledProperty, enable ? 1.0f : 0.0f);
             }
         }
 
@@ -218,6 +227,8 @@ namespace SEE.Game.Operator
 
         protected override TweenOperation<(Color start, Color end)> InitializeColorOperation()
         {
+            return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
+
             Tween[] AnimateToColorAction((Color start, Color end) colors, float d)
             {
                 Tween startTween = DOTween.To(() => spline.GradientColors.start,
@@ -228,8 +239,6 @@ namespace SEE.Game.Operator
                                             colors.end, d);
                 return new[] { startTween.Play(), endTween.Play() };
             }
-
-            return new TweenOperation<(Color start, Color end)>(AnimateToColorAction, spline.GradientColors);
         }
 
         protected override Tween[] BlinkAction(int count, float duration)

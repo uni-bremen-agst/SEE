@@ -1,16 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using MoreLinq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Tools;
 using SEE.Tools.LSP;
 using SEE.Utils;
 using SEE.Utils.Markdown;
-using UnityEngine;
 using UnityEngine.Assertions;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -174,6 +178,25 @@ namespace SEE.DataModel.DG.IO
         private const string SelectionRangeAttribute = "SelectionRange";
 
         /// <summary>
+        /// Whether the given <paramref name="checkPath"/> applies to the given <paramref name="actualPath"/>.
+        /// </summary>
+        /// <param name="checkPath">The path to check. May be a regular expression if ending with $.</param>
+        /// <param name="actualPath">The actual path to compare against.</param>
+        /// <returns>True if the check path applies to the actual path, false otherwise.</returns>
+        private static bool PathApplies(string checkPath, string actualPath)
+        {
+            if (checkPath.EndsWith('$'))
+            {
+                // This is a regular expression.
+                return Regex.IsMatch(actualPath, checkPath);
+            }
+            else
+            {
+                return actualPath.StartsWith(checkPath);
+            }
+        }
+
+        /// <summary>
         /// Loads nodes and edges from the language server and adds them to the given <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph to which the nodes and edges should be added.</param>
@@ -186,7 +209,7 @@ namespace SEE.DataModel.DG.IO
             // Query all documents whose file extension is supported by the language server.
             List<string> relevantExtensions = Handler.Server.Languages.SelectMany(x => x.FileExtensions).ToList();
             List<string> relevantDocuments = SourcePaths.SelectMany(RelevantDocumentsForPath)
-                                                        .Where(x => ExcludedPaths.All(y => !x.StartsWith(y)))
+                                                        .Where(x => ExcludedPaths.All(y => !PathApplies(y, x)))
                                                         .Distinct().ToList();
             IList<Node> originalNodes = graph.Nodes();
             nodeAtDirectory.Clear();
@@ -309,11 +332,11 @@ namespace SEE.DataModel.DG.IO
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Call) && Handler.ServerCapabilities.CallHierarchyProvider.TrueOrValue())
                     {
-                        await HandleCallHierarchyAsync(node, graph, token);
+                        await HandleEdgeHierarchy(() => HandleCallHierarchyAsync(node, graph, token));
                     }
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Extend) && Handler.ServerCapabilities.TypeHierarchyProvider.TrueOrValue())
                     {
-                        await HandleTypeHierarchyAsync(node, graph, token);
+                        await HandleEdgeHierarchy(() => HandleTypeHierarchyAsync(node, graph, token));
                     }
 
                     // The remaining 80% of the progress is made by connecting the nodes.
@@ -345,6 +368,18 @@ namespace SEE.DataModel.DG.IO
             changePercentage?.Invoke(1);
 
             return;
+
+            async UniTask HandleEdgeHierarchy(Func<UniTask> hierarchyFunction)
+            {
+                try
+                {
+                    await hierarchyFunction();
+                }
+                catch (TimeoutException e)
+                {
+                    Debug.LogWarning(e);
+                }
+            }
 
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
@@ -470,7 +505,7 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
                 Edge edge = AddEdge(node, targetNode, LSP.Call, false, graph);
-                edge.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
+                edge?.SetRange(SelectionRangeAttribute, Range.FromLspRange(item.SelectionRange));
             }
             return;
 

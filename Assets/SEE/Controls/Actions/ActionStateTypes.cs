@@ -70,11 +70,6 @@ namespace SEE.Controls.Actions
                   Color.red.Darker(), Icons.Move,
                   MoveAction.CreateReversibleAction);
 
-            Rotate =
-              new("Rotate", "Rotate the selected node and its children within a graph",
-                  Color.blue.Darker(), Icons.Rotate,
-                  RotateAction.CreateReversibleAction);
-
             Hide =
               new("Hide", "Hides nodes or edges",
                   Color.yellow.Darker(), Icons.EyeSlash,
@@ -99,11 +94,6 @@ namespace SEE.Controls.Actions
               new("Resize Node", "Change the size of a node",
                   Color.green.Darker(), Icons.Resize,
                   ResizeNodeAction.CreateReversibleAction);
-
-            ScaleNode =
-              new("Scale Node", "Scale a node",
-                  Color.green.Darker(), Icons.Scale,
-                  ScaleNodeAction.CreateReversibleAction);
 
             Delete =
               new("Delete", "Delete a node or an edge",
@@ -299,20 +289,17 @@ namespace SEE.Controls.Actions
                     parent: Drawable);
         }
 
-        // IMPORTANT NOTE: The order of the following field declarations must be exaclty the same
+        // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
         // as the order of their assignments in the static constructor above.
 
         public static readonly ActionStateType Move;
-        public static readonly ActionStateType Rotate;
         public static readonly ActionStateType Hide;
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
         public static readonly ActionStateType ResizeNode;
-        public static readonly ActionStateType ScaleNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
-        public static readonly ActionStateType Draw;
         public static readonly ActionStateType AcceptDivergence;
 
         public static readonly ActionStateTypeGroup MetricBoard;

@@ -115,8 +115,8 @@ namespace SEE.Controls.KeyActions
             }
             catch (Exception ex)
             {
-                // Because this method is called by the static initializer, it represent an internal
-                // problem. The user is not responsible for it. We do not show a notification
+                // Because this method is called by the static initializer, it represents an internal
+                // problem. The user is not responsible for it. We do not show a notification.
                 Debug.LogError(ex.Message);
             }
         }
@@ -180,9 +180,7 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.MetricCharts, "Toggles the menu for holistic code metrics");
 
             // Browsing
-            Register(KeyAction.SearchMenu, KeyCode.F, "Search",
-                     KeyActionCategory.Browsing, "Opens the search menu.");
-            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view",
+            Register(KeyAction.TreeView, KeyCode.Tab, "Tree view and Search",
                      KeyActionCategory.Browsing, "Opens/closes the tree view window.");
             Register(KeyAction.ToggleEdges, KeyCode.V, "Toggle edges",
                      KeyActionCategory.Browsing, "Toggles the visibility of all edges of a hovered code city.");

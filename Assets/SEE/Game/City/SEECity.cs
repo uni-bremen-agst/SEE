@@ -337,7 +337,6 @@ namespace SEE.Game.City
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
                                                           out Action<float> reportProgress))
                     {
-                        ShowNotification.Info("SEECity", "Loading graph");
                         IsPipelineRunning = true;
 
                         void ReportProgress(float x)
@@ -351,7 +350,6 @@ namespace SEE.Game.City
                         LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
                             cancellationTokenSource.Token);
                         IsPipelineRunning = false;
-                        ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                     }
                 }
                 catch (OperationCanceledException)

@@ -1,5 +1,4 @@
 ﻿using System;
-using RTG;
 
 namespace SEE.Game.Operator
 {

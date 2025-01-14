@@ -14,6 +14,7 @@ using SEE.UI.Window;
 using SEE.Utils.History;
 using SEE.Game.City;
 using SEE.VCS;
+using SEE.XR;
 using GraphElementRef = SEE.GO.GraphElementRef;
 using Range = SEE.DataModel.DG.Range;
 
@@ -318,7 +319,7 @@ namespace SEE.Controls.Actions
         {
             // Only allow local player to open new code windows
             if (spaceManager.CurrentPlayer == WindowSpaceManager.LocalPlayer
-                && SEEInput.Select()
+                && (SEEInput.Select() || XRSEEActions.Selected)
                 && Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef graphElementRef) != HitGraphElement.None)
             {
                 // If nothing is selected, there's nothing more we need to do

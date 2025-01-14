@@ -1420,7 +1420,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 20
+  m_ScrollSensitivity: 0.1
   m_Viewport: {fileID: 1176873081988812620}
   m_HorizontalScrollbar: {fileID: 7171935558317943900}
   m_VerticalScrollbar: {fileID: 5270351434699486664}
@@ -2474,6 +2474,7 @@ GameObject:
   - component: {fileID: 790196186597391616}
   - component: {fileID: 8874951550066978760}
   - component: {fileID: 9004278678232372259}
+  - component: {fileID: 8056112077780593223}
   m_Layer: 5
   m_Name: SearchField
   m_TagString: Untagged
@@ -2684,6 +2685,18 @@ MonoBehaviour:
   m_FlexibleWidth: 100
   m_FlexibleHeight: -1
   m_LayoutPriority: 3
+--- !u!114 &8056112077780593223
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7475176147733851298}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8200dca4f813a2949a733aadb413d2f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8709522067248902145
 GameObject:
   m_ObjectHideFlags: 0

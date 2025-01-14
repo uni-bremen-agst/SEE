@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
+using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -9,6 +10,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using SEE.XR;
 
 namespace SEE.UI.PopupMenu
 {
@@ -21,6 +23,11 @@ namespace SEE.UI.PopupMenu
         /// Path to the prefab that should be used as the popup menu.
         /// </summary>
         private const string menuPrefabPath = "Prefabs/UI/PopupMenu";
+
+        /// <summary>
+        /// Path to the gameobject that should be used as the popup menu in VR.
+        /// </summary>
+        private const string xrMenuPrefabPath = "XRRig(Clone)/Camera Offset/Right Controller/Popup/XRCanvas/PopupMenu";
 
         /// <summary>
         /// The root transform of the popup menu.
@@ -101,23 +108,40 @@ namespace SEE.UI.PopupMenu
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                menu = (RectTransform)GameObject.Find(xrMenuPrefabPath).transform;
+            }
+            else
+            {
+                menu = (RectTransform)PrefabInstantiator.InstantiatePrefab(menuPrefabPath, Canvas.transform, false).transform;
+            }
             contentSizeFitter = menu.gameObject.MustGetComponent<ContentSizeFitter>();
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
             scrollView = (RectTransform)menu.Find("Scroll View");
             actionList = (RectTransform)scrollView.Find("Viewport/Action List");
-
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            {
+                RectTransform background = (RectTransform)menu.Find("Background");
+                RectTransform shadow = (RectTransform)menu.Find("Shadow");
+                shadow.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                background.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+                scrollView.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            }
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
-            pointerHelper.ExitEvent.AddListener(x =>
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
-                // If the mouse is not moving, this may indicate that the trigger has just been
-                // menu entries being rebuilt instead of the mouse moving outside of the menu.
-                if (x.IsPointerMoving())
+                pointerHelper.ExitEvent.AddListener(x =>
                 {
-                    HideMenuAsync().Forget();
-                }
-            });
+                    // If the mouse is not moving, this may indicate that the trigger has just been
+                    // menu entries being rebuilt instead of the mouse moving outside of the menu.
+                    if (x.IsPointerMoving())
+                    {
+                        HideMenuAsync().Forget();
+                    }
+                });
+            }
 
             // We add all entries that were added before the menu was started.
             while (entriesBeforeStart.Count > 0)
@@ -127,6 +151,21 @@ namespace SEE.UI.PopupMenu
 
             // We hide the menu by default.
             menu.gameObject.SetActive(false);
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
+        protected override void UpdateVR()
+        {
+            if (XRSEEActions.TooltipToggle && XRSEEActions.OnSelectToggle)
+            {
+                XRSEEActions.TooltipToggle = false;
+                XRSEEActions.OnSelectToggle = false;
+                HideMenuAsync().Forget();
+            }
         }
 
         /// <summary>
@@ -153,7 +192,7 @@ namespace SEE.UI.PopupMenu
                     AddHeading(heading);
                     break;
                 default:
-                    throw new System.ArgumentException($"Unknown entry type: {entry.GetType()}");
+                    throw new ArgumentException($"Unknown entry type: {entry.GetType()}");
             }
         }
 
@@ -187,6 +226,7 @@ namespace SEE.UI.PopupMenu
                 action.Action();
                 if (action.CloseAfterClick)
                 {
+                    XRSEEActions.OnSelectToggle = false;
                     HideMenuAsync().Forget();
                 }
             }
@@ -365,7 +405,10 @@ namespace SEE.UI.PopupMenu
             }
             if (position.HasValue)
             {
-                MoveTo(position.Value);
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                {
+                    MoveTo(position.Value);
+                }
             }
             ShowMenuAsync().Forget();
         }

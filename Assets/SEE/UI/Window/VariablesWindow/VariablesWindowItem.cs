@@ -72,6 +72,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// The item.
         /// </summary>
+        [ManagedUI]
         private GameObject item;
 
         /// <summary>
@@ -114,6 +115,7 @@ namespace SEE.UI.Window.VariablesWindow
         /// <summary>
         /// List of all items.
         /// </summary>
+        [ManagedUI]
         private readonly List<VariablesWindowItem> children = new();
 
         /// <summary>
@@ -225,12 +227,12 @@ namespace SEE.UI.Window.VariablesWindow
             foreground = item.transform.Find("Foreground");
 
             background.GetComponent<UIGradient>().EffectGradient.SetKeys(
-                new Color[] { BackgroundColor, BackgroundColor.Darker(0.3f) }.ToGradientColorKeys().ToArray(),
+                new[] { BackgroundColor, BackgroundColor.Darker(0.3f) }.ToGradientColorKeys().ToArray(),
                 new GradientAlphaKey[] { new(1, 0), new(1, 1) });
 
             expandIcon = item.transform.Find("Foreground/Expand Icon");
 
-            if (item.TryGetComponent<PointerHelper>(out pointerHelper))
+            if (item.TryGetComponent(out pointerHelper))
             {
                 if (children.Count > 0)
                 {
@@ -272,18 +274,6 @@ namespace SEE.UI.Window.VariablesWindow
             {
                 queueRetrieveChildren = false;
                 RetrieveChildren();
-            }
-        }
-
-        /// <summary>
-        /// Destroys this item and its children.
-        /// </summary>
-        private void OnDestroy()
-        {
-            Destroyer.Destroy(item);
-            foreach (VariablesWindowItem child in children)
-            {
-                Destroyer.Destroy(child);
             }
         }
 

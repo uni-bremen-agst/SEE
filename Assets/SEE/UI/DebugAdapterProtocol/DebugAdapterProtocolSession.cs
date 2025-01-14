@@ -87,6 +87,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// The debug controls.
         /// </summary>
+        [ManagedUI]
         private GameObject controls;
 
         /// <summary>
@@ -319,7 +320,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// <summary>
         /// Cleans up debug session.
         /// </summary>
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             actions.Clear();
             threads.Clear();
@@ -332,10 +333,6 @@ namespace SEE.UI.DebugAdapterProtocol
             ConsoleWindow.OnInputSubmit -= OnConsoleInput;
             CodeWindow.OnWordHoverBegin -= OnWordHoverBegin;
             CodeWindow.OnWordHoverEnd -= OnWordHoverEnd;
-            if (controls)
-            {
-                Destroyer.Destroy(controls);
-            }
             if (adapterProcess is { HasExited: false })
             {
                 adapterProcess.Kill();
@@ -344,6 +341,7 @@ namespace SEE.UI.DebugAdapterProtocol
             {
                 adapterHost.Stop();
             }
+            base.OnDestroy();
         }
 
         /// <summary>

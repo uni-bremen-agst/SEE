@@ -102,7 +102,7 @@ namespace SEE.Game.City
         /// <param name="color">The node color.</param>
         private void SetInitialType(VisualNodeAttributes type, Color color)
         {
-            type.AllowManualNodeManipulation = true;
+            type.AllowManualResize = true;
             type.ColorProperty.TypeColor = color;
             type.ShowNames = false;
         }

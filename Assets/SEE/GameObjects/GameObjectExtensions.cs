@@ -386,8 +386,19 @@ namespace SEE.GO
         /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
-            Vector3 result = gameObject.transform.position;
-            result.y += gameObject.WorldSpaceSize().y / 2.0f;
+            Vector3 result;
+            if (gameObject.TryGetComponent(out SEESpline spline))
+            {
+                // Splines aren't actually positioned at their game object's position,
+                // but their position can be determined by their middle control point.
+                result = spline.GetMiddleControlPoint();
+                result.y += spline.Radius;
+            }
+            else
+            {
+                result = gameObject.transform.position;
+                result.y += gameObject.WorldSpaceSize().y / 2.0f;
+            }
             return result;
         }
 

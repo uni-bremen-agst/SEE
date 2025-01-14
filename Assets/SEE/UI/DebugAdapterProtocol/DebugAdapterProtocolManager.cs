@@ -115,6 +115,11 @@ namespace SEE.UI.DebugAdapterProtocol
             pointerHelper.ExitEvent.AddListener(_ => Tooltip.Deactivate());
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         /// <summary>
         /// Starts a debug session.
         /// </summary>
@@ -133,7 +138,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         public static void OpenDebugAdapterConfig()
         {
-            GameObject go = new GameObject("Debug Adapter Configuration");
+            GameObject go = new("Debug Adapter Configuration");
 
             // create property group
             PropertyGroup group = go.gameObject.AddComponent<PropertyGroup>();
@@ -219,7 +224,7 @@ namespace SEE.UI.DebugAdapterProtocol
         /// </summary>
         public static void OpenLaunchConfig()
         {
-            GameObject go = new GameObject("Launch Request");
+            GameObject go = new("Launch Request");
 
             // create property group
             PropertyGroup group = go.AddComponent<PropertyGroup>();

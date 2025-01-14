@@ -1,5 +1,5 @@
 using Michsky.UI.ModernUIPack;
-using System;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -74,9 +74,10 @@ namespace SEE.UI.Drawable
         /// Handler method for changing the slider value.
         /// </summary>
         /// <param name="newValue">the new selected value</param>
-        private void SliderChanged(float newValue)
+        private void SliderChanged(float _)
         {
             /// Normalizes the value of the slider when the <see cref="valueNormalized"/> option is enabled.
+            float newValue;
             if (valueNormalized)
             {
                 newValue = manager.mainSlider.normalizedValue;
@@ -107,7 +108,7 @@ namespace SEE.UI.Drawable
         /// <param name="value">the value that should be assigned</param>
         public void AssignValue(float value)
         {
-            tmpText.text = value.ToString();
+            tmpText.text = value.ToString(CultureInfo.InvariantCulture);
             manager.mainSlider.value = value;
         }
 

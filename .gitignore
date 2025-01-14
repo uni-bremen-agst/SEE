@@ -154,3 +154,5 @@ Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/uninstall.ps1
 # Files downloaded from backend server
 /Assets/StreamingAssets/Multiplayer
 /Assets/StreamingAssets/Multiplayer.meta
+Assets/StreamingAssets/KeyBindings.json
+Assets/StreamingAssets/KeyBindings.json.meta
