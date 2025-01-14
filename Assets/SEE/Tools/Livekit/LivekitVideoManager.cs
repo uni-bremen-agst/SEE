@@ -294,7 +294,7 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous publishing process.</returns>
         private IEnumerator PublishVideo()
         {
-            if (room == null || !room.IsConnected)
+            if (room == null)
             {
                 ShowNotification.Error("Livekit", "Not connected.");
                 yield break;
@@ -324,8 +324,6 @@ namespace SEE.Tools.Livekit
             };
 
             // Publish the video track to the room.
-            Debug.Log($"[Livekit] Connection state: {room.IsConnected}\n");
-            UnityEngine.Assertions.Assert.IsNotNull(room, "Room is null");
             UnityEngine.Assertions.Assert.IsNotNull(room.LocalParticipant, "Local participant is null");
             PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(track, options);
             yield return publish;
