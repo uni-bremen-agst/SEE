@@ -1,34 +1,28 @@
+using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.GameObjects;
+using SEE.GO;
+using SEE.GO.Menu;
+using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PopupMenu;
+using SEE.UI.PropertyDialog.CitySelection;
+using SEE.UI.Window;
+using SEE.UI.Window.PropertyWindow;
+using SEE.UI.Window.TreeWindow;
+using SEE.Utils;
+using SEE.Utils.History;
+using SEE.Utils.Paths;
+using SEE.XR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
-using SEE.UI.Window;
-using SEE.UI.Window.TreeWindow;
-using SEE.Utils;
 using UnityEngine;
-using SEE.Game.City;
-using SEE.Utils.History;
-using SEE.GO.Menu;
-using SEE.UI.Menu;
-using SEE.UI.Window.PropertyWindow;
-using SEE.Net.Actions;
-using SEE.GameObjects;
-using SEE.UI.PropertyDialog.CitySelection;
-using SEE.GraphProviders;
-using SEE.Utils.Paths;
-using MoreLinq;
-using SEE.Game.CityRendering;
-using SEE.UI.DebugAdapterProtocol.DebugAdapter;
-using System.Threading.Tasks;
-using SEE.UI.RuntimeConfigMenu;
-using System.Reflection;
-using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -86,17 +80,23 @@ namespace SEE.Controls.Actions
                         startMousePosition = Input.mousePosition;
                     }
                     multiselection = false;
-                    XRSEEActions.TooltipToggle = false;
-                    XRSEEActions.OnSelectToggle = true;
-                    onSelect = true;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
                 }
                 else
                 {
                     startObject = null;
                     multiselection = true;
-                    XRSEEActions.TooltipToggle = false;
-                    XRSEEActions.OnSelectToggle = true;
-                    onSelect = true;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
                 }
             }
             if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
@@ -108,7 +108,8 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer
+                        || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
                         if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                         {
