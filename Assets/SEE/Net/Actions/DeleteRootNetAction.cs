@@ -54,7 +54,6 @@ namespace SEE.Net.Actions
             if (cityHolder.GetComponent<AbstractSEECity>() is SEEReflexionCity)
             {
                 Destroyer.Destroy(cityHolder.GetComponent<ReflexionVisualization>());
-                // TODO: what is with the EdgeMeshScheduler component?
                 Destroyer.Destroy(cityHolder.GetComponent<EdgeMeshScheduler>());
             }
             Destroyer.Destroy(gameObject);
