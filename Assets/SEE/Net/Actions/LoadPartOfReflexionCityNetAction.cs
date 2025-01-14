@@ -1,12 +1,9 @@
 ﻿using SEE.Game.City;
 using SEE.Game;
 using SEE.GameObjects;
-using SEE.Utils;
-using System.Collections;
 using UnityEngine;
 using System;
 using SEE.Utils.Paths;
-using SEE.GO;
 using Cysharp.Threading.Tasks;
 
 namespace SEE.Net.Actions
@@ -32,12 +29,12 @@ namespace SEE.Net.Actions
         public DataPath GXL;
 
         /// <summary>
-        /// The project folder; can be null if a architecture graph should be loaded.
+        /// The project folder; can be null if an architecture graph should be loaded.
         /// </summary>
         public DataPath ProjectFolder;
 
         /// <summary>
-        /// Creates a new LoadPartOfReflexionCityNetAction.
+        /// Constructor.
         /// </summary>
         /// <param name="tableID">The unique name of the table on which city the part should be loaded.</param>
         /// <param name="loadArchitecture">Distinction between whether an architecture or implementation graph should be loaded.</param>
@@ -52,16 +49,7 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
-        /// Loads the given GXL file into the city on the specified table on each client.
+        /// Loads the given graph into the city on the specified table on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
@@ -74,15 +62,16 @@ namespace SEE.Net.Actions
                 }
                 if (city.GetComponent<SEEReflexionCity>() != null)
                 {
-                    city.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GXL, LoadArchitecture? null : ProjectFolder).Forget();
-                } else
+                    city.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GXL, LoadArchitecture ? null : ProjectFolder).Forget();
+                }
+                else
                 {
-                    throw new Exception($"GXL can't be loaded because ther is no ReflexionCity component.");
+                    throw new Exception($"Graph can't be loaded because there is no {nameof(SEEReflexionCity)} component.");
                 }
             }
             else
             {
-                throw new Exception($"The city can't be added because there is no CitieHolder component.");
+                throw new Exception($"The city can't be added because there is no {nameof(CitiesHolder)} component.");
             }
         }
     }

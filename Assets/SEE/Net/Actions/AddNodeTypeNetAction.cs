@@ -28,7 +28,7 @@ namespace SEE.Net.Actions
         public string NodeType;
 
         /// <summary>
-        /// Creates a new AddNodeTypeNetAction.
+        /// Constructor.
         /// </summary>
         /// <param name="tableID">The unique name of the table to which city the node type should be added.</param>
         /// <param name="nodeType">The name for the added node type.</param>
@@ -38,15 +38,6 @@ namespace SEE.Net.Actions
             TableID = tableID;
             NodeType = nodeType;
             VisualNodeAttribute = visualNodeAttribute;
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>

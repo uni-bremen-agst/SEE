@@ -7,7 +7,7 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Adds a City to all clients.
+    /// Adds a city to all clients.
     /// </summary>
     public class AddCityNetAction : AbstractNetAction
     {
@@ -27,7 +27,7 @@ namespace SEE.Net.Actions
         public string CityName;
 
         /// <summary>
-        /// Creates a new AddCityNetAction.
+        /// Constructor.
         /// </summary>
         /// <param name="tableID">The unique name of the table to which the city should be added.</param>
         /// <param name="cityType">The city type that should be added.</param>

@@ -51,7 +51,7 @@ namespace SEE.GO
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
         ///
         /// This predicate can be queried for game objects representing a code city,
-        /// that is, game objects that have a <see cref="AbstractSEECity"/> attached to
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
         /// <returns>true if a code city was drawn</returns>
@@ -61,7 +61,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        ///Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
+        /// Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
         /// A code city is assumed to be drawn in there is at least one immediate child
         /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
@@ -149,7 +149,7 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameNode">game object representing a Node to be queried whether it is an implementation or architecture root</param>
         /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
-        public static bool IsArchitectureOrImplmentationRoot(this GameObject gameNode)
+        public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
         }

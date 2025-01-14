@@ -20,13 +20,6 @@ namespace SEE.Net.Actions.RuntimeConfig
         public string WidgetPath;
 
         /// <summary>
-        /// Does nothing on the server.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-        }
-
-        /// <summary>
         /// Updates the runtime config menu if it is necessary.
         /// </summary>
         public override void ExecuteOnClient()
@@ -37,7 +30,7 @@ namespace SEE.Net.Actions.RuntimeConfig
             }
             else
             {
-                throw new Exception($"There is no RuntimeConfigMenu on that player.");
+                throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
             }
         }
     }

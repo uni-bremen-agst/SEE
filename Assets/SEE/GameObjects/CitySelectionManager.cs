@@ -18,8 +18,8 @@ namespace SEE.GameObjects
     public class CitySelectionManager : MonoBehaviour
     {
         #region Initial Cities Configuration Paths
-        public static readonly string InitialReflexionCityPath = Application.streamingAssetsPath + "/reflexion/initial/Reflexion.cfg";
-
+        public static readonly string InitialReflexionCityPath
+            = Application.streamingAssetsPath + "/reflexion/initial/Reflexion.cfg";
         #endregion
 
         /// <summary>
@@ -54,8 +54,8 @@ namespace SEE.GameObjects
         private string nameOfNetworkExecution = null;
 
         /// <summary>
-        /// Adds the game object to which the <see cref="AbstractSEECity"/> comonent
-        /// will be attached and his table to the list of all such objects.
+        /// Adds the game object to which the <see cref="AbstractSEECity"/> component
+        /// will be attached and this table to the list of all such objects.
         /// Is required to create the component across the network.
         /// </summary>
         void Awake()
@@ -124,7 +124,7 @@ namespace SEE.GameObjects
                                 progressState = ProgressState.Start;
                                 break;
                             default:
-                                ShowNotification.Warn("Error", "Error in city selection; The city cannot be added.");
+                                ShowNotification.Warn("Error", "Error in city selection. The city cannot be added.");
                                 progressState = ProgressState.Start;
                                 return;
                         }
@@ -151,7 +151,7 @@ namespace SEE.GameObjects
                     break;
 
                 default:
-                    ShowNotification.Warn("Error", "Error in city selection");
+                    ShowNotification.Warn("Error", "Error in city selection.");
                     break;
             }
         }
@@ -226,14 +226,15 @@ namespace SEE.GameObjects
             /// Adjusting the initial size.
             /// The architecture root should occupy approximately 60% of the table,
             /// and the implementation root 40%.
-            float currenScale = 0.5f;
+            float currentScale = 0.5f;
             float targetArchScale = 0.6f;
-            float targetImplScale = 0.4f;
-            ApplyScale(arch, targetArchScale / currenScale);
-            ApplyScale(impl, targetImplScale / currenScale);
+            float targetImplScale = 1 - targetArchScale;
+            ApplyScale(arch, targetArchScale / currentScale);
+            ApplyScale(impl, targetImplScale / currentScale);
 
             return;
-            void ApplyScale(GameObject obj, float factor)
+
+            static void ApplyScale(GameObject obj, float factor)
             {
                 Vector3 oldScale = obj.transform.localScale;
                 Vector3 newScale = new (oldScale.x, oldScale.y, oldScale.z * factor);

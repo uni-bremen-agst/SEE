@@ -10,14 +10,16 @@ namespace SEE.GameObjects
     /// </summary>
     public class CitiesHolder : MonoBehaviour
     {
-        /// The list of game objects
-        public readonly List<(GameObject city, GameObject table)> Cities;
+        /// <summary>
+        /// The list of game objects.
+        /// </summary>
+        public readonly IList<(GameObject city, GameObject table)> Cities;
 
         /// <summary>
         /// The constructor.
         /// Creates an new list for the cities, table pairs.
         /// </summary>
-        CitiesHolder() => Cities = new();
+        public CitiesHolder() => Cities = new List<(GameObject city, GameObject table)>();
 
         /// <summary>
         /// Finds the city game object corresponding to the associated <paramref name="tableID"/>.

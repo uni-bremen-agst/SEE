@@ -47,7 +47,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Removes an <paramref name="nodeType"/> from the map if the map contains it.
+        /// Removes the given <paramref name="nodeType"/> from the map if the map contains it.
         /// </summary>
         /// <param name="nodeType">The node type to be removed.</param>
         /// <returns>True if the node type could be removed, otherwise false.</returns>

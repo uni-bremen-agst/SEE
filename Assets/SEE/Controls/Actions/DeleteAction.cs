@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions
                 // Architecture and implementation root nodes should only be cleared (all children deleted)
                 // instead of deleting the entire node, as it is not possible to add new architecture or
                 // implementation root nodes.
-                if (go.IsArchitectureOrImplmentationRoot())
+                if (go.IsArchitectureOrImplementationRoot())
                 {
                     Node root = go.GetNode();
                     IEnumerable<Node> children = root.IsInArchitecture() ?
@@ -300,7 +300,7 @@ namespace SEE.Controls.Actions
             base.Undo();
 
             /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-            if (hitGraphElements.Any(obj => obj.IsArchitectureOrImplmentationRoot())
+            if (hitGraphElements.Any(obj => obj.IsArchitectureOrImplementationRoot())
                 && LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
             {
                 runtimeConfigMenu.PerformRebuildOnNextOpening();
@@ -336,7 +336,7 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 #pragma warning disable VSTHRD110
-                if (go.IsArchitectureOrImplmentationRoot())
+                if (go.IsArchitectureOrImplementationRoot())
                 {
                     Node root = go.GetNode();
                     CaptureNodeTypesToRemove(root, false);

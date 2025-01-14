@@ -82,21 +82,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Add the node type if it does not already exist, and then configure the settings.
+        /// Adds the <paramref name="nodeType"/> if it does not already exist, and then configure the settings.
         /// </summary>
-        /// <param name="type">The type to be added</param>
-        /// <param name="color">The node color.</param>
-        private void AddAndSetInitialType(string type, Color color)
+        /// <param name="nodeType">The node type to be added</param>
+        /// <param name="color">The color for the node type.</param>
+        private void AddAndSetInitialType(string nodeType, Color color)
         {
-            if (!NodeTypes.TryGetValue(type, out VisualNodeAttributes _))
+            if (!NodeTypes.TryGetValue(nodeType, out VisualNodeAttributes _))
             {
-                NodeTypes[type] = new VisualNodeAttributes();
+                NodeTypes[nodeType] = new VisualNodeAttributes();
             }
-            SetInitialType(NodeTypes[type], color);
+            SetInitialType(NodeTypes[nodeType], color);
         }
 
         /// <summary>
-        /// Set the necessary properties for the initial type.
+        /// Sets the necessary properties for the <paramref name="type"/>
         /// </summary>
         /// <param name="type">The type whose properties are to be set.</param>
         /// <param name="color">The node color.</param>
@@ -127,14 +127,14 @@ namespace SEE.Game.City
         /// <summary>
         /// Loads a part of the ReflexionCity.
         /// If the <paramref name="projectFolder"/> is null,
-        /// an architectur graph is loaded, otherwise, an implementation graph is loaded.
+        /// an architecture graph is loaded; otherwise, an implementation graph is loaded.
         /// </summary>
-        /// <param name="gxl">The GXL file of thegraph to be loaded.</param>
+        /// <param name="path">The data path of the graph to be loaded.</param>
         /// <param name="projectFolder">The project folder associated with the implementation graph.</param>
         /// <returns>Nothing, it is an asynchronous method that needs to wait.</returns>
-        public async UniTask LoadAndDrawSubgraphAsync(DataPath gxl, DataPath projectFolder = null)
+        public async UniTask LoadAndDrawSubgraphAsync(DataPath path, DataPath projectFolder = null)
         {
-            (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(gxl, projectFolder == null);
+            (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(path, projectFolder == null);
             if (projectFolder != null)
             {
                 // Sets the project directory.
@@ -175,16 +175,17 @@ namespace SEE.Game.City
                 }
             });
 
-            // Ensures that the new drawn graph is displayed.
+            // Ensures that the newly drawn graph is displayed.
             root.GameObject().SetActive(false);
             root.GameObject().SetActive(true);
 
             return;
-            async UniTask<(Graph, GraphRenderer)> LoadGraphAsync(DataPath gxl, bool loadArchitecture)
+
+            async UniTask<(Graph, GraphRenderer)> LoadGraphAsync(DataPath path, bool loadArchitecture)
             {
-                // Loads the graph from the given GXL.
+                // Loads the graph from the given path.
                 ReflexionGraphProvider graphProvider = GetReflexionGraphProvider();
-                Graph graph = await graphProvider.LoadGraphAsync(gxl, this);
+                Graph graph = await graphProvider.LoadGraphAsync(path, this);
                 // Marks the nodes in the graph as architecture-/implementation-nodes.
                 graph.MarkGraphNodesIn(loadArchitecture ? ReflexionSubgraphs.Architecture : ReflexionSubgraphs.Implementation);
                 graph.Edges().ForEach(edge =>
@@ -199,14 +200,14 @@ namespace SEE.Game.City
                     }
                 });
 
-                /// Add the GXL to the <see cref="SEECity.DataProvider"/>
+                /// Add the path to the <see cref="SEECity.DataProvider"/>
                 if (loadArchitecture)
                 {
-                    graphProvider.Architecture = gxl;
+                    graphProvider.Architecture = path;
                 }
                 else
                 {
-                    graphProvider.Implementation = gxl;
+                    graphProvider.Implementation = path;
                 }
 
                 /// Notify <see cref="RuntimeConfigMenu"/> about changes.

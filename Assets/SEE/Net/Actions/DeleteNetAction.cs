@@ -1,6 +1,4 @@
-using SEE.Game;
 using SEE.Game.SceneManipulation;
-using UnityEngine;
 
 namespace SEE.Net.Actions
 {
@@ -28,22 +26,12 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// Deletes the game object identified by <see cref="GameObjectID"/> on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameObject gameObject = GraphElementIDMap.Find(GameObjectID, mustFindElement: true);
 #pragma warning disable VSTHRD110
-            GameElementDeleter.Delete(gameObject);
+            GameElementDeleter.Delete(Find(GameObjectID));
 #pragma warning restore VSTHRD110
         }
     }
