@@ -299,7 +299,6 @@ namespace SEE.GO
         {
             // Corresponds to the material of the LineRenderer.
             defaultMaterial = Materials.New(Materials.ShaderType.TransparentEdge, Color.white);
-            defaultMaterial.renderQueue = (int)(RenderQueue.Transparent + 1);
         }
 
         /// <summary>

@@ -1,3 +1,11 @@
+// Please note:
+// This shader is currently not intended for semi-transparent sprites.
+// It handles full transparency and opaque elements well with depth writing (ZWrite)
+// for opaque fragments; fully transparent fragments are discarded.
+// To allow for blending of semitransparent areas it is necessary to implement a two-pass
+// mechanism akin to the edge shader that draws translucent parts without depth writing.
+// Depth writing is necessary to achieve the correct order of edges and resize handles.
+
 Shader "Unlit/TransparentSpritePortalShader"
 {
     Properties
@@ -10,15 +18,13 @@ Shader "Unlit/TransparentSpritePortalShader"
         Tags {
             "Queue" = "Transparent"
             "RenderType" = "Transparent"
-            "IgnoreProjector"="True"
+            "IgnoreProjector" = "True"
             "ForceNoShadowCasting" = "True"
             "PreviewType" = "Plane"
         }
 
         // Alpha blending mode for transparency
         Blend SrcAlpha OneMinusSrcAlpha
-        // Do not write to depth buffer to allow transparency effect
-        ZWrite Off
         // Makes the back of the sprite plane visible
         Cull Off
         // Unity's lighting will not be applied
@@ -26,7 +32,7 @@ Shader "Unlit/TransparentSpritePortalShader"
 
         Pass
         {
-            CGPROGRAM
+            HLSLPROGRAM
             #pragma vertex vert
             #pragma fragment frag
 
@@ -65,7 +71,7 @@ Shader "Unlit/TransparentSpritePortalShader"
 
                 // Discard coordinates if transparent or outside portal
                 // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-                if ( col.a <= 0 ||
+                if (col.a <= 0 ||
                     i.worldPos.x < _Portal.x || i.worldPos.z < _Portal.y ||
                     i.worldPos.x > _Portal.z || i.worldPos.z > _Portal.w)
                 {
@@ -74,7 +80,7 @@ Shader "Unlit/TransparentSpritePortalShader"
 
                 return col;
             }
-            ENDCG
+            ENDHLSL
         }
     }
 }

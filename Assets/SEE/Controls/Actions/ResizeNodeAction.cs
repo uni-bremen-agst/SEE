@@ -472,7 +472,7 @@ namespace SEE.Controls.Actions
                     {
                         handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowUpDownTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
                     }
                     else if (direction.x != 0f && direction.z != 0f)
                     {
@@ -485,13 +485,13 @@ namespace SEE.Controls.Actions
                             handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
                         }
                         Texture texture = Resources.Load<Texture2D>(resizeArrowBottomRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
                     }
                     else
                     {
                         handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
                         Texture texture = Resources.Load<Texture2D>(resizeArrowRightTexture);
-                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
                     }
                     handle.GetComponent<Renderer>().material = material;
                     handle.transform.localPosition = new(
