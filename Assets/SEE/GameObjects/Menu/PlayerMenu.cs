@@ -9,6 +9,7 @@ using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 using SEE.XR;
+using SEE.Controls.VoiceActions;
 
 namespace SEE.GO.Menu
 {
@@ -25,7 +26,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// The UI object representing the indicator, which displays the current action state on the screen.
         /// </summary>
-        private ActionStateIndicator indicator;
+        public ActionStateIndicator indicator;
 
         /// <summary>
         /// This creates and returns the mode menu, with which you can select the active game mode.
@@ -38,7 +39,7 @@ namespace SEE.GO.Menu
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
 
             ActionStateType firstType = ActionStateTypes.FirstActionStateType();
             IList<MenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
@@ -145,7 +146,7 @@ namespace SEE.GO.Menu
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionStateGO = attachTo ? attachTo : new GameObject {name = "Action State Indicator"};
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject { name = "Action State Indicator" };
             return actionStateGO.AddComponent<ActionStateIndicator>();
         }
 
@@ -185,7 +186,7 @@ namespace SEE.GO.Menu
             // SEEInput here, but need to check the key directly.
             bool shouldReactToToggleMenu = (modeMenu.ShowMenu && !modeMenu.IsSearchFocused)
                 || (!modeMenu.ShowMenu && SEEInput.KeyboardShortcutsEnabled);
-            if (shouldReactToToggleMenu && KeyBindings.IsDown(KeyAction.ToggleMenu))
+            if (shouldReactToToggleMenu && (KeyBindings.IsDown(KeyAction.ToggleMenu) || VoiceBindings.isSaid(VoiceAction.ToggleMenu)))
             {
                 modeMenu.ToggleMenu();
             }
@@ -231,7 +232,7 @@ namespace SEE.GO.Menu
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
         /// <param name="actionName">name of the menu entry to be set</param>
-        private static void SetPlayerMenu(string actionName)
+        public static void SetPlayerMenu(string actionName)
         {
             if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {

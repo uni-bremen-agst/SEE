@@ -3,6 +3,7 @@ using SEE.Utils;
 using UnityEngine;
 using SEE.GO;
 using SEE.XR;
+using SEE.Controls.VoiceActions;
 
 namespace SEE.Controls
 {
@@ -46,8 +47,15 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Help()
         {
-            return KeyboardShortcutsEnabled
-                && KeyBindings.IsDown(KeyAction.Help);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.Help)) || VoiceBindings.isSaid(VoiceAction.Help);
+        }
+
+        //only for testing purpose
+        public static bool LoadDB()
+        {
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.LoadDB));
         }
 
         /// <summary>
@@ -56,8 +64,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleVoiceControl()
         {
-            return KeyboardShortcutsEnabled
-                && KeyBindings.IsDown(KeyAction.ToggleVoiceControl);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsPressed(KeyAction.ToggleVoiceControl));
         }
 
         /// <summary>
@@ -66,8 +74,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMenu()
         {
-            return KeyboardShortcutsEnabled
-                && KeyBindings.IsDown(KeyAction.ToggleMenu);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleMenu)) || VoiceBindings.isSaid(VoiceAction.ToggleMenu);
         }
 
         /// <summary>
@@ -76,7 +84,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleSettings()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleSettings);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleSettings)) || VoiceBindings.isSaid(VoiceAction.ToggleSettings);
         }
 
         /// <summary>
@@ -85,7 +94,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleBrowser()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleBrowser);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleBrowser)) || VoiceBindings.isSaid(VoiceAction.ToggleBrowser);
         }
 
         /// <summary>
@@ -94,7 +104,18 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMirror()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleMirror);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleMirror)) || VoiceBindings.isSaid(VoiceAction.ToggleMirror);
+        }
+
+        /// <summary>
+        /// Opens/closes the search menu.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        internal static bool ToggleSearch()
+        {
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleSettings)) || VoiceBindings.isSaid(VoiceAction.ToggleSettings);
         }
 
         /// <summary>
@@ -125,10 +146,10 @@ namespace SEE.Controls
             }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)  || VoiceBindings.isSaid(VoiceAction.Undo))
             {
 #endif
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Undo);
+            return KeyboardShortcutsEnabled && (KeyBindings.IsDown(KeyAction.Undo) || VoiceBindings.isSaid(VoiceAction.Undo));
 #if UNITY_EDITOR == false
             }
             else
@@ -152,10 +173,10 @@ namespace SEE.Controls
             }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
-            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
+            if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl) || VoiceBindings.isSaid(VoiceAction.Redo))
             {
 #endif
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Redo);
+            return KeyboardShortcutsEnabled && (KeyBindings.IsDown(KeyAction.Redo) || VoiceBindings.isSaid(VoiceAction.Redo));
 #if UNITY_EDITOR == false
             }
             else
@@ -172,7 +193,8 @@ namespace SEE.Controls
         /// <returns>true if the user wants to toggle the run-time configuration menu</returns>
         internal static bool ToggleConfigMenu()
         {
-            return KeyboardShortcutsEnabled & KeyBindings.IsDown(KeyAction.ConfigMenu);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ConfigMenu)) || VoiceBindings.isSaid(VoiceAction.ConfigMenu);
         }
 
         /// <summary>
@@ -181,7 +203,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleEdges()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleEdges);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleEdges)) || VoiceBindings.isSaid(VoiceAction.ToggleEdges);
         }
 
         /// <summary>
@@ -190,7 +213,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         internal static bool ToggleTreeView()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.TreeView);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.TreeView)) || VoiceBindings.isSaid(VoiceAction.TreeView);
         }
 
         #endregion
@@ -229,7 +253,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool ToggleMetricCharts()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleCharts);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleCharts)) || VoiceBindings.isSaid(VoiceAction.ToggleCharts);
         }
 
         /// <summary>
@@ -253,7 +278,7 @@ namespace SEE.Controls
         /// <returns>true if the user starts the mouse interaction to open the context menu</returns>
         internal static bool OpenContextMenuStart()
         {
-            return Input.GetMouseButtonDown(rightMouseButton) && !Raycasting.IsMouseOverGUI();
+            return (Input.GetMouseButtonDown(rightMouseButton) || VoiceBindings.isSaid(VoiceAction.OpenContextMenu)) && !Raycasting.IsMouseOverGUI();
         }
 
         /// <summary>
@@ -295,7 +320,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Cancel()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Cancel);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.Cancel)) || VoiceBindings.isSaid(VoiceAction.Cancel);
         }
 
         /// <summary>
@@ -438,7 +464,8 @@ namespace SEE.Controls
         /// <returns>true if the user wishes to point</returns>
         public static bool TogglePointing()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Pointing);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.Pointing)) || VoiceBindings.isSaid(VoiceAction.Pointing);
         }
 
         #endregion
@@ -484,7 +511,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Previous()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Previous);
+            return (KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Previous)) || VoiceBindings.isSaid(VoiceAction.Previous);
         }
         /// <summary>
         /// The next revision is to be shown.
@@ -492,7 +519,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Next()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Next);
+            return (KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Next)) || VoiceBindings.isSaid(VoiceAction.Next);
         }
         /// <summary>
         /// Toggles auto play of the animation.
@@ -606,7 +633,8 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool OpenTextChat()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleTextChat);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleTextChat)) || VoiceBindings.isSaid(VoiceAction.ToggleTextChat);
         }
 
         /// <summary>
@@ -630,7 +658,8 @@ namespace SEE.Controls
         /// <returns>True if the user wants to close all notifications.</returns>
         public static bool CloseAllNotifications()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.CloseNotifications);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.CloseNotifications)) || VoiceBindings.isSaid(VoiceAction.CloseNotifications);
         }
 
         #endregion
@@ -642,7 +671,8 @@ namespace SEE.Controls
         /// <returns>True if the user wants to turn the FaceCam on or off.</returns>
         internal static bool ToggleFaceCam()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCam);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleFaceCam)) || VoiceBindings.isSaid(VoiceAction.ToggleFaceCam);
         }
 
         /// <summary>
@@ -651,7 +681,8 @@ namespace SEE.Controls
         /// <returns>True if the user wants to switch the position of the FaceCam.</returns>
         internal static bool ToggleFaceCamPosition()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.ToggleFaceCamPosition)) || VoiceBindings.isSaid(VoiceAction.ToggleFaceCamPosition);
         }
         #endregion
         //----------------------------------------------------
@@ -726,7 +757,8 @@ namespace SEE.Controls
         /// <returns>True if the user wants to toggle the drawable manager menu.</returns>
         internal static bool ToggleDrawableManagerView()
         {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.DrawableManagerView);
+            return (KeyboardShortcutsEnabled
+                && KeyBindings.IsDown(KeyAction.DrawableManagerView)) || VoiceBindings.isSaid(VoiceAction.DrawableManagerView);
         }
         #endregion
     }

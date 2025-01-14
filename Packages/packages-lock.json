@@ -464,6 +464,12 @@
       },
       "url": "https://package.openupm.com"
     },
+    "com.whisper.unity": {
+      "version": "file:C:/Users/Sarah/Downloads/whisper.unity-master(1)/whisper.unity-master/Packages/com.whisper.unity",
+      "depth": 0,
+      "source": "local",
+      "dependencies": {}
+    },
     "io.livekit.livekit-sdk": {
       "version": "https://github.com/livekit/client-sdk-unity.git",
       "depth": 0,

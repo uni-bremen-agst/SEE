@@ -35,7 +35,9 @@
         "GUID:5c01796d064528144a599661eaab93a6",
         "GUID:e0cd26848372d4e5c891c569017e11f1",
         "GUID:13e34609dade4964e97712dc04b1cc6a",
-        "GUID:702f733b4deb246808c6ce84d93b5c9c"
+        "GUID:702f733b4deb246808c6ce84d93b5c9c",
+        "GUID:07dcbb6497358493fa23aaaad4b6b054",
+        "GUID:9bf3aace182374edf9e8c04dd2a3c642"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -68,7 +70,9 @@
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
         "Microsoft.Extensions.FileSystemGlobbing.dll",
-        "MediatR.dll"
+        "MediatR.dll",
+        "Neo4j.Driver.dll",
+        "Microsoft.Bcl.AsyncInterfaces.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],

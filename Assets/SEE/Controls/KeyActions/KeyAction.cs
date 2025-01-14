@@ -230,6 +230,10 @@
         /// <summary>
         /// Opens/closes the drawable manager view.
         /// </summary>
-        DrawableManagerView
+        DrawableManagerView,
+        /// <summary>
+        /// This is to load the graphdatabase for RASA
+        /// </summary>
+        LoadDB
     }
 }
