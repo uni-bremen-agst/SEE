@@ -26,6 +26,12 @@ namespace SEE.GameObjects
         #endregion
 
         /// <summary>
+        /// Constant for the word "initial", required to replace this keyword with the city name.
+        /// The initial reflexion city graph uses this keyword as a placeholder for the selected city name in its files.
+        /// </summary>
+        public const string Initial = "initial";
+
+        /// <summary>
         /// The progress states for selecting and adding a city to a table.
         /// </summary>
         private enum ProgressState

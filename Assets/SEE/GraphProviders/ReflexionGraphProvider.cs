@@ -81,9 +81,9 @@ namespace SEE.GraphProviders
             // with the selected city name.
             if (city.ConfigurationPath.Path.Equals(new DataPath(CitySelectionManager.InitialReflexionCityPath).Path))
             {
-                CityName = CityName.Replace("initial", city.gameObject.name);
-                architectureGraph.Name = architectureGraph.Name.Replace("initial", city.gameObject.name);
-                implementationGraph.Name = implementationGraph.Name.Replace("initial", city.gameObject.name);
+                CityName = CityName.Replace(CitySelectionManager.Initial, city.gameObject.name);
+                architectureGraph.Name = architectureGraph.Name.Replace(CitySelectionManager.Initial, city.gameObject.name);
+                implementationGraph.Name = implementationGraph.Name.Replace(CitySelectionManager.Initial, city.gameObject.name);
             }
 
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
