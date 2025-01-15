@@ -49,7 +49,7 @@ if [ "$OPERATION" = "store" ]; then
   echo "Creating cache for $KEY..."
   mkdir -p "$KEYCACHE"
   # shellcheck disable=SC2086
-  rsync -a --ignore-missing-args --relative $TARGETS "$KEYCACHE"
+  rsync -a --update --ignore-missing-args --relative $TARGETS "$KEYCACHE"
   lock u
 elif [ "$OPERATION" = "restore" ]; then
   lock s
