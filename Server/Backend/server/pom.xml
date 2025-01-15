@@ -18,12 +18,12 @@
         <start-class>${project.groupId}.manager.SeeManagerApplication</start-class>
 
         <!-- Dependency Versions -->
-        <spring-boot-version>3.3.2</spring-boot-version>
+        <spring-boot-version>3.3.7</spring-boot-version>
         <!-- Note: Developers of JJWT advise to wait for 1.0 and skip upgrading to 0.12. -->
         <jjwt-version>0.11.5</jjwt-version>
         <maven-compiler-plugin-version>3.13.0</maven-compiler-plugin-version>
-        <maven-javadoc-plugin-version>3.8.0</maven-javadoc-plugin-version>
-        <docker-java-version>3.4.0</docker-java-version>
+        <maven-javadoc-plugin-version>3.11.2</maven-javadoc-plugin-version>
+        <docker-java-version>3.4.1</docker-java-version>
     </properties>
 
     <dependencyManagement>

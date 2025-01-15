@@ -94,13 +94,28 @@ public class ContainerService {
      */
     private static class MaxRetriesExceededException extends RuntimeException {
 
+        /**
+         * Maximal number of retry attempts that were exceeded.
+         */
         private final int maxAttempts;
 
+        /**
+         * Class constructor.
+         *
+         * @param maxAttempts the maximal number of retry attempts that were
+         * exceeded.
+         * @param cause the cause of this exception.
+         */
         public MaxRetriesExceededException(int maxAttempts, Throwable cause) {
             super("Operation failed after " + maxAttempts + " attempts", cause);
             this.maxAttempts = maxAttempts;
         }
 
+        /**
+         * Returns the maximal number of retry attempts that were exceeded.
+         *
+         * @return maximal retry attempts that were exceeded.
+         */
         public int getMaxAttempts() {
             return maxAttempts;
         }

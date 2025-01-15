@@ -9,6 +9,11 @@
     <description>Parent project of the SEE management tool</description>
     <packaging>pom</packaging>
 
+    <properties>
+        <!-- This should be the version used by Maven Wrapper -->
+        <maven-required-version>3.9</maven-required-version>
+    </properties>
+
     <modules>
         <module>server</module>
     </modules>
@@ -20,5 +25,38 @@
             <distribution>repo</distribution>
         </license>
     </licenses>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                    <artifactId>versions-maven-plugin</artifactId>
+                <version>2.18.0</version>
+                <configuration>
+                    <processDependencyManagementTransitive>false</processDependencyManagementTransitive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.5.0</version>
+                <executions>
+                    <execution>
+                        <id>enforce-maven</id>
+                        <goals>
+                        <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                        <rules>
+                            <requireMavenVersion>
+                                <version>${maven-required-version}</version>
+                            </requireMavenVersion>
+                        </rules>    
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>
