@@ -18,6 +18,9 @@ namespace SEE.GameObjects
     public class CitySelectionManager : MonoBehaviour
     {
         #region Initial Cities Configuration Paths
+        /// <summary>
+        /// Path to the initial reflexion city.
+        /// </summary>
         public static readonly string InitialReflexionCityPath
             = Application.streamingAssetsPath + "/reflexion/initial/Reflexion.cfg";
         #endregion
@@ -55,7 +58,7 @@ namespace SEE.GameObjects
 
         /// <summary>
         /// Adds the game object to which the <see cref="AbstractSEECity"/> component
-        /// will be attached and this table to the list of all such objects.
+        /// will be attached and this table to the tuple list <see cref="CitiesHolder.Cities"/>.
         /// Is required to create the component across the network.
         /// </summary>
         void Awake()
@@ -124,7 +127,8 @@ namespace SEE.GameObjects
                                 progressState = ProgressState.Start;
                                 break;
                             default:
-                                ShowNotification.Warn("Error", "Error in city selection. The city cannot be added.");
+                                ShowNotification.Warn("City type is not supported",
+                                    "The selected city type is not supported and cannot be added yet.");
                                 progressState = ProgressState.Start;
                                 return;
                         }
@@ -151,7 +155,7 @@ namespace SEE.GameObjects
                     break;
 
                 default:
-                    ShowNotification.Warn("Error", "Error in city selection.");
+                    ShowNotification.Warn("Unexpected progress state", "An unexpected progress state occurred during execution.");
                     break;
             }
         }

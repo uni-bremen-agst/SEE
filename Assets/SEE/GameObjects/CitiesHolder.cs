@@ -11,7 +11,8 @@ namespace SEE.GameObjects
     public class CitiesHolder : MonoBehaviour
     {
         /// <summary>
-        /// The list of game objects.
+        /// The tuple list of all cities (the game objects assigned to <see cref="AbstractSEECity"/>)
+        /// and their associated tables.
         /// </summary>
         public readonly IList<(GameObject city, GameObject table)> Cities;
 
