@@ -18,7 +18,21 @@ trap _no_more_locking EXIT
 
 # Actual caching starts here.
 CACHEDIR="/local/users/falko1/.actions-cache"
-TARGETS="Library/ Assets/Packages/ *.csproj *.sln"
+TARGETS="Library/ *.csproj *.sln"
+
+if [ "$OPERATION" = "clean" ]; then
+  echo "Cleaning cache..."
+  CACHEDIRS=("$CACHEDIR"/*)
+  NUM_CACHES=${#CACHEDIRS[@]}
+  # Once we have more than four cache directories...
+  if [ "$NUM_CACHES" -gt 4 ]; then
+    # ...we will remove the oldest one.
+    OLDEST=$(find .actions-cache/ -maxdepth 1 -type d -printf '%T+ X%p\n' | sort | head -n 1 | cut -d'X' -f2-)
+    echo "Removing $OLDEST..."
+    rm -rf "$OLDEST"
+  fi
+  exit 0
+fi
 
 if [ -z "$KEY" ]; then
   echo "\$KEY environment variable must be set to a non-empty string."
