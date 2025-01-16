@@ -265,6 +265,11 @@ jobs:
     # This label should be set when a PR does not lead to a noticeable change in the build.
     if: ${{ github.event.pull_request.merged && !contains(github.event.pull_request.labels.*.name, 'no release') }}
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          lfs: false
       - uses: actions/download-artifact@v4
         id: download
         with:
