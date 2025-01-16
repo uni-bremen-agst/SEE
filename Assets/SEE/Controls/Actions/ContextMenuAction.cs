@@ -3,6 +3,7 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.SceneManipulation;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GO.Menu;
@@ -459,19 +460,8 @@ namespace SEE.Controls.Actions
                     string deleteMessage = $"Do you really want to delete the city?\r\nThis action cannot be undone.";
                     if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
                     {
-                        Transform cityHolder = node.GameObject().transform.parent;
-                        if (cityHolder.GetComponent<CitySelectionManager>() != null)
-                        {
-                            cityHolder.GetComponent<CitySelectionManager>().enabled = true;
-                        }
-                        if (cityHolder.GetComponent<AbstractSEECity>() is SEEReflexionCity)
-                        {
-                            Destroyer.Destroy(cityHolder.GetComponent<ReflexionVisualization>());
-                            Destroyer.Destroy(cityHolder.GetComponent<EdgeMeshScheduler>());
-                        }
-                        Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
-                        Destroyer.Destroy(node.GameObject());
-                        new DeleteRootNetAction(graphElement.ID).Execute();
+                        GameElementDeleter.DeleteRoot(node.GameObject());
+                        new DeleteNetAction(graphElement.ID).Execute();
                     }
                     return;
                 }

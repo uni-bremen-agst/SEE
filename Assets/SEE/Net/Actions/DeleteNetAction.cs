@@ -1,4 +1,7 @@
+using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
+using SEE.GO;
+using UnityEngine;
 
 namespace SEE.Net.Actions
 {
@@ -30,9 +33,17 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
+            GameObject objToDelete = Find(GameObjectID);
+            if (objToDelete.TryGetNode(out Node node) && node.IsRoot())
+            {
+                GameElementDeleter.DeleteRoot(objToDelete);
+            }
+            else
+            {
 #pragma warning disable VSTHRD110
-            GameElementDeleter.Delete(Find(GameObjectID));
+                GameElementDeleter.Delete(objToDelete);
 #pragma warning restore VSTHRD110
+            }
         }
     }
 }

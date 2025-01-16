@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Game.SceneManipulation
@@ -84,6 +87,38 @@ namespace SEE.Game.SceneManipulation
             else
             {
                 throw new ArgumentException($"Game object {deletedObject.name} must be a node or edge.");
+            }
+        }
+
+        /// <summary>
+        /// Deletes given <paramref name="rootObject"/> if it contains a root node
+        /// and is indeed a <see cref="Node.IsRoot"/>.
+        /// The <see cref="CitySelectionManager"/> is activated to add a new <see cref="AbstractSEECity"/>.
+        /// Additionally, components belonging to the previous <see cref="AbstractSEECity"/> are removed,
+        /// along with the actual <see cref="AbstractSEECity"/> and the game object of the root node.
+        /// </summary>
+        /// <param name="rootObject">The root game object to be deleted.</param>
+        /// <returns>True if the deletion was successful, otherwise false.</returns>
+        public static bool DeleteRoot(GameObject rootObject)
+        {
+            if (rootObject.TryGetNode(out Node node) && node.IsRoot())
+            {
+                Transform cityHolder = rootObject.transform.parent;
+                if (cityHolder.GetComponent<CitySelectionManager>() != null)
+                {
+                    cityHolder.GetComponent<CitySelectionManager>().enabled = true;
+                }
+                if (cityHolder.GetComponent<AbstractSEECity>() is SEEReflexionCity)
+                {
+                    Destroyer.Destroy(cityHolder.GetComponent<ReflexionVisualization>());
+                    Destroyer.Destroy(cityHolder.GetComponent<EdgeMeshScheduler>());
+                }
+                Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
+                Destroyer.Destroy(rootObject);
+                return true;
+            } else
+            {
+                return false;
             }
         }
 
