@@ -40,15 +40,6 @@ namespace SEE.Net.Actions
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
         /// Adds the city of type <see cref="CityType"/> identified by <see cref="TableID"/> on each client.
         /// </summary>
         public override void ExecuteOnClient()

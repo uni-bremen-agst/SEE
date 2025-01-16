@@ -8,7 +8,7 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Adds a City to all clients.
+    /// Adds a node type to a city on all clients.
     /// </summary>
     public class AddNodeTypeNetAction : AbstractNetAction
     {
