@@ -6,41 +6,32 @@
 
 // Returns all reviews made by us (i.e., GitHub Actions).
 async function get_reviews(github, context) {
-    // We find our review comments for this pull request.
-    const response = await github.rest.pulls.listReviewComments({
-        owner: context.repo.owner,
-        repo: context.repo.repo,
-        pull_number: context.issue.number
+  // We find our review comments for this pull request.
+  const reviews = await github.paginate(github.rest.pulls.listReviewComments,
+    {
+      owner: context.repo.owner,
+      repo: context.repo.repo,
+      pull_number: context.issue.number
     });
-    if (response['data'].length === 0) {
-        // No reviews present.
-        return [];
-    }
-    const reviews = await github.paginate(response);
-    return reviews.filter(x => x['user']['login'] === "github-actions[bot]");
+  return reviews.filter(x => x['user']['login'] === "github-actions[bot]");
 }
 
 module.exports = {
-    // Filters out all comments from `comments` which we already made.
-    filter_out_existing_comments: async (github, context, comments) => {
-        // Uniqueness is now determined by path, line number, and comment text.
-        // To make sure the Set's `has` method works by comparing array values
-        // rather than identity, it seems we need to use this JSON.stringify approach.
-        let existing = new Set();
-        try {
-          const reviews = await get_reviews(github, context);
-          existing = new Set(reviews.map(x => [x['path'], x['line'] !== null ? x['line'] : x['original_line'], x['body']]).map(JSON.stringify));
-        } catch (e) {
-            console.warn("Error while fetching reviews, we may double-post comments: " + e);
-        }
-        for (let i = comments.length - 1; i >= 0; i--) {
-            const comment = comments[i];
-            if (existing.has(JSON.stringify([comment['path'], comment['line'], comment['body']]))) {
-                // Remove comment, we already posted it at the same position.
-                console.log("Removing existing comment " + JSON.stringify(comment));
-                comments.splice(i, 1);
-            }
-        }
+  // Filters out all comments from `comments` which we already made.
+  filter_out_existing_comments: async (github, context, comments) => {
+    // Uniqueness is now determined by path, line number, and comment text.
+    // To make sure the Set's `has` method works by comparing array values
+    // rather than identity, it seems we need to use this JSON.stringify approach.
+    const reviews = await get_reviews(github, context);
+    let existing = new Set(reviews.map(x => [x['path'], x['line'] !== null ? x['line'] : x['original_line'], x['body']]).map(JSON.stringify));
+    for (let i = comments.length - 1; i >= 0; i--) {
+      const comment = comments[i];
+      if (existing.has(JSON.stringify([comment['path'], comment['line'], comment['body']]))) {
+        // Remove comment, we already posted it at the same position.
+        console.log("Removing existing comment " + JSON.stringify(comment));
+        comments.splice(i, 1);
+      }
     }
+  }
 }
 

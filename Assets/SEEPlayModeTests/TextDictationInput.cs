@@ -13,7 +13,7 @@ namespace SEE.Controls
     /// a microphone to talk. The recognized input is shown on the console
     /// for inspection.
     /// </summary>
-    [Category("NonDeterministic")]
+    [Category("SkipOnCI")]
     internal class TextDictationInput
     {
         [UnityTest]

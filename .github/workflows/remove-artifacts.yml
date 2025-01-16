@@ -2,21 +2,19 @@ name: Remove old artifacts
 
 on:
   schedule:
-    - cron: '0 4 * * 1'  # every Monday at 04:00 AM
+    - cron: "0 4 * * 1" # every Monday at 04:00 AM
   workflow_dispatch:
     inputs:
       age:
-        description: 'Remove artifacts older than'
+        description: "Remove artifacts older than"
         required: true
         type: string
-        default: '1 day'
+        default: "1 day"
       keepLast:
-        description: 'Keep most recent artifacts'
+        description: "Keep most recent artifacts"
         required: true
         type: number
         default: 4
-
-
 
 jobs:
   remove-old-artifacts:
@@ -41,3 +39,13 @@ jobs:
           age: ${{ steps.parameters.outputs.AGE }}
           skip-recent: ${{ steps.parameters.outputs.KEEP_LAST }}
           skip-tags: true
+
+  clean-cache:
+    name: Remove old caches
+    runs-on: [self-hosted, sts5]
+    steps:
+      - name: Clean old caches
+        shell: bash
+        env:
+          OPERATION: clean
+        run: ./.github/scripts/cache.sh

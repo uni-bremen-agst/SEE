@@ -44,7 +44,7 @@ namespace SEE.Utils.Paths
         /// <returns>enumerator to continue</returns>
         /// <remarks>This test can only be run when our backend server is running.</remarks>
         [UnityTest]
-        [Category("NonDeterministic")]
+        [Category("SkipOnCI")]
         public IEnumerator LoadFromOurBackend() =>
             UniTask.ToCoroutine(async () =>
             {
