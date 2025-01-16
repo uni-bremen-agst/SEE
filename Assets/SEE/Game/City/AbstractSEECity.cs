@@ -25,6 +25,7 @@ namespace SEE.Game.City
     /// to its visualization.
     /// </summary>
     [Serializable]
+    [ExecuteInEditMode]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         protected virtual void Awake()
