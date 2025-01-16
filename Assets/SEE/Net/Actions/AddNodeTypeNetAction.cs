@@ -10,13 +10,8 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Adds a node type to a city on all clients.
     /// </summary>
-    public class AddNodeTypeNetAction : AbstractNetAction
+    public class AddNodeTypeNetAction : CityNetAction
     {
-        /// <summary>
-        /// The unique name of the table to which city the node type should be added.
-        /// </summary>
-        public string TableID;
-
         /// <summary>
         /// The visual node attribute for the node type that should be added.
         /// </summary>
@@ -28,14 +23,13 @@ namespace SEE.Net.Actions
         public string NodeType;
 
         /// <summary>
-        /// Constructor.
+        /// The constructor of this action. Sets the <see cref="VisualNodeAttributes"/> and the name of the <see cref="NodeType"/> to be added.
         /// </summary>
         /// <param name="tableID">The unique name of the table to which city the node type should be added.</param>
         /// <param name="nodeType">The name for the added node type.</param>
         /// <param name="visualNodeAttribute">The visual node attribute for the node type that should be added.</param>
-        public AddNodeTypeNetAction(string tableID, string nodeType, VisualNodeAttributes visualNodeAttribute) : base()
+        public AddNodeTypeNetAction(string tableID, string nodeType, VisualNodeAttributes visualNodeAttribute) : base(tableID)
         {
-            TableID = tableID;
             NodeType = nodeType;
             VisualNodeAttribute = visualNodeAttribute;
         }
@@ -45,23 +39,12 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            base.ExecuteOnClient();
+            City.GetComponent<AbstractSEECity>().NodeTypes[NodeType] = VisualNodeAttribute;
+            /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
             {
-                GameObject city = citiesHolder.Find(TableID);
-                if (city == null)
-                {
-                    throw new Exception($"The city can't be found");
-                }
-                city.GetComponent<AbstractSEECity>().NodeTypes[NodeType] = VisualNodeAttribute;
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
-            }
-            else
-            {
-                throw new Exception($"The node type can't be added because there is no CitieHolder component.");
+                runtimeConfigMenu.PerformRebuildOnNextOpening();
             }
         }
     }

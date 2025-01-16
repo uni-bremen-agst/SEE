@@ -11,13 +11,8 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Loads a part of a ReflexionCity to all clients.
     /// </summary>
-    public class LoadPartOfReflexionCityNetAction : AbstractNetAction
+    public class LoadPartOfReflexionCityNetAction : CityNetAction
     {
-        /// <summary>
-        /// The unique name of the table on which city the part should be loaded.
-        /// </summary>
-        public string TableID;
-
         /// <summary>
         /// Distinction between wheter an architecture or implementation graph should be loaded.
         /// </summary>
@@ -40,9 +35,8 @@ namespace SEE.Net.Actions
         /// <param name="loadArchitecture">Distinction between whether an architecture or implementation graph should be loaded.</param>
         /// <param name="fileToLoad">The file to be loaded.</param>
         /// <param name="projectFolder">The project folder; can be null if a architecture graph should be loaded.</param>
-        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture, DataPath fileToLoad, DataPath projectFolder = null) : base()
+        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture, DataPath fileToLoad, DataPath projectFolder = null) : base(tableID)
         {
-            TableID = tableID;
             LoadArchitecture = loadArchitecture;
             FileToLoad = fileToLoad;
             ProjectFolder = projectFolder;
@@ -53,25 +47,14 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            base.ExecuteOnClient();
+            if (City.GetComponent<SEEReflexionCity>() != null)
             {
-                GameObject city = citiesHolder.Find(TableID);
-                if (city == null)
-                {
-                    throw new Exception($"The city can't be found");
-                }
-                if (city.GetComponent<SEEReflexionCity>() != null)
-                {
-                    city.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(FileToLoad, LoadArchitecture ? null : ProjectFolder).Forget();
-                }
-                else
-                {
-                    throw new Exception($"Graph can't be loaded because there is no {nameof(SEEReflexionCity)} component.");
-                }
+                City.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(FileToLoad, LoadArchitecture ? null : ProjectFolder).Forget();
             }
             else
             {
-                throw new Exception($"The city can't be added because there is no {nameof(CitiesHolder)} component.");
+                throw new Exception($"Graph can't be loaded because there is no {nameof(SEEReflexionCity)} component.");
             }
         }
     }

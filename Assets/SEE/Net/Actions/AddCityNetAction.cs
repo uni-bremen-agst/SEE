@@ -1,21 +1,13 @@
-﻿using SEE.Game;
-using SEE.Game.City;
+﻿using SEE.Game.City;
 using SEE.GameObjects;
-using System;
-using UnityEngine;
 
 namespace SEE.Net.Actions
 {
     /// <summary>
     /// Adds a city to all clients.
     /// </summary>
-    public class AddCityNetAction : AbstractNetAction
+    public class AddCityNetAction : CityNetAction
     {
-        /// <summary>
-        /// The unique name of the table to which the city should be added.
-        /// </summary>
-        public string TableID;
-
         /// <summary>
         /// The city type that should be added.
         /// </summary>
@@ -27,14 +19,14 @@ namespace SEE.Net.Actions
         public string CityName;
 
         /// <summary>
-        /// Constructor.
+        /// The constructor of this action. Sets <see cref="CityType"/> to determine the type of city to be added
+        /// and the <see cref="CityName"/> to name the city accordingly.
         /// </summary>
         /// <param name="tableID">The unique name of the table to which the city should be added.</param>
         /// <param name="cityType">The city type that should be added.</param>
         /// <param name="cityName">The name to be assigned to the created city.</param>
-        public AddCityNetAction(string tableID, CityTypes cityType, string cityName) : base()
+        public AddCityNetAction(string tableID, CityTypes cityType, string cityName) : base(tableID)
         {
-            TableID = tableID;
             CityType = cityType;
             CityName = cityName;
         }
@@ -44,19 +36,8 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
-            {
-                GameObject city = citiesHolder.Find(TableID);
-                if (city == null)
-                {
-                    throw new Exception($"The city can't be found");
-                }
-                city.GetComponent<CitySelectionManager>().CreateCity(CityType, CityName);
-            }
-            else
-            {
-                throw new Exception($"The city can't be added because there is no CitieHolder component.");
-            }
+            base.ExecuteOnClient();
+            City.GetComponent<CitySelectionManager>().CreateCity(CityType, CityName);
         }
     }
 }
