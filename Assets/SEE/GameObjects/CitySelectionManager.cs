@@ -38,7 +38,7 @@ namespace SEE.GameObjects
         {
             Start,
             ChoseCity,
-            RelfexionCity,
+            ReflexionCity,
             Finish,
         }
 
@@ -145,7 +145,7 @@ namespace SEE.GameObjects
                     }
                     break;
 
-                case ProgressState.RelfexionCity:
+                case ProgressState.ReflexionCity:
                     if (gameObject.GetComponent<SEEReflexionCity>() != null
                         && gameObject.IsCodeCityDrawn())
                     {
@@ -202,7 +202,7 @@ namespace SEE.GameObjects
             reflexionCity.LoadConfiguration();
             await reflexionCity.LoadDataAsync();
             reflexionCity.DrawGraph();
-            progressState = ProgressState.RelfexionCity;
+            progressState = ProgressState.ReflexionCity;
         }
 
         /// <summary>
@@ -212,12 +212,12 @@ namespace SEE.GameObjects
         /// to 40 (implementation).
         /// </summary>
         /// <param name="city">The reflexion city.</param>
-        /// <exception cref="ArgumentException">If the city is null.</exception>
+        /// <exception cref="ArgumentNullException">If the <paramref name="city"/> is null.</exception>
         private void FitInitalReflexionCity(SEEReflexionCity city)
         {
             if (city == null)
             {
-                throw new ArgumentException("The city is null.");
+                throw new ArgumentNullException(nameof(city));
             }
 
             GameObject arch = city.ReflexionGraph.ArchitectureRoot.GameObject(true);
@@ -236,6 +236,7 @@ namespace SEE.GameObjects
             /// Adjusting the initial size.
             /// The architecture root should occupy approximately 60% of the table,
             /// and the implementation root 40%.
+            /// FIXME(#816): Update once branch 816-layouts-for-reflexion-modeling is merged.
             float currentScale = 0.5f;
             float targetArchScale = 0.6f;
             float targetImplScale = 1 - targetArchScale;
