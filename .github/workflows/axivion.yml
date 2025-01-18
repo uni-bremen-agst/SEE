@@ -5,7 +5,7 @@ on:
     branches: [master]
 
 concurrency:
-  group: ${{ github.ref }}
+  group: axivion-${{ github.ref }}
   cancel-in-progress: true
 
 permissions: read-all
@@ -26,8 +26,8 @@ jobs:
           CREDENTIALS: ${{secrets.GITLAB_LFS_TOKEN}}
       - name: Run Axivion CI
         shell: cmd
-        run: | 
-            cd e:\koschke\SEE
-            git pull
-            nugetforunity restore .
-            Axivion\axivion-jenkins.bat axivion_ci
+        run: |
+          cd e:\koschke\SEE
+          git pull
+          nugetforunity restore .
+          Axivion\axivion-jenkins.bat axivion_ci

@@ -190,6 +190,7 @@ namespace SEE.GraphProviders
         }
 
         [Test]
+        [Category("SkipOnCI")]  // We do a checkout with fetch-depth 1 in CI, so we cannot get all VCS metrics.
         public async Task TestVCSMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
