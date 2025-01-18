@@ -56,7 +56,7 @@ namespace SEE.GraphProviders
         {
             if (city == null)
             {
-                throw new ArgumentException("The given city is null.\n");
+                throw new ArgumentNullException(nameof(city));
             }
             Graph architectureGraph = await LoadGraphAsync(Architecture, city, token);
             changePercentage?.Invoke(0.33f);
