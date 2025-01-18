@@ -247,17 +247,12 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <returns>absolute new orientation after the rotation in world space</returns>
         internal Orientation Rotate(Orientation orientation)
         {
-            // FIXME: In C# version 9, we can use the 'or' operator here.
-            switch (orientation)
+            return orientation switch
             {
-                case Orientation.East:
-                case Orientation.West:
-                    return Left ? Orientation.North : Orientation.South;
-                case Orientation.North:
-                case Orientation.South:
-                    return Left ? Orientation.West : Orientation.East;
-                default: throw new NotImplementedException($"Unhandled case {orientation}.");
-            }
+                Orientation.East or Orientation.West => Left ? Orientation.North : Orientation.South,
+                Orientation.North or Orientation.South => Left ? Orientation.West : Orientation.East,
+                _ => throw new NotImplementedException($"Unhandled case {orientation}."),
+            };
         }
     }
 
