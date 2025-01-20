@@ -41,7 +41,6 @@ fi
 
 KEYCACHE="$CACHEDIR/$KEY/"
 
-# TODO: Regularly clean cache.
 if [ "$OPERATION" = "store" ]; then
   # In this case, we will copy all targets over to our caching directory, using the key as a subdir.
   # If the cache exists already, we will update it.
@@ -56,7 +55,7 @@ elif [ "$OPERATION" = "restore" ]; then
   # Restore cache if it exists.
   if [ -d "$KEYCACHE" ]; then
     echo "Restoring cache for $KEY..."
-    rsync -a --update "$KEYCACHE" .
+    rsync -a --inplace --no-compress "$KEYCACHE" .
   else
     echo "No cache exists for $KEY."
   fi
