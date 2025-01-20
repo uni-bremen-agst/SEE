@@ -247,21 +247,6 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// Reparents all <paramref name="children"/> to new <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="children">children to be re-parented</param>
-        /// <param name="parent">new parent of <see cref="children"/></param>
-        public void Reparent(IEnumerable<Node> children, Node parent)
-        {
-            foreach (Node child in children)
-            {
-                child.Reparent(parent);
-                nodes[child.ID] = child;
-                child.ItsGraph.NodeHierarchyHasChanged = false;
-            }
-        }
-
-        /// <summary>
         /// Returns true if this graph contains a node with the same unique ID
         /// as the given node.
         /// Throws an exception if node is null or node has no valid ID.
