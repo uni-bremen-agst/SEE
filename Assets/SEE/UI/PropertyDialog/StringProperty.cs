@@ -178,10 +178,10 @@ namespace SEE.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Displays the text field for the validaiton failed message with the given <paramref name="errorMessage"/>.
+        /// Displays the text field for the validation failed message with the given <paramref name="errorMessage"/>.
         /// </summary>
         /// <param name="errorMessage">The error message which should be displayed.</param>
-        public void ValidateFailed(string errorMessage)
+        public void ChangeToValidationFailed(string errorMessage)
         {
             GameObject validationArea = GameFinder.FindChild(inputField, "Validation Area");
             validationArea.SetActive(true);

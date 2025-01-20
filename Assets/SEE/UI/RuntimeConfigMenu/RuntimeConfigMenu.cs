@@ -126,7 +126,7 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Sorted by the game object name.
         /// </summary>
-        /// <returns>table list</returns>
+        /// <returns>the sorted cities</returns>
         public static AbstractSEECity[] GetCities()
         {
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
@@ -163,7 +163,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Performs the rebuild if necessary.
         /// </summary>
-        /// <returns>True if a rebuild was performed, otherwiese false.</returns>
+        /// <returns>True if a rebuild was performed, otherwise false.</returns>
         public bool PerformRebuildIfRequired()
         {
             if (needsRebuild)

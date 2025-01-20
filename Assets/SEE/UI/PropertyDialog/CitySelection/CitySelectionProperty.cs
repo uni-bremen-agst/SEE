@@ -79,11 +79,11 @@ namespace SEE.UI.PropertyDialog.CitySelection
         {
             if (string.IsNullOrEmpty(selectedName.Value.Trim()))
             {
-                selectedName.ValidateFailed("The entered city name must not be empty.");
+                selectedName.ChangeToValidationFailed("The entered city name must not be empty.");
             }
             else if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder) && citiesHolder.IsNameAlreadyUsed(selectedName.Value))
             {
-                selectedName.ValidateFailed("Name is already in use. You need to enter an not used city name.");
+                selectedName.ChangeToValidationFailed("Name is already in use. You need to enter an not used city name.");
             }
             else
             {
