@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
@@ -258,13 +259,8 @@ namespace SEE.Controls.Actions
             /// </summary>
             void preventOverlap()
             {
-                foreach (Bounds2D siblingBounds in siblingBoundsList)
+                foreach (Bounds2D siblingBounds in siblingBoundsList.Where(bounds.HasOverlap))
                 {
-                    if(!bounds.HasOverlap(siblingBounds))
-                    {
-                        continue;
-                    }
-
                     // Determine shrink direction: weight by area size
                     float area = 0f;
                     float potentialArea;
@@ -349,7 +345,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             void fillAvailableSpace()
             {
-                foreach (Direction2D direction in new Direction2D[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
+                foreach (Direction2D direction in new[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
                 {
                     float oldValue;
                     switch (direction)
@@ -390,14 +386,9 @@ namespace SEE.Controls.Actions
                             continue;
                     }
 
-                    float newValue;
-                    foreach (Bounds2D siblingBounds in siblingBoundsList)
+                    foreach (Bounds2D siblingBounds in siblingBoundsList.Where(bounds.HasOverlap))
                     {
-                        if(!bounds.HasOverlap(siblingBounds))
-                        {
-                            continue;
-                        }
-
+                        float newValue;
                         if (direction == Direction2D.Left && bounds.Left < siblingBounds.Right &&
                                 (newValue = SEEMath.BitIncrement(siblingBounds.Right)) <= oldValue)
                         {

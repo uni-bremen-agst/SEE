@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using SEE.Game;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
@@ -440,18 +440,13 @@ namespace SEE.Controls.Actions
             /// </summary>
             private void InitHandles()
             {
-                handles = new Dictionary<GameObject, Vector3>();
-
                 Vector3[] directions = new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back,
                                                Vector3.right + Vector3.forward, Vector3.right + Vector3.back,
                                                Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
                 Vector3 parentPosition = transform.position;
                 Vector3 parentSize = gameObject.WorldSpaceSize();
                 float yPos = parentPosition.y + 0.5f * parentSize.y + SpatialMetrics.PlacementOffset;
-                foreach (Vector3 direction in directions)
-                {
-                    handles[CreateHandle(direction)] = direction;
-                }
+                handles = directions.ToDictionary(CreateHandle);
                 GameObject upDownHandle = CreateHandle(Vector3.up);
                 upDownHandleTransform = upDownHandle.transform;
                 handles[upDownHandle] = Vector3.up;
@@ -587,7 +582,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Calculate new scale and position
-                // TODO [#806] Make cursorMovement compatible with VR controls
+                // TODO (#806): Make cursorMovement compatible with VR controls
                 Vector3 cursorMovement;
                 if (currentResizeStep.Up)
                 {
@@ -599,7 +594,7 @@ namespace SEE.Controls.Actions
                     if (!Equals(mainCameraTransform.rotation, lastCameraRotation))
                     {
                         // Is camera looking straight up or down?
-                        if (Mathf.Abs(Vector3.Dot(mainCameraTransform.forward, Vector3.up)) > 0.9999f)
+                        if (Mathf.Abs(Vector3.Dot(mainCameraTransform.forward, Vector3.up)) >= 1.0)
                         {
                             // Use the camera's right vector projected onto the horizontal plane
                             cameraPlanarRight = Vector3.ProjectOnPlane(mainCameraTransform.right, Vector3.up).normalized;
@@ -627,11 +622,7 @@ namespace SEE.Controls.Actions
                     - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
 
                 // Collect children
-                List<Transform> children = new(transform.childCount);
-                foreach (Transform child in transform)
-                {
-                    children.Add(child);
-                }
+                List<Transform> children = transform.Cast<Transform>().ToList();
 
                 Transform parent = transform.parent;
 

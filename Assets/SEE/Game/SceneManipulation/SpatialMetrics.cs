@@ -6,7 +6,7 @@ namespace SEE.Game.SceneManipulation
     /// <summary>
     /// Stores metrics that are used for working with node placement.
     /// </summary>
-    public class SpatialMetrics
+    public static class SpatialMetrics
     {
         /// <summary>
         /// A small offset used for placement just outside specific bounds to prevent Z-fighting.
@@ -16,18 +16,18 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// The default local X/Z scale of a (new) node placed on another node.
         /// </summary>
-        public static float DefaultNodeLocalScale = 0.2f;
+        public const float DefaultNodeLocalScale = 0.2f;
 
         /// <summary>
         /// Half the default local X/Z scale of a (new) node placed on another node,
         /// typically used in bounds.
         /// </summary>
-        public static float HalfDefaultNodeLocalScale = DefaultNodeLocalScale / 2f;
+        public const float HalfDefaultNodeLocalScale = DefaultNodeLocalScale / 2f;
 
         /// <summary>
         /// The default world-space Y-axis size of a (new) node.
         /// </summary>
-        public static float DefaultNodeHeight = 0.002f;
+        public const float DefaultNodeHeight = 0.002f;
 
         /// <summary>
         /// The minimal size of a node in world space.
@@ -83,7 +83,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Initializes the struct.
         /// </summary>
-        public Bounds2D (float left, float right, float back, float front)
+        public Bounds2D(float left, float right, float back, float front)
         {
             Left = left;
             Right = right;
@@ -153,19 +153,14 @@ namespace SEE.Game.SceneManipulation
         public float this[Direction2D dir]
         {
             get {
-                switch (dir)
+                return dir switch
                 {
-                    case Direction2D.Left:
-                        return Left;
-                    case Direction2D.Right:
-                        return Right;
-                    case Direction2D.Back:
-                        return Back;
-                    case Direction2D.Front:
-                        return Front;
-                    default:
-                        throw new IndexOutOfRangeException($"Given direction is not possible in {nameof(Bounds2D)}: {dir}");
-                }
+                    Direction2D.Left => Left,
+                    Direction2D.Right => Right,
+                    Direction2D.Back => Back,
+                    Direction2D.Front => Front,
+                    _ => throw new IndexOutOfRangeException($"Given direction is not possible in {nameof(Bounds2D)}: {dir}")
+                };
             }
 
             set {
@@ -212,12 +207,7 @@ namespace SEE.Game.SceneManipulation
         /// <returns><c>true</c> iff the bounds overlap.</returns>
         public bool HasOverlap(Bounds2D other)
         {
-            if (Front < other.Back || Back > other.Front || Left > other.Right || Right < other.Left)
-            {
-                // No overlap detected
-                return false;
-            }
-            return true;
+            return Front >= other.Back && Back <= other.Front && Left <= other.Right && Right >= other.Left;
         }
 
         /// <summary>

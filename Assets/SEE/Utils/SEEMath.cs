@@ -9,9 +9,8 @@ namespace SEE.Utils
     /// Please consult method descriptions for credits and license.
     /// </para>
     /// </summary>
-    public static partial class SEEMath
+    public static class SEEMath
     {
-
         /// <summary>
         /// Returns the largest value that compares less than a specified value.
         /// </summary>

@@ -1060,7 +1060,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Checks if <paramref name="gameObject"/> overlaps with any other acrtive direct child node of its parent.
+        /// Checks if <paramref name="gameObject"/> overlaps with any other active direct child node of its parent.
         /// <para>
         /// Overlap is checked based on the <c>Collider</c> components. Objects with no <c>Collider</c>
         /// component and inactive nodes are ignored.
