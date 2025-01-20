@@ -18,7 +18,7 @@ namespace SEE.GameObjects
 
         /// <summary>
         /// The constructor.
-        /// Creates an new list for the cities, table pairs.
+        /// Creates a new list for the cities, table pairs.
         /// </summary>
         public CitiesHolder() => Cities = new List<(GameObject city, GameObject table)>();
 

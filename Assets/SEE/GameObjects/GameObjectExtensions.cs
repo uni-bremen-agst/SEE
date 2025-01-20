@@ -67,7 +67,7 @@ namespace SEE.GO
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
         ///
         /// This predicate can be queried for game objects representing a code city,
-        /// that is, game objects that have a <see cref="AbstractSEECity"/> attached to
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
         /// <returns>true if a code city was drawn and is active.</returns>

@@ -176,7 +176,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Adds a new node type to the factory.
+        /// Adds a <paramref name="nodeType"/> to the factory.
         /// </summary>
         /// <param name="nodeType">The node type to be added.</param>
         public void AddNewNodeType(string nodeType)

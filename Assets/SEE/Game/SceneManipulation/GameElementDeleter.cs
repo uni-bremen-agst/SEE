@@ -101,7 +101,7 @@ namespace SEE.Game.SceneManipulation
         /// <returns>True if the deletion was successful, otherwise false.</returns>
         public static bool DeleteRoot(GameObject rootObject)
         {
-            if (rootObject.TryGetNode(out Node node) && node.IsRoot())
+            if (rootObject.HasNodeRef() && rootObject.IsRoot())
             {
                 Transform cityHolder = rootObject.transform.parent;
                 if (cityHolder.GetComponent<CitySelectionManager>() != null)
@@ -116,7 +116,8 @@ namespace SEE.Game.SceneManipulation
                 Destroyer.Destroy(cityHolder.GetComponent<AbstractSEECity>());
                 Destroyer.Destroy(rootObject);
                 return true;
-            } else
+            }
+            else
             {
                 return false;
             }

@@ -30,7 +30,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         private SelectionProperty selectedCity;
 
         /// <summary>
-        /// this input field where the player can enter a city name.
+        /// This input field where the player can enter a city name.
         /// </summary>
         private StringProperty selectedName;
 

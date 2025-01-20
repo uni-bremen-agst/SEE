@@ -5,12 +5,12 @@ using SEE.UI.RuntimeConfigMenu;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Removes a node type of a City on all clients.
+    /// Removes a node type of a city on all clients.
     /// </summary>
     public class RemoveNodeTypeNetAction : CityNetAction
     {
         /// <summary>
-        /// The name of the ro removed node type.
+        /// The name of the to removed node type.
         /// </summary>
         public string NodeType;
 

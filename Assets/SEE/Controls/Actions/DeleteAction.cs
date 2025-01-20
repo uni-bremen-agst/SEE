@@ -320,7 +320,6 @@ namespace SEE.Controls.Actions
             });
             GameElementDeleter.Revive(deletedGameObjects);
             new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
-
         }
 
         /// <summary>

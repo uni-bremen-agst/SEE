@@ -37,7 +37,7 @@ namespace SEE.GameObjects
         private enum ProgressState
         {
             Start,
-            ChoseCity,
+            ChooseCity,
             ReflexionCity,
             Finish,
         }
@@ -85,7 +85,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// Provides the selection and addition of a city.
         /// </summary>
-        void Update()
+        private void Update()
         {
             switch (progressState)
             {
@@ -95,17 +95,18 @@ namespace SEE.GameObjects
                         && raycastHit.collider.gameObject == gameObject)
                     {
                         citySelectionProperty.Open();
-                        progressState = ProgressState.ChoseCity;
+                        progressState = ProgressState.ChooseCity;
                     }
                     break;
 
-                case ProgressState.ChoseCity:
+                case ProgressState.ChooseCity:
                     if (citySelectionProperty.TryGetCity(out CityTypes? cityType, out string cityName) || typeOfNetworkExecution != null)
                     {
                         if (cityType != null)
                         {
                             new AddCityNetAction(transform.parent.name, cityType.Value, cityName).Execute();
-                        } else
+                        }
+                        else
                         {
                             cityType = typeOfNetworkExecution;
                             cityName = nameOfNetworkExecution;
@@ -174,7 +175,7 @@ namespace SEE.GameObjects
         {
             typeOfNetworkExecution = cityType;
             nameOfNetworkExecution = cityName;
-            progressState = ProgressState.ChoseCity;
+            progressState = ProgressState.ChooseCity;
         }
 
         /// <summary>

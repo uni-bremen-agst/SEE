@@ -14,7 +14,7 @@ namespace SEE.Net.Actions
     public class LoadPartOfReflexionCityNetAction : CityNetAction
     {
         /// <summary>
-        /// Distinction between wheter an architecture or implementation graph should be loaded.
+        /// Distinction between whether an architecture or implementation graph should be loaded.
         /// </summary>
         public bool LoadArchitecture;
 

@@ -144,7 +144,7 @@ namespace SEE.Game.City
             AddMissingNodeTypes(graph, renderer);
             /// Attention: At this point, the root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
             /// If the <see cref="ReflexionGraph.ImplementationRoot"/> or <see cref="ReflexionGraph.ArchitectureRoot"/> is used,
-            /// loading doesn't work because, the children are not aded to <see cref="Graph.nodes"/>.
+            /// loading doesn't work because, the children are not added to <see cref="Graph.nodes"/>.
             Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.

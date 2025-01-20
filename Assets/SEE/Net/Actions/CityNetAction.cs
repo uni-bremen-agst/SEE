@@ -8,7 +8,7 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Superclass for all city net actions.
     /// </summary>
-    public class CityNetAction : AbstractNetAction
+    public abstract class CityNetAction : AbstractNetAction
     {
         /// <summary>
         /// The unique name of the table to interact with its city.
@@ -43,7 +43,7 @@ namespace SEE.Net.Actions
                 GameObject city = citiesHolder.Find(TableID);
                 if (city == null)
                 {
-                    throw new Exception($"The city can't be found on the table {TableID} ");
+                    throw new Exception($"The city can't be found on the table {TableID}.");
                 }
                 return city;
             }
