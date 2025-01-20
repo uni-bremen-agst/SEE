@@ -114,7 +114,18 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("Graph Drawing", "No graph loaded.");
             }
-            DrawBothGraphsAsync(visualizedSubGraph).Forget();
+            RenderReflexionGraphAsync(visualizedSubGraph, gameObject).Forget();
+        }
+
+        struct Area
+        {
+            public Area(Vector3 position, Vector3 scale)
+            {
+                Position = position;
+                Scale = scale;
+            }
+            public Vector3 Position;
+            public Vector3 Scale;
         }
 
         /// <summary>
@@ -122,49 +133,158 @@ namespace SEE.Game.City
         /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
-        protected async UniTaskVoid DrawBothGraphsAsync(ReflexionGraph graph)
+        /// <param name="codeCity">the game object representing the code city and holding
+        /// a <see cref="SEEReflexionCity"/> component</param>
+        protected async UniTaskVoid RenderReflexionGraphAsync(ReflexionGraph graph, GameObject codeCity)
         {
-            try
+            if (codeCity.TryGetComponent(out SEEReflexionCity reflexionCity))
             {
-                using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
+                // The original real-world position and scale of codeCity.
+                Area codeCityOriginal = new(codeCity.transform.position, codeCity.transform.lossyScale);
+
+                Split(codeCity, reflexionCity.ArchitectureLayoutProportion,
+                    out Area implementionArea, out Area architectureArea);
+
+                try
                 {
-                    void ReportProgress(float x)
+                    using (LoadingSpinner.ShowDeterminate($"Drawing reflexion city \"{codeCity.name}\"", out Action<float> updateProgress))
                     {
-                        ProgressBar = x;
-                        updateProgress(x);
+                        void ReportProgress(float x)
+                        {
+                            ProgressBar = x;
+                            updateProgress(x);
+                        }
+
+                        (Graph implementation, Graph architecture, _) = graph.Disassemble();
+
+                        // There should be no more than one root.
+                        Node reflexionRoot = graph.GetRoots().FirstOrDefault();
+
+                        // There could be no root at all in case the architecture and implementation
+                        // graphs are both empty.
+                        if (reflexionRoot != null)
+                        {
+                            // The parent of the two game object hierarchies for the architecture and implementation.
+                            GameObject reflexionCityRoot;
+
+                            // Draw implementation.
+                            {
+                                GraphRenderer renderer = new(this, implementation);
+                                // reflexionCityRoot will be the direct and only child of gameObject
+                                reflexionCityRoot = renderer.DrawNode(reflexionRoot, codeCity);
+                                reflexionCityRoot.transform.SetParent(codeCity.transform);
+                                // Render the implementation graph under reflexionCityRoot.
+                                await renderer.DrawGraphAsync(implementation, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
+                            }
+
+                            // We need to temporarily unlink the implementation graph from reflexionCityRoot
+                            // because graph renderering assumes that the parent has no other child.
+                            GameObject implementationRoot = reflexionCityRoot.transform.GetChild(0).gameObject;
+                            implementationRoot.transform.SetParent(null);
+
+                            // Draw architecture.
+                            {
+                                GraphRenderer renderer = new(this, architecture);
+                                await renderer.DrawGraphAsync(architecture, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
+                            }
+
+                            implementationRoot.transform.SetParent(reflexionCityRoot.transform);
+                        }
                     }
-
-                    (Graph implementation, Graph architecture, _) = graph.Disassemble();
-
-                    // Draw implementation.
-                    {
-                        GraphRenderer renderer = new(this, implementation);
-                        await renderer.DrawGraphAsync(implementation, gameObject, ReportProgress, cancellationTokenSource.Token);
-                    }
-
-                    GameObject implementationRoot = gameObject.transform.GetChild(0).gameObject;
-                    implementationRoot.transform.SetParent(null);
-
-                    // Draw architecture.
-                    {
-                        GraphRenderer renderer = new(this, architecture);
-                        await renderer.DrawGraphAsync(architecture, gameObject, ReportProgress, cancellationTokenSource.Token);
-                    }
-
-                    implementationRoot.transform.SetParent(gameObject.transform);
                 }
+                catch (OperationCanceledException)
+                {
+                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                    throw;
+                }
+                finally
+                {
+                    RestoreCodeCity();
+                }
+
+                return;
+
+                // Restores codeCity to its codeCityOriginalPosition and codeCityOriginalScale.
+                void RestoreCodeCity()
+                {
+                    codeCity.transform.position = codeCityOriginal.Position;
+                    codeCity.SetAbsoluteScale(codeCityOriginal.Scale, false);
+                }
+
+                void Split(GameObject codeCity, float architectureLayoutProportion,
+                    out Area implementionArea, out Area architectureArea)
+                {
+                    bool xIsLongerEdge = codeCity.transform.lossyScale.x >= codeCity.transform.lossyScale.y;
+
+                    if (architectureLayoutProportion <= 0)
+                    {
+                        // the implemenation takes all the available space
+                        implementionArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
+                        // the architecture sits at the end of the longer edge of the implementation with zero space
+                        Vector3 architecturePos = implementionArea.Position;
+                        if (xIsLongerEdge)
+                        {
+                            architecturePos.x = implementionArea.Position.x + implementionArea.Scale.x / 2;
+                        }
+                        else
+                        {
+                            architecturePos.z = implementionArea.Position.z + implementionArea.Scale.z / 2;
+                        }
+                        architectureArea = new(architecturePos, Vector3.zero);
+                    }
+                    else if (architectureLayoutProportion >= 1)
+                    {
+                        // the architecture takes all the available space
+                        architectureArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
+                        // the implementation sits at the begin of the longer edge of the architecture with zero space
+                        Vector3 implementationPos = architectureArea.Position;
+                        if (xIsLongerEdge)
+                        {
+                            implementationPos.x = architectureArea.Position.x - architectureArea.Scale.x / 2;
+                        }
+                        else
+                        {
+                            implementationPos.z = architectureArea.Position.z - architectureArea.Scale.z / 2;
+                        }
+                        implementionArea = new(implementationPos, Vector3.zero);
+                    }
+                    else
+                    {
+                        implementionArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
+                        architectureArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
+                        if (xIsLongerEdge)
+                        {
+                            // Shrink and move the implementionArea to the left.
+                            {
+                                // The proportion of the implemenation area.
+                                float implementationLayoutProportion = 1 - architectureLayoutProportion;
+                                // The begin of the longer edge in world space. This reference point will stay the same.
+                                float shorterLeftWorldSpaceEdge = implementionArea.Position.x - implementionArea.Scale.x / 2;
+                                // Distance from shorterLeftWorldSpaceEdge to original center.
+                                float originalRelativeCenter = implementionArea.Position.x - shorterLeftWorldSpaceEdge;
+                                implementionArea.Position.x = shorterLeftWorldSpaceEdge + originalRelativeCenter * implementationLayoutProportion;
+                                implementionArea.Scale.x *= implementationLayoutProportion;
+                            }
+
+
+                            architectureArea.Scale.x *= architectureLayoutProportion;
+                        }
+
+                    }
+                }
+
+
             }
-            catch (OperationCanceledException)
+            else
             {
-                ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
-                throw;
+                ShowNotification.Error("Graph Drawing", $"Code city {codeCity.name} is missing a reflexion-city component.");
             }
         }
 
         #region ConfigIO
-            /// <summary>
-            /// Label in the configuration file for <see cref="ArchitectureNodeLayoutSettings"/>.
-            /// </summary>
+        /// <summary>
+        /// Label in the configuration file for <see cref="ArchitectureNodeLayoutSettings"/>.
+        /// </summary>
         private const string architectureLayoutSettingsLabel = "ArchitectureNodeLayout";
         /// <summary>
         /// Label in the configuration file for <see cref="ArchitectureLayoutProportion"/>.
