@@ -130,241 +130,13 @@ namespace SEE.Controls.Actions
                     targetPosition.z - Mathf.Max(SpatialMetrics.HalfDefaultNodeLocalScale, 0.5f * minLocalScale.z),
                     targetPosition.z + Mathf.Max(SpatialMetrics.HalfDefaultNodeLocalScale, 0.5f * minLocalScale.z));
 
-            // Move inside parent area
-            if (bounds.Left < parentBounds.Left)
-            {
-                float diff = parentBounds.Left - bounds.Left;
-                bounds.Left = parentBounds.Left;
-                bounds.Right = Mathf.Min(bounds.Right + diff, parentBounds.Right);
-            }
-            if (bounds.Right > parentBounds.Right)
-            {
-                float diff = bounds.Right - parentBounds.Right;
-                bounds.Right = parentBounds.Right;
-                bounds.Left = Mathf.Max(bounds.Left - diff, parentBounds.Left);
-            }
-            if (bounds.Back < parentBounds.Back)
-            {
-                float diff = parentBounds.Back - bounds.Back;
-                bounds.Back = parentBounds.Back;
-                bounds.Front = Mathf.Min(bounds.Front + diff, parentBounds.Front);
-            }
-            if (bounds.Front > parentBounds.Front)
-            {
-                float diff = bounds.Front - parentBounds.Front;
-                bounds.Front = parentBounds.Front;
-                bounds.Back = Mathf.Max(bounds.Back - diff, parentBounds.Back);
-            }
-
-            // Shrink by raycasting on X/Z axes
             List<Bounds2D> siblingBoundsList = new();
             Bounds2D potentialGrow = new(0f, 0f, 0f, 0f);
-            foreach (Transform sibling in parent.transform)
-            {
-                if (!sibling.gameObject.IsNodeAndActiveSelf())
-                {
-                    continue;
-                }
 
-                Vector3 siblingSize = sibling.gameObject.LocalSize();
-                Vector3 siblingPos = sibling.localPosition;
-                Bounds2D siblingBounds = new(
-                        siblingPos.x - siblingSize.x / 2 - localPadding.x,
-                        siblingPos.x + siblingSize.x / 2 + localPadding.x,
-                        siblingPos.z - siblingSize.z / 2 - localPadding.z,
-                        siblingPos.z + siblingSize.z / 2 + localPadding.z);
-                siblingBoundsList.Add(siblingBounds);
-
-                if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Left) && bounds.Left <= siblingBounds.Right)
-                {
-                    float newVal = SEEMath.BitIncrement(siblingBounds.Right);
-                    potentialGrow.Right = newVal - bounds.Left;
-                    potentialGrow.Left = 0f;
-                    bounds.Left = newVal;
-                }
-                if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Right) && bounds.Right >= siblingBounds.Left)
-                {
-                    float newVal =  SEEMath.BitDecrement(siblingBounds.Left);
-                    potentialGrow.Left = bounds.Right - newVal;
-                    potentialGrow.Right = 0f;
-                    bounds.Right = newVal;
-                }
-                if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Back) && bounds.Back <= siblingBounds.Front)
-                {
-                    float newVal = SEEMath.BitIncrement(siblingBounds.Front);
-                    potentialGrow.Front = newVal - bounds.Back;
-                    potentialGrow.Back = 0f;
-                    bounds.Back = newVal;
-                }
-                if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Front) && bounds.Front >= siblingBounds.Back)
-                {
-                    float newVal =  SEEMath.BitDecrement(siblingBounds.Back);
-                    potentialGrow.Back = bounds.Front - newVal;
-                    potentialGrow.Front = 0f;
-                    bounds.Front = newVal;
-                }
-            }
-
-            // Shrink to prevent sibling overlap
-            foreach (Bounds2D siblingBounds in siblingBoundsList)
-            {
-                if(!bounds.HasOverlap(siblingBounds))
-                {
-                    continue;
-                }
-
-
-                // Determine shrink direction: weight by area size
-                float area = 0f;
-                float potentialArea;
-                Direction2D direction = Direction2D.None;
-                if (bounds.Left < siblingBounds.Right)
-                {
-                    float overlapLen = siblingBounds.Right - bounds.Left;
-                    potentialArea = (bounds.Right - bounds.Left - overlapLen) * (bounds.Front - bounds.Back);
-                    if (potentialArea > area)
-                    {
-                        area = potentialArea;
-                        direction = Direction2D.Left;
-                    }
-                }
-                if (siblingBounds.Left < bounds.Right)
-                {
-                    float overlapLen = bounds.Right - siblingBounds.Left;
-                    potentialArea = (bounds.Right - bounds.Left - overlapLen) * (bounds.Front - bounds.Back);
-                    if (potentialArea > area)
-                    {
-                        area = potentialArea;
-                        direction = Direction2D.Right;
-                    }
-                }
-                if (bounds.Back < siblingBounds.Front)
-                {
-                    float overlapLen = siblingBounds.Front - bounds.Back;
-                    potentialArea = (bounds.Right - bounds.Left) * (bounds.Front - bounds.Back - overlapLen);
-                    if (potentialArea > area)
-                    {
-                        area = potentialArea;
-                        direction = Direction2D.Back;
-                    }
-                }
-                if (siblingBounds.Back < bounds.Front)
-                {
-                    float overlapLen = bounds.Front - siblingBounds.Back;
-                    potentialArea = (bounds.Right - bounds.Left) * (bounds.Front - bounds.Back - overlapLen);
-                    if (potentialArea > area)
-                    {
-                        area = potentialArea;
-                        direction = Direction2D.Front;
-                    }
-                }
-
-                // Adapt bounds to prevent overlap with siblings
-                switch (direction)
-                {
-                    case Direction2D.Left: {
-                        float newVal = SEEMath.BitIncrement(siblingBounds.Right);
-                        potentialGrow.Right += newVal - bounds.Left;
-                        potentialGrow.Left = 0f;
-                        bounds.Left = newVal;
-                        break;
-                    }
-                    case Direction2D.Right: {
-                        float newVal = SEEMath.BitDecrement(siblingBounds.Left);
-                        potentialGrow.Left += bounds.Right - newVal;
-                        potentialGrow.Right = 0f;
-                        bounds.Right = newVal;
-                        break;
-                    }
-                    case Direction2D.Back: {
-                        float newVal = SEEMath.BitIncrement(siblingBounds.Front);
-                        potentialGrow.Front += newVal - bounds.Back;
-                        potentialGrow.Back = 0f;
-                        bounds.Back = newVal;
-                        break;
-                    }
-                    case Direction2D.Front: {
-                        float newVal = SEEMath.BitDecrement(siblingBounds.Back);
-                        potentialGrow.Back += bounds.Front - newVal;
-                        potentialGrow.Front = 0f;
-                        bounds.Front = newVal;
-                        break;
-                    }
-                }
-            }
-
-            // Grow to fill available space
-            foreach (Direction2D direction in new Direction2D[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
-            {
-                float oldValue;
-                switch (direction)
-                {
-                    case Direction2D.Left:
-                        if (Mathf.Approximately(potentialGrow.Left, 0f))
-                        {
-                            continue;
-                        }
-                        oldValue = bounds.Left;
-                        bounds.Left = Mathf.Max(bounds.Left - potentialGrow.Left, parentBounds.Left);
-                        break;
-                    case Direction2D.Right:
-                        if (Mathf.Approximately(potentialGrow.Right, 0f))
-                        {
-                            continue;
-                        }
-                        oldValue = bounds.Right;
-                        bounds.Right = Mathf.Min(bounds.Right + potentialGrow.Right, parentBounds.Right);
-                        break;
-                    case Direction2D.Back:
-                        if (Mathf.Approximately(potentialGrow.Back, 0f))
-                        {
-                            continue;
-                        }
-                        oldValue = bounds.Back;
-                        bounds.Back = Mathf.Max(bounds.Back - potentialGrow.Back, parentBounds.Back);
-                        break;
-                    case Direction2D.Front:
-                        if (Mathf.Approximately(potentialGrow.Front, 0f))
-                        {
-                            continue;
-                        }
-                        oldValue = bounds.Front;
-                        bounds.Front = Mathf.Min(bounds.Front + potentialGrow.Front, parentBounds.Front);
-                        break;
-                    default:
-                        continue;
-                }
-
-                float newValue;
-                foreach (Bounds2D siblingBounds in siblingBoundsList)
-                {
-                    if(!bounds.HasOverlap(siblingBounds))
-                    {
-                        continue;
-                    }
-
-                    if (direction == Direction2D.Left && bounds.Left < siblingBounds.Right &&
-                            (newValue = SEEMath.BitIncrement(siblingBounds.Right)) <= oldValue)
-                    {
-                        bounds.Left = newValue;
-                    }
-                    if (direction == Direction2D.Right && bounds.Right > siblingBounds.Left &&
-                            (newValue = SEEMath.BitDecrement(siblingBounds.Left)) >= oldValue)
-                    {
-                        bounds.Right = newValue;
-                    }
-                    if (direction == Direction2D.Back && bounds.Back < siblingBounds.Front &&
-                            (newValue = SEEMath.BitIncrement(siblingBounds.Front)) <= oldValue)
-                    {
-                        bounds.Back = newValue;
-                    }
-                    if (direction == Direction2D.Front && bounds.Front > siblingBounds.Back &&
-                            (newValue = SEEMath.BitDecrement(siblingBounds.Back)) >= oldValue)
-                    {
-                        bounds.Front = newValue;
-                    }
-                }
-            }
+            moveInsideParentArea();
+            shrink2D();
+            preventOverlap();
+            fillAvailableSpace();
 
             float localHeight = SpatialMetrics.DefaultNodeHeight * parent.transform.InverseTransformVector(Vector3.up).y;
             Vector3 scale = new(
@@ -376,46 +148,9 @@ namespace SEE.Controls.Actions
                 parentBounds3D.max.y + localPadding.y + 0.5f * localHeight,
                 bounds.Back + 0.5f * scale.z);
 
-            // Squarify
-            Vector3 lossyScale = Vector3.Scale(scale, parent.transform.lossyScale);
-            if (lossyScale.x < lossyScale.z)
-            {
-                scale.z = lossyScale.x / parent.transform.lossyScale.z;
+            squarify();
 
-                // Move close to target position
-                float newBackBound = position.z - 0.5f * scale.z;
-                float maxMovement = newBackBound - bounds.Back;
-                float targetMovement = targetPosition.z - position.z;
-                float actualMovement = Mathf.Min(maxMovement, Mathf.Abs(targetMovement));
-                if (targetMovement >= 0f)
-                {
-                    position.z += actualMovement;
-                }
-                else
-                {
-                    position.z -= actualMovement;
-                }
-            }
-            else
-            {
-                scale.x = lossyScale.z / parent.transform.lossyScale.x;
-
-                // Move close to target position
-                float newLeftBound = position.x - 0.5f * scale.x;
-                float maxMovement = newLeftBound - bounds.Left;
-                float targetMovement = targetPosition.x - position.x;
-                float actualMovement = Mathf.Min(maxMovement, Mathf.Abs(targetMovement));
-                if (targetMovement >= 0f)
-                {
-                    position.x += actualMovement;
-                }
-                else
-                {
-                    position.x -= actualMovement;
-                }
-            }
-
-            // Enforce minimal size
+                        // Enforce minimal size
             if (scale.x + tolerance < minLocalScale.x || scale.z + tolerance < minLocalScale.z)
             {
                 ShowNotification.Warn(
@@ -436,6 +171,301 @@ namespace SEE.Controls.Actions
 
             progress = ProgressState.WaitingForInput;
             OpenDialog(addedGameNode);
+
+            void moveInsideParentArea()
+            {
+                    if (bounds.Left < parentBounds.Left)
+                {
+                    float diff = parentBounds.Left - bounds.Left;
+                    bounds.Left = parentBounds.Left;
+                    bounds.Right = Mathf.Min(bounds.Right + diff, parentBounds.Right);
+                }
+                if (bounds.Right > parentBounds.Right)
+                {
+                    float diff = bounds.Right - parentBounds.Right;
+                    bounds.Right = parentBounds.Right;
+                    bounds.Left = Mathf.Max(bounds.Left - diff, parentBounds.Left);
+                }
+                if (bounds.Back < parentBounds.Back)
+                {
+                    float diff = parentBounds.Back - bounds.Back;
+                    bounds.Back = parentBounds.Back;
+                    bounds.Front = Mathf.Min(bounds.Front + diff, parentBounds.Front);
+                }
+                if (bounds.Front > parentBounds.Front)
+                {
+                    float diff = bounds.Front - parentBounds.Front;
+                    bounds.Front = parentBounds.Front;
+                    bounds.Back = Mathf.Max(bounds.Back - diff, parentBounds.Back);
+                }
+            }
+
+            /// <summary>
+            /// Shrink by raycasting on X/Z axes.
+            /// </summary>
+            void shrink2D()
+            {
+                //
+                foreach (Transform sibling in parent.transform)
+                {
+                    if (!sibling.gameObject.IsNodeAndActiveSelf())
+                    {
+                        continue;
+                    }
+
+                    Vector3 siblingSize = sibling.gameObject.LocalSize();
+                    Vector3 siblingPos = sibling.localPosition;
+                    Bounds2D siblingBounds = new(
+                            siblingPos.x - siblingSize.x / 2 - localPadding.x,
+                            siblingPos.x + siblingSize.x / 2 + localPadding.x,
+                            siblingPos.z - siblingSize.z / 2 - localPadding.z,
+                            siblingPos.z + siblingSize.z / 2 + localPadding.z);
+                    siblingBoundsList.Add(siblingBounds);
+
+                    if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Left) && bounds.Left <= siblingBounds.Right)
+                    {
+                        float newVal = SEEMath.BitIncrement(siblingBounds.Right);
+                        potentialGrow.Right = newVal - bounds.Left;
+                        potentialGrow.Left = 0f;
+                        bounds.Left = newVal;
+                    }
+                    if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Right) && bounds.Right >= siblingBounds.Left)
+                    {
+                        float newVal =  SEEMath.BitDecrement(siblingBounds.Left);
+                        potentialGrow.Left = bounds.Right - newVal;
+                        potentialGrow.Right = 0f;
+                        bounds.Right = newVal;
+                    }
+                    if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Back) && bounds.Back <= siblingBounds.Front)
+                    {
+                        float newVal = SEEMath.BitIncrement(siblingBounds.Front);
+                        potentialGrow.Front = newVal - bounds.Back;
+                        potentialGrow.Back = 0f;
+                        bounds.Back = newVal;
+                    }
+                    if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Front) && bounds.Front >= siblingBounds.Back)
+                    {
+                        float newVal =  SEEMath.BitDecrement(siblingBounds.Back);
+                        potentialGrow.Back = bounds.Front - newVal;
+                        potentialGrow.Front = 0f;
+                        bounds.Front = newVal;
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Shrink to prevent sibling overlap with siblings.
+            /// </summary>
+            void preventOverlap()
+            {
+                foreach (Bounds2D siblingBounds in siblingBoundsList)
+                {
+                    if(!bounds.HasOverlap(siblingBounds))
+                    {
+                        continue;
+                    }
+
+                    // Determine shrink direction: weight by area size
+                    float area = 0f;
+                    float potentialArea;
+                    Direction2D direction = Direction2D.None;
+                    if (bounds.Left < siblingBounds.Right)
+                    {
+                        float overlapLen = siblingBounds.Right - bounds.Left;
+                        potentialArea = (bounds.Right - bounds.Left - overlapLen) * (bounds.Front - bounds.Back);
+                        if (potentialArea > area)
+                        {
+                            area = potentialArea;
+                            direction = Direction2D.Left;
+                        }
+                    }
+                    if (siblingBounds.Left < bounds.Right)
+                    {
+                        float overlapLen = bounds.Right - siblingBounds.Left;
+                        potentialArea = (bounds.Right - bounds.Left - overlapLen) * (bounds.Front - bounds.Back);
+                        if (potentialArea > area)
+                        {
+                            area = potentialArea;
+                            direction = Direction2D.Right;
+                        }
+                    }
+                    if (bounds.Back < siblingBounds.Front)
+                    {
+                        float overlapLen = siblingBounds.Front - bounds.Back;
+                        potentialArea = (bounds.Right - bounds.Left) * (bounds.Front - bounds.Back - overlapLen);
+                        if (potentialArea > area)
+                        {
+                            area = potentialArea;
+                            direction = Direction2D.Back;
+                        }
+                    }
+                    if (siblingBounds.Back < bounds.Front)
+                    {
+                        float overlapLen = bounds.Front - siblingBounds.Back;
+                        potentialArea = (bounds.Right - bounds.Left) * (bounds.Front - bounds.Back - overlapLen);
+                        if (potentialArea > area)
+                        {
+                            direction = Direction2D.Front;
+                        }
+                    }
+
+                    // Adapt bounds to prevent overlap with siblings
+                    switch (direction)
+                    {
+                        case Direction2D.Left: {
+                            float newVal = SEEMath.BitIncrement(siblingBounds.Right);
+                            potentialGrow.Right += newVal - bounds.Left;
+                            potentialGrow.Left = 0f;
+                            bounds.Left = newVal;
+                            break;
+                        }
+                        case Direction2D.Right: {
+                            float newVal = SEEMath.BitDecrement(siblingBounds.Left);
+                            potentialGrow.Left += bounds.Right - newVal;
+                            potentialGrow.Right = 0f;
+                            bounds.Right = newVal;
+                            break;
+                        }
+                        case Direction2D.Back: {
+                            float newVal = SEEMath.BitIncrement(siblingBounds.Front);
+                            potentialGrow.Front += newVal - bounds.Back;
+                            potentialGrow.Back = 0f;
+                            bounds.Back = newVal;
+                            break;
+                        }
+                        case Direction2D.Front: {
+                            float newVal = SEEMath.BitDecrement(siblingBounds.Back);
+                            potentialGrow.Back += bounds.Front - newVal;
+                            potentialGrow.Front = 0f;
+                            bounds.Front = newVal;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Grow to fill the available space.
+            /// </summary>
+            void fillAvailableSpace()
+            {
+                foreach (Direction2D direction in new Direction2D[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
+                {
+                    float oldValue;
+                    switch (direction)
+                    {
+                        case Direction2D.Left:
+                            if (Mathf.Approximately(potentialGrow.Left, 0f))
+                            {
+                                continue;
+                            }
+                            oldValue = bounds.Left;
+                            bounds.Left = Mathf.Max(bounds.Left - potentialGrow.Left, parentBounds.Left);
+                            break;
+                        case Direction2D.Right:
+                            if (Mathf.Approximately(potentialGrow.Right, 0f))
+                            {
+                                continue;
+                            }
+                            oldValue = bounds.Right;
+                            bounds.Right = Mathf.Min(bounds.Right + potentialGrow.Right, parentBounds.Right);
+                            break;
+                        case Direction2D.Back:
+                            if (Mathf.Approximately(potentialGrow.Back, 0f))
+                            {
+                                continue;
+                            }
+                            oldValue = bounds.Back;
+                            bounds.Back = Mathf.Max(bounds.Back - potentialGrow.Back, parentBounds.Back);
+                            break;
+                        case Direction2D.Front:
+                            if (Mathf.Approximately(potentialGrow.Front, 0f))
+                            {
+                                continue;
+                            }
+                            oldValue = bounds.Front;
+                            bounds.Front = Mathf.Min(bounds.Front + potentialGrow.Front, parentBounds.Front);
+                            break;
+                        default:
+                            continue;
+                    }
+
+                    float newValue;
+                    foreach (Bounds2D siblingBounds in siblingBoundsList)
+                    {
+                        if(!bounds.HasOverlap(siblingBounds))
+                        {
+                            continue;
+                        }
+
+                        if (direction == Direction2D.Left && bounds.Left < siblingBounds.Right &&
+                                (newValue = SEEMath.BitIncrement(siblingBounds.Right)) <= oldValue)
+                        {
+                            bounds.Left = newValue;
+                        }
+                        if (direction == Direction2D.Right && bounds.Right > siblingBounds.Left &&
+                                (newValue = SEEMath.BitDecrement(siblingBounds.Left)) >= oldValue)
+                        {
+                            bounds.Right = newValue;
+                        }
+                        if (direction == Direction2D.Back && bounds.Back < siblingBounds.Front &&
+                                (newValue = SEEMath.BitIncrement(siblingBounds.Front)) <= oldValue)
+                        {
+                            bounds.Back = newValue;
+                        }
+                        if (direction == Direction2D.Front && bounds.Front > siblingBounds.Back &&
+                                (newValue = SEEMath.BitDecrement(siblingBounds.Back)) >= oldValue)
+                        {
+                            bounds.Front = newValue;
+                        }
+                    }
+                }
+            }
+
+            /// <summary>
+            /// Squarify by applying the length of the shorter side to the other axis (X/Z).
+            /// The resulting square is moved as close as possible to the target position.
+            /// </summary>
+            void squarify()
+            {
+                Vector3 lossyScale = Vector3.Scale(scale, parent.transform.lossyScale);
+                if (lossyScale.x < lossyScale.z)
+                {
+                    scale.z = lossyScale.x / parent.transform.lossyScale.z;
+
+                    // Move close to target position
+                    float newBackBound = position.z - 0.5f * scale.z;
+                    float maxMovement = newBackBound - bounds.Back;
+                    float targetMovement = targetPosition.z - position.z;
+                    float actualMovement = Mathf.Min(maxMovement, Mathf.Abs(targetMovement));
+                    if (targetMovement >= 0f)
+                    {
+                        position.z += actualMovement;
+                    }
+                    else
+                    {
+                        position.z -= actualMovement;
+                    }
+                }
+                else
+                {
+                    scale.x = lossyScale.z / parent.transform.lossyScale.x;
+
+                    // Move close to target position
+                    float newLeftBound = position.x - 0.5f * scale.x;
+                    float maxMovement = newLeftBound - bounds.Left;
+                    float targetMovement = targetPosition.x - position.x;
+                    float actualMovement = Mathf.Min(maxMovement, Mathf.Abs(targetMovement));
+                    if (targetMovement >= 0f)
+                    {
+                        position.x += actualMovement;
+                    }
+                    else
+                    {
+                        position.x -= actualMovement;
+                    }
+                }
+            }
         }
 
         /// <summary>
