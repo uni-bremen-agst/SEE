@@ -134,10 +134,10 @@ namespace SEE.Controls.Actions
             List<Bounds2D> siblingBoundsList = new();
             Bounds2D potentialGrow = new(0f, 0f, 0f, 0f);
 
-            moveInsideParentArea();
-            shrink2D();
-            preventOverlap();
-            fillAvailableSpace();
+            MoveInsideParentArea();
+            Shrink2D();
+            PreventOverlap();
+            FillAvailableSpace();
 
             float localHeight = SpatialMetrics.DefaultNodeHeight * parent.transform.InverseTransformVector(Vector3.up).y;
             Vector3 scale = new(
@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions
 
             squarify();
 
-                        // Enforce minimal size
+            // Enforce minimal size
             if (scale.x + tolerance < minLocalScale.x || scale.z + tolerance < minLocalScale.z)
             {
                 ShowNotification.Warn(
@@ -173,9 +173,14 @@ namespace SEE.Controls.Actions
             progress = ProgressState.WaitingForInput;
             OpenDialog(addedGameNode);
 
-            void moveInsideParentArea()
+            /// <summary>
+            /// Makes sure the bounds stay inside their parent bounds.
+            /// Each time a side is moved to fit into parent, the opposite side is moved as well
+            /// to keep the original size, if possible.
+            /// </summary>
+            void MoveInsideParentArea()
             {
-                    if (bounds.Left < parentBounds.Left)
+                if (bounds.Left < parentBounds.Left)
                 {
                     float diff = parentBounds.Left - bounds.Left;
                     bounds.Left = parentBounds.Left;
@@ -204,9 +209,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Shrink by raycasting on X/Z axes.
             /// </summary>
-            void shrink2D()
+            void Shrink2D()
             {
-                //
                 foreach (Transform sibling in parent.transform)
                 {
                     if (!sibling.gameObject.IsNodeAndActiveSelf())
@@ -257,7 +261,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Shrink to prevent sibling overlap with siblings.
             /// </summary>
-            void preventOverlap()
+            void PreventOverlap()
             {
                 foreach (Bounds2D siblingBounds in siblingBoundsList.Where(bounds.HasOverlap))
                 {
@@ -343,7 +347,7 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Grow to fill the available space.
             /// </summary>
-            void fillAvailableSpace()
+            void FillAvailableSpace()
             {
                 foreach (Direction2D direction in new[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
                 {
