@@ -195,7 +195,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Returns a printable string with the struct's values.
         /// <summary>
-        public override readonly string ToString()
+        public readonly override string ToString()
         {
             return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Back: {Back}, Front: {Front})";
         }
