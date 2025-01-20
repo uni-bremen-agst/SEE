@@ -10,13 +10,13 @@ using System.Linq;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Test cases for <see cref="KeywordInput"/>. 
-    /// 
+    /// Test cases for <see cref="KeywordInput"/>.
+    ///
     /// Note: This test is not automated. It expects that a human tester uses
     /// a microphone to talk. The recognized input is shown on the console
     /// for inspection and will also be compared to the expected result.
     /// </summary>
-    [Category("NonDeterministic")]
+    [Category("SkipOnCI")]
     internal class TestKeywordInput
     {
         /// <summary>

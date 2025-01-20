@@ -324,8 +324,6 @@ namespace SEE.Tools.Livekit
             };
 
             // Publish the video track to the room.
-            Debug.Log($"[Livekit] Connection state: {room.IsConnected}\n");
-            UnityEngine.Assertions.Assert.IsNotNull(room, "Room is null");
             UnityEngine.Assertions.Assert.IsNotNull(room.LocalParticipant, "Local participant is null");
             PublishTrackInstruction publish = room.LocalParticipant.PublishTrack(track, options);
             yield return publish;
