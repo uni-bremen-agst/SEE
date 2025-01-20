@@ -39,6 +39,50 @@ Metadata to identify and retrieve files are stored in the relational database, w
 --------------------------------------------------------------------------------
 ## Dependencies
 
+The backend itself manages its dependencies using Maven.
+However, there are additional dependencies to run the complete stack effectively.
+
+### Maven
+
+You can use the following command to check for outdated versions of direct dependencies:
+
+```sh
+./mvnw versions:display-dependency-updates
+```
+
+Please note that updating dependencies might require code changes.
+It is usually safe -- and strongly suggested -- to bump patch level versions.
+This is typically the third part of the version number, e.g., `1.2.3` -> `1.2.5`.
+Changes to the first two segments are often associated to breaking changes and need additional manual review and testing.
+
+The first part is referred to as *major*, the second is *minor* and the third as *incremental*.
+You can use `-DallowMinorUpdates=false` to limit the report to *incremental* updates,
+or `-DallowMajorUpdates=false` to include *minor* version updates as well.
+Omitting these parameters will result in a complete report, including *major* versions and all below.
+
+The version numbers are typically defined as properties in the respective `pom.xml` file.
+This allows us also to use the following command:
+
+```sh
+./mvnw versions:display-property-updates
+```
+
+A quick way to upgrade version numbers is the following command:
+
+```sh
+./mvnw versions:update-properties
+```
+
+Use parameters like `-DallowMinorUpdates=false` as described above if desired.
+
+Similarly to the dependency versions, the following command checks for Maven plugin updates -- updates for the build system:
+
+```sh
+./mvnw versions:display-plugin-updates
+```
+
+### Stack
+
 This backend requires a container runtime to manage SEE game server instances.
 Refer to the README in the parent directory for additional considerations.
 

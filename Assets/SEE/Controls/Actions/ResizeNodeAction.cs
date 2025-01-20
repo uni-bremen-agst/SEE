@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Rendering;
 using SEE.Game;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
@@ -323,27 +324,23 @@ namespace SEE.Controls.Actions
             private bool clicked = false;
 
             /// <summary>
-            /// The sprite handles are placed just outside the parent object to prevent z-fighting.
+            /// The last recorded rotation of the camera. Used to detect camera orientation changes.
             /// </summary>
-            private static readonly float halfAndABit = 0.5001f;
+            private Quaternion lastCameraRotation;
+
+            /// <summary>
+            /// The forward vector of the camera projected onto the horizontal plane.
+            /// Used for calculating movement relative to the camera's orientation.
+            /// </summary>
+            private Vector3 cameraPlanarForward;
+
+            /// <summary>
+            /// The right vector of the camera projected onto the horizontal plane.
+            /// Used for calculating movement relative to the camera's orientation.
+            /// </summary>
+            private Vector3 cameraPlanarRight;
 
             #region Configurations
-
-            /// <summary>
-            /// The minimal size of a node in world space.
-            /// </summary>
-            private static readonly Vector3 minSize = new (0.06f, 0.001f, 0.06f);
-
-            /// <summary>
-            /// The minimal world-space distance between nodes while resizing.
-            /// </summary>
-            private const float padding = 0.004f;
-
-            /// <summary>
-            /// A small offset is used as a difference between the detection and the set value
-            /// to prevent instant re-detection.
-            /// </summary>
-            private const float detectionOffset = 0.0001f;
 
             /// <summary>
             /// The size of the handles.
@@ -443,82 +440,64 @@ namespace SEE.Controls.Actions
             /// </summary>
             private void InitHandles()
             {
-                handles = new Dictionary<GameObject, Vector3>();
-
                 Vector3[] directions = new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back,
                                                Vector3.right + Vector3.forward, Vector3.right + Vector3.back,
                                                Vector3.left + Vector3.forward, Vector3.left + Vector3.back };
-                Vector3 position = transform.position;
-                Vector3 size = gameObject.WorldSpaceSize();
-                foreach (Vector3 direction in directions)
-                {
-                    handles[CreateHandle(direction, position, size)] = direction;
-                }
-                GameObject upDownHandle = CreateHandle(Vector3.up, position, size);
+                Vector3 parentPosition = transform.position;
+                Vector3 parentSize = gameObject.WorldSpaceSize();
+                float yPos = parentPosition.y + 0.5f * parentSize.y + SpatialMetrics.PlacementOffset;
+                handles = directions.ToDictionary(CreateHandle);
+                GameObject upDownHandle = CreateHandle(Vector3.up);
                 upDownHandleTransform = upDownHandle.transform;
                 handles[upDownHandle] = Vector3.up;
-            }
 
-            /// <summary>
-            /// Creates a resize handle game object at the appropriate position.
-            /// </summary>
-            /// <param name="direction">The direction for which the handle is created.</param>
-            /// <param name="parentWorldPosition">The cached parent world-space position.</param>
-            /// <param name="parentWorldScale">The cached parent world-space scale.</param>
-            /// <returns>The handle game object.</returns>
-            private GameObject CreateHandle(Vector3 direction, Vector3 parentWorldPosition, Vector3 parentWorldScale)
-            {
-                GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
-                handle.transform.localScale = handleScale;
 
-                Material material;
-                if (direction == Vector3.up)
+                /// <summary>
+                /// Creates a resize handle game object at the appropriate position.
+                /// </summary>
+                /// <param name="direction">The direction for which the handle is created.</param>
+                /// <returns>The handle game object.</returns>
+                GameObject CreateHandle(Vector3 direction)
                 {
-                    handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                    Texture texture = LoadTexture(resizeArrowUpDownTexture);
-                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
-                }
-                else if (direction.x != 0f && direction.z != 0f)
-                {
-                    if (direction.x > 0f)
+                    GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
+                    handle.transform.localScale = handleScale;
+
+                    Material material;
+                    if (direction == Vector3.up)
                     {
-                        handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 90f : 180f, 0f);
+                        handle.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                        Texture texture = Resources.Load<Texture2D>(resizeArrowUpDownTexture);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
+                    }
+                    else if (direction.x != 0f && direction.z != 0f)
+                    {
+                        if (direction.x > 0f)
+                        {
+                            handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 90f : 180f, 0f);
+                        }
+                        else
+                        {
+                            handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
+                        }
+                        Texture texture = Resources.Load<Texture2D>(resizeArrowBottomRightTexture);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
                     }
                     else
                     {
-                        handle.transform.localRotation = Quaternion.Euler(0f, direction.z > 0f ? 0f : 270f, 0f);
+                        handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
+                        Texture texture = Resources.Load<Texture2D>(resizeArrowRightTexture);
+                        material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture);
                     }
-                    Texture texture = LoadTexture(resizeArrowBottomRightTexture);
-                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
-                }
-                else
-                {
-                    handle.transform.localRotation = Quaternion.Euler(0f, direction.x > 0f ? 180f : 0f + direction.z * 90f, 0f);
-                    Texture texture = LoadTexture(resizeArrowRightTexture);
-                    material = Materials.New(Materials.ShaderType.Sprite, Color.white, texture, (int)RenderQueue.Overlay);
-                }
-                handle.GetComponent<Renderer>().material = material;
-                handle.transform.localPosition = new(
-                        parentWorldPosition.x + 0.5f * parentWorldScale.x * direction.x,
-                        parentWorldPosition.y
-                                + (direction == Vector3.up ? 0.5f * parentWorldScale.y * direction.y + halfAndABit * handle.WorldSpaceSize().y : 0f),
-                        parentWorldPosition.z + 0.5f * parentWorldScale.z * direction.z);
+                    handle.GetComponent<Renderer>().material = material;
+                    handle.transform.localPosition = new(
+                            parentPosition.x + 0.5f * parentSize.x * direction.x,
+                            yPos + (direction == Vector3.up ? 0.5f * handle.WorldSpaceSize().y : 0f),
+                            parentPosition.z + 0.5f * parentSize.z * direction.z);
 
-                handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
-                handle.transform.SetParent(transform);
-                Portal.InheritPortal(from: transform.gameObject, to: handle);
-                return handle;
-
-                // Loads and return a texture with given path from the resources folder.
-                // If no such path exists, an exception is thrown.
-                static Texture LoadTexture(string path)
-                {
-                    Texture result = Resources.Load<Texture2D>(path);
-                    if (result == null)
-                    {
-                        throw new Exception($"Could not load texture at path: {path}");
-                    }
-                    return result;
+                    handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
+                    handle.transform.SetParent(transform);
+                    Portal.InheritPortal(from: transform.gameObject, to: handle);
+                    return handle;
                 }
             }
 
@@ -554,14 +533,14 @@ namespace SEE.Controls.Actions
 
                 // The height is updated during the resize process
                 upDownHandleTransform.localPosition = new(
-                        halfAndABit * directionToCamera.x,
+                        (0.5f + SpatialMetrics.PlacementOffset) * directionToCamera.x,
                         upDownHandleTransform.localPosition.y,
-                        halfAndABit * directionToCamera.z);
+                        (0.5f + SpatialMetrics.PlacementOffset) * directionToCamera.z);
 
 
+                // Swap Z and Y axes because the plane is rotated 90° on the X-axis to get it upright.
                 void flipScales()
                 {
-                    // Note: Z and Y axes are swapped because the plane is rotated 90° on the X-axis to get it upright.
                     upDownHandleTransform.localScale = new(
                             upDownHandleTransform.localScale.y,
                             upDownHandleTransform.localScale.x,
@@ -603,6 +582,7 @@ namespace SEE.Controls.Actions
                 }
 
                 // Calculate new scale and position
+                // TODO (#806): Make cursorMovement compatible with VR controls
                 Vector3 cursorMovement;
                 if (currentResizeStep.Up)
                 {
@@ -610,19 +590,39 @@ namespace SEE.Controls.Actions
                 }
                 else
                 {
-                    Vector3 hitPoint = targetObjectHit.Value.point;
-                    cursorMovement = Vector3.Scale(currentResizeStep.InitialHitPoint - hitPoint, currentResizeStep.Direction);
+                    // Update cached camera rotation if necessary
+                    if (!Equals(mainCameraTransform.rotation, lastCameraRotation))
+                    {
+                        // Is camera looking straight up or down?
+                        if (Mathf.Abs(Vector3.Dot(mainCameraTransform.forward, Vector3.up)) >= 1.0)
+                        {
+                            // Use the camera's right vector projected onto the horizontal plane
+                            cameraPlanarRight = Vector3.ProjectOnPlane(mainCameraTransform.right, Vector3.up).normalized;
+                            // Calculate forward based on right, ensuring it's perpendicular
+                            cameraPlanarForward = Vector3.Cross(Vector3.up, cameraPlanarRight).normalized * Mathf.Sign(mainCameraTransform.forward.y);
+                        }
+                        else
+                        {
+                            lastCameraRotation = mainCameraTransform.rotation;
+                            cameraPlanarForward = Vector3.ProjectOnPlane(mainCameraTransform.forward, Vector3.up).normalized;
+                            cameraPlanarRight = Vector3.Cross(Vector3.up, cameraPlanarForward).normalized;
+                        }
+                    }
+
+                    float deltaX = (currentResizeStep.InitialMousePosition.x - Input.mousePosition.x) * currentResizeStep.InvScreenHeight;
+                    float deltaY = (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) * currentResizeStep.InvScreenHeight;
+
+                    cursorMovement = new Vector3(
+                            (cameraPlanarRight.x * deltaX + cameraPlanarForward.x * deltaY) * currentResizeStep.Direction.x,
+                            0f,
+                            (cameraPlanarRight.z * deltaX + cameraPlanarForward.z * deltaY) * currentResizeStep.Direction.z);
                 }
                 Vector3 newLocalSize = currentResizeStep.InitialLocalSize - Vector3.Scale(currentResizeStep.LocalScaleFactor, cursorMovement);
                 Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition
                     - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
 
                 // Collect children
-                List<Transform> children = new(transform.childCount);
-                foreach (Transform child in transform)
-                {
-                    children.Add(child);
-                }
+                List<Transform> children = transform.Cast<Transform>().ToList();
 
                 Transform parent = transform.parent;
 
@@ -677,10 +677,10 @@ namespace SEE.Controls.Actions
                     {
                         Vector3 siblingSize = sibling.gameObject.LocalSize();
                         Vector3 siblingPos = sibling.localPosition;
-                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x + detectionOffset;
-                        otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x - detectionOffset;
-                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z + detectionOffset;
-                        otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z - detectionOffset;
+                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x;
+                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
                                 || bounds.Left > otherBounds.Right || bounds.Right < otherBounds.Left)
@@ -713,22 +713,22 @@ namespace SEE.Controls.Actions
                         {
                             if (currentResizeStep.Right)
                             {
-                                bounds.Right = otherBounds.Left - detectionOffset;
+                                bounds.Right = SEEMath.BitDecrement(otherBounds.Left);
                             }
                             else
                             {
-                                bounds.Left = otherBounds.Right + detectionOffset;
+                                bounds.Left = SEEMath.BitIncrement(otherBounds.Right);
                             }
                         }
                         else if (newLocalSize.z - overlap[1] > currentResizeStep.MinLocalSize.z)
                         {
                             if (currentResizeStep.Forward)
                             {
-                                bounds.Front = otherBounds.Back - detectionOffset;
+                                bounds.Front = SEEMath.BitDecrement(otherBounds.Back);
                             }
                             else
                             {
-                                bounds.Back = otherBounds.Front + detectionOffset;
+                                bounds.Back = SEEMath.BitIncrement(otherBounds.Front);
                             }
                         }
                     }
@@ -744,30 +744,30 @@ namespace SEE.Controls.Actions
                         // Child position and scale on common parent
                         Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                         Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
-                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x + detectionOffset;
-                        otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x - detectionOffset;
-                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z + detectionOffset;
-                        otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z - detectionOffset;
+                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x;
+                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
                         {
-                            bounds.Right = otherBounds.Right + detectionOffset;
+                            bounds.Right = SEEMath.BitIncrement(otherBounds.Right);
                         }
 
                         if (currentResizeStep.Left && bounds.Left > otherBounds.Left)
                         {
-                            bounds.Left = otherBounds.Left - detectionOffset;
+                            bounds.Left = SEEMath.BitDecrement(otherBounds.Left);
                         }
 
 
                         if (currentResizeStep.Forward && bounds.Front < otherBounds.Front)
                         {
-                            bounds.Front = otherBounds.Front + detectionOffset;
+                            bounds.Front = SEEMath.BitIncrement(otherBounds.Front);
                         }
 
                         if (currentResizeStep.Back && bounds.Back > otherBounds.Back)
                         {
-                            bounds.Back = otherBounds.Back - detectionOffset;
+                            bounds.Back = SEEMath.BitDecrement(otherBounds.Back);
                         }
                     }
 
@@ -809,23 +809,20 @@ namespace SEE.Controls.Actions
                 // Reparent children
                 foreach (Transform child in children)
                 {
-                    // Adapt position
-                    if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
-                    {
-                        // Reposition base handles
-                        child.localPosition = new(
-                                transform.localPosition.x + 0.5f * transform.localScale.x * direction.x,
-                                child.localPosition.y, // don't move handles up or down
-                                transform.localPosition.z + 0.5f * transform.localScale.z * direction.z);
-                    }
-                    else
-                    {
-                        // Adapt other children's position based on changed position and size
+                    // Adapt children's position based on changed position and size
                         bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
                         child.localPosition = new(
-                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x * currentResizeStep.Direction.x : 0f),
+                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x : 0f),
                                 child.localPosition.y + posDiff.y, // we always resize height in positive direction
-                                child.localPosition.z + (shift2D ? 0.5f * posDiff.z  * currentResizeStep.Direction.z : 0f));
+                                child.localPosition.z + (shift2D ? 0.5f * posDiff.z : 0f));
+
+                    // Fix base handle position
+                    if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
+                    {
+                        child.localPosition = new(
+                                transform.localPosition.x + 0.5f * transform.localScale.x * direction.x,
+                                child.localPosition.y,
+                                transform.localPosition.z + 0.5f * transform.localScale.z * direction.z);
                     }
 
                     child.SetParent(transform);
@@ -916,6 +913,11 @@ namespace SEE.Controls.Actions
                 public readonly bool Up;
 
                 /// <summary>
+                /// The inverse of the screen height. Cached for performance optimization in calculations.
+                /// </summary>
+                public readonly float InvScreenHeight;
+
+                /// <summary>
                 /// Initializes the struct.
                 /// </summary>
                 public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Transform transform)
@@ -937,64 +939,15 @@ namespace SEE.Controls.Actions
                         localScale.y / lossyScale.y,
                         localScale.z / lossyScale.z
                     );
-                    MinLocalSize = Vector3.Scale(minSize, LocalScaleFactor);
-                    LocalPadding = padding * LocalScaleFactor;
+                    MinLocalSize = Vector3.Scale(SpatialMetrics.MinNodeSize, LocalScaleFactor);
+                    LocalPadding = SpatialMetrics.Padding.x * LocalScaleFactor;
                     Left    = Direction.x < 0;
                     Right   = Direction.x > 0;
                     Back    = Direction.z < 0;
                     Forward = Direction.z > 0;
                     Up      = Direction.y > 0;
+                    InvScreenHeight = 1f / Screen.height;
                     IsSet = true;
-                }
-            }
-
-            /// <summary>
-            /// Data structure for 2-dimensional bounds.
-            /// </summary>
-            private struct Bounds2D
-            {
-                /// <summary>
-                /// The left side of the area.
-                /// </summary>
-                public float Left;
-                /// <summary>
-                /// The right side of the area.
-                /// </summary>
-                public float Right;
-                /// <summary>
-                /// The back side of the area.
-                /// </summary>
-                public float Back;
-                /// <summary>
-                /// The front side of the area.
-                /// </summary>
-                public float Front;
-
-                /// <summary>
-                /// Initializes the struct.
-                /// </summary>
-                public Bounds2D (float left, float right, float back, float front)
-                {
-                    Left = left;
-                    Right = right;
-                    Back = back;
-                    Front = front;
-                }
-
-                /// <summary>
-                /// Implicit conversion to string.
-                /// <summary>
-                public static implicit operator string(Bounds2D bounds)
-                {
-                    return bounds.ToString();
-                }
-
-                /// <summary>
-                /// Returns a printable string with the struct's values.
-                /// <summary>
-                public override readonly string ToString()
-                {
-                    return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Bottom: {Back}, Top: {Front})";
                 }
             }
         }
