@@ -1,5 +1,6 @@
 using SEE.Controls;
 using SEE.Utils;
+using UnityEngine;
 
 namespace SEE.UI.PropertyDialog
 {
