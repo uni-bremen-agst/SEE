@@ -2,7 +2,6 @@
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using System;
 using UnityEngine;
@@ -12,7 +11,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
     /// <summary>
     /// This class manages the dialog for adding a city.
     /// </summary>
-    internal class CitySelectionProperty : HolisticMetricsDialog
+    internal class CitySelectionProperty : BasePropertyDialog
     {
         /// <summary>
         /// The city which the player selected.
@@ -73,7 +72,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected city type in a
-        /// variable and set <see cref="HolisticMetricsDialog.GotInput"/> to true.
+        /// variable and set <see cref="BasePropertyDialog.GotInput"/> to true.
         /// </summary>
         private void OnConfirm()
         {
@@ -100,7 +99,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// </summary>
         /// <param name="cityType">If given and not yet fetched, this will be the city type the player selected.</param>
         /// <param name="cityName">If given and not yet fetched, this will be the city name the player chosen.</param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetCity(out CityTypes? cityType, out string cityName)
         {
             if (GotInput)

@@ -1,13 +1,12 @@
 using SEE.Controls;
 using SEE.Utils;
-using UnityEngine;
 
-namespace SEE.UI.PropertyDialog.HolisticMetrics
+namespace SEE.UI.PropertyDialog
 {
     /// <summary>
-    /// Base class for most dialogs needed for the menu for the holistic metrics framework.
+    /// Base class for most dialogs needed for the menu.
     /// </summary>
-    internal abstract class HolisticMetricsDialog
+    internal abstract class BasePropertyDialog
     {
         /// <summary>
         /// Whether this dialog has some complete user input that hasn't yet been fetched.

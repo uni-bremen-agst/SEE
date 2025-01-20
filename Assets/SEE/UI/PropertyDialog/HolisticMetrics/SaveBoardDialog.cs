@@ -8,7 +8,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for saving a board from the scene to a configuration file.
     /// </summary>
-    internal class SaveBoardDialog : HolisticMetricsDialog
+    internal class SaveBoardDialog : BasePropertyDialog
     {
         /// <summary>
         /// The name of the file in which to store the <see cref="BoardConfig"/>.
@@ -91,11 +91,11 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
-        /// <param name="filenameOut">If <see cref="HolisticMetricsDialog.GotInput"/>, this will be the
+        /// <param name="filenameOut">If <see cref="BasePropertyDialog.GotInput"/>, this will be the
         /// <see cref="filename"/>. Otherwise null.</param>
-        /// <param name="widgetsManagerOut">If <see cref="HolisticMetricsDialog.GotInput"/>, this will be the
+        /// <param name="widgetsManagerOut">If <see cref="BasePropertyDialog.GotInput"/>, this will be the
         /// <see cref="widgetsManager"/>. Otherwise null.</param>
-        /// <returns><see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool GetUserInput(out string filenameOut, out WidgetsManager widgetsManagerOut)
         {
             if (GotInput)

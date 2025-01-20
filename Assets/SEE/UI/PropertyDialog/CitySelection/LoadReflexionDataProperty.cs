@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.Game.City;
-using SEE.UI.PropertyDialog.HolisticMetrics;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
@@ -11,7 +10,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
     /// <summary>
     /// This class manages the dialog for loading the data for a reflexion city.
     /// </summary>
-    internal class LoadReflexionDataProperty : HolisticMetricsDialog
+    internal class LoadReflexionDataProperty : BasePropertyDialog
     {
         /// <summary>
         /// The data GXL which the player selected.
@@ -98,7 +97,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected city type in a
-        /// variable and set <see cref="HolisticMetricsDialog.GotInput"/> to true.
+        /// variable and set <see cref="BasePropertyDialog.GotInput"/> to true.
         /// </summary>
         private void OnConfirm()
         {
@@ -121,7 +120,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// </summary>
         /// <param name="gxl">The fetched gxl as data path.</param>
         /// <param name="projectFolder">The fetched project folder as data path.</param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetImplementationDataPaths(out DataPath gxl, out DataPath projectFolder)
         {
             if (GotInput && inputType == InputType.Implementation)
@@ -140,7 +139,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// Fetches the architecture data given by the player.
         /// </summary>
         /// <param name="gxl">The fetched gxl as data path.</param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetArchitectureDataPath(out DataPath gxl)
         {
             if (GotInput && inputType == InputType.Architecture)

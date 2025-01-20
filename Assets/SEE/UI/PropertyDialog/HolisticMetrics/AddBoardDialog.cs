@@ -6,7 +6,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for adding a metrics board to the scene.
     /// </summary>
-    internal class AddBoardDialog : HolisticMetricsDialog
+    internal class AddBoardDialog : BasePropertyDialog
     {
         /// <summary>
         /// The input field where the player can enter a name for the new board.
@@ -60,7 +60,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         /// <param name="name">The name given by the player, if present and not yet fetched. Otherwise a dummy value.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetName(out string name)
         {
             if (GotInput)
