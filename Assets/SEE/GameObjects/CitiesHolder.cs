@@ -1,26 +1,27 @@
-﻿using SEE.Game.City;
+﻿using MoreLinq;
+using SEE.Game.City;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// This component provides a list of all game objects to which
-    /// an <see cref="AbstractSEECity"/> component can be attached.
+    /// This component provides a map that assigns each key (tableID) to the respective game object,
+    /// on which an <see cref="AbstractSEECity"/> component can be attached.
     /// </summary>
     public class CitiesHolder : MonoBehaviour
     {
         /// <summary>
-        /// The tuple list of all cities (the game objects assigned to <see cref="AbstractSEECity"/>)
-        /// and their associated tables.
+        /// The map of all tables (keys) and their associated cities
+        /// (the game objects assigned to <see cref="AbstractSEECity"/>).
         /// </summary>
-        public readonly IList<(GameObject city, GameObject table)> Cities;
+        public readonly Dictionary<string, GameObject> Cities;
 
         /// <summary>
         /// The constructor.
-        /// Creates a new list for the cities, table pairs.
+        /// Creates a new map for the table, city pairs.
         /// </summary>
-        public CitiesHolder() => Cities = new List<(GameObject city, GameObject table)>();
+        public CitiesHolder() => Cities = new();
 
         /// <summary>
         /// Finds the city game object corresponding to the associated <paramref name="tableID"/>.
@@ -29,15 +30,7 @@ namespace SEE.GameObjects
         /// <returns>The city game object, it found, otherwise null.</returns>
         public GameObject Find(string tableID)
         {
-            GameObject result = null;
-            foreach((GameObject city, GameObject table) in Cities)
-            {
-                if (table.name == tableID)
-                {
-                    result = city;
-                }
-            }
-            return result;
+            return Cities[tableID];
         }
 
         /// <summary>
@@ -48,7 +41,7 @@ namespace SEE.GameObjects
         /// <returns>True, if already a city with that name exists, otherwise false.</returns>
         public bool IsNameAlreadyUsed(string name)
         {
-            foreach((GameObject city, _) in Cities)
+            foreach(GameObject city in Cities.Values)
             {
                 if (city.name.ToLower() == name.ToLower())
                 {

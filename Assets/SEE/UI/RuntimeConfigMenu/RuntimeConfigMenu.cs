@@ -132,7 +132,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 return citiesHolder.Cities
-                    .Select(pair => pair.city.GetComponent<AbstractSEECity>())
+                    .Select(pair => pair.Value.GetComponent<AbstractSEECity>())
                     .Where(component => component != null)
                     .OrderBy(go => go.name).ToArray();
             }

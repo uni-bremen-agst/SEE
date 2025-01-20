@@ -77,7 +77,7 @@ namespace SEE.GameObjects
                 await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
                 if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citysHolder))
                 {
-                    citysHolder.Cities.Add((gameObject, transform.parent.gameObject));
+                    citysHolder.Cities.Add(transform.parent.name, gameObject);
                 }
             }
         }
