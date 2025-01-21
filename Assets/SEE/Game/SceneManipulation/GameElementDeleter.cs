@@ -105,6 +105,10 @@ namespace SEE.Game.SceneManipulation
                             deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                         }
+                        if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                        {
+                            runtimeConfigMenu.BlockOpening();
+                        }
                         SubgraphMemento subgraphMemento = null;
                         return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }

@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
+using SEE.UI.Notification;
 using SEE.Utils;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -39,6 +39,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// If the menu needs a rebuild.
         /// </summary>
         private bool needsRebuild;
+
+        /// <summary>
+        /// Indicator of whether opening the menu should be blocked.
+        /// This is only the case during the deletion process.
+        /// </summary>
+        private bool blockOpening;
 
         /// <summary>
         /// Instantiates the tab menu for each city.
@@ -93,6 +99,11 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             if (SEEInput.ToggleConfigMenu())
             {
+                if (blockOpening)
+                {
+                    ShowNotification.Warn("Menu opening is blocked.", "A deletion process is in progress, and therefore the menu cannot be opened.");
+                    return;
+                }
                 if (cityMenus.Length <= currentCity)
                 {
                     currentCity = cityMenus.Length - 1;
@@ -157,7 +168,16 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void PerformRebuildOnNextOpening()
         {
+            blockOpening = false;
             needsRebuild = true;
+        }
+
+        /// <summary>
+        /// Sets the notification that the opening of the menu is blocked.
+        /// </summary>
+        public void BlockOpening()
+        {
+            blockOpening= true;
         }
 
         /// <summary>
