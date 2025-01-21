@@ -1,12 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.SceneManipulation
@@ -51,11 +55,13 @@ namespace SEE.Game.SceneManipulation
         /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
         /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
         /// neither a node nor an edge</exception>
-        public static (GraphElementsMemento, ISet<GameObject>) Delete(GameObject deletedObject)
+        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject)
         {
+            Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
             if (deletedObject.CompareTag(Tags.Edge))
             {
-                return DeleteEdge(deletedObject);
+                (GraphElementsMemento gem, ISet<GameObject> setGO) = DeleteEdge(deletedObject);
+                return (gem, setGO, deletedNodeTypes);
             }
             else if (deletedObject.CompareTag(Tags.Node))
             {
@@ -66,27 +72,122 @@ namespace SEE.Game.SceneManipulation
                 }
                 else
                 {
-                    if (deletedNode.IsInArchitecture())
+                    // Architecture and implementation root nodes should only be cleared (all children deleted)
+                    // instead of deleting the entire node, as it is not possible to add new architecture or
+                    // implementation root nodes.
+                    if (deletedNode.IsArchitectureOrImplementationRoot())
                     {
-                        // We first need to remove any mapping that exists to this architecture node.
-                        // This triggers the `ReflexionVisualization` observer.
-                        // If we didn't do this, the implementation node (whose GameObject descends deletedObject)
-                        // would also get deleted along with the architecture node.
-                        deletedNode.Incomings.Where(x => x.HasSupertypeOf(ReflexionGraph.MapsToType)).ToList()
-                                   .ForEach(deletedNode.ItsGraph.RemoveEdge);
+                        IEnumerable<Node> children = deletedNode.IsInArchitecture() ?
+                            deletedNode.ItsGraph.Nodes().Where(node => node.IsInArchitecture()
+                                                                && !node.HasRootToogle()
+                                                                && node.Parent != null
+                                                                && (!node.Parent.IsInArchitecture()
+                                                                    || node.Parent.IsArchitectureOrImplementationRoot())) :
+                            deletedNode.ItsGraph.Nodes().Where(node => node.IsInImplementation()
+                                                                && !node.HasRootToogle()
+                                                                && node.Parent != null
+                                                                && (!node.Parent.IsInImplementation()
+                                                                    || node.Parent.IsArchitectureOrImplementationRoot()));
+                        if (deletedNode.Children().Count() != children.Count()
+                            || deletedObject.transform.GetComponentsInChildren<NodeRef>().Count() != deletedNode.PostOrderDescendants().Count)
+                        {
+                            ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
+                            return (null, null, deletedNodeTypes);
+                        }
+                        Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
+                        deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
+                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        ISet<GameObject> deletedGameObjects = new HashSet<GameObject>();
+                        foreach (Node child in deletedNode.Children().ToList())
+                        {
+                            (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
+                            deletedGameObjects.UnionWith(deleted);
+                            deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        }
+                        SubgraphMemento subgraphMemento = null;
+                        return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }
-                    // Note: DeleteTree(deletedObject) assumes that the nodes are still
-                    // in the underlying graph, that is why we must call deletedNode.DeleteTree()
-                    // after DeleteTree(deletedObject).
-                    // TODO: Rather than call DeleteTree, this executor should subscribe as an observer to the Graph.
-                    ISet<GameObject> deletedGameObjects = DeleteTree(deletedObject);
-                    SubgraphMemento subgraphMemento = deletedNode.DeleteTree();
-                    return (subgraphMemento, deletedGameObjects);
+                    else
+                    {
+                        if (deletedNode.IsInArchitecture())
+                        {
+                            // We first need to remove any mapping that exists to this architecture node.
+                            // This triggers the `ReflexionVisualization` observer.
+                            // If we didn't do this, the implementation node (whose GameObject descends deletedObject)
+                            // would also get deleted along with the architecture node.
+                            deletedNode.Incomings.Where(x => x.HasSupertypeOf(ReflexionGraph.MapsToType)).ToList()
+                                       .ForEach(deletedNode.ItsGraph.RemoveEdge);
+                        }
+                        // Note: DeleteTree(deletedObject) assumes that the nodes are still
+                        // in the underlying graph, that is why we must call deletedNode.DeleteTree()
+                        // after DeleteTree(deletedObject).
+                        // TODO: Rather than call DeleteTree, this executor should subscribe as an observer to the Graph.
+                        ISet<GameObject> deletedGameObjects = DeleteTree(deletedObject);
+                        SubgraphMemento subgraphMemento = deletedNode.DeleteTree();
+                        return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
+                    }
                 }
             }
             else
             {
                 throw new ArgumentException($"Game object {deletedObject.name} must be a node or edge.");
+            }
+        }
+
+
+        /// <summary>
+        /// Identifies the node types belonging to this subgraph and removes them from the graph.
+        /// </summary>
+        /// <param name="root">The root of this subgraph.</param>
+        private static Dictionary<string, VisualNodeAttributes> CaptureNodeTypesToRemove(Node root)
+        {
+            Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
+            IEnumerable<string> typesToRemove = GetNodeTypesFromSubgraph(root);
+            SEEReflexionCity city = root.GameObject().ContainingCity<SEEReflexionCity>();
+            IEnumerable<string> remainingTypes = GetRemainingGraphNodeTypes(root, city);
+            IEnumerable<string> typesDifference = typesToRemove.Except(remainingTypes);
+            typesDifference.ForEach(type =>
+            {
+                if (city.NodeTypes.TryGetValue(type, out VisualNodeAttributes visualNodeAttribute))
+                {
+                    deletedNodeTypes.Add(type, visualNodeAttribute);
+                }
+            });
+            if (root.Children().Count > 0)
+            {
+                RemoveTypesAfterDeletion().Forget();
+            }
+            return deletedNodeTypes;
+
+            async UniTask RemoveTypesAfterDeletion()
+            {
+                GameObject firstChild = root.Children().First()?.GameObject();
+                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
+                typesDifference.ForEach(type =>
+                {
+                    city.NodeTypes.Remove(type);
+                });
+                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                }
+            }
+
+            IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph)
+            {
+                return subgraph.PostOrderDescendantsWithoutItself().Select(node => node.Type).Distinct();
+            }
+
+            IEnumerable<string> GetRemainingGraphNodeTypes(Node subgraph, SEEReflexionCity city)
+            {
+                /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.Nodes()"/>.
+                /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> or <see cref="ReflexionGraph.ImplementationRoot"/> is used,
+                /// it doesn't work because the children are not added to these root nodes reference.
+                return subgraph.Type == ReflexionGraph.ArchitectureType ?
+                    GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID))
+                    : GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID));
             }
         }
 

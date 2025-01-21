@@ -119,7 +119,7 @@ namespace SEE.Controls.Actions
         /// them to be restored.
         /// This is needed only in the case of deleting an implementation or architecture root.
         /// </summary>
-        private readonly Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
+        private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
 
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
@@ -168,105 +168,19 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-
-                // Architecture and implementation root nodes should only be cleared (all children deleted)
-                // instead of deleting the entire node, as it is not possible to add new architecture or
-                // implementation root nodes.
-                if (go.IsArchitectureOrImplementationRoot())
+                new DeleteNetAction(go.name).Execute();
+                (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                if (deleted == null)
                 {
-                    Node root = go.GetNode();
-                    IEnumerable<Node> children = root.IsInArchitecture() ?
-                        root.ItsGraph.Nodes().Where(node => node.IsInArchitecture()
-                                                            && !node.HasRootToogle()
-                                                            && node.Parent != null
-                                                            && (!node.Parent.IsInArchitecture()
-                                                                || node.Parent.IsArchitectureOrImplementationRoot())) :
-                        root.ItsGraph.Nodes().Where(node => node.IsInImplementation()
-                                                            && !node.HasRootToogle()
-                                                            && node.Parent != null
-                                                            && (!node.Parent.IsInImplementation()
-                                                                || node.Parent.IsArchitectureOrImplementationRoot()));
-                    if (root.Children().Count() != children.Count()
-                        || go.transform.GetComponentsInChildren<NodeRef>().Count() != root.PostOrderDescendants().Count)
-                    {
-                        ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
-                        continue;
-                    }
-                    CaptureNodeTypesToRemove(root);
-                    foreach (Node child in root.Children().ToList())
-                    {
-                        new DeleteNetAction(child.GameObject().name).Execute();
-                        (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(child.GameObject());
-                        deletedGameObjects.UnionWith(deleted);
-                    }
-                    /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                    {
-                        runtimeConfigMenu.PerformRebuildOnNextOpening();
-                    }
+                    continue;
                 }
-                else
-                {
-                    new DeleteNetAction(go.name).Execute();
-                    (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
-                    deletedGameObjects.UnionWith(deleted);
-                }
+                deletedGameObjects.UnionWith(deleted);
+                deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             return true;
-        }
-
-        /// <summary>
-        /// Identifies the node types belonging to this subgraph and removes them from the graph.
-        /// </summary>
-        /// <param name="root">The root of this subgraph.</param>
-        /// <param name="rememberRemovedNodeTypes">Whether the deleted node types need to be remembered.
-        /// Should be switchable for the redo case.</param>
-        private void CaptureNodeTypesToRemove(Node root, bool rememberRemovedNodeTypes = true)
-        {
-            IEnumerable<string> typesToRemove = GetNodeTypesFromSubgraph(root);
-            SEEReflexionCity city = root.GameObject().ContainingCity<SEEReflexionCity>();
-            IEnumerable<string> remainingTypes = GetRemainingGraphNodeTypes(root, city);
-            IEnumerable<string> typesDifference = typesToRemove.Except(remainingTypes);
-            typesDifference.ForEach(type =>
-            {
-                if (rememberRemovedNodeTypes && city.NodeTypes.TryGetValue(type, out VisualNodeAttributes visualNodeAttribute))
-                {
-                    deletedNodeTypes.Add(type, visualNodeAttribute);
-                }
-            });
-            if (root.Children().Count > 0)
-            {
-                RemoveTypesAfterDeletion().Forget();
-            }
-            return;
-
-            async UniTask RemoveTypesAfterDeletion()
-            {
-                GameObject firstChild = root.Children().First()?.GameObject();
-                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
-                typesDifference.ForEach(type =>
-                {
-                    city.NodeTypes.Remove(type);
-                    new RemoveNodeTypeNetAction(city.transform.parent.name, type).Execute();
-                });
-            }
-
-            IEnumerable<string> GetNodeTypesFromSubgraph(Node subgraph)
-            {
-                return subgraph.PostOrderDescendantsWithoutItself().Select(node => node.Type).Distinct();
-            }
-
-            IEnumerable<string> GetRemainingGraphNodeTypes(Node subgraph, SEEReflexionCity city)
-            {
-                /// Attention: At this point, the root nodes must come from the graph's nodes list <see cref="Graph.Nodes()"/>.
-                /// If the <see cref="ReflexionGraph.ArchitectureRoot"/> or <see cref="ReflexionGraph.ImplementationRoot"/> is used,
-                /// it doesn't work because the children are not added to these root nodes reference.
-                return subgraph.Type == ReflexionGraph.ArchitectureType ?
-                    GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ImplementationRoot.ID))
-                    : GetNodeTypesFromSubgraph(city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID));
-            }
         }
 
         /// <summary>
@@ -335,26 +249,8 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 #pragma warning disable VSTHRD110
-                if (go.IsArchitectureOrImplementationRoot())
-                {
-                    Node root = go.GetNode();
-                    CaptureNodeTypesToRemove(root, false);
-                    foreach (Node child in root.Children().ToList())
-                    {
-                        new DeleteNetAction(child.GameObject().name).Execute();
-                        GameElementDeleter.Delete(child.GameObject());
-                    }
-                    /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                    {
-                        runtimeConfigMenu.PerformRebuildOnNextOpening();
-                    }
-                }
-                else
-                {
-                    new DeleteNetAction(go.name).Execute();
-                    GameElementDeleter.Delete(go);
-                }
+                new DeleteNetAction(go.name).Execute();
+                GameElementDeleter.Delete(go);
 #pragma warning restore VSTHRD110
             }
         }
