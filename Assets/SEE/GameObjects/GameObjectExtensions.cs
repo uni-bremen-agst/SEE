@@ -540,6 +540,33 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the bounds of the given <paramref name="gameObject"/> in its own
+        /// local coordinate system.
+        /// <para>
+        /// Note: A primitive cube has a size of (1,1,1), and a coordinate center (pivot)
+        /// of (0,0,0).
+        /// However, that does not apply for all primitives or models in general.
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">The game object.</param>
+        /// <returns>Local-space bounds of <paramref name="gameObject"/>.</returns>
+        public static Bounds LocalBounds(this GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out MeshFilter meshFilter))
+            {
+                return meshFilter.sharedMesh.bounds;
+            }
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return new(
+                        gameObject.transform.InverseTransformPoint(renderer.bounds.center),
+                        gameObject.transform.InverseTransformVector(renderer.bounds.size));
+            }
+            // This fallback works for uniform primitives like cubes, but not for non-uniforms like cylinders.
+            return new(Vector3.zero, Vector3.one);
+        }
+
+        /// <summary>
         /// Returns true if this <paramref name="block"/> is within the spatial area of <paramref name="parentBlock"/>,
         /// that is, if the bounding box of <paramref name="block"/> plus the extra padding <paramref name="outerEdgeMargin"/>
         /// is fully contained in the bounding box of <paramref name="parentBlock"/>.
@@ -1064,10 +1091,10 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Checks if <paramref name="gameObject"/> overlaps with any other direct child node of its parent.
+        /// Checks if <paramref name="gameObject"/> overlaps with any other active direct child node of its parent.
         /// <para>
         /// Overlap is checked based on the <c>Collider</c> components. Objects with no <c>Collider</c>
-        /// component are ignored.
+        /// component and inactive nodes are ignored.
         /// </para>
         /// </summary>
         /// <remarks>
@@ -1075,7 +1102,7 @@ namespace SEE.GO
         /// </remarks>
         /// <param name="gameObject">The game object whose operator to retrieve.</param>
         /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <c>Collider</c> component,
-        /// or does not overlap with its siblings</returns>
+        /// or does not overlap with its siblings.</returns>
         /// <exception cref="InvalidOperationException">
         /// Thrown when the object the method is called on is not a node, i.e., has no <c>NodeRef</c>
         /// component.
@@ -1092,7 +1119,7 @@ namespace SEE.GO
             }
             foreach (Transform sibling in gameObject.transform.parent)
             {
-                if (sibling.gameObject == gameObject || !sibling.gameObject.HasNodeRef() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
+                if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
                 {
                     continue;
                 }

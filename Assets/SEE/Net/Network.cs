@@ -275,27 +275,42 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Name of command-line argument for room password <see cref="RoomPassword"/>.
+        /// Name of the command-line argument containing the room password (<see cref="RoomPassword"/>).
         /// </summary>
-        private const string passwordArgument = "--password";
-
+        private const string passwordArgumentName = "--password";
         /// <summary>
-        /// Name of command-line argument for UDP port <see cref="ServerPort"/>.
+        /// Name of the environment variable containing the room password (<see cref="RoomPassword"/>).
         /// </summary>
-        private const string portArgument = "--port";
+        private const string passwordVariableName = "SEE_SERVER_PASSWORD";
         /// <summary>
-        /// Name of command-line argument for backend domain URL  <see cref="BackendDomain"/>.
+        /// Name of the command-line argument containing the UDP port (<see cref="ServerPort"/>).
         /// </summary>
-        private const string domainArgument = "--host";
+        private const string portArgumentName = "--port";
         /// <summary>
-        /// Name of command-line argument for the server id  <see cref="ServerId"/>.
+        /// Name of the environment variable containing the UDP port (<see cref="ServerPort"/>).
         /// </summary>
-        private const string serverIdArgument = "--id";
+        private const string portVariableName = "SEE_SERVER_PORT";
         /// <summary>
-        /// Name of command-line argument for launching this Unity instance
+        /// Name of the command-line argument containing the backend domain URL (<see cref="BackendDomain"/>).
+        /// </summary>
+        private const string domainArgumentName = "--host";
+        /// <summary>
+        /// Name of the environment variable containing the backend domain URL (<see cref="BackendDomain"/>).
+        /// </summary>
+        private const string domainVariableName = "SEE_BACKEND_DOMAIN";
+        /// <summary>
+        /// Name of the command-line argument containing the the server id (<see cref="ServerId"/>).
+        /// </summary>
+        private const string serverIdArgumentName = "--id";
+        /// <summary>
+        /// Name of the environment variable containing the the server id (<see cref="ServerId"/>).
+        /// </summary>
+        private const string serverIdVariableName = "SEE_SERVER_ID";
+        /// <summary>
+        /// Name of the command-line argument for launching this Unity instance
         /// as a dedicated server.
         /// </summary>
-        private const string launchAsServerArgument = "--launch-as-server";
+        private const string launchAsServerArgumentName = "--launch-as-server";
 
         /// <summary>
         /// Makes sure that we have only one <see cref="Instance"/> and checks
@@ -315,6 +330,7 @@ namespace SEE.Net
 
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
+            CollectEnvironmentVariables();
 #if UNITY_EDITOR
             Debug.Log("Skipping parsing command-line parameters in Editor mode.\n");
 #else
@@ -323,10 +339,49 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// Processes and determines the values of the environment variables
+        /// <see cref="ServerPort"/>, <see cref="RoomPassword"/>, <see cref="BackendDomain"/>,
+        /// <see cref="ServerId"/>.
+        /// </summary>
+        private void CollectEnvironmentVariables()
+        {
+            string serverPort = Environment.GetEnvironmentVariable(portVariableName);
+            if (!string.IsNullOrWhiteSpace(serverPort))
+            {
+                try
+                {
+                    ServerPort = Int32.Parse(serverPort);
+                }
+                catch (FormatException _)
+                {
+                    Debug.LogWarning($"Server port passed via {portVariableName} environment variable is not a valid number.");
+                }
+            }
+
+            string roomPassword = Environment.GetEnvironmentVariable(passwordVariableName);
+            if (!string.IsNullOrWhiteSpace(roomPassword))
+            {
+                RoomPassword = roomPassword;
+            }
+
+            string backendDomain = Environment.GetEnvironmentVariable(domainVariableName);
+            if (!string.IsNullOrWhiteSpace(backendDomain))
+            {
+                BackendDomain = backendDomain;
+            }
+
+            string serverId = Environment.GetEnvironmentVariable(serverIdVariableName);
+            if (!string.IsNullOrWhiteSpace(serverId))
+            {
+                ServerId = serverId;
+            }
+        }
+
+        /// <summary>
         /// Processes and determines the values of the command-line arguments
         /// <see cref="ServerPort"/>, <see cref="RoomPassword"/>, <see cref="BackendDomain"/>,
         /// <see cref="ServerId"/>, and starts the server if the command-line argument
-        /// <see cref="launchAsServerArgument"/> is present.
+        /// <see cref="launchAsServerArgumentName"/> is present.
         /// </summary>
         /// <exception cref="ArgumentException">thrown if an option requiring a value does
         /// not have one</exception>
@@ -346,32 +401,32 @@ namespace SEE.Net
             {
                 switch (arguments[i])
                 {
-                    case portArgument:
-                        Debug.Log($"Found {portArgument} as parameter {i}.\n");
-                        CheckArgumentValue(arguments, i, portArgument);
+                    case portArgumentName:
+                        Debug.Log($"Found {portArgumentName} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, portArgumentName);
                         ServerPort = Int32.Parse(arguments[i + 1]);
                         i++; // skip one parameter
                         break;
-                    case passwordArgument:
-                        Debug.Log($"Found {passwordArgument} as parameter {i}.\n");
-                        CheckArgumentValue(arguments, i, passwordArgument);
+                    case passwordArgumentName:
+                        Debug.Log($"Found {passwordArgumentName} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, passwordArgumentName);
                         RoomPassword = arguments[i + 1];
                         i++; // skip one parameter
                         break;
-                    case domainArgument:
-                        Debug.Log($"Found {domainArgument} as parameter {i}.\n");
-                        CheckArgumentValue(arguments, i, domainArgument);
+                    case domainArgumentName:
+                        Debug.Log($"Found {domainArgumentName} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, domainArgumentName);
                         BackendDomain = arguments[i + 1];
                         i++; // skip one parameter
                         break;
-                    case serverIdArgument:
-                        Debug.Log($"Found {serverIdArgument} as parameter {i}.\n");
-                        CheckArgumentValue(arguments, i, serverIdArgument);
+                    case serverIdArgumentName:
+                        Debug.Log($"Found {serverIdArgumentName} as parameter {i}.\n");
+                        CheckArgumentValue(arguments, i, serverIdArgumentName);
                         ServerId = arguments[i + 1];
                         i++; // skip one parameter
                         break;
-                    case launchAsServerArgument:
-                        Debug.Log($"Found {launchAsServerArgument} as parameter {i}.\n");
+                    case launchAsServerArgumentName:
+                        Debug.Log($"Found {launchAsServerArgumentName} as parameter {i}.\n");
                         // This argument does not have a value. It works as a flag.
                         launchAsServer = true;
                         break;
