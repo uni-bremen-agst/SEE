@@ -211,10 +211,15 @@ namespace SEE.Controls.Actions
 
             void Delete()
             {
+                if (selectedObjects.Any(iO => iO.gameObject.IsArchitectureOrImplementationRoot()))
+                {
+                    ShowNotification.Info("Cannot clear in multiselection",
+                        "In multiselection mode, architecture and implementation roots cannot be cleared. They will be skipped.");
+                }
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.Delete);
                 DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject));
+                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject).Where(iO => !iO.IsArchitectureOrImplementationRoot()));
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
 
