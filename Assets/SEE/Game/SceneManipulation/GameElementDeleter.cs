@@ -4,6 +4,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -348,12 +349,34 @@ namespace SEE.Game.SceneManipulation
         /// <see cref="GameObjectFader"/> as alive again. That means to let
         /// them be set active, fade in and blink. All <paramref name="nodesOrEdges"/>
         /// are re-added to their original graph.
+        /// <paramref name="nodeTypes"/> will be added to the <see cref="AbstractSEECity.NodeTypes"/>.
         ///
         /// Assumption: The objects were set inactive.
         /// </summary>
         /// <param name="nodesOrEdges">nodes and edge to be marked as alive again</param>
-        public static void Revive(ISet<GameObject> nodesOrEdges)
+        /// <param name="nodeTypes">node types to be added.</param>
+        public static void Revive(ISet<GameObject> nodesOrEdges, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
+            if (nodeTypes != null && nodeTypes.Count > 0)
+            {
+                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                }
+                nodesOrEdges.ForEach(go =>
+                {
+                    if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
+                    {
+                        SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
+                        Node node = go.GetNode();
+                        if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
+                        {
+                            city.NodeTypes[node.Type] = nodeTypes[node.Type];
+                        }
+                    }
+                });
+            }
             RestoreGraph(nodesOrEdges);
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {

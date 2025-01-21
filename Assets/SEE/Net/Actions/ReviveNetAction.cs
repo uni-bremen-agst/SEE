@@ -1,4 +1,6 @@
-﻿using SEE.Game;
+﻿using Assets.SEE.Utils;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -24,6 +26,8 @@ namespace SEE.Net.Actions
         /// </summary>
         public string GameObjectIDList;
 
+        public string NodeTypeList;
+
         /// <summary>
         /// Creates a new <see cref="ReviveNetAction"/>.
         ///
@@ -37,9 +41,10 @@ namespace SEE.Net.Actions
         /// a node or edge that have to be revived</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
-        public ReviveNetAction(List<string> gameObjectIDs)
+        public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
+            NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
         }
 
         /// <summary>
@@ -58,7 +63,8 @@ namespace SEE.Net.Actions
         {
             ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
             ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-            GameElementDeleter.Revive(gameObjects);
+            Dictionary<string, VisualNodeAttributes> nodeTypes = NodeTypesSerializer.Unserialize(NodeTypeList);
+            GameElementDeleter.Revive(gameObjects, nodeTypes);
         }
     }
 }

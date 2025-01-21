@@ -212,28 +212,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-
-            /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-            if (hitGraphElements.Any(obj => obj.IsArchitectureOrImplementationRoot())
-                && LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-            {
-                runtimeConfigMenu.PerformRebuildOnNextOpening();
-            }
-            deletedGameObjects.ForEach(go =>
-            {
-                if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
-                {
-                    SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
-                    Node node = go.GetNode();
-                    if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
-                    {
-                        city.NodeTypes[node.Type] = deletedNodeTypes[node.Type];
-                        new AddNodeTypeNetAction(city.transform.parent.name, node.Type, deletedNodeTypes[node.Type]).Execute();
-                    }
-                }
-            });
-            GameElementDeleter.Revive(deletedGameObjects);
-            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
+            GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
+            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes).Execute();
         }
 
         /// <summary>
