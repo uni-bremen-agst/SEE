@@ -95,7 +95,7 @@ namespace SEE.Game
                 }
                 if (source.Parent != null)
                 {
-                    // If `AddChildInImplementation` fails, the source will be left without a parent, hence the if.
+                    // If `AddChild` fails, the source will be left without a parent, hence the if.
                     // TODO (#785): Implement a proper transaction model for the reflexion analysis.
                     reflexionCity.ReflexionGraph.Unparent(source);
                 }
