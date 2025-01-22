@@ -94,9 +94,14 @@ namespace SEE.Game.City
 
             // When we're initialized, we also convert all existing edges into meshes first.
             graph.Edges().ForEach(edges.Enqueue);
-            LoadingSpinner.ShowDeterminate(LoadingText, out Action<float> updateProgress);
             int totalEdges = edges.Count;
-            UpdateInitialEdgesProgress = remaining => updateProgress(1 - remaining / (float)totalEdges);
+            if (totalEdges > 0)
+            {
+                using (LoadingSpinner.ShowDeterminate(LoadingText, out Action<float> updateProgress))
+                {
+                    UpdateInitialEdgesProgress = remaining => updateProgress(1 - remaining / (float)totalEdges);
+                }
+            }
         }
 
         /// <summary>
