@@ -35,6 +35,24 @@ namespace SEE.Game.City
         private ReflexionVisualization visualization;
 
         /// <summary>
+        /// Indicatior of whether the initial reflexion city is being loaded.
+        /// This is important for the <see cref="Start"/> method of this class.
+        /// </summary>
+        private bool initialReflexionCity = false;
+
+        /// <summary>
+        /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
+        /// Regular loading of a city from files is not used for the initial reflexion city.
+        /// </summary>
+        protected override void Start()
+        {
+            if (!initialReflexionCity)
+            {
+                base.Start();
+            }
+        }
+
+        /// <summary>
         /// First, if a graph was already loaded, everything will be reset by calling <see cref="Reset"/>.
         /// Second, the graph data from the three GXL files are loaded. The loaded graph is available
         /// in <see cref="LoadedGraph"/> afterwards.
@@ -47,8 +65,7 @@ namespace SEE.Game.City
         public override async UniTask LoadDataAsync()
         {
             // Makes the necessary changes for the inital types of a reflexion city.
-            AddAndSetInitialType(ReflexionGraph.ArchitectureType, new(1.0f, 0.7569f, 0.0275f));
-            AddAndSetInitialType(ReflexionGraph.ImplementationType, new(0.3922f, 0.7843f, 0.3922f));
+            AddInitialSubrootTypes();
 
             if (LoadedGraph != null)
             {
@@ -79,6 +96,54 @@ namespace SEE.Game.City
             {
                 scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
+        }
+
+        /// <summary>
+        /// Loads the initial reflexion city.
+        /// </summary>
+        /// <param name="cityName">the name of the city.</param>
+        public void LoadInitial(string cityName)
+        {
+            initialReflexionCity = true;
+            AddInitialSubrootTypes();
+            AddAndSetInitialType(Graph.UnknownType, Color.magenta);
+            if (LoadedGraph != null)
+            {
+                Reset();
+            }
+            SetupInitialReflexionCity();
+            using (LoadingSpinner.ShowDeterminate($"Creating initial reflexion city \"{gameObject.name}\"...",
+                                                out Action<float> reportProgress))
+            {
+                void UpdateProgress(float progress)
+                {
+                    reportProgress(progress);
+                    ProgressBar = progress;
+                }
+
+                LoadedGraph = GetReflexionGraphProvider().ProvideInitial(cityName, this,
+                    UpdateProgress, cancellationTokenSource.Token);
+            }
+            visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+            visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+        }
+
+        /// <summary>
+        /// Sets the initial values of a reflexion city.
+        /// </summary>
+        private void SetupInitialReflexionCity()
+        {
+            DataProvider.Add(new ReflexionGraphProvider());
+            NodeLayoutSettings.Kind = NodeLayoutKind.Treemap;
+        }
+
+        /// <summary>
+        /// Adds the initial subroot node types for the architecture and implementation to the <see cref="AbstractSEECity.NodeTypes"/>.
+        /// </summary>
+        private void AddInitialSubrootTypes()
+        {
+            AddAndSetInitialType(ReflexionGraph.ArchitectureType, new(1.0f, 0.7569f, 0.0275f));
+            AddAndSetInitialType(ReflexionGraph.ImplementationType, new(0.3922f, 0.7843f, 0.3922f));
         }
 
         /// <summary>

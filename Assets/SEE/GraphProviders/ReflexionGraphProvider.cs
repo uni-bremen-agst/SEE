@@ -76,16 +76,6 @@ namespace SEE.GraphProviders
                 mappingGraph = await LoadGraphAsync(Mapping, city, token);
                 changePercentage?.Invoke(1.0f);
             }
-
-            // If the initial reflexion city is loaded, replace the initial key value in the name
-            // with the selected city name.
-            if (city.ConfigurationPath.Path.Equals(new DataPath(CitySelectionManager.InitialReflexionCityPath).Path))
-            {
-                CityName = CityName.Replace(CitySelectionManager.Initial, city.gameObject.name);
-                architectureGraph.Name = architectureGraph.Name.Replace(CitySelectionManager.Initial, city.gameObject.name);
-                implementationGraph.Name = implementationGraph.Name.Replace(CitySelectionManager.Initial, city.gameObject.name);
-            }
-
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
@@ -105,6 +95,33 @@ namespace SEE.GraphProviders
                 throw new ArgumentNullException(nameof(path));
             }
             return await GraphReader.LoadAsync(path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
+        }
+
+        /// <summary>
+        /// Provides the initial reflexion city.
+        /// </summary>
+        /// <param name="cityName">the name for the city.</param>
+        /// <param name="city">the reflexion city.</param>
+        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
+        /// <param name="token">cancellation token</param>
+        /// <returns>the created <see cref="ReflexionGraph"/></returns>
+        /// <exception cref="ArgumentNullException">thrown, if the city is null.</exception>
+        public Graph ProvideInitial(string cityName, AbstractSEECity city,
+                                    Action<float> changePercentage = null, CancellationToken token = default)
+        {
+            if (city == null)
+            {
+                throw new ArgumentNullException(nameof(city));
+            }
+            string graphSuffix = $" ({cityName})";
+            CityName += graphSuffix;
+            Graph architectureGraph = new("", $"Compiler{graphSuffix}");
+            changePercentage?.Invoke(0.33f);
+            Graph implementationGraph = new("", $"Files{graphSuffix}");
+            changePercentage?.Invoke(0.66f);
+            Graph mappingGraph = new("", $"EmptyMapping{graphSuffix}");
+            changePercentage?.Invoke(1.0f);
+            return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
         #region Configuration file input/output

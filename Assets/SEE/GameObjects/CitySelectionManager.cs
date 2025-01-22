@@ -17,20 +17,6 @@ namespace SEE.GameObjects
     /// </summary>
     public class CitySelectionManager : MonoBehaviour
     {
-        #region Initial Cities Configuration Paths
-        /// <summary>
-        /// Path to the initial reflexion city.
-        /// </summary>
-        public static readonly string InitialReflexionCityPath
-            = Application.streamingAssetsPath + "/reflexion/initial/Reflexion.cfg";
-        #endregion
-
-        /// <summary>
-        /// Constant for the word "initial", required to replace this keyword with the city name.
-        /// The initial reflexion city graph uses this keyword as a placeholder for the selected city name in its files.
-        /// </summary>
-        public const string Initial = "initial";
-
         /// <summary>
         /// The progress states for selecting and adding a city to a table.
         /// </summary>
@@ -123,7 +109,7 @@ namespace SEE.GameObjects
                         switch (cityType)
                         {
                             case CityTypes.ReflexionCity:
-                                CreateReflexionCityAsync().Forget();
+                                CreateReflexionCity();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -192,16 +178,12 @@ namespace SEE.GameObjects
         /// <summary>
         /// Creates and loads an initial reflexion city.
         /// </summary>
-        /// <returns>Needed for asynchrony.</returns>
-        private async UniTask CreateReflexionCityAsync()
+        private void CreateReflexionCity()
         {
             SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
             gameObject.AddComponent<ReflexionVisualization>();
             gameObject.AddComponent<EdgeMeshScheduler>();
-
-            reflexionCity.ConfigurationPath = new(InitialReflexionCityPath);
-            reflexionCity.LoadConfiguration();
-            await reflexionCity.LoadDataAsync();
+            reflexionCity.LoadInitial(gameObject.name);
             reflexionCity.DrawGraph();
             progressState = ProgressState.ReflexionCity;
         }
