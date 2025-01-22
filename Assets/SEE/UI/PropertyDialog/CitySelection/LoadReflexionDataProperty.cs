@@ -15,12 +15,12 @@ namespace SEE.UI.PropertyDialog.CitySelection
         /// <summary>
         /// The data GXL which the player selected.
         /// </summary>
-        private static string dataGXL;
+        private static DataPath dataGXL;
 
         /// <summary>
         /// The implementation project folder.
         /// </summary>
-        private static string implProjectFolder;
+        private static DataPath implProjectFolder;
 
         /// <summary>
         /// This file picker lets the player pick an data GXL.
@@ -102,10 +102,10 @@ namespace SEE.UI.PropertyDialog.CitySelection
         private void OnConfirm()
         {
             SEEInput.KeyboardShortcutsEnabled = true;
-            dataGXL = selectedGXL.Value;
+            dataGXL = new DataPath(selectedGXL.Value);
             if (selectedProject != null)
             {
-                implProjectFolder = selectedProject.Value;
+                implProjectFolder = new DataPath(selectedProject.Value);
                 inputType = InputType.Implementation;
             } else
             {
@@ -125,8 +125,8 @@ namespace SEE.UI.PropertyDialog.CitySelection
         {
             if (GotInput && inputType == InputType.Implementation)
             {
-                gxl = new(dataGXL);
-                projectFolder = new(implProjectFolder);
+                gxl = dataGXL;
+                projectFolder = implProjectFolder;
                 GotInput = false;
                 return true;
             }
@@ -144,7 +144,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
         {
             if (GotInput && inputType == InputType.Architecture)
             {
-                gxl = new(dataGXL);
+                gxl = dataGXL;
                 GotInput = false;
                 return true;
             }
