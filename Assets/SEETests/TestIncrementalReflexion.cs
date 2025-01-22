@@ -475,7 +475,7 @@ namespace SEE.Tools.Architecture
             // We set up the reflexion graph as described in Figure 9 of the paper.
             MapIncrementally();
             ResetEvents();
-            graph.UnparentInImplementation(i[7]);
+            graph.Unparent(i[7]);
             Assert.AreEqual(changes
                           .OfType<HierarchyEvent>()
                           .Count(x => x.Child == i[7] && x.Parent == i[2] && x.Change == ChangeType.Removal && x.Affected == ReflexionSubgraphs.Implementation), 1);
@@ -563,7 +563,7 @@ namespace SEE.Tools.Architecture
 
             // Now we start testing what we actually want to check: Incremental changes to the arch hierarchy.
             ResetEvents();
-            graph.UnparentInArchitecture(a_2);
+            graph.Unparent(a_2);
             Assert.That(IsAbsent(a2, a3, call));
             Assert.That(IsDivergent(i2, i3, call));
             Assert.That(IsDivergent(i2, i4, call));
