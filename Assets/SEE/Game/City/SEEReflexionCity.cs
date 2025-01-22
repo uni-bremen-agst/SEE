@@ -106,7 +106,7 @@ namespace SEE.Game.City
         {
             initialReflexionCity = true;
             AddInitialSubrootTypes();
-            AddAndSetInitialType(Graph.UnknownType, Color.magenta);
+            AddUnkownNodeType();
             if (LoadedGraph != null)
             {
                 Reset();
@@ -135,6 +135,21 @@ namespace SEE.Game.City
         {
             DataProvider.Add(new ReflexionGraphProvider());
             NodeLayoutSettings.Kind = NodeLayoutKind.Treemap;
+        }
+
+        /// <summary>
+        /// Adds the <see cref="Graph.UnknownType"/> to the <see cref="AbstractSEECity.NodeTypes"/>
+        /// with a magenta color.
+        /// </summary>
+        private void AddUnkownNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.UnknownType, out VisualNodeAttributes _))
+            {
+                VisualNodeAttributes visualNodeAttributes = new();
+                visualNodeAttributes.ColorProperty.TypeColor = Color.magenta;
+                visualNodeAttributes.ShowNames = true;
+                NodeTypes[Graph.UnknownType] = visualNodeAttributes;
+            }
         }
 
         /// <summary>
