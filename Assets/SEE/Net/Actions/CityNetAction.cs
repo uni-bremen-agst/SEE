@@ -49,7 +49,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                throw new Exception($"The city can't be found because there is no CitieHolder component.");
+                throw new Exception($"The city can't be found because there is no {nameof(CitiesHolder)} component.");
             }
         }
 
