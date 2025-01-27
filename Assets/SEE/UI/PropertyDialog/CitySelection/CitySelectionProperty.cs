@@ -82,7 +82,7 @@ namespace SEE.UI.PropertyDialog.CitySelection
             }
             else if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder) && citiesHolder.IsNameAlreadyUsed(selectedName.Value))
             {
-                selectedName.ChangeToValidationFailed("Name is already in use. You need to enter an not used city name.");
+                selectedName.ChangeToValidationFailed("Name is already in use. You need to enter an unused city name.");
             }
             else
             {
