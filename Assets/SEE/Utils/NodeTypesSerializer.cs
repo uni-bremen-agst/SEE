@@ -1,10 +1,9 @@
-﻿using OpenCVForUnity.FaceModule;
-using SEE.Game.City;
+﻿using SEE.Game.City;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace Assets.SEE.Utils
+namespace SEE.Utils
 {
     /// <summary>
     /// A serializer for maps of node types.
