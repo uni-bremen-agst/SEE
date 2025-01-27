@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Utils;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
@@ -39,21 +38,12 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectIDs">the list of unique names of the gameObjects representing
         /// a node or edge that have to be revived</param>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
+        /// <exception cref="System.ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
         public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
             NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>
