@@ -13,8 +13,8 @@ namespace SEE.Game.City
     {
         /// <summary>
         /// Prepares the <paramref name="cityHolder"/> object for adding a new city.
-        /// For this, the object is named accordingly with <paramref name="cityName"/>
-        /// and if an <see cref="AbstractSEECity"/> is already present, it will be removed.
+        /// The <paramref name="cityHolder"/> will be named <paramref name="cityName"/>.
+        /// If an <see cref="AbstractSEECity"/> is already present, it will be removed.
         /// </summary>
         /// <param name="cityHolder">The game object to which the city should be attached.</param>
         /// <param name="cityName">The name for the city.</param>
