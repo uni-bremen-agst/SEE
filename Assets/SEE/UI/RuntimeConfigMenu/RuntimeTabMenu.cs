@@ -24,6 +24,9 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using SEE.GraphProviders;
 using Sirenix.OdinInspector;
+using Cysharp.Threading.Tasks;
+using DG.Tweening;
+using SEE.UI.PropertyDialog;
 
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -603,7 +606,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     // not supported
                     break;
                 case IDictionary dict:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, settingName == "NodeTypes");
+                    CreateDictAddEntry(parent, dict, settingName);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
@@ -659,14 +663,57 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
+        /// <param name="addVisibility">Enables the add button to add new items.</param>
         /// <returns>container for child settings</returns>
-        private static GameObject CreateNestedSetting(string settingName, GameObject parent)
+        private static GameObject CreateNestedSetting(string settingName, GameObject parent, bool addVisibility = false)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
             container.name = settingName;
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
+            if (addVisibility)
+            {
+                MoveAddButton().Forget();
+            }
             return container.transform.Find("Content").gameObject;
+
+            async UniTask MoveAddButton()
+            {
+                RectTransform titleCollapse = container.transform.Find("TitleCollapse").GetComponent<RectTransform>();
+                Transform addTransform = container.transform.Find("TitleCollapse/Add");
+                addTransform.gameObject.SetActive(true);
+                await UniTask.WaitUntil(() => titleCollapse.rect.width != 0)
+                    .ContinueWith(() => addTransform.DOLocalMoveX(titleCollapse.rect.width + titleCollapse.rect.x - 25, 0));
+            }
+        }
+
+        private void CreateDictAddEntry(GameObject parent, IDictionary dict, string settingName)
+        {
+            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("TitleCollapse/Add").GetComponent<ButtonManagerBasicIcon>();
+            addBtn.clickEvent.AddListener(() =>
+            {
+                switch (settingName)
+                {
+                    case "NodeTypes":
+                        AddNodeType().Forget();
+                        break;
+                    default:
+                        break;
+                }
+            });
+            return;
+            async UniTask AddNodeType()
+            {
+                AddNodeTypeProperty nodeTypeProperty = new();
+                nodeTypeProperty.Open(city);
+                string nodeTypeName = null;
+                await UniTask.WaitUntil(() => nodeTypeProperty.TryGetNodeTypeName(out nodeTypeName) || nodeTypeProperty.WasCanceled());
+                if (nodeTypeName != null)
+                {
+                    dict.Add(nodeTypeName, new VisualNodeAttributes());
+                    UpdateDictChildren(parent, dict);
+                }
+            }
         }
 
         /// <summary>
