@@ -11,12 +11,12 @@ namespace SEE.UI.PropertyDialog
     internal class AddNodeTypeProperty : BasePropertyDialog
     {
         /// <summary>
-        /// The node type name which the player entered.
+        /// The node-type name which the player entered.
         /// </summary>
-        private static string name;
+        private static string nodeType;
 
         /// <summary>
-        /// This input field where the player can enter a node type name.
+        /// This is the input field where the player can enter a node-type name.
         /// </summary>
         private StringProperty selectedName;
 
@@ -74,7 +74,7 @@ namespace SEE.UI.PropertyDialog
             else
             {
                 SEEInput.KeyboardShortcutsEnabled = true;
-                name = selectedName.Value;
+                nodeType = selectedName.Value;
                 GotInput = true;
                 Destroyer.Destroy(Dialog);
             }
@@ -89,7 +89,7 @@ namespace SEE.UI.PropertyDialog
         {
             if (GotInput)
             {
-                nodeTypeName = name;
+                nodeTypeName = nodeType;
                 GotInput = false;
                 return true;
             }
