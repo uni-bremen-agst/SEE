@@ -23,7 +23,6 @@ namespace SEE.GameObjects
         {
             Start,
             ChooseCity,
-            Finish,
         }
 
         /// <summary>
