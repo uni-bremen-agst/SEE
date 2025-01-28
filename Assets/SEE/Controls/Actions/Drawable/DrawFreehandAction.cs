@@ -151,7 +151,7 @@ namespace SEE.Controls.Actions.Drawable
                 }
 
                 /// This block is executed when the drawing should be completed.
-                if ((Queries.MouseUp(MouseButton.Left) || !Queries.MouseHold(MouseButton.Left))
+                if ((SEEInput.MouseUp(MouseButton.Left) || !SEEInput.MouseHold(MouseButton.Left))
                     && drawing)
                 {
                     return FinishDrawing();

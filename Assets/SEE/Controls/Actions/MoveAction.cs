@@ -100,10 +100,10 @@ namespace SEE.Controls.Actions
                 // User interacts with UI element
                 return false;
             }
-            bool mouseHeldDown = Queries.LeftMouseInteraction();
+            bool mouseHeldDown = SEEInput.LeftMouseInteraction();
             if (!grabbedObject.IsGrabbed) // grab object
             {
-                if ((Queries.LeftMouseDown() || (XRSEEActions.Selected && !activeAction)) && !ExecuteViaContextMenu)
+                if ((SEEInput.LeftMouseDown() || (XRSEEActions.Selected && !activeAction)) && !ExecuteViaContextMenu)
                 {
                     // User starts dragging the currently hovered object.
                     InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;

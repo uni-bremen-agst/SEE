@@ -1,5 +1,7 @@
-﻿using SEE.GO;
+﻿using SEE.GameObjects;
+using SEE.GO;
 using SEE.GO.Menu;
+using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;
 
 namespace SEE.Game
@@ -59,6 +61,54 @@ namespace SEE.Game
             if (surfaces == null)
             {
                 Debug.LogError($"Couldn't find component '{nameof(DrawableSurfaceRef)}' "
+                               + $"on local player named '{Instance.name}'.\n");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="RuntimeConfigMenu"/> attached to the local player <see cref="Instance"/>
+        /// or any of its descendants (including inactive ones).
+        /// </summary>
+        /// <param name="runtimeConfigMenu">the resulting <see cref="RuntimeConfigMenu"/>; null if none could be found</param>
+        /// <returns>true if a <see cref="RuntimeConfigMenu"/> could be found.</returns>
+        internal static bool TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu)
+        {
+            if (Instance == null)
+            {
+                Debug.LogError($"Local player is null'.\n");
+                runtimeConfigMenu = null;
+                return false;
+            }
+            runtimeConfigMenu = Instance.GetComponentInChildren<RuntimeConfigMenu>();
+            if (runtimeConfigMenu == null)
+            {
+                Debug.LogError($"Couldn't find component '{nameof(RuntimeConfigMenu)}' "
+                               + $"on local player named '{Instance.name}'.\n");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="CitiesHolder"/> attached to the local player <see cref="Instance"/>
+        /// or any of its descendants (including inactive ones).
+        /// </summary>
+        /// <param name="citiesHolder">the resulting <see cref="CitiesHolder"/>; null if none could be found</param>
+        /// <returns>true if a <see cref="CitiesHolder"/> could be found.</returns>
+        internal static bool TryGetCitiesHolder(out CitiesHolder citiesHolder)
+        {
+            if (Instance == null)
+            {
+                Debug.LogError($"Local player is null'.\n");
+                citiesHolder = null;
+                return false;
+            }
+            citiesHolder = Instance.GetComponentInChildren<CitiesHolder>();
+            if (citiesHolder == null)
+            {
+                Debug.LogError($"Couldn't find component '{nameof(CitiesHolder)}' "
                                + $"on local player named '{Instance.name}'.\n");
                 return false;
             }

@@ -12,6 +12,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// </summary>
         public override void ExecuteOnClient()
         {
+            base.ExecuteOnClient();
             RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncRemoveListElement?.Invoke(WidgetPath);
         }
     }

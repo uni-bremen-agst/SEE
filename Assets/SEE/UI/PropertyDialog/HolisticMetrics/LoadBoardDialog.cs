@@ -9,7 +9,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class manages the dialog for loading a board from a configuration file.
     /// </summary>
-    internal class LoadBoardDialog : HolisticMetricsDialog
+    internal class LoadBoardDialog : BasePropertyDialog
     {
         /// <summary>
         /// The name of the file which the player selected.
@@ -62,7 +62,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
 
         /// <summary>
         /// This method gets called when the player confirms the dialog. It will save the selected filename in a
-        /// variable and set <see cref="HolisticMetricsDialog.GotInput"/> to true.
+        /// variable and set <see cref="BasePropertyDialog.GotInput"/> to true.
         /// </summary>
         private void OnConfirm()
         {
@@ -77,7 +77,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </summary>
         /// <param name="nameOfFile">If given and not yet fetched, this will be the filename the player selected.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetFilename(out string nameOfFile)
         {
             if (GotInput)

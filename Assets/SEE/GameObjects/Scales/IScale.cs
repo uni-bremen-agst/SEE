@@ -281,5 +281,20 @@ namespace SEE.GO
                 Debug.Log("maximum of " + item.Key + ": " + item.Value + "\n");
             }
         }
+
+        /// <summary>
+        /// Updates the <see cref="Graph.MetricLevel"/> key in <see cref="MetricMaxima"/>
+        /// when the passed value is higher than the stored one.
+        /// This is needed to enable dynamic city creation.
+        /// </summary>
+        /// <param name="value">The node metric level value.</param>
+        public void UpdateMetricLevel(float value)
+        {
+            if (MetricMaxima.ContainsKey(Graph.MetricLevel)
+                && MetricMaxima[Graph.MetricLevel] < value)
+            {
+                MetricMaxima[Graph.MetricLevel] = value;
+            }
+        }
     }
 }

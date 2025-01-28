@@ -1,23 +1,29 @@
+using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.SceneManipulation;
+using SEE.GO;
+using SEE.GO.Menu;
+using SEE.Net.Actions;
+using SEE.Net.Actions.City;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PopupMenu;
+using SEE.UI.PropertyDialog.CitySelection;
+using SEE.UI.Window;
+using SEE.UI.Window.PropertyWindow;
+using SEE.UI.Window.TreeWindow;
+using SEE.Utils;
+using SEE.Utils.History;
+using SEE.Utils.Paths;
+using SEE.XR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.GO;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
-using SEE.UI.Window;
-using SEE.UI.Window.TreeWindow;
-using SEE.Utils;
 using UnityEngine;
-using SEE.Game.City;
-using SEE.Utils.History;
-using SEE.GO.Menu;
-using SEE.UI.Menu;
-using SEE.UI.Window.PropertyWindow;
-using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -75,17 +81,23 @@ namespace SEE.Controls.Actions
                         startMousePosition = Input.mousePosition;
                     }
                     multiselection = false;
-                    XRSEEActions.TooltipToggle = false;
-                    XRSEEActions.OnSelectToggle = true;
-                    onSelect = true;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
                 }
                 else
                 {
                     startObject = null;
                     multiselection = true;
-                    XRSEEActions.TooltipToggle = false;
-                    XRSEEActions.OnSelectToggle = true;
-                    onSelect = true;
+                    if (XRSEEActions.TooltipToggle)
+                    {
+                        XRSEEActions.TooltipToggle = false;
+                        XRSEEActions.OnSelectToggle = true;
+                        onSelect = true;
+                    }
                 }
             }
             if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
@@ -97,7 +109,8 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer
+                        || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
                         if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                         {
@@ -198,10 +211,15 @@ namespace SEE.Controls.Actions
 
             void Delete()
             {
+                if (selectedObjects.Any(iO => iO.gameObject.IsArchitectureOrImplementationRoot()))
+                {
+                    ShowNotification.Info("Cannot clear in multiselection",
+                        "In multiselection mode, architecture and implementation roots cannot be cleared. They will be skipped.");
+                }
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.Delete);
                 DeleteAction action = (DeleteAction)GlobalActionHistory.CurrentAction();
-                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject));
+                action.ContextMenuExecution(selectedObjects.Select(iO => iO.gameObject).Where(iO => !iO.IsArchitectureOrImplementationRoot()));
                 ExcecutePreviousActionAsync(action, previousAction).Forget();
             }
 
@@ -314,12 +332,53 @@ namespace SEE.Controls.Actions
         {
             IEnumerable<PopupMenuEntry> options
                 = GetCommonOptions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
+
             return options.Concat(graphElement switch
             {
-                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions),
+                Node node => GetNodeOptions(popupMenu, position, raycastHitPosition, node, gameObject, appendActions)
+                    .Concat(node.Type == ReflexionGraph.ImplementationType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Implementation", LoadImplementation, Icons.Upload, Priority: 3) }
+                        : new() { })
+                    .Concat(node.Type == ReflexionGraph.ArchitectureType && node.ItsGraph is ReflexionGraph
+                            && node.GameObject() != null && !node.GameObject().IsCodeCityDrawnAndActive() ?
+                        new List<PopupMenuEntry>() { new PopupMenuAction("Load Architecture", LoadArchitecture, Icons.Upload, Priority: 3) }
+                        : new() { }),
                 Edge edge => GetEdgeOptions(popupMenu, position, raycastHitPosition, edge, gameObject, appendActions),
                 _ => throw new ArgumentOutOfRangeException()
             });
+
+            void LoadImplementation()
+            {
+                LoadReflexionDataProperty dialog = new();
+                dialog.Open();
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            void LoadArchitecture()
+            {
+                LoadReflexionDataProperty dialog = new();
+                dialog.Open(false);
+                WaitForInputAsync(dialog).Forget();
+            }
+
+            async UniTask WaitForInputAsync(LoadReflexionDataProperty dialog)
+            {
+                await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
+                SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
+                if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
+                {
+                    city.LoadAndDrawSubgraphAsync(implGXL, projectFolder).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implGXL, projectFolder).Execute();
+
+                }
+
+                if (dialog.TryGetArchitectureDataPath(out DataPath archGXL))
+                {
+                    city.LoadAndDrawSubgraphAsync(archGXL).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, true, archGXL).Execute();
+                }
+            }
         }
 
         /// <summary>
@@ -358,7 +417,9 @@ namespace SEE.Controls.Actions
                 entries.Add(new PopupMenuHeading("Source: " + source, Priority: int.MaxValue));
                 entries.Add(new PopupMenuHeading("Target: " + target, Priority: int.MaxValue));
             }
-            entries.Add(new PopupMenuAction("Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+
+            entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
+                "Clear" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
@@ -401,7 +462,12 @@ namespace SEE.Controls.Actions
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
-                    ShowNotification.Warn("Forbidden!", "You can't delete a root node.");
+                    string deleteMessage = $"Do you really want to delete the city?\r\nThis action cannot be undone.";
+                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
+                    {
+                        GameElementDeleter.DeleteRoot(node.GameObject());
+                        new DeleteNetAction(graphElement.ID).Execute();
+                    }
                     return;
                 }
                 if (gameObject != null)
@@ -469,20 +535,20 @@ namespace SEE.Controls.Actions
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
         {
-                if (appendActions != null)
-                {
-                    List<PopupMenuAction> actions = new(GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                        graphElement, gameObject, appendActions)
-                        .OfType<PopupMenuAction>()
-                        .Where(x => !x.Name.Contains("TreeWindow")));
-                    actions.AddRange(appendActions);
-                    UpdateEntries(popupMenu, position, actions);
-                }
-                else
-                {
-                    UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition,
-                        graphElement, gameObject));
-                }
+            if (appendActions != null)
+            {
+                List<PopupMenuAction> actions = new(GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject, appendActions)
+                    .OfType<PopupMenuAction>()
+                    .Where(x => !x.Name.Contains("TreeWindow")));
+                actions.AddRange(appendActions);
+                UpdateEntries(popupMenu, position, actions);
+            }
+            else
+            {
+                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                    graphElement, gameObject));
+            }
         }
 
         /// <summary>
@@ -589,9 +655,12 @@ namespace SEE.Controls.Actions
                 }
             }
 
-            return node.IsRoot() ? new List<PopupMenuEntry>() { } :
-                new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
-                    "Node Options", Icons.Node, actions, node, gameObject, 2, appendActions) };
+            return new List<PopupMenuEntry>() { CreateSubMenu(popupMenu, position, raycastHitPosition,
+                    "Node Options", Icons.Node,
+                    node.IsRoot()?
+                        new List<PopupMenuEntry>() {new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1)}
+                        : actions,
+                    node, gameObject, 2, appendActions) };
 
             void MoveNode()
             {

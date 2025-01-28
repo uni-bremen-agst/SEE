@@ -82,7 +82,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// either into <see cref="ValueHolder.CurrentPrimaryColor"/> or
                 /// <see cref="ValueHolder.CurrentSecondaryColor"/>.
                 /// Subsequently, a memento is created, and the action process is completed.
-                if (((Queries.MouseUp(MouseButton.Left) || Queries.MouseUp(MouseButton.Right))
+                if (((SEEInput.MouseUp(MouseButton.Left) || SEEInput.MouseUp(MouseButton.Right))
                     && isInAction && !waitForHelperMenu)
                     || finishChosingColor)
                 {

@@ -1,11 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using Cysharp.Threading.Tasks;
-using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
@@ -13,10 +6,13 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
 
@@ -120,12 +116,6 @@ namespace SEE.Game.CityRendering
                 nodeTypeToAntennaDectorator[nodeType] = null;
             }
 
-            // The default node factory that we use if the we cannot find a setting for a given node type.
-            NodeFactory GetDefaultNodeFactory()
-            {
-                return new CubeFactory(shaderType, ColorRange.Default());
-            }
-
             // The appropriate node factory for value.Shape.
             NodeFactory GetNodeFactory(VisualNodeAttributes value)
             {
@@ -174,6 +164,25 @@ namespace SEE.Game.CityRendering
                               value.AntennaSettings, Settings.AntennaWidth, Settings.MaximalAntennaSegmentHeight,
                               Settings.MetricToColor);
             }
+        }
+
+        /// <summary>
+        /// Creates a default node factory.
+        /// </summary>
+        /// <returns>The created factory.</returns>
+        private NodeFactory GetDefaultNodeFactory()
+        {
+            return new CubeFactory(shaderType, ColorRange.Default());
+        }
+
+        /// <summary>
+        /// Adds a <paramref name="nodeType"/> to the factory.
+        /// </summary>
+        /// <param name="nodeType">The node type to be added.</param>
+        public void AddNewNodeType(string nodeType)
+        {
+            nodeTypeToFactory[nodeType] = GetDefaultNodeFactory();
+            nodeTypeToAntennaDectorator[nodeType] = null;
         }
 
         /// <summary>
@@ -277,7 +286,7 @@ namespace SEE.Game.CityRendering
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default)
+                                            CancellationToken token = default, bool loadReflexionFiles = false)
         {
             // all nodes of the graph
             IList<Node> nodes = graph.Nodes();
@@ -292,7 +301,10 @@ namespace SEE.Game.CityRendering
             NodeLayout nodeLayout = GetLayout(parent);
 
             // If we have multiple roots, we need to add a unique one.
-            AddGameRootNodeIfNecessary(graph, nodeMap);
+            if (!loadReflexionFiles)
+            {
+                AddGameRootNodeIfNecessary(graph, nodeMap);
+            }
 
             // The representation of the nodes for the layout.
             ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
@@ -316,7 +328,7 @@ namespace SEE.Game.CityRendering
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
-            GameObject rootGameNode = RootGameNode(parent);
+            GameObject rootGameNode = RootGameNode(loadReflexionFiles? parent.ContainingCity().gameObject : parent);
             try
             {
                 await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);

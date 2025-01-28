@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -25,6 +26,11 @@ namespace SEE.Net.Actions
         public string GameObjectIDList;
 
         /// <summary>
+        /// A serialization of the map of the node types to be restored.
+        /// </summary>
+        public string NodeTypeList;
+
+        /// <summary>
         /// Creates a new <see cref="ReviveNetAction"/>.
         ///
         /// Preconditions:
@@ -35,20 +41,13 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectIDs">the list of unique names of the gameObjects representing
         /// a node or edge that have to be revived</param>
+        /// <param name="nodeTypes">the map of the node types to be restored.</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
-        public ReviveNetAction(List<string> gameObjectIDs)
+        public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
+            NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
         }
 
         /// <summary>
@@ -58,7 +57,8 @@ namespace SEE.Net.Actions
         {
             ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
             ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-            GameElementDeleter.Revive(gameObjects);
+            Dictionary<string, VisualNodeAttributes> nodeTypes = NodeTypesSerializer.Unserialize(NodeTypeList);
+            GameElementDeleter.Revive(gameObjects, nodeTypes);
         }
     }
 }

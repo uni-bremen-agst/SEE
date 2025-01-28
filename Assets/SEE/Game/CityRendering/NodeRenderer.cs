@@ -96,6 +96,8 @@ namespace SEE.Game.CityRendering
         public GameObject DrawNode(Node node, GameObject city = null)
         {
             Assert.IsTrue(node.ItsGraph.MaxDepth >= 0, $"Graph of node {node.ID} has negative depth");
+            node.TryGetNumeric(Graph.MetricLevel, out float value);
+            scaler.UpdateMetricLevel(value);
             GameObject result = CreateGameNode(node);
             FinishGameNode(result, city);
             return result;

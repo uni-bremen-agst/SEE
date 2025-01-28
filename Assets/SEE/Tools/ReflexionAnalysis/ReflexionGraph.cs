@@ -17,13 +17,61 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Root node of the architecture.
         /// Note that this isn't a root node of the whole graph, it only roots all architecture nodes.
         /// </summary>
-        public readonly Node ArchitectureRoot;
+        private Node architectureRoot;
+
+        /// <summary>
+        /// Property for the architecture root.
+        /// If the attribute has not been set,
+        /// the corresponding node is searched for,
+        /// and the attribute is assigned.
+        /// Assignment to the attribute is only possible once.
+        /// </summary>
+        public Node ArchitectureRoot
+        {
+            get {
+                return architectureRoot ??= Nodes().FirstOrDefault(node => node.IsArchitectureRoot());
+            }
+            set {
+                architectureRoot ??= value;
+            }
+        }
+
+        /// <summary>
+        /// Name of the artificial node type used for the artificial architecture root nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string ArchitectureType = "ARCHITECTURE";
 
         /// <summary>
         /// Root node of the implementation.
         /// Note that this isn't a root node of the whole graph, it only roots all implementation nodes.
         /// </summary>
-        public readonly Node ImplementationRoot;
+        private Node implementationRoot;
+
+        /// <summary>
+        /// Property for the implementation root.
+        /// If the attribute has not been set,
+        /// the corresponding node is searched for,
+        /// and the attribute is assigned.
+        /// Assignment to the attribute is only possible once.
+        /// </summary>
+        public Node ImplementationRoot
+        {
+            get
+            {
+                return implementationRoot ??= Nodes().FirstOrDefault(node => node.IsImplementationRoot());
+            }
+            set
+            {
+                implementationRoot ??= value;
+            }
+        }
+
+        /// <summary>
+        /// Name of the artificial node type used for artificial implementation root nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string ImplementationType = "IMPLEMENTATION";
 
         /// <summary>
         /// Constructor.
@@ -99,8 +147,8 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            architectureGraph.AddSingleRoot(out architectureRoot);
-            implementationGraph.AddSingleRoot(out implementationRoot);
+            architectureGraph.AddSingleRoot(out architectureRoot, type: ArchitectureType);
+            implementationGraph.AddSingleRoot(out implementationRoot, type: ImplementationType);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it

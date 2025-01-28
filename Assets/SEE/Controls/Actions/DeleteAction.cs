@@ -1,14 +1,21 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.Audio;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using UnityEngine;
-using UnityEngine.Assertions;
-using SEE.Audio;
-using SEE.Game.SceneManipulation;
 using SEE.Utils.History;
 using SEE.XR;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -108,6 +115,13 @@ namespace SEE.Controls.Actions
         private ISet<GameObject> deletedGameObjects;
 
         /// <summary>
+        /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow
+        /// them to be restored.
+        /// This is needed only in the case of deleting an implementation or architecture root.
+        /// </summary>
+        private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
+
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -130,6 +144,7 @@ namespace SEE.Controls.Actions
             }
             else if (ExecuteViaContextMenu)
             {
+                ExecuteViaContextMenu = false;
                 return Delete();
             }
             else
@@ -153,8 +168,15 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                (_, ISet<GameObject> deleted) = GameElementDeleter.Delete(go);
+                new DeleteNetAction(go.name).Execute();
+                (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                if (deleted == null)
+                {
+                    continue;
+                }
                 deletedGameObjects.UnionWith(deleted);
+                deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
@@ -190,8 +212,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            GameElementDeleter.Revive(deletedGameObjects);
-            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList()).Execute();
+            GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
+            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes).Execute();
         }
 
         /// <summary>
@@ -206,8 +228,8 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-                new DeleteNetAction(go.name).Execute();
 #pragma warning disable VSTHRD110
+                new DeleteNetAction(go.name).Execute();
                 GameElementDeleter.Delete(go);
 #pragma warning restore VSTHRD110
             }

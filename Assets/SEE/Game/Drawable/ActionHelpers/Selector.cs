@@ -1,4 +1,5 @@
-﻿using SEE.Controls.Actions;
+﻿using SEE.Controls;
+using SEE.Controls.Actions;
 using SEE.Game.Drawable.Configurations;
 using SEE.GO;
 using SEE.UI.Drawable;
@@ -30,7 +31,7 @@ namespace SEE.Game.Drawable.ActionHelpers
             bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true,
             bool allowSelectViaChild = true)
         {
-            if (Queries.LeftMouseInteraction()
+            if (SEEInput.LeftMouseInteraction()
                 && selectedObj == null
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                 && (oldSelectedObj == null
@@ -79,7 +80,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryHasDrawableSurface(out RaycastHit raycastHit)
         {
-            if (Queries.LeftMouseInteraction()
+            if (SEEInput.LeftMouseInteraction()
                 && Raycasting.RaycastAnything(out RaycastHit hit)
                 && GameFinder.HasDrawableSurface(hit.collider.gameObject))
             {
@@ -99,9 +100,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit, bool leftMouseButton = true, bool onlyLeftDown = false)
         {
-            if ((Queries.LeftMouseInteraction() && leftMouseButton && !onlyLeftDown
-                 || Queries.LeftMouseDown() && leftMouseButton && onlyLeftDown
-                 || Queries.RightMouseInteraction() && !leftMouseButton)
+            if ((SEEInput.LeftMouseInteraction() && leftMouseButton && !onlyLeftDown
+                 || SEEInput.LeftMouseDown() && leftMouseButton && onlyLeftDown
+                 || SEEInput.RightMouseInteraction() && !leftMouseButton)
                 && Raycasting.RaycastAnything(out RaycastHit hit)
                 && GameFinder.IsOrHasDrawableSurface(hit.collider.gameObject))
             {
@@ -119,7 +120,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectQueryIsDrawableType(out RaycastHit raycastHit)
         {
-            if (Queries.LeftMouseInteraction()
+            if (SEEInput.LeftMouseInteraction()
                 && Raycasting.RaycastAnything(out RaycastHit hit)
                 && Tags.DrawableTypes.Contains(hit.collider.gameObject.tag))
             {
