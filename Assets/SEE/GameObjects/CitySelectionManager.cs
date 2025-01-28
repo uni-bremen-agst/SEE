@@ -96,7 +96,7 @@ namespace SEE.GameObjects
                             default:
                                 ShowNotification.Warn("City type is not supported",
                                     "The selected city type is not supported and cannot be added yet.");
-                                return;
+                                break;
                         }
                         progressState = ProgressState.Start;
                     }
