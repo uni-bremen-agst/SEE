@@ -102,14 +102,15 @@ namespace SEE.GameObjects
                         }
                         gameObject.name = cityName;
                         /// Delete existing <see cref="AbstractSEECity"/> component.
-                        if (GetComponent<AbstractSEECity>() != null)
+                        if (TryGetComponent(out AbstractSEECity existingCity))
                         {
-                            Destroyer.Destroy(GetComponent<AbstractSEECity>());
+                            Destroyer.Destroy(existingCity);
                         }
                         switch (cityType)
                         {
                             case CityTypes.ReflexionCity:
                                 CreateReflexionCity();
+                                progressState = ProgressState.ReflexionCity;
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -133,10 +134,9 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.ReflexionCity:
-                    if (gameObject.GetComponent<SEEReflexionCity>() != null
+                    if (gameObject.TryGetComponent(out SEEReflexionCity reflexionCity)
                         && gameObject.IsCodeCityDrawn())
                     {
-                        SEEReflexionCity reflexionCity = gameObject.GetComponent<SEEReflexionCity>();
                         FitInitalReflexionCity(reflexionCity);
                         progressState = ProgressState.Finish;
                     }
@@ -185,7 +185,6 @@ namespace SEE.GameObjects
             gameObject.AddComponent<EdgeMeshScheduler>();
             reflexionCity.LoadInitial(gameObject.name);
             reflexionCity.DrawGraph();
-            progressState = ProgressState.ReflexionCity;
         }
 
         /// <summary>
@@ -211,9 +210,7 @@ namespace SEE.GameObjects
             /// and the implementation root is on the left side.
             if (arch.transform.position.z < impl.transform.position.z)
             {
-                Vector3 oldPosition = arch.transform.position;
-                arch.transform.position = impl.transform.position;
-                impl.transform.position = oldPosition;
+                (impl.transform.position, arch.transform.position) = (arch.transform.position, impl.transform.position);
             }
 
             /// Adjusting the initial size.
