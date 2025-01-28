@@ -20,7 +20,8 @@ namespace SEE.Net.Actions.City
         public string NodeType;
 
         /// <summary>
-        /// The constructor of this action. Sets the <see cref="VisualNodeAttributes"/> and the name of the <see cref="NodeType"/> to be added.
+        /// The constructor of this action. Sets the <see cref="VisualNodeAttributes"/> and the name
+        /// of the <see cref="NodeType"/> to be added.
         /// </summary>
         /// <param name="tableID">The unique name of the table to which city the node type should be added.</param>
         /// <param name="nodeType">The name for the added node type.</param>
@@ -32,7 +33,7 @@ namespace SEE.Net.Actions.City
         }
 
         /// <summary>
-        /// Adds the node type with his visual node attribute into the given table city on each client.
+        /// Adds the node type with its visual node attributes to the given table city on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
