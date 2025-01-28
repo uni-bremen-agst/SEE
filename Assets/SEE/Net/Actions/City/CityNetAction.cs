@@ -1,9 +1,10 @@
 ﻿using SEE.Game;
 using SEE.GameObjects;
+using SEE.Net.Actions;
 using System;
 using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.City
 {
     /// <summary>
     /// Superclass for all city net actions.
@@ -19,7 +20,7 @@ namespace SEE.Net.Actions
         /// The city object that should be manipulated by this action.
         /// Will be set in the <see cref="ExecuteOnClient"/> method.
         /// </summary>
-        protected GameObject City {  get; private set; }
+        protected GameObject City { get; private set; }
 
         /// <summary>
         /// The constructor of this action. It sets the <see cref="TableID"/> to identify the table whose

@@ -2,7 +2,7 @@
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.City
 {
     /// <summary>
     /// Removes a node type of a city on all clients.

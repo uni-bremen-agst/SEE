@@ -3,7 +3,7 @@ using System;
 using SEE.Utils.Paths;
 using Cysharp.Threading.Tasks;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.City
 {
     /// <summary>
     /// Loads a part of a <see cref="SEEReflexionCity"/> to all clients.

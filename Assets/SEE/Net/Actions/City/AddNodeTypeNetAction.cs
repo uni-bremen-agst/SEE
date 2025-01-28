@@ -1,11 +1,8 @@
 ﻿using SEE.Game;
 using SEE.Game.City;
-using SEE.GameObjects;
 using SEE.UI.RuntimeConfigMenu;
-using System;
-using UnityEngine;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.City
 {
     /// <summary>
     /// Adds a node type to a city on all clients.

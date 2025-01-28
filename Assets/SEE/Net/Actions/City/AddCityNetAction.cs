@@ -1,7 +1,7 @@
 ﻿using SEE.Game.City;
 using SEE.GameObjects;
 
-namespace SEE.Net.Actions
+namespace SEE.Net.Actions.City
 {
     /// <summary>
     /// Adds a city to all clients.
