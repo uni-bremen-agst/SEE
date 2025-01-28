@@ -3,11 +3,10 @@ using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
-using SEE.Net.Actions;
+using SEE.Net.Actions.City;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.Utils;
-using System;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -24,7 +23,6 @@ namespace SEE.GameObjects
         {
             Start,
             ChooseCity,
-            ReflexionCity,
             Finish,
         }
 
@@ -37,16 +35,6 @@ namespace SEE.GameObjects
         /// The dialog for selecting a city type.
         /// </summary>
         private readonly CitySelectionProperty citySelectionProperty = new();
-
-        /// <summary>
-        /// The type of city that should be created via a network execution.
-        /// </summary>
-        private CityTypes? typeOfNetworkExecution = null;
-
-        /// <summary>
-        /// The name for the city that should be created via a network execution.
-        /// </summary>
-        private string nameOfNetworkExecution = null;
 
         /// <summary>
         /// Adds the game object to which the <see cref="AbstractSEECity"/> component
@@ -73,6 +61,10 @@ namespace SEE.GameObjects
         /// </summary>
         private void Update()
         {
+            if (gameObject.IsCodeCityDrawn())
+            {
+                CityComponentsSettings();
+            }
             switch (progressState)
             {
                 case ProgressState.Start:
@@ -86,31 +78,13 @@ namespace SEE.GameObjects
                     break;
 
                 case ProgressState.ChooseCity:
-                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType, out string cityName) || typeOfNetworkExecution != null)
+                    if (citySelectionProperty.TryGetCity(out CityTypes? cityType, out string cityName))
                     {
-                        if (cityType != null)
-                        {
-                            new AddCityNetAction(transform.parent.name, cityType.Value, cityName).Execute();
-                        }
-                        else
-                        {
-                            cityType = typeOfNetworkExecution;
-                            cityName = nameOfNetworkExecution;
-                            // If the variable is not reset, there will be multiple attempts to add the city, which leads to errors.
-                            typeOfNetworkExecution = null;
-                            nameOfNetworkExecution = null;
-                        }
-                        gameObject.name = cityName;
-                        /// Delete existing <see cref="AbstractSEECity"/> component.
-                        if (TryGetComponent(out AbstractSEECity existingCity))
-                        {
-                            Destroyer.Destroy(existingCity);
-                        }
                         switch (cityType)
                         {
                             case CityTypes.ReflexionCity:
-                                CreateReflexionCity();
-                                progressState = ProgressState.ReflexionCity;
+                                CityAdder.CreateReflexionCityAsync(gameObject, cityName).Forget();
+                                new AddReflexionCityNetAction(transform.parent.name, cityName).Execute();
                                 break;
                             case CityTypes.CodeCity:
                             case CityTypes.DiffCity:
@@ -118,14 +92,13 @@ namespace SEE.GameObjects
                             case CityTypes.BranchCity:
                             case CityTypes.DynamicCity:
                                 ShowNotification.Warn("Not available", "This type of city cannot be added yet.");
-                                progressState = ProgressState.Start;
                                 break;
                             default:
                                 ShowNotification.Warn("City type is not supported",
                                     "The selected city type is not supported and cannot be added yet.");
-                                progressState = ProgressState.Start;
                                 return;
                         }
+                        progressState = ProgressState.Start;
                     }
                     if (citySelectionProperty.WasCanceled())
                     {
@@ -133,35 +106,10 @@ namespace SEE.GameObjects
                     }
                     break;
 
-                case ProgressState.ReflexionCity:
-                    if (gameObject.TryGetComponent(out SEEReflexionCity reflexionCity)
-                        && gameObject.IsCodeCityDrawn())
-                    {
-                        FitInitalReflexionCity(reflexionCity);
-                        progressState = ProgressState.Finish;
-                    }
-                    break;
-
-                case ProgressState.Finish:
-                    CityComponentsSettings();
-                    progressState = ProgressState.Start;
-                    break;
-
                 default:
                     ShowNotification.Warn("Unexpected progress state", "An unexpected progress state occurred during execution.");
                     break;
             }
-        }
-
-        /// <summary>
-        /// Creates a city through a network execution.
-        /// </summary>
-        /// <param name="cityType">The type of city that should be added.</param>
-        internal void CreateCity(CityTypes cityType, string cityName)
-        {
-            typeOfNetworkExecution = cityType;
-            nameOfNetworkExecution = cityName;
-            progressState = ProgressState.ChooseCity;
         }
 
         /// <summary>
@@ -173,68 +121,5 @@ namespace SEE.GameObjects
             gameObject.GetComponent<CityCursor>().enabled = true;
             enabled = false;
         }
-
-        #region Reflexion City
-        /// <summary>
-        /// Creates and loads an initial reflexion city.
-        /// </summary>
-        private void CreateReflexionCity()
-        {
-            SEEReflexionCity reflexionCity = gameObject.AddComponent<SEEReflexionCity>();
-            gameObject.AddComponent<ReflexionVisualization>();
-            gameObject.AddComponent<EdgeMeshScheduler>();
-            reflexionCity.LoadInitial(gameObject.name);
-            reflexionCity.DrawGraph();
-        }
-
-        /// <summary>
-        /// Ensures that the architecture root is always positioned on the right side
-        /// and the implementation root on the left side.
-        /// Additionally, the roots are scaled to a ratio of 60 (architecture)
-        /// to 40 (implementation).
-        /// </summary>
-        /// <param name="city">The reflexion city.</param>
-        /// <exception cref="ArgumentNullException">If the <paramref name="city"/> is null.</exception>
-        private void FitInitalReflexionCity(SEEReflexionCity city)
-        {
-            if (city == null)
-            {
-                throw new ArgumentNullException(nameof(city));
-            }
-
-            GameObject arch = city.ReflexionGraph.ArchitectureRoot.GameObject(true);
-            GameObject impl = city.ReflexionGraph.ImplementationRoot.GameObject(true);
-
-            /// Changes the position of the architecture and implementation roots.
-            /// The result is that the architecture root is on the right side,
-            /// and the implementation root is on the left side.
-            if (arch.transform.position.z < impl.transform.position.z)
-            {
-                (impl.transform.position, arch.transform.position) = (arch.transform.position, impl.transform.position);
-            }
-
-            /// Adjusting the initial size.
-            /// The architecture root should occupy approximately 60% of the table,
-            /// and the implementation root 40%.
-            /// FIXME(#816): Update once branch 816-layouts-for-reflexion-modeling is merged.
-            float currentScale = 0.5f;
-            float targetArchScale = 0.6f;
-            float targetImplScale = 1 - targetArchScale;
-            ApplyScale(arch, targetArchScale / currentScale);
-            ApplyScale(impl, targetImplScale / currentScale);
-
-            return;
-
-            static void ApplyScale(GameObject obj, float factor)
-            {
-                Vector3 oldScale = obj.transform.localScale;
-                Vector3 newScale = new (oldScale.x, oldScale.y, oldScale.z * factor);
-                float diff = oldScale.z - newScale.z;
-                diff = diff < 0 ? diff : -diff;
-                Vector3 newPosition = obj.transform.position + new Vector3(0, 0, diff) * 1.5f;
-                obj.NodeOperator().ResizeTo(newScale, newPosition, 0, reparentChildren: false);
-            }
-        }
-        #endregion
     }
 }
