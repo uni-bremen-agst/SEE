@@ -1,7 +1,7 @@
 ﻿namespace SEE.Net.Actions.City
 {
     /// <summary>
-    /// Superclass for all add city net actions.
+    /// Abstract superclass for all net actions adding a code city.
     /// </summary>
     public abstract class AddCityNetAction : CityNetAction
     {
@@ -18,14 +18,6 @@
         public AddCityNetAction(string tableID, string cityName) : base(tableID)
         {
             CityName = cityName;
-        }
-
-        /// <summary>
-        /// Adds the city of type <see cref="CityType"/> identified by <see cref="TableID"/> on each client.
-        /// </summary>
-        public override void ExecuteOnClient()
-        {
-            base.ExecuteOnClient();
         }
     }
 }
