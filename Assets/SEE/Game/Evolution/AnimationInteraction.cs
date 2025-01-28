@@ -550,6 +550,10 @@ namespace SEE.Game.Evolution
         /// </summary>
         private void Update()
         {
+            if (evolutionRenderer == null)
+            {
+                return;
+            }
             bool userIsHoveringCity = AbstractSEECity.UserIsHoveringCity(evolutionRenderer.gameObject);
 
             if (!IsRevisionSelectionOpen)

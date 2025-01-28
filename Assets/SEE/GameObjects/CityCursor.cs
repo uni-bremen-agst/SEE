@@ -70,7 +70,8 @@ namespace SEE.GO
         private void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph.Equals(city.LoadedGraph))
+            if (selectedGraph != null && city.LoadedGraph != null
+                && selectedGraph.Equals(city.LoadedGraph))
             {
                 Cursor.AddFocus(interactableObject);
             }
@@ -85,7 +86,7 @@ namespace SEE.GO
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph.Equals(city.LoadedGraph))
+            if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
             {
                 Cursor.RemoveFocus(interactableObject);
             }

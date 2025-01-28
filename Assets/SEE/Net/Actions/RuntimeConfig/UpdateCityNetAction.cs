@@ -1,3 +1,7 @@
+using SEE.Game;
+using SEE.UI.RuntimeConfigMenu;
+using System;
+
 namespace SEE.Net.Actions.RuntimeConfig
 {
     /// <summary>
@@ -16,10 +20,18 @@ namespace SEE.Net.Actions.RuntimeConfig
         public string WidgetPath;
 
         /// <summary>
-        /// Does nothing on the server.
+        /// Updates the runtime config menu if it is necessary.
         /// </summary>
-        public override void ExecuteOnServer()
+        public override void ExecuteOnClient()
         {
+            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+            {
+                runtimeConfigMenu.PerformRebuildIfRequired();
+            }
+            else
+            {
+                throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+            }
         }
     }
 }

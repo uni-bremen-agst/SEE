@@ -1,5 +1,4 @@
 ﻿using SEE.Controls;
-using SEE.UI.PropertyDialog.HolisticMetrics;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -8,7 +7,7 @@ namespace SEE.UI.PropertyDialog.Drawable
     /// <summary>
     /// This class manages the dialog for adding/editing a text drawable type.
     /// </summary>
-    internal class WriteEditTextDialog : HolisticMetricsDialog
+    internal class WriteEditTextDialog : BasePropertyDialog
     {
         /// <summary>
         /// The text provided in the dialog.
@@ -83,9 +82,9 @@ namespace SEE.UI.PropertyDialog.Drawable
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
-        /// <param name="text">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <param name="text">If <see cref="BasePropertyDialog.gotInput"/>, this will be the
         /// the text provided by the user. Otherwise it is empty.</param>
-        /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.gotInput"/></returns>
         internal bool TryGetUserInput(out string text)
         {
             if (GotInput)

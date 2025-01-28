@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (chosenOperation)
                 {
                     case Operation.None:
-                        if (Queries.LeftMouseDown())
+                        if (SEEInput.LeftMouseDown())
                         {
                             ShowNotification.Info("Select an operation",
                                 "First you need to select an operation from the menu.");
@@ -328,7 +328,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Queries.MouseHold(MouseButton.Left)
+            if (!SEEInput.MouseHold(MouseButton.Left)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && node != null)
             {
@@ -343,7 +343,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the selection of a parent node.
             /// It will executed if the left mouse button will be clicked.
-            if (Queries.LeftMouseDown() && node != null)
+            if (SEEInput.LeftMouseDown() && node != null)
             {
                 /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node.
                 /// Additionally, the node must not choose itself.

@@ -1,10 +1,14 @@
 ﻿using SEE.Controls;
-using SEE.Controls.Actions; /// Reference in comment.
+using SEE.Controls.Actions;
+/// Reference in comment.
 using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
+using Sirenix.Serialization;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
@@ -75,30 +79,37 @@ namespace SEE.UI.PropertyDialog
             nodeName.Value = node.SourceName;
             nodeName.Description = "Name of the node";
 
-            // Type of the node
-            nodeType = dialog.AddComponent<SelectionProperty>();
-            nodeType.Name = "Node type";
-            nodeType.AddOptions(node.GameObject().ContainingCity().NodeTypes.Types.OrderBy(t => t));
-            if (!useLastUsed || string.IsNullOrEmpty(lastUsed))
+            if (!node.HasRootToogle())
             {
-                nodeType.Value = node.Type;
-            }
-            else if (useLastUsed)
-            {
-                if (node.Type != lastUsed)
+                // Type of the node
+                nodeType = dialog.AddComponent<SelectionProperty>();
+                nodeType.Name = "Node type";
+
+                nodeType.AddOptions(GetNonRootTypes().OrderBy(t => t));
+                if (!useLastUsed || string.IsNullOrEmpty(lastUsed))
                 {
-                    GameNodeEditor.ChangeType(node, lastUsed);
-                    new EditNodeNetAction(node.ID, node.SourceName, lastUsed).Execute();
+                    nodeType.Value = node.Type;
                 }
-                nodeType.Value = lastUsed;
+                else if (useLastUsed)
+                {
+                    if (node.Type != lastUsed)
+                    {
+                        GameNodeEditor.ChangeType(node, lastUsed);
+                        new EditNodeNetAction(node.ID, node.SourceName, lastUsed).Execute();
+                    }
+                    nodeType.Value = lastUsed;
+                }
+                nodeType.Description = "Type of the node";
             }
-            nodeType.Description = "Type of the node";
 
             // Group for node name and type
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
             group.Name = "Node attributes";
             group.AddProperty(nodeName);
-            group.AddProperty(nodeType);
+            if (nodeType != null)
+            {
+                group.AddProperty(nodeType);
+            }
 
             // Dialog
             PropertyDialog propertyDialog = dialog.AddComponent<PropertyDialog>();
@@ -121,7 +132,10 @@ namespace SEE.UI.PropertyDialog
             void OKButtonPressed()
             {
                 GameNodeEditor.ChangeName(node, nodeName.Value);
-                GameNodeEditor.ChangeType(node, nodeType.Value);
+                if (nodeType != null)
+                {
+                    GameNodeEditor.ChangeType(node, nodeType.Value);
+                }
 
                 /// Updates the <see cref="lastUsed"/> attribute.
                 if (useLastUsed)
@@ -132,6 +146,20 @@ namespace SEE.UI.PropertyDialog
                 SEEInput.KeyboardShortcutsEnabled = true;
                 Close();
             }
+        }
+
+        /// <summary>
+        /// Returns the node types of the graph
+        /// except for the root types.
+        /// </summary>
+        /// <returns>The node types execpt the root types.</returns>
+        private ISet<string> GetNonRootTypes()
+        {
+            ISet<string> types = node.GameObject().ContainingCity().NodeTypes.Types;
+            types.Remove(Graph.RootType);
+            types.Remove(ReflexionGraph.ArchitectureType);
+            types.Remove(ReflexionGraph.ImplementationType);
+            return types;
         }
 
         /// <summary>

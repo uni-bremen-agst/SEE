@@ -22,13 +22,13 @@ namespace SEE.Game
 #if UNITY_EDITOR
         [UnityEditor.InitializeOnEnterPlayMode]
         /// <summary>
-        /// Resets the mapping. As a consequence, all game objects  representing nodes or edges 
+        /// Resets the mapping. As a consequence, all game objects  representing nodes or edges
         /// must re-added to the mapping when the game is being started.
-        /// 
-        /// We always want to start with a clean mapping when entering play mode in 
+        ///
+        /// We always want to start with a clean mapping when entering play mode in
         /// the Unity editor. Otherwise, the mapping could contain game objects from the last
         /// game session which are no longer valid.
-        /// 
+        ///
         /// This method is called when entering play mode in the Unity editor. When the game
         /// is run from a build, this method does not need to be called, because the mapping
         /// would be initialized from scratch anyway due to the static initialization of

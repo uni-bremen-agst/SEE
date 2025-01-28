@@ -47,6 +47,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Removes the given <paramref name="nodeType"/> from the map if the map contains it.
+        /// </summary>
+        /// <param name="nodeType">The node type to be removed.</param>
+        /// <returns>True if the node type could be removed, otherwise false.</returns>
+        public bool Remove(string nodeType)
+        {
+            if (map.ContainsKey(nodeType))
+            {
+                map.Remove(nodeType);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// The number of elements in the map.
         /// </summary>
         public int Count => map.Count;

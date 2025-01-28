@@ -25,11 +25,13 @@ namespace SEE.Game.City
     /// to its visualization.
     /// </summary>
     [Serializable]
+    [ExecuteInEditMode]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         protected virtual void Awake()
         {
             LabelLineMaterial = new Material(LineMaterial(Color.white));
+            AddRootNodeType();
         }
 
         protected virtual void Start()
@@ -318,7 +320,7 @@ namespace SEE.Game.City
         /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
         protected static void UpdateGraphElementIDMap(GameObject root)
         {
-            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
+            if ((root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge)) && !GraphElementIDMap.Has(root.name))
             {
                 GraphElementIDMap.Add(root);
             }
@@ -737,6 +739,21 @@ namespace SEE.Game.City
                 CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
                                                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
+        }
+
+        /// <summary>
+        /// Adds the initial root node type to the <see cref="NodeTypes"/>.
+        /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
+        /// </summary>
+        private void AddRootNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
+            {
+                NodeTypes[Graph.RootType] = new VisualNodeAttributes();
+            }
+            VisualNodeAttributes root = NodeTypes[Graph.RootType];
+            root.ShowNames = false;
+            root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
         #region Odin Inspector Attributes

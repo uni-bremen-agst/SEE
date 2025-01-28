@@ -10,7 +10,7 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using MouseButton = SEE.Game.Drawable.ActionHelpers.MouseButton;
+using MouseButton = SEE.Controls.MouseButton;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -304,7 +304,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SpawnOnPosition()
         {
-            if (Queries.LeftMouseDown() && !inProgress
+            if (SEEInput.LeftMouseDown() && !inProgress
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 inProgress = true;
@@ -413,7 +413,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true, if a sticky not was selected, Otherwise false</returns>
         private bool MoveSelection()
         {
-            if (Queries.LeftMouseDown()
+            if (SEEInput.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
@@ -504,7 +504,7 @@ namespace SEE.Controls.Actions.Drawable
                     newPos, eulerAngles).Execute();
 
                 /// Opens the move and rotation menu for fine-tuning.
-                if (Queries.MouseHold(MouseButton.Left))
+                if (SEEInput.MouseHold(MouseButton.Left))
                 {
                     GameFinder.GetDrawableSurface(stickyNoteHolder).GetComponent<Collider>().enabled = true;
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
@@ -623,7 +623,7 @@ namespace SEE.Controls.Actions.Drawable
         /// False, if the update method should return false.</returns>
         private EditReturnState EditSelection()
         {
-            if (Queries.LeftMouseDown()
+            if (SEEInput.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
@@ -791,24 +791,24 @@ namespace SEE.Controls.Actions.Drawable
             bool interaction = false;
             value = 0;
 
-            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate? ValueHolder.Rotate : ValueHolder.ScaleUp;
                 interaction = true;
             }
-            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? ValueHolder.RotateFast : ValueHolder.ScaleUpFast;
                 interaction = true;
             }
 
-            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.Rotate : ValueHolder.ScaleDown;
                 interaction = true;
 
             }
-            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.RotateFast : ValueHolder.ScaleDownFast;
                 interaction = true;
