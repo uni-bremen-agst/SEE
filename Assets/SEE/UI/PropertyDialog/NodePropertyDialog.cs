@@ -86,7 +86,8 @@ namespace SEE.UI.PropertyDialog
                 nodeType.Name = "Node type";
 
                 nodeType.AddOptions(GetNonRootTypes().OrderBy(t => t));
-                if (!useLastUsed || string.IsNullOrEmpty(lastUsed))
+                if (!useLastUsed || string.IsNullOrEmpty(lastUsed)
+                    || !node.GameObject().ContainingCity().NodeTypes.Types.Contains(lastUsed))
                 {
                     nodeType.Value = node.Type;
                 }
