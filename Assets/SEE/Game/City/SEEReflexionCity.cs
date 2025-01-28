@@ -35,7 +35,7 @@ namespace SEE.Game.City
         private ReflexionVisualization visualization;
 
         /// <summary>
-        /// Indicatior of whether the initial reflexion city is being loaded.
+        /// Indicator of whether the initial reflexion city is being loaded.
         /// This is important for the <see cref="Start"/> method of this class.
         /// </summary>
         private bool initialReflexionCity = false;
@@ -64,7 +64,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask LoadDataAsync()
         {
-            // Makes the necessary changes for the inital types of a reflexion city.
+            // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
             if (LoadedGraph != null)
@@ -113,7 +113,7 @@ namespace SEE.Game.City
             }
             SetupInitialReflexionCity();
             using (LoadingSpinner.ShowDeterminate($"Creating initial reflexion city \"{gameObject.name}\"...",
-                                                out Action<float> reportProgress))
+                                                  out Action<float> reportProgress))
             {
                 void UpdateProgress(float progress)
                 {
@@ -236,7 +236,8 @@ namespace SEE.Game.City
                 if (projectFolder != null)
                 {
                     ReflexionGraph.AddToImplementation(node);
-                } else
+                }
+                else
                 {
                     ReflexionGraph.AddToArchitecture(node);
                 }

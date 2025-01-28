@@ -19,9 +19,9 @@ namespace SEE.Net.Actions
         public bool LoadArchitecture;
 
         /// <summary>
-        /// The file to be loaded.
+        /// The graph file to be loaded.
         /// </summary>
-        public DataPath FileToLoad;
+        public DataPath GraphFileToLoad;
 
         /// <summary>
         /// The project folder; can be null if an architecture graph should be loaded.
@@ -33,12 +33,12 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="tableID">The unique name of the table on which city the part should be loaded.</param>
         /// <param name="loadArchitecture">Distinction between whether an architecture or implementation graph should be loaded.</param>
-        /// <param name="fileToLoad">The file to be loaded.</param>
+        /// <param name="graphFile">The graph file to be loaded.</param>
         /// <param name="projectFolder">The project folder; can be null if a architecture graph should be loaded.</param>
-        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture, DataPath fileToLoad, DataPath projectFolder = null) : base(tableID)
+        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture, DataPath graphFile, DataPath projectFolder = null) : base(tableID)
         {
             LoadArchitecture = loadArchitecture;
-            FileToLoad = fileToLoad;
+            GraphFileToLoad = graphFile;
             ProjectFolder = projectFolder;
         }
 
@@ -50,7 +50,7 @@ namespace SEE.Net.Actions
             base.ExecuteOnClient();
             if (City.GetComponent<SEEReflexionCity>() != null)
             {
-                City.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(FileToLoad, LoadArchitecture ? null : ProjectFolder).Forget();
+                City.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GraphFileToLoad, LoadArchitecture ? null : ProjectFolder).Forget();
             }
             else
             {

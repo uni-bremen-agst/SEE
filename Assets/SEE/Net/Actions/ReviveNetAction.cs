@@ -26,6 +26,9 @@ namespace SEE.Net.Actions
         /// </summary>
         public string GameObjectIDList;
 
+        /// <summary>
+        /// A serialization of the map of the node types to be restored.
+        /// </summary>
         public string NodeTypeList;
 
         /// <summary>
@@ -39,6 +42,7 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectIDs">the list of unique names of the gameObjects representing
         /// a node or edge that have to be revived</param>
+        /// <param name="nodeTypes">the map of the node types to be restored.</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
         public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
