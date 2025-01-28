@@ -673,23 +673,26 @@ namespace SEE.UI.RuntimeConfigMenu
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
             if (addVisibility)
             {
-                MoveAddButton().Forget();
+                EnableAddButton();
             }
             return container.transform.Find("Content").gameObject;
 
-            async UniTask MoveAddButton()
+            void EnableAddButton()
             {
-                RectTransform titleCollapse = container.transform.Find("TitleCollapse").GetComponent<RectTransform>();
-                Transform addTransform = container.transform.Find("TitleCollapse/Add");
-                addTransform.gameObject.SetActive(true);
-                await UniTask.WaitUntil(() => titleCollapse.rect.width != 0)
-                    .ContinueWith(() => addTransform.DOLocalMoveX(titleCollapse.rect.width + titleCollapse.rect.x - 25, 0));
+                Transform addBtnTransform = container.transform.Find("AddBtn");
+                addBtnTransform.gameObject.SetActive(true);
             }
         }
 
+        /// <summary>
+        /// Adds functionality to allow a new to be added to the dictionary.
+        /// </summary>
+        /// <param name="parent">container</param>
+        /// <param name="dict">the dictionary</param>
+        /// <param name="settingName">setting name</param>
         private void CreateDictAddEntry(GameObject parent, IDictionary dict, string settingName)
         {
-            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("TitleCollapse/Add").GetComponent<ButtonManagerBasicIcon>();
+            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("AddBtn").GetComponent<ButtonManagerBasicIcon>();
             addBtn.clickEvent.AddListener(() =>
             {
                 switch (settingName)
