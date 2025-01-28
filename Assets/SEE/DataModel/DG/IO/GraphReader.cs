@@ -92,7 +92,7 @@ namespace SEE.DataModel.DG.IO
                     Debug.LogWarning($"Graph stored in {Name} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new()
                     {
-                        Type = Graph.UnknownType,
+                        Type = Graph.RootType,
                         ID = rootName,
                         SourceName = ""
                     };

@@ -222,7 +222,7 @@ namespace SEE.Controls.Actions.Drawable
                 /// Block for successfully completing the line.
                 /// It adds a final point to the line.
                 /// It requires a left-click with the left Ctrl key held down.
-                if (Queries.MouseUp(MouseButton.Left)
+                if (SEEInput.MouseUp(MouseButton.Left)
                     && Input.GetKey(KeyCode.LeftControl)
                     && drawing
                     && positions.Length > 0
@@ -244,7 +244,7 @@ namespace SEE.Controls.Actions.Drawable
 
                 /// Block for successfully completing the line without adding a new point.
                 /// It requires a wheel-click.
-                if (Queries.MouseUp(MouseButton.Middle)
+                if (SEEInput.MouseUp(MouseButton.Middle)
                     && drawing
                     && positions.Length > 1
                     && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line)
@@ -454,7 +454,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShapePreviewReleasePosition()
         {
-            if (Queries.MouseDown(MouseButton.Middle)
+            if (SEEInput.MouseDown(MouseButton.Middle)
                 && shapePreviewFix
                 && Input.GetKey(KeyCode.LeftControl)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
@@ -473,7 +473,7 @@ namespace SEE.Controls.Actions.Drawable
         private void ShapePreviewFixPosition()
         {
             if (Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
-                && Queries.MouseDown(MouseButton.Middle)
+                && SEEInput.MouseDown(MouseButton.Middle)
                 && !Input.GetKey(KeyCode.LeftControl)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
             {
@@ -526,7 +526,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShapePreviewUnfixed()
         {
-            if (!drawing && !Queries.LeftMouseInteraction()
+            if (!drawing && !SEEInput.LeftMouseInteraction()
                 && !shapePreviewFix
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
@@ -543,7 +543,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void ShapePreviewFixed()
         {
-            if (!drawing && !Queries.LeftMouseDown()
+            if (!drawing && !SEEInput.LeftMouseDown()
                 && shapePreviewFix
                 && ShapeMenu.GetSelectedShape() != ShapePointsCalculator.Shape.Line)
             {
@@ -609,7 +609,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void LineShapePreview()
         {
-            if (drawing && !Queries.LeftMouseInteraction()
+            if (drawing && !SEEInput.LeftMouseInteraction()
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))
@@ -650,7 +650,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void AddLineShapePoint()
         {
-            if (Queries.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift)
+            if (SEEInput.LeftMouseDown() && !Input.GetKey(KeyCode.LeftControl) && !Input.GetKey(KeyCode.LeftShift)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && drawing && ShapeMenu.GetSelectedShape() == ShapePointsCalculator.Shape.Line
                 && Queries.DrawableSurfaceNullOrSame(Surface, raycastHit.collider.gameObject))

@@ -1,5 +1,7 @@
-﻿using System;
+﻿using SEE.Tools.ReflexionAnalysis;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace SEE.DataModel.DG
@@ -154,6 +156,43 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
+        /// True iff node has the <see cref="Graph.RootToggle"/> marking.
+        /// </summary>
+        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> marking.</returns>
+        public bool HasRootToogle()
+        {
+            return HasToggle(Graph.RootToggle);
+        }
+
+        /// <summary>
+        /// True iff node is the implementation or the architecture root of a reflexion city.
+        /// </summary>
+        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the implementation or architecture marking.</returns>
+        public bool IsArchitectureOrImplementationRoot()
+        {
+            return HasToggle(Graph.RootToggle) &&
+                (HasToggle(ReflexionSubgraphs.Implementation.GetLabel()) || HasToggle(ReflexionSubgraphs.Architecture.GetLabel()));
+        }
+
+        /// <summary>
+        /// True iff node is the architecture root of a reflexion city.
+        /// </summary>
+        /// <returns>true iff node has the <see cref="Graph.RootToggle"/> and the architecture marking.</returns>
+        public bool IsArchitectureRoot()
+        {
+            return HasRootToogle() && HasToggle(ReflexionSubgraphs.Architecture.GetLabel());
+        }
+
+        /// <summary>
+        /// True iff node is implementation root of a reflexion city.
+        /// </summary>
+        /// <returns>true iff node has <see cref="Graph.RootToggle"/> and the implementation marking.</returns>
+        public bool IsImplementationRoot()
+        {
+            return HasRootToogle() && HasToggle(ReflexionSubgraphs.Implementation.GetLabel());
+        }
+
+        /// <summary>
         /// Yields the set of all transitive parents of this node in the node hierarchy
         /// including the node itself.
         /// </summary>
@@ -191,6 +230,18 @@ namespace SEE.DataModel.DG
                 }
                 result.Add(parent);
             }
+        }
+
+        /// <summary>
+        /// Returns all transitive descendants of this node in a post-order traversal of the
+        /// node hierarchy rooted by this node, excluding this node itself.
+        /// </summary>
+        /// <returns>transitive descendants of this node in post order without itself.</returns>
+        public IList<Node> PostOrderDescendantsWithoutItself()
+        {
+            IList<Node> result = PostOrderDescendants();
+            result.RemoveAt(result.Count - 1);
+            return result;
         }
 
         /// <summary>

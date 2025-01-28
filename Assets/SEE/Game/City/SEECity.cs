@@ -388,24 +388,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Re-draws the graph without deleting the underlying loaded graph.
-        /// Only the game objects generated for the nodes are deleted first.
-        /// Precondition: The graph and its metrics have been loaded.
-        /// </summary>
-        public void ReDrawGraph()
-        {
-            if (LoadedGraph == null)
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-            else
-            {
-                DeleteGraphGameObjects();
-                DrawGraph();
-            }
-        }
-
-        /// <summary>
         /// Returns whether the graph has been loaded.
         /// </summary>
         private bool IsGraphLoaded => loadedGraph != null;
@@ -475,6 +457,29 @@ namespace SEE.Game.City
                 {
                     InitializeAfterDrawn();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Re-draws the graph without deleting the underlying loaded graph.
+        /// Only the game objects generated for the nodes and edges are deleted first
+        /// and then they are re-created.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphLoaded))]
+        public void ReDrawGraph()
+        {
+            if (LoadedGraph == null)
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
+                DeleteGraphGameObjects();
+                DrawGraph();
             }
         }
 

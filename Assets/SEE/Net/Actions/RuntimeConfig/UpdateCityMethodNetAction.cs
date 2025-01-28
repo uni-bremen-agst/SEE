@@ -17,6 +17,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// </summary>
         public override void ExecuteOnClient()
         {
+            base.ExecuteOnClient();
             RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncMethod?.Invoke(MethodName);
         }
     }

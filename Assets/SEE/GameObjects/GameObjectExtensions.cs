@@ -51,13 +51,30 @@ namespace SEE.GO
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
         ///
         /// This predicate can be queried for game objects representing a code city,
-        /// that is, game objects that have a <see cref="AbstractSEECity"/> attached to
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
         /// <returns>true if a code city was drawn</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
             return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
+        }
+
+        /// <summary>
+        /// Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
+        /// A code city is assumed to be drawn in there is at least one immediate child
+        /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>.
+        ///
+        /// This predicate can be queried for game objects representing a code city,
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
+        /// them.
+        /// </summary>
+        /// <returns>true if a code city was drawn and is active.</returns>
+        public static bool IsCodeCityDrawnAndActive(this GameObject gameObject)
+        {
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+                    && child.gameObject.activeInHierarchy);
         }
 
         /// <summary>
@@ -121,6 +138,20 @@ namespace SEE.GO
         public static bool IsRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
+        }
+
+        /// <summary>
+        /// True if <paramref name="gameNode"/> represents the implementation or architecture root of
+        /// the graph.
+        ///
+        /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
+        /// attached to it that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is an implementation or architecture root</param>
+        /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
+        public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
         }
 
         /// <summary>

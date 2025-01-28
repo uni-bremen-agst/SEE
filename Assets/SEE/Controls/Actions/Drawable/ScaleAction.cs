@@ -172,7 +172,7 @@ namespace SEE.Controls.Actions.Drawable
                             /// Initializes the end of scaling.
                             /// When the left mouse button is pressed and released,
                             /// scaling is finished and it switches to the last progress state.
-                            if (Queries.LeftMouseInteraction())
+                            if (SEEInput.LeftMouseInteraction())
                             {
                                 BlinkEffect.Deactivate(selectedObj);
                                 progressState = ProgressState.Finish;
@@ -241,12 +241,12 @@ namespace SEE.Controls.Actions.Drawable
             }
 
             /// Tracked a released mouse button.
-            if (Queries.MouseUp(MouseButton.Left))
+            if (SEEInput.MouseUp(MouseButton.Left))
             {
                 mouseWasReleased = true;
             }
             /// Initiates scaling by opening the menu and switching to the corresponding state.
-            if (Queries.MouseUp(MouseButton.Left) && selectedObj != null)
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedObj != null)
             {
                 ScaleMenu.Enable(selectedObj);
                 progressState = ProgressState.Scale;
@@ -263,25 +263,25 @@ namespace SEE.Controls.Actions.Drawable
             float scaleFactor = 0f;
             bool isScaled = false;
             /// Scale up with normal speed.
-            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleUp;
                 isScaled = true;
             }
             /// Scale up with faster speed.
-            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleUpFast;
                 isScaled = true;
             }
             /// Scale down with normal speed.
-            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleDown;
                 isScaled = true;
             }
             /// Scale down with faster speed.
-            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 scaleFactor = ValueHolder.ScaleDownFast;
                 isScaled = true;

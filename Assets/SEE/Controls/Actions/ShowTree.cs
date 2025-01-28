@@ -39,7 +39,7 @@ namespace SEE.Controls.Actions
             // We will create a tree view for each code city.
             foreach (GameObject cityObject in cities)
             {
-                if (cityObject.TryGetComponentOrLog(out AbstractSEECity city))
+                if (cityObject.TryGetComponent(out AbstractSEECity city))
                 {
                     if (city.LoadedGraph == null || treeWindows.ContainsKey(city.name))
                     {

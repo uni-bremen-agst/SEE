@@ -101,16 +101,9 @@ namespace SEE.Controls.Actions
                         GameObject editedNode = raycastHit.collider.gameObject;
                         if (editedNode.TryGetNode(out Node node))
                         {
-                            if (!node.IsRoot())
-                            {
-                                progress = ProgressState.WaitingForInput;
-                                memento = new Memento(node);
-                                OpenDialog();
-                            }
-                            else
-                            {
-                                ShowNotification.Warn("Root node is readonly", "You cannot edit the root node.");
-                            }
+                            progress = ProgressState.WaitingForInput;
+                            memento = new Memento(node);
+                            OpenDialog();
                         }
                         else
                         {
@@ -225,7 +218,7 @@ namespace SEE.Controls.Actions
         private void OpenDialog()
         {
             // This dialog will set the source name and type of memento.node.
-            NodePropertyDialog dialog = new NodePropertyDialog(memento.Node);
+            NodePropertyDialog dialog = new(memento.Node);
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open();

@@ -1,4 +1,4 @@
-﻿namespace SEE.Game.Drawable.ActionHelpers
+﻿namespace SEE.Controls
 {
     /// <summary>
     /// Enum representing the different mouse buttons.

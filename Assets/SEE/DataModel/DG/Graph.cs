@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Sirenix.Utilities;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -21,17 +21,27 @@ namespace SEE.DataModel.DG
             elementObserver = new ProxyObserver(this, x => x.CopyWithGuid(Version));
         }
 
-        // The list of graph nodes indexed by their unique IDs
+        /// <summary>
+        /// The list of graph nodes indexed by their unique IDs.
+        /// </summary>
         private Dictionary<string, Node> nodes = new();
 
-        // The list of graph edges indexed by their unique IDs.
+        /// <summary>
+        /// The list of graph edges indexed by their unique IDs.
+        /// </summary>
         private Dictionary<string, Edge> edges = new();
+
+        /// <summary>
+        /// Name of the artificial node type used for artificial nodes added
+        /// when we do not have a real node type derived from the input graph.
+        /// </summary>
+        public const string UnknownType = "UNKNOWNTYPE";
 
         /// <summary>
         /// Name of the artificial node type used for artificial root nodes added
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
-        public const string UnknownType = "UNKNOWNTYPE";
+        public const string RootType = "ROOT";
 
         /// <summary>
         /// A toggle marking artificial root nodes as such.
@@ -295,7 +305,7 @@ namespace SEE.DataModel.DG
         ///
         /// If <paramref name="name"/> is null or empty, the <see cref="Name"/> of the graph
         /// concatenated with "#ROOT" will be used.
-        /// If <paramref name="type"/> is null or empty, <see cref="Graph.UnknownType"/> will be used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> will be used.
         /// </summary>
         /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
         /// <param name="name">ID of new root node</param>
@@ -304,34 +314,25 @@ namespace SEE.DataModel.DG
         public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
         {
             List<Node> roots = GetRoots();
-            if (roots.Count > 1)
+            string id = name;
+            string sourceName = name;
+            if (string.IsNullOrWhiteSpace(id))
             {
-                string id = name;
-                string sourceName = name;
-                if (string.IsNullOrWhiteSpace(id))
-                {
-                    id = $"{Name}#ROOT";
-                    sourceName = $"{Name} (root)";
-                }
-                if (string.IsNullOrWhiteSpace(type))
-                {
-                    type = UnknownType;
-                }
-                root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
-                AddNode(root);
-                foreach (Node oldRoot in roots)
-                {
-                    root.AddChild(oldRoot);
-                }
-
-                NodeHierarchyHasChanged = true;
-                return true;
+                id = $"{Name}#ROOT";
+                sourceName = $"{Name} (root)";
             }
-            else
+            if (string.IsNullOrWhiteSpace(type))
             {
-                root = roots.FirstOrDefault();
-                return false;
+                type = RootType;
             }
+            root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
+            AddNode(root);
+            foreach (Node oldRoot in roots)
+            {
+                root.AddChild(oldRoot);
+            }
+            NodeHierarchyHasChanged = true;
+            return true;
         }
 
         /// <summary>
@@ -774,7 +775,7 @@ namespace SEE.DataModel.DG
         /// <typeparam name="T">Type of the graph.</typeparam>
         /// <returns>The result from merging the <paramref name="other"/> graph into this one</returns>
         /// <exception cref="ArgumentNullException">If <paramref name="other"/> is <c>null</c></exception>
-        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T: Graph
+        public T MergeWith<T>(Graph other, string nodeIdSuffix = null, string edgeIdSuffix = null) where T : Graph
         {
             if (other == null)
             {

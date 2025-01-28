@@ -9,7 +9,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
     /// <summary>
     /// This class implements a dialog that allows the player to configure a widget and then add it to a board.
     /// </summary>
-    internal class AddWidgetDialog : HolisticMetricsDialog
+    internal class AddWidgetDialog : BasePropertyDialog
     {
         /// <summary>
         /// The metric type the player selected.
@@ -117,7 +117,7 @@ namespace SEE.UI.PropertyDialog.HolisticMetrics
         /// </param>
         /// <param name="widget">If given and not yet fetched, this will be the widget type selected by the player.
         /// </param>
-        /// <returns>The value of <see cref="HolisticMetricsDialog.GotInput"/></returns>
+        /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
         internal bool TryGetConfig(out string metric, out string widget)
         {
             if (GotInput)

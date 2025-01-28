@@ -326,12 +326,12 @@ namespace SEE.Controls.Actions.Drawable
                 SetupButtons(cutCopyPasteMenu);
             }
 
-            if (Queries.MouseUp(MouseButton.Left) && selectedObj == null)
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedObj == null)
             {
                 mouseWasReleased = true;
             }
 
-            if (Queries.MouseUp(MouseButton.Left) && selectedObj != null)
+            if (SEEInput.MouseUp(MouseButton.Left) && selectedObj != null)
             {
                 progressState = ProgressState.CutCopyPaste;
             }
@@ -375,13 +375,13 @@ namespace SEE.Controls.Actions.Drawable
                 }
             }
 
-            if (Queries.MouseUp(MouseButton.Left) && state != CutCopy.None && newObject != null
+            if (SEEInput.MouseUp(MouseButton.Left) && state != CutCopy.None && newObject != null
                 && progressState == ProgressState.CutCopyPaste)
             {
                 progressState = ProgressState.Finish;
             }
 
-            if (Queries.LeftMouseInteraction() && state == CutCopy.None)
+            if (SEEInput.LeftMouseInteraction() && state == CutCopy.None)
             {
                 SetToInitialState();
             }
