@@ -107,6 +107,7 @@ namespace SEE.GameObjects
 
                 default:
                     ShowNotification.Warn("Unexpected progress state", "An unexpected progress state occurred during execution.");
+                    progressState = ProgressState.Start;
                     break;
             }
         }
