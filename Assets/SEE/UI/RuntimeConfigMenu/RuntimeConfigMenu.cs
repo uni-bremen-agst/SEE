@@ -36,7 +36,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private AbstractSEECity[] currentMenuCities;
 
         /// <summary>
-        /// If the menu needs a rebuild.
+        /// Whether the menu needs a rebuild.
         /// </summary>
         private bool needsRebuild;
 
@@ -53,6 +53,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             WaitForLocalPlayerInstantiation().Forget();
             return;
+
             async UniTask WaitForLocalPlayerInstantiation()
             {
                 await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
@@ -137,7 +138,8 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Sorted by the game object name.
         /// </summary>
-        /// <returns>the sorted cities</returns>
+        /// <returns>the sorted cities or null if this menu does not have a
+        /// <see cref="CitiesHolder"/> attached to it</returns>
         public static AbstractSEECity[] GetCities()
         {
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))

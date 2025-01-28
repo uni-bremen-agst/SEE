@@ -53,7 +53,7 @@ namespace SEE.GameObjects
         /// will be attached and this table to the tuple list <see cref="CitiesHolder.Cities"/>.
         /// Is required to create the component across the network.
         /// </summary>
-        void Awake()
+        private void Awake()
         {
             WaitForLocalPlayerInstantiation().Forget();
             return;

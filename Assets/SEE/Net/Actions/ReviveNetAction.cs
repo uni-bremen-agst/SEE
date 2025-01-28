@@ -1,5 +1,4 @@
-﻿using Assets.SEE.Utils;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
@@ -49,15 +48,6 @@ namespace SEE.Net.Actions
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
             NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
-        }
-
-        /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
         }
 
         /// <summary>

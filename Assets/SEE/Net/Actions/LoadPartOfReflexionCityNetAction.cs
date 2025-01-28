@@ -1,7 +1,4 @@
 ﻿using SEE.Game.City;
-using SEE.Game;
-using SEE.GameObjects;
-using UnityEngine;
 using System;
 using SEE.Utils.Paths;
 using Cysharp.Threading.Tasks;
@@ -9,7 +6,7 @@ using Cysharp.Threading.Tasks;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// Loads a part of a ReflexionCity to all clients.
+    /// Loads a part of a <see cref="SEEReflexionCity"/> to all clients.
     /// </summary>
     public class LoadPartOfReflexionCityNetAction : CityNetAction
     {
@@ -35,7 +32,8 @@ namespace SEE.Net.Actions
         /// <param name="loadArchitecture">Distinction between whether an architecture or implementation graph should be loaded.</param>
         /// <param name="graphFile">The graph file to be loaded.</param>
         /// <param name="projectFolder">The project folder; can be null if a architecture graph should be loaded.</param>
-        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture, DataPath graphFile, DataPath projectFolder = null) : base(tableID)
+        public LoadPartOfReflexionCityNetAction(string tableID, bool loadArchitecture,
+            DataPath graphFile, DataPath projectFolder = null) : base(tableID)
         {
             LoadArchitecture = loadArchitecture;
             GraphFileToLoad = graphFile;
@@ -50,7 +48,8 @@ namespace SEE.Net.Actions
             base.ExecuteOnClient();
             if (City.GetComponent<SEEReflexionCity>() != null)
             {
-                City.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GraphFileToLoad, LoadArchitecture ? null : ProjectFolder).Forget();
+                City.GetComponent<SEEReflexionCity>().LoadAndDrawSubgraphAsync(GraphFileToLoad, LoadArchitecture ?
+                    null : ProjectFolder).Forget();
             }
             else
             {

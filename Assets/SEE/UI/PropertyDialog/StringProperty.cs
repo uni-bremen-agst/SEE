@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml;
 using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
 using SEE.GO;
