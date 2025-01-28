@@ -1,5 +1,4 @@
-﻿using MoreLinq;
-using SEE.Game.City;
+﻿using SEE.Game.City;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -27,7 +26,8 @@ namespace SEE.GameObjects
         /// Finds the city game object corresponding to the associated <paramref name="tableID"/>.
         /// </summary>
         /// <param name="tableID">The table ID</param>
-        /// <returns>The city game object, it found, otherwise a <see cref="KeyNotFoundException"/> will be thrown.</returns>
+        /// <returns>The city game object found.</returns>
+        /// <exception cref="KeyNotFoundException">If the <paramref name="tableID"/> could not be found"/></exception>
         public GameObject Find(string tableID)
         {
             return Cities[tableID];
