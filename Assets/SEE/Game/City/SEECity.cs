@@ -453,6 +453,11 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// True if the graph has been drawn (and of course loaded).
+        /// </summary>
+        protected bool IsGraphDrawn => IsGraphLoaded && gameObject.IsCodeCityDrawn();
+
+        /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
         /// Only the game objects generated for the nodes and edges are deleted first
         /// and then they are re-created.
@@ -461,7 +466,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphLoaded))]
+        [EnableIf(nameof(IsGraphDrawn))]
         public void ReDrawGraph()
         {
             if (LoadedGraph == null)
