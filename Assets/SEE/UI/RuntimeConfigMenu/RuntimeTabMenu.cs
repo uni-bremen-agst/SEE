@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -10,26 +6,27 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.UI.Menu;
 using SEE.GO;
+using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using SimpleFileBrowser;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
-using SEE.GraphProviders;
-using Sirenix.OdinInspector;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using SEE.UI.PropertyDialog;
-using OmniSharp.Extensions.LanguageServer.Protocol.Document;
-using static UnityEditor.Search.SearchValue;
-using SEE.UI.Notification;
 
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -152,6 +149,11 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Triggers when a list element was removed by a different player.
         /// </summary>
         public Action<string> SyncRemoveListElement;
+
+        /// <summary>
+        /// Triggers when a dict entry was added by a different player.
+        /// </summary>
+        public Action<string, string, string> SyncAddDictEntry;
 
         /// <summary>
         /// Prefab for the menu
@@ -717,6 +719,19 @@ namespace SEE.UI.RuntimeConfigMenu
                         "value type could not be determined since the dictionary is empty.");
                 }
             });
+            // listeners for net actions; broadcasts the addition of a new dict
+            // entry to all clients
+            SyncAddDictEntry += (widgetPath, key, valueTypeName) =>
+            {
+                if (widgetPath == parent.FullName())
+                {
+                    Debug.Log($"Value Type Name {valueTypeName}");
+                    Debug.Log($"GetType {Type.GetType(valueTypeName)}");
+                    Type valueType = Type.GetType(valueTypeName);
+                    dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                }
+            };
             return;
             /// Returns the desired type from a dictionary, depending on searchKeyType.
             /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
@@ -745,6 +760,14 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     dict.Add(key, Activator.CreateInstance(valueType));
                     UpdateDictChildren(parent, dict);
+                    AddDictEntryNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        WidgetPath = parent.FullName(),
+                        Key = key,
+                        ValueType = valueType.FullName
+                    };
+                    netAction.Execute();
                 }
             }
         }
