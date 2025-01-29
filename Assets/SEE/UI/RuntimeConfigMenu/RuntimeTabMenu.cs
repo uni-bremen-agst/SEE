@@ -697,13 +697,7 @@ namespace SEE.UI.RuntimeConfigMenu
             ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("AddBtn").GetComponent<ButtonManagerBasicIcon>();
             addBtn.clickEvent.AddListener(() =>
             {
-                /// Some dictionaries, such as <see cref="VisualNodeAttributesMapping"/>,
-                /// return an empty result from <see cref="Type.GetGenericArguments()"/>.
-                /// Therefore, the second case is also handled to ensure that entries cannot be added
-                /// to certain dictionaries when they are still empty.
-                Type keyType = dict.GetType().GetGenericArguments().Length == 2?
-                    dict.GetType().GetGenericArguments()[0] : dict.Keys.Count > 0?
-                        dict.Keys.Cast<object>().FirstOrDefault()?.GetType() : null;
+                Type keyType = GetType(true);
                 if (keyType != typeof(string))
                 {
                     string message = keyType != null ?
@@ -712,9 +706,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     ShowNotification.Error("Entry cannot be added.", $"The entry cannot be added because {message}");
                     return;
                 }
-                Type valueType = dict.GetType().GetGenericArguments().Length == 2 ?
-                    dict.GetType().GetGenericArguments()[1] : dict.Values.Count > 0?
-                        dict.Values.Cast<object>().FirstOrDefault()?.GetType() : null;
+                Type valueType = GetType(false);
                 if (valueType != null)
                 {
                     AddEntry(valueType).Forget();
@@ -726,6 +718,23 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
             });
             return;
+            /// Returns the desired type from a dictionary, depending on searchKeyType.
+            /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
+            /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
+            /// the second case is used, where the base type is examined.
+            /// If the types cannot be determined here either, it tries to extract the types directly from the first entry.
+            /// However, this only works if the dictionary is not empty.
+            /// If none of the cases can determine the desired type, null is returned.
+            Type GetType(bool searchKeyType)
+            {
+                Type dictType = dict.GetType();
+                int i = searchKeyType? 0 : 1;
+                ICollection collection = searchKeyType? dict.Keys : dict.Values;
+                return dictType.GetGenericArguments().Length == 2 ?
+                    dictType.GetGenericArguments()[i] : dictType.BaseType.GetGenericArguments().Length == 2 ?
+                        dictType.BaseType.GetGenericArguments()[i] : collection.Count > 0 ?
+                            collection.Cast<object>().FirstOrDefault()?.GetType() : null;
+            }
             async UniTask AddEntry(Type valueType)
             {
                 RuntimeMenuAddDictEntryProperty addEntryProperty = new(dict);
