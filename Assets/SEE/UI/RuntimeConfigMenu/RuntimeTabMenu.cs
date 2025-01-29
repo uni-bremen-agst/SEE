@@ -29,6 +29,7 @@ using DG.Tweening;
 using SEE.UI.PropertyDialog;
 using OmniSharp.Extensions.LanguageServer.Protocol.Document;
 using static UnityEditor.Search.SearchValue;
+using SEE.UI.Notification;
 
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -696,10 +697,32 @@ namespace SEE.UI.RuntimeConfigMenu
             ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("AddBtn").GetComponent<ButtonManagerBasicIcon>();
             addBtn.clickEvent.AddListener(() =>
             {
-                Type valueType = dict.Values.Count > 0? dict.Values.Cast<object>().FirstOrDefault()?.GetType() : null;
+                /// Some dictionaries, such as <see cref="VisualNodeAttributesMapping"/>,
+                /// return an empty result from <see cref="Type.GetGenericArguments()"/>.
+                /// Therefore, the second case is also handled to ensure that entries cannot be added
+                /// to certain dictionaries when they are still empty.
+                Type keyType = dict.GetType().GetGenericArguments().Length == 2?
+                    dict.GetType().GetGenericArguments()[0] : dict.Keys.Count > 0?
+                        dict.Keys.Cast<object>().FirstOrDefault()?.GetType() : null;
+                if (keyType != typeof(string))
+                {
+                    string message = keyType != null ?
+                        $"currently {keyType} is not supported as a key value." :
+                        "the key type could not be determined since the dictionary is empty.";
+                    ShowNotification.Error("Entry cannot be added.", $"The entry cannot be added because {message}");
+                    return;
+                }
+                Type valueType = dict.GetType().GetGenericArguments().Length == 2 ?
+                    dict.GetType().GetGenericArguments()[1] : dict.Values.Count > 0?
+                        dict.Values.Cast<object>().FirstOrDefault()?.GetType() : null;
                 if (valueType != null)
                 {
                     AddEntry(valueType).Forget();
+                }
+                else
+                {
+                    ShowNotification.Error("Entry cannot be added.", "The entry cannot be added because the " +
+                        "value type could not be determined since the dictionary is empty.");
                 }
             });
             return;
