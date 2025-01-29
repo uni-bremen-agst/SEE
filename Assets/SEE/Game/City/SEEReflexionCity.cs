@@ -153,7 +153,7 @@ namespace SEE.Game.City
             /// </summary>
             /// <param name="position">The center point of the area in world space.</param>
             /// <param name="scale">The scale of the area in world space.</param>
-            public Area(Vector3 position, Vector3 scale)
+            internal Area(Vector3 position, Vector3 scale)
             {
                 Position = position;
                 Scale = scale;
@@ -161,12 +161,35 @@ namespace SEE.Game.City
             /// <summary>
             /// The center point of the area in world space.
             /// </summary>
-            public Vector3 Position;
+            internal Vector3 Position;
             /// <summary>
             /// The scale of the area in world space. Only its x and z components
             /// are relevant.
             /// </summary>
-            public Vector3 Scale;
+            internal Vector3 Scale;
+
+            /// <summary>
+            /// Draws the area as a cube in the scene. Used for debugging.
+            /// </summary>
+            internal readonly void Draw(string name)
+            {
+                GameObject cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                cube.name = name;
+                cube.transform.transform.position = Position;
+                cube.transform.localScale = Scale;
+            }
+
+            /// <summary>
+            /// Applies the area to the given <paramref name="gameObject"/>.
+            /// After this method, the position and scale of <paramref name="gameObject"/>
+            /// will be the same as the position and scale of this area (in world space).
+            /// </summary>
+            /// <param name="gameObject">the object to which apply the area to</param>
+            internal readonly void ApplyTo(GameObject gameObject)
+            {
+                gameObject.transform.position = Position;
+                gameObject.SetAbsoluteScale(Scale, false);
+            }
         }
 
         /// <summary>
@@ -181,10 +204,7 @@ namespace SEE.Game.City
             if (codeCity.TryGetComponent(out SEEReflexionCity reflexionCity))
             {
                 // The original real-world position and scale of codeCity.
-                Area codeCityOriginal = new(codeCity.transform.position, codeCity.transform.lossyScale);
-
-                Split(codeCity, reflexionCity.ArchitectureLayoutProportion,
-                    out Area implementionArea, out Area architectureArea);
+                Area codeCityArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
 
                 try
                 {
@@ -205,6 +225,9 @@ namespace SEE.Game.City
                         // graphs are both empty.
                         if (reflexionRoot != null)
                         {
+                            Split(codeCity, reflexionCity.ArchitectureLayoutProportion,
+                                  out Area implementionArea, out Area architectureArea);
+
                             // The parent of the two game object hierarchies for the architecture and implementation.
                             GameObject reflexionCityRoot;
 
@@ -213,7 +236,27 @@ namespace SEE.Game.City
                                 GraphRenderer renderer = new(this, implementation);
                                 // reflexionCityRoot will be the direct and only child of gameObject
                                 reflexionCityRoot = renderer.DrawNode(reflexionRoot, codeCity);
+                                codeCityArea.ApplyTo(reflexionCityRoot);
+
+                                Debug.Log($"[reflexionCityRoot] position={reflexionCityRoot.transform.position} lossyScale={reflexionCityRoot.transform.lossyScale}\n");
+
                                 reflexionCityRoot.transform.SetParent(codeCity.transform);
+
+                                /*
+                                implementionArea.ApplyTo(codeCity);
+                                await renderer.DrawGraphAsync(implementation, codeCity, ReportProgress, cancellationTokenSource.Token);
+                                RestoreCodeCity();
+                                */
+                            }
+                            /*
+
+
+                            // Draw implementation.
+                            {
+                                GraphRenderer renderer = new(this, implementation);
+
+
+
                                 // Render the implementation graph under reflexionCityRoot.
                                 await renderer.DrawGraphAsync(implementation, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
                             }
@@ -230,6 +273,7 @@ namespace SEE.Game.City
                             }
 
                             implementationRoot.transform.SetParent(reflexionCityRoot.transform);
+                            */
                         }
                     }
                 }
@@ -245,17 +289,35 @@ namespace SEE.Game.City
 
                 return;
 
-                // Restores codeCity to its codeCityOriginalPosition and codeCityOriginalScale.
+                // Restores codeCity to its original osition and scale.
                 void RestoreCodeCity()
                 {
-                    codeCity.transform.position = codeCityOriginal.Position;
-                    codeCity.SetAbsoluteScale(codeCityOriginal.Scale, false);
+                    codeCityArea.ApplyTo(codeCity);
                 }
 
+                /// <summary>
+                /// Splits the code city into two areas - one for the implementation and one for the
+                /// architecture - along the longer edge of the code city in the proportion of
+                /// architectureLayoutProportion.
+                ///
+                /// The area of the implementation is returned in implemenationArea and the area of the
+                /// architecture in architectureArea.
+                ///
+                /// The edge length of architectureArea is the length of the longer edge of code city multiplied
+                /// by architectureLayoutProportion.
+                ///
+                /// implementationArea and architectureArea together occupy exactly the space of codeCity.
+                ///
+                /// architectureLayoutProportion is assumed to be in [0, 1]. If architectureLayoutProportion
+                /// is 0 or less, the implementation takes all the space and the architecture area sits at the
+                /// end of the longer edge of the implementation with zero scale. If architectureLayoutProportion
+                /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
+                /// begin of the longer edge of the architecture with zero scale.
+                /// </summary>
                 void Split(GameObject codeCity, float architectureLayoutProportion,
                     out Area implementionArea, out Area architectureArea)
                 {
-                    bool xIsLongerEdge = codeCity.transform.lossyScale.x >= codeCity.transform.lossyScale.y;
+                    bool xIsLongerEdge = codeCity.transform.lossyScale.x >= codeCity.transform.lossyScale.z;
 
                     if (architectureLayoutProportion <= 0)
                     {
@@ -291,27 +353,63 @@ namespace SEE.Game.City
                     }
                     else
                     {
-                        implementionArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
-                        architectureArea = new(codeCity.transform.position, codeCity.transform.lossyScale);
                         if (xIsLongerEdge)
                         {
-                            // Shrink and move the implementionArea to the left.
+                            // The reference point from which to start laying out the areas.
+                            Vector3 referencePoint = codeCity.transform.position;
+                            // The mid point of the left edge of the code city.
+                            referencePoint.x -= codeCity.transform.lossyScale.x / 2;
+
+                            // The implementationArea.
                             {
-                                // The proportion of the implemenation area.
-                                float implementationLayoutProportion = 1 - architectureLayoutProportion;
-                                // The begin of the longer edge in world space. This reference point will stay the same.
-                                float shorterLeftWorldSpaceEdge = implementionArea.Position.x - implementionArea.Scale.x / 2;
-                                // Distance from shorterLeftWorldSpaceEdge to original center.
-                                float originalRelativeCenter = implementionArea.Position.x - shorterLeftWorldSpaceEdge;
-                                implementionArea.Position.x = shorterLeftWorldSpaceEdge + originalRelativeCenter * implementationLayoutProportion;
-                                implementionArea.Scale.x *= implementationLayoutProportion;
+                                float length = codeCity.transform.lossyScale.x * (float)(1 - architectureLayoutProportion);
+                                Vector3 position = referencePoint;
+                                position.x += length / 2;
+                                Vector3 scale = new(length, codeCity.transform.lossyScale.y, codeCity.transform.lossyScale.z);
+                                implementionArea = new(position, scale);
+                                // Move the reference point to the right end of the implementation area.
+                                referencePoint.x += length;
                             }
 
-
-                            architectureArea.Scale.x *= architectureLayoutProportion;
+                            // The architectureArea.
+                            {
+                                float length = codeCity.transform.lossyScale.x * architectureLayoutProportion;
+                                Vector3 position = referencePoint;
+                                position.x += length / 2;
+                                Vector3 scale = new(length, codeCity.transform.lossyScale.y, codeCity.transform.lossyScale.z);
+                                architectureArea = new(position, scale);
+                            }
                         }
+                        else
+                        {
+                            // The reference point from which to start laying out the areas.
+                            Vector3 referencePoint = codeCity.transform.position;
+                            // The mid point of the lower edge of the code city.
+                            referencePoint.z -= codeCity.transform.lossyScale.z / 2;
 
+                            // The implementationArea.
+                            {
+                                float length = codeCity.transform.lossyScale.z * (float)(1 - architectureLayoutProportion);
+                                Vector3 position = referencePoint;
+                                position.z += length / 2;
+                                Vector3 scale = new(codeCity.transform.lossyScale.x, codeCity.transform.lossyScale.y, length);
+                                implementionArea = new(position, scale);
+                                // Move the reference point to the lower end of the implementation area.
+                                referencePoint.z += length;
+                            }
+
+                            // The architectureArea.
+                            {
+                                float length = codeCity.transform.lossyScale.z * architectureLayoutProportion;
+                                Vector3 position = referencePoint;
+                                position.z += length / 2;
+                                Vector3 scale = new(codeCity.transform.lossyScale.x, codeCity.transform.lossyScale.y, length);
+                                architectureArea = new(position, scale);
+                            }
+                        }
                     }
+                    implementionArea.Draw("implementation"); // FIXME: Remove this line.
+                    architectureArea.Draw("architecture");
                 }
             }
             else
