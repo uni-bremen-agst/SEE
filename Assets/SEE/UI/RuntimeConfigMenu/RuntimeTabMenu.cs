@@ -27,6 +27,8 @@ using Sirenix.OdinInspector;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using SEE.UI.PropertyDialog;
+using OmniSharp.Extensions.LanguageServer.Protocol.Document;
+using static UnityEditor.Search.SearchValue;
 
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -606,8 +608,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     // not supported
                     break;
                 case IDictionary dict:
-                    parent = CreateNestedSetting(settingName, parent, settingName == "NodeTypes");
-                    CreateDictAddEntry(parent, dict, settingName);
+                    parent = CreateNestedSetting(settingName, parent, true);
+                    CreateDictAddEntry(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
@@ -689,31 +691,27 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="parent">container</param>
         /// <param name="dict">the dictionary</param>
-        /// <param name="settingName">setting name</param>
-        private void CreateDictAddEntry(GameObject parent, IDictionary dict, string settingName)
+        private void CreateDictAddEntry(GameObject parent, IDictionary dict)
         {
             ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("AddBtn").GetComponent<ButtonManagerBasicIcon>();
             addBtn.clickEvent.AddListener(() =>
             {
-                switch (settingName)
+                Type valueType = dict.Values.Count > 0? dict.Values.Cast<object>().FirstOrDefault()?.GetType() : null;
+                if (valueType != null)
                 {
-                    case "NodeTypes":
-                        AddNodeType().Forget();
-                        break;
-                    default:
-                        break;
+                    AddEntry(valueType).Forget();
                 }
             });
             return;
-            async UniTask AddNodeType()
+            async UniTask AddEntry(Type valueType)
             {
-                AddNodeTypeProperty nodeTypeProperty = new();
-                nodeTypeProperty.Open(city);
-                string nodeTypeName = null;
-                await UniTask.WaitUntil(() => nodeTypeProperty.TryGetNodeTypeName(out nodeTypeName) || nodeTypeProperty.WasCanceled());
-                if (nodeTypeName != null)
+                RuntimeMenuAddDictEntryProperty addEntryProperty = new(dict);
+                addEntryProperty.Open();
+                string key = null;
+                await UniTask.WaitUntil(() => addEntryProperty.TryGetKey(out key) || addEntryProperty.WasCanceled());
+                if (key != null)
                 {
-                    dict.Add(nodeTypeName, new VisualNodeAttributes());
+                    dict.Add(key, Activator.CreateInstance(valueType));
                     UpdateDictChildren(parent, dict);
                 }
             }
