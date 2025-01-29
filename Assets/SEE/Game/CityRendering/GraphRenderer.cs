@@ -262,7 +262,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns a mapping of each graph Node onto its containing GameNode for every
+        /// Returns a mapping of each graph node onto its containing GameNode for every
         /// element in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes"></param>
@@ -280,13 +280,21 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
         /// to the user's choice in the settings.
+        ///
+        /// If the <paramref name="graph"/> has multiple roots, a unique root will be added to <paramref name="graph"/>
+        /// whose immediate children are all previous root nodes and a game object will be created for this new root.
+        /// This, however, can be avoided by passing true to <paramref name="doNotAddUniqueRoot"/>.
         /// </summary>
         /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
-        /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
+        /// <param name="parent">every game object drawn for roots of <paramref name="graph"/> will be become an
+        /// immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
+        /// <param name="doNotAddUniqueRoot">if true and if there is no single root in <paramref name="graph"/>,
+        /// an artificial unique root will be added whose immediate children are the multiple roots of
+        /// <paramref name="graph"/></param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool loadReflexionFiles = false)
+                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
             // all nodes of the graph
             IList<Node> nodes = graph.Nodes();
@@ -301,7 +309,7 @@ namespace SEE.Game.CityRendering
             NodeLayout nodeLayout = GetLayout(parent);
 
             // If we have multiple roots, we need to add a unique one.
-            if (!loadReflexionFiles)
+            if (!doNotAddUniqueRoot)
             {
                 AddGameRootNodeIfNecessary(graph, nodeMap);
             }
@@ -328,7 +336,7 @@ namespace SEE.Game.CityRendering
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
-            GameObject rootGameNode = RootGameNode(loadReflexionFiles? parent.ContainingCity().gameObject : parent);
+            GameObject rootGameNode = RootGameNode(parent);
             try
             {
                 await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
@@ -694,12 +702,12 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the child object of <paramref name="codeCity"/> tagged by Tags.Node.
+        /// Returns the child object of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
         /// If there is no such child or if there are more than one, an exception will
         /// be thrown.
         /// </summary>
         /// <param name="codeCity">game object representing a code city</param>
-        /// <returns>child object of <paramref name="codeCity"/> tagged by Tags.Node</returns>
+        /// <returns>child object of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/></returns>
         public static GameObject RootGameNode(GameObject codeCity)
         {
             GameObject result = null;
