@@ -156,6 +156,11 @@ namespace SEE.UI.RuntimeConfigMenu
         public Action<string, string, string> SyncAddDictEntry;
 
         /// <summary>
+        /// Triggers when a dict entry was removed by a different player.
+        /// </summary>
+        public Action<string, string, string> SyncRemoveDictEntry;
+
+        /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
@@ -612,7 +617,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case IDictionary dict:
                     parent = CreateNestedSetting(settingName, parent, true);
-                    CreateDictAddEntry(parent, dict);
+                    CreateDictEntryManagement(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
@@ -668,15 +673,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
-        /// <param name="addVisibility">Enables the add button to add new items.</param>
+        /// <param name="expandable">Enables the add button to add new items.</param>
+        /// <param name="removeable">Enables the remove button to remove this entry from its dictionary.</param>
         /// <returns>container for child settings</returns>
-        private static GameObject CreateNestedSetting(string settingName, GameObject parent, bool addVisibility = false)
+        private static GameObject CreateNestedSetting(string settingName, GameObject parent,
+            bool expandable = false, bool removeable = false)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
             container.name = settingName;
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
-            if (addVisibility)
+            if (expandable)
             {
                 EnableAddButton();
             }
@@ -684,19 +691,20 @@ namespace SEE.UI.RuntimeConfigMenu
 
             void EnableAddButton()
             {
-                Transform addBtnTransform = container.transform.Find("AddBtn");
+                Transform addBtnTransform = container.transform.Find("Buttons/AddBtn");
                 addBtnTransform.gameObject.SetActive(true);
             }
         }
 
         /// <summary>
-        /// Adds functionality to allow a new to be added to the dictionary.
+        /// Adds functinality for managing dictionary entries.
+        /// This includes adding new entries as well as removing existing ones.
         /// </summary>
         /// <param name="parent">container</param>
         /// <param name="dict">the dictionary</param>
-        private void CreateDictAddEntry(GameObject parent, IDictionary dict)
+        private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
         {
-            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("AddBtn").GetComponent<ButtonManagerBasicIcon>();
+            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
             addBtn.clickEvent.AddListener(() =>
             {
                 Type keyType = GetType(true);
@@ -725,8 +733,6 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (widgetPath == parent.FullName())
                 {
-                    Debug.Log($"Value Type Name {valueTypeName}");
-                    Debug.Log($"GetType {Type.GetType(valueTypeName)}");
                     Type valueType = Type.GetType(valueTypeName);
                     dict.Add(key, Activator.CreateInstance(valueType));
                     UpdateDictChildren(parent, dict);
