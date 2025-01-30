@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
@@ -693,7 +694,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 EnableAddButton();
             }
-            if (removable) //TODO prevent deleting ROOT-Types
+            if (removable && CanRemoveKey())
             {
                 InitRemoveButton();
             }
@@ -705,6 +706,13 @@ namespace SEE.UI.RuntimeConfigMenu
                 addBtnTransform.gameObject.SetActive(true);
             }
 
+            bool CanRemoveKey()
+            {
+                return settingName != Graph.RootType
+                    && settingName != ReflexionGraph.ArchitectureType
+                    && settingName != ReflexionGraph.ImplementationType;
+            }
+
             void InitRemoveButton()
             {
                 Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
@@ -713,6 +721,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 removeBtn.clickEvent.AddListener(() =>
                 {
                     SyncRemoveDictEntry.Invoke(parent.FullName(), settingName);
+                    // TODO Network
                 });
             }
         }
