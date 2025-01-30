@@ -158,7 +158,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Triggers when a dict entry was removed by a different player.
         /// </summary>
-        public Action<string, string, string> SyncRemoveDictEntry;
+        public Action<string, string> SyncRemoveDictEntry;
 
         /// <summary>
         /// Prefab for the menu
@@ -443,6 +443,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => fieldInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => fieldInfo.SetValue(obj, changedValue),
                         memberInfo.GetCustomAttributes()
                     );
@@ -464,6 +465,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => propertyInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => propertyInfo.SetValue(obj, changedValue),
                         memberInfo.GetCustomAttributes()
                     );
@@ -482,7 +484,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent game object</param>
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
-        private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
+        private void CreateSetting(Func<object> getter, string settingName, GameObject parent, bool removable,
             UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
@@ -545,14 +547,14 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case Color:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateColorPicker(settingName,
                         parent,
                         changedValue => setter!(changedValue),
                         () => (Color)getter());
                     break;
                 case DataPath dataPath:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateFilePicker(settingName, dataPath, parent);
                     break;
                 case Enum:
@@ -577,6 +579,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => mapInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -585,6 +588,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => antennaInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -594,6 +598,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -604,6 +609,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline2.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -616,21 +622,21 @@ namespace SEE.UI.RuntimeConfigMenu
                     // not supported
                     break;
                 case IDictionary dict:
-                    parent = CreateNestedSetting(settingName, parent, true);
+                    parent = CreateNestedSetting(settingName, parent, removable, true);
                     CreateDictEntryManagement(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
                 case IList<string> list:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(list, parent, () => string.Empty);
                     break;
                 case List<SingleGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(providerList, parent, () => new SingleGraphPipelineProvider());
                     break;
                 case List<MultiGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(providerList, parent, () => new MultiGraphPipelineProvider());
                     break;
 
@@ -648,7 +654,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case VisualAttributes:
                 case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 case CSVGraphProvider:
@@ -656,7 +662,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case GXLSingleGraphProvider:
                 case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
@@ -674,10 +680,10 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
         /// <param name="expandable">Enables the add button to add new items.</param>
-        /// <param name="removeable">Enables the remove button to remove this entry from its dictionary.</param>
+        /// <param name="removable">Enables the remove button to remove this entry from its dictionary.</param>
         /// <returns>container for child settings</returns>
-        private static GameObject CreateNestedSetting(string settingName, GameObject parent,
-            bool expandable = false, bool removeable = false)
+        private GameObject CreateNestedSetting(string settingName, GameObject parent,
+            bool removable, bool expandable = false)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
@@ -687,12 +693,27 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 EnableAddButton();
             }
+            if (removable) //TODO prevent deleting ROOT-Types
+            {
+                InitRemoveButton();
+            }
             return container.transform.Find("Content").gameObject;
 
             void EnableAddButton()
             {
                 Transform addBtnTransform = container.transform.Find("Buttons/AddBtn");
                 addBtnTransform.gameObject.SetActive(true);
+            }
+
+            void InitRemoveButton()
+            {
+                Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
+                removeBtnTransform.gameObject.SetActive(true);
+                ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
+                removeBtn.clickEvent.AddListener(() =>
+                {
+                    SyncRemoveDictEntry.Invoke(parent.FullName(), settingName);
+                });
             }
         }
 
@@ -735,6 +756,17 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     Type valueType = Type.GetType(valueTypeName);
                     dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                }
+            };
+
+            // broadcasts the removing of a new dict entry to all cients
+            SyncRemoveDictEntry += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    dict.Remove(key);
                     UpdateDictChildren(parent, dict);
                 }
             };
@@ -1537,6 +1569,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => list[iCopy],
                         i.ToString(),
                         parent,
+                        false,
                         changedValue => list[iCopy] = changedValue as T
                     );
                 }
@@ -1555,7 +1588,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (!dict.Contains(child.name))
                 {
-                    Destroyer.Destroy(child);
+                    Destroyer.Destroy(child.gameObject);
                 }
             }
 
@@ -1568,6 +1601,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => dict[key],
                         key.ToString(),
                         parent,
+                        true,
                         changedValue => dict[key] = changedValue
                     );
                 }
