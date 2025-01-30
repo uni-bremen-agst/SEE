@@ -16,6 +16,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// The name of the value type for which an object should be created.
         /// </summary>
         public string ValueType;
+
         /// <summary>
         /// Triggers 'SyncAddDictEntry' on <see cref="RuntimeTabMenu"/>.
         /// </summary>

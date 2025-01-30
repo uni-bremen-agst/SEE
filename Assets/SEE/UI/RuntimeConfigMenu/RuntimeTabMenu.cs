@@ -29,7 +29,6 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-
 namespace SEE.UI.RuntimeConfigMenu
 {
     /// <summary>
@@ -160,6 +159,11 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Triggers when a dict entry was removed by a different player.
         /// </summary>
         public Action<string, string> SyncRemoveDictEntry;
+
+        /// <summary>
+        /// Triggers when a dict entry should be removed.
+        /// </summary>
+        public Action<string, string> RemoveDictEntryAction;
 
         /// <summary>
         /// Prefab for the menu
@@ -720,8 +724,17 @@ namespace SEE.UI.RuntimeConfigMenu
                 ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
                 removeBtn.clickEvent.AddListener(() =>
                 {
+                    RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
+                    /*
                     SyncRemoveDictEntry.Invoke(parent.FullName(), settingName);
-                    // TODO Network
+                    RemoveDictEntryNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        WidgetPath = parent.FullName(),
+                        Key = settingName
+                    };
+                    netAction.Execute();
+                    */
                 });
             }
         }
@@ -757,6 +770,26 @@ namespace SEE.UI.RuntimeConfigMenu
                         "value type could not be determined since the dictionary is empty.");
                 }
             });
+
+            /// The action to be executed when an entry should be removed from a dictionary.
+            /// Additionally, it is checked whether it is a <see cref="VisualNodeAttributes"/>.
+            /// If this is the case, it is verified whether it can be removed at all.
+            RemoveDictEntryAction += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    if (dict[key].GetType() == typeof(VisualNodeAttributes))
+                    {
+                        ValidateAndRemoveNodeType((VisualNodeAttributes)dict[key], key);
+                    }
+                    else
+                    {
+                        RemoveDictEntry(key);
+                    }
+                }
+            };
+
             // listeners for net actions; broadcasts the addition of a new dict
             // entry to all clients
             SyncAddDictEntry += (widgetPath, key, valueTypeName) =>
@@ -780,6 +813,38 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
             };
             return;
+            void RemoveDictEntry(string key)
+            {
+                dict.Remove(key);
+                UpdateDictChildren(parent, dict);
+                RemoveDictEntryNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    WidgetPath = parent.FullName(),
+                    Key = key
+                };
+                netAction.Execute();
+            }
+
+            void ValidateAndRemoveNodeType(VisualNodeAttributes nodeType, string key)
+            {
+                if (city.LoadedGraph == null)
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because the graph is not loaded.");
+                    return;
+                }
+                if (city.LoadedGraph.Nodes().Any(node => node.Type == key))
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because it is used in the graph. Only unused node types can be deleted.");
+                }
+                else
+                {
+                    RemoveDictEntry(key);
+                }
+            }
+
             /// Returns the desired type from a dictionary, depending on searchKeyType.
             /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
             /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
@@ -1541,6 +1606,11 @@ namespace SEE.UI.RuntimeConfigMenu
             // add listener to update list
             OnUpdateMenuValues += () =>
             {
+                // This case can occur if a dictionary entry has been removed.
+                if (parent == null || addButton == null || removeButton == null)
+                {
+                    return;
+                }
                 UpdateListChildren(list, parent);
                 addButton.transform.SetAsLastSibling();
                 removeButton.transform.SetAsLastSibling();
