@@ -723,16 +723,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 removeBtn.clickEvent.AddListener(() =>
                 {
                     RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
-                    /*
-                    SyncRemoveDictEntry.Invoke(parent.FullName(), settingName);
-                    RemoveDictEntryNetAction netAction = new()
-                    {
-                        CityIndex = CityIndex,
-                        WidgetPath = parent.FullName(),
-                        Key = settingName
-                    };
-                    netAction.Execute();
-                    */
                 });
             }
         }
