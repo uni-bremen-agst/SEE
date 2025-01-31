@@ -1,4 +1,5 @@
 ﻿using SEE.Controls;
+using SEE.DataModel.DG;
 using SEE.Utils;
 using System.Collections;
 using UnityEngine;
@@ -77,6 +78,10 @@ namespace SEE.UI.PropertyDialog
             else if (dict.Contains(selectedName.Value))
             {
                 selectedName.ChangeToValidationFailed("Key is already in use. Please enter a unique key.");
+            }
+            else if (Graph.RootTypes.Contains(selectedName.Value))
+            {
+                selectedName.ChangeToValidationFailed("Key is reserved. Please enter a unique key.");
             }
             else
             {
