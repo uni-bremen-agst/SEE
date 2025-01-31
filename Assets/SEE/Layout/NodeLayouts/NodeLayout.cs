@@ -18,7 +18,7 @@ namespace SEE.Layout.NodeLayouts
         /// placed on this level</param>
         public NodeLayout(float groundLevel)
         {
-            this.GroundLevel = groundLevel;
+            GroundLevel = groundLevel;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layoutNodes"></param>
         /// <param name="edges"></param>
         /// <param name="sublayouts"></param>
-        /// <returns></returns>
+        /// <returns>The calculated laout</returns>
         public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts);
 
         /// <summary>
@@ -106,19 +106,28 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Adds the given <paramref name="target"/> to every node in <paramref name="layoutNodes"/>.
+        /// Moves all <paramref name="layoutNodes"/> together to the cube defined by <paramref name="target"/>.
+        /// More precisely, the bounding box enclosing all nodes in <paramref name="layoutNodes"/> will be
+        /// translated (moved such that there is no change in size or shape) to a new location defined by
+        /// <paramref name="target"/> such that the center of the bounding box at the new location
+        /// is at <paramref name="target"/>.
         /// </summary>
-        /// <param name="layoutNodes">layout nodes to be adjusted</param>
-        /// <param name="target">offset to be added</param>
+        /// <param name="layoutNodes">layout nodes to be moved</param>
+        /// <param name="target">worldspace center point where to move the <paramref name="layoutNodes"/></param>
         public static void MoveTo(IEnumerable<ILayoutNode> layoutNodes, Vector3 target)
         {
             IList<ILayoutNode> layoutList = layoutNodes.ToList();
             Bounding3DBox(layoutList.ToList(), out Vector3 left, out Vector3 right);
-            // The center of the bounding 3D box enclosing all layoutNodes
+            // centerPosition is the worldspace center of the bounding 3D box (cube) enclosing all layoutNodes.
+            // The center of the cube is the midpoint of the line segment connecting its
+            // left front corner and its right back corner. The coordinates of the center
+            // can be calculated using the midpoint formula:
             Vector3 centerPosition = (right + left) / 2.0f;
+            // The offest is the vector from the current center of the bounding box to the
+            // target center point and needs to be added to all nodes.
             Vector3 offset = target - centerPosition;
             // It is assumed that target.y is the lowest point of the city.
-            offset.y = target.y;
+            // offset.y = target.y; FIXME can be removed.
             foreach (ILayoutNode layoutNode in layoutList)
             {
                 layoutNode.CenterPosition += offset;
@@ -216,8 +225,8 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the bounding 3D box enclosing all given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding 3D box</param>
-        /// <param name="left">the left lower front corner of the bounding box</param>
-        /// <param name="right">the right upper back corner of the bounding box</param>
+        /// <param name="left">the left lower front corner of the bounding box in worldspace</param>
+        /// <param name="right">the right upper back corner of the bounding box in worldspace</param>
         private static void Bounding3DBox(ICollection<ILayoutNode> layoutNodes, out Vector3 left, out Vector3 right)
         {
             if (layoutNodes.Count == 0)
@@ -230,20 +239,20 @@ namespace SEE.Layout.NodeLayouts
                 left = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
                 right = new Vector3(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
 
-                foreach (ILayoutNode go in layoutNodes)
+                foreach (ILayoutNode node in layoutNodes)
                 {
-                    Vector3 extent = go.AbsoluteScale / 2.0f;
+                    Vector3 extent = node.AbsoluteScale / 2.0f;
                     // Note: position denotes the center of the object
-                    Vector3 position = go.CenterPosition;
+                    Vector3 position = node.CenterPosition;
                     {
-                        // left x co-ordinate of go
+                        // left x co-ordinate of node
                         float x = position.x - extent.x;
                         if (x < left.x)
                         {
                             left.x = x;
                         }
                     }
-                    {   // right x co-ordinate of go
+                    {   // right x co-ordinate of node
                         float x = position.x + extent.x;
                         if (x > right.x)
                         {
@@ -251,7 +260,7 @@ namespace SEE.Layout.NodeLayouts
                         }
                     }
                     {
-                        // lower y co-ordinate of go
+                        // lower y co-ordinate of node
                         float y = position.y - extent.y;
                         if (y < left.y)
                         {
@@ -259,7 +268,7 @@ namespace SEE.Layout.NodeLayouts
                         }
                     }
                     {
-                        // upper y co-ordinate of go
+                        // upper y co-ordinate of node
                         float y = position.y + extent.y;
                         if (y > right.y)
                         {
@@ -267,7 +276,7 @@ namespace SEE.Layout.NodeLayouts
                         }
                     }
                     {
-                        // front z co-ordinate of go
+                        // front z co-ordinate of node
                         float z = position.z - extent.z;
                         if (z < left.z)
                         {
@@ -275,7 +284,7 @@ namespace SEE.Layout.NodeLayouts
                         }
                     }
                     {
-                        // back z co-ordinate of go
+                        // back z co-ordinate of node
                         float z = position.z + extent.z;
                         if (z > right.z)
                         {
