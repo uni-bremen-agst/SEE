@@ -1,6 +1,7 @@
-﻿using Sirenix.Utilities;
+﻿using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -42,6 +43,13 @@ namespace SEE.DataModel.DG
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string RootType = "ROOT";
+
+        /// <summary>
+        /// An immutable list of all root types of the graphs.
+        /// </summary>
+        public static ImmutableList<string> RootTypes = ImmutableList.Create(RootType,
+            ReflexionGraph.ArchitectureType,
+            ReflexionGraph.ImplementationType);
 
         /// <summary>
         /// A toggle marking artificial root nodes as such.

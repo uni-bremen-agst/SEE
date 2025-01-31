@@ -712,9 +712,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             bool CanRemoveKey()
             {
-                return settingName != Graph.RootType
-                    && settingName != ReflexionGraph.ArchitectureType
-                    && settingName != ReflexionGraph.ImplementationType;
+                return !Graph.RootTypes.Contains(settingName);
             }
 
             void InitRemoveButton()
