@@ -868,6 +868,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         ValueType = valueType.FullName
                     };
                     netAction.Execute();
+                    ReDraw();
                 }
             }
         }
@@ -1730,6 +1731,33 @@ namespace SEE.UI.RuntimeConfigMenu
                 yield return 0;
                 city.Invoke(nameof(SEECity.DrawGraph), 0);
             }
+        }
+
+        /// <summary>
+        /// Performs the redrawing of the city.
+        /// </summary>
+        private void ReDraw()
+        {
+            TriggerReDraw();
+            UpdateCityMethodNetAction netAction = new()
+            {
+                CityIndex = CityIndex,
+                MethodName = nameof(TriggerReDraw)
+            };
+            netAction.Execute();
+        }
+
+        /// <summary>
+        /// Immediately redraws the city using the <see cref="SEECity.ReDrawGraph"/>
+        /// function.
+        /// </summary>
+        private void TriggerReDraw()
+        {
+            if (city.LoadedGraph == null)
+            {
+                return;
+            }
+            city.Invoke(nameof(SEECity.ReDrawGraph), 0);
         }
 
         /// <summary>
