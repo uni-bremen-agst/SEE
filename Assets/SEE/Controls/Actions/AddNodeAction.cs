@@ -12,6 +12,7 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
+using SEE.Game.City;
 
 namespace SEE.Controls.Actions
 {
@@ -79,17 +80,19 @@ namespace SEE.Controls.Actions
                     if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
                     {
-                        AddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
+                        CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
                     else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef() &&
                         XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out raycastHit))
                     {
                         XRSEEActions.Selected = false;
-                        AddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
+                        CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
                     else if (ExecuteViaContextMenu)
                     {
                         ExecuteViaContextMenu = false;
+                        /// Here, <see cref="AddNode"/> is used since the check for whether adding is possible has
+                        /// already been performed in the <see cref="ContextMenuAction"/>.
                         AddNode(contextMenuTargetParent, contextMenuTargetLocalPosition);
                     }
                     break;
@@ -105,6 +108,30 @@ namespace SEE.Controls.Actions
                     throw new NotImplementedException($"Unhandled case {nameof(progress)}.");
             }
             return result;
+        }
+
+        /// <summary>
+        /// Checks if adding a node is possible and adds the node if so.
+        /// </summary>
+        /// <param name="parent">The parent on which to place the node.</param>
+        /// <param name="targetPosition">The local position where the node should be placed.</param>
+        private void CheckAddNode(GameObject parent, Vector3 targetPosition)
+        {
+            if (!HasAvailableNodeType(parent.ContainingCity()))
+            {
+                ShowNotification.Warn("No node type available.", "Node could not be added. A node type must be added first.");
+                return;
+            }
+            AddNode(parent, targetPosition);
+        }
+
+        /// <summary>
+        /// Checks if there is at least one node type that is note a root type.
+        /// </summary>
+        /// <returns></returns>
+        public static bool HasAvailableNodeType(AbstractSEECity city)
+        {
+            return city.NodeTypes.Any(nodeType => !Graph.RootTypes.Contains(nodeType.Key));
         }
 
         /// <summary>

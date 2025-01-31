@@ -674,6 +674,11 @@ namespace SEE.Controls.Actions
 
             void NewNode()
             {
+                if (!AddNodeAction.HasAvailableNodeType(gameObject.ContainingCity()))
+                {
+                    ShowNotification.Warn("No node type available.", "Node could not be added. A node type must be added first.");
+                    return;
+                }
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.NewNode);
                 AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
