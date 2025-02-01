@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using SEE.Layout.NodeLayouts.RectanglePacking;
+﻿using SEE.Layout.NodeLayouts.RectanglePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -16,16 +14,15 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        /// <param name="Unit">the unit for blocks; will be used to adjust the padding</param>
-        /// <param name="padding">the padding to be added between neighboring nodes;
-        /// the actual value used is padding * leafNodeFactory.Unit()</param>
-        public RectanglePackingNodeLayout(float groundLevel, float padding = 1.0f)
-            : base(groundLevel)
+        /// <param name="padding">the padding to be added between neighboring nodes</param>
+        public RectanglePackingNodeLayout(float padding = 0.1f)
+        {
+            this.padding = padding;
+        }
+
+        static RectanglePackingNodeLayout()
         {
             Name = "Rectangle Packing";
-            this.padding = padding;
         }
 
         /// <summary>
@@ -33,12 +30,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly float padding;
 
-        /// <summary>
-        /// Yields a layout of <paramref name="layoutNodes"/> as a set of nested packed rectangles.
-        /// </summary>
-        /// <param name="layoutNodes">nodes to be laid out</param>
-        /// <returns>retangle packing layout</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
@@ -46,7 +38,7 @@ namespace SEE.Layout.NodeLayouts
             if (layoutNodeList.Count == 1)
             {
                 ILayoutNode layoutNode = layoutNodeList.First();
-                layoutResult[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.LocalScale);
+                layoutResult[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.AbsoluteScale);
                 return layoutResult;
             }
 
@@ -71,7 +63,7 @@ namespace SEE.Layout.NodeLayouts
                 if (numberOfLeaves == layoutNodeList.Count)
                 {
                     // There are only leaves.
-                    Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList());
+                    Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
                     RemovePadding(layoutResult, padding);
                     return layoutResult;
                 }
@@ -89,8 +81,8 @@ namespace SEE.Layout.NodeLayouts
             else
             {
                 ILayoutNode root = roots.FirstOrDefault();
-                Vector2 area = PlaceNodes(layoutResult, root);
-                Vector3 position = new(0.0f, GroundLevel, 0.0f);
+                Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
+                Vector3 position = new(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
                 RemovePadding(layoutResult, padding);
@@ -169,8 +161,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layout">the current layout; will be updated</param>
         /// <param name="node">node to be laid out (includings all its descendants)</param>
+        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
         /// <returns>the width and depth of the area covered by the rectangle for <paramref name="node"/></returns>
-        private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node)
+        private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
         {
             if (node.IsLeaf)
             {
@@ -189,7 +182,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     if (!child.IsLeaf)
                     {
-                        Vector2 childArea = PlaceNodes(layout, child);
+                        Vector2 childArea = PlaceNodes(layout, child, groundLevel);
                         // childArea is the ground area size required for this inner node.
                         // The position of this inner node in layout will be below in the call to Pack().
                         // The position is relative to the parent of this inner node.
@@ -198,14 +191,14 @@ namespace SEE.Layout.NodeLayouts
                         // inner node. Nevertheless, we do not add padding here, because padding is already
                         // included in the returned childArea.
                         layout[child] = new NodeTransform(Vector3.zero,
-                                                          new Vector3(childArea.x, GroundLevel, childArea.y));
+                                                          new Vector3(childArea.x, groundLevel, childArea.y));
                     }
                 }
                 // The scales of all children of the node have now been set. Now
                 // let's pack those children.
                 if (children.Count > 0)
                 {
-                    Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList());
+                    Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel);
                     return new Vector2(area.x + 2.0f * padding, area.y + 2.0f * padding);
                 }
                 else
@@ -282,9 +275,10 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layout">the current layout (positions of <paramref name="nodes"/>
         /// will be updated</param>
         /// <param name="nodes">the nodes to be laid out</param>
+        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
         /// <returns>the width (x) and depth (y) of the outer rectangle in which all
         /// <paramref name="nodes"/> were placed</returns>
-        private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes)
+        private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
         {
             // To increase the efficiency of the space usage, we order the elements by one of the sizes.
             // Elements must be sorted by size, descending
@@ -297,7 +291,7 @@ namespace SEE.Layout.NodeLayouts
             Vector2 worstCaseSize = Sum(nodes, layout);
             // The worst-case size is increased slightly to circumvent potential
             // imprecisions of floating-point arithmetics.
-            PTree tree = new PTree(Vector2.zero, 1.1f * worstCaseSize);
+            PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
 
             // Keeps track of the area currently covered by elements. It is the bounding
             // box containing all rectangles placed so far.
@@ -308,11 +302,11 @@ namespace SEE.Layout.NodeLayouts
             // All nodes in pnodes that preserve the size of coverec. The
             // value is the amount of remaining space if the node were split to
             // place el.
-            Dictionary<PNode, float> preservers = new Dictionary<PNode, float>();
+            Dictionary<PNode, float> preservers = new();
             // All nodes in pnodes that do not preserve the size of coverec.
             // The value is the aspect ratio of coverec if the node were used to
             // place el.
-            Dictionary<PNode, float> expanders = new Dictionary<PNode, float>();
+            Dictionary<PNode, float> expanders = new();
 
             foreach (ILayoutNode el in nodes)
             {
@@ -388,7 +382,7 @@ namespace SEE.Layout.NodeLayouts
                 // position returned must be the center. The y co-ordinate is the ground level.
                 Vector3 scale = layout[el].Scale;
                 layout[el] = new NodeTransform(new Vector3(fitNode.Rectangle.Position.x + scale.x / 2.0f,
-                                                           GroundLevel,
+                                                           groundLevel,
                                                            fitNode.Rectangle.Position.y + scale.z / 2.0f),
                                                scale);
 
@@ -409,16 +403,6 @@ namespace SEE.Layout.NodeLayouts
 
             }
             return covrec;
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

@@ -42,6 +42,15 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// The mapping from graph nodes onto layout nodes. Every layout node created by any of the
+        /// constructors of this class or one of its subclasses will be added to it. All layout nodes
+        /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
+        /// same for all. The mapping will be gathered by the constructor.
+        /// </summary>
+        protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
+
+        #region IHierarchyNode
+        /// <summary>
         /// The tree level of the node. Roots have level 0, for all other nodes the level is the
         /// distance to its root.
         /// </summary>
@@ -50,6 +59,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The tree level of the node. Roots have level 0, for all other nodes the level is the
         /// distance to its root.
+        ///
+        /// <see cref="IHierarchyNode.Level"/>
         /// </summary>
         public int Level
         {
@@ -58,27 +69,17 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The mapping from graph nodes onto layout nodes. Every layout node created by any of the
-        /// constructors of this class or one of its subclasses will be added to it. All layout nodes
-        /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
-        /// same for all. The mapping will be gathered by the constructor.
-        /// </summary>
-        protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
-
-        /// <summary>
         /// Whether this node represents a leaf.
+        ///
+        /// <see cref="IHierarchyNode.IsLeaf"/>
         /// </summary>
         /// <returns>true if this node represents a leaf</returns>
         public bool IsLeaf => Node.IsLeaf();
 
         /// <summary>
-        /// A unique ID for a node: the ID of the graph node underlying this layout node.
-        /// </summary>
-        /// <returns>unique ID for this node</returns>
-        public string ID => Node.ID;
-
-        /// <summary>
         /// The parent of this node. May be null if it has none.
+        ///
+        /// <see cref="IHierarchyNode.Children"/>
         ///
         /// Note: Parent may be null even if the underlying graph node actually has a
         /// parent in the graph, yet that parent was never passed to any of the
@@ -115,6 +116,8 @@ namespace SEE.Game.CityRendering
         /// Note: If a child of the node in the underlying graph, has no
         /// corresponding layout node (<see cref="ToLayoutNode"/>), it will be ignored silently.
         /// This is useful in situation where only a subset of nodes is to be considered for a layout.
+        ///
+        /// <see cref="IHierarchyNode.Children"/>
         /// </summary>
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
@@ -130,10 +133,6 @@ namespace SEE.Game.CityRendering
                     {
                         result.Add(layoutNode);
                     }
-                    //else
-                    //{
-                    //    Debug.LogError($"Child {node.ID} of {ID} has no corresponding layout node.\n");
-                    //}
                 }
             }
             else
@@ -142,19 +141,12 @@ namespace SEE.Game.CityRendering
             }
             return result;
         }
+        #endregion IHierarchyNode
 
-        public void SetOrigin()
-        {
-            CenterPosition = relativePosition + sublayoutRoot.CenterPosition;
-        }
-
-        public void SetRelative(ILayoutNode node)
-        {
-            relativePosition.x -= node.CenterPosition.x;
-            relativePosition.z -= node.CenterPosition.z;
-            sublayoutRoot = node;
-        }
-
+        #region IGraphNode
+        /// <summary>
+        /// <see cref="IGraphNode.Successors"/>.
+        /// </summary>
         public ICollection<ILayoutNode> Successors
         {
             get
@@ -168,27 +160,58 @@ namespace SEE.Game.CityRendering
             }
         }
 
-        // Features defined by LayoutNode that must be implemented by subclasses.
+        /// <summary>
+        /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
+        /// </summary>
+        /// <param name="typeName">Name of a node type</param>
+        /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
+        public bool HasType(string typeName)
+        {
+            return Node.Type == typeName;
+        }
+        #endregion
+
+        #region IGameNode
+
+        /// <summary>
+        /// A unique ID for a node: the ID of the graph node underlying this layout node.
+        ///
+        /// <see cref="IGameNode.ID"/>.
+        /// </summary>
+        /// <returns>unique ID for this node</returns>
+        public string ID => Node.ID;
+
+        /// </summary>
+        /// <summary>
+        /// <see cref="IGameNode.LocalScale"/>.
+        /// </summary>
         public abstract Vector3 LocalScale { get; set; }
+        /// <summary>
+        /// <see cref="IGameNode.AbsoluteScale"/>.
+        /// </summary>
         public abstract Vector3 AbsoluteScale { get; }
 
+        /// <summary>
+        /// <see cref="IGameNode.ScaleBy(float)"/>.
+        /// </summary>
         public abstract void ScaleBy(float factor);
+        /// <summary>
+        /// <see cref="IGameNode.CenterPosition"/>.
+        /// </summary>
         public abstract Vector3 CenterPosition { get; set; }
+        /// <summary>
+        /// <see cref="IGameNode.Rotation"/>.
+        /// </summary>
         public abstract float Rotation { get; set; }
+        /// <summary>
+        /// <see cref="IGameNode.Roof"/>.
+        /// </summary>
         public abstract Vector3 Roof { get; }
+        /// <summary>
+        /// <see cref="IGameNode.Ground"/>.
+        /// </summary>
         public abstract Vector3 Ground { get; }
-
-        private Vector3 relativePosition;
-        private bool isSublayoutNode;
-        private bool isSublayoutRoot;
-        private Sublayout sublayout;
-        private ILayoutNode sublayoutRoot;
-
-        public Vector3 RelativePosition { get => relativePosition; set => relativePosition = value; }
-        public bool IsSublayoutNode { get => isSublayoutNode; set => isSublayoutNode = value; }
-        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value; }
-        public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
-        public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
+        #endregion
 
         public override string ToString()
         {
@@ -197,6 +220,5 @@ namespace SEE.Game.CityRendering
                 + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
             return result;
         }
-
     }
 }

@@ -397,44 +397,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Loads and applies a layout stored in <see cref="Settings.NodeLayoutSettings.LayoutPath.Path"/>.
-        /// </summary>
-        /// <param name="gameNodes">the nodes to be laid out</param>
-        /// <param name="groundLevel">ground level where the lowest node will be placed (y axis)</param>
-        internal void LoadLayout(ICollection<GameObject> gameNodes, float groundLevel)
-        {
-            if (Application.isPlaying)
-            {
-                // The LayoutGraphNode, unlike LayoutGameNode, does not change the underlying game object
-                // representing a node, hence, we have no unwanted side effects when calling the Layout.
-                ICollection<LayoutGraphNode> layoutNodes = ToAbstractLayoutNodes(gameNodes);
-                LoadedNodeLayout layout = new(groundLevel, Settings.NodeLayoutSettings.LayoutPath.Path);
-                foreach (KeyValuePair<ILayoutNode, NodeTransform> item in layout.Layout(layoutNodes))
-                {
-                    GameObject node = GraphElementIDMap.Find(item.Key.ID);
-                    if (node != null)
-                    {
-                        NodeTransform nodeTransform = item.Value;
-                        NodeOperator nodeOperator = node.NodeOperator();
-                        // nodeTransform.position.y relates to the ground of the node;
-                        // the node operator's y co-ordinate is meant to be the center
-                        nodeTransform.Position.y += nodeTransform.Scale.y / 2;
-                        //Debug.Log($"{node.name} [{node.transform.position}, {node.transform.lossyScale}] => [{nodeTransform.position}), ({nodeTransform.scale}]\n");
-                        nodeOperator.MoveTo(nodeTransform.Position);
-                        // FIXME: Scaling doesn't work yet; likely because nodeTransform.scale is world space
-                        // but the node operator expects local scale.
-                        //nodeOperator.ScaleTo(nodeTransform.scale, animationDuration);
-                    }
-                }
-            }
-            else
-            {
-                throw new NotImplementedException("Loading a layout is currently supported only in play mode."
-                    + " In the editor, use 'Draw Data' instead");
-            }
-        }
-
-        /// <summary>
         /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
         /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node
         /// attached to the game node is passed on to the LayoutNode so that the graph node data is

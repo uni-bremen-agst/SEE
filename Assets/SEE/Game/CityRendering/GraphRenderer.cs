@@ -11,7 +11,6 @@ using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
@@ -296,19 +295,16 @@ namespace SEE.Game.CityRendering
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
                                             CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
-            // all nodes of the graph
-            IList<Node> nodes = graph.Nodes();
-            if (nodes.Count == 0)
+            if (graph.NodeCount == 0)
             {
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
 
-            // the layout to be applied
-            NodeLayout nodeLayout = GetLayout(parent);
+            // all nodes of the graph
+            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(graph.Nodes(), x => updateProgress?.Invoke(x * 0.5f), token);
 
-            // If we have multiple roots, we need to add a unique one.
+            // If we have multiple roots, we need to add a unique one, unless otherwise told.
             if (!doNotAddUniqueRoot)
             {
                 AddGameRootNodeIfNecessary(graph, nodeMap);
@@ -319,17 +315,19 @@ namespace SEE.Game.CityRendering
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
+            // the layout to be applied
+            NodeLayout nodeLayout = GetLayout();
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
-            nodeLayout.Apply(layoutNodes);
+            {
+                Vector3 position = parent.transform.position;
+                position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
+                nodeLayout.Apply(layoutNodes, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z), position);
+            }
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
-
-            // Fit layoutNodes into parent.
-            Fit(parent, layoutNodes);
-            Stack(parent, layoutNodes);
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
@@ -391,16 +389,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
-        /// </summary>
-        /// <param name="plane">plane upon which <paramref name="layoutNodes"/> should be stacked</param>
-        /// <param name="layoutNodes">the layout nodes to be stacked</param>
-        public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
-        {
-            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
-        }
-
-        /// <summary>
         /// Adds light to simulate an emissive effect. The new light object will be added to
         /// <paramref name="parent"/> above its center such that it covers all <paramref name="gameObjects"/>.
         /// </summary>
@@ -425,17 +413,6 @@ namespace SEE.Game.CityRendering
             light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
             light.intensity = 1.0f;
-        }
-
-        /// <summary>
-        /// Scales and moves the <paramref name="layoutNodes"/> so that they fit into the <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
-        /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        public static void Fit(GameObject parent, IEnumerable<ILayoutNode> layoutNodes)
-        {
-            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x, parent.transform.lossyScale.z);
-            NodeLayout.MoveTo(layoutNodes, parent.transform.position);
         }
 
         /// <summary>
@@ -466,29 +443,32 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the node layouter according to the settings. The node layouter will
-        /// place the nodes at ground level 0. This method just returns the layouter,
+        /// Returns the node layouter according to the settings. This method just returns
+        /// the layouter, it does not actually calculate the layout.
+        /// </summary>
+        /// <returns>node layout selected</returns>
+        public NodeLayout GetLayout() => GetLayout(Settings.NodeLayoutSettings.Kind);
+
+        /// <summary>
+        /// Returns the node layouter according to the settings. This method just returns the layouter,
         /// it does not actually calculate the layout.
         /// </summary>
-        /// <param name="parent">the parent in which to fit the nodes</param>
+        /// <param name="kind">the kind of the node layout requested</param>
         /// <returns>node layout selected</returns>
-        public NodeLayout GetLayout(GameObject parent) =>
-            Settings.NodeLayoutSettings.Kind switch
+        private NodeLayout GetLayout(NodeLayoutKind kind) =>
+            kind switch
             {
-                NodeLayoutKind.Manhattan => new ManhattanLayout(groundLevel),
-                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(groundLevel),
-                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(groundLevel),
-                NodeLayoutKind.Treemap => new TreemapLayout(groundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
-                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
-                    groundLevel,
-                    parent.transform.lossyScale.x,
-                    parent.transform.lossyScale.z,
-                    Settings.NodeLayoutSettings.IncrementalTreeMap),
-                NodeLayoutKind.Balloon => new BalloonNodeLayout(groundLevel),
-                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(groundLevel),
-                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(groundLevel, Settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(groundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
-                _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
+                NodeLayoutKind.Reflexion => new ReflexionLayout(GetLayout(Settings.NodeLayoutSettings.Implementation),
+                                                                GetLayout(Settings.NodeLayoutSettings.Architecture)),
+                NodeLayoutKind.Manhattan => new ManhattanLayout(),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
+                NodeLayoutKind.Treemap => new TreemapLayout(),
+                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),
+                NodeLayoutKind.Balloon => new BalloonNodeLayout(),
+                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
+                _ => throw new Exception("Unhandled node layout " + kind)
             };
 
         /// <summary>

@@ -19,14 +19,22 @@ namespace SEE.Game.City
         /// How to layout the nodes.
         /// </summary>
         [Tooltip("How to layout the nodes.")]
-        public NodeLayoutKind Kind = NodeLayoutKind.Balloon;
+        public NodeLayoutKind Kind = NodeLayoutKind.Treemap;
 
         /// <summary>
-        /// Settings for the <see cref="SEE.Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
+        /// Settings for the <see cref="Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
         [Tooltip("Settings for the IncrementalTreeMap layout. Used only for this kind of layout.")]
         [ShowIf("@this.Kind == NodeLayoutKind.IncrementalTreeMap")]
         public IncrementalTreeMapAttributes IncrementalTreeMap = new();
+
+        [Tooltip("Layout for the architecture. Used only for the reflexion layout.")]
+        [ShowIf("@this.Kind == NodeLayoutKind.Reflexion")]
+        public NodeLayoutKind Architecture = NodeLayoutKind.Treemap; // TODO: Save in configuration.
+
+        [Tooltip("Layout for the implementation. Used only for the reflexion layout.")]
+        [ShowIf("@this.Kind == NodeLayoutKind.Reflexion")]
+        public NodeLayoutKind Implementation = NodeLayoutKind.Treemap; // TODO: Save in configuration.
 
         /// <summary>
         /// The path for the layout file containing the node layout information.
@@ -42,6 +50,7 @@ namespace SEE.Game.City
                  "This information is used only if 'From File' is selected as node layout.")]
         public DataPath LayoutPath = new();
 
+        #region Config I/O
         public override void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -75,5 +84,6 @@ namespace SEE.Game.City
         /// Configuration label for <see cref="Kind"/>.
         /// </summary>
         private const string nodeLayoutLabel = "NodeLayout";
+        #endregion Config I/O
     }
 }

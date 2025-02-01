@@ -110,8 +110,8 @@ namespace SEE.Game.City
         {
             switch (nodeLayout)
             {
-                case NodeLayoutKind.CompoundSpringEmbedder:
-                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: true, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
+                case NodeLayoutKind.Reflexion:
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.EvoStreets:
                     return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: false, isCircular: false, isHierarchical: true);
                 case NodeLayoutKind.Balloon:
@@ -126,6 +126,8 @@ namespace SEE.Game.City
                     return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: true, isHierarchical: true);
                 case NodeLayoutKind.Manhattan:
                     return new NodelayoutModel(onlyLeaves: true, canApplySublayouts: false, innerNodesEncloseLeafNodes: false, isCircular: false, isHierarchical: false);
+                case NodeLayoutKind.FromFile:
+                    return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
                 default:
                     return new NodelayoutModel(onlyLeaves: false, canApplySublayouts: false, innerNodesEncloseLeafNodes: true, isCircular: false, isHierarchical: true);
             }

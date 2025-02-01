@@ -145,7 +145,6 @@ namespace SEE.Game.City
                 else if (visualizedSubGraph == null)
                 {
                     visualizedSubGraph = RelevantGraph(LoadedGraph);
-                    SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
                 return visualizedSubGraph;
             }
@@ -514,21 +513,6 @@ namespace SEE.Game.City
             {
                 Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
             }
-        }
-
-        /// <summary>
-        /// Reads the a saved layout of the city from a file named <see cref="LayoutPath"/>.
-        /// The format of the written file depends upon the file extension. If the extension
-        /// is <see cref="Filenames.GVLExtension"/> it is expected to be in the GVL format; otherwise
-        /// the file is assumed to be in the SLD format.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
-        [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
-        public void LoadLayout()
-        {
-            ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
-            graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
         }
 
         /// <summary>

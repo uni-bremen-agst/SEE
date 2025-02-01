@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -14,13 +12,7 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     public class BalloonNodeLayout : HierarchicalNodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public BalloonNodeLayout(float groundLevel)
-            : base(groundLevel)
+        static BalloonNodeLayout()
         {
             Name = "Balloon";
         }
@@ -28,7 +20,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Information about a node necessary to draw it.
         /// </summary>
-        private struct NodeInfo
+        private readonly struct NodeInfo
         {
             public readonly float Radius;
             public readonly float OuterRadius;
@@ -36,23 +28,23 @@ namespace SEE.Layout.NodeLayouts
 
             public NodeInfo(float radius, float outerRadius, float referenceLengthChildren)
             {
-                this.Radius = radius;
-                this.OuterRadius = outerRadius;
-                this.ReferenceLengthChildren = referenceLengthChildren;
+                Radius = radius;
+                OuterRadius = outerRadius;
+                ReferenceLengthChildren = referenceLengthChildren;
             }
         }
 
         /// <summary>
         /// A mapping of nodes onto their circle data.
         /// </summary>
-        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
+        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new();
 
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes, Vector2 rectangle)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -65,7 +57,7 @@ namespace SEE.Layout.NodeLayouts
             Roots = LayoutNodes.GetRoots(gameNodes);
             if (Roots.Count == 0)
             {
-                throw new System.Exception("Graph has no root nodes.");
+                throw new Exception("Graph has no root nodes.");
             }
 
             // the maximal radius over all root circles; required to create the plane underneath
@@ -346,7 +338,7 @@ namespace SEE.Layout.NodeLayouts
                         // Convert polar coordinate back to cartesian coordinate.
                         Vector3 childCenter;
                         childCenter.x = position.x + (float)(parentInnerRadius * System.Math.Cos(accummulatedAlpha));
-                        childCenter.y = GroundLevel;
+                        childCenter.y = position.y;
                         childCenter.z = position.z + (float)(parentInnerRadius * System.Math.Sin(accummulatedAlpha));
 
                         DrawCircles(child, childCenter);
@@ -356,16 +348,6 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
             }
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

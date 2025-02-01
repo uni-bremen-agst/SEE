@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -12,27 +10,18 @@ namespace SEE.Layout.NodeLayouts
     public abstract class NodeLayout
     {
         /// <summary>
-        /// Constructor.
+        /// The unique name of a layout. Must be set by all concrete subclasses.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public NodeLayout(float groundLevel)
-        {
-            GroundLevel = groundLevel;
-        }
-
-        /// <summary>
-        /// The unique name of a layout.  Must be set by all concrete subclasses.
-        /// </summary>
-        public string Name
+        public static string Name
         {
             get; protected set;
         } = string.Empty;
 
         /// <summary>
-        /// The y co-ordinate of the ground where blocks are placed.
+        /// The y co-ordinate of the ground level where all nodes will be placed initially
+        /// by calling <see cref="Layout(IEnumerable{ILayoutNode}, Vector2)"/>.
         /// </summary>
-        protected readonly float GroundLevel;
+        protected const float groundLevel = 0.0f;
 
         /// <summary>
         /// If inner nodes are represented as visible objects covering their total area
@@ -65,27 +54,16 @@ namespace SEE.Layout.NodeLayouts
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
         ///
-        /// IMPORTANT NOTE: The y co-ordinate of the position in NodeTransform will
-        /// be interpreted as the ground position of the game object (unlike in Unity
-        /// where it is the center height).
+        /// The nodes will be placed into a rectangle whose width is the
+        /// x co-ordindate of <paramref name="rectangle"/> and whose depth is the y co-ordinate
+        /// of <paramref name="rectangle"/>.
         /// </summary>
         /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
+        /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
         /// <returns>node layout</returns>
-        ///
-        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes);
-
-        /// <summary>
-        /// Yields the layout for all given <paramref name="layoutNodes"/>.
-        /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
-        /// i.e., the game object's position, scale, and rotation.
-        ///
-        /// <paramref name="edges"/> contains all edges of the overlying graph and <paramref name="sublayouts"/> contains all sublayouts
-        /// </summary>
-        /// <param name="layoutNodes"></param>
-        /// <param name="edges"></param>
-        /// <param name="sublayouts"></param>
-        /// <returns>The calculated laout</returns>
-        public abstract Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts);
+        public abstract Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> layoutNodes,
+             Vector2 rectangle);
 
         /// <summary>
         /// Adds the given <paramref name="offset"/> to every node position in the given <paramref name="layout"/>.
@@ -93,9 +71,9 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layout">node layout to be adjusted</param>
         /// <param name="offset">offset to be added</param>
         /// <returns><paramref name="layout"/> where <paramref name="offset"/> has been added to each position</returns>
-        public static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
+        private static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
         {
-            Dictionary<ILayoutNode, NodeTransform> result = new Dictionary<ILayoutNode, NodeTransform>();
+            Dictionary<ILayoutNode, NodeTransform> result = new();
             foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
                 NodeTransform transform = entry.Value;
@@ -114,7 +92,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">layout nodes to be moved</param>
         /// <param name="target">worldspace center point where to move the <paramref name="layoutNodes"/></param>
-        public static void MoveTo(IEnumerable<ILayoutNode> layoutNodes, Vector3 target)
+        private static void MoveTo(IEnumerable<ILayoutNode> layoutNodes, Vector3 target)
         {
             IList<ILayoutNode> layoutList = layoutNodes.ToList();
             Bounding3DBox(layoutList.ToList(), out Vector3 left, out Vector3 right);
@@ -143,7 +121,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
         /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        public static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
+        private static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
         {
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             Bounding3DBox(layoutNodeList, out Vector3 leftFrontCorner, out Vector3 rightBackCorner);
@@ -172,7 +150,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
         /// <param name="groundLevel">target y co-ordinate ground position of the layout nodes</param>
         /// <param name="levelDelta">the y distance between parents and their children</param>
-        public static void Stack(IEnumerable<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        private static void Stack(IEnumerable<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
         {
             // position all root nodes at groundLevel
             foreach (ILayoutNode layoutNode in layoutNodes)
@@ -303,29 +281,20 @@ namespace SEE.Layout.NodeLayouts
         public abstract bool IsHierarchical();
 
         /// <summary>
-        /// If true, the layout needs the edges to calculate the Layout
-        /// </summary>
-        /// <returns></returns>
-        public abstract bool UsesEdgesAndSublayoutNodes();
-
-        /// <summary>
         /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        public void Apply(IEnumerable<ILayoutNode> layoutNodes)
+        /// <param name="rectangle">The ground where all nodes will be placed.</param>
+        /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
+        ///
+        public void Apply(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle, Vector3 centerPosition)
         {
-            ApplyLayoutNodeTransform(Layout(layoutNodes));
-        }
-
-        /// <summary>
-        /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        /// <param name="edges">edges of the underlying graph</param>
-        /// <param name="sublayouts">the sublayouts for the layout</param>
-        public void Apply(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            ApplyLayoutNodeTransform(Layout(layoutNodes, edges, sublayouts));
+            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
+            ApplyLayoutNodeTransform(layout);
+            // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
+            Scale(layoutNodes, rectangle.x, rectangle.y);
+            MoveTo(layoutNodes, centerPosition);
+            Stack(layoutNodes, centerPosition.y);
         }
 
         /// <summary>

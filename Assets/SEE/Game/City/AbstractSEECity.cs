@@ -4,7 +4,6 @@ using System.Linq;
 using Sirenix.Serialization;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -263,13 +262,6 @@ namespace SEE.Game.City
         /// </summary>
         [Tooltip("Settings for the selection of edges."), TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup)]
         public EdgeSelectionAttributes EdgeSelectionSettings = new();
-
-        /// <summary>
-        /// The cose graph settings.
-        /// </summary>
-        [HideInInspector]
-        [Obsolete]
-        public CoseGraphAttributes CoseGraphSettings = new(); // FIXME put into CitySettings.cs
 
         /// <summary>
         /// The metrics for the visualization of erosions.
@@ -694,50 +686,6 @@ namespace SEE.Game.City
                 {
                     Debug.Log($"  metric {metric}\n");
                 }
-            }
-        }
-
-        /// <summary>
-        /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
-        /// </summary>
-        /// <param name="graph"></param>
-        [Obsolete]
-        public void SetupCompoundSpringEmbedder(Graph graph)
-        {
-            if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
-            {
-                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
-                // the new directories
-                Dictionary<string, bool> dirsLocal = new();
-
-                Dictionary<string, NodeLayoutKind> dirsLayout = new();
-                Dictionary<string, NodeShapes> dirsShape = new();
-
-                foreach (Node node in graph.Nodes())
-                {
-                    if (!node.IsLeaf())
-                    {
-                        dirsShape.Add(node.ID, NodeTypes[node.Type].Shape);
-                        dirsLocal.Add(node.ID, false);
-                        dirsLayout.Add(node.ID, NodeLayoutSettings.Kind);
-                    }
-                }
-
-                // if the key isn't in the old dictionaries
-                //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
-
-                bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
-                bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
-
-                if (dirs.Count != dirsLocal.Count || diff1 || diff2)
-                {
-                    CoseGraphSettings.InnerNodeShape = dirsShape;
-                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
-                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
-                }
-
-                CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
-                                                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
             }
         }
 

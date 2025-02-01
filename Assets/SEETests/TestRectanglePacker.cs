@@ -205,9 +205,9 @@ namespace SEE.Layout.RectanglePacking
         {
             ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-            RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.0f, 1.0f);
+            RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.01f);
 
-            Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects);
+            Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects, Vector2.one);
         }
     }
 }

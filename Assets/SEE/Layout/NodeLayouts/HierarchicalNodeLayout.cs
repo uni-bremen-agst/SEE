@@ -8,16 +8,6 @@ namespace SEE.Layout.NodeLayouts
     public abstract class HierarchicalNodeLayout : NodeLayout
     {
         /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public HierarchicalNodeLayout(float groundLevel)
-            : base(groundLevel)
-        {
-        }
-
-        /// <summary>
         /// Always true because hierarchical layouts can handle both inner nodes and leaves.
         /// </summary>
         /// <returns>always true</returns>

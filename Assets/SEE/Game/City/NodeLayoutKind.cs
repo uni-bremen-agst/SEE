@@ -10,8 +10,9 @@
         RectanglePacking,
         Treemap,
         CirclePacking,
+        Reflexion,
         Manhattan,
-        CompoundSpringEmbedder,
+        // CompoundSpringEmbedder,
         IncrementalTreeMap,
         FromFile
     }

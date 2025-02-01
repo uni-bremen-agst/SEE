@@ -43,7 +43,7 @@ namespace SEE.Layout
                 ClearLayout(gameObjects, yIsStored);
 
                 // Read the saved layout.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Layout(gameObjects, Vector2.one);
                 //Dump(readLayout, 10);
 
                 Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
@@ -89,7 +89,7 @@ namespace SEE.Layout
 
                 // Read the saved layout.
                 // Note: groundLevel will be ignored when the layout was stored in SLD.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(groundLevel, filename).Layout(layoutNodes);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Layout(layoutNodes, Vector2.one);
                 //Dump(readLayout, 10, "Read layout (y relates to the ground)");
 
                 Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
@@ -199,8 +199,8 @@ namespace SEE.Layout
             out Dictionary<string, NodeTransform> layoutMap)
         {
             // Layout the nodes.
-            RectanglePackingNodeLayout packer = new(0.0f, 1.0f);
-            savedLayout = packer.Layout(gameObjects);
+            RectanglePackingNodeLayout packer = new(0.01f);
+            savedLayout = packer.Layout(gameObjects, Vector2.one);
 
             // Apply the layout.
             layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
@@ -328,8 +328,8 @@ namespace SEE.Layout
                     Assert.Fail("Untested layout format");
                 }
                 // Read the saved layout.
-                LoadedNodeLayout loadedNodeLayout = new(0, filename);
-                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>());
+                LoadedNodeLayout loadedNodeLayout = new(filename);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>(), Vector2.one);
                 Assert.AreEqual(0, readLayout.Count);
             }
             finally

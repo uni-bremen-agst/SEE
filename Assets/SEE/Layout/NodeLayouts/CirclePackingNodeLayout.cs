@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.CirclePacking;
-using SEE.Layout.NodeLayouts.Cose;
+﻿using SEE.Layout.NodeLayouts.CirclePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -13,13 +11,7 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     public class CirclePackingNodeLayout : HierarchicalNodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public CirclePackingNodeLayout(float groundLevel)
-            : base(groundLevel)
+        static CirclePackingNodeLayout()
         {
             Name = "Circle Packing";
         }
@@ -29,7 +21,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
@@ -46,8 +38,8 @@ namespace SEE.Layout.NodeLayouts
             {
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
-                float outRadius = PlaceNodes(root);
-                Vector3 position = new(0.0f, GroundLevel, 0.0f);
+                float outRadius = PlaceNodes(root, groundLevel);
+                Vector3 position = new(0.0f, groundLevel, 0.0f);
                 layoutResult[root] = new NodeTransform(position,
                                                         GetScale(root, outRadius));
                 MakeGlobal(layoutResult, position, root.Children());
@@ -89,8 +81,9 @@ namespace SEE.Layout.NodeLayouts
         /// of the given parent).
         /// </summary>
         /// <param name="parent">node whose descendants are to be placed</param>
+        /// <param name="groundLevel">The y-coordinate of the ground where all nodes will be placed.</param>
         /// <returns>the radius required for a circle represent parent</returns>
-        private float PlaceNodes(ILayoutNode parent)
+        private float PlaceNodes(ILayoutNode parent, float groundLevel)
         {
             ICollection<ILayoutNode> children = parent.Children();
 
@@ -108,7 +101,7 @@ namespace SEE.Layout.NodeLayouts
                 int i = 0;
                 foreach (ILayoutNode child in children)
                 {
-                    float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child);
+                    float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child, groundLevel);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = (i / (float)children.Count) * (2.0f * Mathf.PI);
                     circles.Add(new Circle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
@@ -132,7 +125,7 @@ namespace SEE.Layout.NodeLayouts
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
                     layoutResult[circle.GameObject]
-                         = new NodeTransform(new Vector3(circle.Center.x, GroundLevel, circle.Center.y),
+                         = new NodeTransform(new Vector3(circle.Center.x, groundLevel, circle.Center.y),
                                              GetScale(circle.GameObject, circle.Radius));
                 }
                 return outOuterRadius;
@@ -166,16 +159,6 @@ namespace SEE.Layout.NodeLayouts
         {
             Vector3 extent = block.LocalScale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }
