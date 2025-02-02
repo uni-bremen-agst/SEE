@@ -192,9 +192,9 @@ namespace SEE.Game.CityRendering
         public abstract Vector3 AbsoluteScale { get; }
 
         /// <summary>
-        /// <see cref="IGameNode.ScaleBy(float)"/>.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        public abstract void ScaleBy(float factor);
+        public abstract void ScaleXZBy(float factor);
         /// <summary>
         /// <see cref="IGameNode.CenterPosition"/>.
         /// </summary>

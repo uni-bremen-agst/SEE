@@ -133,7 +133,7 @@ namespace SEE.Layout.NodeLayouts
             float scaleFactor = Mathf.Min(width / actualWidth, depth / actualDepth);
             foreach (ILayoutNode layoutNode in layoutNodeList)
             {
-                layoutNode.ScaleBy(scaleFactor);
+                layoutNode.ScaleXZBy(scaleFactor);
                 // The x/z co-ordinates must be adjusted after scaling
                 Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
                 layoutNode.CenterPosition = newPosition;

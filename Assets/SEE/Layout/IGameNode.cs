@@ -25,10 +25,11 @@ namespace SEE.Layout
         Vector3 AbsoluteScale { get; }
 
         /// <summary>
-        /// Scales the node by the given <paramref name="factor"/>.
+        /// Scales the width (x) and depth (z) of the node by the given <paramref name="factor"/>.
+        /// The height will be maintained.
         /// </summary>
-        /// <param name="factor">factory by which to scale the node</param>
-        void ScaleBy(float factor);
+        /// <param name="factor">factory by which to scale the width and depth of the node</param>
+        void ScaleXZBy(float factor);
 
         /// <summary>
         /// Center position of a node in world space.

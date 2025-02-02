@@ -77,12 +77,14 @@ namespace SEE.Layout
         public Vector3 LocalScale { set; get; }
 
         /// <summary>
-        /// Increases the size of this node by the given factor.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        /// <param name="factor">factor by which to multiply this node's scale</param>
-        public void ScaleBy(float factor)
+        public void ScaleXZBy(float factor)
         {
-            LocalScale *= factor;
+            Vector3 result = LocalScale;
+            result.x *= factor;
+            result.z *= factor;
+            LocalScale = result;
         }
 
         /// <summary>
