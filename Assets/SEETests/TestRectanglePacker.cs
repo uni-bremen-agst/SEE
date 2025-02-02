@@ -51,7 +51,7 @@ namespace SEE.Layout.RectanglePacking
         [Test]
         public void TestSplit()
         {
-            Vector2 totalSize = new Vector2(14, 12);
+            Vector2 totalSize = new(14, 12);
             PTree tree = new(Vector2.zero, totalSize);
 
             PNode A = tree.Root;
@@ -60,7 +60,7 @@ namespace SEE.Layout.RectanglePacking
             Assert.That(A.Rectangle.Size, Is.EqualTo(totalSize));
 
             // First split
-            Vector2 EL1size = new Vector2(8, 6);
+            Vector2 EL1size = new(8, 6);
             PNode result = tree.Split(A, EL1size);
 
             PNode B = A.Left;
@@ -193,8 +193,6 @@ namespace SEE.Layout.RectanglePacking
             Assert.That(Fright.Rectangle.Size, Is.EqualTo(new Vector2(F.Rectangle.Size.x, F.Rectangle.Size.y - Fleft.Rectangle.Size.y)));
 
             Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
-
-            // Debug.Log(A.ToString() + "\n");
         }
 
         /// <summary>
@@ -205,7 +203,7 @@ namespace SEE.Layout.RectanglePacking
         {
             ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-            RectanglePackingNodeLayout packer = new RectanglePackingNodeLayout(0.01f);
+            RectanglePackingNodeLayout packer = new(0.01f);
 
             Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects, Vector2.one);
         }
