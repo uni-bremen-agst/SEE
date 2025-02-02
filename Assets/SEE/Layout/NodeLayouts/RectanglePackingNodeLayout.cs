@@ -98,7 +98,7 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// Adjusts the layout so that all rectangles are truly nested. Also lifts the inner
-        /// nodes a bit along the y axis so that are stacked. This may be necessary for
+        /// nodes a bit along the y axis so that they are stacked. This may be necessary for
         /// space filling inner nodes such as cubes. It is not needed for lines, however.
         /// </summary>
         /// <param name="layout">the layout to be adjusted</param>
