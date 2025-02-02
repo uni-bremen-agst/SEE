@@ -306,8 +306,8 @@ namespace SEE.Layout.NodeLayouts
             // place el.
             Dictionary<PNode, float> preservers = new();
             // All nodes in pnodes that do not preserve the size of coverec.
-            // The value is the aspect ratio of coverec if the node were used to
-            // place el.
+            // The value is the absolute difference of the aspect ratio of coverec from 1
+            // (1 being the perfect ratio) if the node were used to place el.
             Dictionary<PNode, float> expanders = new();
 
             foreach (ILayoutNode el in nodes)
@@ -338,7 +338,7 @@ namespace SEE.Layout.NodeLayouts
                     {
                         // The aspect ratio of coverec if pnode were used to place el.
                         float ratio = expandedCoveRec.x / expandedCoveRec.y;
-                        expanders[pnode] = ratio;
+                        expanders[pnode] = Mathf.Abs(ratio - 1);
                     }
                 }
 
@@ -367,7 +367,7 @@ namespace SEE.Layout.NodeLayouts
                     float bestRatio = Mathf.Infinity;
                     foreach (KeyValuePair<PNode, float> entry in expanders)
                     {
-                        if (Mathf.Abs(entry.Value - 1) < Mathf.Abs(bestRatio - 1))
+                        if (entry.Value < bestRatio)
                         {
                             targetNode = entry.Key;
                             bestRatio = entry.Value;
