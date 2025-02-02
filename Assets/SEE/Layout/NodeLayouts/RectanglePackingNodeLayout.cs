@@ -7,7 +7,9 @@ namespace SEE.Layout.NodeLayouts
 {
     /// <summary>
     /// This layout packs rectangles closely together as a set of nested packed rectangles to decrease
-    /// the total area of city.
+    /// the total area of city. The algorithm is based on the dissertation of Richard Wettel
+    /// "Software Systems as Cities" (2010); see page 35.
+    /// https://www.inf.usi.ch/lanza/Downloads/PhD/Wett2010b.pdf
     /// </summary>
     public class RectanglePackingNodeLayout : HierarchicalNodeLayout
     {
@@ -15,7 +17,7 @@ namespace SEE.Layout.NodeLayouts
         /// Constructor.
         /// </summary>
         /// <param name="padding">the padding to be added between neighboring nodes</param>
-        public RectanglePackingNodeLayout(float padding = 0.1f)
+        public RectanglePackingNodeLayout(float padding = 0.01f)
         {
             this.padding = padding;
         }
@@ -50,10 +52,10 @@ namespace SEE.Layout.NodeLayouts
                     if (node.IsLeaf)
                     {
                         // All leaves maintain their original size. Pack assumes that
-                        // their sizes are already set in layout_result.
+                        // their sizes are already set in layoutResult.
                         // We add the padding upfront. Padding is added on both sides.
                         // The padding will later be removed again.
-                        Vector3 scale = node.LocalScale;
+                        Vector3 scale = node.AbsoluteScale;
                         scale.x += 2.0f * padding;
                         scale.z += 2.0f * padding;
                         layoutResult[node] = new NodeTransform(Vector3.zero, scale);
@@ -84,7 +86,7 @@ namespace SEE.Layout.NodeLayouts
                 Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
                 Vector3 position = new(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
-                layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.LocalScale.y, area.y));
+                layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.AbsoluteScale.y, area.y));
                 RemovePadding(layoutResult, padding);
                 // Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
                 // for each node hierarchy level anew. That is why we need to adjust the layout so
@@ -170,7 +172,7 @@ namespace SEE.Layout.NodeLayouts
                 // Leaves maintain their scale, which was already set initially. The position will
                 // be adjusted later at a higher level of the node hierarchy when Pack() is
                 // applied to this leaf and all its siblings.
-                return new Vector2(node.LocalScale.x, node.LocalScale.z);
+                return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
             }
             else
             {
@@ -323,7 +325,7 @@ namespace SEE.Layout.NodeLayouts
                     // Right lower corner of new rectangle
                     Vector2 corner = pnode.Rectangle.Position + requiredSize;
                     // Expanded covrec.
-                    Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
+                    Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
                     // If placing el in pnode would preserve the size of coverec
                     if (PTree.FitsInto(expandedCoveRec, covrec))
@@ -365,7 +367,7 @@ namespace SEE.Layout.NodeLayouts
                     float bestRatio = Mathf.Infinity;
                     foreach (KeyValuePair<PNode, float> entry in expanders)
                     {
-                        if (entry.Value < bestRatio)
+                        if (Mathf.Abs(entry.Value - 1) < Mathf.Abs(bestRatio - 1))
                         {
                             targetNode = entry.Key;
                             bestRatio = entry.Value;
@@ -386,13 +388,13 @@ namespace SEE.Layout.NodeLayouts
                                                            fitNode.Rectangle.Position.y + scale.z / 2.0f),
                                                scale);
 
-                // If fitNode is a boundary expander, then we need to expand coverc to the
+                // If fitNode is a boundary expander, then we need to expand covrec to the
                 // newly covered area.
                 {
                     // Right lower corner of fitNode
                     Vector2 corner = fitNode.Rectangle.Position + requiredSize;
                     // Expanded covrec.
-                    Vector2 expandedCoveRec = new Vector2(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
+                    Vector2 expandedCoveRec = new(Mathf.Max(covrec.x, corner.x), Mathf.Max(covrec.y, corner.y));
 
                     // If placing fitNode does not preserve the size of coverec
                     if (!PTree.FitsInto(expandedCoveRec, covrec))
@@ -400,7 +402,6 @@ namespace SEE.Layout.NodeLayouts
                         covrec = expandedCoveRec;
                     }
                 }
-
             }
             return covrec;
         }
