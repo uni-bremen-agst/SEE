@@ -215,7 +215,8 @@ namespace SEE.Game.City
                             ProgressBar = x;
                             updateProgress(x);
                         }
-
+                        // THINK TWICE: DISSAMBLE WILL CREATE TWO SEPARATE GRAPHS. THAT IS LIKELY NOT WHAT WE SHOULD DO.
+                        // QUITE LIKELY, THE NODE REFS WILL BE WRONG.
                         (Graph implementation, Graph architecture, _) = graph.Disassemble();
 
                         // There should be no more than one root.
@@ -228,26 +229,37 @@ namespace SEE.Game.City
                             Split(codeCity, reflexionCity.ArchitectureLayoutProportion,
                                   out Area implementionArea, out Area architectureArea);
 
+                            //implementionArea.Draw("implementation"); // FIXME: Remove this line.
+                            //architectureArea.Draw("architecture");
+
                             // The parent of the two game object hierarchies for the architecture and implementation.
-                            GameObject reflexionCityRoot;
+                            // GameObject reflexionCityRoot;
 
                             // Draw implementation.
                             {
+                                Node implementationRoot = implementation.GetRoots().FirstOrDefault();
+
                                 GraphRenderer renderer = new(this, implementation);
-                                // reflexionCityRoot will be the direct and only child of gameObject
-                                reflexionCityRoot = renderer.DrawNode(reflexionRoot, codeCity);
-                                codeCityArea.ApplyTo(reflexionCityRoot);
+                                GameObject implementationCityRoot = renderer.DrawNode(reflexionRoot, codeCity);
+                                codeCityArea.ApplyTo(implementationCityRoot);
 
-                                Debug.Log($"[reflexionCityRoot] position={reflexionCityRoot.transform.position} lossyScale={reflexionCityRoot.transform.lossyScale}\n");
+                                Debug.Log($"[reflexionCityRoot] position={implementationCityRoot.transform.position} lossyScale={implementationCityRoot.transform.lossyScale}\n");
 
-                                reflexionCityRoot.transform.SetParent(codeCity.transform);
+                                implementationCityRoot.transform.SetParent(codeCity.transform);
 
-                                /*
-                                implementionArea.ApplyTo(codeCity);
-                                await renderer.DrawGraphAsync(implementation, codeCity, ReportProgress, cancellationTokenSource.Token);
-                                RestoreCodeCity();
-                                */
+                                implementionArea.ApplyTo(implementationCityRoot);
+                                await renderer.DrawGraphAsync(implementation, implementationCityRoot, ReportProgress, cancellationTokenSource.Token);
+
+                                //RestoreCodeCity();
                             }
+
+                            // Draw architecture.
+                            {
+                                //architectureArea.ApplyTo(reflexionCityRoot);
+                                //GraphRenderer renderer = new(this, architecture);
+                                //await renderer.DrawGraphAsync(architecture, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
+                            }
+
                             /*
 
 
@@ -408,8 +420,6 @@ namespace SEE.Game.City
                             }
                         }
                     }
-                    implementionArea.Draw("implementation"); // FIXME: Remove this line.
-                    architectureArea.Draw("architecture");
                 }
             }
             else
@@ -453,6 +463,8 @@ namespace SEE.Game.City
         }
         #endregion ConfigIO
 
+        #region SEEReflexionCity creation during in play mode
+        /// <summary>
         /// Loads the initial reflexion city.
         /// </summary>
         /// <param name="cityName">the name of the city.</param>
@@ -545,14 +557,14 @@ namespace SEE.Game.City
         /// Returns the <see cref="ReflexionGraphProvider"/> of this city.
         /// </summary>
         /// <returns>The <see cref="ReflexionGraphProvider"/> if it exists, otherwise null.</returns>
-        public ReflexionGraphProvider GetReflexionGraphProvider()
+        private ReflexionGraphProvider GetReflexionGraphProvider()
         {
             ReflexionGraphProvider provider = null;
             DataProvider.Pipeline.ForEach(p =>
             {
-                if (p is ReflexionGraphProvider)
+                if (p is ReflexionGraphProvider pAsReflexionGraphProvider)
                 {
-                    provider = (ReflexionGraphProvider)p;
+                    provider = pAsReflexionGraphProvider;
                 }
             });
             return provider;
@@ -568,6 +580,9 @@ namespace SEE.Game.City
         /// <returns>Nothing, it is an asynchronous method that needs to wait.</returns>
         public async UniTask LoadAndDrawSubgraphAsync(DataPath path, DataPath projectFolder = null)
         {
+            // FIXME: This code should be moved to ReflexionGraph. It updates a subgraph.
+            // Clearly, what this update requires in an implementation detail of ReflexionGraph.
+
             (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(path, projectFolder == null);
             if (projectFolder != null)
             {
@@ -582,7 +597,8 @@ namespace SEE.Game.City
             Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.
-            await renderer.DrawGraphAsync(graph, root.GameObject(), loadReflexionFiles: true);
+            // parent.ContainingCity().gameObject
+            await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);
             // Adds the graph to the existing reflexion graph.
             graph.Nodes().ForEach(node =>
             {
@@ -665,5 +681,7 @@ namespace SEE.Game.City
                 }
             }
         }
+
+        #endregion SEEReflexionCity creation during in play mode
     }
 }
