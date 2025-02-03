@@ -199,7 +199,7 @@ namespace SEE.Layout
             out Dictionary<string, NodeTransform> layoutMap)
         {
             // Layout the nodes.
-            RectanglePackingNodeLayout packer = new(0.01f);
+            RectanglePackingNodeLayout packer = new();
             savedLayout = packer.Layout(gameObjects, Vector2.one);
 
             // Apply the layout.

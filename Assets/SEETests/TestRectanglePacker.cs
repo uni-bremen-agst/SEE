@@ -203,7 +203,7 @@ namespace SEE.Layout.RectanglePacking
         {
             ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-            RectanglePackingNodeLayout packer = new(0.01f);
+            RectanglePackingNodeLayout packer = new();
 
             Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects, Vector2.one);
         }
