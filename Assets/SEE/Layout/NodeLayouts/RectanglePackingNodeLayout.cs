@@ -84,9 +84,11 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Adjusts the layout so that all rectangles are truly nested. Also lifts the inner
-        /// nodes a bit along the y axis so that they are stacked. This may be necessary for
-        /// space filling inner nodes such as cubes. It is not needed for lines, however.
+        /// Adjusts the layout so that all rectangles are truly nested. This is necessary
+        /// because the origin of the rectangle packing layout is different from the
+        /// Unity's co-ordinate system. The rectangle packing layout's origin is upper left
+        /// and grows to the right and *down*, while the X/Z plane in unity grows to the
+        /// right and *up*.
         /// </summary>
         /// <param name="layout">the layout to be adjusted</param>
         /// <param name="parent">the parent node whose children are to be adjusted</param>
@@ -108,37 +110,35 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 newChildPosition = childTransform.Position;
                 newChildPosition.x += xCorner;
                 newChildPosition.z += zCorner;
-                if (!child.IsLeaf)
-                {
-                    // The inner nodes will be slightly lifted along the y axis according to their
-                    // tree depth so that they can be stacked visually (level 0 is at the bottom).
-                    // FIXME: We do not need this. Stack will be called later anyway.
-                    newChildPosition.y += LevelLift(child);
-                }
                 layout[child] = new NodeTransform(newChildPosition, childTransform.Scale, childTransform.Rotation);
                 MakeContained(layout, child);
             }
         }
 
         /// <summary>
-        /// Removes the <paramref name="padding"/> for all NodeTransforms in <paramref name="layout"/>.
+        /// Removes the added padding for all NodeTransforms in <paramref name="layout"/>.
         /// </summary>
-        /// <param name="layout">layout containing the NodeTransform.scale to be adjusted</param>
-        /// <param name="padding">padding to be removed</param>
+        /// <param name="layout">layout containing the NodeTransform.Scale to be adjusted</param>
         private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
+            // We use a copy of the keys because we will modify layout during the iteration.
+            ICollection<ILayoutNode> layoutNodes = new List<ILayoutNode>(layout.Keys);
 
-            foreach (ILayoutNode key in keys)
+            foreach (ILayoutNode layoutNode in layoutNodes)
             {
-                NodeTransform value = layout[key];
-                Vector3 scale = value.Scale;
-                float reversePadding = ReversePadding(scale.x, scale.z);
-                scale.x -= reversePadding;
-                scale.z -= reversePadding;
-                // We shrink the scale, but the position remains the same since
-                // value.Position denotes the center point.
-                layout[key] = new NodeTransform(value.Position, scale);
+                // We added padding to both inner nodes and leaves, but we want to
+                // the restore the original size of the leaves only.
+                if (layoutNode.IsLeaf)
+                {
+                    NodeTransform value = layout[layoutNode];
+                    Vector3 scale = value.Scale;
+                    float reversePadding = ReversePadding(scale.x, scale.z);
+                    scale.x -= reversePadding;
+                    scale.z -= reversePadding;
+                    // We shrink the scale, but the position remains the same since
+                    // value.Position denotes the center point.
+                    layout[layoutNode] = new NodeTransform(value.Position, scale);
+                }
             }
         }
 
