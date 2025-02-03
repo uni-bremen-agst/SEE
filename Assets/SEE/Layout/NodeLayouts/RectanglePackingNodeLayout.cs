@@ -18,11 +18,6 @@ namespace SEE.Layout.NodeLayouts
             Name = "Rectangle Packing";
         }
 
-        /// <summary>
-        /// The padding between neighboring rectangles.
-        /// </summary>
-        private const float padding = 0.01f;
-
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
@@ -47,8 +42,9 @@ namespace SEE.Layout.NodeLayouts
                         // We add the padding upfront. Padding is added on both sides.
                         // The padding will later be removed again.
                         Vector3 scale = node.AbsoluteScale;
-                        scale.x += 2.0f * padding;
-                        scale.z += 2.0f * padding;
+                        float padding = Padding(scale.x, scale.z);
+                        scale.x += padding;
+                        scale.z += padding;
                         layoutResult[node] = new NodeTransform(Vector3.zero, scale);
                         numberOfLeaves++;
                     }
@@ -131,21 +127,18 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="padding">padding to be removed</param>
         private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
         {
-            return;
             ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
 
             foreach (ILayoutNode key in keys)
             {
                 NodeTransform value = layout[key];
                 Vector3 scale = value.Scale;
-                scale.x -= 2.0f * padding;
-                scale.z -= 2.0f * padding;
-                // Since we removed the padding, we need to adjust the position, too,
-                // to center the node within the assigned rectangle.
-                Vector3 position = value.Position;
-                position.x += padding;
-                position.z += padding;
-                layout[key] = new NodeTransform(position, scale);
+                float reversePadding = ReversePadding(scale.x, scale.z);
+                scale.x -= reversePadding;
+                scale.z -= reversePadding;
+                // We shrink the scale, but the position remains the same since
+                // value.Position denotes the center point.
+                layout[key] = new NodeTransform(value.Position, scale);
             }
         }
 
@@ -194,7 +187,8 @@ namespace SEE.Layout.NodeLayouts
                 if (children.Count > 0)
                 {
                     Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel);
-                    return new Vector2(area.x + 2.0f * padding, area.y + 2.0f * padding);
+                    float padding = Padding(area.x, area.y);
+                    return new Vector2(area.x + padding, area.y + padding);
                 }
                 else
                 {
