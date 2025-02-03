@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -44,6 +45,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="node">an inner node to be lifted</param>
         /// <returns>lift for an innner node</returns>
+        [Obsolete("This should not be needed anymore. We call Stack() for all layouts.")]
         protected static float LevelLift(ILayoutNode node)
         {
             return node.Level * LevelIncreaseForInnerNodes;
@@ -64,24 +66,6 @@ namespace SEE.Layout.NodeLayouts
         public abstract Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector2 rectangle);
-
-        /// <summary>
-        /// Adds the given <paramref name="offset"/> to every node position in the given <paramref name="layout"/>.
-        /// </summary>
-        /// <param name="layout">node layout to be adjusted</param>
-        /// <param name="offset">offset to be added</param>
-        /// <returns><paramref name="layout"/> where <paramref name="offset"/> has been added to each position</returns>
-        private static Dictionary<ILayoutNode, NodeTransform> Move(Dictionary<ILayoutNode, NodeTransform> layout, Vector3 offset)
-        {
-            Dictionary<ILayoutNode, NodeTransform> result = new();
-            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
-            {
-                NodeTransform transform = entry.Value;
-                transform.Position += offset;
-                result[entry.Key] = transform;
-            }
-            return result;
-        }
 
         /// <summary>
         /// Moves all <paramref name="layoutNodes"/> together to the cube defined by <paramref name="target"/>.
