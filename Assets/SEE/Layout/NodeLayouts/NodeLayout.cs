@@ -113,7 +113,7 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Scales all nodes in <paramref name="layoutNodes"/> so that they fit into
+        /// Scales the width and depth of all nodes in <paramref name="layoutNodes"/> so that they fit into
         /// a rectangled defined by <paramref name="width"/> and <paramref name="depth"/>.
         /// The aspect ratio of every node is maintained.
         /// </summary>
@@ -121,7 +121,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
         /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        private static float Scale(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
+        private static float ScaleXZ(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
         {
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             Bounding3DBox(layoutNodeList, out Vector3 leftFrontCorner, out Vector3 rightBackCorner);
@@ -134,8 +134,10 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode layoutNode in layoutNodeList)
             {
                 layoutNode.ScaleXZBy(scaleFactor);
-                // The x/z co-ordinates must be adjusted after scaling
-                Vector3 newPosition = layoutNode.CenterPosition * scaleFactor;
+                // The x/z co-ordinates of the position must be adjusted after scaling.
+                Vector3 newPosition = layoutNode.CenterPosition;
+                newPosition.x *= scaleFactor;
+                newPosition.z *= scaleFactor;
                 layoutNode.CenterPosition = newPosition;
             }
             return scaleFactor;
@@ -292,7 +294,7 @@ namespace SEE.Layout.NodeLayouts
             Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
             ApplyLayoutNodeTransform(layout);
             // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
-            Scale(layoutNodes, rectangle.x, rectangle.y);
+            ScaleXZ(layoutNodes, rectangle.x, rectangle.y);
             MoveTo(layoutNodes, centerPosition);
             Stack(layoutNodes, centerPosition.y);
         }
