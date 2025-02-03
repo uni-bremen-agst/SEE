@@ -14,10 +14,10 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         {
             public Rectangle(float x, float z, float width, float depth)
             {
-                this.X = x;
-                this.Z = z;
-                this.Width = width;
-                this.Depth = depth;
+                X = x;
+                Z = z;
+                Width = width;
+                Depth = depth;
             }
             public float X;      // x co-ordinate at corner
             public float Z;      // z co-ordinate at corner
@@ -32,15 +32,16 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         {
             public NodeSize(ILayoutNode gameNode, float size)
             {
-                this.GameNode = gameNode;
-                this.Size = size;
+                GameNode = gameNode;
+                Size = size;
             }
             public ILayoutNode GameNode;
             public float Size;
         }
 
         /// <summary>
-        /// Adds padding to the rectangle.
+        /// Adds padding to the rectangle to all sides, that is, the width
+        /// and depth are increased by twice the <paramref name="padding"/>.
         /// </summary>
         /// <param name="rect">rectangle for which to add padding</param>
         /// <param name="padding">the absolute padding to be added in between
