@@ -116,6 +116,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // The inner nodes will be slightly lifted along the y axis according to their
                     // tree depth so that they can be stacked visually (level 0 is at the bottom).
+                    // FIXME: We do not need this. Stack will be called later anyway.
                     newChildPosition.y += LevelLift(child);
                 }
                 layout[child] = new NodeTransform(newChildPosition, childTransform.Scale, childTransform.Rotation);
@@ -199,7 +200,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Can we ever arrive here? That would mean that node is not a leaf
                     // and does not have children.
-                    return new Vector2(node.LocalScale.x, node.LocalScale.z);
+                    return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
                 }
             }
         }
