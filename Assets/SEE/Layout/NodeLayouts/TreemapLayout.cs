@@ -225,7 +225,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>list of node area sizes</returns>
         private List<RectangleTiling.NodeSize> GetSizes(ICollection<ILayoutNode> nodes)
         {
-            List<RectangleTiling.NodeSize> result = new List<RectangleTiling.NodeSize>();
+            List<RectangleTiling.NodeSize> result = new();
             foreach (ILayoutNode node in nodes)
             {
                 result.Add(sizes[node]);
