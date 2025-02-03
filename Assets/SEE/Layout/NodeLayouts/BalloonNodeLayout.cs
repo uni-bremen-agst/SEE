@@ -290,7 +290,7 @@ namespace SEE.Layout.NodeLayouts
                         // point, P, are isosceles triangles, with |cp_p - P| = |cp_p - cp_c| = r_p
                         // and |cp_c - P| = r_c. The angle alpha of this isosceles triangle is
                         // 2 * arcsin(r_c / (2*r_p)).
-                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
+                        double alpha = 2 * Math.Asin(childOuterRadius / (2 * parentInnerRadius));
                         //Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
 
                         // There are two identical isosceles triangles, one for each of the two
@@ -326,7 +326,7 @@ namespace SEE.Layout.NodeLayouts
 
                         // Asin (arcsin) returns an angle, θ, measured in radians, such that
                         // -π/2 ≤ θ ≤ π/2 -or- NaN if d < -1 or d > 1 or d equals NaN.
-                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
+                        double alpha = 2 * Math.Asin(childOuterRadius / (2 * parentInnerRadius));
 
                         if (accummulatedAlpha > 0.0)
                         {
@@ -337,9 +337,9 @@ namespace SEE.Layout.NodeLayouts
                         }
                         // Convert polar coordinate back to cartesian coordinate.
                         Vector3 childCenter;
-                        childCenter.x = position.x + (float)(parentInnerRadius * System.Math.Cos(accummulatedAlpha));
+                        childCenter.x = position.x + (float)(parentInnerRadius * Math.Cos(accummulatedAlpha));
                         childCenter.y = position.y;
-                        childCenter.z = position.z + (float)(parentInnerRadius * System.Math.Sin(accummulatedAlpha));
+                        childCenter.z = position.z + (float)(parentInnerRadius * Math.Sin(accummulatedAlpha));
 
                         DrawCircles(child, childCenter);
 
