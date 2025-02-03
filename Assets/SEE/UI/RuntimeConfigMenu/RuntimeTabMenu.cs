@@ -12,7 +12,6 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.UI.Menu;
 using SEE.GO;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.Utils;
 using SimpleFileBrowser;
@@ -627,7 +626,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 // confirmed types where the nested fields should be edited
                 case ColorRange:
                 case ColorProperty:
-                case CoseGraphAttributes:
                 case VisualNodeAttributes:
                 case NodeLayoutAttributes:
                 case EdgeLayoutAttributes:

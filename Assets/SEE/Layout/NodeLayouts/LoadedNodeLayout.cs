@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.Layout.IO;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using UnityEngine;
 
@@ -20,12 +18,14 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
         /// placed on this level</param>
-        /// <param name="filename">the name of file from which to read the layout information</param>
-        public LoadedNodeLayout(float groundLevel, string filename)
-          : base(groundLevel)
+        public LoadedNodeLayout(string filename)
+        {
+            this.filename = filename;
+        }
+
+        static LoadedNodeLayout()
         {
             Name = "Loaded Layout";
-            this.filename = filename;
         }
 
         /// <summary>
@@ -33,14 +33,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
-        /// <summary>
-        /// See <see cref="HierarchicalNodeLayout.Layout()"/>.
-        /// Note: The layout may not only be returned but also applied depending on the implementation
-        /// of <see cref="ILayoutNode"/>.
-        /// </summary>
-        /// <param name="layoutNodes">nodes to be laid out</param>
-        /// <returns>resulting layout</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new();
             if (File.Exists(filename))
@@ -48,7 +41,7 @@ namespace SEE.Layout.NodeLayouts
                 IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
                 if (Filenames.HasExtension(filename, Filenames.GVLExtension))
                 {
-                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), GroundLevel, new SEELogger());
+                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
                     // The elements in layoutNodeList will be stacked onto each other starting at groundLevel.
                 }
                 else if (Filenames.HasExtension(filename, Filenames.SLDExtension))
@@ -77,16 +70,6 @@ namespace SEE.Layout.NodeLayouts
                 Debug.LogError($"Layout file {filename} does not exist. No layout could be loaded.\n");
             }
             return result;
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

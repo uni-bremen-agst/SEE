@@ -15,12 +15,12 @@ namespace SEE.Layout
         /// The y co-ordinate of the position will be interpreted as the ground position of
         /// the game object (unlike in Unity where it is the center height).
         /// </summary>
-        /// <param name="position">position in the scene; y co-ordinate denotes the ground</param>
-        /// <param name="scale">the scale of the object</param>
+        /// <param name="position">worldspace position in the scene; y co-ordinate denotes the ground</param>
+        /// <param name="scale">the absolute scale of the object</param>
         public NodeTransform(Vector3 position, Vector3 scale)
         {
-            this.Position = position;
-            this.Scale = scale;
+            Position = position;
+            Scale = scale;
             Rotation = 0.0f;
         }
 
@@ -30,18 +30,18 @@ namespace SEE.Layout
         /// the game object (unlike in Unity where it is the center height). The x and z
         /// co-ordinate refer to the center of an object in the x/z plane (ground).
         /// </summary>
-        /// <param name="position">position in the scene; y co-ordinate denotes the ground</param>
-        /// <param name="scale">the scale of the object</param>
+        /// <param name="position">worldspace position in the scene; y co-ordinate denotes the ground</param>
+        /// <param name="scale">the absolute scale of the object</param>
         /// <param name="rotation">rotation of the object around the y axis in degree</param>
         public NodeTransform(Vector3 position, Vector3 scale, float rotation)
         {
-            this.Position = position;
-            this.Scale = scale;
-            this.Rotation = rotation;
+            Position = position;
+            Scale = scale;
+            Rotation = rotation;
         }
 
         /// <summary>
-        /// The position in the scene.
+        /// The worldspace position in the scene.
         ///
         /// IMPORTANT NOTE: The y co-ordinate will be interpreted as the ground position of
         /// the game object (unlike in Unity where it is the center height).  The x and z
@@ -49,7 +49,7 @@ namespace SEE.Layout
         /// </summary>
         public Vector3 Position;
         /// <summary>
-        /// The scale (width, height, depth) of the game object.
+        /// The absolute scale (width, height, depth) of the game object.
         /// </summary>
         public Vector3 Scale;
         /// <summary>

@@ -1,5 +1,3 @@
-using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.NodeLayouts.IncrementalTreeMap;
 using System;
 using System.Collections.Generic;
@@ -22,36 +20,21 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level</param>
-        /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
-        /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="settings">the settings for the layout</param>
-        public IncrementalTreeMapLayout(float groundLevel,
-            float width,
-            float depth,
-            IncrementalTreeMapAttributes settings)
-            : base(groundLevel)
+        public IncrementalTreeMapLayout(IncrementalTreeMapAttributes settings)
+        {
+            this.settings = settings;
+        }
+
+        static IncrementalTreeMapLayout()
         {
             Name = "IncrementalTreeMap";
-            this.width = width;
-            this.depth = depth;
-            this.settings = settings;
         }
 
         /// <summary>
         /// The adjustable parameters for the layout.
         /// </summary>
         private readonly IncrementalTreeMapAttributes settings;
-
-        /// <summary>
-        /// The width of the rectangle in which to place all nodes in Unity units.
-        /// </summary>
-        private readonly float width;
-
-        /// <summary>
-        /// The depth of the rectangle in which to place all nodes in Unity units.
-        /// </summary>
-        private readonly float depth;
 
         /// <summary>
         /// The node layout we compute as a result.
@@ -94,7 +77,7 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             List<ILayoutNode> layoutNodesList = layoutNodes.ToList();
             if (!layoutNodesList.Any())
@@ -102,10 +85,9 @@ namespace SEE.Layout.NodeLayouts
                 throw new ArgumentException("No nodes to be laid out.");
             }
 
-            this.Roots = LayoutNodes.GetRoots(layoutNodesList);
-            InitNodes();
-            Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
-            CalculateLayout(Roots, rectangle);
+            Roots = LayoutNodes.GetRoots(layoutNodesList);
+            InitNodes(rectangle);
+            CalculateLayout(Roots, new Rectangle(x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y), groundLevel);
             return layoutResult;
         }
 
@@ -114,12 +96,12 @@ namespace SEE.Layout.NodeLayouts
         /// and sets the <see cref="Node.DesiredSize"/>.
         /// Fills the <see cref="nodeMap"/> and the <see cref="iLayoutNodeMap"/>.
         /// </summary>
-        private void InitNodes()
+        private void InitNodes(Vector2 rectangle)
         {
             float totalSize = Roots.Sum(InitNode);
 
             // adjust the absolute size to the rectangle of the layout
-            float adjustFactor = (width * depth) / totalSize;
+            float adjustFactor = (rectangle.x * rectangle.y) / totalSize;
             foreach (Node node in nodeMap.Values)
             {
                 node.DesiredSize *= adjustFactor;
@@ -161,7 +143,8 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="siblings">nodes with same parent (or roots)</param>
         /// <param name="rectangle">area to place siblings</param>
-        private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
+        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
+        private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle, float groundLevel)
         {
             List<Node> nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
             // check if the old layout can be used to lay out siblings.
@@ -176,7 +159,7 @@ namespace SEE.Layout.NodeLayouts
                 ApplyIncrementalLayout(nodes, rectangle);
             }
 
-            AddToLayout(nodes);
+            AddToLayout(nodes, groundLevel);
 
             foreach (ILayoutNode node in siblings)
             {
@@ -187,7 +170,7 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 Rectangle childRectangle = nodeMap[node.ID].Rectangle;
-                CalculateLayout(children, childRectangle);
+                CalculateLayout(children, childRectangle, groundLevel);
             }
         }
 
@@ -321,7 +304,8 @@ namespace SEE.Layout.NodeLayouts
         /// Applies padding to the result.
         /// </summary>
         /// <param name="nodes">nodes with calculated layout</param>
-        private void AddToLayout(IEnumerable<Node> nodes)
+        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
+        private void AddToLayout(IEnumerable<Node> nodes, float groundLevel)
         {
             foreach (Node node in nodes)
             {
@@ -337,7 +321,7 @@ namespace SEE.Layout.NodeLayouts
 
                 Vector3 position = new Vector3(
                     (float)(rectangle.X + rectangle.Width / 2.0d),
-                    GroundLevel,
+                    groundLevel,
                     (float)(rectangle.Z + rectangle.Depth / 2.0d));
                 Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),
@@ -346,20 +330,6 @@ namespace SEE.Layout.NodeLayouts
 
                 layoutResult[layoutNode] = new NodeTransform(position, scale);
             }
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout
-        (ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
-            ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            // Must not be implemented because UsesEdgesAndSublayoutNodes() returns false
-            // and this method should never be called.
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

@@ -84,7 +84,7 @@ namespace SEE.Game.Evolution
             List<GameObject> gameObjects = new();
 
             // The layout to be applied.
-            NodeLayout nodeLayout = Renderer.GetLayout(gameObject);
+            NodeLayout nodeLayout = Renderer.GetLayout();
 
             // Gather all nodes for the layout.
             ignoreInnerNodes = !nodeLayout.IsHierarchical();
@@ -114,15 +114,10 @@ namespace SEE.Game.Evolution
                 iNodeLayout.OldLayout = iOldLayout;
             }
 
-            // Calculate and apply the node layout
+            // Calculate and apply the node layout.
             ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
-            // Note: Apply applies its results only on the layoutNodes but not on the game objects
-            // these layoutNodes represent. Here, we leave the game objects untouched. The layout
-            // must be later applied when we render a city. Here, we only store the layout for later use.
-            nodeLayout.Apply(layoutNodes);
+            nodeLayout.Apply(layoutNodes, new Vector2(gameObject.transform.lossyScale.x, gameObject.transform.lossyScale.z), gameObject.transform.position);
             oldLayout = nodeLayout;
-            GraphRenderer.Fit(gameObject, layoutNodes);
-            GraphRenderer.Stack(gameObject, layoutNodes);
 
             if (edgesAreDrawn)
             {

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout
@@ -16,8 +15,8 @@ namespace SEE.Layout
         /// <param name="index">the unique ID of the node (a number to be converted into a string)</param>
         public LayoutVertex(Vector3 initialSize, int index)
         {
-            scale = initialSize;
-            id = index.ToString();
+            LocalScale = initialSize;
+            ID = index.ToString();
         }
 
         /// <summary>
@@ -26,14 +25,11 @@ namespace SEE.Layout
         /// <param name="id">unique ID of the node</param>
         public LayoutVertex(string id)
         {
-            scale = Vector3.zero;
-            this.id = id;
+            LocalScale = Vector3.zero;
+            ID = id;
         }
 
-        /// <summary>
-        /// Unique ID of the node.
-        /// </summary>
-        private readonly string id;
+        #region IHierarchyNode
 
         /// <summary>
         /// Immediate ancestor of the node. May be null, if the node is a root.
@@ -69,63 +65,39 @@ namespace SEE.Layout
             node.Parent = this;
         }
 
-        /// <summary>
-        /// The local scale of the node, that is, the size of the node
-        /// relative to its parent. If size is Vector3.one, the node is
-        /// as large as its parent.
-        /// </summary>
-        private Vector3 scale;
+        #endregion IHierarchyNode
+
+        #region IGameNode
 
         /// <summary>
         /// The local scale of the node, that is, the size of the node
         /// relative to its parent. If size is Vector3.one, the node is
         /// as large as its parent.
         /// </summary>
-        public Vector3 LocalScale
-        {
-            get => scale;
-            set => scale = value;
-        }
+        public Vector3 LocalScale { set; get; }
 
         /// <summary>
-        /// Increases the size of this node by the given factor.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        /// <param name="factor">factor by which to multiply this node's scale</param>
-        public void ScaleBy(float factor)
+        public void ScaleXZBy(float factor)
         {
-            scale *= factor;
-        }
-
-        public void SetOrigin()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetRelative(ILayoutNode node)
-        {
-            throw new NotImplementedException();
+            Vector3 result = LocalScale;
+            result.x *= factor;
+            result.z *= factor;
+            LocalScale = result;
         }
 
         /// <summary>
         /// The center position of the node.
         /// </summary>
-        private Vector3 centerPosition;
-
-        /// <summary>
-        /// The center position of the node.
-        /// </summary>
-        public Vector3 CenterPosition
-        {
-            get => centerPosition;
-            set => centerPosition = value;
-        }
+        public Vector3 CenterPosition { set; get; }
 
         /// <summary>
         /// The X-Z center position of the node's roof.
         /// </summary>
         public Vector3 Roof
         {
-            get => centerPosition + 0.5f * scale.y * Vector3.up;
+            get => CenterPosition + 0.5f * LocalScale.y * Vector3.up;
         }
 
         /// <summary>
@@ -133,7 +105,7 @@ namespace SEE.Layout
         /// </summary>
         public Vector3 Ground
         {
-            get => centerPosition - 0.5f * scale.y * Vector3.up;
+            get => CenterPosition - 0.5f * LocalScale.y * Vector3.up;
         }
 
         /// <summary>
@@ -144,21 +116,22 @@ namespace SEE.Layout
         /// <summary>
         /// The unique ID of this node.
         /// </summary>
-        public string ID { get => id; }
+        public string ID { get; private set; }
 
         /// <summary>
         /// The rotation of the node along the y axis in degrees.
         /// </summary>
-        private float rotation;
+        public float Rotation { set; get; }
 
         /// <summary>
-        /// The rotation of the node along the y axis in degrees.
+        /// The scale of the node in world space, i.e., in absolute Unity units
+        /// independent of its parent.
         /// </summary>
-        public float Rotation
-        {
-            get => rotation;
-            set => rotation = value;
-        }
+        public Vector3 AbsoluteScale => LocalScale;
+
+        #endregion IGameNode
+
+        #region IGraphNode
 
         /// <summary>
         /// The set of successor nodes.
@@ -166,16 +139,15 @@ namespace SEE.Layout
         public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
 
         /// <summary>
-        /// The scale of the node in world space, i.e., in absolute Unity units
-        /// independent of its parent.
+        /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
         /// </summary>
-        public Vector3 AbsoluteScale => scale;
+        /// <param name="typeName">ignored</param>
+        /// <returns>always false</returns>
+        public bool HasType(string typeName)
+        {
+            return false;
+        }
 
-        public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public GameObject GameObject => throw new NotImplementedException();
+        #endregion IGraphNode
     }
 }

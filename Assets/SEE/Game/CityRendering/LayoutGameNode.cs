@@ -59,22 +59,14 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Scales this node by the given <paramref name="factor"/>: its current
-        /// Scale is multiplied by <paramref name="factor"/>. If the object
-        /// contains a line, the line width is multiplied by <paramref name="factor"/>, too.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        /// <param name="factor">factor by which to mulitply the scale</param>
-        public override void ScaleBy(float factor)
+        public override void ScaleXZBy(float factor)
         {
-            LineRenderer renderer = GameObject.GetComponent<LineRenderer>();
-            if (renderer != null)
-            {
-                // This object is drawn by a line. The width of the line must
-                // be adjusted.
-                renderer.startWidth *= factor;
-                renderer.endWidth *= factor;
-            }
-            LocalScale *= factor;
+            Vector3 result = LocalScale;
+            result.x *= factor;
+            result.z *= factor;
+            LocalScale = result;
         }
 
         /// <summary>

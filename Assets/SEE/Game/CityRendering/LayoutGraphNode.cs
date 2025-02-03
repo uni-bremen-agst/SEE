@@ -49,12 +49,12 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// <see cref="AbstractLayoutNode.ScaleBy"/>.
+        /// <see cref="AbstractLayoutNode.ScaleXZBy"/>.
         /// </summary>
-        /// <param name="factor">factor by which to scale the node</param>
-        public override void ScaleBy(float factor)
+        public override void ScaleXZBy(float factor)
         {
-            scale *= factor;
+            scale.x *= factor;
+            scale.z *= factor;
         }
 
         /// <summary>
