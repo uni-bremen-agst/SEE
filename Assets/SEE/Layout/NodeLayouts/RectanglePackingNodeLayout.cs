@@ -13,15 +13,6 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     public class RectanglePackingNodeLayout : HierarchicalNodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="padding">the padding to be added between neighboring nodes</param>
-        public RectanglePackingNodeLayout(float padding = 0.01f)
-        {
-            this.padding = padding;
-        }
-
         static RectanglePackingNodeLayout()
         {
             Name = "Rectangle Packing";
@@ -30,7 +21,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// The padding between neighboring rectangles.
         /// </summary>
-        private readonly float padding;
+        private const float padding = 0.01f;
 
         public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
@@ -66,7 +57,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // There are only leaves.
                     Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
-                    RemovePadding(layoutResult, padding);
+                    RemovePadding(layoutResult);
                     return layoutResult;
                 }
             }
@@ -87,7 +78,7 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 position = new(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
                 layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.AbsoluteScale.y, area.y));
-                RemovePadding(layoutResult, padding);
+                RemovePadding(layoutResult);
                 // Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
                 // for each node hierarchy level anew. That is why we need to adjust the layout so
                 // that all rectangles are truly nested.
@@ -137,8 +128,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layout">layout containing the NodeTransform.scale to be adjusted</param>
         /// <param name="padding">padding to be removed</param>
-        private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout, float padding)
+        private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
         {
+            return;
             ICollection<ILayoutNode> keys = new List<ILayoutNode>(layout.Keys);
 
             foreach (ILayoutNode key in keys)
