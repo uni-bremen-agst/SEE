@@ -193,7 +193,7 @@ namespace SEE.Layout.NodeLayouts
                         // inner node. Nevertheless, we do not add padding here, because padding is already
                         // included in the returned childArea.
                         layout[child] = new NodeTransform(Vector3.zero,
-                                                          new Vector3(childArea.x, groundLevel, childArea.y));
+                                                          new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
                     }
                 }
                 // The scales of all children of the node have now been set. Now
