@@ -21,7 +21,7 @@ namespace SEE.Game.CityRendering
         public LayoutGameNode(IDictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject)
             : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
         {
-            this.GameObject = gameObject;
+            GameObject = gameObject;
         }
 
         /// <summary>
