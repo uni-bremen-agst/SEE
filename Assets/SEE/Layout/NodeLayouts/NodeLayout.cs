@@ -336,9 +336,14 @@ namespace SEE.Layout.NodeLayouts
         private const float maximalAbsolutePadding = 0.1f;
 
         /// <summary>
-        /// Returns the padding to be added between neighboring nodes (on a per node basis,
-        /// i.e., the actual padding is the sum of the padding of two neighboring nodes).
+        /// Returns the padding to be added around a node to separate it visually
+        /// from its neigboaring nodes.
+        ///
+        /// The resulting padding will clamped into <see cref="minimimalAbsolutePadding"/>
+        /// and <see cref="maximalAbsolutePadding"/>.
         /// </summary>
+        /// <remarks>The actual padding added between two neighboaring nodes
+        /// may be double this value if padding was added for both nodes.</remarks>
         /// <param name="width">the width of the node</param>
         /// <param name="depth">the depth of the node</param>
         /// <returns>padding to be added</returns>
@@ -346,6 +351,29 @@ namespace SEE.Layout.NodeLayouts
         {
             return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
         }
+
+        /// <summary>
+        /// The inverse function of <see cref="Padding(float, float)"/>. It returns
+        /// the padding that was added to a node to obtain an area with <paramref name="widthWithPadding"/>
+        /// and <paramref name="depthWithPadding"/>. This padding needs to removed
+        /// from this area to get the original node area before padding was added.
+        ///
+        /// Let o = (w, d) be the original area and p = Padding(w, d).
+        /// Let n = (w+p, d+p) be the area where padding p was added.
+        /// Let p' = ReversePadding(w+p, d+p). Then (w+p-p', d+p-p') = (w, p).
+        ///
+        /// The resulting padding will clamped into <see cref="minimimalAbsolutePadding"/>
+        /// and <see cref="maximalAbsolutePadding"/>.
+        /// </summary>
+        /// <param name="widthWithPadding">the width of the node after padding was added</param>
+        /// <param name="depthWithPadding">the depth of the node after padding was added</param>
+        /// <returns>padding to be added</returns>
+        protected static float ReversePadding(float widthWithPadding, float depthWithPadding)
+        {
+            float min = Mathf.Min(widthWithPadding, depthWithPadding);
+            return Mathf.Clamp((min * paddingFactor)/(1 + paddingFactor), minimimalAbsolutePadding, maximalAbsolutePadding);
+        }
+
         #endregion Padding
     }
 }
