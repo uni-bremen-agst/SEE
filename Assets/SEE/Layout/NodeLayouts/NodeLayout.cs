@@ -317,5 +317,35 @@ namespace SEE.Layout.NodeLayouts
                 node.Rotation = transform.Rotation;
             }
         }
+
+        #region Padding
+        /// <summary>
+        /// Some padding will be added between nodes. That padding depends upon the minimum
+        /// of the width and depth of a node, multiplied by this factor.
+        /// </summary>
+        private const float paddingFactor = 0.05f;
+
+        /// <summary>
+        /// The minimal padding between nodes in absolute (world space) terms.
+        /// </summary>
+        private const float minimimalAbsolutePadding = 0.01f;
+
+        /// <summary>
+        /// The maximal padding between nodes in absolute (world space) terms.
+        /// </summary>
+        private const float maximalAbsolutePadding = 0.1f;
+
+        /// <summary>
+        /// Returns the padding to be added between neighboring nodes (on a per node basis,
+        /// i.e., the actual padding is the sum of the padding of two neighboring nodes).
+        /// </summary>
+        /// <param name="width">the width of the node</param>
+        /// <param name="depth">the depth of the node</param>
+        /// <returns>padding to be added</returns>
+        protected static float Padding(float width, float depth)
+        {
+            return Mathf.Clamp(Mathf.Min(width, depth) * paddingFactor, minimimalAbsolutePadding, maximalAbsolutePadding);
+        }
+        #endregion Padding
     }
 }
