@@ -212,13 +212,13 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
         /// </summary>
-        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
+        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new();
 
         /// <summary>
         /// A mapping of the name of node types of <see cref="graphs"/> onto the
         /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
         /// </summary>
-        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
@@ -228,7 +228,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// A mapping from Node to ILayoutNode.
         /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
+        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new();
 
         /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
