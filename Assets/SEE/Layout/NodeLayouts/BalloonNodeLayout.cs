@@ -241,9 +241,6 @@ namespace SEE.Layout.NodeLayouts
             {
                 // inner node
                 // inner nodes will be positioned and scaled, primarily in x and z axes;
-                // the inner nodes will be slightly lifted along the y axis according to their
-                // tree depth so that they can be stacked visually (level 0 is at the bottom)
-                position.y += LevelLift(node);
                 layoutResult[node]
                     = new NodeTransform(position,
                                         new Vector3(2 * nodeInfos[node].OuterRadius,

@@ -51,7 +51,6 @@ namespace SEE.Layout.NodeLayouts
         /// "Globalizes" the layout. Initially, the position of children are assumed to be
         /// relative to their parent, where the parent has position Vector3.zero. This
         /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
-        /// We also adjust the ground level of each inner node by its level lift.
         /// </summary>
         /// <param name="layoutResult">the layout to be adjusted</param>
         /// <param name="position">the position of the parent of all children</param>
@@ -64,12 +63,6 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode child in children)
             {
                 NodeTransform childTransform = layoutResult[child];
-                if (!child.IsLeaf)
-                {
-                    // The inner nodes will be slightly lifted along the y axis according to their
-                    // tree depth so that they can be stacked visually (level 0 is at the bottom).
-                    position.y += LevelLift(child);
-                }
                 childTransform.Position += position;
                 layoutResult[child] = childTransform;
                 MakeGlobal(layoutResult, childTransform.Position, child.Children());
