@@ -11,8 +11,6 @@
         Treemap,
         CirclePacking,
         Reflexion,
-        Manhattan,
-        // CompoundSpringEmbedder,
         IncrementalTreeMap,
         FromFile
     }

@@ -12,7 +12,7 @@ namespace SEE.Layout.NodeLayouts
     /// described by Bruls, Huizing, van Wijk, "Squarified Treemaps".
     /// pp. 33-42, Eurographics / IEEE VGTC Symposium on Visualization, 2000.
     /// </summary>
-    public class TreemapLayout : HierarchicalNodeLayout
+    public class TreemapLayout : NodeLayout
     {
         static TreemapLayout()
         {

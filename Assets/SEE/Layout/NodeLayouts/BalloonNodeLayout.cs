@@ -10,7 +10,7 @@ namespace SEE.Layout.NodeLayouts
     /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on
     /// Information Visualization, Pages 19-25.
     /// </summary>
-    public class BalloonNodeLayout : HierarchicalNodeLayout
+    public class BalloonNodeLayout : NodeLayout
     {
         static BalloonNodeLayout()
         {

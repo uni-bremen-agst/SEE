@@ -9,7 +9,7 @@ namespace SEE.Layout.NodeLayouts
     /// This layout packs circles closely together as a set of nested circles to decrease
     /// the total area of city.
     /// </summary>
-    public class CirclePackingNodeLayout : HierarchicalNodeLayout
+    public class CirclePackingNodeLayout : NodeLayout
     {
         static CirclePackingNodeLayout()
         {

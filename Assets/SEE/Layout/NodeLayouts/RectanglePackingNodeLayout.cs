@@ -11,7 +11,7 @@ namespace SEE.Layout.NodeLayouts
     /// "Software Systems as Cities" (2010); see page 35.
     /// https://www.inf.usi.ch/lanza/Downloads/PhD/Wett2010b.pdf
     /// </summary>
-    public class RectanglePackingNodeLayout : HierarchicalNodeLayout
+    public class RectanglePackingNodeLayout : NodeLayout
     {
         static RectanglePackingNodeLayout()
         {

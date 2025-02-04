@@ -87,8 +87,7 @@ namespace SEE.Game.Evolution
             NodeLayout nodeLayout = Renderer.GetLayout();
 
             // Gather all nodes for the layout.
-            ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
+            foreach (Node node in graph.Nodes())
             {
                 // All layouts (flat and hierarchical ones) must be able to handle leaves;
                 // hence, leaves can be added at any rate. For a hierarchical layout, we

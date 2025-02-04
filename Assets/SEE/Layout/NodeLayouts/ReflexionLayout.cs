@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
-    public class ReflexionLayout : HierarchicalNodeLayout
+    public class ReflexionLayout : NodeLayout
     {
         /// <summary>
         /// Constructor.
@@ -82,10 +82,10 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // The available space is retrieved from the root node.
-            Split(roots[0], 0.5f, out Area implementionArea, out Area architectureArea); // FIXME: 0.5f is a placeholder
+            Split(roots[0], 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.5f is a placeholder
 
-            //implementationRoot.Parent = null;
-            //architectureRoot.Parent = null;
+            implementationRoot.Parent = null;
+            architectureRoot.Parent = null;
 
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Debug.Log($"implementationNodes.Count= {implementationNodes.Count}\n");
@@ -94,7 +94,12 @@ namespace SEE.Layout.NodeLayouts
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
             Debug.Log($"architectureNodes.Count= {architectureNodes.Count}\n");
 
-            return result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            implementationRoot.Parent = roots[0];
+            architectureRoot.Parent = roots[0];
+
+            result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+
+            return result;
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ namespace SEE.Layout.NodeLayouts
     /// <summary>
     /// A layout that is read from a layout file.
     /// </summary>
-    public class LoadedNodeLayout : HierarchicalNodeLayout
+    public class LoadedNodeLayout : NodeLayout
     {
         /// <summary>
         /// Constructor.

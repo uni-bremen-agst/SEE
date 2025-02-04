@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
-    public class EvoStreetsNodeLayout : HierarchicalNodeLayout
+    public class EvoStreetsNodeLayout : NodeLayout
     {
         static EvoStreetsNodeLayout()
         {

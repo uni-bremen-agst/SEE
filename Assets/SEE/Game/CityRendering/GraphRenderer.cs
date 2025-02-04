@@ -460,7 +460,6 @@ namespace SEE.Game.CityRendering
             {
                 NodeLayoutKind.Reflexion => new ReflexionLayout(GetLayout(Settings.NodeLayoutSettings.Implementation),
                                                                 GetLayout(Settings.NodeLayoutSettings.Architecture)),
-                NodeLayoutKind.Manhattan => new ManhattanLayout(),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),

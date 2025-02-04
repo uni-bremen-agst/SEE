@@ -15,7 +15,7 @@ namespace SEE.Layout.NodeLayouts
     /// that can guarantee stability in the layouts over the series of graphs in the evolution
     /// while not neglecting the aspect of visual quality either.
     /// </summary>
-    public class IncrementalTreeMapLayout : HierarchicalNodeLayout, IIncrementalNodeLayout
+    public class IncrementalTreeMapLayout : NodeLayout, IIncrementalNodeLayout
     {
         /// <summary>
         /// Constructor.
