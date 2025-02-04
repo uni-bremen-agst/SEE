@@ -175,7 +175,7 @@ namespace SEE.Net
             // Make sure the object is really holding a button.
             Assert.That(buttonObject.TryGetComponent(out Button _));
             // Press the button.
-            ExecuteEvents.Execute(buttonObject.gameObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
+            ExecuteEvents.Execute(buttonObject, new BaseEventData(EventSystem.current), ExecuteEvents.submitHandler);
         }
     }
 }
