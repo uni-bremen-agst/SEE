@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -20,7 +22,8 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
-        /// i.e., the game object's position, scale, and rotation.
+        /// i.e., the game object's position, scale, and rotation. It is this node transform
+        /// that is calculated by this method.
         ///
         /// The nodes will be placed into a rectangle whose width is the
         /// x co-ordindate of <paramref name="rectangle"/> and whose depth is the y co-ordinate
@@ -37,17 +40,35 @@ namespace SEE.Layout.NodeLayouts
         /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
         /// </summary>
         /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        /// <param name="rectangle">The ground where all nodes will be placed.</param>
         /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
+        /// <param name="rectangle">The rectangle in which all nodes will be placed.</param>
         ///
-        public void Apply(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle, Vector3 centerPosition)
+        public void Apply(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
+            if (!layoutNodes.Any())
+            {
+                return;
+            }
             Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
-            ApplyLayoutNodeTransform(layout);
+            // FIXME: We can remove the following assertion later.
+            Assert.IsTrue(new HashSet<ILayoutNode>(layout.Keys).SetEquals(new HashSet<ILayoutNode>(layoutNodes)));
+
             // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
-            ScaleXZ(layoutNodes, rectangle.x, rectangle.y);
-            MoveTo(layoutNodes, centerPosition);
-            Stack(layoutNodes, centerPosition.y);
+            Box box = Bounding3DBox(layout.Values);
+            //Test(layout.Values);
+            //MoveTo(layout.Values, centerPosition, box);
+            float factor = ScaleXZ(layout.Values, rectangle.x, rectangle.y, box);
+            //Stack(layout, centerPosition.y);
+
+            ApplyLayoutNodeTransform(layout);
+        }
+
+        private void Test(Dictionary<ILayoutNode, NodeTransform>.ValueCollection values)
+        {
+            foreach (NodeTransform nodeTransform in values)
+            {
+                nodeTransform.ScaleXZBy(0);
+            }
         }
 
         /// <summary>
@@ -60,8 +81,8 @@ namespace SEE.Layout.NodeLayouts
             {
                 T node = entry.Key;
                 NodeTransform transform = entry.Value;
-                // y co-ordinate of transform.position refers to the ground
-                Vector3 position = transform.Position;
+                // y co-ordinate of transform.GroundCenter refers to the ground
+                Vector3 position = transform.GroundCenter;
                 position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;
                 node.LocalScale = transform.Scale;
@@ -76,196 +97,171 @@ namespace SEE.Layout.NodeLayouts
         protected const float groundLevel = 0.0f;
 
         #region Modifiers
-        /// <summary>
-        /// Moves all <paramref name="layoutNodes"/> together to the cube defined by <paramref name="target"/>.
-        /// More precisely, the bounding box enclosing all nodes in <paramref name="layoutNodes"/> will be
-        /// translated (moved such that there is no change in size or shape) to a new location defined by
-        /// <paramref name="target"/> such that the center of the bounding box at the new location
-        /// is at <paramref name="target"/>.
-        /// </summary>
-        /// <param name="layoutNodes">layout nodes to be moved</param>
-        /// <param name="target">worldspace center point where to move the <paramref name="layoutNodes"/></param>
-        private static void MoveTo(IEnumerable<ILayoutNode> layoutNodes, Vector3 target)
-        {
-            IList<ILayoutNode> layoutList = layoutNodes.ToList();
-            Bounding3DBox(layoutList.ToList(), out Vector3 left, out Vector3 right);
-            // centerPosition is the worldspace center of the bounding 3D box (cube) enclosing all layoutNodes.
-            // The center of the cube is the midpoint of the line segment connecting its
-            // left front corner and its right back corner. The coordinates of the center
-            // can be calculated using the midpoint formula:
-            Vector3 centerPosition = (right + left) / 2.0f;
-            // The offest is the vector from the current center of the bounding box to the
-            // target center point and needs to be added to all nodes.
-            Vector3 offset = target - centerPosition;
-            // It is assumed that target.y is the lowest point of the city.
-            // offset.y = target.y; FIXME can be removed.
-            foreach (ILayoutNode layoutNode in layoutList)
-            {
-                layoutNode.CenterPosition += offset;
-            }
-        }
 
         /// <summary>
-        /// Scales the width and depth of all nodes in <paramref name="layoutNodes"/> so that they fit into
-        /// a rectangled defined by <paramref name="width"/> and <paramref name="depth"/>.
-        /// The aspect ratio of every node is maintained.
+        /// A 3D box enclosing all nodes.
         /// </summary>
-        /// <param name="layoutNodes">layout nodes to be scaled</param>
+        /// <param name="LeftFrontCorner">the left front corner</param>
+        /// <param name="RightBackCorner">the right back corner</param>
+        record Box(Vector3 LeftFrontCorner, Vector3 RightBackCorner);
+
+        /// <summary>
+        /// Scales the width and depth of all nodes in <paramref name="layout"/> so that they fit into
+        /// a rectangled defined by <paramref name="width"/> and <paramref name="depth"/>.
+        /// The aspect ratio of every node is maintained. Only the NodeTransforms (values of the
+        /// dictionary) are affected.
+        /// </summary>
+        /// <param name="layout">layout nodes to be scaled</param>
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
         /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        private static float ScaleXZ(IEnumerable<ILayoutNode> layoutNodes, float width, float depth)
+        private static float ScaleXZ(ICollection<NodeTransform> layout, float width, float depth, Box box)
         {
-            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
-            Bounding3DBox(layoutNodeList, out Vector3 leftFrontCorner, out Vector3 rightBackCorner);
-            // The actual occupied space is a rectangle defined by leftFrontCorner and rightBackCorner.
-
-            float actualWidth = rightBackCorner.x - leftFrontCorner.x;
-            float actualDepth = rightBackCorner.z - leftFrontCorner.z;
+            float actualWidth = box.RightBackCorner.x - box.LeftFrontCorner.x;
+            float actualDepth = box.RightBackCorner.z - box.LeftFrontCorner.z;
 
             float scaleFactor = Mathf.Min(width / actualWidth, depth / actualDepth);
-            foreach (ILayoutNode layoutNode in layoutNodeList)
+
+            foreach (NodeTransform nodeTransform in layout)
             {
-                layoutNode.ScaleXZBy(scaleFactor);
-                // The x/z co-ordinates of the position must be adjusted after scaling.
-                Vector3 newPosition = layoutNode.CenterPosition;
-                newPosition.x *= scaleFactor;
-                newPosition.z *= scaleFactor;
-                layoutNode.CenterPosition = newPosition;
+                nodeTransform.ScaleXZBy(scaleFactor);
             }
             return scaleFactor;
         }
 
         /// <summary>
-        /// Stacks all <paramref name="layoutNodes"/> onto each other with <paramref name="levelDelta"/>
+        /// Moves all <paramref name="layout"/> together to the cube defined by <paramref name="target"/>.
+        /// More precisely, the bounding box enclosing all nodes in <paramref name="layout"/> will be
+        /// translated (moved such that there is no change in size or shape) to a new location defined by
+        /// <paramref name="target"/> such that the center of the bounding box at the new location
+        /// is at <paramref name="target"/>.
+        /// </summary>layout">layout to be moved</param>
+        /// <param name="target">worldspace center point where to move the <paramref name="layout"/></param>
+        private static void MoveTo(ICollection<NodeTransform> layout, Vector3 target, Box box)
+        {
+            // centerPosition is the worldspace center of the bounding 3D box (cube) enclosing all layoutNodes.
+            // The center of the cube is the midpoint of the line segment connecting its
+            // left front corner and its right back corner. The coordinates of the center
+            // can be calculated using the midpoint formula:
+            Vector3 centerPosition = (box.RightBackCorner + box.LeftFrontCorner) / 2.0f;
+            // The offest is the vector from the current center of the bounding box to the
+            // target center point and needs to be added to all nodes.
+            Vector3 offset = target - centerPosition;
+            // It is assumed that target.y is the lowest point of the city. FIXME????
+            foreach (NodeTransform nodeTransform in layout)
+            {
+                nodeTransform.TranslateBy(offset);
+            }
+        }
+
+        /// <summary>
+        /// Stacks all nodes in the <paramref name="layout"/> onto each other with <paramref name="levelDelta"/>
         /// in between parent and children (children are on top of their parent) where the initial
         /// y co-ordinate ground position of the roof nodes is specified by <paramref name="groundLevel"/>.
-        /// The x and z co-ordinates of the <paramref name="layoutNodes"/> are not changed.
+        /// The x and z co-ordinates of the nodes are not changed.
         /// </summary>
-        /// <param name="layoutNodes">the nodes to be stacked onto each other</param>
+        /// <param name="layout">layout whose nodes are to be stacked onto each other</param>
         /// <param name="groundLevel">target y co-ordinate ground position of the layout nodes</param>
         /// <param name="levelDelta">the y distance between parents and their children</param>
-        private static void Stack(IEnumerable<ILayoutNode> layoutNodes, float groundLevel, float levelDelta = 0.001f)
+        private static void Stack(Dictionary<ILayoutNode, NodeTransform> layout, float groundLevel, float levelDelta = 0.001f)
         {
             // position all root nodes at groundLevel
-            foreach (ILayoutNode layoutNode in layoutNodes)
+            foreach (ILayoutNode root in layout.Keys)
             {
-                if (layoutNode.Parent == null)
+                if (root.Parent == null)
                 {
-                    float newRoofY = PutOn(layoutNode, groundLevel);
+                    float newRoofY = PutOn(layout[root], groundLevel) + levelDelta;
                     // Continue with the children
-                    foreach (ILayoutNode child in layoutNode.Children())
+                    foreach (ILayoutNode child in root.Children())
                     {
-                        Stack(child, newRoofY + levelDelta, levelDelta);
+                        Stack(child, newRoofY);
                     }
                 }
             }
-        }
+            return;
 
-        /// <summary>
-        /// Positions the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/>
-        /// and then stacks its children onto <paramref name="layoutNode"/> with <paramref name="levelDelta"/>
-        /// space along the y axis in between. Recurses to its children. Children are put on top of
-        /// <paramref name="layoutNode"/>.
-        /// <param name="layoutNode">the node to be positioned</param>
-        /// <param name="groundLevel">the target y co-ordinate ground position of <paramref name="layoutNode"/></param>
-        /// <param name="levelDelta">the y distance between <paramref name="layoutNode"/> and its children</param>
-        private static void Stack(ILayoutNode layoutNode, float groundLevel, float levelDelta)
-        {
-            float newRoofY = PutOn(layoutNode, groundLevel);
-            foreach (ILayoutNode child in layoutNode.Children())
+            void Stack(ILayoutNode layoutNode, float level)
             {
-                Stack(child, newRoofY + levelDelta, levelDelta);
+                float newRoofY = PutOn(layout[layoutNode], level) + levelDelta;
+                foreach (ILayoutNode child in layoutNode.Children())
+                {
+                    Stack(child, newRoofY);
+                }
+            }
+
+            static float PutOn(NodeTransform nodeTransform, float level)
+            {
+                nodeTransform.LiftTo(level);
+                return nodeTransform.Roof;
             }
         }
 
         /// <summary>
-        /// Puts the ground of <paramref name="layoutNode"/> on <paramref name="groundLevel"/> (y axis).
+        /// Returns the bounding 3D box enclosing all given <paramref name="nodeTransforms"/>.
         /// </summary>
-        /// <param name="layoutNode">the layout node to be positioned</param>
-        /// <param name="groundLevel">the y-coordinate of the ground of <paramref name="layoutNode"/> to be positioned</param>
-        /// <returns>the y co-ordinate of the roof of the <paramref name="groundLevel"/> after it was moved along the y-axis</returns>
-        private static float PutOn(ILayoutNode layoutNode, float groundLevel)
-        {
-            Vector3 centerPosition = layoutNode.CenterPosition;
-            float yExtent = layoutNode.AbsoluteScale.y / 2.0f;
-            centerPosition.y = groundLevel + yExtent;
-            layoutNode.CenterPosition = centerPosition;
-            return centerPosition.y + yExtent;
-        }
-
-        /// <summary>
-        /// Returns the bounding 3D box enclosing all given <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <param name="layoutNodes">the list of layout nodes that are enclosed in the resulting bounding 3D box</param>
+        /// <param name="nodeTransforms">the list of layout node transforms that are enclosed in the resulting bounding 3D box</param>
         /// <param name="left">the left lower front corner of the bounding box in worldspace</param>
         /// <param name="right">the right upper back corner of the bounding box in worldspace</param>
-        private static void Bounding3DBox(ICollection<ILayoutNode> layoutNodes, out Vector3 left, out Vector3 right)
+        private static Box Bounding3DBox(IEnumerable<NodeTransform> nodeTransforms)
         {
-            if (layoutNodes.Count == 0)
-            {
-                left = Vector3.zero;
-                right = Vector3.zero;
-            }
-            else
-            {
-                left = new Vector3(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
-                right = new Vector3(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
+            Vector3 left = new(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);
+            Vector3 right = new(Mathf.NegativeInfinity, Mathf.NegativeInfinity, Mathf.NegativeInfinity);
 
-                foreach (ILayoutNode node in layoutNodes)
+            foreach (NodeTransform node in nodeTransforms)
+            {
+                Vector3 extent = node.Scale / 2.0f;
+                // Note: position denotes the center of the *ground* of the object;
+                // this has consequences on the interpretation of the y co-ordinate.
+                Vector3 position = node.GroundCenter;
                 {
-                    Vector3 extent = node.AbsoluteScale / 2.0f;
-                    // Note: position denotes the center of the object
-                    Vector3 position = node.CenterPosition;
+                    // left x co-ordinate of node
+                    float x = position.x - extent.x;
+                    if (x < left.x)
                     {
-                        // left x co-ordinate of node
-                        float x = position.x - extent.x;
-                        if (x < left.x)
-                        {
-                            left.x = x;
-                        }
+                        left.x = x;
                     }
-                    {   // right x co-ordinate of node
-                        float x = position.x + extent.x;
-                        if (x > right.x)
-                        {
-                            right.x = x;
-                        }
-                    }
+                }
+                {   // right x co-ordinate of node
+                    float x = position.x + extent.x;
+                    if (x > right.x)
                     {
-                        // lower y co-ordinate of node
-                        float y = position.y - extent.y;
-                        if (y < left.y)
-                        {
-                            left.y = y;
-                        }
+                        right.x = x;
                     }
+                }
+                {
+                    // lower y co-ordinate of node; note: position.y is the ground
+                    float y = position.y;
+                    if (y < left.y)
                     {
-                        // upper y co-ordinate of node
-                        float y = position.y + extent.y;
-                        if (y > right.y)
-                        {
-                            right.y = y;
-                        }
+                        left.y = y;
                     }
+                }
+                {
+                    // upper y co-ordinate of node; note: position.y is the ground
+                    float y = position.y + 2 * extent.y;
+                    if (y > right.y)
                     {
-                        // front z co-ordinate of node
-                        float z = position.z - extent.z;
-                        if (z < left.z)
-                        {
-                            left.z = z;
-                        }
+                        right.y = y;
                     }
+                }
+                {
+                    // front z co-ordinate of node
+                    float z = position.z - extent.z;
+                    if (z < left.z)
                     {
-                        // back z co-ordinate of node
-                        float z = position.z + extent.z;
-                        if (z > right.z)
-                        {
-                            right.z = z;
-                        }
+                        left.z = z;
+                    }
+                }
+                {
+                    // back z co-ordinate of node
+                    float z = position.z + extent.z;
+                    if (z > right.z)
+                    {
+                        right.z = z;
                     }
                 }
             }
+            return new Box(left, right);
         }
         #endregion Modifiers
 

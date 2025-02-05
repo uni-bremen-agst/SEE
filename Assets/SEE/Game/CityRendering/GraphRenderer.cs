@@ -195,11 +195,6 @@ namespace SEE.Game.CityRendering
         private const float levelDistance = 0.001f;
 
         /// <summary>
-        /// the ground level of the nodes
-        /// </summary>
-        private const float groundLevel = 0.0f;
-
-        /// <summary>
         /// The graphs to be rendered.
         /// </summary>
         private IList<Graph> graphs;
@@ -324,7 +319,7 @@ namespace SEE.Game.CityRendering
             {
                 Vector3 position = parent.transform.position;
                 position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
-                nodeLayout.Apply(layoutNodes, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z), position);
+                nodeLayout.Apply(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z));
             }
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");

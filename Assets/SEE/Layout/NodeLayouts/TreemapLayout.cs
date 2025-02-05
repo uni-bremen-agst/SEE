@@ -124,8 +124,8 @@ namespace SEE.Layout.NodeLayouts
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
                     NodeTransform nodeTransform = layoutResult[node];
                     CalculateLayout(children,
-                                    nodeTransform.Position.x - nodeTransform.Scale.x / 2.0f,
-                                    nodeTransform.Position.z - nodeTransform.Scale.z / 2.0f,
+                                    nodeTransform.GroundCenter.x - nodeTransform.Scale.x / 2.0f,
+                                    nodeTransform.GroundCenter.z - nodeTransform.Scale.z / 2.0f,
                                     nodeTransform.Scale.x,
                                     nodeTransform.Scale.z,
                                     groundLevel);

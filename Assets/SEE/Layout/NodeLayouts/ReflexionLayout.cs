@@ -1,4 +1,5 @@
 ﻿using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -82,10 +83,13 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // The available space is retrieved from the root node.
-            Split(roots[0], 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
+            Split(roots[0].CenterPosition, rectangle.x, rectangle.y, 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
 
-            implementationRoot.Parent = null;
-            architectureRoot.Parent = null;
+            architectureArea.ApplyTo(architectureRoot);
+            implementionArea.ApplyTo(implementationRoot);
+
+            //implementationRoot.Parent = null;
+            //architectureRoot.Parent = null;
 
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Debug.Log($"implementationNodes.Count= {implementationNodes.Count}\n");
@@ -94,8 +98,8 @@ namespace SEE.Layout.NodeLayouts
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
             Debug.Log($"architectureNodes.Count= {architectureNodes.Count}\n");
 
-            implementationRoot.Parent = roots[0];
-            architectureRoot.Parent = roots[0];
+            //implementationRoot.Parent = roots[0];
+            //architectureRoot.Parent = roots[0];
 
             result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
@@ -113,21 +117,26 @@ namespace SEE.Layout.NodeLayouts
             /// Constructor.
             /// </summary>
             /// <param name="position">The center point of the area in world space.</param>
-            /// <param name="scale">The scale of the area in world space.</param>
-            internal Area(Vector3 position, Vector3 scale)
+            /// <param name="width">The width of the area in world space.</param>
+            /// <param name="depth">The depth of the area in world space.</param>
+            internal Area(Vector3 position, float width, float depth)
             {
                 Position = position;
-                Scale = scale;
+                Width = width;
+                Depth = depth;
             }
             /// <summary>
             /// The center point of the area in world space.
             /// </summary>
             internal Vector3 Position;
             /// <summary>
-            /// The scale of the area in world space. Only its x and z components
-            /// are relevant.
+            /// The width of the area in world space.
             /// </summary>
-            internal Vector3 Scale;
+            internal float Width;
+            /// <summary>
+            /// The depth of the area in world space.
+            /// </summary>
+            internal float Depth;
 
             /// <summary>
             /// Applies the area to the given <paramref name="layoutNode"/>.
@@ -135,11 +144,11 @@ namespace SEE.Layout.NodeLayouts
             /// will be the same as the position and scale of this area (in world space).
             /// </summary>
             /// <param name="layoutNode">the object to which apply the area to</param>
-            //internal readonly void ApplyTo(ILayoutNode layoutNode)
-            //{
-            //    layoutNode.CenterPosition = Position;
-            //    layoutNode.SetAbsoluteScale(Scale, false);
-            //}
+            internal readonly void ApplyTo(ILayoutNode layoutNode)
+            {
+                layoutNode.CenterPosition = Position;
+                layoutNode.LocalScale = new Vector3(Width, layoutNode.AbsoluteScale.y, Depth);
+            }
         }
 
         /// <summary>
@@ -161,97 +170,107 @@ namespace SEE.Layout.NodeLayouts
         /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
         /// begin of the longer edge of the architecture with zero scale.
         /// </summary>
-        void Split(ILayoutNode root, float architectureLayoutProportion,
+        private static void Split(ILayoutNode root, float architectureLayoutProportion,
             out Area implementionArea, out Area architectureArea)
         {
-            bool xIsLongerEdge = root.AbsoluteScale.x >= root.AbsoluteScale.z;
+            float width = root.AbsoluteScale.x;
+            float depth = root.AbsoluteScale.z;
+            Vector3 centerPosition = root.CenterPosition;
+
+            Split(centerPosition, width, depth, architectureLayoutProportion, out implementionArea, out architectureArea);
+        }
+
+        private static void Split(Vector3 centerPosition,
+                                  float width,
+                                  float depth,
+                                  float architectureLayoutProportion,
+                                  out Area implementionArea,
+                                  out Area architectureArea)
+        {
+            bool xIsLongerEdge = width >= depth;
 
             if (architectureLayoutProportion <= 0)
             {
                 // the implemenation takes all the available space
-                implementionArea = new(root.CenterPosition, root.AbsoluteScale);
+                implementionArea = new(centerPosition, width, depth);
                 // the architecture sits at the end of the longer edge of the implementation with zero space
                 Vector3 architecturePos = implementionArea.Position;
                 if (xIsLongerEdge)
                 {
-                    architecturePos.x = implementionArea.Position.x + implementionArea.Scale.x / 2;
+                    architecturePos.x = implementionArea.Position.x + implementionArea.Width / 2;
                 }
                 else
                 {
-                    architecturePos.z = implementionArea.Position.z + implementionArea.Scale.z / 2;
+                    architecturePos.z = implementionArea.Position.z + implementionArea.Depth / 2;
                 }
-                architectureArea = new(architecturePos, Vector3.zero);
+                architectureArea = new(architecturePos, 0, 0);
             }
             else if (architectureLayoutProportion >= 1)
             {
                 // the architecture takes all the available space
-                architectureArea = new(root.CenterPosition, root.AbsoluteScale);
+                architectureArea = new(centerPosition, width, depth);
                 // the implementation sits at the begin of the longer edge of the architecture with zero space
                 Vector3 implementationPos = architectureArea.Position;
                 if (xIsLongerEdge)
                 {
-                    implementationPos.x = architectureArea.Position.x - architectureArea.Scale.x / 2;
+                    implementationPos.x = architectureArea.Position.x - architectureArea.Width / 2;
                 }
                 else
                 {
-                    implementationPos.z = architectureArea.Position.z - architectureArea.Scale.z / 2;
+                    implementationPos.z = architectureArea.Position.z - architectureArea.Depth / 2;
                 }
-                implementionArea = new(implementationPos, Vector3.zero);
+                implementionArea = new(implementationPos, 0, 0);
             }
             else
             {
                 if (xIsLongerEdge)
                 {
                     // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = root.CenterPosition;
+                    Vector3 referencePoint = centerPosition;
                     // The mid point of the left edge of the code city.
-                    referencePoint.x -= root.AbsoluteScale.x / 2;
+                    referencePoint.x -= width / 2;
 
                     // The implementationArea.
                     {
-                        float length = root.AbsoluteScale.x * (float)(1 - architectureLayoutProportion);
+                        float length = width * (float)(1 - architectureLayoutProportion);
                         Vector3 position = referencePoint;
                         position.x += length / 2;
-                        Vector3 scale = new(length, root.AbsoluteScale.y, root.AbsoluteScale.z);
-                        implementionArea = new(position, scale);
+                        implementionArea = new(position, length, depth);
                         // Move the reference point to the right end of the implementation area.
                         referencePoint.x += length;
                     }
 
                     // The architectureArea.
                     {
-                        float length = root.AbsoluteScale.x * architectureLayoutProportion;
+                        float length = width * architectureLayoutProportion;
                         Vector3 position = referencePoint;
                         position.x += length / 2;
-                        Vector3 scale = new(length, root.AbsoluteScale.y, root.AbsoluteScale.z);
-                        architectureArea = new(position, scale);
+                        architectureArea = new(position, length, depth);
                     }
                 }
                 else
                 {
                     // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = root.CenterPosition;
+                    Vector3 referencePoint = centerPosition;
                     // The mid point of the lower edge of the code city.
-                    referencePoint.z -= root.AbsoluteScale.z / 2;
+                    referencePoint.z -= depth / 2;
 
                     // The implementationArea.
                     {
-                        float length = root.AbsoluteScale.z * (float)(1 - architectureLayoutProportion);
+                        float length = depth * (float)(1 - architectureLayoutProportion);
                         Vector3 position = referencePoint;
                         position.z += length / 2;
-                        Vector3 scale = new(root.AbsoluteScale.x, root.AbsoluteScale.y, length);
-                        implementionArea = new(position, scale);
+                        implementionArea = new(position, width, length);
                         // Move the reference point to the lower end of the implementation area.
                         referencePoint.z += length;
                     }
 
                     // The architectureArea.
                     {
-                        float length = root.AbsoluteScale.z * architectureLayoutProportion;
+                        float length = depth * architectureLayoutProportion;
                         Vector3 position = referencePoint;
                         position.z += length / 2;
-                        Vector3 scale = new(root.AbsoluteScale.x, root.AbsoluteScale.y, length);
-                        architectureArea = new(position, scale);
+                        architectureArea = new(position, width, length);
                     }
                 }
             }

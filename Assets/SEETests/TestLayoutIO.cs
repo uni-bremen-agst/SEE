@@ -112,7 +112,7 @@ namespace SEE.Layout
                     go.transform.localScale = layoutNode.Value.Scale;
                     // position.y of a NodeTransform relates to the ground, while a
                     // game objects position.y relates to the center; we need to lift it
-                    Vector3 position = layoutNode.Value.Position;
+                    Vector3 position = layoutNode.Value.GroundCenter;
                     position.y += go.transform.localScale.y / 2;
                     go.transform.position = position;
                     result.Add(go);
@@ -175,12 +175,12 @@ namespace SEE.Layout
                     Assert.That(readTransform.Scale.y, Is.EqualTo(savedTransform.Scale.y).Within(floatTolerance));
                 }
                 Assert.That(readTransform.Scale.z, Is.EqualTo(savedTransform.Scale.z).Within(floatTolerance));
-                Assert.That(readTransform.Position.x, Is.EqualTo(savedTransform.Position.x).Within(floatTolerance));
+                Assert.That(readTransform.GroundCenter.x, Is.EqualTo(savedTransform.GroundCenter.x).Within(floatTolerance));
                 if (compareY)
                 {
-                    Assert.That(readTransform.Position.y, Is.EqualTo(savedTransform.Position.y).Within(floatTolerance));
+                    Assert.That(readTransform.GroundCenter.y, Is.EqualTo(savedTransform.GroundCenter.y).Within(floatTolerance));
                 }
-                Assert.That(readTransform.Position.z, Is.EqualTo(savedTransform.Position.z).Within(floatTolerance));
+                Assert.That(readTransform.GroundCenter.z, Is.EqualTo(savedTransform.GroundCenter.z).Within(floatTolerance));
                 Assert.AreEqual(savedTransform.Rotation, readTransform.Rotation);
             }
         }
@@ -209,7 +209,7 @@ namespace SEE.Layout
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
                 node.LocalScale = transform.Scale;
-                Vector3 position = transform.Position;
+                Vector3 position = transform.GroundCenter;
                 // from ground to center position along the y axis
                 position.y += transform.Scale.y / 2.0f;
                 node.CenterPosition = position;

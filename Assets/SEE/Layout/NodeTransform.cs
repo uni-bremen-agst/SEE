@@ -8,7 +8,7 @@ namespace SEE.Layout
     /// the game object (unlike in Unity where it is the center height).
     /// </summary>
     /// Note: Structs are value types and are copied on assignment.
-    public struct NodeTransform
+    public class NodeTransform
     {
         /// <summary>
         /// Constructor setting the position and scale. The rotation will be 0 degrees.
@@ -19,7 +19,7 @@ namespace SEE.Layout
         /// <param name="scale">the absolute scale of the object</param>
         public NodeTransform(Vector3 position, Vector3 scale)
         {
-            Position = position;
+            GroundCenter = position;
             Scale = scale;
             Rotation = 0.0f;
         }
@@ -35,7 +35,7 @@ namespace SEE.Layout
         /// <param name="rotation">rotation of the object around the y axis in degree</param>
         public NodeTransform(Vector3 position, Vector3 scale, float rotation)
         {
-            Position = position;
+            GroundCenter = position;
             Scale = scale;
             Rotation = rotation;
         }
@@ -44,10 +44,10 @@ namespace SEE.Layout
         /// The worldspace position in the scene.
         ///
         /// IMPORTANT NOTE: The y co-ordinate will be interpreted as the ground position of
-        /// the game object (unlike in Unity where it is the center height).  The x and z
+        /// the game object (unlike in Unity where it is the center height). The x and z
         /// co-ordinate refer to the center of an object in the x/z plane (ground).
         /// </summary>
-        public Vector3 Position;
+        public Vector3 GroundCenter;
         /// <summary>
         /// The absolute scale (width, height, depth) of the game object.
         /// </summary>
@@ -57,10 +57,43 @@ namespace SEE.Layout
         /// in degree. In other words, the rotation is around the y axis.
         /// </summary>
         public float Rotation;
+        /// <summary>
+        /// The roof (y axis) of this node transform.
+        /// </summary>
+        public float Roof => GroundCenter.y + Scale.y;
 
         public override string ToString()
         {
-            return "position=" + Position.ToString() + " scale=" + Scale.ToString();
+            return "position=" + GroundCenter.ToString() + " scale=" + Scale.ToString();
+        }
+
+        /// <summary>
+        /// Scales the width (x) and depth (z) by the given <paramref name="factor"/>.
+        /// The height will be maintained.
+        /// </summary>
+        /// <param name="factor">factory by which to scale the width and depth of the node</param>
+        public void ScaleXZBy(float factor)
+        {
+            Scale.x *= factor;
+            Scale.z *= factor;
+        }
+
+        /// <summary>
+        /// Translate (moves) this transform by given <paramref name="offset"/>.
+        /// </summary>
+        /// <param name="offset">the relative offset by which to move</param>
+        internal void TranslateBy(Vector3 offset)
+        {
+            GroundCenter += offset;
+        }
+
+        /// <summary>
+        /// Lifts this transform along the y axis to the given <paramref name="offset"/>.
+        /// </summary>
+        /// <param name="offset">the absolute worldspace y co-ordindate where to lift</param>
+        internal void LiftTo(float offset)
+        {
+            GroundCenter.y = offset;
         }
     }
 }

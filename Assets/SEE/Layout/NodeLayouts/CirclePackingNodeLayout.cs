@@ -63,9 +63,9 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode child in children)
             {
                 NodeTransform childTransform = layoutResult[child];
-                childTransform.Position += position;
+                childTransform.GroundCenter += position;
                 layoutResult[child] = childTransform;
-                MakeGlobal(layoutResult, childTransform.Position, child.Children());
+                MakeGlobal(layoutResult, childTransform.GroundCenter, child.Children());
             }
         }
 

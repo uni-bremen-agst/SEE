@@ -97,7 +97,7 @@ namespace SEE.Layout.NodeLayouts
              ILayoutNode parent)
         {
             NodeTransform parentTransform = layout[parent];
-            Vector3 parentCenterPosition = parentTransform.Position;
+            Vector3 parentCenterPosition = parentTransform.GroundCenter;
             Vector3 parentExtent = parentTransform.Scale / 2.0f;
             // The x co-ordinate of the left lower corner of the parent.
             float xCorner = parentCenterPosition.x - parentExtent.x;
@@ -107,7 +107,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (ILayoutNode child in parent.Children())
             {
                 NodeTransform childTransform = layout[child];
-                Vector3 newChildPosition = childTransform.Position;
+                Vector3 newChildPosition = childTransform.GroundCenter;
                 newChildPosition.x += xCorner;
                 newChildPosition.z += zCorner;
                 layout[child] = new NodeTransform(newChildPosition, childTransform.Scale, childTransform.Rotation);
@@ -137,7 +137,7 @@ namespace SEE.Layout.NodeLayouts
                     scale.z -= reversePadding;
                     // We shrink the scale, but the position remains the same since
                     // value.Position denotes the center point.
-                    layout[layoutNode] = new NodeTransform(value.Position, scale);
+                    layout[layoutNode] = new NodeTransform(value.GroundCenter, scale);
                 }
             }
         }
