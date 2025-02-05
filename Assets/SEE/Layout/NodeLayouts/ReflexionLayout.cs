@@ -82,7 +82,7 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // The available space is retrieved from the root node.
-            Split(roots[0], 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.5f is a placeholder
+            Split(roots[0], 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
 
             implementationRoot.Parent = null;
             architectureRoot.Parent = null;
@@ -99,6 +99,7 @@ namespace SEE.Layout.NodeLayouts
 
             result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
+            result[roots[0]] = new NodeTransform(roots[0].CenterPosition, roots[0].AbsoluteScale);
             return result;
         }
 
