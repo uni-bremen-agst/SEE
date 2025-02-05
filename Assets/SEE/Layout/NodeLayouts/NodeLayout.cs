@@ -18,12 +18,6 @@ namespace SEE.Layout.NodeLayouts
         } = string.Empty;
 
         /// <summary>
-        /// The y co-ordinate of the ground level where all nodes will be placed initially
-        /// by calling <see cref="Layout(IEnumerable{ILayoutNode}, Vector2)"/>.
-        /// </summary>
-        protected const float groundLevel = 0.0f;
-
-        /// <summary>
         /// Yields the layout for all given <paramref name="layoutNodes"/>.
         /// For every node n in <paramref name="layoutNodes"/>: result[n] is the node transform,
         /// i.e., the game object's position, scale, and rotation.
@@ -39,6 +33,49 @@ namespace SEE.Layout.NodeLayouts
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector2 rectangle);
 
+        /// <summary>
+        /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">nodes for which to apply the layout</param>
+        /// <param name="rectangle">The ground where all nodes will be placed.</param>
+        /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
+        ///
+        public void Apply(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle, Vector3 centerPosition)
+        {
+            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
+            ApplyLayoutNodeTransform(layout);
+            // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
+            ScaleXZ(layoutNodes, rectangle.x, rectangle.y);
+            MoveTo(layoutNodes, centerPosition);
+            Stack(layoutNodes, centerPosition.y);
+        }
+
+        /// <summary>
+        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
+        /// </summary>
+        /// <param name="layout">the calculated layout to be applied</param>
+        private static void ApplyLayoutNodeTransform<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
+        {
+            foreach (KeyValuePair<T, NodeTransform> entry in layout)
+            {
+                T node = entry.Key;
+                NodeTransform transform = entry.Value;
+                // y co-ordinate of transform.position refers to the ground
+                Vector3 position = transform.Position;
+                position.y += transform.Scale.y / 2.0f;
+                node.CenterPosition = position;
+                node.LocalScale = transform.Scale;
+                node.Rotation = transform.Rotation;
+            }
+        }
+
+        /// <summary>
+        /// The y co-ordinate of the ground level where all nodes will be placed initially
+        /// by calling <see cref="Layout(IEnumerable{ILayoutNode}, Vector2)"/>.
+        /// </summary>
+        protected const float groundLevel = 0.0f;
+
+        #region Modifiers
         /// <summary>
         /// Moves all <paramref name="layoutNodes"/> together to the cube defined by <paramref name="target"/>.
         /// More precisely, the bounding box enclosing all nodes in <paramref name="layoutNodes"/> will be
@@ -230,42 +267,7 @@ namespace SEE.Layout.NodeLayouts
                 }
             }
         }
-
-        /// <summary>
-        /// Calculates and applies the layout to the given <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <param name="layoutNodes">nodes for which to apply the layout</param>
-        /// <param name="rectangle">The ground where all nodes will be placed.</param>
-        /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
-        ///
-        public void Apply(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle, Vector3 centerPosition)
-        {
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
-            ApplyLayoutNodeTransform(layout);
-            // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
-            ScaleXZ(layoutNodes, rectangle.x, rectangle.y);
-            MoveTo(layoutNodes, centerPosition);
-            Stack(layoutNodes, centerPosition.y);
-        }
-
-        /// <summary>
-        /// Applies the <see cref="NodeTransform"/> values to its corresponding <see cref="ILayoutNode"/>.
-        /// </summary>
-        /// <param name="layout">the calculated layout to be applied</param>
-        private static void ApplyLayoutNodeTransform<T>(Dictionary<T, NodeTransform> layout) where T : ILayoutNode
-        {
-            foreach (KeyValuePair<T, NodeTransform> entry in layout)
-            {
-                T node = entry.Key;
-                NodeTransform transform = entry.Value;
-                // y co-ordinate of transform.position refers to the ground
-                Vector3 position = transform.Position;
-                position.y += transform.Scale.y / 2.0f;
-                node.CenterPosition = position;
-                node.LocalScale = transform.Scale;
-                node.Rotation = transform.Rotation;
-            }
-        }
+        #endregion Modifiers
 
         #region Hierarchy
         /// <summary>
@@ -315,6 +317,7 @@ namespace SEE.Layout.NodeLayouts
             }
             return result + 1;
         }
+
         #endregion Hierarchy
 
         #region Padding
