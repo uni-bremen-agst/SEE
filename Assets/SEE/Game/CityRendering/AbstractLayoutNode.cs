@@ -38,7 +38,7 @@ namespace SEE.Game.CityRendering
         {
             Node = node;
             ToLayoutNode = toLayoutNode;
-            ToLayoutNode[node] = this;
+            ToLayoutNode.Add(node, this);
         }
 
         /// <summary>
@@ -46,6 +46,10 @@ namespace SEE.Game.CityRendering
         /// constructors of this class or one of its subclasses will be added to it. All layout nodes
         /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
         /// same for all. The mapping will be gathered by the constructor.
+        ///
+        /// This mapping serves two purposes: (1) To decide which nodes are to be laid out (nodes
+        /// not part of this mapping will be ignored by the layout) and (2) to map edges between
+        /// graph nodes to edges between layout nodes (<see cref="Successors"/>).
         /// </summary>
         protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
 
@@ -79,13 +83,11 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The parent of this node. May be null if it has none.
         ///
-        /// <see cref="IHierarchyNode.Children"/>
+        /// <see cref="IHierarchyNode.Parent"/>
         ///
         /// Note: Parent may be null even if the underlying graph node actually has a
         /// parent in the graph, yet that parent was never passed to any of the
-        /// constructors of this class. For instance, non-hierarchical layouts will
-        /// receive only leaf nodes, i.e., their parents will not be passed to the
-        /// layout, in which case Parent will be null.
+        /// constructors of this class.
         /// </summary>
         public ILayoutNode Parent
         {
@@ -107,6 +109,27 @@ namespace SEE.Game.CityRendering
                     return null;
                 }
             }
+
+            set
+            {
+                if (Node.Parent == null)
+                {
+                    throw new System.InvalidOperationException("Cannot set parent for layout node without parent in graph.");
+                }
+                else if (value == null)
+                {
+                    // We remove the parent only from the layout node mapping, but do not modify the graph.
+                    if (!ToLayoutNode.Remove(Node.Parent))
+                    {
+                        throw new System.InvalidOperationException($"Parent {Node.Parent.ID} not found in layout node mapping.");
+                    }
+                }
+                else
+                {
+                    // value != null
+                    ToLayoutNode.Add(Node.Parent, value); // throws ArgumentException if key already exists.
+                }
+            }
         }
 
         /// <summary>
@@ -122,6 +145,10 @@ namespace SEE.Game.CityRendering
         /// <returns>children of this node</returns>
         public ICollection<ILayoutNode> Children()
         {
+            if (!ToLayoutNode.ContainsKey(Node))
+            {
+                throw new System.InvalidOperationException($"Cannot retrieve children for layout node {Node.ID} to be ignored.");
+            }
             IList<ILayoutNode> result;
             if (!IsLeaf)
             {
@@ -151,6 +178,10 @@ namespace SEE.Game.CityRendering
         {
             get
             {
+                if (ToLayoutNode.ContainsKey(Node))
+                {
+                    throw new System.InvalidOperationException($"Cannot retrieve successors for layout node {Node.ID} to be ignored.");
+                }
                 ICollection<ILayoutNode> successors = new List<ILayoutNode>();
                 foreach (Edge edge in Node.Outgoings)
                 {

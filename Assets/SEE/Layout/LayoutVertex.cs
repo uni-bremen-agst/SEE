@@ -34,7 +34,7 @@ namespace SEE.Layout
         /// <summary>
         /// Immediate ancestor of the node. May be null, if the node is a root.
         /// </summary>
-        public ILayoutNode Parent { get; private set; }
+        public ILayoutNode Parent { get; set; }
 
         /// <summary>
         /// The level of the node in the node hierarchy, that is, the number

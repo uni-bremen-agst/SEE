@@ -11,7 +11,7 @@ namespace SEE.Layout
         /// <summary>
         /// The parent of the node. Is null if the node is a root.
         /// </summary>
-        T Parent { get; }
+        T Parent { get; set; }
 
         /// <summary>
         /// The level of the node in the node hierarchy. A root node has
