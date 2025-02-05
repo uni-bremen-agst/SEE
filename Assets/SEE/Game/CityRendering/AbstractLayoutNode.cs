@@ -109,27 +109,6 @@ namespace SEE.Game.CityRendering
                     return null;
                 }
             }
-
-            set
-            {
-                if (Node.Parent == null)
-                {
-                    throw new System.InvalidOperationException("Cannot set parent for layout node without parent in graph.");
-                }
-                else if (value == null)
-                {
-                    // We remove the parent only from the layout node mapping, but do not modify the graph.
-                    if (!ToLayoutNode.Remove(Node.Parent))
-                    {
-                        throw new System.InvalidOperationException($"Parent {Node.Parent.ID} not found in layout node mapping.");
-                    }
-                }
-                else
-                {
-                    // value != null
-                    ToLayoutNode.Add(Node.Parent, value); // throws ArgumentException if key already exists.
-                }
-            }
         }
 
         /// <summary>

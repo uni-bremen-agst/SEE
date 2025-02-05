@@ -28,7 +28,7 @@ namespace SEE.Layout
 
         private class LNode : IHierarchyNode<LNode>
         {
-            public LNode Parent { set; get; }
+            public LNode Parent { private set; get; }
 
 
             private int level;
