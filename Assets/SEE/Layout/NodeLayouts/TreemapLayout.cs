@@ -32,7 +32,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="layoutNodes">nodes to be laid out</param>
         /// <returns>treemap layout scaled in x and z axes</returns>
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 

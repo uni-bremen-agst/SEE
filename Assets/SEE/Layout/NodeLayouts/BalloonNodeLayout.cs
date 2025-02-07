@@ -44,7 +44,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes, Vector2 rectangle)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,

@@ -18,7 +18,7 @@ namespace SEE.Layout.NodeLayouts
             Name = "Rectangle Packing";
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 

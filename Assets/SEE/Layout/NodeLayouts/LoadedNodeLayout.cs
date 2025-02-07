@@ -33,7 +33,7 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new();
             if (File.Exists(filename))

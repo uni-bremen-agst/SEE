@@ -1,5 +1,4 @@
 ﻿using SEE.Tools.ReflexionAnalysis;
-using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -29,7 +28,7 @@ namespace SEE.Layout.NodeLayouts
         private readonly NodeLayout implementationLayout;
         private readonly NodeLayout architectureLayout;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
         {
             // There should be one root that has exactly two children. One of them is the architecture
             // and the other is the implementation. The architecture node has the node type Architecture
@@ -93,7 +92,7 @@ namespace SEE.Layout.NodeLayouts
 
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Debug.Log($"implementationNodes.Count= {implementationNodes.Count}\n");
-            Dictionary<ILayoutNode, NodeTransform> result = implementationLayout.Layout(implementationNodes, rectangle);
+            Dictionary<ILayoutNode, NodeTransform> result = implementationLayout.Layout(implementationNodes, implementationRoot.CenterPosition, rectangle);
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
             Debug.Log($"architectureNodes.Count= {architectureNodes.Count}\n");
@@ -101,7 +100,7 @@ namespace SEE.Layout.NodeLayouts
             //implementationRoot.Parent = roots[0];
             //architectureRoot.Parent = roots[0];
 
-            result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+            result.Union(architectureLayout.Layout(architectureNodes, architectureRoot.CenterPosition, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
             // FIXME: Suitable X and Z coordinates for the roots. roots[0].CenterPosition
             result[roots[0]] = new NodeTransform(0, 0, roots[0].AbsoluteScale);
