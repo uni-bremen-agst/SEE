@@ -49,7 +49,7 @@ namespace SEE.Layout.NodeLayouts
                         // MoveNext() must be called before we can call Current.
                         ILayoutNode gameNode = enumerator.Current;
                         Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
-                        layoutResult[gameNode] = new NodeTransform(Vector3.zero,
+                        layoutResult[gameNode] = new NodeTransform(0, 0,
                                                                    new Vector3(rectangle.x, gameNode.AbsoluteScale.y, rectangle.y));
                     }
                     else
@@ -86,13 +86,13 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode root = Roots[0];
                 Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
-                layoutResult[root] = new NodeTransform(Vector3.zero,
-                                                        new Vector3(rectangle.x, root.AbsoluteScale.y, rectangle.y));
-                CalculateLayout(root.Children(), x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y, groundLevel);
+                layoutResult[root] = new NodeTransform(0, 0,
+                                                       new Vector3(rectangle.x, root.AbsoluteScale.y, rectangle.y));
+                CalculateLayout(root.Children(), x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y);
             }
             else
             {
-                CalculateLayout(Roots, x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y, groundLevel);
+                CalculateLayout(Roots, x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y);
             }
         }
 
@@ -107,12 +107,12 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="z">z co-ordinate of the left front corner of the rectangle</param>
         /// <param name="width">width of the rectangle in which to fit the nodes</param>
         /// <param name="depth">depth of the rectangle in which to fit the nodes</param>
-        private void CalculateLayout(ICollection<ILayoutNode> siblings, float x, float z, float width, float depth, float groundLevel)
+        private void CalculateLayout(ICollection<ILayoutNode> siblings, float x, float z, float width, float depth)
         {
             List<RectangleTiling.NodeSize> sizes = GetSizes(siblings);
             float padding = Padding(width, depth);
             List<RectangleTiling.Rectangle> rects = RectangleTiling.SquarifiedLayoutWithPadding(sizes, x, z, width, depth, padding);
-            AddToLayout(sizes, rects, groundLevel);
+            AddToLayout(sizes, rects);
 
             foreach (ILayoutNode node in siblings)
             {
@@ -124,11 +124,10 @@ namespace SEE.Layout.NodeLayouts
                     Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
                     NodeTransform nodeTransform = layoutResult[node];
                     CalculateLayout(children,
-                                    nodeTransform.GroundCenter.x - nodeTransform.Scale.x / 2.0f,
-                                    nodeTransform.GroundCenter.z - nodeTransform.Scale.z / 2.0f,
+                                    nodeTransform.X - nodeTransform.Scale.x / 2.0f,
+                                    nodeTransform.Z - nodeTransform.Scale.z / 2.0f,
                                     nodeTransform.Scale.x,
-                                    nodeTransform.Scale.z,
-                                    groundLevel);
+                                    nodeTransform.Scale.z);
                 }
             }
         }
@@ -218,20 +217,17 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="nodes">the game nodes</param>
         /// <param name="rects">their corresponding rectangle</param>
-        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
         private void AddToLayout
            (List<RectangleTiling.NodeSize> nodes,
-            List<RectangleTiling.Rectangle> rects,
-            float groundLevel)
+            List<RectangleTiling.Rectangle> rects)
         {
             int i = 0;
             foreach (RectangleTiling.Rectangle rect in rects)
             {
                 ILayoutNode o = nodes[i].GameNode;
-                Vector3 position = new(rect.X + rect.Width / 2.0f, groundLevel, rect.Z + rect.Depth / 2.0f);
                 Vector3 scale = new(rect.Width, o.LocalScale.y, rect.Depth);
                 Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
-                layoutResult[o] = new NodeTransform(position, scale);
+                layoutResult[o] = new NodeTransform(rect.X + rect.Width / 2.0f, rect.Z + rect.Depth / 2.0f, scale);
                 i++;
             }
         }

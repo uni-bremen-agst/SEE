@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -52,22 +51,40 @@ namespace SEE.Layout.NodeLayouts
             Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
             // FIXME: We can remove the following assertion later.
             Assert.IsTrue(new HashSet<ILayoutNode>(layout.Keys).SetEquals(new HashSet<ILayoutNode>(layoutNodes)));
+            // nodes will have random positions at this point; leaves will have their three dimensions set.
 
             // FIXME: Not needed for some layouts because they already scale the nodes so that they fit into rectangle.
             Box box = Bounding3DBox(layout.Values);
-            //Test(layout.Values);
-            //MoveTo(layout.Values, centerPosition, box);
-            float factor = ScaleXZ(layout.Values, rectangle.x, rectangle.y, box);
-            //Stack(layout, centerPosition.y);
+            MoveTo(layout.Values, centerPosition, box);
+            float scaleFactor = Mathf.Min(rectangle.x / box.Width, rectangle.y / box.Depth);
+            // The box is now at centerPosition.
+            ScaleXZ(layout.Values, scaleFactor, new Vector2(centerPosition.x, centerPosition.z));
+
+            // MoveTo and ScaleXZ affect only the scales and X/Z positions of the nodes.
+            // The y co-ordinates are not changed and are still the ones set by the caller.
+            // We need to stack the nodes on top of each other.
+            Stack(layout, centerPosition.y);
 
             ApplyLayoutNodeTransform(layout);
         }
 
-        private void Test(Dictionary<ILayoutNode, NodeTransform>.ValueCollection values)
+        /// <summary>
+        /// Creates cubes for each node in the layout and places them at the calculated positions.
+        /// This method can be used for debugging to show intermediate results of the layouting
+        /// process.
+        /// </summary>
+        /// <param name="layout">layout to be shown</param>
+        /// <param name="prefix">a prefix to be prepanded to the gameObject name</param>
+        static void Draw(Dictionary<ILayoutNode, NodeTransform> layout, string prefix)
         {
-            foreach (NodeTransform nodeTransform in values)
+            foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
             {
-                nodeTransform.ScaleXZBy(0);
+                ILayoutNode node = entry.Key;
+                NodeTransform transform = entry.Value;
+                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = prefix + "+" + node.ID;
+                go.transform.position = transform.CenterPosition;
+                go.transform.localScale = transform.Scale;
             }
         }
 
@@ -81,10 +98,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 T node = entry.Key;
                 NodeTransform transform = entry.Value;
-                // y co-ordinate of transform.GroundCenter refers to the ground
-                Vector3 position = transform.GroundCenter;
-                position.y += transform.Scale.y / 2.0f;
-                node.CenterPosition = position;
+                node.CenterPosition = transform.CenterPosition;
                 node.LocalScale = transform.Scale;
                 node.Rotation = transform.Rotation;
             }
@@ -101,9 +115,31 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// A 3D box enclosing all nodes.
         /// </summary>
-        /// <param name="LeftFrontCorner">the left front corner</param>
-        /// <param name="RightBackCorner">the right back corner</param>
-        record Box(Vector3 LeftFrontCorner, Vector3 RightBackCorner);
+        /// <param name="LeftFrontCorner">the left front lower corner</param>
+        /// <param name="RightBackCorner">the right back upper corner</param>
+        record Box(Vector3 LeftFrontCorner, Vector3 RightBackCorner)
+        {
+            /// <summary>
+            /// The center of the box.
+            /// </summary>
+            /// <remarks>The center of the box is the midpoint of the line segment connecting its
+            /// left front corner and its right back corner. The coordinates of the center
+            /// can be calculated using the midpoint formula.</remarks>
+            public Vector3 Center => (LeftFrontCorner + RightBackCorner) / 2.0f;
+
+            /// <summary>
+            /// The height of the box.
+            /// </summary>
+            public float Height => RightBackCorner.y - LeftFrontCorner.y;
+            /// <summary>
+            /// The width of the box.
+            /// </summary>
+            public float Width => RightBackCorner.x - LeftFrontCorner.x;
+            /// <summary>
+            /// The depth of the box.
+            /// </summary>
+            public float Depth => RightBackCorner.z - LeftFrontCorner.z;
+        }
 
         /// <summary>
         /// Scales the width and depth of all nodes in <paramref name="layout"/> so that they fit into
@@ -115,38 +151,80 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="width">the absolute width (x axis) the required space for the laid out nodes must have</param>
         /// <param name="depth">the absolute depth (z axis) the required space for the laid out nodes must have</param>
         /// <returns>the factor by which the scale of edge node was multiplied</returns>
-        private static float ScaleXZ(ICollection<NodeTransform> layout, float width, float depth, Box box)
+        private static float ScaleXZ(ICollection<NodeTransform> layout, float scaleFactor, Vector2 centerPosition)
         {
-            float actualWidth = box.RightBackCorner.x - box.LeftFrontCorner.x;
-            float actualDepth = box.RightBackCorner.z - box.LeftFrontCorner.z;
-
-            float scaleFactor = Mathf.Min(width / actualWidth, depth / actualDepth);
-
             foreach (NodeTransform nodeTransform in layout)
             {
-                nodeTransform.ScaleXZBy(scaleFactor);
+                nodeTransform.ScaleXZBy(scaleFactor, centerPosition);
             }
             return scaleFactor;
         }
 
+        /*
+        private static float ScaleXZ(Dictionary<ILayoutNode, NodeTransform> layout, float width, float depth, Box box)
+        {
+            float scaleFactor = Mathf.Min(width / box.Width, depth / box.Depth);
+
+            // for each root
+            foreach (ILayoutNode root in layout.Keys)
+            {
+                if (root.Parent == null)
+                {
+                    float newRoofY = PutOn(layout[root], groundLevel) + levelDelta;
+                    // Continue with the children
+                    foreach (ILayoutNode child in root.Children())
+                    {
+                        ScaleXZ(child, newRoofY);
+                    }
+                }
+            }
+            return scaleFactor;
+
+            void ScaleXZ(ILayoutNode layoutNode, float level)
+            {
+                float newRoofY = PutOn(layout[layoutNode], level) + levelDelta;
+                foreach (ILayoutNode child in layoutNode.Children())
+                {
+                    ScaleXZ(child, newRoofY);
+                }
+            }
+
+            static float PutOn(NodeTransform nodeTransform, float level)
+            {
+                nodeTransform.LiftGroundTo(level);
+                return nodeTransform.Roof;
+            }
+
+            static void Adjust(NodeTransform nodeTransform, float scaleFactor)
+            {
+                nodeTransform.ScaleXZBy(scaleFactor);
+                // The x/z co-ordinates must be adjusted after scaling
+                nodeTransform.MoveTo(nodeTransform.X * scaleFactor, nodeTransform.Z * scaleFactor);
+            }
+        }
+        */
+
         /// <summary>
-        /// Moves all <paramref name="layout"/> together to the cube defined by <paramref name="target"/>.
-        /// More precisely, the bounding box enclosing all nodes in <paramref name="layout"/> will be
-        /// translated (moved such that there is no change in size or shape) to a new location defined by
-        /// <paramref name="target"/> such that the center of the bounding box at the new location
-        /// is at <paramref name="target"/>.
-        /// </summary>layout">layout to be moved</param>
-        /// <param name="target">worldspace center point where to move the <paramref name="layout"/></param>
-        private static void MoveTo(ICollection<NodeTransform> layout, Vector3 target, Box box)
+        /// Moves all nodes in <paramref name="layout"/> together to the X/Z plane defined
+        /// by <paramref name="targetGroundCenter"/>.
+        /// More precisely, the bounding <paramref name="box"/> enclosing all nodes in <paramref name="layout"/> will be
+        /// translated (moved such that there is no change in size or shape) to a new location
+        /// such that the ground center of the bounding box at the new location is <paramref name="targetGroundCenter"/>.
+        /// </summary>
+        /// <param name="layout">layout to be moved</param>
+        /// <param name="targetGroundCenter">worldspace center point where to move the <paramref name="layout"/></param>
+        /// <param name="box">bounding box enclosing all nodes in <paramref name="layout"/></param>
+        private static void MoveTo(ICollection<NodeTransform> layout, Vector3 targetGroundCenter, Box box)
         {
             // centerPosition is the worldspace center of the bounding 3D box (cube) enclosing all layoutNodes.
-            // The center of the cube is the midpoint of the line segment connecting its
-            // left front corner and its right back corner. The coordinates of the center
-            // can be calculated using the midpoint formula:
-            Vector3 centerPosition = (box.RightBackCorner + box.LeftFrontCorner) / 2.0f;
+            Vector3 centerPosition = box.Center;
+            // Note that centerPosition relates to the center of the bounding box, while
+            // targetGroundCenter is the ground center of the target bounding box.
+            // Hence, we need to adjust the y co-ordinate of centerPosition.
+            centerPosition.y -= box.Height / 2.0f;
             // The offest is the vector from the current center of the bounding box to the
             // target center point and needs to be added to all nodes.
-            Vector3 offset = target - centerPosition;
+            Vector3 offset = targetGroundCenter - centerPosition;
             // It is assumed that target.y is the lowest point of the city. FIXME????
             foreach (NodeTransform nodeTransform in layout)
             {
@@ -191,7 +269,7 @@ namespace SEE.Layout.NodeLayouts
 
             static float PutOn(NodeTransform nodeTransform, float level)
             {
-                nodeTransform.LiftTo(level);
+                nodeTransform.LiftGroundTo(level);
                 return nodeTransform.Roof;
             }
         }
@@ -212,7 +290,7 @@ namespace SEE.Layout.NodeLayouts
                 Vector3 extent = node.Scale / 2.0f;
                 // Note: position denotes the center of the *ground* of the object;
                 // this has consequences on the interpretation of the y co-ordinate.
-                Vector3 position = node.GroundCenter;
+                Vector3 position = node.CenterPosition;
                 {
                     // left x co-ordinate of node
                     float x = position.x - extent.x;
@@ -229,16 +307,16 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
                 {
-                    // lower y co-ordinate of node; note: position.y is the ground
-                    float y = position.y;
+                    // lower y co-ordinate of node
+                    float y = position.y - extent.y;
                     if (y < left.y)
                     {
                         left.y = y;
                     }
                 }
                 {
-                    // upper y co-ordinate of node; note: position.y is the ground
-                    float y = position.y + 2 * extent.y;
+                    // upper y co-ordinate of node
+                    float y = position.y + extent.y;
                     if (y > right.y)
                     {
                         right.y = y;

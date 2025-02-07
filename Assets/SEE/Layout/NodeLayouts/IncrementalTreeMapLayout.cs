@@ -319,16 +319,14 @@ namespace SEE.Layout.NodeLayouts
                     absolutePadding = 0;
                 }
 
-                Vector3 position = new Vector3(
-                    (float)(rectangle.X + rectangle.Width / 2.0d),
-                    groundLevel,
-                    (float)(rectangle.Z + rectangle.Depth / 2.0d));
                 Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),
                     layoutNode.LocalScale.y,
                     (float)(rectangle.Depth - absolutePadding));
 
-                layoutResult[layoutNode] = new NodeTransform(position, scale);
+                layoutResult[layoutNode] = new NodeTransform((float)(rectangle.X + rectangle.Width / 2.0d),
+                                                             (float)(rectangle.Z + rectangle.Depth / 2.0d),
+                                                             scale);
             }
         }
     }

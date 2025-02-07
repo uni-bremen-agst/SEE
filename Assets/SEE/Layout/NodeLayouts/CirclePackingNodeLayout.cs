@@ -38,10 +38,10 @@ namespace SEE.Layout.NodeLayouts
             {
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
-                float outRadius = PlaceNodes(root, groundLevel);
-                Vector3 position = new(0.0f, groundLevel, 0.0f);
-                layoutResult[root] = new NodeTransform(position,
-                                                        GetScale(root, outRadius));
+                float outRadius = PlaceNodes(root);
+                Vector2 position = Vector2.zero;
+                layoutResult[root] = new NodeTransform(position.x, position.y,
+                                                       GetScale(root, outRadius));
                 MakeGlobal(layoutResult, position, root.Children());
                 return layoutResult;
             }
@@ -49,23 +49,24 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// "Globalizes" the layout. Initially, the position of children are assumed to be
-        /// relative to their parent, where the parent has position Vector3.zero. This
-        /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
+        /// relative to their parent, where the parent has position (0, 0). This
+        /// function adjusts the X/Z co-ordinates of all nodes to the world's co-ordinates.
         /// </summary>
         /// <param name="layoutResult">the layout to be adjusted</param>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
         private static void MakeGlobal
             (Dictionary<ILayoutNode, NodeTransform> layoutResult,
-             Vector3 position,
+             Vector2 position,
              ICollection<ILayoutNode> children)
         {
             foreach (ILayoutNode child in children)
             {
                 NodeTransform childTransform = layoutResult[child];
-                childTransform.GroundCenter += position;
+                Vector2 childPosition = new Vector2(childTransform.X, childTransform.Z) + position;
+                childTransform.MoveTo(childPosition.x, childPosition.y);
                 layoutResult[child] = childTransform;
-                MakeGlobal(layoutResult, childTransform.GroundCenter, child.Children());
+                MakeGlobal(layoutResult, childPosition, child.Children());
             }
         }
 
@@ -74,9 +75,8 @@ namespace SEE.Layout.NodeLayouts
         /// of the given parent).
         /// </summary>
         /// <param name="parent">node whose descendants are to be placed</param>
-        /// <param name="groundLevel">The y-coordinate of the ground where all nodes will be placed.</param>
         /// <returns>the radius required for a circle represent parent</returns>
-        private float PlaceNodes(ILayoutNode parent, float groundLevel)
+        private float PlaceNodes(ILayoutNode parent)
         {
             ICollection<ILayoutNode> children = parent.Children();
 
@@ -89,12 +89,12 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                List<Circle> circles = new List<Circle>(children.Count);
+                List<Circle> circles = new(children.Count);
 
                 int i = 0;
                 foreach (ILayoutNode child in children)
                 {
-                    float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child, groundLevel);
+                    float radius = child.IsLeaf ? LeafRadius(child) : PlaceNodes(child);
                     // Position the children on a circle as required by CirclePacker.Pack.
                     float radians = (i / (float)children.Count) * (2.0f * Mathf.PI);
                     circles.Add(new Circle(child, new Vector2(Mathf.Cos(radians), Mathf.Sin(radians)) * radius, radius));
@@ -118,7 +118,7 @@ namespace SEE.Layout.NodeLayouts
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
                     layoutResult[circle.GameObject]
-                         = new NodeTransform(new Vector3(circle.Center.x, groundLevel, circle.Center.y),
+                         = new NodeTransform(circle.Center.x, circle.Center.y,
                                              GetScale(circle.GameObject, circle.Radius));
                 }
                 return outOuterRadius;

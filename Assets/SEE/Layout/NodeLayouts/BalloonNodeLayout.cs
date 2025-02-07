@@ -235,14 +235,14 @@ namespace SEE.Layout.NodeLayouts
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                layoutResult[node] = new NodeTransform(position, node.LocalScale);
+                layoutResult[node] = new NodeTransform(position.x, position.z, node.LocalScale);
             }
             else
             {
                 // inner node
                 // inner nodes will be positioned and scaled, primarily in x and z axes;
                 layoutResult[node]
-                    = new NodeTransform(position,
+                    = new NodeTransform(position.x, position.z,
                                         new Vector3(2 * nodeInfos[node].OuterRadius,
                                                     node.LocalScale.y,
                                                     2 * nodeInfos[node].OuterRadius));

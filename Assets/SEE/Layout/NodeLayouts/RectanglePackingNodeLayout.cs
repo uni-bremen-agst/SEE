@@ -26,7 +26,7 @@ namespace SEE.Layout.NodeLayouts
             if (layoutNodeList.Count == 1)
             {
                 ILayoutNode layoutNode = layoutNodeList.First();
-                layoutResult[layoutNode] = new NodeTransform(Vector3.zero, layoutNode.AbsoluteScale);
+                layoutResult[layoutNode] = new NodeTransform(0, 0, layoutNode.AbsoluteScale);
                 return layoutResult;
             }
 
@@ -45,7 +45,7 @@ namespace SEE.Layout.NodeLayouts
                         float padding = Padding(scale.x, scale.z);
                         scale.x += padding;
                         scale.z += padding;
-                        layoutResult[node] = new NodeTransform(Vector3.zero, scale);
+                        layoutResult[node] = new NodeTransform(0, 0, scale);
                         numberOfLeaves++;
                     }
                 }
@@ -71,9 +71,8 @@ namespace SEE.Layout.NodeLayouts
             {
                 ILayoutNode root = roots.FirstOrDefault();
                 Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
-                Vector3 position = new(0.0f, groundLevel, 0.0f);
                 // Maintain the original height of all inner nodes (and root is an inner node).
-                layoutResult[root] = new NodeTransform(position, new Vector3(area.x, root.AbsoluteScale.y, area.y));
+                layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
                 RemovePadding(layoutResult);
                 // Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
                 // for each node hierarchy level anew. That is why we need to adjust the layout so
@@ -97,20 +96,15 @@ namespace SEE.Layout.NodeLayouts
              ILayoutNode parent)
         {
             NodeTransform parentTransform = layout[parent];
-            Vector3 parentCenterPosition = parentTransform.GroundCenter;
             Vector3 parentExtent = parentTransform.Scale / 2.0f;
             // The x co-ordinate of the left lower corner of the parent.
-            float xCorner = parentCenterPosition.x - parentExtent.x;
+            float xCorner = parentTransform.X - parentExtent.x;
             // The z co-ordinate of the left lower corner of the parent.
-            float zCorner = parentCenterPosition.z - parentExtent.z;
+            float zCorner = parentTransform.Z - parentExtent.z;
 
             foreach (ILayoutNode child in parent.Children())
             {
-                NodeTransform childTransform = layout[child];
-                Vector3 newChildPosition = childTransform.GroundCenter;
-                newChildPosition.x += xCorner;
-                newChildPosition.z += zCorner;
-                layout[child] = new NodeTransform(newChildPosition, childTransform.Scale, childTransform.Rotation);
+                layout[child].MoveBy(xCorner, zCorner);
                 MakeContained(layout, child);
             }
         }
@@ -133,11 +127,9 @@ namespace SEE.Layout.NodeLayouts
                     NodeTransform value = layout[layoutNode];
                     Vector3 scale = value.Scale;
                     float reversePadding = ReversePadding(scale.x, scale.z);
-                    scale.x -= reversePadding;
-                    scale.z -= reversePadding;
                     // We shrink the scale, but the position remains the same since
                     // value.Position denotes the center point.
-                    layout[layoutNode] = new NodeTransform(value.GroundCenter, scale);
+                    layout[layoutNode].ExpandBy(-reversePadding, -reversePadding);
                 }
             }
         }
@@ -178,7 +170,7 @@ namespace SEE.Layout.NodeLayouts
                         // Note: We have already added padding to leaf nodes, but this one here is an
                         // inner node. Nevertheless, we do not add padding here, because padding is already
                         // included in the returned childArea.
-                        layout[child] = new NodeTransform(Vector3.zero,
+                        layout[child] = new NodeTransform(0, 0,
                                                           new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
                     }
                 }
@@ -370,9 +362,8 @@ namespace SEE.Layout.NodeLayouts
                 // The x and y co-ordinates of the rectangle denote the left front corner. The layout
                 // position returned must be the center. The y co-ordinate is the ground level.
                 Vector3 scale = layout[el].Scale;
-                layout[el] = new NodeTransform(new Vector3(fitNode.Rectangle.Position.x + scale.x / 2.0f,
-                                                           groundLevel,
-                                                           fitNode.Rectangle.Position.y + scale.z / 2.0f),
+                layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
+                                               fitNode.Rectangle.Position.y + scale.z / 2.0f,
                                                scale);
 
                 // If fitNode is a boundary expander, then we need to expand covrec to the

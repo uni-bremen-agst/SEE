@@ -103,7 +103,8 @@ namespace SEE.Layout.NodeLayouts
 
             result.Union(architectureLayout.Layout(architectureNodes, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
 
-            result[roots[0]] = new NodeTransform(roots[0].CenterPosition, roots[0].AbsoluteScale);
+            // FIXME: Suitable X and Z coordinates for the roots. roots[0].CenterPosition
+            result[roots[0]] = new NodeTransform(0, 0, roots[0].AbsoluteScale);
             return result;
         }
 

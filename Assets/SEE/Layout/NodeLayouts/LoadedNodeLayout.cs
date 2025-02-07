@@ -38,7 +38,9 @@ namespace SEE.Layout.NodeLayouts
             Dictionary<ILayoutNode, NodeTransform> result = new();
             if (File.Exists(filename))
             {
+                // Where to add the loaded node layout.
                 IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+                // Load the layout from the file.
                 if (Filenames.HasExtension(filename, Filenames.GVLExtension))
                 {
                     new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
@@ -57,12 +59,7 @@ namespace SEE.Layout.NodeLayouts
                 // Apply the layout for the result.
                 foreach (ILayoutNode node in layoutNodeList)
                 {
-                    Vector3 position = node.CenterPosition;
-                    Vector3 absoluteScale = node.AbsoluteScale;
-                    // Note: The node transform's y co-ordinate of the position is interpreted
-                    // as the ground of the object. We need to adjust it accordingly.
-                    position.y -= absoluteScale.y / 2.0f;
-                    result[node] = new NodeTransform(position, absoluteScale);
+                    result[node] = new NodeTransform(node.CenterPosition, node.AbsoluteScale);
                 }
             }
             else

@@ -303,7 +303,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <param name="streetHeight">will be ignored</param>
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
         {
-            layoutResult[GraphNode] = new NodeTransform(new Vector3(Rectangle.Center.X, groundLevel, Rectangle.Center.Y),
+            layoutResult[GraphNode] = new NodeTransform(Rectangle.Center.X, Rectangle.Center.Y,
                                                          new Vector3 (Rectangle.Width, GraphNode.AbsoluteScale.y, Rectangle.Depth),
                                                          0);
         }
@@ -568,7 +568,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
         {
             layoutResult[GraphNode]
-                = new NodeTransform(new Vector3(street.Center.X, groundLevel, street.Center.Y),
+                = new NodeTransform(street.Center.X, street.Center.Y,
                                     new Vector3(street.Width, streetHeight, street.Depth),
                                     0);
             foreach (ENode child in children)
