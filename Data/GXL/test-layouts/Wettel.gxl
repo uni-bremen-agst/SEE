@@ -44,7 +44,7 @@
         <int>3</int>
       </attr>            
       <attr name="Metric.Height">
-        <int>1</int>
+        <int>2</int>
       </attr>            
     </node>
     <node id="N4">
@@ -62,7 +62,7 @@
         <int>3</int>
       </attr>
       <attr name="Metric.Height">
-        <int>1</int>
+        <int>3</int>
       </attr>      
     </node>
     <node id="N5">
@@ -80,7 +80,7 @@
         <int>4</int>
       </attr>
       <attr name="Metric.Height">
-        <int>1</int>
+        <int>4</int>
       </attr>      
     </node>
     <edge id="E1" from="N2" to="N1">
