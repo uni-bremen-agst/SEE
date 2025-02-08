@@ -115,7 +115,7 @@ namespace SEE.Game.Evolution
 
             // Calculate and apply the node layout.
             ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
-            NodeLayout.Apply(nodeLayout.Layout(layoutNodes, gameObject.transform.position,
+            NodeLayout.Apply(nodeLayout.GetLayout(layoutNodes, gameObject.transform.position,
                                                new Vector2(gameObject.transform.lossyScale.x, gameObject.transform.lossyScale.z)));
             oldLayout = nodeLayout;
 

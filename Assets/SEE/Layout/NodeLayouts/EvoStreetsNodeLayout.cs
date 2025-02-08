@@ -32,7 +32,10 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly float streetHeight = 0.0001f;
 
-        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> gameNodes,
+            Vector3 centerPosition,
+            Vector2 rectangle)
         {
             IList<ILayoutNode> layoutNodes = gameNodes.ToList();
             if (layoutNodes.Count == 0)

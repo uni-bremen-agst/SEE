@@ -77,7 +77,7 @@ namespace SEE.Layout.NodeLayouts
             }
         }
 
-        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
             List<ILayoutNode> layoutNodesList = layoutNodes.ToList();
             if (!layoutNodesList.Any())

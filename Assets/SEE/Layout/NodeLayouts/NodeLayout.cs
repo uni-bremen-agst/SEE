@@ -34,7 +34,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
         /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
         /// <returns>node layout</returns>
-        public virtual Dictionary<ILayoutNode, NodeTransform> Layout
+        public virtual Dictionary<ILayoutNode, NodeTransform> GetLayout
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,
              Vector2 rectangle)
@@ -43,9 +43,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 return new();
             }
-            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, rectangle);
-            // FIXME: We can remove the following assertion later.
-            Assert.IsTrue(new HashSet<ILayoutNode>(layout.Keys).SetEquals(new HashSet<ILayoutNode>(layoutNodes)));
+            Dictionary<ILayoutNode, NodeTransform> layout = Layout(layoutNodes, centerPosition, rectangle);
             // nodes will have random positions at this point; leaves will have their three dimensions set.
 
             // We now move and scale the layout such that it fits into the rectangle at centerPosition.
@@ -78,10 +76,12 @@ namespace SEE.Layout.NodeLayouts
         /// of <paramref name="rectangle"/>.
         /// </summary>
         /// <param name="layoutNodes">set of layout nodes for which to compute the layout</param>
+        /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
         /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
         /// <returns>node layout</returns>
         protected abstract Dictionary<ILayoutNode, NodeTransform> Layout
                                                                     (IEnumerable<ILayoutNode> layoutNodes,
+                                                                     Vector3 centerPosition,
                                                                      Vector2 rectangle);
 
         /// <summary>
@@ -250,8 +250,6 @@ namespace SEE.Layout.NodeLayouts
         /// Returns the bounding 3D box enclosing all given <paramref name="nodeTransforms"/>.
         /// </summary>
         /// <param name="nodeTransforms">the list of layout node transforms that are enclosed in the resulting bounding 3D box</param>
-        /// <param name="left">the left lower front corner of the bounding box in worldspace</param>
-        /// <param name="right">the right upper back corner of the bounding box in worldspace</param>
         private static Box Bounding3DBox(IEnumerable<NodeTransform> nodeTransforms)
         {
             Vector3 left = new(Mathf.Infinity, Mathf.Infinity, Mathf.Infinity);

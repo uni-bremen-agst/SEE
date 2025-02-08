@@ -1,6 +1,5 @@
 ﻿using SEE.Tools.ReflexionAnalysis;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
@@ -10,8 +9,6 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
         /// <param name="architectureLayout">the layout to applied to the architecture nodes</param>
         /// <param name="implementationLayout">the layout to applied to the implementation nodes</param>
         public ReflexionLayout(NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
@@ -28,7 +25,10 @@ namespace SEE.Layout.NodeLayouts
         private readonly NodeLayout implementationLayout;
         private readonly NodeLayout architectureLayout;
 
-        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> layoutNodes,
+            Vector3 centerPosition,
+            Vector2 rectangle)
         {
             // There should be one root that has exactly two children. One of them is the architecture
             // and the other is the implementation. The architecture node has the node type Architecture
@@ -82,29 +82,35 @@ namespace SEE.Layout.NodeLayouts
             }
 
             // The available space is retrieved from the root node.
-            Split(roots[0].CenterPosition, rectangle.x, rectangle.y, 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
+            Split(centerPosition, rectangle.x, rectangle.y, 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
 
             architectureArea.ApplyTo(architectureRoot);
             implementionArea.ApplyTo(implementationRoot);
 
-            //implementationRoot.Parent = null;
-            //architectureRoot.Parent = null;
-
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
-            Debug.Log($"implementationNodes.Count= {implementationNodes.Count}\n");
-            Dictionary<ILayoutNode, NodeTransform> result = implementationLayout.Layout(implementationNodes, implementationRoot.CenterPosition, rectangle);
+            Dictionary<ILayoutNode, NodeTransform> result
+                = implementationLayout.GetLayout(implementationNodes,
+                                                 implementationRoot.CenterPosition,
+                                                 new Vector2(implementionArea.Width, implementionArea.Depth));
+            Debug.Log($"implementationLayout.Count= {result.Count}\n");
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
-            Debug.Log($"architectureNodes.Count= {architectureNodes.Count}\n");
 
-            //implementationRoot.Parent = roots[0];
-            //architectureRoot.Parent = roots[0];
+            Union(result, architectureLayout.GetLayout(architectureNodes,
+                                                       architectureRoot.CenterPosition,
+                                                       new Vector2(architectureArea.Width, architectureArea.Depth)));
 
-            result.Union(architectureLayout.Layout(architectureNodes, architectureRoot.CenterPosition, rectangle)).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-
-            // FIXME: Suitable X and Z coordinates for the roots. roots[0].CenterPosition
-            result[roots[0]] = new NodeTransform(0, 0, roots[0].AbsoluteScale);
+            result[roots[0]] = new NodeTransform(centerPosition.y, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
             return result;
+
+            static void Union(Dictionary<ILayoutNode, NodeTransform> result, Dictionary<ILayoutNode, NodeTransform> layout)
+            {
+                Debug.Log($"architectureLayout.Count= {layout.Count}\n");
+                foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
+                {
+                    result[entry.Key] = entry.Value;
+                }
+            }
         }
 
         /// <summary>
@@ -170,16 +176,6 @@ namespace SEE.Layout.NodeLayouts
         /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
         /// begin of the longer edge of the architecture with zero scale.
         /// </summary>
-        private static void Split(ILayoutNode root, float architectureLayoutProportion,
-            out Area implementionArea, out Area architectureArea)
-        {
-            float width = root.AbsoluteScale.x;
-            float depth = root.AbsoluteScale.z;
-            Vector3 centerPosition = root.CenterPosition;
-
-            Split(centerPosition, width, depth, architectureLayoutProportion, out implementionArea, out architectureArea);
-        }
-
         private static void Split(Vector3 centerPosition,
                                   float width,
                                   float depth,

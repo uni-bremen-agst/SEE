@@ -24,15 +24,10 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        /// <summary>
-        /// Return a treemap layout where are all nodes are fit into a given rectangle
-        /// with the width and depth passed to the constructor. The width and depth of
-        /// the original layout nodes will be scaled to fit into the rectangle, but
-        /// the height will remain the same as in the input.
-        /// </summary>
-        /// <param name="layoutNodes">nodes to be laid out</param>
-        /// <returns>treemap layout scaled in x and z axes</returns>
-        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector2 rectangle)
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> layoutNodes,
+             Vector3 centerPosition,
+             Vector2 rectangle)
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
