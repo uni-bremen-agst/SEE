@@ -76,7 +76,7 @@ namespace SEE.Layout.EdgeLayouts
             IList<T> layoutNodes = nodes.ToList();
             if (layoutEdges.Count > 0)
             {
-                ICollection<T> roots = GetRoots(layoutNodes).ToList();
+                ICollection<T> roots = LayoutNodes.GetRoots(layoutNodes).ToList();
                 Assert.IsTrue(roots.Any());
                 maxLevel = GetMaxLevel(roots, -1);
 
@@ -110,17 +110,6 @@ namespace SEE.Layout.EdgeLayouts
         {
             int max = currentLevel + 1;
             return nodes.Select(node => GetMaxLevel(node.Children(), currentLevel + 1)).Prepend(max).Max();
-        }
-
-        /// <summary>
-        /// Yields all nodes in <paramref name="layoutNodes"/> that do not have a parent,
-        /// i.e., are root nodes.
-        /// </summary>
-        /// <param name="layoutNodes">list of nodes</param>
-        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
-        private static ICollection<T> GetRoots<T>(IEnumerable<T> layoutNodes) where T : ILayoutNode
-        {
-            return layoutNodes.Where(layoutNode => layoutNode.Parent == null).ToList();
         }
 
         /// <summary>
