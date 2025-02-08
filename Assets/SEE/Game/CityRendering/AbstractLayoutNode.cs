@@ -157,7 +157,7 @@ namespace SEE.Game.CityRendering
         {
             get
             {
-                if (ToLayoutNode.ContainsKey(Node))
+                if (!ToLayoutNode.ContainsKey(Node))
                 {
                     throw new System.InvalidOperationException($"Cannot retrieve successors for layout node {Node.ID} to be ignored.");
                 }
