@@ -397,37 +397,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
-        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node
-        /// attached to the game node is passed on to the LayoutNode so that the graph node data is
-        /// available to the node layout (e.g., Parent or Children).
-        /// Sets also the node levels of all resulting LayoutNodes.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        public static ICollection<LayoutGraphNode> ToAbstractLayoutNodes(ICollection<GameObject> gameNodes)
-        {
-            IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-            Dictionary<Node, ILayoutNode> toLayoutNode = new();
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutGraphNode layoutNode = new(node, toLayoutNode)
-                {
-                    // We must transfer the scale from gameObject to layoutNode.
-                    // but the layout needs the game object's scale.
-                    // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                    // Note: LayoutGraphNode does not make a distinction between local and absolute scale.
-                    LocalScale = gameObject.transform.lossyScale
-                };
-                result.Add(layoutNode);
-            }
-            LayoutNodes.SetLevels(result);
-            return result;
-        }
-
-        /// <summary>
         /// Returns the scale of the given <paramref name="node"/> as requested by the user's
         /// settings, i.e., what the use specified for the width, height, and depth of a node.
         ///
