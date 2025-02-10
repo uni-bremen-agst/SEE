@@ -47,9 +47,8 @@ namespace SEE.Game.CityRendering
         /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
         /// same for all. The mapping will be gathered by the constructor.
         ///
-        /// This mapping serves two purposes: (1) To decide which nodes are to be laid out (nodes
-        /// not part of this mapping will be ignored by the layout) and (2) to map edges between
-        /// graph nodes to edges between layout nodes (<see cref="Successors"/>).
+        /// This mapping is used to decide which nodes are to be laid out (nodes
+        /// not part of this mapping will be ignored by the layout).
         /// </summary>
         protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
 
@@ -150,26 +149,6 @@ namespace SEE.Game.CityRendering
         #endregion IHierarchyNode
 
         #region IGraphNode
-        /// <summary>
-        /// <see cref="IGraphNode.Successors"/>.
-        /// </summary>
-        public ICollection<ILayoutNode> Successors
-        {
-            get
-            {
-                if (!ToLayoutNode.ContainsKey(Node))
-                {
-                    throw new System.InvalidOperationException($"Cannot retrieve successors for layout node {Node.ID} to be ignored.");
-                }
-                ICollection<ILayoutNode> successors = new List<ILayoutNode>();
-                foreach (Edge edge in Node.Outgoings)
-                {
-                    successors.Add(ToLayoutNode[edge.Target]);
-                }
-                return successors;
-            }
-        }
-
         /// <summary>
         /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
         /// </summary>

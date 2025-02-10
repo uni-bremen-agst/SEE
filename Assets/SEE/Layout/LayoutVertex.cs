@@ -134,11 +134,6 @@ namespace SEE.Layout
         #region IGraphNode
 
         /// <summary>
-        /// The set of successor nodes.
-        /// </summary>
-        public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
-
-        /// <summary>
         /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
         /// </summary>
         /// <param name="typeName">ignored</param>
