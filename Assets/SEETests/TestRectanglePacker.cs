@@ -205,7 +205,7 @@ namespace SEE.Layout.RectanglePacking
 
             RectanglePackingNodeLayout packer = new();
 
-            Dictionary<ILayoutNode, NodeTransform> layout = packer.Layout(gameObjects, Vector3.zero, Vector2.one);
+            Dictionary<ILayoutNode, NodeTransform> layout = packer.GetLayout(gameObjects, Vector3.zero, Vector2.one);
         }
     }
 }

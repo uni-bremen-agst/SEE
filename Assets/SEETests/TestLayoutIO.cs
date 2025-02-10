@@ -43,7 +43,7 @@ namespace SEE.Layout
                 ClearLayout(gameObjects, yIsStored);
 
                 // Read the saved layout.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Layout(gameObjects, Vector3.zero, Vector2.one);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).GetLayout(gameObjects, Vector3.zero, Vector2.one);
                 //Dump(readLayout, 10);
 
                 Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
@@ -87,7 +87,7 @@ namespace SEE.Layout
                 ClearLayout(layoutNodes, yIsStored);
 
                 // Read the saved layout.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Layout(layoutNodes, Vector3.zero, Vector2.one);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).GetLayout(layoutNodes, Vector3.zero, Vector2.one);
                 //Dump(readLayout, 10, "Read layout");
 
                 Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
@@ -194,7 +194,7 @@ namespace SEE.Layout
             out Dictionary<string, NodeTransform> layoutMap)
         {
             // Layout the nodes.
-            savedLayout = new RectanglePackingNodeLayout().Layout(gameObjects, Vector3.zero, Vector2.one);
+            savedLayout = new RectanglePackingNodeLayout().GetLayout(gameObjects, Vector3.zero, Vector2.one);
 
             // Apply the layout.
             layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
@@ -320,7 +320,7 @@ namespace SEE.Layout
                 }
                 // Read the saved layout.
                 LoadedNodeLayout loadedNodeLayout = new(filename);
-                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>(), Vector3.zero, Vector2.one);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.GetLayout(new List<ILayoutNode>(), Vector3.zero, Vector2.one);
                 Assert.AreEqual(0, readLayout.Count);
             }
             finally
