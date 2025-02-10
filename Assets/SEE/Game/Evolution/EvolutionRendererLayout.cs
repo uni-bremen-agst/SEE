@@ -153,12 +153,11 @@ namespace SEE.Game.Evolution
         private static ICollection<LayoutGraphNode> ToAbstractLayoutNodes(ICollection<GameObject> gameNodes)
         {
             IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-            Dictionary<Node, ILayoutNode> toLayoutNode = new();
 
             foreach (GameObject gameObject in gameNodes)
             {
                 Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutGraphNode layoutNode = new(node, toLayoutNode)
+                LayoutGraphNode layoutNode = new(node)
                 {
                     // We must transfer the scale from gameObject to layoutNode.
                     // but the layout needs the game object's scale.

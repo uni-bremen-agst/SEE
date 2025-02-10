@@ -1,6 +1,4 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Layout;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering
@@ -14,15 +12,11 @@ namespace SEE.Game.CityRendering
     public class LayoutGraphNode : AbstractLayoutNode
     {
         /// <summary>
-        /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
-        /// and the <paramref name="toLayoutNode"/> mapping. The mapping maps all graph nodes to be
-        /// laid out onto their corresponding layout node and is shared among all layout nodes.
-        /// The given <paramref name="node"/> will be added to <paramref name="toLayoutNode"/>.
+        /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node.
         /// </summary>
         /// <param name="node">graph node corresponding to this layout node</param>
-        /// <param name="toLayoutNode">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
-        public LayoutGraphNode(Node node, Dictionary<Node, ILayoutNode> toLayoutNode)
-            : base(node, toLayoutNode)
+        public LayoutGraphNode(Node node)
+            : base(node)
         { }
 
         /// <summary>

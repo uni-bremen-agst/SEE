@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.GO;
+﻿using SEE.GO;
 using SEE.Layout;
 using UnityEngine;
 
@@ -15,11 +13,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="toLayoutNode">the mapping of graph nodes onto <see cref="ILayoutNode"/>s
-        /// this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
-        public LayoutGameNode(IDictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject)
-            : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
+        public LayoutGameNode(GameObject gameObject)
+            : base(gameObject.GetComponent<NodeRef>().Value)
         {
             GameObject = gameObject;
         }

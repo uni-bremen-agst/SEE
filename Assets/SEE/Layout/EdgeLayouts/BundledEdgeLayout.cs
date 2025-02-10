@@ -173,17 +173,16 @@ namespace SEE.Layout.EdgeLayouts
         /// <param name="target">ending node</param>
         /// <param name="lcaFinder">to retrieve the lowest common ancestor of source and target</param>
         /// <returns>points to draw a spline between source and target</returns>
-        private TinySpline.BSpline CreateSpline<T>(T source, T target, LCAFinder<T> lcaFinder)
-            where T : ILayoutNode, IHierarchyNode<T>
+        private TinySpline.BSpline CreateSpline(ILayoutNode source, ILayoutNode target, LCAFinder<ILayoutNode> lcaFinder)
         {
-            EqualityComparer<T> comparer = EqualityComparer<T>.Default;
+            EqualityComparer<ILayoutNode> comparer = EqualityComparer<ILayoutNode>.Default;
             if (comparer.Equals(source, target))
             {
                 return SelfLoop(source, EdgesAboveBlocks, levelDistance);
             }
 
             // Lowest common ancestor
-            T lca = lcaFinder.LCA(source, target);
+            ILayoutNode lca = lcaFinder.LCA(source, target);
             if (lca == null)
             {
                 // This should never occur if we have a single root node, but may happen if

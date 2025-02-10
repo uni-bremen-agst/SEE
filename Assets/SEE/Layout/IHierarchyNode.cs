@@ -5,7 +5,6 @@ namespace SEE.Layout
     /// <summary>
     /// Defines the interface of nodes in a node hierarchy.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     public interface IHierarchyNode<T>
     {
         /// <summary>
@@ -27,6 +26,12 @@ namespace SEE.Layout
         /// layouter. It may or may not lay them out.
         /// </summary>
         bool IsLeaf { get; }
+
+        /// <summary>
+        /// Adds given <paramref name="child"/> to the list of children of this node.
+        /// </summary>
+        /// <param name="child">child to be added</param>
+        void AddChild(T child);
 
         /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf

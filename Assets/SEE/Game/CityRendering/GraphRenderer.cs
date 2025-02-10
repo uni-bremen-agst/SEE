@@ -221,11 +221,6 @@ namespace SEE.Game.CityRendering
         private IScale scaler;
 
         /// <summary>
-        /// A mapping from Node to ILayoutNode.
-        /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new();
-
-        /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
         /// edge layout different from <see cref="EdgeLayoutKind.None"/>.
         /// </summary>
@@ -306,7 +301,7 @@ namespace SEE.Game.CityRendering
             }
 
             // The representation of the nodes for the layout.
-            ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
+            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
@@ -314,7 +309,7 @@ namespace SEE.Game.CityRendering
             NodeLayout nodeLayout = GetLayout();
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
-            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
             {
                 Vector3 position = parent.transform.position;
@@ -332,7 +327,7 @@ namespace SEE.Game.CityRendering
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
-                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+                await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
             }
             catch (OperationCanceledException)
             {
@@ -490,29 +485,35 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
-        /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// Returns a mapping of all graph nodes associated with any of the given <paramref name="gameNodes"/>
+        /// onto newly created <see cref="LayoutGameNode"/>s.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        /// <returns>mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s</returns>
+        private static IDictionary<Node, LayoutGameNode> ToLayoutNodes
+            (ICollection<GameObject> gameNodes)
         {
-            return ToLayoutNodes(gameObjects, go => new LayoutGameNode(toLayoutNode, go));
-        }
-
-        /// <summary>
-        /// Transforms the given <paramref name="gameNodes"/> to a collection of <see cref="LayoutGameNode"/>s.
-        /// Sets the node levels of all <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private static ICollection<T> ToLayoutNodes<T>
-            (ICollection<GameObject> gameNodes,
-             Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
-        {
-            ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
-            LayoutNodes.SetLevels(result);
+            Dictionary<Node, LayoutGameNode> result = new();
+            foreach (GameObject gameNode in gameNodes)
+            {
+                if (gameNode.TryGetNode(out Node node))
+                {
+                    result[node] = new LayoutGameNode(gameNode);
+                }
+            }
+            foreach (var item in result)
+            {
+                Node parent = item.Key;
+                LayoutGameNode parentGameNode = item.Value;
+                foreach (Node child in parent.Children())
+                {
+                    if (result.TryGetValue(child, out LayoutGameNode childGameNode))
+                    {
+                        parentGameNode.AddChild(childGameNode);
+                    }
+                }
+            }
+            LayoutNodes.SetLevels(result.Values);
             return result;
         }
 
@@ -524,16 +525,6 @@ namespace SEE.Game.CityRendering
         private static IEnumerable<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Where(o => !o.IsLeaf());
-        }
-
-        /// <summary>
-        /// Returns only the leaf nodes in gameNodes as a list.
-        /// </summary>
-        /// <param name="gameNodes"></param>
-        /// <returns>the leaf nodes in gameNodes as a list</returns>
-        private static IEnumerable<GameObject> FindLeafNodes(IEnumerable<GameObject> gameNodes)
-        {
-            return gameNodes.Where(o => o.IsLeaf());
         }
 
         /// <summary>
