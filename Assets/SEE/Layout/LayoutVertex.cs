@@ -70,6 +70,16 @@ namespace SEE.Layout
         #region IGameNode
 
         /// <summary>
+        /// Implementation of <see cref="ILayoutNode.HasType(string)"/>.
+        /// </summary>
+        /// <param name="typeName">ignored</param>
+        /// <returns>always false</returns>
+        public bool HasType(string typeName)
+        {
+            return false;
+        }
+
+        /// <summary>
         /// The local scale of the node, that is, the size of the node
         /// relative to its parent. If size is Vector3.one, the node is
         /// as large as its parent.
@@ -130,19 +140,5 @@ namespace SEE.Layout
         public Vector3 AbsoluteScale => LocalScale;
 
         #endregion IGameNode
-
-        #region IGraphNode
-
-        /// <summary>
-        /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
-        /// </summary>
-        /// <param name="typeName">ignored</param>
-        /// <returns>always false</returns>
-        public bool HasType(string typeName)
-        {
-            return false;
-        }
-
-        #endregion IGraphNode
     }
 }
