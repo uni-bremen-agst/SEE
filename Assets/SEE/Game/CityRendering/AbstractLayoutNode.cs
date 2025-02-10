@@ -148,18 +148,6 @@ namespace SEE.Game.CityRendering
         }
         #endregion IHierarchyNode
 
-        #region IGraphNode
-        /// <summary>
-        /// Implementation of <see cref="IGraphNode{T}.HasType(string)"/>.
-        /// </summary>
-        /// <param name="typeName">Name of a node type</param>
-        /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
-        public bool HasType(string typeName)
-        {
-            return Node.Type == typeName;
-        }
-        #endregion
-
         #region IGameNode
 
         /// <summary>
@@ -169,6 +157,16 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <returns>unique ID for this node</returns>
         public string ID => Node.ID;
+
+        /// <summary>
+        /// Implementation of <see cref="ILayoutNode{T}.HasType(string)"/>.
+        /// </summary>
+        /// <param name="typeName">Name of a node type</param>
+        /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
+        public bool HasType(string typeName)
+        {
+            return Node.Type == typeName;
+        }
 
         /// </summary>
         /// <summary>
