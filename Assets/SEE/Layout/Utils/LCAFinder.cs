@@ -38,10 +38,12 @@ namespace SEE.Layout.Utils
         {
             if (root == null)
             {
-                throw new System.ArgumentNullException("Root must not be null.");
+                throw new ArgumentNullException("Root must not be null.");
             }
-            ICollection<HNode> roots = new List<HNode>();
-            roots.Add(root);
+            ICollection<HNode> roots = new List<HNode>
+            {
+                root
+            };
             Run(roots);
         }
 
@@ -55,7 +57,7 @@ namespace SEE.Layout.Utils
         {
             if (roots.Count == 0)
             {
-                throw new System.Exception("Empty set of roots given.");
+                throw new Exception("Empty set of roots given.");
             }
             Run(roots);
         }
@@ -142,7 +144,7 @@ namespace SEE.Layout.Utils
         private int MapAllNodes(ICollection<HNode> roots)
         {
             ICollection<HNode> allNodes = AllNodes(roots);
-            NodeToIntegerMap nodeToIntegerMapping = new NodeToIntegerMap(allNodes);
+            NodeToIntegerMap nodeToIntegerMapping = new(allNodes);
             nodeMap = nodeToIntegerMapping.NodeMap();
             indexList = nodeToIntegerMapping.IndexList();
             return allNodes.Count;
@@ -155,8 +157,8 @@ namespace SEE.Layout.Utils
         /// <returns><paramref name="roots"/> and their transitive descendants</returns>
         private static ICollection<HNode> AllNodes(ICollection<HNode> roots)
         {
-            List<HNode> result = new List<HNode>(roots);
-            Queue<HNode> todos = new Queue<HNode>(roots);
+            List<HNode> result = new(roots);
+            Queue<HNode> todos = new(roots);
             while (todos.Count > 0)
             {
                 HNode node = todos.Dequeue();
@@ -178,9 +180,9 @@ namespace SEE.Layout.Utils
         private void DepthFirstTraversal(int n, int level)
         {
             // List of nodes already visited
-            HashSet<int> visited = new HashSet<int>();
+            HashSet<int> visited = new();
 
-            Stack<Pair<int, int>> stack = new Stack<Pair<int, int>>();
+            Stack<Pair<int, int>> stack = new();
             stack.Push(Pair<int, int>.Of(n, level));
 
             while (stack.Count > 0)
@@ -279,8 +281,7 @@ namespace SEE.Layout.Utils
                 }
                 else
                 {
-                    Debug.LogError("LCSFinder: multiple roots in the same tree.\n");
-                    throw new System.Exception("LCSFinder: multiple roots in the same tree.");
+                    throw new Exception("LCSFinder: multiple roots in the same tree.");
                 }
             }
 
@@ -313,11 +314,11 @@ namespace SEE.Layout.Utils
         {
             if (!nodeMap.TryGetValue(nodeA, out int indexOfA))
             {
-                throw new System.Exception("invalid vertex: " + nodeA);
+                throw new Exception("invalid vertex: " + nodeA);
             }
             if (!nodeMap.TryGetValue(nodeB, out int indexOfB))
             {
-                throw new System.Exception("invalid vertex: " + nodeB);
+                throw new Exception("invalid vertex: " + nodeB);
             }
             // Check if a == b because lca(a, a) == a
             if (nodeA.Equals(nodeB))
