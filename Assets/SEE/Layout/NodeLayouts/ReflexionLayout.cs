@@ -93,20 +93,20 @@ namespace SEE.Layout.NodeLayouts
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Dictionary<ILayoutNode, NodeTransform> result
                 = implementationLayout.Create(implementationNodes,
-                                              implementationRoot.CenterPosition,
+                                              implementionArea.Position,
                                               new Vector2(implementionArea.Width, implementionArea.Depth));
             Debug.Log($"implementationLayout.Count= {result.Count}\n");
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
 
             Union(result, architectureLayout.Create(architectureNodes,
-                                                    architectureRoot.CenterPosition,
+                                                    implementionArea.Position,
                                                     new Vector2(architectureArea.Width, architectureArea.Depth)));
 
             roots[0].AddChild(architectureRoot);
             roots[0].AddChild(implementationRoot);
 
-            result[roots[0]] = new NodeTransform(centerPosition.y, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
+            result[roots[0]] = new NodeTransform(centerPosition.x, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
             return result;
 
             static void Union(Dictionary<ILayoutNode, NodeTransform> result, Dictionary<ILayoutNode, NodeTransform> layout)
