@@ -1,4 +1,5 @@
 ﻿using SEE.Tools.ReflexionAnalysis;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -42,12 +43,12 @@ namespace SEE.Layout.NodeLayouts
             }
             if (roots.Count > 1)
             {
-                throw new System.Exception("Graph has more than one root node.");
+                throw new Exception("Graph has more than one root node.");
             }
             ICollection<ILayoutNode> children = roots[0].Children();
             if (children.Count != 2)
             {
-                throw new System.Exception("Root node has not exactly two children.");
+                throw new Exception("Root node has not exactly two children.");
             }
             ILayoutNode architectureRoot = null;
             ILayoutNode implementationRoot = null;
@@ -65,27 +66,24 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-                    throw new System.Exception("Root node has a child that is neither architecture nor implementation.");
+                    throw new Exception("Root node has a child that is neither architecture nor implementation.");
                 }
             }
             if (architectureRoot == null)
             {
-                throw new System.Exception("Root node has no architecture child.");
+                throw new Exception("Root node has no architecture child.");
             }
             if (implementationRoot == null)
             {
-                throw new System.Exception("Root node has no implementation child.");
+                throw new Exception("Root node has no implementation child.");
             }
             if (architectureRoot == implementationRoot)
             {
-                throw new System.Exception("Root node has the two children that are both architecture or implementation, respectively.");
+                throw new Exception("Root node has the two children that are both architecture or implementation, respectively.");
             }
 
             // The available space is retrieved from the root node.
             Split(centerPosition, rectangle.x, rectangle.y, 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
-
-            architectureArea.ApplyTo(architectureRoot);
-            implementionArea.ApplyTo(implementationRoot);
 
             roots[0].RemoveChild(architectureRoot);
             roots[0].RemoveChild(implementationRoot);
@@ -95,12 +93,11 @@ namespace SEE.Layout.NodeLayouts
                 = implementationLayout.Create(implementationNodes,
                                               implementionArea.Position,
                                               new Vector2(implementionArea.Width, implementionArea.Depth));
-            Debug.Log($"implementationLayout.Count= {result.Count}\n");
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
 
             Union(result, architectureLayout.Create(architectureNodes,
-                                                    implementionArea.Position,
+                                                    architectureArea.Position,
                                                     new Vector2(architectureArea.Width, architectureArea.Depth)));
 
             roots[0].AddChild(architectureRoot);
@@ -111,7 +108,6 @@ namespace SEE.Layout.NodeLayouts
 
             static void Union(Dictionary<ILayoutNode, NodeTransform> result, Dictionary<ILayoutNode, NodeTransform> layout)
             {
-                Debug.Log($"architectureLayout.Count= {layout.Count}\n");
                 foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
                 {
                     result[entry.Key] = entry.Value;
@@ -160,6 +156,14 @@ namespace SEE.Layout.NodeLayouts
             {
                 layoutNode.CenterPosition = Position;
                 layoutNode.AbsoluteScale = new Vector3(Width, layoutNode.AbsoluteScale.y, Depth);
+            }
+
+            internal void Draw(string name)
+            {
+                GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                go.name = name;
+                go.transform.position = Position;
+                go.transform.localScale = new Vector3(Width, 0.01f, Depth);
             }
         }
 
@@ -280,111 +284,4 @@ namespace SEE.Layout.NodeLayouts
             //architectureArea.Draw("architecture");
         }
     }
-
-#if false
-
-        /// <summary>
-        /// Draws <paramref name="graph"/>.
-        /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
-        /// </summary>
-        /// <param name="graph">graph to be drawn</param>
-        /// <param name="codeCity">the game object representing the code city and holding
-        /// a <see cref="SEEReflexionCity"/> component</param>
-        protected async UniTaskVoid RenderReflexionGraphAsync(ReflexionGraph graph, GameObject codeCity)
-        {
-            if (codeCity.TryGetComponent(out SEEReflexionCity reflexionCity))
-            {
-                // The original real-world position and scale of codeCity.
-                Area codeCityArea = new(codeCity.CenterPosition, codeCity.AbsoluteScale);
-
-                try
-                {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing reflexion city \"{codeCity.name}\"", out Action<float> updateProgress))
-                    {
-                        void ReportProgress(float x)
-                        {
-                            ProgressBar = x;
-                            updateProgress(x);
-                        }
-
-                        (Graph implementation, Graph architecture, _) = graph.Disassemble();
-
-                        // There should be no more than one root.
-                        Node reflexionRoot = graph.GetRoots().FirstOrDefault();
-
-                        // There could be no root at all in case the architecture and implementation
-                        // graphs are both empty.
-                        if (reflexionRoot != null)
-                        {
-                            Split(codeCity, reflexionCity.ArchitectureLayoutProportion,
-                                  out Area implementionArea, out Area architectureArea);
-
-                            // The parent of the two game object hierarchies for the architecture and implementation.
-                            GameObject reflexionCityRoot;
-
-                            // Draw implementation.
-                            {
-                                GraphRenderer renderer = new(this, implementation);
-                                // reflexionCityRoot will be the direct and only child of gameObject
-                                reflexionCityRoot = renderer.DrawNode(reflexionRoot, codeCity);
-                                codeCityArea.ApplyTo(reflexionCityRoot);
-
-                                Debug.Log($"[reflexionCityRoot] position={reflexionCityRoot.CenterPosition} lossyScale={reflexionCityRoot.AbsoluteScale}\n");
-
-                                reflexionCityRoot.transform.SetParent(codeCity.transform);
-
-                                /*
-                                implementionArea.ApplyTo(codeCity);
-                                await renderer.DrawGraphAsync(implementation, codeCity, ReportProgress, cancellationTokenSource.Token);
-                                RestoreCodeCity();
-                                */
-                            }
-                            /*
-
-
-                            // Draw implementation.
-                            {
-                                GraphRenderer renderer = new(this, implementation);
-
-
-
-                                // Render the implementation graph under reflexionCityRoot.
-                                await renderer.DrawGraphAsync(implementation, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
-                            }
-
-                            // We need to temporarily unlink the implementation graph from reflexionCityRoot
-                            // because graph renderering assumes that the parent has no other child.
-                            GameObject implementationRoot = reflexionCityRoot.transform.GetChild(0).gameObject;
-                            implementationRoot.transform.SetParent(null);
-
-                            // Draw architecture.
-                            {
-                                GraphRenderer renderer = new(this, architecture);
-                                await renderer.DrawGraphAsync(architecture, reflexionCityRoot, ReportProgress, cancellationTokenSource.Token);
-                            }
-
-                            implementationRoot.transform.SetParent(reflexionCityRoot.transform);
-                            */
-                        }
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
-                    throw;
-                }
-                finally
-                {
-                    RestoreCodeCity();
-                }
-
-                return;
-
-                // Restores codeCity to its original osition and scale.
-                void RestoreCodeCity()
-                {
-                    codeCityArea.ApplyTo(codeCity);
-                }
-#endif
-
 }
