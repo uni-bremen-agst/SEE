@@ -146,18 +146,6 @@ namespace SEE.Layout.NodeLayouts
             /// </summary>
             internal float Depth;
 
-            /// <summary>
-            /// Applies the area to the given <paramref name="layoutNode"/>.
-            /// After this method, the position and scale of <paramref name="layoutNode"/>
-            /// will be the same as the position and scale of this area (in world space).
-            /// </summary>
-            /// <param name="layoutNode">the object to which apply the area to</param>
-            internal readonly void ApplyTo(ILayoutNode layoutNode)
-            {
-                layoutNode.CenterPosition = Position;
-                layoutNode.AbsoluteScale = new Vector3(Width, layoutNode.AbsoluteScale.y, Depth);
-            }
-
             internal void Draw(string name)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
