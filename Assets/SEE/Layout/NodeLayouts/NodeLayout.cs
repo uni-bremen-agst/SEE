@@ -94,7 +94,7 @@ namespace SEE.Layout.NodeLayouts
                 T node = entry.Key;
                 NodeTransform transform = entry.Value;
                 node.CenterPosition = transform.CenterPosition;
-                node.LocalScale = transform.Scale;
+                node.AbsoluteScale = transform.Scale;
                 node.Rotation = transform.Rotation;
             }
         }

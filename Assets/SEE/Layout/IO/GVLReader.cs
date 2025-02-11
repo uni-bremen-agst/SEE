@@ -578,7 +578,7 @@ namespace SEE.Layout.IO
             // Although we assign the local scale here, the node is not yet contained in any
             // other node, in which case local scale and world-space scale are the same.
             // Nodes will be nested later by the client of this layout.
-            gameNode.LocalScale = scale;
+            gameNode.AbsoluteScale = scale;
             gameNode.CenterPosition = position;
         }
 

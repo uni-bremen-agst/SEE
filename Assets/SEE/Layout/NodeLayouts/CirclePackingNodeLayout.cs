@@ -140,8 +140,8 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>the scale of <paramref name="node"/></returns>
         private static Vector3 GetScale(ILayoutNode node, float radius)
         {
-            return node.IsLeaf ? node.LocalScale
-                               : new Vector3(2 * radius, node.LocalScale.y, 2 * radius);
+            return node.IsLeaf ? node.AbsoluteScale
+                               : new Vector3(2 * radius, node.AbsoluteScale.y, 2 * radius);
         }
 
         /// <summary>
@@ -153,7 +153,7 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>radius of the minimal circle containing the given block</returns>
         private static float LeafRadius(ILayoutNode block)
         {
-            Vector3 extent = block.LocalScale / 2.0f;
+            Vector3 extent = block.AbsoluteScale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
         }
     }

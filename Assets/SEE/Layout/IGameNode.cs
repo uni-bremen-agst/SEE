@@ -20,16 +20,11 @@ namespace SEE.Layout
         bool HasType(string typeName);
 
         /// <summary>
-        /// The local scale of a node (i.e., scale relative to its parent).
-        /// </summary>
-        Vector3 LocalScale { get; set; }
-
-        /// <summary>
         /// The absolute scale of a node in world co-ordinates.
         ///
         /// Note: This value may be meaningful only if the node is not skewed.
         /// </summary>
-        Vector3 AbsoluteScale { get; }
+        Vector3 AbsoluteScale { get; set; }
 
         /// <summary>
         /// Scales the width (x) and depth (z) of the node by the given <paramref name="factor"/>.

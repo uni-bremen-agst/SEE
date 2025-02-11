@@ -159,7 +159,7 @@ namespace SEE.Layout.NodeLayouts
             internal readonly void ApplyTo(ILayoutNode layoutNode)
             {
                 layoutNode.CenterPosition = Position;
-                layoutNode.LocalScale = new Vector3(Width, layoutNode.AbsoluteScale.y, Depth);
+                layoutNode.AbsoluteScale = new Vector3(Width, layoutNode.AbsoluteScale.y, Depth);
             }
         }
 

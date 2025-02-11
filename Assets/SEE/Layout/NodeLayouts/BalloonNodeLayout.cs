@@ -165,7 +165,7 @@ namespace SEE.Layout.NodeLayouts
             if (node.IsLeaf)
             {
                 // Necessary size of the block independent of the parent
-                Vector3 size = node.LocalScale;
+                Vector3 size = node.AbsoluteScale;
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
@@ -238,7 +238,7 @@ namespace SEE.Layout.NodeLayouts
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                layoutResult[node] = new NodeTransform(position.x, position.z, node.LocalScale);
+                layoutResult[node] = new NodeTransform(position.x, position.z, node.AbsoluteScale);
             }
             else
             {
@@ -247,7 +247,7 @@ namespace SEE.Layout.NodeLayouts
                 layoutResult[node]
                     = new NodeTransform(position.x, position.z,
                                         new Vector3(2 * nodeInfos[node].OuterRadius,
-                                                    node.LocalScale.y,
+                                                    node.AbsoluteScale.y,
                                                     2 * nodeInfos[node].OuterRadius));
 
                 // The center points of the children circles are located on the circle

@@ -163,7 +163,7 @@ namespace SEE.Game.Evolution
                     // but the layout needs the game object's scale.
                     // Rotation and CenterPosition are all zero. They will be computed by the layout,
                     // Note: LayoutGraphNode does not make a distinction between local and absolute scale.
-                    LocalScale = gameObject.transform.lossyScale
+                    AbsoluteScale = gameObject.transform.lossyScale
                 };
                 result.Add(layoutNode);
             }

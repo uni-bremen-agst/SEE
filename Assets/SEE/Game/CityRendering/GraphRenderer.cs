@@ -628,7 +628,7 @@ namespace SEE.Game.CityRendering
 
                 foreach (ILayoutNode layoutNode in layoutNodes)
                 {
-                    Vector3 extent = layoutNode.LocalScale / 2.0f;
+                    Vector3 extent = layoutNode.AbsoluteScale / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = layoutNode.CenterPosition;
                     {

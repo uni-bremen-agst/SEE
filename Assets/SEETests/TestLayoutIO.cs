@@ -134,13 +134,13 @@ namespace SEE.Layout
             {
                 if (yIsStored)
                 {
-                    layoutNode.LocalScale = Vector3.zero;
+                    layoutNode.AbsoluteScale = Vector3.zero;
                     layoutNode.CenterPosition = Vector3.zero;
                 }
                 else
                 {
-                    layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
-                    layoutNode.CenterPosition = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
+                    layoutNode.AbsoluteScale = new Vector3(0.0f, layoutNode.AbsoluteScale.y, 0.0f);
+                    layoutNode.CenterPosition = new Vector3(0.0f, layoutNode.AbsoluteScale.y, 0.0f);
                 }
             }
         }
@@ -202,9 +202,9 @@ namespace SEE.Layout
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
-                node.LocalScale = transform.Scale;
+                node.AbsoluteScale = transform.Scale;
                 node.CenterPosition = transform.CenterPosition;
-                layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.LocalScale, node.Rotation);
+                layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.AbsoluteScale, node.Rotation);
             }
         }
 

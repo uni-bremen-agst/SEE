@@ -61,6 +61,12 @@ namespace SEE.Layout
                 child.Parent = this;
                 children.Add(child);
             }
+
+            public void RemoveChild(LNode child)
+            {
+                children.Remove(child);
+                child.Parent = null;
+            }
         }
 
         [SetUp]

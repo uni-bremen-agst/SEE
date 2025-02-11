@@ -30,13 +30,13 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The local scale of this node.
+        /// See <see cref="IGameNode.AbsoluteScale"/>.
         /// </summary>
-        public override Vector3 LocalScale
+        public override Vector3 AbsoluteScale
         {
             get
             {
-                return GameObject.transform.localScale;
+                return GameObject.transform.lossyScale;
             }
             set
             {
@@ -45,24 +45,14 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The absolute scale of a node in world co-ordinates.
-        ///
-        /// Note: This value may be meaningful only if the node is not skewed.
-        /// </summary>
-        public override Vector3 AbsoluteScale
-        {
-            get => GameObject.transform.lossyScale;
-        }
-
-        /// <summary>
         /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
         public override void ScaleXZBy(float factor)
         {
-            Vector3 result = LocalScale;
+            Vector3 result = AbsoluteScale;
             result.x *= factor;
             result.z *= factor;
-            LocalScale = result;
+            AbsoluteScale = result;
         }
 
         /// <summary>
@@ -80,6 +70,9 @@ namespace SEE.Game.CityRendering
             }
         }
 
+        /// <summary>
+        /// See <see cref="IGameNode.Rotation"/>.
+        /// </summary>
         public override float Rotation
         {
             get => GameObject.transform.eulerAngles.y;
@@ -88,7 +81,7 @@ namespace SEE.Game.CityRendering
 
 
         /// <summary>
-        /// X-Z center position of the roof of the node in world space.
+        /// See <see cref="IGameNode.Roof"/>.
         /// </summary>
         public override Vector3 Roof
         {
@@ -99,7 +92,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// X-Z center position of the ground of the node in world space.
+        /// See <see cref="IGameNode.Ground"/>.
         /// </summary>
         public override Vector3 Ground
         {

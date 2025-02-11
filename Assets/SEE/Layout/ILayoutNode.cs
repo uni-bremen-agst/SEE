@@ -17,13 +17,9 @@ namespace SEE.Layout
         public abstract string ID { get; }
 
         /// <summary>
-        /// See <see cref="IGameNode.LocalScale"/>.
-        /// </summary>
-        public abstract Vector3 LocalScale { get; set; }
-        /// <summary>
         /// See <see cref="IGameNode.AbsoluteScale"/>.
         /// </summary>
-        public abstract Vector3 AbsoluteScale { get; }
+        public abstract Vector3 AbsoluteScale { get; set; }
         /// <summary>
         /// See <see cref="IGameNode.CenterPosition"/>.
         /// </summary>

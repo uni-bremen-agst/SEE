@@ -14,7 +14,7 @@ namespace SEE.Layout
         /// <param name="index">the unique ID of the node (a number to be converted into a string)</param>
         public LayoutVertex(Vector3 initialSize, int index)
         {
-            LocalScale = initialSize;
+            AbsoluteScale = initialSize;
             this.id = index.ToString();
         }
 
@@ -24,7 +24,7 @@ namespace SEE.Layout
         /// <param name="id">unique ID of the node</param>
         public LayoutVertex(string id)
         {
-            LocalScale = Vector3.zero;
+            AbsoluteScale = Vector3.zero;
             this.id = id;
         }
 
@@ -51,19 +51,19 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// <see cref="IGameNode.LocalScale"/>.
+        /// <see cref="IGameNode.AbsoluteScale"/>.
         /// </summary>
-        public override Vector3 LocalScale { set; get; }
+        public override Vector3 AbsoluteScale { set; get; }
 
         /// <summary>
         /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
         public override void ScaleXZBy(float factor)
         {
-            Vector3 result = LocalScale;
+            Vector3 result = AbsoluteScale;
             result.x *= factor;
             result.z *= factor;
-            LocalScale = result;
+            AbsoluteScale = result;
         }
 
         /// <summary>
@@ -76,7 +76,7 @@ namespace SEE.Layout
         /// </summary>
         public override Vector3 Roof
         {
-            get => CenterPosition + 0.5f * LocalScale.y * Vector3.up;
+            get => CenterPosition + 0.5f * AbsoluteScale.y * Vector3.up;
         }
 
         /// <summary>
@@ -84,19 +84,13 @@ namespace SEE.Layout
         /// </summary>
         public override Vector3 Ground
         {
-            get => CenterPosition - 0.5f * LocalScale.y * Vector3.up;
+            get => CenterPosition - 0.5f * AbsoluteScale.y * Vector3.up;
         }
 
         /// <summary>
         /// The rotation of the node along the y axis in degrees.
         /// </summary>
         public override float Rotation { set; get; }
-
-        /// <summary>
-        /// The scale of the node in world space, i.e., in absolute Unity units
-        /// independent of its parent.
-        /// </summary>
-        public override Vector3 AbsoluteScale => LocalScale;
 
         #endregion IGameNode
     }

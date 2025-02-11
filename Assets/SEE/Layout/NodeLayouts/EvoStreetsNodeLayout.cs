@@ -48,7 +48,7 @@ namespace SEE.Layout.NodeLayouts
                 ILayoutNode singleNode = layoutNodes.First();
                 Dictionary<ILayoutNode, NodeTransform> layoutResult = new()
                 {
-                    [singleNode] = new NodeTransform(0, 0, singleNode.LocalScale)
+                    [singleNode] = new NodeTransform(0, 0, singleNode.AbsoluteScale)
                 };
                 return layoutResult;
             }

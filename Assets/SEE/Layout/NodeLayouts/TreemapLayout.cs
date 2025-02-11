@@ -43,7 +43,7 @@ namespace SEE.Layout.NodeLayouts
                     {
                         // MoveNext() must be called before we can call Current.
                         ILayoutNode gameNode = enumerator.Current;
-                        Assert.AreEqual(gameNode.AbsoluteScale, gameNode.LocalScale);
+                        Assert.AreEqual(gameNode.AbsoluteScale, gameNode.AbsoluteScale);
                         layoutResult[gameNode] = new NodeTransform(0, 0,
                                                                    new Vector3(rectangle.x, gameNode.AbsoluteScale.y, rectangle.y));
                     }
@@ -80,7 +80,7 @@ namespace SEE.Layout.NodeLayouts
             if (Roots.Count == 1)
             {
                 ILayoutNode root = Roots[0];
-                Assert.AreEqual(root.AbsoluteScale, root.LocalScale);
+                Assert.AreEqual(root.AbsoluteScale, root.AbsoluteScale);
                 layoutResult[root] = new NodeTransform(0, 0,
                                                        new Vector3(rectangle.x, root.AbsoluteScale.y, rectangle.y));
                 CalculateLayout(root.Children(), x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y);
@@ -116,7 +116,7 @@ namespace SEE.Layout.NodeLayouts
                 {
                     // Note: nodeTransform.position is the center position, while
                     // CalculateLayout assumes co-ordinates x and z as the left front corner
-                    Assert.AreEqual(node.AbsoluteScale, node.LocalScale);
+                    Assert.AreEqual(node.AbsoluteScale, node.AbsoluteScale);
                     NodeTransform nodeTransform = layoutResult[node];
                     CalculateLayout(children,
                                     nodeTransform.X - nodeTransform.Scale.x / 2.0f,
@@ -165,7 +165,7 @@ namespace SEE.Layout.NodeLayouts
             if (node.IsLeaf)
             {
                 // a leaf
-                Vector3 size = node.LocalScale;
+                Vector3 size = node.AbsoluteScale;
                 // x and z lengths may differ; we need to consider the larger value
                 float result = Mathf.Max(size.x, size.z);
                 sizes[node] = new RectangleTiling.NodeSize(node, result);
@@ -220,8 +220,7 @@ namespace SEE.Layout.NodeLayouts
             foreach (RectangleTiling.Rectangle rect in rects)
             {
                 ILayoutNode o = nodes[i].GameNode;
-                Vector3 scale = new(rect.Width, o.LocalScale.y, rect.Depth);
-                Assert.AreEqual(o.AbsoluteScale, o.LocalScale, $"{o.ID}: {o.AbsoluteScale} != {o.LocalScale}");
+                Vector3 scale = new(rect.Width, o.AbsoluteScale.y, rect.Depth);
                 layoutResult[o] = new NodeTransform(rect.X + rect.Width / 2.0f, rect.Z + rect.Depth / 2.0f, scale);
                 i++;
             }

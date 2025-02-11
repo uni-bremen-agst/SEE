@@ -28,18 +28,10 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// <see cref="AbstractLayoutNode.LocalScale"/>.
         /// </summary>
-        public override Vector3 LocalScale
-        {
-            get => scale;
-            set => scale = value;
-        }
-
-        /// <summary>
-        /// <see cref="AbstractLayoutNode.AbsoluteScale"/>.
-        /// </summary>
         public override Vector3 AbsoluteScale
         {
             get => scale;
+            set => scale = value;
         }
 
         /// <summary>

@@ -124,7 +124,7 @@ namespace SEE.Layout.NodeLayouts
             if (node.IsLeaf)
             {
                 // x and z lengths may differ; we need to consider the larger value
-                float size = Mathf.Max(node.LocalScale.x, node.LocalScale.z);
+                float size = Mathf.Max(node.AbsoluteScale.x, node.AbsoluteScale.z);
                 newNode.DesiredSize = size;
                 return size;
             }
@@ -321,7 +321,7 @@ namespace SEE.Layout.NodeLayouts
 
                 Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),
-                    layoutNode.LocalScale.y,
+                    layoutNode.AbsoluteScale.y,
                     (float)(rectangle.Depth - absolutePadding));
 
                 layoutResult[layoutNode] = new NodeTransform((float)(rectangle.X + rectangle.Width / 2.0d),
