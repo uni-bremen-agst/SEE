@@ -85,5 +85,14 @@ namespace SEE.Layout
             children.Add(child);
             child.Parent = this;
         }
+
+        public void RemoveChild(ILayoutNode child)
+        {
+            if (!children.Remove(child))
+            {
+                throw new System.Exception("Child not found.");
+            }
+            child.Parent = null;
+        }
     }
 }

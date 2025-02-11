@@ -87,6 +87,9 @@ namespace SEE.Layout.NodeLayouts
             architectureArea.ApplyTo(architectureRoot);
             implementionArea.ApplyTo(implementationRoot);
 
+            roots[0].RemoveChild(architectureRoot);
+            roots[0].RemoveChild(implementationRoot);
+
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Dictionary<ILayoutNode, NodeTransform> result
                 = implementationLayout.Create(implementationNodes,
@@ -99,6 +102,9 @@ namespace SEE.Layout.NodeLayouts
             Union(result, architectureLayout.Create(architectureNodes,
                                                     architectureRoot.CenterPosition,
                                                     new Vector2(architectureArea.Width, architectureArea.Depth)));
+
+            roots[0].AddChild(architectureRoot);
+            roots[0].AddChild(implementationRoot);
 
             result[roots[0]] = new NodeTransform(centerPosition.y, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
             return result;

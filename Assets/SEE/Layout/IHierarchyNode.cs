@@ -34,6 +34,13 @@ namespace SEE.Layout
         void AddChild(T child);
 
         /// <summary>
+        /// Removes given <paramref name="child"/> from the list of children of this node.
+        /// </summary>
+        /// <param name="child">child to be removed</param>
+        /// <exception cref="System.Exception">in case <paramref name="child"/> is not a child</exception>
+        void RemoveChild(T child);
+
+        /// <summary>
         /// The set of children of this node. Note: Even nodes for which IsLeaf
         /// returns true, may still have children. Layouts may refuse to layout
         /// the children of a node for which IsLeaf returns true.
