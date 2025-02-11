@@ -90,15 +90,15 @@ namespace SEE.Layout.NodeLayouts
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Dictionary<ILayoutNode, NodeTransform> result
                 = implementationLayout.Create(implementationNodes,
-                                                 implementationRoot.CenterPosition,
-                                                 new Vector2(implementionArea.Width, implementionArea.Depth));
+                                              implementationRoot.CenterPosition,
+                                              new Vector2(implementionArea.Width, implementionArea.Depth));
             Debug.Log($"implementationLayout.Count= {result.Count}\n");
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
 
             Union(result, architectureLayout.Create(architectureNodes,
-                                                       architectureRoot.CenterPosition,
-                                                       new Vector2(architectureArea.Width, architectureArea.Depth)));
+                                                    architectureRoot.CenterPosition,
+                                                    new Vector2(architectureArea.Width, architectureArea.Depth)));
 
             result[roots[0]] = new NodeTransform(centerPosition.y, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
             return result;
