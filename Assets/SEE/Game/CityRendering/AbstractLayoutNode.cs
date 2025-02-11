@@ -26,6 +26,11 @@ namespace SEE.Game.CityRendering
         public Node ItsNode => Node;
 
         /// <summary>
+        /// See See <see cref="IGameNode.ID"/>.
+        /// </summary>
+        public override string ID => Node.ID;
+
+        /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node.
         /// </summary>
         /// <param name="node">graph node corresponding to this layout node</param>

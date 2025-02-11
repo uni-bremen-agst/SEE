@@ -15,7 +15,7 @@ namespace SEE.Layout
         public LayoutVertex(Vector3 initialSize, int index)
         {
             LocalScale = initialSize;
-            ID = index.ToString();
+            this.id = index.ToString();
         }
 
         /// <summary>
@@ -25,8 +25,18 @@ namespace SEE.Layout
         public LayoutVertex(string id)
         {
             LocalScale = Vector3.zero;
-            ID = id;
+            this.id = id;
         }
+
+        /// <summary>
+        /// Unique ID of the node.
+        /// </summary>
+        private readonly string id;
+
+        /// <summary>
+        /// <see cref="IGameNode.ID"/>.
+        /// </summary>
+        public override string ID => id;
 
         #region IGameNode
 
@@ -41,9 +51,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// The local scale of the node, that is, the size of the node
-        /// relative to its parent. If size is Vector3.one, the node is
-        /// as large as its parent.
+        /// <see cref="IGameNode.LocalScale"/>.
         /// </summary>
         public override Vector3 LocalScale { set; get; }
 

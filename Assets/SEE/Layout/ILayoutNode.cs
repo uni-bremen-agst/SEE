@@ -14,7 +14,7 @@ namespace SEE.Layout
         /// <summary>
         /// See <see cref="IGameNode.ID"/>.
         /// </summary>
-        public string ID { get; set; } = string.Empty;
+        public abstract string ID { get; }
 
         /// <summary>
         /// See <see cref="IGameNode.LocalScale"/>.
