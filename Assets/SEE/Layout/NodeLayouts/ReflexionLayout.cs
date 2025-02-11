@@ -89,14 +89,14 @@ namespace SEE.Layout.NodeLayouts
 
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Dictionary<ILayoutNode, NodeTransform> result
-                = implementationLayout.GetLayout(implementationNodes,
+                = implementationLayout.Create(implementationNodes,
                                                  implementationRoot.CenterPosition,
                                                  new Vector2(implementionArea.Width, implementionArea.Depth));
             Debug.Log($"implementationLayout.Count= {result.Count}\n");
 
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
 
-            Union(result, architectureLayout.GetLayout(architectureNodes,
+            Union(result, architectureLayout.Create(architectureNodes,
                                                        architectureRoot.CenterPosition,
                                                        new Vector2(architectureArea.Width, architectureArea.Depth)));
 

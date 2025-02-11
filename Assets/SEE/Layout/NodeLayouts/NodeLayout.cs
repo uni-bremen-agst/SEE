@@ -33,7 +33,7 @@ namespace SEE.Layout.NodeLayouts
         /// <param name="centerPosition">The center of the rectangle in worldspace.</param>
         /// <param name="rectangle">The size of the rectangle within all nodes will be placed.</param>
         /// <returns>node layout</returns>
-        public virtual Dictionary<ILayoutNode, NodeTransform> GetLayout
+        public virtual Dictionary<ILayoutNode, NodeTransform> Create
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,
              Vector2 rectangle)

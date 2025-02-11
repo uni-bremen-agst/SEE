@@ -314,7 +314,7 @@ namespace SEE.Game.CityRendering
             {
                 Vector3 position = parent.transform.position;
                 position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
-                NodeLayout.Apply(nodeLayout.GetLayout(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z)));
+                NodeLayout.Apply(nodeLayout.Create(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z)));
             }
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
