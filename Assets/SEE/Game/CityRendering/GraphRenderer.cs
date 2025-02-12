@@ -461,6 +461,12 @@ namespace SEE.Game.CityRendering
                 _ => throw new Exception("Unhandled node layout " + kind)
             };
 
+        /// <summary>
+        /// Returns the node layouter for drawing the implementation according to <paramref name="nodeLayoutSettings"/>.
+        /// </summary>
+        /// <param name="nodeLayoutSettings">the settings for the implementation layout</param>
+        /// <returns>layouter for implementation</returns>
+        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
         private NodeLayout GetImplementationLayout(NodeLayoutAttributes nodeLayoutSettings)
         {
             if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
@@ -474,6 +480,12 @@ namespace SEE.Game.CityRendering
             return GetLayout(nodeLayoutSettings.Implementation);
         }
 
+        /// <summary>
+        /// Returns the node layouter for drawing the architecture according to <paramref name="nodeLayoutSettings"/>.
+        /// </summary>
+        /// <param name="nodeLayoutSettings">the settings for the architecture layout</param>
+        /// <returns>layouter for architecture</returns>
+        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
         private NodeLayout GetArchitectureLayout(NodeLayoutAttributes nodeLayoutSettings)
         {
             if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
