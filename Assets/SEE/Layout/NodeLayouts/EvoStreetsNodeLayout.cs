@@ -6,6 +6,10 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
+    /// <summary>
+    /// Lays out nodes in a tree hierarchy in a street-like manner (EvoStreets
+    /// according to Frank Steinbrückner).
+    /// </summary>
     public class EvoStreetsNodeLayout : NodeLayout
     {
         static EvoStreetsNodeLayout()

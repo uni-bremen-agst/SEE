@@ -3,6 +3,9 @@ using System.Linq;
 
 namespace SEE.Layout
 {
+    /// <summary>
+    /// Utility methods for <see cref="ILayoutNode"/> hierarchies.
+    /// </summary>
     public static class ILayoutNodeHierarchy
     {
         /// <summary>
