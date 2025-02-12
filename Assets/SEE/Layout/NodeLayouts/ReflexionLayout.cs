@@ -12,8 +12,13 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="architectureLayout">the layout to applied to the architecture nodes</param>
         /// <param name="implementationLayout">the layout to applied to the implementation nodes</param>
-        public ReflexionLayout(NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
+        public ReflexionLayout(float architectureProportion, NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
         {
+            if (architectureProportion < 0 || architectureProportion > 1)
+            {
+                throw new ArgumentException("Architecture proportion must be in [0, 1].");
+            }
+            this.architectureProportion = architectureProportion;
             this.implementationLayout = implementationLayout ?? new CirclePackingNodeLayout();
             this.architectureLayout = architectureLayout ?? new CirclePackingNodeLayout();
         }
@@ -23,6 +28,7 @@ namespace SEE.Layout.NodeLayouts
             Name = "Reflexion";
         }
 
+        private readonly float architectureProportion;
         private readonly NodeLayout implementationLayout;
         private readonly NodeLayout architectureLayout;
 
@@ -82,8 +88,7 @@ namespace SEE.Layout.NodeLayouts
                 throw new Exception("Root node has the two children that are both architecture or implementation, respectively.");
             }
 
-            // The available space is retrieved from the root node.
-            Split(centerPosition, rectangle.x, rectangle.y, 0.6f, out Area implementionArea, out Area architectureArea); // FIXME: 0.6f is a placeholder
+            Split(centerPosition, rectangle.x, rectangle.y, architectureProportion, out Area implementionArea, out Area architectureArea);
 
             roots[0].RemoveChild(architectureRoot);
             roots[0].RemoveChild(implementationRoot);
@@ -146,7 +151,7 @@ namespace SEE.Layout.NodeLayouts
             /// </summary>
             internal float Depth;
 
-            internal void Draw(string name)
+            internal readonly void Draw(string name)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                 go.name = name;

@@ -448,8 +448,9 @@ namespace SEE.Game.CityRendering
         private NodeLayout GetLayout(NodeLayoutKind kind) =>
             kind switch
             {
-                NodeLayoutKind.Reflexion => new ReflexionLayout(GetLayout(Settings.NodeLayoutSettings.Implementation),
-                                                                GetLayout(Settings.NodeLayoutSettings.Architecture)),
+                NodeLayoutKind.Reflexion => new ReflexionLayout(Settings.NodeLayoutSettings.ArchitectureLayoutProportion,
+                                                                GetImplementationLayout(Settings.NodeLayoutSettings),
+                                                                GetArchitectureLayout(Settings.NodeLayoutSettings)),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),
@@ -459,6 +460,32 @@ namespace SEE.Game.CityRendering
                 NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
                 _ => throw new Exception("Unhandled node layout " + kind)
             };
+
+        private NodeLayout GetImplementationLayout(NodeLayoutAttributes nodeLayoutSettings)
+        {
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
+            {
+                return new LoadedNodeLayout(nodeLayoutSettings.LayoutPath.Path);
+            }
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
+            {
+               throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+            }
+            return GetLayout(nodeLayoutSettings.Implementation);
+        }
+
+        private NodeLayout GetArchitectureLayout(NodeLayoutAttributes nodeLayoutSettings)
+        {
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
+            {
+                return new LoadedNodeLayout(nodeLayoutSettings.ArchitectureLayoutPath.Path);
+            }
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
+            {
+                throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+            }
+            return GetLayout(nodeLayoutSettings.Architecture);
+        }
 
         /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
