@@ -5,13 +5,22 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
+    /// <summary>
+    /// A layout for the reflexion analysis of a code city where there are two sublayouts,
+    /// one for the architecture and one for the implementation.
+    /// </summary>
     public class ReflexionLayout : NodeLayout
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="architectureLayout">the layout to applied to the architecture nodes</param>
-        /// <param name="implementationLayout">the layout to applied to the implementation nodes</param>
+        /// <param name="architectureProportion">the proportion of the longer edge of the available space that
+        /// is occupied by the architecture; must be in [0, 1]</param>
+        /// <param name="architectureLayout">the layout to applied to the architecture nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used</param>
+        /// <param name="implementationLayout">the layout to applied to the implementation nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used</param>
+        /// <exception cref="ArgumentException">thrown if <paramref name="architectureProportion"/> is not in [0, 1]</exception>
         public ReflexionLayout(float architectureProportion, NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
         {
             if (architectureProportion < 0 || architectureProportion > 1)
@@ -19,8 +28,8 @@ namespace SEE.Layout.NodeLayouts
                 throw new ArgumentException("Architecture proportion must be in [0, 1].");
             }
             this.architectureProportion = architectureProportion;
-            this.implementationLayout = implementationLayout ?? new CirclePackingNodeLayout();
-            this.architectureLayout = architectureLayout ?? new CirclePackingNodeLayout();
+            this.implementationLayout = implementationLayout ?? new TreemapLayout();
+            this.architectureLayout = architectureLayout ?? new TreemapLayout();
         }
 
         static ReflexionLayout()
@@ -28,19 +37,37 @@ namespace SEE.Layout.NodeLayouts
             Name = "Reflexion";
         }
 
+        /// <summary>
+        /// The proportion of the longer edge of the available space that is occupied by
+        /// the architecture; must be in [0, 1].
+        /// </summary>
         private readonly float architectureProportion;
+        /// <summary>
+        /// The layout to applied to the implementation nodes.
+        /// </summary>
         private readonly NodeLayout implementationLayout;
+        /// <summary>
+        /// The layout to applied to the architecture nodes.
+        /// </summary>
         private readonly NodeLayout architectureLayout;
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        ///
+        /// Preconditions:
+        /// There must be only one root node that has exactly two children. One of them is the architecture
+        /// and the other is the implementation. The architecture node has the node type
+        /// <see cref="ReflexionGraph.ArchitectureType"/> and the implementation node has the node type
+        /// <see cref="ReflexionGraph.ImplementationType"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown in case the preconditions are not met</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
             Vector3 centerPosition,
             Vector2 rectangle)
         {
             // There should be one root that has exactly two children. One of them is the architecture
-            // and the other is the implementation. The architecture node has the node type Architecture
-            // and the implementation node has the node type Implementation.
-
+            // and the other is the implementation.
             IList<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodes);
             if (roots.Count == 0)
             {
@@ -49,12 +76,12 @@ namespace SEE.Layout.NodeLayouts
             }
             if (roots.Count > 1)
             {
-                throw new Exception("Graph has more than one root node.");
+                throw new ArgumentException("Graph has more than one root node.");
             }
             ICollection<ILayoutNode> children = roots[0].Children();
             if (children.Count != 2)
             {
-                throw new Exception("Root node has not exactly two children.");
+                throw new ArgumentException("Root node has not exactly two children.");
             }
             ILayoutNode architectureRoot = null;
             ILayoutNode implementationRoot = null;
@@ -72,45 +99,53 @@ namespace SEE.Layout.NodeLayouts
                 }
                 else
                 {
-                    throw new Exception("Root node has a child that is neither architecture nor implementation.");
+                    throw new ArgumentException("Root node has a child that is neither architecture nor implementation.");
                 }
             }
             if (architectureRoot == null)
             {
-                throw new Exception("Root node has no architecture child.");
+                throw new ArgumentException("Root node has no architecture child.");
             }
             if (implementationRoot == null)
             {
-                throw new Exception("Root node has no implementation child.");
+                throw new ArgumentException("Root node has no implementation child.");
             }
             if (architectureRoot == implementationRoot)
             {
-                throw new Exception("Root node has the two children that are both architecture or implementation, respectively.");
+                throw new ArgumentException("Root node has the two children that are both architecture or implementation, respectively.");
             }
 
             Split(centerPosition, rectangle.x, rectangle.y, architectureProportion, out Area implementionArea, out Area architectureArea);
 
+            // We will temporarily remove the architecture and implementation nodes as children from the root node
+            // because the sublayouts would be unable to detect a root.
             roots[0].RemoveChild(architectureRoot);
             roots[0].RemoveChild(implementationRoot);
 
+            // Laying out the implementation.
             ICollection<ILayoutNode> implementationNodes = ILayoutNodeHierarchy.DescendantsOf(implementationRoot);
             Dictionary<ILayoutNode, NodeTransform> result
                 = implementationLayout.Create(implementationNodes,
                                               implementionArea.Position,
                                               new Vector2(implementionArea.Width, implementionArea.Depth));
 
+            // Laying out the architecture.
             ICollection<ILayoutNode> architectureNodes = ILayoutNodeHierarchy.DescendantsOf(architectureRoot);
 
             Union(result, architectureLayout.Create(architectureNodes,
                                                     architectureArea.Position,
                                                     new Vector2(architectureArea.Width, architectureArea.Depth)));
 
+            // Adding the architecture and implementation nodes back as children to the root node.
             roots[0].AddChild(architectureRoot);
             roots[0].AddChild(implementationRoot);
 
+            // The root node was not laid out by the sublayouts, hence, we need to add it manually,
+            // occupying the complete available space.
             result[roots[0]] = new NodeTransform(centerPosition.x, centerPosition.z, new Vector3(rectangle.x, roots[0].AbsoluteScale.y, rectangle.y));
             return result;
 
+            // Adds the layout to the result.
             static void Union(Dictionary<ILayoutNode, NodeTransform> result, Dictionary<ILayoutNode, NodeTransform> layout)
             {
                 foreach (KeyValuePair<ILayoutNode, NodeTransform> entry in layout)
@@ -151,6 +186,10 @@ namespace SEE.Layout.NodeLayouts
             /// </summary>
             internal float Depth;
 
+            /// <summary>
+            /// Draws a cube representing the area. Can be used for debugging.
+            /// </summary>
+            /// <param name="name">the name of the created cube</param>
             internal readonly void Draw(string name)
             {
                 GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
@@ -273,8 +312,6 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
             }
-            //implementionArea.Draw("implementation"); // FIXME: Remove this line.
-            //architectureArea.Draw("architecture");
         }
     }
 }
