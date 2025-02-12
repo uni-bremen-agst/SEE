@@ -5,6 +5,7 @@ namespace SEE.Layout
     /// <summary>
     /// Defines the interface of nodes in a node hierarchy.
     /// </summary>
+    /// <typeparam name="T">The type of the node in the hierarchy (parent and children).</typeparam>
     public interface IHierarchyNode<T>
     {
         /// <summary>
