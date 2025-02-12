@@ -215,8 +215,8 @@ namespace SEE.Game.City
         /// <returns>Nothing, it is an asynchronous method that needs to wait.</returns>
         public async UniTask LoadAndDrawSubgraphAsync(DataPath path, DataPath projectFolder = null)
         {
-            // FIXME: This code should be moved to ReflexionGraph. It updates a subgraph.
-            // Clearly, what this update requires in an implementation detail of ReflexionGraph.
+            // FIXME (#825): This code should be moved to ReflexionGraph. It updates a subgraph.
+            // Clearly, what this update requires is an implementation detail of ReflexionGraph.
 
             (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(path, projectFolder == null);
             if (projectFolder != null)
