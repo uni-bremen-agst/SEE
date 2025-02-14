@@ -229,32 +229,9 @@ namespace SEE.Game.City
 
             // Draws the graph.
             await renderer.DrawGraphAsync(graph, root.GameObject(), loadReflexionFiles: true);
+
             // Adds the graph to the existing reflexion graph.
-            graph.Nodes().ForEach(node =>
-            {
-                node.ItsGraph = null;
-                if (projectFolder != null)
-                {
-                    ReflexionGraph.AddToImplementation(node);
-                }
-                else
-                {
-                    ReflexionGraph.AddToArchitecture(node);
-                }
-            });
-            graph.GetRoots().ForEach(subRoot => root.AddChild(subRoot));
-            graph.Edges().ForEach((edge) =>
-            {
-                edge.ItsGraph = null;
-                if (projectFolder != null)
-                {
-                    ReflexionGraph.AddToImplementation(edge);
-                }
-                else
-                {
-                    ReflexionGraph.AddToArchitecture(edge);
-                }
-            });
+            ReflexionGraph.AddSubgraphInContext(graph, root, projectFolder != null);
 
             // Ensures that the newly drawn graph is displayed.
             root.GameObject().SetActive(false);
