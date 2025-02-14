@@ -973,7 +973,7 @@ namespace SEE.Tools.ReflexionAnalysis
             toSubtree ??= new HashSet<Node>(to.PostOrderDescendants());
 
             // TODO: Once a true type hierarchy exists, this needs to be updated
-            Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => IsSpecified(edge) && edge.HasSupertypeOf(type) && targets.Contains(edge.Target);
+            Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => edge.HasSupertypeOf(type) && targets.Contains(edge.Target) && IsSpecified(edge);
 
             Edge redundantSuper = fromSupertree.SelectMany(x => x.Outgoings).FirstOrDefault(IsRedundantIn(toSupertree));
             AssertOrThrow(redundantSuper == null,
