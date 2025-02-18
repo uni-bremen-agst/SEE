@@ -95,9 +95,14 @@ namespace SEE.Tools.Livekit
 
         /// <summary>
         /// Initializes the video manager by obtaining a token and setting up the camera dropdown.
+        /// If this code is executed in an environment different from <see cref="PlayerInputType.DesktopPlayer"/>,
+        /// the object will be disabled.
         /// </summary>
         private void Start()
         {
+            // FIXME (#826): Rather than trying to obtain the token on Start, we should rather try that only
+            // if the user explicitly demands it (starts the face cam). Otherwise we might annoy
+            // the user with a failing request to the token server that is not needed.
             if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
                 SetupCameraDropdown();

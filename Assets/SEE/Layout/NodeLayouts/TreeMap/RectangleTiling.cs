@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.TreeMap
 {
+    /// <summary>
+    /// Implements the tiling of rectangles for a tree map layout.
+    /// </summary>
     internal class RectangleTiling
     {
         /// <summary>
@@ -12,6 +15,13 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// </summary>
         public class Rectangle
         {
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="x">X co-ordinate at corner</param>
+            /// <param name="z">Z co-ordinate at corner</param>
+            /// <param name="width">width of the rectangle</param>
+            /// <param name="depth">depth (breadth) of the rectangle</param>
             public Rectangle(float x, float z, float width, float depth)
             {
                 X = x;
@@ -19,10 +29,22 @@ namespace SEE.Layout.NodeLayouts.TreeMap
                 Width = width;
                 Depth = depth;
             }
-            public float X;      // x co-ordinate at corner
-            public float Z;      // z co-ordinate at corner
-            public float Width;  // width
-            public float Depth;  // depth (breadth)
+            /// <summary>
+            /// X co-ordinate at corner.
+            /// </summary>
+            public float X;
+            /// <summary>
+            /// Z co-ordinate at corner.
+            /// </summary>
+            public float Z;
+            /// <summary>
+            /// Width of the rectangle.
+            /// </summary>
+            public float Width;
+            /// <summary>
+            /// Depth (breadth) of the rectangle.
+            /// </summary>
+            public float Depth;
         }
 
         /// <summary>
@@ -30,12 +52,23 @@ namespace SEE.Layout.NodeLayouts.TreeMap
         /// </summary>
         public class NodeSize
         {
+            /// <summary>
+            /// Constructor.
+            /// </summary>
+            /// <param name="gameNode">layout node this node size corresponds to</param>
+            /// <param name="size">size of the node</param>
             public NodeSize(ILayoutNode gameNode, float size)
             {
                 GameNode = gameNode;
                 Size = size;
             }
+            /// <summary>
+            /// The layout node this node size corresponds to.
+            /// </summary>
             public ILayoutNode GameNode;
+            /// <summary>
+            /// The size of the node.
+            /// </summary>
             public float Size;
         }
 

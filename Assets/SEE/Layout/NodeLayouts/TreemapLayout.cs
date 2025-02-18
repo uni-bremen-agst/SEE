@@ -24,6 +24,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,
@@ -35,7 +38,7 @@ namespace SEE.Layout.NodeLayouts
             switch (layoutNodeList.Count)
             {
                 case 0:
-                    throw new ArgumentException("No nodes to be laid out.");
+                    return layoutResult;
                 case 1:
                 {
                     using IEnumerator<ILayoutNode> enumerator = layoutNodeList.GetEnumerator();

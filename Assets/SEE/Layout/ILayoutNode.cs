@@ -4,10 +4,7 @@ using UnityEngine;
 namespace SEE.Layout
 {
     /// <summary>
-    ///  Defines the methods for all nodes to be laid out.
-    /// </summary>
-    /// <summary>
-    /// Defines the interface of nodes in a node hierarchy.
+    /// Defines the methods for all nodes to be laid out.
     /// </summary>
     public abstract class ILayoutNode : IGameNode, IHierarchyNode<ILayoutNode>
     {
@@ -74,7 +71,7 @@ namespace SEE.Layout
         }
 
         /// <summary>
-        /// See <see cref="IHierarchyNode.AddChild"/>.
+        /// See <see cref="IHierarchyNode.AddChild(T)"/>.
         /// </summary>
         public void AddChild(ILayoutNode child)
         {
@@ -82,6 +79,9 @@ namespace SEE.Layout
             child.Parent = this;
         }
 
+        /// <summary>
+        /// See <see cref="IHierarchyNode.RemoveChild(T)"/>.
+        /// </summary>
         public void RemoveChild(ILayoutNode child)
         {
             if (!children.Remove(child))

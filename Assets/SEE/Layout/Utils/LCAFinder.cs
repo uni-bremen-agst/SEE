@@ -5,26 +5,60 @@ namespace SEE.Layout.Utils
 {
     /// <summary>
     /// Computes the lowest common ancestors (LCA) in a rooted tree or a forest based on
-    /// the algorithm by Berkman, Omer and Vishkin, Uzi(1993), "Recursive Star-Tree
+    /// the algorithm by Berkman, Omer and Vishkin, Uzi (1993), "Recursive Star-Tree
     /// Parallel Data Structure", SIAM Journal on Computing, 22 (2): 221–242.
     /// </summary>
     public class LCAFinder<HNode> where HNode : IHierarchyNode<HNode>
     {
+        /// <summary>
+        /// The maximum depth of the tree.
+        /// </summary>
         private uint maxLevel;
 
+        /// <summary>
+        /// Mapping of nodes onto their tree index.
+        /// </summary>
         private Dictionary<HNode, int> nodeMap;
+
+        /// <summary>
+        /// The list of nodes in the tree.
+        /// </summary>
         private HNode[] indexList;
 
+        /// <summary>
+        /// The Euler tour through the tree.
+        /// </summary>
         private int[] eulerTour;
+        /// <summary>
+        /// The length of the Euler tour.
+        /// </summary>
         private int tourLength;
 
+        /// <summary>
+        /// The component number of each node in the Euler tour.
+        /// </summary>
         private int numberComponent;
+        /// <summary>
+        /// The tree number of each node in the Euler tour.
+        /// </summary>
         private int[] tree;
 
+        /// <summary>
+        /// The level of each node in the Euler tour.
+        /// </summary>
         private int[] level;
+        /// <summary>
+        /// The representative of each node in the Euler tour.
+        /// </summary>
         private int[] representative;
 
-        private int[,] rmq;  // two-dimensional array
+        /// <summary>
+        /// The two-dimensional Range Minimum Query (RMQ) data structure.
+        /// </summary>
+        private int[,] rmq;
+        /// <summary>
+        /// The logarithm base 2 of the length of the Euler tour.
+        /// </summary>
         private int[] log2;
 
         /// <summary>
@@ -51,6 +85,7 @@ namespace SEE.Layout.Utils
         /// has at most one parent).
         /// </summary>
         /// <param name="root">roots of the forest</param>
+        /// <exception cref="Exception">thrown if <paramref name="roots"/> is empty</exception>
         public LCAFinder(ICollection<HNode> roots)
         {
             if (roots.Count == 0)
@@ -60,77 +95,13 @@ namespace SEE.Layout.Utils
             Run(roots);
         }
 
-        private void CheckTree(ICollection<HNode> roots)
-        {
-            HashSet<HNode> visited = new HashSet<HNode>();
-            foreach (HNode root in roots)
-            {
-                CheckTree(root, visited);
-            }
-        }
-
-        private void CheckTree(HNode node, HashSet<HNode> visited)
-        {
-            if (visited.Contains(node))
-            {
-                // node was already visited
-                throw new Exception("Input is not a tree. Node " + node + " can be reached more than once.");
-            }
-            else
-            {
-                visited.Add(node);
-                HNode parent = node.Parent;
-                // We should have visited the parent already in this pre-order depth-first traversal.
-                if (parent != null && !visited.Contains(parent))
-                {
-                    throw new Exception("Parent in tree is inconsistent. Violating node: " + parent);
-                }
-                foreach (HNode child in node.Children())
-                {
-                    // Does child also believe it is a child of node?
-                    if (!ReferenceEquals(child.Parent, node))
-                    {
-                        throw new Exception("Parenting in tree is inconsistent: Child " + child + " is not a child of node " + parent);
-                    }
-                    CheckTree(child, visited);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Yields the floor of the binary logarithm of n.
-        /// </summary>
-        /// <param name="n">the input number</param>
-        /// <returns>floor of the binary logarithm</returns>
-        private static uint Log2(uint n)
-        {
-            n |= (n >> 1);
-            n |= (n >> 2);
-            n |= (n >> 4);
-            n |= (n >> 8);
-            n |= (n >> 16);
-
-            return (uint)(NumBitsSet(n) - 1);
-        }
-
-        private static int NumBitsSet(uint x)
-        {
-            x -= ((x >> 1) & 0x55555555);
-            x = (((x >> 2) & 0x33333333) + (x & 0x33333333));
-            x = (((x >> 4) + x) & 0x0f0f0f0f);
-            x += (x >> 8);
-            x += (x >> 16);
-
-            return (int)(x & 0x0000003f);
-        }
-
         /// <summary>
         /// Runs the preprocessing step to find the LCA in O(|V| log(|V|)) time and space.
         /// </summary>
-        /// <param name="root">roots of the forest</param>
+        /// <param name="roots">roots of the forest</param>
         private void Run(ICollection<HNode> roots)
         {
-            CheckTree(roots);
+            // CheckTree(roots);
             int numberOfNodes = MapAllNodes(roots);
             maxLevel = 1 + Log2((uint)numberOfNodes);
             DetermineEulerTours(roots, numberOfNodes);
@@ -139,6 +110,7 @@ namespace SEE.Layout.Utils
         /// <summary>
         /// Creates the mapping of nodes onto integers and the index list.
         /// </summary>
+        /// <param name="roots">roots of the forest</param>
         private int MapAllNodes(ICollection<HNode> roots)
         {
             ICollection<HNode> allNodes = AllNodes(roots);
@@ -220,7 +192,7 @@ namespace SEE.Layout.Utils
         }
 
         /// <summary>
-        /// Determines the RMQ. See the paper.
+        /// Determines the Range Minimum Query (RMQ). See the paper.
         /// </summary>
         private void DetermineRMQ()
         {
@@ -257,8 +229,11 @@ namespace SEE.Layout.Utils
 
         /// <summary>
         /// Determines the Euler tours for all subtrees rooted by any of the given roots.
-        /// Computes eulerTour, level, and representative.
+        /// Computes <see cref="eulerTour"/>, <see cref="level"/>, <see cref="representative"/>,
+        /// <see cref="numberComponent"/>, and <see cref="tree"/>.
         /// </summary>
+        /// <param name="roots">list of root nodes</param>
+        /// <param name="numberOfNodes">number of nodes in the forest</param>
         private void DetermineEulerTours(ICollection<HNode> roots, int numberOfNodes)
         {
             eulerTour = new int[2 * numberOfNodes];
@@ -307,7 +282,7 @@ namespace SEE.Layout.Utils
         /// </summary>
         /// <param name="nodeA">first node</param>
         /// <param name="nodeB">second</param>
-        /// <returns></returns>
+        /// <returns>lowest common ancestor</returns>
         public HNode LCA(HNode nodeA, HNode nodeB)
         {
             if (!nodeMap.TryGetValue(nodeA, out int indexOfA))
@@ -327,16 +302,14 @@ namespace SEE.Layout.Utils
             // If a and b are in different components, they do not have an LCA
             if (tree[indexOfA] != tree[indexOfB] || tree[indexOfA] == 0)
             {
-                return default(HNode);
+                return default;
             }
             indexOfA = representative[indexOfA];
             indexOfB = representative[indexOfB];
 
             if (indexOfA > indexOfB)
             {
-                int swap = indexOfA;
-                indexOfA = indexOfB;
-                indexOfB = swap;
+                (indexOfB, indexOfA) = (indexOfA, indexOfB);
             }
 
             int l = log2[indexOfB - indexOfA + 1];
@@ -357,12 +330,12 @@ namespace SEE.Layout.Utils
         private class NodeToIntegerMap
         {
             /// <summary>
-            /// The mapping from nodes onto integers, i.e., the inverse of indexList.
+            /// The mapping from nodes onto integers, i.e., the inverse of <see cref="indexList"/>.
             /// </summary>
             private readonly Dictionary<HNode, int> nodeMap;
 
             /// <summary>
-            /// The mapping from integers onto nodes, i.e., the inverse of nodeMap.
+            /// The mapping from integers onto nodes, i.e., the inverse of <see cref="nodeMap"/>.
             /// </summary>
             private readonly HNode[] indexList;
 
@@ -385,7 +358,7 @@ namespace SEE.Layout.Utils
             }
 
             /// <summary>
-            /// Yields the mapping from nodes onto integers, i.e., the inverse of indexList.
+            /// Yields the mapping from nodes onto integers, i.e., the inverse of <see cref="indexList"/>.
             /// </summary>
             /// <returns>a mapping from nodes onto integers</returns>
             public Dictionary<HNode, int> NodeMap()
@@ -394,7 +367,7 @@ namespace SEE.Layout.Utils
             }
 
             /// <summary>
-            /// Yields the mapping from integers onto nodes, i.e., the inverse of nodeMap.
+            /// Yields the mapping from integers onto nodes, i.e., the inverse of <see cref="nodeMap"/>.
             /// </summary>
             /// <returns>mapping from integers onto nodes</returns>
             public HNode[] IndexList()
@@ -402,5 +375,85 @@ namespace SEE.Layout.Utils
                 return indexList;
             }
         }
+
+        #region Utils
+        /// <summary>
+        /// Yields the floor of the binary logarithm of n.
+        /// </summary>
+        /// <param name="n">the input number</param>
+        /// <returns>floor of the binary logarithm</returns>
+        private static uint Log2(uint n)
+        {
+            n |= (n >> 1);
+            n |= (n >> 2);
+            n |= (n >> 4);
+            n |= (n >> 8);
+            n |= (n >> 16);
+
+            return (uint)(NumBitsSet(n) - 1);
+        }
+
+        /// <summary>
+        /// Returns the number of 1 bits in integer <paramref name="x"/>.
+        /// </summary>
+        /// <param name="x">the integer whose 1 bits should be counted</param>
+        /// <returns>number of 1 bits in integer <paramref name="x"/></returns>
+        private static int NumBitsSet(uint x)
+        {
+            x -= ((x >> 1) & 0x55555555);
+            x = (((x >> 2) & 0x33333333) + (x & 0x33333333));
+            x = (((x >> 4) + x) & 0x0f0f0f0f);
+            x += (x >> 8);
+            x += (x >> 16);
+
+            return (int)(x & 0x0000003f);
+        }
+        #endregion Utils
+
+        #region Debugging
+        /// <summary>
+        /// Checks if all trees rooted by a root listed in <paramref name="roots"/> are valid trees
+        /// (nodes can be reached  only once) and whether the parent-child information is consistent.
+        /// </summary>
+        /// <remarks>This method can be used for debugging.</remarks>
+        private static void CheckTree(ICollection<HNode> roots)
+        {
+            HashSet<HNode> visited = new();
+            foreach (HNode root in roots)
+            {
+                CheckTree(root, visited);
+            }
+
+            return;
+
+            static void CheckTree(HNode node, HashSet<HNode> visited)
+            {
+                if (visited.Contains(node))
+                {
+                    // node was already visited
+                    throw new Exception("Input is not a tree. Node " + node + " can be reached more than once.");
+                }
+                else
+                {
+                    visited.Add(node);
+                    HNode parent = node.Parent;
+                    // We should have visited the parent already in this pre-order depth-first traversal.
+                    if (parent != null && !visited.Contains(parent))
+                    {
+                        throw new Exception("Parent in tree is inconsistent. Violating node: " + parent);
+                    }
+                    foreach (HNode child in node.Children())
+                    {
+                        // Does child also believe it is a child of node?
+                        if (!ReferenceEquals(child.Parent, node))
+                        {
+                            throw new Exception("Parenting in tree is inconsistent: Child " + child + " is not a child of node " + parent);
+                        }
+                        CheckTree(child, visited);
+                    }
+                }
+            }
+        }
+        #endregion Debugging
     }
 }

@@ -36,6 +36,11 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly float streetHeight = 0.0001f;
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="Exception">thrown if there is no or more than one root in
+        /// <paramref name="gameNodes"/></exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> gameNodes,
             Vector3 centerPosition,
@@ -44,7 +49,7 @@ namespace SEE.Layout.NodeLayouts
             IList<ILayoutNode> layoutNodes = gameNodes.ToList();
             if (layoutNodes.Count == 0)
             {
-                throw new Exception("No nodes to be laid out.");
+                return new Dictionary<ILayoutNode, NodeTransform>();
             }
 
             if (layoutNodes.Count == 1)

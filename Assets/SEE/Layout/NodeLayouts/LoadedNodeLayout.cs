@@ -33,6 +33,11 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly string filename;
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="Exception">thrown if the file extension of <see cref="filename"/>
+        /// is not known or if the file could not be loaded</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
              Vector3 centerPosition,
@@ -67,7 +72,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                Debug.LogError($"Layout file {filename} does not exist. No layout could be loaded.\n");
+                throw new Exception($"Layout file {filename} does not exist. No layout could be loaded.");
             }
             return result;
         }

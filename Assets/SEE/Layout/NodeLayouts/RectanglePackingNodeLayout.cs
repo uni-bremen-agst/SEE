@@ -18,6 +18,11 @@ namespace SEE.Layout.NodeLayouts
             Name = "Rectangle Packing";
         }
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="System.Exception">thrown if there is more than one root in
+        /// <paramref name="layoutNodes"/></exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout
             (IEnumerable<ILayoutNode> layoutNodes,
             Vector3 centerPosition,
@@ -40,10 +45,10 @@ namespace SEE.Layout.NodeLayouts
                 {
                     if (node.IsLeaf)
                     {
-                        // All leaves maintain their original size. Pack assumes that
-                        // their sizes are already set in layoutResult.
-                        // We add the padding upfront. Padding is added on both sides.
-                        // The padding will later be removed again.
+                        /// All leaves maintain their original size. Pack assumes that
+                        /// their sizes are already set in <paramref name="layoutNodes"/>.
+                        /// We add the padding upfront. Padding is added on both sides.
+                        /// The padding will later be removed again.
                         Vector3 scale = node.AbsoluteScale;
                         float padding = Padding(scale.x, scale.z);
                         scale.x += padding;

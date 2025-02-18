@@ -47,8 +47,8 @@ namespace SEE.DataModel.DG.IO
         /// <param name="path">path of the GXL data</param>
         /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
         /// <param name="basePath">the base path of the graph</param>
-        /// <param name="token">token with which the loading can be cancelled</param>
         /// <param name="changePercentage">to report progress</param>
+        /// <param name="token">token with which the loading can be cancelled</param>
         /// <param name="logger">logger to log the output</param>
         /// <returns>loaded graph</returns>
         public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,

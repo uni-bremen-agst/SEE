@@ -26,7 +26,7 @@ namespace SEE.Game.CityRendering
         public Node ItsNode => Node;
 
         /// <summary>
-        /// See See <see cref="IGameNode.ID"/>.
+        /// See <see cref="IGameNode.ID"/>.
         /// </summary>
         public override string ID => Node.ID;
 
@@ -49,6 +49,11 @@ namespace SEE.Game.CityRendering
             return Node.Type == typeName;
         }
 
+        /// <summary>
+        /// Human-readable representation of this layout node for debugging purposes.
+        /// </summary>
+        /// <returns>combination of <see cref="ID"/>, <see cref="ILayoutNode.Level"/>,
+        /// <see cref="ILayoutNode.IsLeaf"/> and <see cref="ILayoutNode.Parent"/></returns>
         public override string ToString()
         {
             string result = base.ToString();

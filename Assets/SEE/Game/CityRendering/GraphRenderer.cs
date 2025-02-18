@@ -324,6 +324,13 @@ namespace SEE.Game.CityRendering
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
+
+            // FIXME: Should we add "doNotAddUniqueRoot ? parent.ContainingCity().gameObject"
+            // to the RootGameNode argument?
+            // This case distinction regarding the parent is necessary for the later loading
+            // of subgraphs (implementation or architecture) when using the initial reflexion
+            // city. If parent were used for this, incorrect nodes will be recognized as the root
+            // when the subgraph is loaded.
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
@@ -434,14 +441,14 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// Returns the node layouter according to the settings. This method just returns
-        /// the layouter, it does not actually calculate the layout.
+        /// the layouter; it does not actually calculate the layout.
         /// </summary>
         /// <returns>node layout selected</returns>
         public NodeLayout GetLayout() => GetLayout(Settings.NodeLayoutSettings.Kind);
 
         /// <summary>
-        /// Returns the node layouter according to the settings. This method just returns the layouter,
-        /// it does not actually calculate the layout.
+        /// Returns the node layouter according to <paramref name="kind"/>. This method
+        /// just returns the layouter; it does not actually calculate the layout.
         /// </summary>
         /// <param name="kind">the kind of the node layout requested</param>
         /// <returns>node layout selected</returns>
@@ -488,13 +495,13 @@ namespace SEE.Game.CityRendering
         /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
         private NodeLayout GetArchitectureLayout(NodeLayoutAttributes nodeLayoutSettings)
         {
-            if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
+            if (nodeLayoutSettings.Architecture == NodeLayoutKind.FromFile)
             {
                 return new LoadedNodeLayout(nodeLayoutSettings.ArchitectureLayoutPath.Path);
             }
-            if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
+            if (nodeLayoutSettings.Architecture == NodeLayoutKind.Reflexion)
             {
-                throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+                throw new Exception("Reflexion layout cannot be used as an architecture layout.");
             }
             return GetLayout(nodeLayoutSettings.Architecture);
         }

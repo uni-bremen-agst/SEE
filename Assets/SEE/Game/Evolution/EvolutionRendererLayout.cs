@@ -142,14 +142,15 @@ namespace SEE.Game.Evolution
         }
 
         /// <summary>
-        /// Yields the collection of LayoutNodes corresponding to the given <paramref name="gameNodes"/>.
-        /// Each LayoutNode has the position, scale, and rotation of the game node. The graph node
-        /// attached to the game node is passed on to the LayoutNode so that the graph node data is
+        /// Yields the collection of <see cref="LayoutGraphNode"/>s corresponding to the given <paramref name="gameNodes"/>.
+        /// Each <see cref="LayoutGraphNode"/> has the position, scale, and rotation of the game node. The graph node
+        /// attached to the game node is passed on to the <see cref="LayoutGraphNode"/> so that the graph node data is
         /// available to the node layout (e.g., Parent or Children).
-        /// Sets also the node levels of all resulting LayoutNodes.
+        /// Sets also the node levels of all resulting <see cref="LayoutGraphNode"/>.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
+        /// <returns>collection of <see cref="LayoutGraphNode"/>s representing the information
+        /// of <paramref name="gameNodes"/> for layouting</returns>
         private static ICollection<LayoutGraphNode> ToAbstractLayoutNodes(ICollection<GameObject> gameNodes)
         {
             IList<LayoutGraphNode> result = new List<LayoutGraphNode>();

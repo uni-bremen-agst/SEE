@@ -16,9 +16,9 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         /// <param name="architectureProportion">the proportion of the longer edge of the available space that
         /// is occupied by the architecture; must be in [0, 1]</param>
-        /// <param name="architectureLayout">the layout to applied to the architecture nodes;
-        /// if none is given <see cref="TreemapLayout"/> will be used</param>
         /// <param name="implementationLayout">the layout to applied to the implementation nodes;
+        /// if none is given <see cref="TreemapLayout"/> will be used</param>
+        /// <param name="architectureLayout">the layout to applied to the architecture nodes;
         /// if none is given <see cref="TreemapLayout"/> will be used</param>
         /// <exception cref="ArgumentException">thrown if <paramref name="architectureProportion"/> is not in [0, 1]</exception>
         public ReflexionLayout(float architectureProportion, NodeLayout implementationLayout = null, NodeLayout architectureLayout = null)
@@ -200,24 +200,37 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Splits the code city into two areas - one for the implementation and one for the
-        /// architecture - along the longer edge of the code city in the proportion of
-        /// architectureLayoutProportion.
+        /// Splits the available rectangle for the code city into two areas - one for the
+        /// implementation and one for the architecture - along the longer edge of the
+        /// rectangle in the proportion of <paramref name="architectureLayoutProportion"/>.
         ///
-        /// The area of the implementation is returned in implemenationArea and the area of the
-        /// architecture in architectureArea.
+        /// The rectangle is specified by its center position <paramref name="centerPosition"/>,
+        /// and its <paramref name="width"/> and <paramref name="depth"/>.
         ///
-        /// The edge length of architectureArea is the length of the longer edge of code city multiplied
-        /// by architectureLayoutProportion.
+        /// The area of the implementation is returned in <paramref name="implementionArea"/>
+        /// and the area of the architecture in <paramref name="architectureArea"/>.
         ///
-        /// implementationArea and architectureArea together occupy exactly the space of codeCity.
+        /// The edge length of <paramref name="architectureArea"/> is the length of the longer edge
+        /// of the rectangle multiplied by <paramref name="architectureLayoutProportion"/>.
         ///
-        /// architectureLayoutProportion is assumed to be in [0, 1]. If architectureLayoutProportion
-        /// is 0 or less, the implementation takes all the space and the architecture area sits at the
-        /// end of the longer edge of the implementation with zero scale. If architectureLayoutProportion
+        /// <paramref name="implementionArea"/> and <paramref name="architectureArea"/> together
+        /// occupy exactly the space of the rectangle.
+        ///
+        /// <paramref name="architectureLayoutProportion"/> is assumed to be in [0, 1]. If
+        /// <paramref name="architectureLayoutProportion"/> is 0 or less, the implementation takes
+        /// all the space and the architecture area sits at the end of the longer edge of the
+        /// implementation with zero scale. If <paramref name="architectureLayoutProportion"/>
         /// is 1 or greater, the architecture takes all the space and the implementation area sits at the
         /// begin of the longer edge of the architecture with zero scale.
         /// </summary>
+        /// <param name="centerPosition">the center position of the rectangle in which to place
+        /// the implementation and architecture</param>
+        /// <param name="width">the width of the rectangle in which to place them</param>
+        /// <param name="depth">the depth of the rectangle in which to place them</param>
+        /// <param name="architectureLayoutProportion">the proportion of the longer edge of the available
+        /// space that should be allocated for the architecture; must be in [0, 1]</param>
+        /// <param name="implementionArea">the resulting area of the implementation</param>
+        /// <param name="architectureArea">the resulting area of the architecture</param>
         private static void Split(Vector3 centerPosition,
                                   float width,
                                   float depth,
