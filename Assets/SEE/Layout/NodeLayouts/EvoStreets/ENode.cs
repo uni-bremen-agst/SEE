@@ -107,7 +107,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// The rectangle as a human-readable string.
         /// </summary>
         /// <returns>rectangle as a human-readable string</returns>
-        public override string ToString()
+        public override readonly string ToString()
         {
             return $"[center={Center}, width={Width:F4}, depth={Depth:F4}]";
         }
@@ -208,10 +208,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// Adds the layout information of this <see cref="ENode"/> to the <paramref name="layoutResult"/>.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
         /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
-        public abstract void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight);
+        public abstract void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight);
 
         /// <summary>
         /// Prints this node with an indentation proportional to its <see cref="TreeDepth"/>. Can be used for debugging.
@@ -298,10 +297,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// Adds the layout information of this <see cref="ELeaf"/> to the <paramref name="layoutResult"/>.
         /// <seealso cref="ENode.ToLayout(ref Dictionary{ILayoutNode, NodeTransform}, float, float)"/>.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
         /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">will be ignored</param>
-        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
+        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
             layoutResult[GraphNode] = new NodeTransform(Rectangle.Center.X, Rectangle.Center.Y,
                                                          new Vector3 (Rectangle.Width, GraphNode.AbsoluteScale.y, Rectangle.Depth),
@@ -347,7 +345,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// <summary>
         /// The children of this inner node in the hierarchy.
         /// </summary>
-        private readonly List<ENode> children = new List<ENode>();
+        private readonly List<ENode> children = new();
 
         /// <summary>
         /// This is the rectangle for the street itself representing the inner node.
@@ -562,10 +560,9 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
         /// node. The attribute <see cref="Rectangle"/> is just the area enclosing this street and all
         /// representations of the descendants of this node.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate of the ground of this node to be added to <paramref name="layoutResult"/></param>
         /// <param name="layoutResult">layout where to add the layout information</param>
         /// <param name="streetHeight">the height of an inner node (depicted as street)</param>
-        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float groundLevel, float streetHeight)
+        public override void ToLayout(ref Dictionary<ILayoutNode, NodeTransform> layoutResult, float streetHeight)
         {
             layoutResult[GraphNode]
                 = new NodeTransform(street.Center.X, street.Center.Y,
@@ -573,7 +570,7 @@ namespace SEE.Layout.NodeLayouts.EvoStreets
                                     0);
             foreach (ENode child in children)
             {
-                child.ToLayout(ref layoutResult, groundLevel, streetHeight);
+                child.ToLayout(ref layoutResult, streetHeight);
             }
         }
     }
