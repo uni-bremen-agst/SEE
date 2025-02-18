@@ -45,10 +45,10 @@ namespace SEE.Layout.NodeLayouts
                 {
                     if (node.IsLeaf)
                     {
-                        /// All leaves maintain their original size. Pack assumes that
-                        /// their sizes are already set in <paramref name="layoutNodes"/>.
-                        /// We add the padding upfront. Padding is added on both sides.
-                        /// The padding will later be removed again.
+                        // All leaves maintain their original size. Pack assumes that
+                        // their sizes are already set in layoutNodes.
+                        // We add the padding upfront. Padding is added on both sides.
+                        // The padding will later be removed again.
                         Vector3 scale = node.AbsoluteScale;
                         float padding = Padding(scale.x, scale.z);
                         scale.x += padding;
