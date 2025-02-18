@@ -67,16 +67,20 @@ namespace SEE.Layout.NodeLayouts
             {
                 if (value is IncrementalTreeMapLayout layout)
                 {
-                    this.oldLayout = layout;
+                    oldLayout = layout;
                 }
                 else
                 {
                     throw new ArgumentException(
-                        "Predecessor of IncrementalTreeMapLayout was not a IncrementalTreeMapLayout.");
+                        $"Predecessor of {nameof(IncrementalTreeMapLayout)} was not an {nameof(IncrementalTreeMapLayout)}.");
                 }
             }
         }
 
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown if <paramref name="layoutNodes"/> is empty.</exception>
         protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
             List<ILayoutNode> layoutNodesList = layoutNodes.ToList();
@@ -96,6 +100,7 @@ namespace SEE.Layout.NodeLayouts
         /// and sets the <see cref="Node.DesiredSize"/>.
         /// Fills the <see cref="nodeMap"/> and the <see cref="iLayoutNodeMap"/>.
         /// </summary>
+        /// <param name="rectangle">the rectangle size in which to fit the node</param>
         private void InitNodes(Vector2 rectangle)
         {
             float totalSize = Roots.Sum(InitNode);
@@ -109,8 +114,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Creates a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
-        /// and continues recursively with the children of the ILayoutNode <paramref name="node"/>.
+        /// Creates a <see cref="Node"/> for the given <paramref name="node"/>
+        /// and continues recursively with the children of <paramref name="node"/>.
         /// Extends both <see cref="nodeMap"/> and <see cref="iLayoutNodeMap"/> by the node.
         /// </summary>
         /// <param name="node">node of the layout</param>
@@ -123,7 +128,7 @@ namespace SEE.Layout.NodeLayouts
 
             if (node.IsLeaf)
             {
-                // x and z lengths may differ; we need to consider the larger value
+                // x and z lengths may differ; we need to consider the larger value.
                 float size = Mathf.Max(node.AbsoluteScale.x, node.AbsoluteScale.z);
                 newNode.DesiredSize = size;
                 return size;
@@ -139,11 +144,11 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Calculates the layout for <paramref name="siblings"/> so that they fit in <paramref name="rectangle"/>.
         /// Works recursively on the children of each sibling.
-        /// Adds the actual layout to <see cref="layoutResult"/>
+        /// Adds the actual layout to <see cref="layoutResult"/>.
         /// </summary>
         /// <param name="siblings">nodes with same parent (or roots)</param>
         /// <param name="rectangle">area to place siblings</param>
-        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
+        /// <param name="groundLevel">the y-coordindate of the ground where all nodes will be placed</param>
         private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle, float groundLevel)
         {
             List<Node> nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
