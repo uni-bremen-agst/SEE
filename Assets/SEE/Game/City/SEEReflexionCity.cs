@@ -232,7 +232,7 @@ namespace SEE.Game.City
             Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.
-            await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);
+            await renderer.DrawGraphAsync(graph, root.GameObject());
             // Adds the graph to the existing reflexion graph.
             graph.Nodes().ForEach(node =>
             {

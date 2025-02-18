@@ -279,11 +279,8 @@ namespace SEE.Game.CityRendering
         /// immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
-        /// <param name="doNotAddUniqueRoot">if true and if there is no single root in <paramref name="graph"/>,
-        /// an artificial unique root will be added whose immediate children are the multiple roots of
-        /// <paramref name="graph"/></param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
+                                            CancellationToken token = default)
         {
             if (graph.NodeCount == 0)
             {
@@ -294,11 +291,8 @@ namespace SEE.Game.CityRendering
             // all nodes of the graph
             IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(graph.Nodes(), x => updateProgress?.Invoke(x * 0.5f), token);
 
-            // If we have multiple roots, we need to add a unique one, unless otherwise told.
-            if (!doNotAddUniqueRoot)
-            {
-                AddGameRootNodeIfNecessary(graph, nodeMap);
-            }
+            // If we have multiple roots, we need to add a unique one.
+            AddGameRootNodeIfNecessary(graph, nodeMap);
 
             // The representation of the nodes for the layout.
             IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
@@ -324,13 +318,6 @@ namespace SEE.Game.CityRendering
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
-
-            // FIXME: Should we add "doNotAddUniqueRoot ? parent.ContainingCity().gameObject"
-            // to the RootGameNode argument?
-            // This case distinction regarding the parent is necessary for the later loading
-            // of subgraphs (implementation or architecture) when using the initial reflexion
-            // city. If parent were used for this, incorrect nodes will be recognized as the root
-            // when the subgraph is loaded.
             GameObject rootGameNode = RootGameNode(parent);
             try
             {
