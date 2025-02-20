@@ -273,14 +273,20 @@ namespace SEE.Game.CityRendering
         /// If the <paramref name="graph"/> has multiple roots, a unique root will be added to <paramref name="graph"/>
         /// whose immediate children are all previous root nodes and a game object will be created for this new root.
         /// This, however, can be avoided by passing true to <paramref name="doNotAddUniqueRoot"/>.
+        ///
+        /// The game objects representing the nodes will be children of <paramref name="parent"/>, while
+        /// the game objects drawn for edges will always be children of the unique root game object representing
+        /// the code city as a whole.
         /// </summary>
-        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
-        /// <param name="parent">every game object drawn for roots of <paramref name="graph"/> will be become an
-        /// immediate child to this parent</param>
+        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor since
+        /// the node-type factories and the like are set up by the constructor</param>
+        /// <param name="parent">every game object drawn will be become an immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
+        /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
+        /// nodes in <paramref name="graph"/></param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default)
+                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
             if (graph.NodeCount == 0)
             {
@@ -292,7 +298,10 @@ namespace SEE.Game.CityRendering
             IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(graph.Nodes(), x => updateProgress?.Invoke(x * 0.5f), token);
 
             // If we have multiple roots, we need to add a unique one.
-            AddGameRootNodeIfNecessary(graph, nodeMap);
+            if (!doNotAddUniqueRoot)
+            {
+                AddGameRootNodeIfNecessary(graph, nodeMap);
+            }
 
             // The representation of the nodes for the layout.
             IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
@@ -700,33 +709,26 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the child object of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
-        /// If there is no such child or if there are more than one, an exception will
-        /// be thrown.
+        /// Returns the first immediate child object of the code-city object containing <paramref name="gameNode"/>
+        /// and tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="codeCity">game object representing a code city</param>
-        /// <returns>child object of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/></returns>
-        public static GameObject RootGameNode(GameObject codeCity)
+        /// <param name="gameNode">game object representing a node in a code city or a code city as a whole</param>
+        /// <returns>first immediate child object of the code-city object containing <paramref name="gameNode"/>
+        /// and tagged by <see cref="Tags.Node"/></returns>
+        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> is not contained in
+        /// a code city or if that code city has no child tagged by <see cref="Tags.Node"/></exception>
+        /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
+        private static GameObject RootGameNode(GameObject gameNode)
         {
-            GameObject result = null;
-            foreach (Transform child in codeCity.transform)
+            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            if (codeCity == null)
             {
-                if (child.CompareTag(Tags.Node))
-                {
-                    if (result == null)
-                    {
-                        result = child.gameObject;
-                    }
-                    else
-                    {
-                        throw new Exception($"Code city {codeCity.name} has multiple children tagged by {Tags.Node}"
-                            + $": {result.name} and {child.name}");
-                    }
-                }
+                throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
+            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
             if (result == null)
             {
-                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}");
+                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");
             }
             return result;
         }
