@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="CodeFacts" edgeids="true">
+    <node id="N1">
+      <type xlink:href="File"/>
+      <attr name="Metric.Width">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>4</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>EL4</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>EL4</string>
+      </attr>
+    </node>
+    <node id="N2">
+      <type xlink:href="File"/>
+      <attr name="Metric.Width">
+        <int>5</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>EL3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>EL3</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="File"/>
+      <attr name="Metric.Width">
+        <int>7</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>3</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>EL2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>EL2</string>
+      </attr>
+    </node>
+    <node id="N4">
+      <type xlink:href="File"/>
+      <attr name="Metric.Width">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>EL1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>EL1</string>
+      </attr>
+    </node>
+    <node id="N5">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>D1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D1</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>D2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2</string>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>D2A</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2A</string>
+      </attr>
+    </node>
+    <node id="N8">
+      <type xlink:href="Directory"/>
+      <attr name="Source.Name">
+        <string>D2B</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2B</string>
+      </attr>
+    </node>
+    <node id="N9">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>D2AF1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2AF1</string>
+      </attr>
+      <attr name="Metric.Width">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+    </node>
+    <node id="N10">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>D2AF2</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2AF2</string>
+      </attr>
+      <attr name="Metric.Width">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+    </node>
+    <node id="N11">
+      <type xlink:href="File"/>
+      <attr name="Source.Name">
+        <string>D2BF1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>D2BF1</string>
+      </attr>
+      <attr name="Metric.Width">
+        <int>8</int>
+      </attr>
+      <attr name="Metric.Depth">
+        <int>6</int>
+      </attr>
+      <attr name="Metric.Height">
+        <int>1</int>
+      </attr>
+    </node>
+    <edge id="E1" from="N1" to="N5">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E2" from="N2" to="N5">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N3" to="N5">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E4" from="N4" to="N5">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E5" from="N7" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N8" to="N6">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E7" from="N9" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E8" from="N10" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E9" from="N11" to="N8">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+  </graph>
+</gxl>

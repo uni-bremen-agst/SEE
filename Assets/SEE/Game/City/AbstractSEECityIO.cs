@@ -23,10 +23,6 @@ namespace SEE.Game.City
         /// </summary>
         private const string nodeTypesLabel = "NodeTypes";
         /// <summary>
-        /// Label in the configuration file for <see cref="CoseGraphSettings"/>.
-        /// </summary>
-        private const string coseGraphSettingsLabel = "CoseGraph";
-        /// <summary>
         /// Label in the configuration file for <see cref="ErosionSettings"/>.
         /// </summary>
         private const string erosionSettingsLabel = "ErosionIssues";
@@ -123,7 +119,6 @@ namespace SEE.Game.City
             NodeLayoutSettings.Save(writer, nodeLayoutSettingsLabel);
             EdgeLayoutSettings.Save(writer, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Save(writer, edgeSelectionSettingsLabel);
-            CoseGraphSettings.Save(writer, coseGraphSettingsLabel);
             MarkerAttributes.Save(writer, markerAttributesLabel);
         }
 
@@ -152,7 +147,6 @@ namespace SEE.Game.City
             NodeLayoutSettings.Restore(attributes, nodeLayoutSettingsLabel);
             EdgeLayoutSettings.Restore(attributes, edgeLayoutSettingsLabel);
             EdgeSelectionSettings.Restore(attributes, edgeSelectionSettingsLabel);
-            CoseGraphSettings.Restore(attributes, coseGraphSettingsLabel);
             MarkerAttributes.Restore(attributes, markerAttributesLabel);
         }
     }

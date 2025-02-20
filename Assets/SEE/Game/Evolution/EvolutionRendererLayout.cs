@@ -1,5 +1,6 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
+using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -84,11 +85,10 @@ namespace SEE.Game.Evolution
             List<GameObject> gameObjects = new();
 
             // The layout to be applied.
-            NodeLayout nodeLayout = Renderer.GetLayout(gameObject);
+            NodeLayout nodeLayout = Renderer.GetLayout();
 
             // Gather all nodes for the layout.
-            ignoreInnerNodes = !nodeLayout.IsHierarchical();
-            foreach (Node node in graph.Nodes().Where(node => !ignoreInnerNodes || node.IsLeaf()))
+            foreach (Node node in graph.Nodes())
             {
                 // All layouts (flat and hierarchical ones) must be able to handle leaves;
                 // hence, leaves can be added at any rate. For a hierarchical layout, we
@@ -114,15 +114,11 @@ namespace SEE.Game.Evolution
                 iNodeLayout.OldLayout = iOldLayout;
             }
 
-            // Calculate and apply the node layout
-            ICollection<LayoutGraphNode> layoutNodes = GraphRenderer.ToAbstractLayoutNodes(gameObjects);
-            // Note: Apply applies its results only on the layoutNodes but not on the game objects
-            // these layoutNodes represent. Here, we leave the game objects untouched. The layout
-            // must be later applied when we render a city. Here, we only store the layout for later use.
-            nodeLayout.Apply(layoutNodes);
+            // Calculate and apply the node layout.
+            ICollection<LayoutGraphNode> layoutNodes = ToAbstractLayoutNodes(gameObjects);
+            NodeLayout.Apply(nodeLayout.Create(layoutNodes, gameObject.transform.position,
+                                               new Vector2(gameObject.transform.lossyScale.x, gameObject.transform.lossyScale.z)));
             oldLayout = nodeLayout;
-            GraphRenderer.Fit(gameObject, layoutNodes);
-            GraphRenderer.Stack(gameObject, layoutNodes);
 
             if (edgesAreDrawn)
             {
@@ -143,6 +139,37 @@ namespace SEE.Game.Evolution
             // Anyhow, we do not need to apply the layout already now. That can be deferred
             // to the point in time when the city is actually visualized. Here, we just calculate
             // the layout for every graph in the graph series for later use.
+        }
+
+        /// <summary>
+        /// Yields the collection of <see cref="LayoutGraphNode"/>s corresponding to the given <paramref name="gameNodes"/>.
+        /// Each <see cref="LayoutGraphNode"/> has the position, scale, and rotation of the game node. The graph node
+        /// attached to the game node is passed on to the <see cref="LayoutGraphNode"/> so that the graph node data is
+        /// available to the node layout (e.g., Parent or Children).
+        /// Sets also the node levels of all resulting <see cref="LayoutGraphNode"/>.
+        /// </summary>
+        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
+        /// <returns>collection of <see cref="LayoutGraphNode"/>s representing the information
+        /// of <paramref name="gameNodes"/> for layouting</returns>
+        private static ICollection<LayoutGraphNode> ToAbstractLayoutNodes(ICollection<GameObject> gameNodes)
+        {
+            IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
+
+            foreach (GameObject gameObject in gameNodes)
+            {
+                Node node = gameObject.GetComponent<NodeRef>().Value;
+                LayoutGraphNode layoutNode = new(node)
+                {
+                    // We must transfer the scale from gameObject to layoutNode.
+                    // but the layout needs the game object's scale.
+                    // Rotation and CenterPosition are all zero. They will be computed by the layout,
+                    // Note: LayoutGraphNode does not make a distinction between local and absolute scale.
+                    AbsoluteScale = gameObject.transform.lossyScale
+                };
+                result.Add(layoutNode);
+            }
+            LayoutNodes.SetLevels(result);
+            return result;
         }
 
         /// <summary>

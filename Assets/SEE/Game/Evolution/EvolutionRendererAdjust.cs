@@ -69,8 +69,8 @@ namespace SEE.Game.Evolution
                 // hence, the two spaces may be different.
                 // We may need to transform layoutNode.LocalScale from world space to local space.
                 Vector3 localScale = gameNode.transform.parent == null ?
-                                         layoutNode.LocalScale
-                                       : gameNode.transform.parent.InverseTransformVector(layoutNode.LocalScale);
+                                         layoutNode.AbsoluteScale
+                                       : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
 
                 gameNode.NodeOperator()
                         .ScaleTo(localScale, AnimationLagFactor, updateEdges: false)

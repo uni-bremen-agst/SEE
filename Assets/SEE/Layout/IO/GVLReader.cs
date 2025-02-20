@@ -30,14 +30,14 @@ namespace SEE.Layout.IO
         /// <param name="logger">logger used to emit errors, warnings, etc.</param>
         public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, SEE.Utils.ILogger logger = null)
         {
-            this.Filename = filename;
-            this.Logger = logger;
+            Filename = filename;
+            Logger = logger;
             this.groundLevel = groundLevel;
             Reader = new XmlTextReader(filename)
             {
                 WhitespaceHandling = WhitespaceHandling.None
             };
-            this.GameNodes = ToMap(gameNodes);
+            GameNodes = ToMap(gameNodes);
             // The CS (icon size) values of the nested nodes. The icon size
             // of a node N is the CS value of its immediate parent node.
             // Root nodes do not have a parent, but will try to access the CS
@@ -80,7 +80,7 @@ namespace SEE.Layout.IO
         /// layout data of their containing node. ParentNode stores the necessary
         /// information obtained for a parent and requested by its children.
         /// </summary>
-        protected struct ParentNode
+        protected readonly struct ParentNode
         {
             /// <summary>
             /// The icon size attribute of the parent. This value specifies the
@@ -101,8 +101,8 @@ namespace SEE.Layout.IO
             /// <param name="gameNode">parent game node</param>
             public ParentNode(float cs, IGameNode gameNode)
             {
-                this.CS = cs;
-                this.GameNode = gameNode;
+                CS = cs;
+                GameNode = gameNode;
             }
         }
 
@@ -578,7 +578,7 @@ namespace SEE.Layout.IO
             // Although we assign the local scale here, the node is not yet contained in any
             // other node, in which case local scale and world-space scale are the same.
             // Nodes will be nested later by the client of this layout.
-            gameNode.LocalScale = scale;
+            gameNode.AbsoluteScale = scale;
             gameNode.CenterPosition = position;
         }
 

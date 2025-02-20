@@ -172,7 +172,7 @@ namespace SEE.Net.Dashboard
                                                                  TimeSpan.FromSeconds(TimeoutSeconds), throwOnTimeout: false);
             if (timeout)
             {
-                return new DashboardResult(new TimeoutException("Request timed out."));
+                return new DashboardResult(new TimeoutException($"Request timed out ({TimeoutSeconds} seconds)."));
             }
             DashboardResult result = request.result switch
             {

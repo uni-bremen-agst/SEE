@@ -28,9 +28,8 @@ namespace SEE.Layout
 
         private class LNode : IHierarchyNode<LNode>
         {
-            private LNode parent;
+            public LNode Parent { private set; get; }
 
-            public LNode Parent => parent;
 
             private int level;
 
@@ -59,8 +58,14 @@ namespace SEE.Layout
 
             public void AddChild(LNode child)
             {
-                child.parent = this;
+                child.Parent = this;
                 children.Add(child);
+            }
+
+            public void RemoveChild(LNode child)
+            {
+                children.Remove(child);
+                child.Parent = null;
             }
         }
 
@@ -110,7 +115,7 @@ namespace SEE.Layout
         public void TestChain()
         {
             //       root
-            //        |  
+            //        |
             //        a
             //        |
             //        b
@@ -142,7 +147,7 @@ namespace SEE.Layout
             //      a  b    c
             //     /\  |    /\
             //   a1 a2 b1 c1 c2
-            //            /\ 
+            //            /\
             //          c11 c12
 
             LNode root = NewVertex("root");
@@ -189,7 +194,7 @@ namespace SEE.Layout
             //      a  b    c
             //     /\  |    /\
             //   a1 a2 b1 c1 c2
-            //            /\ 
+            //            /\
             //          c11 c12
 
             LNode r1 = NewVertex("r1");

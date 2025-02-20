@@ -135,7 +135,7 @@ namespace SEE.Game
         /// If <paramref name="codeCity"/> is a node representing a code city,
         /// the result is considered the root of the graph.
         /// </summary>
-        /// <param name="codeCity">object representing a code city (generally tagged by Tags.CodeCity)</param>
+        /// <param name="codeCity">object representing a code city (tagged by <see cref="Tags.CodeCity"/>)</param>
         /// <returns>game object representing the root of the graph or null if there is none</returns>
         public static GameObject GetCityRootNode(GameObject codeCity)
         {
@@ -152,16 +152,19 @@ namespace SEE.Game
         /// <summary>
         /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
         /// <see cref="Tags.Node"/>.
+        /// If <paramref name="cityChildTransform"/> has no parent or if its parent is not tagged by
+        /// <see cref="Tags.Node"/>, <paramref name="cityChildTransform"/> will be returned.
         /// </summary>
         /// <param name="cityChildTransform">The child transform, to find the root for.</param>
         /// <returns>The root transform of given child, so the highest transform with the tag
         /// <see cref="Tags.Node"/>.</returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="cityChildTransform"/> is <c>null</c></exception>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="cityChildTransform"/>
+        /// is <c>null</c></exception>
         public static Transform GetCityRootTransformUpwards(Transform cityChildTransform)
         {
             if (cityChildTransform == null)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException(nameof(cityChildTransform));
             }
             Transform result = cityChildTransform;
             while (result.parent != null && result.parent.CompareTag(Tags.Node))
@@ -176,10 +179,12 @@ namespace SEE.Game
         /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
         /// This ancestor is assumed to carry the settings (layout information etc.).
         /// If none can be found, null will be returned.
+        /// If <paramref name="transform"/> is tagged by <see cref="Tags.CodeCity"/>,
+        /// it will be returned.
         /// </summary>
         /// <param name="transform">transform at which to start the search</param>
         /// <returns>closest ancestor transform in the game-object hierarchy tagged by
-        /// Tags.CodeCity or null</returns>
+        /// <see cref="Tags.CodeCity"/> or null</returns>
         public static Transform GetCodeCity(Transform transform)
         {
             Transform result = transform;

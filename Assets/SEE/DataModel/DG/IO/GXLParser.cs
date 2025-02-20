@@ -174,8 +174,11 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
         /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
+        /// <param name="changePercentage">to report progress</param>
         /// <param name="token">token with which the loading can be cancelled</param>
-        public virtual async UniTask LoadAsync(Stream gxl, string name, CancellationToken token = default)
+        public virtual async UniTask LoadAsync(Stream gxl, string name,
+                                               Action<float> changePercentage = null,
+                                               CancellationToken token = default)
         {
             Name = name;
 
@@ -193,6 +196,8 @@ namespace SEE.DataModel.DG.IO
             // e.g., "mystring" in <string>mystring</string>.
             // Defined only at the EndElement, e.g. </string> here.
             string lastText = string.Empty;
+
+            bool firstEdgeRead = false;
 
             try
             {
@@ -237,6 +242,11 @@ namespace SEE.DataModel.DG.IO
                                     StartNode();
                                     break;
                                 case State.InEdge:
+                                    if (!firstEdgeRead)
+                                    {
+                                       firstEdgeRead = true;
+                                       changePercentage?.Invoke(0.5f);
+                                    }
                                     StartEdge();
                                     break;
                                 case State.InType:
@@ -402,6 +412,7 @@ namespace SEE.DataModel.DG.IO
             {
                 Reader.Close();
                 await UniTask.SwitchToMainThread();
+                changePercentage?.Invoke(1.0f);
             }
 
             if (Context.Count > 0)

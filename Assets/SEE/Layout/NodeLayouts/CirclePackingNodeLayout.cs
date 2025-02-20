@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.CirclePacking;
-using SEE.Layout.NodeLayouts.Cose;
+﻿using SEE.Layout.NodeLayouts.CirclePacking;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,15 +9,9 @@ namespace SEE.Layout.NodeLayouts
     /// This layout packs circles closely together as a set of nested circles to decrease
     /// the total area of city.
     /// </summary>
-    public class CirclePackingNodeLayout : HierarchicalNodeLayout
+    public class CirclePackingNodeLayout : NodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public CirclePackingNodeLayout(float groundLevel)
-            : base(groundLevel)
+        static CirclePackingNodeLayout()
         {
             Name = "Circle Packing";
         }
@@ -29,7 +21,15 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="Exception">thrown if there is no root in <paramref name="gameNodes"/>
+        /// or if there is more than one root</exception>
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> layoutNodes,
+             Vector3 centerPosition,
+             Vector2 rectangle)
         {
             layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
 
@@ -47,9 +47,9 @@ namespace SEE.Layout.NodeLayouts
                 // exactly one root
                 ILayoutNode root = roots.FirstOrDefault();
                 float outRadius = PlaceNodes(root);
-                Vector3 position = new(0.0f, GroundLevel, 0.0f);
-                layoutResult[root] = new NodeTransform(position,
-                                                        GetScale(root, outRadius));
+                Vector2 position = Vector2.zero;
+                layoutResult[root] = new NodeTransform(position.x, position.y,
+                                                       GetScale(root, outRadius));
                 MakeGlobal(layoutResult, position, root.Children());
                 return layoutResult;
             }
@@ -57,30 +57,24 @@ namespace SEE.Layout.NodeLayouts
 
         /// <summary>
         /// "Globalizes" the layout. Initially, the position of children are assumed to be
-        /// relative to their parent, where the parent has position Vector3.zero. This
-        /// function adjusts the co-ordinates of all nodes to the world's co-ordinates.
-        /// We also adjust the ground level of each inner node by its level lift.
+        /// relative to their parent, where the parent has position (0, 0). This
+        /// function adjusts the X/Z co-ordinates of all nodes to the world's co-ordinates.
         /// </summary>
         /// <param name="layoutResult">the layout to be adjusted</param>
         /// <param name="position">the position of the parent of all children</param>
         /// <param name="children">the children to be laid out</param>
         private static void MakeGlobal
             (Dictionary<ILayoutNode, NodeTransform> layoutResult,
-             Vector3 position,
+             Vector2 position,
              ICollection<ILayoutNode> children)
         {
             foreach (ILayoutNode child in children)
             {
                 NodeTransform childTransform = layoutResult[child];
-                if (!child.IsLeaf)
-                {
-                    // The inner nodes will be slightly lifted along the y axis according to their
-                    // tree depth so that they can be stacked visually (level 0 is at the bottom).
-                    position.y += LevelLift(child);
-                }
-                childTransform.Position += position;
+                Vector2 childPosition = new Vector2(childTransform.X, childTransform.Z) + position;
+                childTransform.MoveTo(childPosition.x, childPosition.y);
                 layoutResult[child] = childTransform;
-                MakeGlobal(layoutResult, childTransform.Position, child.Children());
+                MakeGlobal(layoutResult, childPosition, child.Children());
             }
         }
 
@@ -103,7 +97,7 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                List<Circle> circles = new List<Circle>(children.Count);
+                List<Circle> circles = new(children.Count);
 
                 int i = 0;
                 foreach (ILayoutNode child in children)
@@ -132,7 +126,7 @@ namespace SEE.Layout.NodeLayouts
                     // Note: The position of the transform is currently only local, relative to the zero center
                     // within the parent node. The co-ordinates will later be adjusted to the world scope.
                     layoutResult[circle.GameObject]
-                         = new NodeTransform(new Vector3(circle.Center.x, GroundLevel, circle.Center.y),
+                         = new NodeTransform(circle.Center.x, circle.Center.y,
                                              GetScale(circle.GameObject, circle.Radius));
                 }
                 return outOuterRadius;
@@ -151,8 +145,8 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>the scale of <paramref name="node"/></returns>
         private static Vector3 GetScale(ILayoutNode node, float radius)
         {
-            return node.IsLeaf ? node.LocalScale
-                               : new Vector3(2 * radius, node.LocalScale.y, 2 * radius);
+            return node.IsLeaf ? node.AbsoluteScale
+                               : new Vector3(2 * radius, node.AbsoluteScale.y, 2 * radius);
         }
 
         /// <summary>
@@ -164,18 +158,8 @@ namespace SEE.Layout.NodeLayouts
         /// <returns>radius of the minimal circle containing the given block</returns>
         private static float LeafRadius(ILayoutNode block)
         {
-            Vector3 extent = block.LocalScale / 2.0f;
+            Vector3 extent = block.AbsoluteScale / 2.0f;
             return Mathf.Sqrt(extent.x * extent.x + extent.z * extent.z);
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

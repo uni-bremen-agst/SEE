@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.GO;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
@@ -101,97 +100,6 @@ namespace SEE.Game.City
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
             return UniTask.CompletedTask;
-        }
-
-        /// <summary>
-        /// Adds clone edges for nodes whose Euclidean distance is below a threshold.
-        ///
-        /// Note: This method was used for our VISSOFT 2022 publication and should be
-        /// removed when the research for it is done.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
-        [Obsolete("Remove after VISSOFT publication")]
-        private void AddCloneEdges()
-        {
-            float threshold = 2.75f;
-
-            // FIXME: To be removed after the VISSOFT paper submission.
-            if (LoadedGraph != null)
-            {
-                ISet<string> metrics = LoadedGraph.AllNumericNodeAttributes();
-                ZScoreScale zscore = new ZScoreScale(new List<Graph> { LoadedGraph }, metrics, true);
-                IList<Node> nodes = LoadedGraph.Nodes();
-                int numberOfEdgesAdded = 0;
-                int numberOfComparisons = 0;
-                float minimumDistance = float.MaxValue;
-                int numberOfClones = 0;
-                int numberOfLeaves = 0;
-
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    if (nodes[i].IsLeaf())
-                    {
-                        numberOfLeaves++;
-                        bool isClone = false;
-                        for (int j = i + 1; j < nodes.Count; j++)
-                        {
-                            if (nodes[j].IsLeaf())
-                            {
-                                numberOfComparisons++;
-                                float distance = Distance(metrics, zscore, nodes[i], nodes[j]);
-                                if (distance < minimumDistance)
-                                {
-                                    minimumDistance = distance;
-                                }
-                                if (distance <= threshold)
-                                {
-                                    //Debug.Log($"Distance({nodes[i].ID}, {nodes[j].ID}) = {distance} <= {threshold}: {distance <= threshold}.\n");
-                                    Debug.Log($"{nodes[i].ID};{nodes[j].ID};{distance}\n");
-                                    LoadedGraph.AddEdge(new Edge(nodes[i], nodes[j], "clone-" + distance));
-                                    numberOfEdgesAdded++;
-                                    isClone = true;
-                                }
-                            }
-                        }
-                        if (isClone)
-                        {
-                            numberOfClones++;
-                        }
-                    }
-                }
-                Debug.Log($"Added {numberOfEdgesAdded} clone edges for {numberOfComparisons} comparisons. Minimum distance = {minimumDistance}.\n");
-                Debug.Log($"Clone rate  {numberOfClones}/{numberOfLeaves} =  {(float)numberOfClones / numberOfLeaves}.\n");
-            }
-
-            float Distance(ISet<string> metrics, ZScoreScale zscore, Node left, Node right)
-            {
-                return Euclidean(GetMetrics(metrics, zscore, left), GetMetrics(metrics, zscore, right));
-            }
-
-            float[] GetMetrics(ISet<string> metrics, ZScoreScale zscore, Node node)
-            {
-                float[] result = new float[metrics.Count];
-                int i = 0;
-                foreach (string metric in metrics)
-                {
-                    result[i] = zscore.GetMetricValue(node, metric);
-                    i++;
-                }
-                return result;
-            }
-
-            float Euclidean(float[] leftVector, float[] rightVector)
-            {
-                float result = 0;
-                for (int i = 0; i < leftVector.Length; i++)
-                {
-                    float diff = leftVector[i] - rightVector[i];
-                    result += diff * diff;
-                }
-                return Mathf.Sqrt(result);
-            }
         }
 
         //----------------------------------------------------------------------------

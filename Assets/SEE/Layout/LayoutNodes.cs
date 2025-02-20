@@ -14,7 +14,7 @@ namespace SEE.Layout
         /// </summary>
         /// <param name="layoutNodes">nodes whose level is to be set</param>
         public static void SetLevels<T>(ICollection<T> layoutNodes)
-        where T : class, ILayoutNode
+        where T : ILayoutNode
         {
             foreach (T root in GetRoots(layoutNodes))
             {

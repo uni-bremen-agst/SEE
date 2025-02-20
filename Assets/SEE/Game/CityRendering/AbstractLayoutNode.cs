@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
+﻿using SEE.DataModel.DG;
 using SEE.Layout;
 using UnityEngine;
 
@@ -27,169 +26,34 @@ namespace SEE.Game.CityRendering
         public Node ItsNode => Node;
 
         /// <summary>
-        /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node
-        /// and the <paramref name="toLayoutNode"/> mapping. The mapping maps all graph nodes to be
-        /// laid out onto their corresponding layout node and is shared among all layout nodes.
-        /// The given <paramref name="node"/> will be added to <paramref name="toLayoutNode"/>.
+        /// See <see cref="IGameNode.ID"/>.
+        /// </summary>
+        public override string ID => Node.ID;
+
+        /// <summary>
+        /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node.
         /// </summary>
         /// <param name="node">graph node corresponding to this layout node</param>
-        /// <param name="toLayoutNode">the mapping of graph nodes onto LayoutNodes this node should be added to</param>
-        protected AbstractLayoutNode(Node node, IDictionary<Node, ILayoutNode> toLayoutNode)
+        protected AbstractLayoutNode(Node node)
         {
             Node = node;
-            ToLayoutNode = toLayoutNode;
-            ToLayoutNode[node] = this;
         }
 
         /// <summary>
-        /// The tree level of the node. Roots have level 0, for all other nodes the level is the
-        /// distance to its root.
+        /// Implementation of <see cref="ILayoutNode{T}.HasType(string)"/>.
         /// </summary>
-        private int level;
-
-        /// <summary>
-        /// The tree level of the node. Roots have level 0, for all other nodes the level is the
-        /// distance to its root.
-        /// </summary>
-        public int Level
+        /// <param name="typeName">Name of a node type</param>
+        /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
+        public override bool HasType(string typeName)
         {
-            get => level;
-            set => level = value;
+            return Node.Type == typeName;
         }
 
         /// <summary>
-        /// The mapping from graph nodes onto layout nodes. Every layout node created by any of the
-        /// constructors of this class or one of its subclasses will be added to it. All layout nodes
-        /// given to the layout will refer to the same mapping, i.e., <see cref="ToLayoutNode"/> is the
-        /// same for all. The mapping will be gathered by the constructor.
+        /// Human-readable representation of this layout node for debugging purposes.
         /// </summary>
-        protected readonly IDictionary<Node, ILayoutNode> ToLayoutNode;
-
-        /// <summary>
-        /// Whether this node represents a leaf.
-        /// </summary>
-        /// <returns>true if this node represents a leaf</returns>
-        public bool IsLeaf => Node.IsLeaf();
-
-        /// <summary>
-        /// A unique ID for a node: the ID of the graph node underlying this layout node.
-        /// </summary>
-        /// <returns>unique ID for this node</returns>
-        public string ID => Node.ID;
-
-        /// <summary>
-        /// The parent of this node. May be null if it has none.
-        ///
-        /// Note: Parent may be null even if the underlying graph node actually has a
-        /// parent in the graph, yet that parent was never passed to any of the
-        /// constructors of this class. For instance, non-hierarchical layouts will
-        /// receive only leaf nodes, i.e., their parents will not be passed to the
-        /// layout, in which case Parent will be null.
-        /// </summary>
-        public ILayoutNode Parent
-        {
-            get
-            {
-                if (Node.Parent == null)
-                {
-                    // The node does not have a parent in the original graph.
-                    return null;
-                }
-                else if (ToLayoutNode.TryGetValue(Node.Parent, out ILayoutNode result))
-                {
-                    // The node has a parent in the original graph and that parent was passed to the layout.
-                    return result;
-                }
-                else
-                {
-                    // The node has a parent in the original graph, but it was not passed to the layout.
-                    return null;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The set of children of this node. Note: For nodes for which IsLeaf
-        /// is true, the empty list will be returned.
-        ///
-        /// Note: If a child of the node in the underlying graph, has no
-        /// corresponding layout node (<see cref="ToLayoutNode"/>), it will be ignored silently.
-        /// This is useful in situation where only a subset of nodes is to be considered for a layout.
-        /// </summary>
-        /// <returns>children of this node</returns>
-        public ICollection<ILayoutNode> Children()
-        {
-            IList<ILayoutNode> result;
-            if (!IsLeaf)
-            {
-                IList<Node> children = Node.Children();
-                result = new List<ILayoutNode>(children.Count);
-                foreach (Node node in children)
-                {
-                    if (ToLayoutNode.TryGetValue(node, out ILayoutNode layoutNode))
-                    {
-                        result.Add(layoutNode);
-                    }
-                    //else
-                    //{
-                    //    Debug.LogError($"Child {node.ID} of {ID} has no corresponding layout node.\n");
-                    //}
-                }
-            }
-            else
-            {
-                result = new List<ILayoutNode>();
-            }
-            return result;
-        }
-
-        public void SetOrigin()
-        {
-            CenterPosition = relativePosition + sublayoutRoot.CenterPosition;
-        }
-
-        public void SetRelative(ILayoutNode node)
-        {
-            relativePosition.x -= node.CenterPosition.x;
-            relativePosition.z -= node.CenterPosition.z;
-            sublayoutRoot = node;
-        }
-
-        public ICollection<ILayoutNode> Successors
-        {
-            get
-            {
-                ICollection<ILayoutNode> successors = new List<ILayoutNode>();
-                foreach (Edge edge in Node.Outgoings)
-                {
-                    successors.Add(ToLayoutNode[edge.Target]);
-                }
-                return successors;
-            }
-        }
-
-        // Features defined by LayoutNode that must be implemented by subclasses.
-        public abstract Vector3 LocalScale { get; set; }
-        public abstract Vector3 AbsoluteScale { get; }
-
-        public abstract void ScaleBy(float factor);
-        public abstract Vector3 CenterPosition { get; set; }
-        public abstract float Rotation { get; set; }
-        public abstract Vector3 Roof { get; }
-        public abstract Vector3 Ground { get; }
-
-        private Vector3 relativePosition;
-        private bool isSublayoutNode;
-        private bool isSublayoutRoot;
-        private Sublayout sublayout;
-        private ILayoutNode sublayoutRoot;
-
-        public Vector3 RelativePosition { get => relativePosition; set => relativePosition = value; }
-        public bool IsSublayoutNode { get => isSublayoutNode; set => isSublayoutNode = value; }
-        public bool IsSublayoutRoot { get => isSublayoutRoot; set => isSublayoutRoot = value; }
-        public Sublayout Sublayout { get => sublayout; set => sublayout = value; }
-        public ILayoutNode SublayoutRoot { get => sublayoutRoot; set => sublayoutRoot = value; }
-
+        /// <returns>combination of <see cref="ID"/>, <see cref="ILayoutNode.Level"/>,
+        /// <see cref="ILayoutNode.IsLeaf"/> and <see cref="ILayoutNode.Parent"/></returns>
         public override string ToString()
         {
             string result = base.ToString();
@@ -197,6 +61,5 @@ namespace SEE.Game.CityRendering
                 + " Parent=" + (Parent != null ? Parent.ID : "<NO PARENT>");
             return result;
         }
-
     }
 }

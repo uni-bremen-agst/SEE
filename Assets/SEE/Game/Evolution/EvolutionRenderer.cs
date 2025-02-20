@@ -193,12 +193,6 @@ namespace SEE.Game.Evolution
         /// </summary>
         private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
-        /// <summary>
-        /// If true, inner nodes should not be rendered. This will be true if a non-hierarchical
-        /// layout is applied.
-        /// </summary>
-        private bool ignoreInnerNodes = true;
-
         #region User Messages
 
         /// <summary>

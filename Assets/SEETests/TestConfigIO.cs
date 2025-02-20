@@ -1,14 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using NUnit.Framework;
-using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GraphProviders;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Tools.RandomGraphs;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -701,7 +698,6 @@ namespace SEE.Utils
             AreEqualEdgeLayoutSettings(expected.EdgeLayoutSettings, actual.EdgeLayoutSettings);
             AreEqualEdgeSelectionSettings(expected.EdgeSelectionSettings, actual.EdgeSelectionSettings);
             AreEqualErosionSettings(expected.ErosionSettings, actual.ErosionSettings);
-            AreEqualCoseGraphSettings(expected.CoseGraphSettings, actual.CoseGraphSettings);
             AreEqual(expected.MarkerAttributes, actual.MarkerAttributes);
         }
 
@@ -887,7 +883,6 @@ namespace SEE.Utils
             WipeOutEdgeLayoutSettings(city);
             WipeOutEdgeSelectionSettings(city.EdgeSelectionSettings);
             WipeOutErosionSettings(city);
-            WipeOutCoseGraphSettings(city);
             WipeOutMarkerAttributes(city.MarkerAttributes);
         }
 
@@ -907,50 +902,10 @@ namespace SEE.Utils
         /// <param name="city">the city whose attributes are to be re-assigned</param>
         private static void WipeOutNodeTypes(AbstractSEECity city)
         {
-            foreach (var settings in city.NodeTypes.Values)
+            foreach (VisualNodeAttributes settings in city.NodeTypes.Values)
             {
                 WipeOutNodeSettings(settings);
             }
-        }
-
-        private static void WipeOutCoseGraphSettings(AbstractSEECity city)
-        {
-            // CoseGraphSettings
-            city.CoseGraphSettings.EdgeLength++;
-            city.CoseGraphSettings.UseSmartIdealEdgeCalculation = !city.CoseGraphSettings.UseSmartIdealEdgeCalculation;
-            city.CoseGraphSettings.UseSmartMultilevelScaling = !city.CoseGraphSettings.UseSmartMultilevelScaling;
-            city.CoseGraphSettings.PerLevelIdealEdgeLengthFactor++;
-            city.CoseGraphSettings.UseSmartRepulsionRangeCalculation = !city.CoseGraphSettings.UseSmartRepulsionRangeCalculation;
-            city.CoseGraphSettings.GravityStrength++;
-            city.CoseGraphSettings.CompoundGravityStrength++;
-            city.CoseGraphSettings.RepulsionStrength++;
-            city.CoseGraphSettings.MultiLevelScaling = !city.CoseGraphSettings.MultiLevelScaling;
-            city.CoseGraphSettings.ListInnerNodeToggle = new Dictionary<string, bool>() { { "ID1", true }, { "ID2", false } };
-            city.CoseGraphSettings.InnerNodeLayout = new Dictionary<string, NodeLayoutKind>() { { "ID1", NodeLayoutKind.Manhattan }, { "ID2", NodeLayoutKind.Balloon } };
-            city.CoseGraphSettings.InnerNodeShape = new Dictionary<string, NodeShapes>() { { "ID1", NodeShapes.Blocks }, { "ID2", NodeShapes.Cylinders } };
-            city.CoseGraphSettings.LoadedForNodeTypes = new Dictionary<string, bool>() { { "ID1", false }, { "ID2", true } };
-            city.CoseGraphSettings.UseCalculationParameter = !city.CoseGraphSettings.UseCalculationParameter;
-            city.CoseGraphSettings.UseIterativeCalculation = !city.CoseGraphSettings.UseIterativeCalculation;
-        }
-
-        private static void AreEqualCoseGraphSettings(CoseGraphAttributes expected, CoseGraphAttributes actual)
-        {
-            // CoseGraphSettings
-            Assert.AreEqual(expected.EdgeLength, actual.EdgeLength);
-            Assert.AreEqual(expected.UseSmartIdealEdgeCalculation, actual.UseSmartIdealEdgeCalculation);
-            Assert.AreEqual(expected.UseSmartMultilevelScaling, actual.UseSmartMultilevelScaling);
-            Assert.AreEqual(expected.PerLevelIdealEdgeLengthFactor, actual.PerLevelIdealEdgeLengthFactor);
-            Assert.AreEqual(expected.UseSmartRepulsionRangeCalculation, actual.UseSmartRepulsionRangeCalculation);
-            Assert.AreEqual(expected.GravityStrength, actual.GravityStrength);
-            Assert.AreEqual(expected.CompoundGravityStrength, actual.CompoundGravityStrength);
-            Assert.AreEqual(expected.RepulsionStrength, actual.RepulsionStrength);
-            Assert.AreEqual(expected.MultiLevelScaling, actual.MultiLevelScaling);
-            CollectionAssert.AreEquivalent(expected.ListInnerNodeToggle, actual.ListInnerNodeToggle);
-            CollectionAssert.AreEquivalent(expected.InnerNodeLayout, actual.InnerNodeLayout);
-            CollectionAssert.AreEquivalent(expected.InnerNodeShape, actual.InnerNodeShape);
-            CollectionAssert.AreEquivalent(expected.LoadedForNodeTypes, actual.LoadedForNodeTypes);
-            Assert.AreEqual(expected.UseCalculationParameter, actual.UseCalculationParameter);
-            Assert.AreEqual(expected.UseIterativeCalculation, actual.UseIterativeCalculation);
         }
 
         private static void WipeOutErosionSettings(AbstractSEECity city)
@@ -1043,7 +998,7 @@ namespace SEE.Utils
 
         private static void WipeOutNodeLayoutSettings(AbstractSEECity city)
         {
-            city.NodeLayoutSettings.Kind = NodeLayoutKind.CompoundSpringEmbedder;
+            city.NodeLayoutSettings.Kind = NodeLayoutKind.Balloon;
             city.NodeLayoutSettings.LayoutPath.Path = "no path found";
         }
 

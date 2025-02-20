@@ -113,13 +113,12 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentNullException(nameof(city));
             }
-            string graphSuffix = $" ({cityName})";
-            CityName += graphSuffix;
-            Graph architectureGraph = new("", $"Compiler{graphSuffix}");
+            CityName = cityName;
+            Graph architectureGraph = new("", $"Architecture {cityName}");
             changePercentage?.Invoke(0.33f);
-            Graph implementationGraph = new("", $"Files{graphSuffix}");
+            Graph implementationGraph = new("", $"Implementation {cityName}");
             changePercentage?.Invoke(0.66f);
-            Graph mappingGraph = new("", $"EmptyMapping{graphSuffix}");
+            Graph mappingGraph = new("", $"Mapping {cityName}");
             changePercentage?.Invoke(1.0f);
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }

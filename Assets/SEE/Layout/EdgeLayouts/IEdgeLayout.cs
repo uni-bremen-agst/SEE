@@ -38,7 +38,7 @@ namespace SEE.Layout.EdgeLayouts
         /// ancestors of any nodes whose edges are to be drawn</param>
         /// <param name="edges">edges for which to add way points</param>
         public abstract void Create<T>(IEnumerable<T> nodes, IEnumerable<ILayoutEdge<T>> edges)
-            where T : ILayoutNode, IHierarchyNode<ILayoutNode>;
+            where T : ILayoutNode;
 
         /// <summary>
         /// Orientation of the edges;

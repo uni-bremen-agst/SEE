@@ -348,6 +348,8 @@ namespace SEE.Controls.Actions
                 _ => throw new ArgumentOutOfRangeException()
             });
 
+            // We want to empower the user to load the implementation and architecture, separately.
+            // This method loads only the implementation.
             void LoadImplementation()
             {
                 LoadReflexionDataProperty dialog = new();
@@ -355,6 +357,7 @@ namespace SEE.Controls.Actions
                 WaitForInputAsync(dialog).Forget();
             }
 
+            // This method loads only the architecture.
             void LoadArchitecture()
             {
                 LoadReflexionDataProperty dialog = new();
@@ -366,17 +369,17 @@ namespace SEE.Controls.Actions
             {
                 await UniTask.WaitWhile(dialog.WaitForInputOrCancel);
                 SEEReflexionCity city = graphElement.GameObject().ContainingCity<SEEReflexionCity>();
-                if (dialog.TryGetImplementationDataPaths(out DataPath implGXL, out DataPath projectFolder))
+                if (dialog.TryGetImplementationDataPaths(out DataPath implDataPath, out DataPath projectFolder))
                 {
-                    city.LoadAndDrawSubgraphAsync(implGXL, projectFolder).Forget();
-                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implGXL, projectFolder).Execute();
+                    city.LoadAndDrawSubgraphAsync(implDataPath, projectFolder).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implDataPath, projectFolder).Execute();
 
                 }
 
-                if (dialog.TryGetArchitectureDataPath(out DataPath archGXL))
+                if (dialog.TryGetArchitectureDataPath(out DataPath archDataPath))
                 {
-                    city.LoadAndDrawSubgraphAsync(archGXL).Forget();
-                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, true, archGXL).Execute();
+                    city.LoadAndDrawSubgraphAsync(archDataPath).Forget();
+                    new LoadPartOfReflexionCityNetAction(city.transform.parent.name, true, archDataPath).Execute();
                 }
             }
         }

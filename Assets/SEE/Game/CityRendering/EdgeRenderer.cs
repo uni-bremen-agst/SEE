@@ -68,11 +68,8 @@ namespace SEE.Game.CityRendering
                 gameNodes.UnionWith(ascendants);
             }
 
-            // Mapping of graph nodes onto layout nodes.
-            IDictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
-
             // One layout game node for each game node.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(toLayoutNode, go));
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
 
             // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges.
 
@@ -82,13 +79,13 @@ namespace SEE.Game.CityRendering
             {
                 if (gameEdge.TryGetEdge(out Edge edge))
                 {
-                    layoutEdges.Add(new LayoutGraphEdge<ILayoutNode>(toLayoutNode[edge.Source], toLayoutNode[edge.Target], edge));
+                    layoutEdges.Add(new LayoutGraphEdge<ILayoutNode>(layoutNodes[edge.Source], layoutNodes[edge.Target], edge));
                 }
             }
 
             // All (graph/layout) nodes and edges are known.
             // We can now calculate the edge layout.
-            GetEdgeLayout().Create(layoutNodes, layoutEdges);
+            GetEdgeLayout().Create(layoutNodes.Values, layoutEdges);
 
             // Finally, we can prepare the result.
             IDictionary<string, ILayoutEdge<ILayoutNode>> result = new Dictionary<string, ILayoutEdge<ILayoutNode>>(layoutEdges.Count);
@@ -134,15 +131,14 @@ namespace SEE.Game.CityRendering
             // We add the ascendants of the source and target nodes in case the edge layout is hierarchical.
             AddAscendants(from, gameNodes);
             AddAscendants(to, gameNodes);
-            Dictionary<Node, ILayoutNode> nodeToLayoutNode = new();
             // The layout nodes corresponding to those game nodes.
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, go => new LayoutGameNode(nodeToLayoutNode, go));
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
 
             LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
             // We need fromLayoutNode and toLayoutNode to create a single layout edge to be passed
             // to the edge layouter.
-            foreach (LayoutGameNode layoutNode in layoutNodes)
+            foreach (LayoutGameNode layoutNode in layoutNodes.Values)
             {
                 if (layoutNode.ItsNode == edge.Source)
                 {
@@ -163,7 +159,7 @@ namespace SEE.Game.CityRendering
                 { new(fromLayoutNode, toLayoutNode, edge) };
 
             // Calculate the edge layout (for the single edge only).
-            GameObject resultingEdge = EdgeLayout(layoutNodes, layoutEdges, addToGraphElementIDMap).Single();
+            GameObject resultingEdge = EdgeLayout(layoutNodes.Values, layoutEdges, addToGraphElementIDMap).Single();
 
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
@@ -280,8 +276,8 @@ namespace SEE.Game.CityRendering
                                                   GameObject parent,
                                                   bool addToGraphElementIDMap)
         {
-            ICollection<LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
-            ICollection<GameObject> result = EdgeLayout(layoutNodes, ConnectingEdges(layoutNodes), addToGraphElementIDMap);
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
+            ICollection<GameObject> result = EdgeLayout(layoutNodes.Values, ConnectingEdges(layoutNodes.Values), addToGraphElementIDMap);
             AddToParent(result, parent);
             return result;
         }
@@ -319,7 +315,7 @@ namespace SEE.Game.CityRendering
         /// <param name="layoutNodes">nodes whose connecting edges are to be laid out</param>
         /// <returns>laid out edges</returns>
         public ICollection<LayoutGraphEdge<T>> LayoutEdges<T>(ICollection<T> layoutNodes)
-            where T : AbstractLayoutNode, IHierarchyNode<ILayoutNode>
+            where T : AbstractLayoutNode
         {
             if (layoutNodes == null || layoutNodes.Count == 0)
             {
@@ -354,7 +350,7 @@ namespace SEE.Game.CityRendering
                                                                           bool addToGraphElementIDMap,
                                                                           Action<float> updateProgress = null,
                                                                           CancellationToken token = default)
-            where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
+            where T : LayoutGameNode
         {
             IEdgeLayout layout = GetEdgeLayout();
             if (layout == null)
@@ -396,7 +392,7 @@ namespace SEE.Game.CityRendering
         private ICollection<GameObject> EdgeLayout<T>(ICollection<T> gameNodes,
                                                       ICollection<LayoutGraphEdge<T>> layoutEdges,
                                                       bool addToGraphElementIDMap)
-            where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
+            where T : LayoutGameNode
         {
             IEdgeLayout layout = GetEdgeLayout();
             EdgeFactory edgeFactory = new(layout, Settings.EdgeLayoutSettings.EdgeWidth);

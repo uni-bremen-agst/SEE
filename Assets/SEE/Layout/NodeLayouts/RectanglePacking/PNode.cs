@@ -10,7 +10,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// A node is aware of its assigned space rectangle.
         /// </summary>
-        public PRectangle Rectangle = new PRectangle();
+        public PRectangle Rectangle = new();
 
         /// <summary>
         /// Whether the rectangle is occupied.

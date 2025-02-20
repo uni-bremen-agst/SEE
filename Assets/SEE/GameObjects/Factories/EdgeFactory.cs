@@ -78,7 +78,7 @@ namespace SEE.GO
         /// <param name="edges">the layout edges for which to create game objects</param>
         /// <returns>game objects representing the <paramref name="edges"/></returns>
         public IEnumerable<GameObject> DrawEdges<T>(IEnumerable<T> nodes, ICollection<LayoutGraphEdge<T>> edges)
-            where T : LayoutGameNode, IHierarchyNode<ILayoutNode>
+            where T : LayoutGameNode
         {
             if (edges.Count == 0)
             {
