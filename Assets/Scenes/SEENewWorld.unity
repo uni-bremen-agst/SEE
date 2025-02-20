@@ -1729,6 +1729,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -4343,6 +4348,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -7911,6 +7921,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 0
@@ -9950,6 +9965,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 2
@@ -13926,6 +13946,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -20505,6 +20530,11 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 2
+      RelativePath: 
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
     AnimationKind: 2
@@ -29873,19 +29903,24 @@ MonoBehaviour:
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 3
+    Kind: 5
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
       pNorm: 1
       PaddingMm: 5
       GradientDescentPrecision: -4
-    Architecture: 3
+    Architecture: 7
     Implementation: 3
     LayoutPath:
       Root: 3
       RelativePath: /reflexion/compiler/Layout.sld
       AbsolutePath: 
+    ArchitectureLayoutPath:
+      Root: 3
+      RelativePath: /reflexion/compiler/ArchitectureLayout.sld
+      AbsolutePath: 
+    ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 3
     AnimationKind: 0
@@ -29929,21 +29964,6 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
-  ArchitectureNodeLayoutSettings:
-    Kind: 8
-    IncrementalTreeMap:
-      LocalMovesDepth: 3
-      LocalMovesBranchingLimit: 4
-      pNorm: 1
-      PaddingMm: 5
-      GradientDescentPrecision: -4
-    Architecture: 3
-    Implementation: 3
-    LayoutPath:
-      Root: 3
-      RelativePath: /reflexion/compiler/ArchitectureLayout.sld
-      AbsolutePath: 
-  ArchitectureLayoutProportion: 0.6
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
