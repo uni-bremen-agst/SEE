@@ -447,14 +447,14 @@ namespace SEE.Tools.LSP
             switch (messageParams.Type)
             {
                 case MessageType.Error:
-                    Debug.LogError(messageParams.Message);
+                    Debug.LogError(messageParams.Message + "\n");
                     break;
                 case MessageType.Warning:
-                    Debug.LogWarning(messageParams.Message);
+                    Debug.LogWarning(messageParams.Message + "\n");
                     break;
                 case MessageType.Info or MessageType.Log:
                 default:
-                    Debug.Log(messageParams.Message);
+                    Debug.Log(messageParams.Message + "\n");
                     break;
             }
         }

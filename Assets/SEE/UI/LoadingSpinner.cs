@@ -177,7 +177,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Running: {processMessage}");
+                Debug.Log($"Running: {processMessage}\n");
             }
 
             if (indeterminateProcesses.Add(processMessage) && !ReferenceEquals(loadingSpinner, null))
