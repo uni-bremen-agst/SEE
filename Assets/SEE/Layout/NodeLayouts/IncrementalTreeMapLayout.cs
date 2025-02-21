@@ -1,5 +1,3 @@
-using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.NodeLayouts.IncrementalTreeMap;
 using System;
 using System.Collections.Generic;
@@ -17,41 +15,26 @@ namespace SEE.Layout.NodeLayouts
     /// that can guarantee stability in the layouts over the series of graphs in the evolution
     /// while not neglecting the aspect of visual quality either.
     /// </summary>
-    public class IncrementalTreeMapLayout : HierarchicalNodeLayout, IIncrementalNodeLayout
+    public class IncrementalTreeMapLayout : NodeLayout, IIncrementalNodeLayout
     {
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level</param>
-        /// <param name="width">width of the rectangle in which to place all nodes in Unity units</param>
-        /// <param name="depth">width of the rectangle in which to place all nodes in Unity units</param>
         /// <param name="settings">the settings for the layout</param>
-        public IncrementalTreeMapLayout(float groundLevel,
-            float width,
-            float depth,
-            IncrementalTreeMapAttributes settings)
-            : base(groundLevel)
+        public IncrementalTreeMapLayout(IncrementalTreeMapAttributes settings)
+        {
+            this.settings = settings;
+        }
+
+        static IncrementalTreeMapLayout()
         {
             Name = "IncrementalTreeMap";
-            this.width = width;
-            this.depth = depth;
-            this.settings = settings;
         }
 
         /// <summary>
         /// The adjustable parameters for the layout.
         /// </summary>
         private readonly IncrementalTreeMapAttributes settings;
-
-        /// <summary>
-        /// The width of the rectangle in which to place all nodes in Unity units.
-        /// </summary>
-        private readonly float width;
-
-        /// <summary>
-        /// The depth of the rectangle in which to place all nodes in Unity units.
-        /// </summary>
-        private readonly float depth;
 
         /// <summary>
         /// The node layout we compute as a result.
@@ -84,17 +67,21 @@ namespace SEE.Layout.NodeLayouts
             {
                 if (value is IncrementalTreeMapLayout layout)
                 {
-                    this.oldLayout = layout;
+                    oldLayout = layout;
                 }
                 else
                 {
                     throw new ArgumentException(
-                        "Predecessor of IncrementalTreeMapLayout was not a IncrementalTreeMapLayout.");
+                        $"Predecessor of {nameof(IncrementalTreeMapLayout)} was not an {nameof(IncrementalTreeMapLayout)}.");
                 }
             }
         }
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes)
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown if <paramref name="layoutNodes"/> is empty.</exception>
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition, Vector2 rectangle)
         {
             List<ILayoutNode> layoutNodesList = layoutNodes.ToList();
             if (!layoutNodesList.Any())
@@ -102,10 +89,9 @@ namespace SEE.Layout.NodeLayouts
                 throw new ArgumentException("No nodes to be laid out.");
             }
 
-            this.Roots = LayoutNodes.GetRoots(layoutNodesList);
-            InitNodes();
-            Rectangle rectangle = new Rectangle(x: -width / 2.0f, z: -depth / 2.0f, width, depth);
-            CalculateLayout(Roots, rectangle);
+            Roots = LayoutNodes.GetRoots(layoutNodesList);
+            InitNodes(rectangle);
+            CalculateLayout(Roots, new Rectangle(x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y), groundLevel);
             return layoutResult;
         }
 
@@ -114,12 +100,13 @@ namespace SEE.Layout.NodeLayouts
         /// and sets the <see cref="Node.DesiredSize"/>.
         /// Fills the <see cref="nodeMap"/> and the <see cref="iLayoutNodeMap"/>.
         /// </summary>
-        private void InitNodes()
+        /// <param name="rectangle">the rectangle size in which to fit the node</param>
+        private void InitNodes(Vector2 rectangle)
         {
             float totalSize = Roots.Sum(InitNode);
 
             // adjust the absolute size to the rectangle of the layout
-            float adjustFactor = (width * depth) / totalSize;
+            float adjustFactor = (rectangle.x * rectangle.y) / totalSize;
             foreach (Node node in nodeMap.Values)
             {
                 node.DesiredSize *= adjustFactor;
@@ -127,8 +114,8 @@ namespace SEE.Layout.NodeLayouts
         }
 
         /// <summary>
-        /// Creates a <see cref="Node"/> for the given <see cref="ILayoutNode"/> <paramref name="node"/>
-        /// and continues recursively with the children of the ILayoutNode <paramref name="node"/>.
+        /// Creates a <see cref="Node"/> for the given <paramref name="node"/>
+        /// and continues recursively with the children of <paramref name="node"/>.
         /// Extends both <see cref="nodeMap"/> and <see cref="iLayoutNodeMap"/> by the node.
         /// </summary>
         /// <param name="node">node of the layout</param>
@@ -141,8 +128,8 @@ namespace SEE.Layout.NodeLayouts
 
             if (node.IsLeaf)
             {
-                // x and z lengths may differ; we need to consider the larger value
-                float size = Mathf.Max(node.LocalScale.x, node.LocalScale.z);
+                // x and z lengths may differ; we need to consider the larger value.
+                float size = Mathf.Max(node.AbsoluteScale.x, node.AbsoluteScale.z);
                 newNode.DesiredSize = size;
                 return size;
             }
@@ -157,11 +144,12 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Calculates the layout for <paramref name="siblings"/> so that they fit in <paramref name="rectangle"/>.
         /// Works recursively on the children of each sibling.
-        /// Adds the actual layout to <see cref="layoutResult"/>
+        /// Adds the actual layout to <see cref="layoutResult"/>.
         /// </summary>
         /// <param name="siblings">nodes with same parent (or roots)</param>
         /// <param name="rectangle">area to place siblings</param>
-        private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle)
+        /// <param name="groundLevel">the y-coordindate of the ground where all nodes will be placed</param>
+        private void CalculateLayout(ICollection<ILayoutNode> siblings, Rectangle rectangle, float groundLevel)
         {
             List<Node> nodes = siblings.Select(n => nodeMap[n.ID]).ToList();
             // check if the old layout can be used to lay out siblings.
@@ -176,7 +164,7 @@ namespace SEE.Layout.NodeLayouts
                 ApplyIncrementalLayout(nodes, rectangle);
             }
 
-            AddToLayout(nodes);
+            AddToLayout(nodes, groundLevel);
 
             foreach (ILayoutNode node in siblings)
             {
@@ -187,7 +175,7 @@ namespace SEE.Layout.NodeLayouts
                 }
 
                 Rectangle childRectangle = nodeMap[node.ID].Rectangle;
-                CalculateLayout(children, childRectangle);
+                CalculateLayout(children, childRectangle, groundLevel);
             }
         }
 
@@ -321,7 +309,8 @@ namespace SEE.Layout.NodeLayouts
         /// Applies padding to the result.
         /// </summary>
         /// <param name="nodes">nodes with calculated layout</param>
-        private void AddToLayout(IEnumerable<Node> nodes)
+        /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
+        private void AddToLayout(IEnumerable<Node> nodes, float groundLevel)
         {
             foreach (Node node in nodes)
             {
@@ -335,31 +324,15 @@ namespace SEE.Layout.NodeLayouts
                     absolutePadding = 0;
                 }
 
-                Vector3 position = new Vector3(
-                    (float)(rectangle.X + rectangle.Width / 2.0d),
-                    GroundLevel,
-                    (float)(rectangle.Z + rectangle.Depth / 2.0d));
                 Vector3 scale = new Vector3(
                     (float)(rectangle.Width - absolutePadding),
-                    layoutNode.LocalScale.y,
+                    layoutNode.AbsoluteScale.y,
                     (float)(rectangle.Depth - absolutePadding));
 
-                layoutResult[layoutNode] = new NodeTransform(position, scale);
+                layoutResult[layoutNode] = new NodeTransform((float)(rectangle.X + rectangle.Width / 2.0d),
+                                                             (float)(rectangle.Z + rectangle.Depth / 2.0d),
+                                                             scale);
             }
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout
-        (ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
-            ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            // Must not be implemented because UsesEdgesAndSublayoutNodes() returns false
-            // and this method should never be called.
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

@@ -317,9 +317,7 @@ namespace SEE.Game.City
                     // there may now be multiple roots again.
                     relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
-
                 graphs[i] = relevantGraph;
-                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 

@@ -43,7 +43,7 @@ namespace SEE.Layout
                 ClearLayout(gameObjects, yIsStored);
 
                 // Read the saved layout.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(0, filename).Layout(gameObjects);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Create(gameObjects, Vector3.zero, Vector2.one);
                 //Dump(readLayout, 10);
 
                 Assert.AreEqual(savedLayout.Count, readLayout.Count); // no gameObject added or removed
@@ -63,7 +63,6 @@ namespace SEE.Layout
         [Test]
         public void TestSLDWriteRead()
         {
-            float groundLevel = -1;
             // SLD contains the height (y co-ordinate).
             bool yIsStored = true;
             string filename = Path.GetTempFileName() + Filenames.SLDExtension;
@@ -73,7 +72,7 @@ namespace SEE.Layout
                 ICollection<ILayoutNode> layoutNodes = NodeCreator.CreateNodes(howManyRootNodes: 9, howDeeplyNested: 0);
 
                 CalculateLayout(layoutNodes,
-                                out Dictionary<ILayoutNode, NodeTransform> _,
+                                out _,
                                 out Dictionary<string, NodeTransform> layoutMap);
 
                 //Dump(layoutMap, 10, "Created layout (y relates to the ground)");
@@ -82,15 +81,14 @@ namespace SEE.Layout
                 {
                     ICollection<GameObject> gameObjects = ToGameNodes(layoutMap);
                     IO.SLDWriter.Save(filename, gameObjects);
-                    //Dump(gameObjects, 10, "Saved layout (y relates to the center)");
+                    //Dump(gameObjects, 10, "Saved layout");
                 }
 
                 ClearLayout(layoutNodes, yIsStored);
 
                 // Read the saved layout.
-                // Note: groundLevel will be ignored when the layout was stored in SLD.
-                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(groundLevel, filename).Layout(layoutNodes);
-                //Dump(readLayout, 10, "Read layout (y relates to the ground)");
+                Dictionary<ILayoutNode, NodeTransform> readLayout = new LoadedNodeLayout(filename).Create(layoutNodes, Vector3.zero, Vector2.one);
+                //Dump(readLayout, 10, "Read layout");
 
                 Assert.AreEqual(layoutMap.Count, readLayout.Count); // no gameObject added or removed
                                                                     // Now layoutMap and readLayout should be the same including
@@ -102,6 +100,7 @@ namespace SEE.Layout
                 FileIO.DeleteIfExists(filename);
             }
 
+            // Returns a list of new game objects whose position and scale are retrieved from the given layoutNodes.
             static ICollection<GameObject> ToGameNodes(Dictionary<string, NodeTransform> layoutNodes)
             {
                 ICollection<GameObject> result = new List<GameObject>(layoutNodes.Count);
@@ -110,11 +109,7 @@ namespace SEE.Layout
                     GameObject go = GameObject.CreatePrimitive(PrimitiveType.Cube);
                     go.name = layoutNode.Key;
                     go.transform.localScale = layoutNode.Value.Scale;
-                    // position.y of a NodeTransform relates to the ground, while a
-                    // game objects position.y relates to the center; we need to lift it
-                    Vector3 position = layoutNode.Value.Position;
-                    position.y += go.transform.localScale.y / 2;
-                    go.transform.position = position;
+                    go.transform.position = layoutNode.Value.CenterPosition;
                     result.Add(go);
                 }
                 return result;
@@ -139,13 +134,13 @@ namespace SEE.Layout
             {
                 if (yIsStored)
                 {
-                    layoutNode.LocalScale = Vector3.zero;
+                    layoutNode.AbsoluteScale = Vector3.zero;
                     layoutNode.CenterPosition = Vector3.zero;
                 }
                 else
                 {
-                    layoutNode.LocalScale = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
-                    layoutNode.CenterPosition = new Vector3(0.0f, layoutNode.LocalScale.y, 0.0f);
+                    layoutNode.AbsoluteScale = new Vector3(0.0f, layoutNode.AbsoluteScale.y, 0.0f);
+                    layoutNode.CenterPosition = new Vector3(0.0f, layoutNode.AbsoluteScale.y, 0.0f);
                 }
             }
         }
@@ -175,12 +170,12 @@ namespace SEE.Layout
                     Assert.That(readTransform.Scale.y, Is.EqualTo(savedTransform.Scale.y).Within(floatTolerance));
                 }
                 Assert.That(readTransform.Scale.z, Is.EqualTo(savedTransform.Scale.z).Within(floatTolerance));
-                Assert.That(readTransform.Position.x, Is.EqualTo(savedTransform.Position.x).Within(floatTolerance));
+                Assert.That(readTransform.X, Is.EqualTo(savedTransform.X).Within(floatTolerance));
                 if (compareY)
                 {
-                    Assert.That(readTransform.Position.y, Is.EqualTo(savedTransform.Position.y).Within(floatTolerance));
+                    Assert.That(readTransform.CenterPosition.y, Is.EqualTo(savedTransform.CenterPosition.y).Within(floatTolerance));
                 }
-                Assert.That(readTransform.Position.z, Is.EqualTo(savedTransform.Position.z).Within(floatTolerance));
+                Assert.That(readTransform.Z, Is.EqualTo(savedTransform.Z).Within(floatTolerance));
                 Assert.AreEqual(savedTransform.Rotation, readTransform.Rotation);
             }
         }
@@ -199,8 +194,7 @@ namespace SEE.Layout
             out Dictionary<string, NodeTransform> layoutMap)
         {
             // Layout the nodes.
-            RectanglePackingNodeLayout packer = new(0.0f, 1.0f);
-            savedLayout = packer.Layout(gameObjects);
+            savedLayout = new RectanglePackingNodeLayout().Create(gameObjects, Vector3.zero, Vector2.one);
 
             // Apply the layout.
             layoutMap = new Dictionary<string, NodeTransform>(savedLayout.Count);
@@ -208,12 +202,9 @@ namespace SEE.Layout
             {
                 ILayoutNode node = entry.Key;
                 NodeTransform transform = entry.Value;
-                node.LocalScale = transform.Scale;
-                Vector3 position = transform.Position;
-                // from ground to center position along the y axis
-                position.y += transform.Scale.y / 2.0f;
-                node.CenterPosition = position;
-                layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.LocalScale, node.Rotation);
+                node.AbsoluteScale = transform.Scale;
+                node.CenterPosition = transform.CenterPosition;
+                layoutMap[node.ID] = new NodeTransform(node.CenterPosition, node.AbsoluteScale, node.Rotation);
             }
         }
 
@@ -328,8 +319,8 @@ namespace SEE.Layout
                     Assert.Fail("Untested layout format");
                 }
                 // Read the saved layout.
-                LoadedNodeLayout loadedNodeLayout = new(0, filename);
-                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Layout(new List<ILayoutNode>());
+                LoadedNodeLayout loadedNodeLayout = new(filename);
+                Dictionary<ILayoutNode, NodeTransform> readLayout = loadedNodeLayout.Create(new List<ILayoutNode>(), Vector3.zero, Vector2.one);
                 Assert.AreEqual(0, readLayout.Count);
             }
             finally
