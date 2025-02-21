@@ -380,7 +380,7 @@ namespace SEE.DataModel.DG.IO
 
             IEnumerable<string> RelevantDocumentsForPath(string path)
             {
-                return relevantExtensions.SelectMany(x => Directory.EnumerateFiles(path, $"*.{x}", SearchOption.AllDirectories));
+                return relevantExtensions.SelectMany(x => Directory.EnumerateFiles(path, $"*.{x}", SearchOption.AllDirectories)).Select(x => Filenames.OnCurrentPlatform(x));
             }
 
             void HandleJavaClasses(IList<Node> nodes)
