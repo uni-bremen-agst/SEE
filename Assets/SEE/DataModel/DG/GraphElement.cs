@@ -193,7 +193,7 @@ namespace SEE.DataModel.DG
         /// A path is the concatenation of its directory and filename.
         /// Not all graph elements have this information, in which case the result
         /// may be empty.
-        /// Note: <see cref="Filenames.UnixDirectorySeparator"/> will used as a directory
+        /// Note: <see cref="Filenames.UnixDirectorySeparator"/> will be used as a directory
         /// separator.
         /// </summary>
         /// <returns>path of the source file containing this graph element; may be empty</returns>
