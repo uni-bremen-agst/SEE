@@ -130,7 +130,6 @@ namespace SEE.DataModel.DG.IO
         All = ~(~0 << 4)
     }
 
-
     /// <summary>
     /// A class that creates a graph from the output of a language server.
     /// </summary>
@@ -584,7 +583,6 @@ namespace SEE.DataModel.DG.IO
                 node.SourceName = symbol.Name;
                 node.Filename = Path.GetFileName(path);
                 node.Directory = Path.GetDirectoryName(path);
-                Assert.AreEqual(path, node.Path());
                 node.Type = symbol.Kind.ToNodeKind().ToString();
                 node.SourceRange = Range.FromLspRange(symbol.Range);
                 node.SourceLine = symbol.SelectionRange.Start.Line + 1;
@@ -616,6 +614,10 @@ namespace SEE.DataModel.DG.IO
                     }
 
                     graph.AddNode(node);
+                    // Note: We need to use AbsolutePlatformPath() because path is a platform path.
+                    // Moreover, we can check this assertion here once the node has been added to the graph,
+                    // since AbsolutePlatformPath() will access the graph's BasePath.
+                    Assert.AreEqual(path, node.AbsolutePlatformPath());
                     node.Reparent(parent);
                 }
                 else
