@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -280,7 +278,7 @@ namespace SEE.DataModel.DG.IO
 
             // Relevant nodes (for edges) are those that have a source range and are not already in the graph.
             IList<Node> relevantNodes = graph.Nodes().Except(originalNodes).Where(x => x.SourceRange != null).ToList();
-            Debug.Log($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).");
+            Debug.Log($"LSPImporter: Found {documentCount} documents with relevant extensions ({string.Join(", ", relevantExtensions)}).\n");
 
             if (Handler.Server == LSPServer.EclipseJdtls)
             {
@@ -377,7 +375,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (TimeoutException e)
                 {
-                    Debug.LogWarning(e);
+                    Debug.LogWarning(e + "\n");
                 }
             }
 
