@@ -25,12 +25,6 @@ namespace SEE.GraphProviders
     public class LSPGraphProvider : SingleGraphProvider
     {
         /// <summary>
-        /// The path to the software project for which the graph shall be generated.
-        /// </summary>
-        [Tooltip("Root path of the project to be analyzed."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public DataPath ProjectPath = new();
-
-        /// <summary>
         /// The name of the language server to be used for the analysis.
         /// </summary>
         [Tooltip("The language server to be used for the analysis."),
@@ -49,6 +43,12 @@ namespace SEE.GraphProviders
          GUIColor(nameof(ExecutablePathColor)),
          FolderPath(AbsolutePath = true)]
         public string ServerPath;
+
+        /// <summary>
+        /// The path to the software project for which the graph shall be generated.
+        /// </summary>
+        [Tooltip("Root path of the project to be analyzed."), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+        public DataPath ProjectPath = new();
 
         /// <summary>
         /// The paths within the project (recursively) containing the source code to be analyzed.
