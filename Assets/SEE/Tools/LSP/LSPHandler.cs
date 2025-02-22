@@ -282,6 +282,8 @@ namespace SEE.Tools.LSP
             savedDiagnostics.Clear();
             unhandledDiagnostics.Clear();
             HashSet<ProgressToken> initialWork = new();
+            Stream outputLog = Stream.Null;
+            Stream inputLog = Stream.Null;
             IDisposable spinner = LoadingSpinner.ShowIndeterminate("Starting language server...");
             try
             {
@@ -308,17 +310,34 @@ namespace SEE.Tools.LSP
                                                         + $"See {Server.WebsiteURL} for setup instructions.\n");
                 }
 
-                Stream outputLog = Stream.Null;
-                Stream inputLog = Stream.Null;
                 if (LogLSP)
                 {
                     string tempDir = Path.GetTempPath();
                     string outputPath = Path.Combine(tempDir, "outputLogLsp.txt");
                     string inputPath = Path.Combine(tempDir, "inputLogLsp.txt");
-                    FileIO.DeleteIfExists(outputPath);
-                    FileIO.DeleteIfExists(inputPath);
-                    outputLog = new FileStream(outputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
-                    inputLog = new FileStream(inputPath, FileMode.Create, FileAccess.Write, FileShare.Read);
+                    FileMode outputFileMode = FileMode.Create;
+                    FileMode inputFileMode = FileMode.Create;
+                    try
+                    {
+                        FileIO.DeleteIfExists(outputPath);
+                    }
+                    catch (IOException e)
+                    {
+                        Debug.LogError($"Failed to delete the file at {outputPath}: {e.Message}. Output will be appended.\n");
+                        outputFileMode = FileMode.Append;
+                    }
+                    try
+                    {
+                        FileIO.DeleteIfExists(inputPath);
+                    }
+                    catch (IOException e)
+                    {
+                        Debug.LogError($"Failed to delete the file at {inputPath}: {e.Message}.  Output will be appended.\n");
+                        inputFileMode = FileMode.Append;
+                    }
+
+                    outputLog = new FileStream(outputPath, outputFileMode, FileAccess.Write, FileShare.Read);
+                    inputLog = new FileStream(inputPath, inputFileMode, FileAccess.Write, FileShare.Read);
                 }
 
                 TeeStream teedInputStream = new(lspProcess.StandardOutput.BaseStream, outputLog);
@@ -371,6 +390,8 @@ namespace SEE.Tools.LSP
             {
                 semaphore.Release();
                 spinner.Dispose();
+                outputLog?.Close();
+                inputLog?.Close();
             }
             return;
 
