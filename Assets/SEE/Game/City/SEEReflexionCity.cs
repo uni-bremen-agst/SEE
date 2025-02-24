@@ -7,10 +7,10 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using SEE.GraphProviders;
-using SEE.Utils.Paths;
 using SEE.Game.CityRendering;
 using MoreLinq;
+using SEE.GraphProviders;
+using SEE.Utils.Paths;
 using SEE.Utils;
 
 namespace SEE.Game.City
@@ -98,6 +98,7 @@ namespace SEE.Game.City
             }
         }
 
+        #region SEEReflexionCity creation during in play mode
         /// <summary>
         /// Loads the initial reflexion city.
         /// </summary>
@@ -134,7 +135,8 @@ namespace SEE.Game.City
         private void SetupInitialReflexionCity()
         {
             DataProvider.Add(new ReflexionGraphProvider());
-            NodeLayoutSettings.Kind = NodeLayoutKind.Treemap;
+            NodeLayoutSettings.Kind = NodeLayoutKind.Reflexion;
+            NodeLayoutSettings.ArchitectureLayoutProportion = 0.6f;
         }
 
         /// <summary>
@@ -191,14 +193,14 @@ namespace SEE.Game.City
         /// Returns the <see cref="ReflexionGraphProvider"/> of this city.
         /// </summary>
         /// <returns>The <see cref="ReflexionGraphProvider"/> if it exists, otherwise null.</returns>
-        public ReflexionGraphProvider GetReflexionGraphProvider()
+        private ReflexionGraphProvider GetReflexionGraphProvider()
         {
             ReflexionGraphProvider provider = null;
             DataProvider.Pipeline.ForEach(p =>
             {
-                if (p is ReflexionGraphProvider)
+                if (p is ReflexionGraphProvider pAsReflexionGraphProvider)
                 {
-                    provider = (ReflexionGraphProvider)p;
+                    provider = pAsReflexionGraphProvider;
                 }
             });
             return provider;
@@ -228,8 +230,7 @@ namespace SEE.Game.City
             Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.
-            await renderer.DrawGraphAsync(graph, root.GameObject(), loadReflexionFiles: true);
-
+            await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);
             // Adds the graph to the existing reflexion graph.
             ReflexionGraph.AddSubgraphInContext(graph, root, projectFolder != null);
 
@@ -288,5 +289,7 @@ namespace SEE.Game.City
                 }
             }
         }
+
+        #endregion SEEReflexionCity creation during in play mode
     }
 }

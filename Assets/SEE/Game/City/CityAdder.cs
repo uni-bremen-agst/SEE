@@ -43,7 +43,7 @@ namespace SEE.Game.City
             cityHolder.AddComponent<EdgeMeshScheduler>();
             reflexionCity.LoadInitial(cityHolder.name);
             reflexionCity.DrawGraph();
-            FitInitalReflexionCityAsync(reflexionCity).Forget();
+            //FitInitalReflexionCityAsync(reflexionCity).Forget();
         }
 
         /// <summary>

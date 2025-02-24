@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.RectanglePacking
@@ -84,11 +85,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
             // so that it is actually not split, but it is not free.
             if (!FreeLeaves.Remove(node))
             {
-                throw new System.Exception("Node to be split is not a free leaf.");
+                throw new Exception("Node to be split is not a free leaf.");
             }
             else if (size.x > node.Rectangle.Size.x || size.y > node.Rectangle.Size.y)
             {
-                throw new System.Exception("Requested size does not fit into this rectangle.");
+                throw new Exception("Requested size does not fit into this rectangle.");
             }
             else if (size.x == node.Rectangle.Size.x)
             {
@@ -141,7 +142,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
                     node.Right = new();
                     node.Right.Rectangle = new PRectangle(new Vector2(node.Rectangle.Position.x, node.Rectangle.Position.y + size.y),
-                                                        new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
+                                                          new Vector2(node.Rectangle.Size.x, node.Rectangle.Size.y - size.y));
                     FreeLeaves.Add(node.Right);
 
                     // The upper enclosed rectangle is split again. Its left rectangle will be the rectangle
@@ -191,6 +192,43 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                 }
             }
             return result;
+        }
+
+        /// <summary>
+        /// Prints the tree to the console. Can be used for debugging.
+        /// </summary>
+        public void Print()
+        {
+            Print(Root, "", true);
+        }
+
+        /// <summary>
+        /// Prints the tree rooted by <paramref name="node"/> to the console. Can be used for debugging.
+        /// </summary>
+        /// <param name="node">the root of the tree to be printed</param>
+        /// <param name="indent">indentation before the node is printed</param>
+        /// <param name="last">whether this is the last node to be printed</param>
+        private void Print(PNode node, string indent, bool last)
+        {
+            if (node == null)
+            {
+                return;
+            }
+            string output = indent;
+            if (last)
+            {
+                output += "└─";
+                indent += "  ";
+            }
+            else
+            {
+                output += "├─";
+                indent += "| ";
+            }
+            Debug.Log(output + " " + node + "\n");
+
+            Print(node.Left, indent, false);
+            Print(node.Right, indent, true);
         }
     }
 }

@@ -4,7 +4,6 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
 using MoreLinq;
-using SEE.DataModel;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;

@@ -27,7 +27,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">input graph (currently ignored)</param>
         /// <param name="city">where the <see cref="AbstractSEECity.HierarchicalEdges"/>
         /// and <see cref="AbstractSEECity.SourceCodeDirectory"/> will be retrieved</param>
-        /// <param name="changePercentage">this parameter is currently ignored</param>
+        /// <param name="changePercentage">to report progress</param>
         /// <param name="token">this parameter is currently ignored</param>
         /// <returns>loaded graph</returns>
         /// <exception cref="ArgumentException">thrown in case <see cref="Path"/>
@@ -39,7 +39,7 @@ namespace SEE.GraphProviders
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path, token);
+            return await GraphReader.LoadAsync(Path, city.HierarchicalEdges, city.SourceCodeDirectory.Path, changePercentage, token);
         }
 
         public override SingleGraphProviderKind GetKind()

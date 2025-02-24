@@ -123,7 +123,7 @@ namespace SEE.Game.City
         /// <summary>
         /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
-        private bool IsPipelineRunning;
+        protected bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -148,7 +148,6 @@ namespace SEE.Game.City
                 else if (visualizedSubGraph == null)
                 {
                     visualizedSubGraph = RelevantGraph(LoadedGraph);
-                    SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
                 return visualizedSubGraph;
             }
@@ -393,7 +392,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Returns whether the graph has been loaded.
         /// </summary>
-        private bool IsGraphLoaded => loadedGraph != null;
+        protected bool IsGraphLoaded => loadedGraph != null;
 
         /// <summary>
         /// Draws the graph.
@@ -407,61 +406,58 @@ namespace SEE.Game.City
         {
             if (IsPipelineRunning)
             {
-                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
+                ShowNotification.Error("Graph Drawing", "Graph provider pipeline is still running.");
                 return;
             }
-
-            if (LoadedGraph == null)
+            if (LoadedGraph != null)
             {
-                Debug.LogError("No graph loaded.\n");
+                DrawGraphAsync(VisualizedSubGraph).Forget();
             }
             else
             {
-                Graph theVisualizedSubGraph = VisualizedSubGraph;
-                if (ReferenceEquals(theVisualizedSubGraph, null))
-                {
-                    Debug.LogError("No graph loaded.\n");
-                }
-                else
-                {
-                    DrawAsync(theVisualizedSubGraph).Forget();
-                }
-            }
-
-            return;
-
-            async UniTaskVoid DrawAsync(Graph subGraph)
-            {
-                graphRenderer = new GraphRenderer(this, subGraph);
-                // We assume here that this SEECity instance was added to a game object as
-                // a component. The inherited attribute gameObject identifies this game object.
-                try
-                {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
-                    {
-                        void ReportProgress(float x)
-                        {
-                            ProgressBar = x;
-                            updateProgress(x);
-                        }
-
-                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
-                    throw;
-                }
-
-                // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                // game starts. Otherwise, in playmode, we have to call it ourselves.
-                if (Application.isPlaying)
-                {
-                    InitializeAfterDrawn();
-                }
+                ShowNotification.Error("Graph Drawing", "No graph loaded.");
             }
         }
+
+        /// <summary>
+        /// Draws <paramref name="graph"/>.
+        /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
+        /// </summary>
+        /// <param name="graph">graph to be drawn</param>
+        protected async UniTaskVoid DrawGraphAsync(Graph graph)
+        {
+            GraphRenderer renderer = new(this, graph);
+            try
+            {
+                using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
+                {
+                    void ReportProgress(float x)
+                    {
+                        ProgressBar = x;
+                        updateProgress(x);
+                    }
+
+                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                throw;
+            }
+
+            // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+            // game starts. Otherwise, in playmode, we have to call it ourselves.
+            if (Application.isPlaying)
+            {
+                InitializeAfterDrawn();
+            }
+        }
+
+        /// <summary>
+        /// True if the graph has been drawn (and of course loaded).
+        /// </summary>
+        protected bool IsGraphDrawn => IsGraphLoaded && gameObject.IsCodeCityDrawn();
 
         /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
@@ -472,7 +468,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphLoaded))]
+        [EnableIf(nameof(IsGraphDrawn))]
         public void ReDrawGraph()
         {
             const string Prefix = "Text";
@@ -497,7 +493,7 @@ namespace SEE.Game.City
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
                     if (node != null)
                     {
-                        node.NodeOperator().ScaleTo(nodeLayout.LocalScale, 0);
+                        node.NodeOperator().ScaleTo(nodeLayout.AbsoluteScale, 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
@@ -520,10 +516,10 @@ namespace SEE.Game.City
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
-                    LayoutGraphNode layoutNode = new(node, toLayoutNode)
+                    LayoutGraphNode layoutNode = new(node)
                     {
                         CenterPosition = gameObject.transform.position,
-                        LocalScale = gameObject.transform.localScale
+                        AbsoluteScale = gameObject.transform.localScale
                     };
                     result.Add(layoutNode);
                     if (gameObject.FindChildWithPrefix(Prefix) != null)
@@ -575,21 +571,6 @@ namespace SEE.Game.City
             {
                 Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
             }
-        }
-
-        /// <summary>
-        /// Reads the a saved layout of the city from a file named <see cref="LayoutPath"/>.
-        /// The format of the written file depends upon the file extension. If the extension
-        /// is <see cref="Filenames.GVLExtension"/> it is expected to be in the GVL format; otherwise
-        /// the file is assumed to be in the SLD format.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
-        [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
-        public void LoadLayout()
-        {
-            ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
-            graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
         }
 
         /// <summary>

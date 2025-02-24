@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Layout.NodeLayouts.EvoStreets;
 using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts
 {
-    public class EvoStreetsNodeLayout : HierarchicalNodeLayout
+    /// <summary>
+    /// Lays out nodes in a tree hierarchy in a street-like manner (EvoStreets
+    /// according to Frank Steinbrückner).
+    /// </summary>
+    public class EvoStreetsNodeLayout : NodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public EvoStreetsNodeLayout(float groundLevel)
-            : base(groundLevel)
+        static EvoStreetsNodeLayout()
         {
             Name = "EvoStreets";
         }
@@ -40,20 +36,28 @@ namespace SEE.Layout.NodeLayouts
         /// </summary>
         private readonly float streetHeight = 0.0001f;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="Exception">thrown if there is no or more than one root in
+        /// <paramref name="gameNodes"/></exception>
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> gameNodes,
+            Vector3 centerPosition,
+            Vector2 rectangle)
         {
             IList<ILayoutNode> layoutNodes = gameNodes.ToList();
             if (layoutNodes.Count == 0)
             {
-                throw new Exception("No nodes to be laid out.");
+                return new Dictionary<ILayoutNode, NodeTransform>();
             }
 
             if (layoutNodes.Count == 1)
             {
                 ILayoutNode singleNode = layoutNodes.First();
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>
+                Dictionary<ILayoutNode, NodeTransform> layoutResult = new()
                 {
-                    [singleNode] = new NodeTransform(Vector3.zero, singleNode.LocalScale)
+                    [singleNode] = new NodeTransform(0, 0, singleNode.AbsoluteScale)
                 };
                 return layoutResult;
             }
@@ -80,8 +84,8 @@ namespace SEE.Layout.NodeLayouts
                 rootNode.SetSize(Orientation.East, treeDescriptor);
                 rootNode.SetLocation(Orientation.East, new Location(0, 0));
 
-                Dictionary<ILayoutNode, NodeTransform> layoutResult = new Dictionary<ILayoutNode, NodeTransform>();
-                rootNode.ToLayout(ref layoutResult, GroundLevel, streetHeight);
+                Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
+                rootNode.ToLayout(ref layoutResult, streetHeight);
                 return layoutResult;
             }
         }
@@ -128,17 +132,6 @@ namespace SEE.Layout.NodeLayouts
                 }
             }
             return result;
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges,
-                                                                      ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

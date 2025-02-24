@@ -1,3 +1,7 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -7,12 +11,7 @@ using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
 using UnityEngine;
 using Plane = SEE.GO.Plane;
 
@@ -196,11 +195,6 @@ namespace SEE.Game.CityRendering
         private const float levelDistance = 0.001f;
 
         /// <summary>
-        /// the ground level of the nodes
-        /// </summary>
-        private const float groundLevel = 0.0f;
-
-        /// <summary>
         /// The graphs to be rendered.
         /// </summary>
         private IList<Graph> graphs;
@@ -213,23 +207,18 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// A mapping of the name of node types of <see cref="graphs"/> onto the factories creating those nodes.
         /// </summary>
-        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new Dictionary<string, NodeFactory>();
+        private readonly Dictionary<string, NodeFactory> nodeTypeToFactory = new();
 
         /// <summary>
         /// A mapping of the name of node types of <see cref="graphs"/> onto the
         /// <see cref="AntennaDecorator"/>s creating the antennas of those nodes.
         /// </summary>
-        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new Dictionary<string, AntennaDecorator>();
+        private readonly Dictionary<string, AntennaDecorator> nodeTypeToAntennaDectorator = new();
 
         /// <summary>
         /// The scale used to normalize the metrics determining the lengths of the blocks.
         /// </summary>
         private IScale scaler;
-
-        /// <summary>
-        /// A mapping from Node to ILayoutNode.
-        /// </summary>
-        private readonly Dictionary<Node, ILayoutNode> toLayoutNode = new Dictionary<Node, ILayoutNode>();
 
         /// <summary>
         /// True if edges are to be actually drawn, that is, if the user has selected an
@@ -262,7 +251,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns a mapping of each graph Node onto its containing GameNode for every
+        /// Returns a mapping of each graph node onto its containing GameNode for every
         /// element in <paramref name="gameNodes"/>.
         /// </summary>
         /// <param name="gameNodes"></param>
@@ -280,58 +269,68 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Draws the nodes and edges of the graph and their decorations by applying the layouts according
         /// to the user's choice in the settings.
+        ///
+        /// If the <paramref name="graph"/> has multiple roots, a unique root will be added to <paramref name="graph"/>
+        /// whose immediate children are all previous root nodes and a game object will be created for this new root.
+        /// This, however, can be avoided by passing true to <paramref name="doNotAddUniqueRoot"/>.
+        ///
+        /// The game objects representing the nodes will be children of <paramref name="parent"/>, while
+        /// the game objects drawn for edges will always be children of the unique root game object representing
+        /// the code city as a whole.
         /// </summary>
-        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor</param>
-        /// <param name="parent">every game object drawn for this graph will be added to this parent</param>
+        /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor since
+        /// the node-type factories and the like are set up by the constructor</param>
+        /// <param name="parent">every game object drawn will be become an immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
+        /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
+        /// nodes in <paramref name="graph"/></param>
         public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool loadReflexionFiles = false)
+                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
-            // all nodes of the graph
-            IList<Node> nodes = graph.Nodes();
-            if (nodes.Count == 0)
+            if (graph.NodeCount == 0)
             {
                 Debug.LogWarning("The graph has no nodes.\n");
                 return;
             }
-            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(nodes, x => updateProgress?.Invoke(x * 0.5f), token);
 
-            // the layout to be applied
-            NodeLayout nodeLayout = GetLayout(parent);
+            // all nodes of the graph
+            IDictionary<Node, GameObject> nodeMap = await DrawNodesAsync(graph.Nodes(), x => updateProgress?.Invoke(x * 0.5f), token);
 
             // If we have multiple roots, we need to add a unique one.
-            if (!loadReflexionFiles)
+            if (!doNotAddUniqueRoot)
             {
                 AddGameRootNodeIfNecessary(graph, nodeMap);
             }
 
             // The representation of the nodes for the layout.
-            ICollection<LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
+            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
+            // the layout to be applied
+            NodeLayout nodeLayout = GetLayout();
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
-            ICollection<ILayoutNode> layoutNodes = gameNodes.Cast<ILayoutNode>().ToList();
+            ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
-            nodeLayout.Apply(layoutNodes);
+            {
+                Vector3 position = parent.transform.position;
+                position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
+                NodeLayout.Apply(nodeLayout.Create(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z)));
+            }
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
-
-            // Fit layoutNodes into parent.
-            Fit(parent, layoutNodes);
-            Stack(parent, layoutNodes);
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
             // Create the laid out edges; they will be children of the unique root game node
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
-            GameObject rootGameNode = RootGameNode(loadReflexionFiles? parent.ContainingCity().gameObject : parent);
+            GameObject rootGameNode = RootGameNode(parent);
             try
             {
-                await EdgeLayoutAsync(gameNodes, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+                await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
             }
             catch (OperationCanceledException)
             {
@@ -383,16 +382,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The <paramref name="layoutNodes"/> are put just above the <paramref name="plane"/> w.r.t. the y axis.
-        /// </summary>
-        /// <param name="plane">plane upon which <paramref name="layoutNodes"/> should be stacked</param>
-        /// <param name="layoutNodes">the layout nodes to be stacked</param>
-        public static void Stack(GameObject plane, IEnumerable<ILayoutNode> layoutNodes)
-        {
-            NodeLayout.Stack(layoutNodes, plane.transform.position.y + plane.transform.lossyScale.y / 2.0f + levelDistance);
-        }
-
-        /// <summary>
         /// Adds light to simulate an emissive effect. The new light object will be added to
         /// <paramref name="parent"/> above its center such that it covers all <paramref name="gameObjects"/>.
         /// </summary>
@@ -417,17 +406,6 @@ namespace SEE.Game.CityRendering
             light.range = 3.0f * Mathf.Sqrt(boundingBoxWidth * boundingBoxWidth + boundingBoxDepth * boundingBoxDepth);
             light.type = LightType.Point;
             light.intensity = 1.0f;
-        }
-
-        /// <summary>
-        /// Scales and moves the <paramref name="layoutNodes"/> so that they fit into the <paramref name="parent"/>.
-        /// </summary>
-        /// <param name="parent">the parent in which to fit the <paramref name="layoutNodes"/></param>
-        /// <param name="layoutNodes">the nodes to be fitted into the <paramref name="parent"/></param>
-        public static void Fit(GameObject parent, IEnumerable<ILayoutNode> layoutNodes)
-        {
-            NodeLayout.Scale(layoutNodes, parent.transform.lossyScale.x, parent.transform.lossyScale.z);
-            NodeLayout.MoveTo(layoutNodes, parent.transform.position);
         }
 
         /// <summary>
@@ -458,30 +436,71 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the node layouter according to the settings. The node layouter will
-        /// place the nodes at ground level 0. This method just returns the layouter,
-        /// it does not actually calculate the layout.
+        /// Returns the node layouter according to the settings. This method just returns
+        /// the layouter; it does not actually calculate the layout.
         /// </summary>
-        /// <param name="parent">the parent in which to fit the nodes</param>
         /// <returns>node layout selected</returns>
-        public NodeLayout GetLayout(GameObject parent) =>
-            Settings.NodeLayoutSettings.Kind switch
+        public NodeLayout GetLayout() => GetLayout(Settings.NodeLayoutSettings.Kind);
+
+        /// <summary>
+        /// Returns the node layouter according to <paramref name="kind"/>. This method
+        /// just returns the layouter; it does not actually calculate the layout.
+        /// </summary>
+        /// <param name="kind">the kind of the node layout requested</param>
+        /// <returns>node layout selected</returns>
+        private NodeLayout GetLayout(NodeLayoutKind kind) =>
+            kind switch
             {
-                NodeLayoutKind.Manhattan => new ManhattanLayout(groundLevel),
-                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(groundLevel),
-                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(groundLevel),
-                NodeLayoutKind.Treemap => new TreemapLayout(groundLevel, parent.transform.lossyScale.x, parent.transform.lossyScale.z),
-                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(
-                    groundLevel,
-                    parent.transform.lossyScale.x,
-                    parent.transform.lossyScale.z,
-                    Settings.NodeLayoutSettings.IncrementalTreeMap),
-                NodeLayoutKind.Balloon => new BalloonNodeLayout(groundLevel),
-                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(groundLevel),
-                NodeLayoutKind.CompoundSpringEmbedder => new CoseLayout(groundLevel, Settings),
-                NodeLayoutKind.FromFile => new LoadedNodeLayout(groundLevel, Settings.NodeLayoutSettings.LayoutPath.Path),
-                _ => throw new Exception("Unhandled node layout " + Settings.NodeLayoutSettings.Kind)
+                NodeLayoutKind.Reflexion => new ReflexionLayout(Settings.NodeLayoutSettings.ArchitectureLayoutProportion,
+                                                                GetImplementationLayout(Settings.NodeLayoutSettings),
+                                                                GetArchitectureLayout(Settings.NodeLayoutSettings)),
+                NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
+                NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
+                NodeLayoutKind.Treemap => new TreemapLayout(),
+                NodeLayoutKind.IncrementalTreeMap => new IncrementalTreeMapLayout(Settings.NodeLayoutSettings.IncrementalTreeMap),
+                NodeLayoutKind.Balloon => new BalloonNodeLayout(),
+                NodeLayoutKind.CirclePacking => new CirclePackingNodeLayout(),
+                NodeLayoutKind.FromFile => new LoadedNodeLayout(Settings.NodeLayoutSettings.LayoutPath.Path),
+                _ => throw new Exception("Unhandled node layout " + kind)
             };
+
+        /// <summary>
+        /// Returns the node layouter for drawing the implementation according to <paramref name="nodeLayoutSettings"/>.
+        /// </summary>
+        /// <param name="nodeLayoutSettings">the settings for the implementation layout</param>
+        /// <returns>layouter for implementation</returns>
+        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
+        private NodeLayout GetImplementationLayout(NodeLayoutAttributes nodeLayoutSettings)
+        {
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.FromFile)
+            {
+                return new LoadedNodeLayout(nodeLayoutSettings.LayoutPath.Path);
+            }
+            if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
+            {
+               throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+            }
+            return GetLayout(nodeLayoutSettings.Implementation);
+        }
+
+        /// <summary>
+        /// Returns the node layouter for drawing the architecture according to <paramref name="nodeLayoutSettings"/>.
+        /// </summary>
+        /// <param name="nodeLayoutSettings">the settings for the architecture layout</param>
+        /// <returns>layouter for architecture</returns>
+        /// <exception cref="Exception">thrown if called for <see cref="NodeLayoutKind.Reflexion"/></exception>
+        private NodeLayout GetArchitectureLayout(NodeLayoutAttributes nodeLayoutSettings)
+        {
+            if (nodeLayoutSettings.Architecture == NodeLayoutKind.FromFile)
+            {
+                return new LoadedNodeLayout(nodeLayoutSettings.ArchitectureLayoutPath.Path);
+            }
+            if (nodeLayoutSettings.Architecture == NodeLayoutKind.Reflexion)
+            {
+                throw new Exception("Reflexion layout cannot be used as an architecture layout.");
+            }
+            return GetLayout(nodeLayoutSettings.Architecture);
+        }
 
         /// <summary>
         /// Adds <paramref name="child"/> as a child to <paramref name="parent"/>,
@@ -508,29 +527,35 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Transforms the given <paramref name="gameNodes"/> to a collection of LayoutNodes.
-        /// Sets the node levels of all <paramref name="gameNodes"/>.
+        /// Returns a mapping of all graph nodes associated with any of the given <paramref name="gameNodes"/>
+        /// onto newly created <see cref="LayoutGameNode"/>s.
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private ICollection<LayoutGameNode> ToLayoutNodes(ICollection<GameObject> gameObjects)
+        /// <returns>mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s</returns>
+        private static IDictionary<Node, LayoutGameNode> ToLayoutNodes
+            (ICollection<GameObject> gameNodes)
         {
-            return ToLayoutNodes(gameObjects, go => new LayoutGameNode(toLayoutNode, go));
-        }
-
-        /// <summary>
-        /// Transforms the given <paramref name="gameNodes"/> to a collection of <see cref="LayoutGameNode"/>s.
-        /// Sets the node levels of all <paramref name="gameNodes"/>.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <param name="newLayoutNode">delegate that returns a new layout node <see cref="T"/> for each <see cref="GameObject"/></param>
-        /// <returns>collection of LayoutNodes representing the information of <paramref name="gameNodes"/> for layouting</returns>
-        private static ICollection<T> ToLayoutNodes<T>
-            (ICollection<GameObject> gameNodes,
-             Func<GameObject, T> newLayoutNode) where T : class, ILayoutNode
-        {
-            ICollection<T> result = gameNodes.Select(newLayoutNode).ToList();
-            LayoutNodes.SetLevels(result);
+            Dictionary<Node, LayoutGameNode> result = new();
+            foreach (GameObject gameNode in gameNodes)
+            {
+                if (gameNode.TryGetNode(out Node node))
+                {
+                    result[node] = new LayoutGameNode(gameNode);
+                }
+            }
+            foreach (var item in result)
+            {
+                Node parent = item.Key;
+                LayoutGameNode parentGameNode = item.Value;
+                foreach (Node child in parent.Children())
+                {
+                    if (result.TryGetValue(child, out LayoutGameNode childGameNode))
+                    {
+                        parentGameNode.AddChild(childGameNode);
+                    }
+                }
+            }
+            LayoutNodes.SetLevels(result.Values);
             return result;
         }
 
@@ -542,16 +567,6 @@ namespace SEE.Game.CityRendering
         private static IEnumerable<GameObject> FindInnerNodes(IEnumerable<GameObject> gameNodes)
         {
             return gameNodes.Where(o => !o.IsLeaf());
-        }
-
-        /// <summary>
-        /// Returns only the leaf nodes in gameNodes as a list.
-        /// </summary>
-        /// <param name="gameNodes"></param>
-        /// <returns>the leaf nodes in gameNodes as a list</returns>
-        private static IEnumerable<GameObject> FindLeafNodes(IEnumerable<GameObject> gameNodes)
-        {
-            return gameNodes.Where(o => o.IsLeaf());
         }
 
         /// <summary>
@@ -655,7 +670,7 @@ namespace SEE.Game.CityRendering
 
                 foreach (ILayoutNode layoutNode in layoutNodes)
                 {
-                    Vector3 extent = layoutNode.LocalScale / 2.0f;
+                    Vector3 extent = layoutNode.AbsoluteScale / 2.0f;
                     // Note: position denotes the center of the object
                     Vector3 position = layoutNode.CenterPosition;
                     {
@@ -694,33 +709,26 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Returns the child object of <paramref name="codeCity"/> tagged by Tags.Node.
-        /// If there is no such child or if there are more than one, an exception will
-        /// be thrown.
+        /// Returns the first immediate child object of the code-city object containing <paramref name="gameNode"/>
+        /// and tagged by <see cref="Tags.Node"/>.
         /// </summary>
-        /// <param name="codeCity">game object representing a code city</param>
-        /// <returns>child object of <paramref name="codeCity"/> tagged by Tags.Node</returns>
-        public static GameObject RootGameNode(GameObject codeCity)
+        /// <param name="gameNode">game object representing a node in a code city or a code city as a whole</param>
+        /// <returns>first immediate child object of the code-city object containing <paramref name="gameNode"/>
+        /// and tagged by <see cref="Tags.Node"/></returns>
+        /// <exception cref="Exception">thrown if <paramref name="gameNode"/> is not contained in
+        /// a code city or if that code city has no child tagged by <see cref="Tags.Node"/></exception>
+        /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
+        private static GameObject RootGameNode(GameObject gameNode)
         {
-            GameObject result = null;
-            foreach (Transform child in codeCity.transform)
+            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            if (codeCity == null)
             {
-                if (child.CompareTag(Tags.Node))
-                {
-                    if (result == null)
-                    {
-                        result = child.gameObject;
-                    }
-                    else
-                    {
-                        throw new Exception($"Code city {codeCity.name} has multiple children tagged by {Tags.Node}"
-                            + $": {result.name} and {child.name}");
-                    }
-                }
+                throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
+            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
             if (result == null)
             {
-                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}");
+                throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");
             }
             return result;
         }

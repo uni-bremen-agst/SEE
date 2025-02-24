@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.GO;
+﻿using SEE.GO;
 using SEE.Layout;
 using UnityEngine;
 
@@ -15,13 +13,11 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="toLayoutNode">the mapping of graph nodes onto <see cref="ILayoutNode"/>s
-        /// this node should be added to</param>
         /// <param name="gameObject">the game object this layout node represents</param>
-        public LayoutGameNode(IDictionary<Node, ILayoutNode> toLayoutNode, GameObject gameObject)
-            : base(gameObject.GetComponent<NodeRef>().Value, toLayoutNode)
+        public LayoutGameNode(GameObject gameObject)
+            : base(gameObject.GetComponent<NodeRef>().Value)
         {
-            this.GameObject = gameObject;
+            GameObject = gameObject;
         }
 
         /// <summary>
@@ -34,13 +30,13 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The local scale of this node.
+        /// See <see cref="IGameNode.AbsoluteScale"/>.
         /// </summary>
-        public override Vector3 LocalScale
+        public override Vector3 AbsoluteScale
         {
             get
             {
-                return GameObject.transform.localScale;
+                return GameObject.transform.lossyScale;
             }
             set
             {
@@ -49,32 +45,14 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// The absolute scale of a node in world co-ordinates.
-        ///
-        /// Note: This value may be meaningful only if the node is not skewed.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        public override Vector3 AbsoluteScale
+        public override void ScaleXZBy(float factor)
         {
-            get => GameObject.transform.lossyScale;
-        }
-
-        /// <summary>
-        /// Scales this node by the given <paramref name="factor"/>: its current
-        /// Scale is multiplied by <paramref name="factor"/>. If the object
-        /// contains a line, the line width is multiplied by <paramref name="factor"/>, too.
-        /// </summary>
-        /// <param name="factor">factor by which to mulitply the scale</param>
-        public override void ScaleBy(float factor)
-        {
-            LineRenderer renderer = GameObject.GetComponent<LineRenderer>();
-            if (renderer != null)
-            {
-                // This object is drawn by a line. The width of the line must
-                // be adjusted.
-                renderer.startWidth *= factor;
-                renderer.endWidth *= factor;
-            }
-            LocalScale *= factor;
+            Vector3 result = AbsoluteScale;
+            result.x *= factor;
+            result.z *= factor;
+            AbsoluteScale = result;
         }
 
         /// <summary>
@@ -92,6 +70,9 @@ namespace SEE.Game.CityRendering
             }
         }
 
+        /// <summary>
+        /// See <see cref="IGameNode.Rotation"/>.
+        /// </summary>
         public override float Rotation
         {
             get => GameObject.transform.eulerAngles.y;
@@ -100,7 +81,7 @@ namespace SEE.Game.CityRendering
 
 
         /// <summary>
-        /// X-Z center position of the roof of the node in world space.
+        /// See <see cref="IGameNode.Roof"/>.
         /// </summary>
         public override Vector3 Roof
         {
@@ -111,7 +92,7 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// X-Z center position of the ground of the node in world space.
+        /// See <see cref="IGameNode.Ground"/>.
         /// </summary>
         public override Vector3 Ground
         {
