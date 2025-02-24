@@ -8,9 +8,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GraphProviders;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Net.Actions.RuntimeConfig;
-using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
@@ -648,7 +646,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 // confirmed types where the nested fields should be edited
                 case ColorRange:
                 case ColorProperty:
-                case CoseGraphAttributes:
                 case VisualNodeAttributes:
                 case NodeLayoutAttributes:
                 case EdgeLayoutAttributes:
