@@ -18,7 +18,6 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using TMPro;
 using UnityEngine;
@@ -483,6 +482,7 @@ namespace SEE.Game.City
                 DeleteGraphGameObjects();
                 DrawGraph();
                 RestoreLayout(layoutGraphNodes, decorationValues).Forget();
+                graphRenderer = null;
             }
             async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
@@ -497,12 +497,15 @@ namespace SEE.Game.City
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
-                            RectTransform tmpRect = (RectTransform)tmp.transform;
-                            tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
-                            if (tmp.name.StartsWith(Prefix))
+                            if (decorationValues.ContainsKey(nodeLayout.ID))
                             {
-                                tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
-                                tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
+                                RectTransform tmpRect = (RectTransform)tmp.transform;
+                                tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
+                                if (tmp.name.StartsWith(Prefix))
+                                {
+                                    tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
+                                    tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
+                                }
                             }
                         });
                     }
@@ -511,22 +514,28 @@ namespace SEE.Game.City
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
             {
                 IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-                Dictionary<Node, ILayoutNode> toLayoutNode = new();
                 Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
+                    // skip root nodes. Their restoration is handled by the layout itself.
+                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot())
+                    {
+                        continue;
+                    }
                     LayoutGraphNode layoutNode = new(node)
                     {
                         CenterPosition = gameObject.transform.position,
                         AbsoluteScale = gameObject.transform.localScale
                     };
                     result.Add(layoutNode);
+                    // Case for decorative texts that start with the prefix "Text".
                     if (gameObject.FindChildWithPrefix(Prefix) != null)
                     {
                         RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
                         textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
                     }
+                    // Case for label texts that start with the prefix "Label".
                     else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
                     {
                         textValues.Add(node.ID, (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
