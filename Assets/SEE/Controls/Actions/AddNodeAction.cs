@@ -523,7 +523,9 @@ namespace SEE.Controls.Actions
             void OnCancel()
             {
                 // New node discarded
-                Destroyer.Destroy(go);
+                ShowNotification.Warn("Add node aborted",
+                    "The temporaily added node will be removed again.");
+                _ = GameElementDeleter.Delete(go);
                 new DeleteNetAction(go.name).Execute();
                 progress = ProgressState.NoNodeSelected;
                 SEEInput.KeyboardShortcutsEnabled = true;
