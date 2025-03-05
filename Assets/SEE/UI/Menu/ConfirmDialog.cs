@@ -124,8 +124,25 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The game object under which the dialogs are instantiated.
         /// </summary>
-        private static readonly Lazy<GameObject> dialogGameObject = new(() => new("ConfirmDialogs"));
+        private static Lazy<GameObject> dialogGameObject;
 
+        /// <summary>
+        /// Property of <see cref="dialogGameObject"/>.
+        /// This is required because the static variable is not cleared with each
+        /// execution of SEE, and therefore, there may be an attempt to access a
+        /// <see cref="GameObject"/> that no longer exists.
+        /// </summary>
+        private static Lazy<GameObject> DialogGameObject
+        {
+            get
+            {
+                if (dialogGameObject == null || dialogGameObject.Value == null)
+                {
+                    dialogGameObject = new(() => new("ConfirmDialogs"));
+                }
+                return dialogGameObject;
+            }
+        }
         /// <summary>
         /// The ongoing fade animation of the dialog, if any.
         /// </summary>
@@ -207,7 +224,7 @@ namespace SEE.UI.Menu
         /// <returns>Whether the user confirmed the dialog.</returns>
         public static async UniTask<bool> ConfirmAsync(ConfirmConfiguration configuration)
         {
-            ConfirmDialog dialog = dialogGameObject.Value.AddComponent<ConfirmDialog>();
+            ConfirmDialog dialog = DialogGameObject.Value.AddComponent<ConfirmDialog>();
             dialog.oneTime = true;
             await UniTask.WaitUntil(() => dialog.Dialog != null); // May need to wait for initialization.
             dialog.ShowMenu(configuration);
