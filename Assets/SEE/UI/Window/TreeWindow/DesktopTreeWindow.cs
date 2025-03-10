@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
@@ -12,11 +9,14 @@ using SEE.GO;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.Utils;
+using SEE.XR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
-using SEE.XR;
 using ArgumentException = System.ArgumentException;
 using Edge = SEE.DataModel.DG.Edge;
 using Node = SEE.DataModel.DG.Node;
@@ -462,6 +462,14 @@ namespace SEE.UI.Window.TreeWindow
                             Rebuild();
                         }, Icons.Hide)
                     };
+                    if (representedGraphElement is Node node && node.IsRoot())
+                    {
+                        appends.Add(new("Delete City", () =>
+                        {
+                            WindowSpace winSpace = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                            ContextMenuAction.DeleteCityAsync(node, () => winSpace.CloseWindow(this)).Forget();
+                        }, Icons.Trash));
+                    }
 
                     IEnumerable<PopupMenuEntry> actions = ContextMenuAction
                         .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);
