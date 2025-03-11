@@ -1,7 +1,5 @@
 package de.unibremen.swt.see.manager.config;
 
-import de.unibremen.swt.see.manager.security.AuthEntryPointJwt;
-import de.unibremen.swt.see.manager.security.AuthTokenFilter;
 import de.unibremen.swt.see.manager.security.UserDetailsServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +16,6 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * Configuration class for web security in the application.
@@ -30,9 +27,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-//(securedEnabled = true,
-//jsr250Enabled = true,
-//prePostEnabled = true) // by default
 public class WebSecurityConfig {
 
     /**
@@ -41,24 +35,6 @@ public class WebSecurityConfig {
     @Autowired
     UserDetailsServiceImpl userDetailsService;
 
-    /**
-     * Entry point for handling unauthorized access.
-     */
-    @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
-
-    /**
-     * Creates an {@link AuthTokenFilter} bean.
-     * <p>
-     * This method creates an instance of {@link AuthTokenFilter} and exposes it
-     * as a Spring bean for use in the security configuration.
-     *
-     * @return the {@link AuthTokenFilter} instance
-     */
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
-    }
 
     /**
      * Configures the authentication provider.
@@ -120,17 +96,12 @@ public class WebSecurityConfig {
      */
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http.cors(Customizer.withDefaults())
+        http
+                .cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED).maximumSessions(1))
                 .authorizeHttpRequests(auth -> auth.requestMatchers("/user/signin").permitAll().anyRequest().authenticated());
         // fix H2 database console: Refused to display ' in a frame because it set 'X-Frame-Options' to 'deny'
-        //http.headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin));
-
-        http.authenticationProvider(authenticationProvider());
-
-        http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

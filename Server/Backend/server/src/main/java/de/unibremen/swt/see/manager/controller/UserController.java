@@ -10,11 +10,10 @@ import de.unibremen.swt.see.manager.model.User;
 import de.unibremen.swt.see.manager.security.JwtUtils;
 import de.unibremen.swt.see.manager.security.UserDetailsImpl;
 import de.unibremen.swt.see.manager.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,10 +46,6 @@ public class UserController {
      */
     private final AuthenticationManager authenticationManager;
 
-    /**
-     * Provides JWT utilities.
-     */
-    private final JwtUtils jwtUtils;
 
     /**
      * Retrieves user metadata of the authenticated user.
@@ -179,11 +174,8 @@ public class UserController {
 
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(changeUsernameRequest.getNewUsername(), changeUsernameRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(newUser);
     }
 
@@ -223,14 +215,13 @@ public class UserController {
      * @see de.unibremen.swt.see.manager.controller.request.LoginRequest
      */
     @PostMapping("/signin")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, HttpServletRequest request) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
         SecurityContextHolder.getContext().setAuthentication(authentication);
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
 
+        request.getSession().setAttribute("SPRING_SECURITY_CONTEXT", SecurityContextHolder.getContext());
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .body(userService.getByUsername(userDetails.getUsername()));
     }
 
@@ -246,11 +237,9 @@ public class UserController {
      * @see de.unibremen.swt.see.manager.controller.request.LoginRequest
      */
     @PostMapping("/signout")
-    public ResponseEntity<?> logoutUser() {
-        // FIXME This does not invalidate the token on server side!
-        ResponseCookie cookie = jwtUtils.getCleanJwtCookie();
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        request.getSession().invalidate(); // Destroy session
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
 }
