@@ -1,5 +1,7 @@
 package de.unibremen.swt.see.manager.config;
 
+import java.net.MalformedURLException;
+import java.net.URL;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -7,9 +9,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Web configuration class for the SEE Manager back-end application.
@@ -19,7 +18,7 @@ import java.net.URL;
 @Configuration
 @EnableWebMvc
 @Slf4j
-public class WebConfig implements WebMvcConfigurer{
+public class WebConfig {
 
     /**
      * Contains the domain name, or IP address, and port of the front-end
