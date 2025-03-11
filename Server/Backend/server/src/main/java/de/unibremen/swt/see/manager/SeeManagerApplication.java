@@ -20,7 +20,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.session.data.redis.config.annotation.web.http.EnableRedisHttpSession;
 
 /**
  * SEE Manager is part of the Software Engineering Experience (SEE).
@@ -35,7 +34,6 @@ import org.springframework.session.data.redis.config.annotation.web.http.EnableR
  */
 @SpringBootApplication
 @RequiredArgsConstructor
-@EnableRedisHttpSession
 @EnableScheduling
 @Slf4j
 public class SeeManagerApplication {
