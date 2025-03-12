@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static System.Collections.Specialized.BitVector32;
 
 namespace SEE.Controls.Actions
 {
@@ -424,7 +425,7 @@ namespace SEE.Controls.Actions
             if (appendActions == null || !appendActions.Any(action => action.Name.Contains("Delete")))
             {
                 entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
-                    "Clear" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+                    "Clear" : (graphElement as Node).IsRoot()? "Delete City" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
             }
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
@@ -468,7 +469,12 @@ namespace SEE.Controls.Actions
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
-                    DeleteCityAsync(node).Forget();
+                    string deleteMessage = $"Do you really want to delete the city?\r\nThis action cannot be undone.";
+                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
+                    {
+                        GameElementDeleter.DeleteRoot(node.GameObject());
+                        new DeleteNetAction(node.ID).Execute();
+                    }
                     return;
                 }
                 if (gameObject != null)
@@ -933,28 +939,6 @@ namespace SEE.Controls.Actions
         {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             menu.UpdateActiveEntry();
-        }
-
-        /// <summary>
-        /// Deletes the root of a city.
-        /// This cannot be undone, so a <see cref="ConfirmDialog"/> is opened first to obtain
-        /// confirmation for the deletion.
-        /// </summary>
-        /// <param name="node">The root node that is to be deleted.</param>
-        /// <param name="action">An action to be executed after the deletion. Can be null</param>
-        /// <returns>Waits until a response from the <see cref="ConfirmDialog"/> is received.</returns>
-        public async static UniTask DeleteCityAsync(Node node, Action action = null)
-        {
-            if (node.IsRoot())
-            {
-                string deleteMessage = $"Do you really want to delete the city?\r\nThis action cannot be undone.";
-                if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
-                {
-                    GameElementDeleter.DeleteRoot(node.GameObject());
-                    new DeleteNetAction(node.ID).Execute();
-                    action?.Invoke();
-                }
-            }
         }
     }
 }

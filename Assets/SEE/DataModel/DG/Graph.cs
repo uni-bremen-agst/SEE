@@ -1493,5 +1493,17 @@ namespace SEE.DataModel.DG
         {
             return graph != null;
         }
+
+        /// <summary>
+        /// Notifies the observers about the deletion of the root node of the graph.
+        /// </summary>
+        /// <param name="node">The root node.</param>
+        public void NotifyRootNodeDeletion(Node node)
+        {
+            if (node.IsRoot() && GetRoots().Contains(node))
+            {
+                Notify(new NodeEvent(Version, node, ChangeType.Removal));
+            }
+        }
     }
 }

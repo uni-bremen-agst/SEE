@@ -462,6 +462,7 @@ namespace SEE.UI.Window.TreeWindow
                             Rebuild();
                         }, Icons.Hide)
                     };
+                    /*
                     if (representedGraphElement is Node node && node.IsRoot())
                     {
                         appends.Add(new("Delete City", () =>
@@ -469,7 +470,7 @@ namespace SEE.UI.Window.TreeWindow
                             WindowSpace winSpace = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
                             ContextMenuAction.DeleteCityAsync(node, () => winSpace.CloseWindow(this)).Forget();
                         }, Icons.Trash));
-                    }
+                    }*/
 
                     IEnumerable<PopupMenuEntry> actions = ContextMenuAction
                         .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);
