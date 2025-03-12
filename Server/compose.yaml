@@ -1,32 +1,54 @@
 version: "3.8"
 
 services:
+
+  traefik:
+    image: traefik:v2.9
+    command:
+      - --providers.docker
+      - --entrypoints.web.address=:80
+      - --api.insecure=true
+    ports:
+      - "80:80"
+      # Uncomment this line to enable the traefik dashboard
+      #- "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   frontend:
     build: ./Frontend
     container_name: see-frontend
     restart: always
     depends_on:
-      - backend-server
-    ports:
-      - "8083:8080"
+      - backend
+      - traefik
     environment:
       # Backend API URL
-      VITE_APP_API_URL: http://localhost:8080/api/v1/
+      VITE_APP_API_URL: http://see.localhost/api/v1/
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend.rule=Host(`${HOSTNAME}`) && !PathPrefix(`/api`)"
+      - "traefik.http.services.frontend.loadbalancer.server.port=8080"
+    networks:
+      - traefik
+      - default
 
   backend:
     privileged: true
     build: ./Backend
     container_name: see-backend
     restart: always
+    depends_on:
+      - traefik
     volumes:
       - backend-data:/see
       # - /var/run/docker.sock:/var/run/docker.sock
-      - /run/user/1001/podman/podman.sock:/var/run/docker.sock
+      - /var/run/docker.sock:/var/run/docker.sock
     ports:
-      - "8080:8080"
+      - ":8080"
     environment:
-      BACKEND_DOMAIN: localhost:8080
-      FRONTEND_DOMAIN: localhost:8083
+      BACKEND_DOMAIN: see.localhost
+      FRONTEND_DOMAIN: see.localhost
       FRONTEND_SCHEME: HTTP
       FILESTORAGE_DIR: /see/file-storage
       SQLITE_DB_FILE: /see/database.db
@@ -40,8 +62,19 @@ services:
       JWT_SECRET: Pd0lrQXVI8wVYuX+LGtJRCd62gvRDfS0Gd2BnUdwFWJsHiNDf6FOx9muwOTPB7YBqt1MDMlS4emg2DvDOHSkOg==
       JWT_EXPIRATION: 86400000
       # This will add an admin account to the backend. Use with care!
-      # ADD_ADMIN_NAME: see
-      # ADD_ADMIN_PASSWORD: XAo%@X9LQHdmV?+F
+      ADD_ADMIN_NAME: admin
+      ADD_ADMIN_PASSWORD: admin
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend.rule=Host(`${HOSTNAME}`) && PathPrefix(`/api`)"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+    networks:
+      - traefik
+      - default
+
+networks:
+  traefik:
+  default:
 
 
 volumes:
