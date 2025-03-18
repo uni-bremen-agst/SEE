@@ -24,7 +24,7 @@ import org.springframework.web.bind.annotation.*;
  * file resources, specifically SEE Code City data.
  */
 @RestController
-@RequestMapping("/file")
+@RequestMapping("/api/v1/file")
 @RequiredArgsConstructor
 @Slf4j
 public class FileController {

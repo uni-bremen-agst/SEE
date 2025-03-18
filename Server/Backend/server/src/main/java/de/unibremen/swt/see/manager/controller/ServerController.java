@@ -26,7 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
  * instances.
  */
 @RestController
-@RequestMapping("/server")
+@RequestMapping("/api/v1/server")
 @RequiredArgsConstructor
 @Slf4j
 public class ServerController {
@@ -150,7 +150,7 @@ public class ServerController {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error during file deletion!"));
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -174,7 +174,7 @@ public class ServerController {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage("Error accessing server files!"));
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     /**
@@ -196,7 +196,7 @@ public class ServerController {
             return ResponseEntity.internalServerError().body(ControllerUtils.wrapMessage(e.getMessage()));
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.noContent().build();
     }
 
     /**
