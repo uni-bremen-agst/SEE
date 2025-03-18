@@ -33,7 +33,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "a011c51ed65c9abc3151a7a408bc70d408352933"
+      "hash": "fe31ad0904abee296b5ea72c6073157accba59e8"
     },
     "com.openai.unity": {
       "version": "8.5.1",
@@ -91,7 +91,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.collections": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -387,7 +387,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
-      "version": "1.14.0",
+      "version": "1.14.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
