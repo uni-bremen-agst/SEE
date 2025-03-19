@@ -3491,37 +3491,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 3933618643060986223}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &3609035152083277115
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 7525062123392414355}
-  m_Layer: 0
-  m_Name: HeadAdjust
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &7525062123392414355
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3609035152083277115}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.003409257, y: 0.0140735945, z: 0.7036491, w: -0.71040004}
-  m_LocalPosition: {x: -0.005471002, y: -0.041960362, z: 0.02919769}
-  m_LocalScale: {x: 0.89301056, y: 0.8572704, z: 0.89301}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 2259532064594164372}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &3726792714510972064
 GameObject:
   m_ObjectHideFlags: 0
@@ -3875,7 +3844,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 3647884689276491473}
-  - {fileID: 7525062123392414355}
   m_Father: {fileID: 2679397362495722499}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4693167515050243663
@@ -6381,7 +6349,7 @@ PrefabInstance:
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}

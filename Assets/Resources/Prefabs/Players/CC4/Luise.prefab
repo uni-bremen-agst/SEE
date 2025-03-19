@@ -641,37 +641,6 @@ SkinnedMeshRenderer:
     m_Center: {x: 0.006654009, y: 0.3582701, z: -0.03559459}
     m_Extent: {x: 0.1188737, y: 0.13379979, z: 0.10626363}
   m_DirtyAABB: 0
---- !u!1 &1470023737617646264
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 210529479401095083}
-  m_Layer: 0
-  m_Name: HeadAdjust
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &210529479401095083
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1470023737617646264}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.0034090723, y: 0.01407375, z: 0.7036493, w: -0.71040004}
-  m_LocalPosition: {x: -0.0054710736, y: 0.06556675, z: 0.014134714}
-  m_LocalScale: {x: 0.89301044, y: 0.8572706, z: 0.89300984}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 5149256646234930882}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1526642450123016905
 GameObject:
   m_ObjectHideFlags: 0
@@ -1336,7 +1305,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4669988357992880030}
-  - {fileID: 210529479401095083}
   m_Father: {fileID: 2254239956683980784}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2841129528795614277
@@ -6713,7 +6681,7 @@ PrefabInstance:
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}

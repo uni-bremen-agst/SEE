@@ -1823,7 +1823,6 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6911424014740824989}
-  - {fileID: 2908846410848982790}
   m_Father: {fileID: 5797790987266523904}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4720186666122000706
@@ -5568,37 +5567,6 @@ Transform:
   m_Children:
   - {fileID: 5666004789474557558}
   m_Father: {fileID: 7925918136850262061}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8252346877912522407
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2908846410848982790}
-  m_Layer: 0
-  m_Name: HeadAdjust
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2908846410848982790
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8252346877912522407}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0.0034091393, y: 0.014073698, z: 0.7036492, w: -0.71040004}
-  m_LocalPosition: {x: -0.0054709488, y: 0.06583755, z: 0.014136172}
-  m_LocalScale: {x: 0.89301044, y: 0.85727066, z: 0.89300984}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6994599672752612342}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8392417628556438930
 GameObject:
@@ -10466,7 +10434,7 @@ PrefabInstance:
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
