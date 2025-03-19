@@ -10333,6 +10333,11 @@ PrefabInstance:
       propertyPath: blinklids.Array.data[1].expData.controllerVars.Array.data[1].smr
       value: 
       objectReference: {fileID: 4871984334615894583}
+    - target: {fileID: 651677388701850471, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 1242937920193830085, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -10386,7 +10391,7 @@ PrefabInstance:
     - target: {fileID: 1906181387538679423, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Name
-      value: Female2
+      value: Hanna
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
