@@ -83,7 +83,7 @@ namespace SEE.Game.Worlds
            "John",
            "Karl",
            "Eddy",
-           "Female1",
+           "Paula",
            "Female2",
            "Female3",
         };
