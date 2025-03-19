@@ -7150,7 +7150,7 @@ PrefabInstance:
     - target: {fileID: 1906181387538679423, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Name
-      value: Male1
+      value: John
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -7240,7 +7240,7 @@ PrefabInstance:
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
