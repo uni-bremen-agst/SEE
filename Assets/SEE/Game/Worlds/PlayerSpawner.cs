@@ -83,6 +83,7 @@ namespace SEE.Game.Worlds
            "John",
            "Karl",
            "Eddy",
+           "Kevin"
            "Paula",
            "Hanna",
            "Luise",
