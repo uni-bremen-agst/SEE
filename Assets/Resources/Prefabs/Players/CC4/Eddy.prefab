@@ -5944,7 +5944,7 @@ PrefabInstance:
     - target: {fileID: 66448070250737606, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: visemes.Array.data[0].expData.inspFoldout
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 66448070250737606, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -6349,7 +6349,7 @@ PrefabInstance:
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: inspSalsaLinked
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
