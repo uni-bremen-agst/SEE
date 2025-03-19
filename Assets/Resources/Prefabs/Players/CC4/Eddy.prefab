@@ -6265,6 +6265,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
+      propertyPath: inspStateFoldoutEyelids
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 650674032146329087, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
       propertyPath: blinklids.Array.data[0].expData.inspFoldout
       value: 1
       objectReference: {fileID: 0}

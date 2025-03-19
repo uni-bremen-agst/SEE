@@ -7155,72 +7155,72 @@ PrefabInstance:
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.axis.x
-      value: 0.015199572
+      value: -9.629917e-13
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.axis.y
-      value: 0.024649445
+      value: -0.0000014305117
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.axis.z
-      value: 0.9995806
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.IKPosition.x
-      value: -0.0054707103
+      value: 0.00000028628915
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.IKPosition.y
-      value: 1.6205956
+      value: 1.6440792
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.IKPosition.z
-      value: 2.969008
+      value: 2.9397275
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.transform
       value: 
-      objectReference: {fileID: 4083467552537113597}
+      objectReference: {fileID: 3088466752427434027}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalPosition.x
-      value: -0.0054709967
+      value: 0.0000000019202706
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalPosition.y
-      value: -0.023483781
+      value: 0.045531005
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalPosition.z
-      value: 0.029280256
+      value: -0.000063591004
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalRotation.w
-      value: -0.7103999
+      value: 0.9951948
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalRotation.x
-      value: -0.003409221
+      value: -0.09791485
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalRotation.y
-      value: 0.014073577
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.defaultLocalRotation.z
-      value: 0.7036492
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 5179106205997057727, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
