@@ -81,7 +81,7 @@ namespace SEE.Game.Worlds
         public static List<string> Prefabs = new()
         {
            "John",
-           "Male2",
+           "Karl",
            "Eddy",
            "Female1",
            "Female2",
