@@ -59,6 +59,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -96,6 +99,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 814d03533fbb9a8409b921253838f2de, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!1 &7978100806410315116
 GameObject:
   m_ObjectHideFlags: 0
@@ -156,6 +160,9 @@ MeshRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 2
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -214,6 +221,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -231,6 +242,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!1001 &1527852820800760868
@@ -341,6 +353,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2035415008117143363, guid: d5cd7421055650b4a96646900cab131b,
+        type: 3}
+      propertyPath: 'm_ActiveFontFeatures.Array.data[0]'
+      value: 1801810542
+      objectReference: {fileID: 0}
     - target: {fileID: 7542913983359697422, guid: d5cd7421055650b4a96646900cab131b,
         type: 3}
       propertyPath: m_Name
@@ -447,17 +464,17 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4747962948313757172, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
-      propertyPath: m_Materials.Array.data[0]
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: 4162258790146a541bfe125d17bcd34f, type: 2}
     - target: {fileID: 5197118176682910397, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
-      propertyPath: m_BlendShapeWeights.Array.data[54]
+      propertyPath: 'm_BlendShapeWeights.Array.data[54]'
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5197118176682910397, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
-      propertyPath: m_BlendShapeWeights.Array.data[55]
+      propertyPath: 'm_BlendShapeWeights.Array.data[55]'
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
@@ -604,7 +621,6 @@ CharacterController:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -699,8 +715,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 4051342736
+  GlobalObjectIdHash: 2113941817
   InScenePlacedSourceGlobalObjectIdHash: 0
+  DeferredDespawnTick: 0
+  Ownership: 1
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -708,6 +726,8 @@ MonoBehaviour:
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
+  SyncOwnerTransformWhenParented: 1
+  AllowOwnerToParent: 0
 --- !u!114 &4483526754788980897
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -720,6 +740,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06a892ac1d6c864dad7c6c575b6e640, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &8392003161173775861
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -732,6 +753,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4295300675c15c140a195eca006cefd7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  NetworkTransformExpanded: 0
+  AuthorityMode: 0
+  TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
   SyncPositionY: 1
@@ -749,6 +774,7 @@ MonoBehaviour:
   UseQuaternionCompression: 0
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
+  SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
 --- !u!114 &4561120900764070664
@@ -763,6 +789,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c02547380b5a94d4b8bdc3239eeeea84, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!114 &2135427831744147440
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6066,7 +6093,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 0
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 1
