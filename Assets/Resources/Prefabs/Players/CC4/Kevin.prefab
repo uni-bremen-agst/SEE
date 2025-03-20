@@ -8522,9 +8522,9 @@ MonoBehaviour:
   m_Script: {fileID: -1091098677, guid: 21fe281538940584e84b6d5eedb3525e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSrc: {fileID: 8987971954791351240}
+  audioSrc: {fileID: 0}
   waitForAudioSource: 0
-  useExternalAnalysis: 0
+  useExternalAnalysis: 1
   audioSourceWaitTarget: {fileID: 0}
   queueProcessor: {fileID: 6599488138934562417}
   emoter: {fileID: 676924765516763992}
@@ -12150,7 +12150,7 @@ MonoBehaviour:
   isDebug: 0
   useAudioAnalysis: 1
   needAudioSource: 1
-  inspStateFoldoutProcessing: 0
+  inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 0
   inspStateFoldoutVisemes: 0
   inspCollectionDisplayMode: 0
@@ -15160,8 +15160,8 @@ MonoBehaviour:
     referenceIdx: 0
   eyeExpIndex: 0
   eyeExpNames:
-  - eyelid 0
-  - eyelid 1
+  - eyeL
+  - eyeR
   eyeExpRend: {fileID: 0}
   eyeExpRendItemCount: 2
   eyeExpRendIsNullOrSmr: 1
@@ -15324,7 +15324,9 @@ MonoBehaviour:
     gizmo: {fileID: 0}
     referenceIdx: 0
   eyelidExpIndex: 0
-  eyelidExpNames: []
+  eyelidExpNames:
+  - eyelidL
+  - eyelidR
   eyelidExpRend: {fileID: 0}
   eyelidExpRendItemCount: 1
   eyelidExpRendIsNullOrSmr: 1
