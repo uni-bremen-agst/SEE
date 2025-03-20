@@ -10637,10 +10637,6 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 2888973682104671505}
-    - targetCorrespondingSourceObject: {fileID: 1906181387538679423, guid: 628493a4652d54b47aaee2226a0c0890,
-        type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 4383449354478772617}
   m_SourcePrefab: {fileID: 100100000, guid: 628493a4652d54b47aaee2226a0c0890, type: 3}
 --- !u!4 &3496049326477354375 stripped
 Transform:
@@ -10666,9 +10662,9 @@ MonoBehaviour:
   m_Script: {fileID: -1091098677, guid: 21fe281538940584e84b6d5eedb3525e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  audioSrc: {fileID: 4383449354478772617}
+  audioSrc: {fileID: 0}
   waitForAudioSource: 0
-  useExternalAnalysis: 0
+  useExternalAnalysis: 1
   audioSourceWaitTarget: {fileID: 0}
   queueProcessor: {fileID: 2888973682104671505}
   emoter: {fileID: 9208499487129490026}
@@ -13853,7 +13849,7 @@ MonoBehaviour:
   isDebug: 0
   useAudioAnalysis: 1
   needAudioSource: 1
-  inspStateFoldoutProcessing: 0
+  inspStateFoldoutProcessing: 1
   inspStateFoldoutSettings: 0
   inspStateFoldoutVisemes: 0
   inspCollectionDisplayMode: 0
@@ -16863,8 +16859,8 @@ MonoBehaviour:
     referenceIdx: 0
   eyeExpIndex: 0
   eyeExpNames:
-  - eyelid 0
-  - eyelid 1
+  - eyeL
+  - eyeR
   eyeExpRend: {fileID: 0}
   eyeExpRendItemCount: 2
   eyeExpRendIsNullOrSmr: 1
@@ -17027,7 +17023,9 @@ MonoBehaviour:
     gizmo: {fileID: 0}
     referenceIdx: 0
   eyelidExpIndex: 0
-  eyelidExpNames: []
+  eyelidExpNames:
+  - eyelidL
+  - eyelidR
   eyelidExpRend: {fileID: 0}
   eyelidExpRendItemCount: 1
   eyelidExpRendIsNullOrSmr: 1
@@ -17199,100 +17197,3 @@ MonoBehaviour:
   inspShowLids: 1
   inspShowLipsync: 1
   inspShowBlinks: 1
---- !u!82 &4383449354478772617
-AudioSource:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4309846963091504957}
-  m_Enabled: 1
-  serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
-  m_audioClip: {fileID: 0}
-  m_Resource: {fileID: 0}
-  m_PlayOnAwake: 1
-  m_Volume: 1
-  m_Pitch: 1
-  Loop: 1
-  Mute: 0
-  Spatialize: 0
-  SpatializePostEffects: 0
-  Priority: 128
-  DopplerLevel: 1
-  MinDistance: 1
-  MaxDistance: 500
-  Pan2D: 0
-  rolloffMode: 0
-  BypassEffects: 0
-  BypassListenerEffects: 0
-  BypassReverbZones: 0
-  rolloffCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    - serializedVersion: 3
-      time: 1
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  panLevelCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  spreadCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
-  reverbZoneMixCustomCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0.33333334
-      outWeight: 0.33333334
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
