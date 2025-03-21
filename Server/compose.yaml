@@ -43,8 +43,6 @@ services:
       - backend-data:/see
       # - /var/run/docker.sock:/var/run/docker.sock
       - /var/run/docker.sock:/var/run/docker.sock
-    ports:
-      - ":8080"
     environment:
       # You should not change these values here.
       # Use the env file instead
