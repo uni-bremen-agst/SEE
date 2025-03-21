@@ -887,7 +887,6 @@ namespace SEE.Net
         public void StartClient(CallBack callBack)
         {
             callbackToMenu = callBack;
-            
             // Set the address of the server to connect to.
             UnityTransport netTransport = GetNetworkTransport();
             netTransport.ConnectionData.Address = ServerIP4Address;
