@@ -92,6 +92,7 @@ namespace SEE.Game.Worlds
            "Dwayne",
            "Caleb",
            "Carlos",
+           "Tao",
            "Paula",
            "Hanna",
            "Luise",
@@ -118,6 +119,7 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[8], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[9], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[10], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[11], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
