@@ -68,16 +68,16 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
+        /// The dissonance communication. Its game object holds the remote players as its children.
+        /// </summary>
+        private DissonanceComms dissonanceComms = null;
+
+        /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
         /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
         [Tooltip("The information to be used to spawn players."), ShowInInspector, SerializeField]
         private List<SpawnInfo> playerSpawns;
-
-        /// <summary>
-        /// The dissonance communication. Its game object holds the remote players as its children.
-        /// </summary>
-        private DissonanceComms dissonanceComms = null;
 
         /// <summary>
         /// The name of the player prefabs used for spawning. These prefabs must be located in the
@@ -89,6 +89,7 @@ namespace SEE.Game.Worlds
            "Karl",
            "Eddy",
            "Kevin",
+           "Dwayne",
            "Paula",
            "Hanna",
            "Luise",
@@ -112,6 +113,7 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[5], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[6], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[7], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[8], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
