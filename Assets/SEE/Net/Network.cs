@@ -887,6 +887,10 @@ namespace SEE.Net
         public void StartClient(CallBack callBack)
         {
             callbackToMenu = callBack;
+            
+            UnityTransport netTransport = GetNetworkTransport();
+            netTransport.ConnectionData.Address = ServerIP4Address;
+            
             StartCoroutine(ShutdownNetwork(InternalStartClient));
 
             void InternalStartClient()
