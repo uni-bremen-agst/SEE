@@ -5,7 +5,7 @@ import AppUtils from '../utils/AppUtils';
 
 const axiosInstance = axios.create({
   baseURL: import.meta.env.MODE === "development" ? import.meta.env.VITE_APP_API_URL : "/api/v1/",
-  timeout: 5000,
+  timeout: 50000,
   withCredentials: true
 });
 
