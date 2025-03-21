@@ -890,7 +890,6 @@ namespace SEE.Net
             // Set the address of the server to connect to.
             UnityTransport netTransport = GetNetworkTransport();
             netTransport.ConnectionData.Address = ServerIP4Address;
-            
             StartCoroutine(ShutdownNetwork(InternalStartClient));
 
             void InternalStartClient()
