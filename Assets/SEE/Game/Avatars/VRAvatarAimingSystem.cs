@@ -63,7 +63,6 @@ namespace SEE.Game.Avatars
             Laser.On = true;
             if (HandBone == null)
             {
-                //HandBone = gameObject.transform.Find("Root/Global/Position/Hips/LowerBack/Spine/Spine1/RightShoulder/RightArm/RightForeArm/RightHand")?.transform;
                 HandBone = gameObject.transform.Find("CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand")?.transform;
             }
             if (HandBone == null)

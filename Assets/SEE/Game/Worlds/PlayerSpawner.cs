@@ -68,6 +68,11 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
+        /// The dissonance communication. Its game object holds the remote players as its children.
+        /// </summary>
+        private DissonanceComms dissonanceComms = null;
+
+        /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
         /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
@@ -80,18 +85,20 @@ namespace SEE.Game.Worlds
         /// </summary>
         public static List<string> Prefabs = new()
         {
-           "Male1",
-           "Male2",
-           "Male3",
-           "Female1",
-           "Female2",
-           "Female3",
+           "John",
+           "Karl",
+           "Eddy",
+           "Kevin",
+           "Dwayne",
+           "Caleb",
+           "Carlos",
+           "Tao",
+           "Paula",
+           "Hanna",
+           "Luise",
+           "Susan",
+           "Shi",
         };
-
-        /// <summary>
-        /// The dissonance communication. Its game object holds the remote players as its children.
-        /// </summary>
-        private DissonanceComms dissonanceComms = null;
 
         /// <summary>
         /// Initializes the player spawns if they are not already set by the user in the Unity inspector.
@@ -108,6 +115,13 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[3], new Vector3(-3.5f, 0f, -5.8f), 90),
                     new SpawnInfo(Prefabs[4], new Vector3(-3.5f, 0f, -6.8f), 90),
                     new SpawnInfo(Prefabs[5], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[6], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[7], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[8], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[9], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[10], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[11], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[12], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
@@ -139,13 +153,13 @@ namespace SEE.Game.Worlds
         /// </summary>
         private void SpawnPlayer()
         {
-            Net.Network networkConfig = FindObjectOfType<Net.Network>()
+            Net.Network networkConfig = FindFirstObjectByType<Net.Network>()
                 ?? throw new Exception("Network configuration not found.\n");
 
             // Wait until Dissonance is created.
             if (ReferenceEquals(dissonanceComms, null))
             {
-                dissonanceComms = FindObjectOfType<DissonanceComms>();
+                dissonanceComms = FindFirstObjectByType<DissonanceComms>();
                 // We need to set the local player name in DissonanceComms
                 // before Dissonance is started. That is why we cannot afford
                 // to wait until the next frame.
