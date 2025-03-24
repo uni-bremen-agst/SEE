@@ -21348,6 +21348,10 @@ MonoBehaviour:
       type: 3}
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
+  - PlayerPrefab: {fileID: 3697348554535967023, guid: c69bb6b2634083043a49fc87558d509d,
+      type: 3}
+    Position: {x: -3.5, y: 0, z: -7.8}
+    Rotation: 90
 --- !u!1001 &1339535448
 PrefabInstance:
   m_ObjectHideFlags: 0
