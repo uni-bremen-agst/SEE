@@ -98,6 +98,7 @@ namespace SEE.Game.Worlds
            "Luise",
            "Susan",
            "Shi",
+           "Yvo",
         };
 
         /// <summary>
@@ -122,6 +123,7 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[10], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[11], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[12], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[13], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
