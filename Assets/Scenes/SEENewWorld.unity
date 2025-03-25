@@ -21328,6 +21328,10 @@ MonoBehaviour:
       type: 3}
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
+  - PlayerPrefab: {fileID: 3697348554535967023, guid: c69bb6b2634083043a49fc87558d509d,
+      type: 3}
+    Position: {x: -3.5, y: 0, z: -7.8}
+    Rotation: 90
   - PlayerPrefab: {fileID: 4309846963091504957, guid: cd997918b70142e44bb15e96c5ef5e7a,
       type: 3}
     Position: {x: -3.5, y: 0, z: -5.8}
@@ -21345,10 +21349,6 @@ MonoBehaviour:
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
   - PlayerPrefab: {fileID: 5652934945685355807, guid: dd7cff846db58534da9f8e3a274b0b36,
-      type: 3}
-    Position: {x: -3.5, y: 0, z: -7.8}
-    Rotation: 90
-  - PlayerPrefab: {fileID: 3697348554535967023, guid: c69bb6b2634083043a49fc87558d509d,
       type: 3}
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90

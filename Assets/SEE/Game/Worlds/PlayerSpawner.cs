@@ -93,12 +93,12 @@ namespace SEE.Game.Worlds
            "Caleb",
            "Carlos",
            "Tao",
+           "Yvo",
            "Paula",
            "Hanna",
            "Luise",
            "Susan",
            "Shi",
-           "Yvo",
         };
 
         /// <summary>
