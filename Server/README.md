@@ -6,6 +6,81 @@ The management server can be used to configure, run, and stop SEE game server in
 Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
 
 
+## Pre-requirements
+
+Docker (or podman) will be needed for running this Server.
+
+You may need to configure your firewall to allow incoming traffic.
+
+SEE Server Manager will use UDP Ports from 9100 to 9300.
+You can either allow the entire port-range (not recommended for servers reachable from the internet), or allow the individual ports for each server instance.
+
+##  Install SEE Server Manager on your own Server
+
+1. Install docker according to the [Documentation](https://docs.docker.com/engine/install/)
+2. Clone the repository:
+
+Optional:
+
++ Install [just](https://github.com/casey/just)
+  + You can view all avaliable commands with the command `just` or  `just --list`
+
+```console
+$ git clone
+$ cd
+```
+
+### Docker images
+Now pull the docker images with
+
+```console
+$ docker compose pull
+```
+or using `just`
+
+```
+$ just pull-images
+```
+
+You also need to pull the images of the actual game server
+
+```console
+$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.0
+```
+You may change the version tag of this images if needed.
+
+
+#### Alternative: Building the containers
+You may also build the images by yourself for local testing by using:
+```console
+$ just containerize
+```
+
+or
+```console
+$ docker compose build
+```
+
+### Start the Server
+
+The SEE Server manager uses [Traefik](https://traefik.io/traefik/) as a reverse proxy which will be exposed at port 80 by default
+
+#### Configuration
+
+In the file `prod.env` you will find the enviroment variables for configuring the Deployment of the Server.
+
++ DOMAIN_NAME: The domain address under which the frontend and backend should be served.
++ EXTERNAL_PORT: The port under which the compose stack will be served (Default is 80).
++ DOCKER_HOST_EXTERNAL: The address under which the gameserver should be registred - currently this must be a valid, reachable IPv4 adress.
++ DOCKER_IMAGE_NAME: The docker image name of the gameserver that should be used for spawning a new instance.
++ JWT_SECRET: The JWT secret that should be used when signing auth tokens
++ JWT_EXPIRATION: The duration of how long a  JWT should live.
+
+You can create a new random jwt secret by running the following just command (openssl required):
+```console
+just seed-jwt prod.env
+```
+
 --------------------------------------------------------------------------------
 ## Documentation
 
