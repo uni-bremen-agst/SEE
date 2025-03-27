@@ -10,7 +10,6 @@ import de.unibremen.swt.see.manager.repository.UserRepository;
 import de.unibremen.swt.see.manager.service.FileService;
 import de.unibremen.swt.see.manager.service.ServerService;
 import de.unibremen.swt.see.manager.service.UserService;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -55,6 +54,7 @@ public class SeeManagerApplication {
 
     /**
      * The main method to run the Spring Boot application.
+     *
      * @param args command-line arguments
      */
     public static void main(String[] args) {
@@ -69,15 +69,15 @@ public class SeeManagerApplication {
      * <p>
      * Required dependencies are listed in the parameters.
      *
-     * @param newAdminName username of an admin user that should be created
-     * during startup
+     * @param newAdminName     username of an admin user that should be created
+     *                         during startup
      * @param newAdminPassword plain-text password of an admin user that should
-     * @param serverRepo server repository dependency
-     * @param userRepo user repository dependency
-     * @param userService user service dependency
-     * @param fileService file service dependency
-     * @param roleRepo role repository dependency
-     * @param configRepo configuration repository dependency
+     * @param serverRepo       server repository dependency
+     * @param userRepo         user repository dependency
+     * @param userService      user service dependency
+     * @param fileService      file service dependency
+     * @param roleRepo         role repository dependency
+     * @param configRepo       configuration repository dependency
      * @return the configured {@link CommandLineRunner}
      */
     @Bean
@@ -85,10 +85,10 @@ public class SeeManagerApplication {
             @Value("${see.app.admin.add.name}") String newAdminName,
             @Value("${see.app.admin.add.password}") String newAdminPassword,
             ServerRepository serverRepo,
-            UserRepository userRepo, 
-            UserService userService, 
-            FileService fileService, 
-            RoleRepository roleRepo, 
+            UserRepository userRepo,
+            UserService userService,
+            FileService fileService,
+            RoleRepository roleRepo,
             ConfigRepository configRepo) {
         return args -> {
             Config config = new Config();
@@ -97,14 +97,18 @@ public class SeeManagerApplication {
             config.setMaxContainerPort(9300);
             configRepo.save(config);
 
-            Optional<Role> optAdminRole = roleRepo.findByName(RoleType.ROLE_ADMIN);
-            if (optAdminRole.isEmpty())
-                roleRepo.save(new Role(RoleType.ROLE_ADMIN));
-            Optional<Role> optUserRole = roleRepo.findByName(RoleType.ROLE_USER);
-            if (optUserRole.isEmpty())
-                roleRepo.save(new Role(RoleType.ROLE_USER));
+            roleRepo
+                    .findByName(RoleType.ROLE_ADMIN)
+                    .orElseGet(() -> roleRepo.save(new Role(RoleType.ROLE_ADMIN)));
+            roleRepo
+                    .findByName(RoleType.ROLE_USER)
+                    .orElseGet(() -> roleRepo.save(new Role(RoleType.ROLE_USER)));
 
             if (newAdminName != null && !newAdminName.isBlank() && newAdminPassword != null && !newAdminPassword.isBlank()) {
+                if (userService.getByUsername(newAdminName) != null) {
+                    log.warn("Skip creating new admin user {}: account already exist", newAdminName);
+                    return;
+                }
                 log.warn("ADDING ADMIN USER PASSED VIA ENVIRONMENT: {}", newAdminName);
                 userService.create(newAdminName, newAdminPassword, RoleType.ROLE_ADMIN);
             }
