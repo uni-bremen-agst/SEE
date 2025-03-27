@@ -67,7 +67,13 @@
         "System.Collections.Immutable.dll",
         "MoreLinq.dll",
         "Microsoft.Extensions.FileSystemGlobbing.dll",
-        "MediatR.dll"
+        "MediatR.dll",
+        "OpenTelemetry.dll",
+        "OpenTelemetry.Api.dll",
+        "OpenTelemetry.Exporter.Console.dll",
+        "System.Diagnostics.DiagnosticSource.dll",
+        "System.Diagnostics.dll"
+
     ],
     "autoReferenced": false,
     "defineConstraints": [],

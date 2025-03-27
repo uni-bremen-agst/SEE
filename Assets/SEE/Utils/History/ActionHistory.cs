@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using SEE.Net.Actions;
+using SEE.Tools.OpenTelemetry;
 
 namespace SEE.Utils.History
 {
@@ -232,6 +233,7 @@ namespace SEE.Utils.History
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
+            TracingHelper.TrackAddToHistory(action, actionID, changedObjects);
             if (syncOverNetwork)
             {
                 new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);
@@ -248,6 +250,7 @@ namespace SEE.Utils.History
         private void RemoveFromGlobalHistory(GlobalHistoryEntry action)
         {
             RemoveAction(action.ActionID);
+            TracingHelper.TrackRemoveFromHistory(action);
             if (syncOverNetwork)
             {
                 new NetActionHistory().Delete(action.ActionID);

@@ -186,6 +186,12 @@ namespace SEE.Controls.Actions
                 // Prevent instant re-grab if the action was started via context menu and is not completed
                 ExecuteViaContextMenu = ExecuteViaContextMenu && wasMoved;
                 CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                if (wasMoved && grabbedObject.GrabbedGameObject != null)
+                {
+                    TracingHelper.TrackMoveAction(grabbedObject.GrabbedGameObject,
+                        grabbedObject.GrabbedGameObject.transform.position, grabbedObject.NewParent);
+                }
+
                 return wasMoved;
             }
             return false;
@@ -665,7 +671,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Reflexion Mapping",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 

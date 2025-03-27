@@ -32,6 +32,8 @@ namespace SEE.Controls
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane FocusedObject;
 
+        private Vector3 lastPosition; // For tracking the player's previous position
+
         private void Start()
         {
             controller = gameObject.MustGetComponent<CharacterController>();
@@ -45,6 +47,8 @@ namespace SEE.Controls
             controller.center = new Vector3(0.0f, 1.55f, 0.21f);
             controller.radius = HeadRadius();
             controller.height = 0.0f;
+
+            lastPosition = transform.position; // Initialize last position
 
             if (FocusedObject != null)
             {
@@ -83,6 +87,9 @@ namespace SEE.Controls
             }
         }
 
+        bool moved; // Flag to track if there was any movement
+        bool keyReleased = false; // Flag to track if a key was just released
+        
         private void Update()
         {
             if (FocusedObject != null && SEEInput.ToggleCameraLock())
@@ -104,7 +111,7 @@ namespace SEE.Controls
             {
                 speed *= BoostFactor;
             }
-
+            // Handle movement logic and check for key release
             if (!cameraState.FreeMode)
             {
                 float d = 0.0f;
@@ -119,7 +126,8 @@ namespace SEE.Controls
                 cameraState.Distance -= d;
 
                 HandleRotation();
-                transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
+                transform.SetPositionAndRotation(FocusedObject.CenterTop,
+                    Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
                 transform.position -= transform.forward * cameraState.Distance;
             }
             else // cameraState.freeMode == true
@@ -128,27 +136,39 @@ namespace SEE.Controls
                 if (SEEInput.MoveForward())
                 {
                     velocity += transform.forward;
+                    moved = true;
                 }
+
                 if (SEEInput.MoveBackward())
                 {
                     velocity -= transform.forward;
+                    moved = true;
                 }
+
                 if (SEEInput.MoveRight())
                 {
                     velocity += transform.right;
+                    moved = true;
                 }
+
                 if (SEEInput.MoveLeft())
                 {
                     velocity -= transform.right;
+                    moved = true;
                 }
+
                 if (SEEInput.MoveUp())
                 {
                     velocity += Vector3.up;
+                    moved = true;
                 }
+
                 if (SEEInput.MoveDown())
                 {
                     velocity += Vector3.down;
+                    moved = true;
                 }
+
                 velocity.Normalize();
                 velocity *= speed;
                 // The following two lines may look strange, yet both are actually needed.
@@ -160,7 +180,35 @@ namespace SEE.Controls
                 transform.rotation = Quaternion.Euler(0.0f, cameraState.Yaw, 0.0f);
                 // Cameras Pitch and Yaw
                 Camera.main.transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+
+                // Check for key release to trigger movement tracking
+                if (moved && !AnyMovementInput())
+                {
+                    TracingHelper.TrackMovement(lastPosition, transform.position);
+                    lastPosition = transform.position; // Update last position
+                    moved = false;
+                }
             }
+        }
+
+        /// <summary>
+        /// Checks whether any movement input is currently being held down by the player.
+        /// This includes inputs for moving forward, backward, right, left, up, or down.
+        ///
+        /// It returns a boolean value indicating if any of the movement inputs are active.
+        /// If any of the directional keys or controls are being pressed, it will return true,
+        /// otherwise it will return false.
+        /// </summary>
+        /// <returns>
+        /// true if any movement input (forward, backward, right, left, up, or down) is held down,
+        /// false otherwise.
+        /// </returns>
+        private bool AnyMovementInput()
+        {
+            bool anyInput = SEEInput.MoveForward() || SEEInput.MoveBackward() || SEEInput.MoveRight() ||
+                            SEEInput.MoveLeft() ||
+                            SEEInput.MoveUp() || SEEInput.MoveDown();
+            return anyInput;
         }
 
         /// <summary>
@@ -192,6 +240,7 @@ namespace SEE.Controls
                 // locks the camera, so the player can look up and down, but can't fully rotate the camera.
                 cameraState.Pitch = Mathf.Clamp(cameraState.Pitch, -90, 90);
             }
+
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;
         }
