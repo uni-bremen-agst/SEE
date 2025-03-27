@@ -38,10 +38,8 @@ public static class TracingHelper
             if (foundObject != null)
             {
                 tags[$"action.affectedObjects[{index}].id"] = foundObject.name; // Add object ID tag
-                tags[$"action.affectedObjects[{index}].instanceID"] =
-                    foundObject.GetInstanceID(); // Add instance ID tag
-                tags[$"action.affectedObjects[{index}].position"] =
-                    foundObject.transform.position.ToString(); // Add position tag
+                tags[$"action.affectedObjects[{index}].instanceID"] = foundObject.GetInstanceID(); // Add instance ID tag
+                tags[$"action.affectedObjects[{index}].position"] = foundObject.transform.position.ToString(); // Add position tag
                 index++;
             }
         }
@@ -77,10 +75,8 @@ public static class TracingHelper
             if (foundObject != null)
             {
                 tags[$"action.affectedObjects[{index}].id"] = foundObject.name; // Add object ID tag
-                tags[$"action.affectedObjects[{index}].instanceID"] =
-                    foundObject.GetInstanceID(); // Add instance ID tag
-                tags[$"action.affectedObjects[{index}].position"] =
-                    foundObject.transform.position.ToString(); // Add position tag
+                tags[$"action.affectedObjects[{index}].instanceID"] = foundObject.GetInstanceID(); // Add instance ID tag
+                tags[$"action.affectedObjects[{index}].position"] = foundObject.transform.position.ToString(); // Add position tag
                 index++;
             }
         }

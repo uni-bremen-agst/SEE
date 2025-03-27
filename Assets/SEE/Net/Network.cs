@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
+using SEE.Tools.OpenTelemetry;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -609,6 +610,7 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
+            OpenTelemetryManager.Shutdown();
             ShutdownNetwork();
         }
 

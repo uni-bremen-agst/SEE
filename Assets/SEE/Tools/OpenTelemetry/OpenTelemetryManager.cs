@@ -30,8 +30,7 @@ namespace SEE.Tools.OpenTelemetry
             try
             {
                 // Generate a path for trace export directory.
-                _exportDirectoryPath = Path.Combine(Application.dataPath, "StreamingAssets", "OpenTelemetryLogs",
-                    "TraceLogs");
+                _exportDirectoryPath = Path.Combine(Application.dataPath, "StreamingAssets", "OpenTelemetryLogs", "TraceLogs");
 
                 // Configure and build the OpenTelemetry tracer provider.
                 _tracerProvider = Sdk.CreateTracerProviderBuilder()
