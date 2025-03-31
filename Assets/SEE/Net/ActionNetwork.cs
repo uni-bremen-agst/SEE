@@ -1,5 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Drawable;
+using SEE.GameObjects;
+using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Util;
@@ -24,6 +28,12 @@ namespace SEE.Net
 
         /// Collect and preserve the fragments of packages.
         public Dictionary<string, List<Fragment>> fragmentsGatherer = new();
+
+        /// <summary>
+        /// Indicator of whether synchronization was blocked to wait for a response from the client.
+        /// Only needed for late joining.
+        /// </summary>
+        private bool blockedForSynchronization = false;
 
         /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
@@ -173,20 +183,77 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         internal void SyncClientServerRpc(ulong clientId)
         {
-            StartCoroutine(SyncActionsAndWaitSomeSecondsForCityCreation(clientId));
-            return;
-            IEnumerator SyncActionsAndWaitSomeSecondsForCityCreation(ulong clientId)
+            SyncActionsAsync(clientId).Forget();
+
+            async UniTask SyncActionsAsync(ulong clientId)
             {
                 foreach (string serializedAction in Network.NetworkActionList.ToList())
                 {
                     AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-                    ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
                     if (action is AddCityNetAction)
                     {
-                        yield return new WaitForSeconds(2f);
+                        blockedForSynchronization = true;
+                        ExecuteActionUnsafeForCityCreationClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                        await UniTask.WaitUntil(()=> !blockedForSynchronization);
+                    } else
+                    {
+                        ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
                     }
                 }
                 DrawableSynchronizer.Synchronize(clientId);
+            }
+        }
+
+
+        /// <summary>
+        /// Releases the synchronization lock on the server side.
+        /// </summary>
+        [Rpc(SendTo.Server)]
+        private void ResponseCityCreationActionExeceutionToServerRpc(RpcParams rpcParams = default)
+        {
+            if (!IsServer && !IsHost)
+            {
+                return;
+            }
+            blockedForSynchronization = false;
+        }
+
+
+        /// <summary>
+        /// Perfroms the synchronization of a city creation on the client side and then sends a response to the server.
+        /// </summary>
+        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+        private void ExecuteActionUnsafeForCityCreationClientRpc(string serializedAction, RpcParams rpcParams = default)
+        {
+            if (IsHost || IsServer)
+            {
+                return;
+            }
+
+            if (rpcParams.Receive.SenderClientId != ServerClientId)
+            {
+                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                return;
+            }
+            ExecuteAndWait().Forget();
+
+            async UniTask ExecuteAndWait()
+            {
+                AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+                AddCityNetAction cityAction = (AddCityNetAction)action;
+                cityAction.ExecuteOnClient();
+                if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+                {
+                    GameObject city = citiesHolder.Find(cityAction.TableID);
+                    await UniTask.WaitUntil(() => city.GetComponent<AbstractSEECity>() != null && city.IsCodeCityDrawnAndActive());
+                    ResponseCityCreationActionExeceutionToServerRpc();
+                }
+                else
+                {
+                    // This case should not actually occur, but it serves as a backup.
+                    await UniTask.Delay(2000);
+                    ResponseCityCreationActionExeceutionToServerRpc();
+                }
             }
         }
 
