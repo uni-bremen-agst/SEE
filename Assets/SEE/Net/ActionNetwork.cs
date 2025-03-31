@@ -1,7 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable;
 using SEE.Net.Actions;
+using SEE.Net.Actions.City;
 using SEE.Net.Util;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -171,11 +173,21 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         internal void SyncClientServerRpc(ulong clientId)
         {
-            foreach (string serializedAction in Network.NetworkActionList.ToList())
+            StartCoroutine(SyncActionsAndWaitSomeSecondsForCityCreation(clientId));
+            return;
+            IEnumerator SyncActionsAndWaitSomeSecondsForCityCreation(ulong clientId)
             {
-                ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                foreach (string serializedAction in Network.NetworkActionList.ToList())
+                {
+                    AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+                    ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                    if (action is AddCityNetAction)
+                    {
+                        yield return new WaitForSeconds(2f);
+                    }
+                }
+                DrawableSynchronizer.Synchronize(clientId);
             }
-            DrawableSynchronizer.Synchronize(clientId);
         }
 
         /// <summary>
