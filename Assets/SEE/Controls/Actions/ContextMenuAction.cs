@@ -24,7 +24,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static System.Collections.Specialized.BitVector32;
 
 namespace SEE.Controls.Actions
 {
@@ -645,7 +644,10 @@ namespace SEE.Controls.Actions
             if (appendActions == null)
             {
                 actions.Add(new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1));
-                actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                if (!node.IsArchitectureOrImplementationRoot())
+                {
+                    actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                }
                 actions.Add(new PopupMenuAction("New Edge", NewEdge, Icons.Edge, Priority: 2));
                 actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
 
