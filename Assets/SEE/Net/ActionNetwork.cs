@@ -7,7 +7,6 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Util;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -204,7 +203,6 @@ namespace SEE.Net
             }
         }
 
-
         /// <summary>
         /// Releases the synchronization lock on the server side.
         /// </summary>
@@ -218,9 +216,8 @@ namespace SEE.Net
             blockedForSynchronization = false;
         }
 
-
         /// <summary>
-        /// Perfroms the synchronization of a city creation on the client side and then sends a response to the server.
+        /// Performs the synchronization of a city creation on the client side and then sends a response to the server.
         /// </summary>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
         private void ExecuteActionUnsafeForCityCreationClientRpc(string serializedAction, RpcParams rpcParams = default)

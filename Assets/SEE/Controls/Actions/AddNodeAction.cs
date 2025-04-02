@@ -117,7 +117,7 @@ namespace SEE.Controls.Actions
         /// <param name="targetPosition">The local position where the node should be placed.</param>
         private void CheckAddNode(GameObject parent, Vector3 targetPosition)
         {
-            if (!HasAvailableNodeType(parent.ContainingCity()))
+            if (!HasNotOnlyRootNodeTypes(parent.ContainingCity()))
             {
                 ShowNotification.Warn("No node type available.", "Node could not be added. A node type must be added first.");
                 return;
@@ -126,10 +126,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Checks if there is at least one node type that is note a root type.
+        /// Returns true if there is at least one node type in the graph associated with
+        /// the given <paramref name="city"/> that is not a root type.
         /// </summary>
-        /// <returns></returns>
-        public static bool HasAvailableNodeType(AbstractSEECity city)
+        /// <returns>true if the graph has a node type that is not a root type</returns>
+        public static bool HasNotOnlyRootNodeTypes(AbstractSEECity city)
         {
             return city.NodeTypes.Any(nodeType => !Graph.RootTypes.Contains(nodeType.Key));
         }
@@ -523,7 +524,7 @@ namespace SEE.Controls.Actions
             void OnCancel()
             {
                 // New node discarded
-                ShowNotification.Warn("Add node aborted",
+                ShowNotification.Warn("Addition of node aborted",
                     "The temporaily added node will be removed again.");
                 _ = GameElementDeleter.Delete(go);
                 new DeleteNetAction(go.name).Execute();

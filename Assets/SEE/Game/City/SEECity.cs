@@ -340,17 +340,17 @@ namespace SEE.Game.City
                     {
                         IsPipelineRunning = true;
 
+                        ReportProgress(0.01f);
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
+                                                                      cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
+
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
                             reportProgress(x);
                         }
-
-                        ReportProgress(0.01f);
-
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                            cancellationTokenSource.Token);
-                        IsPipelineRunning = false;
                     }
                 }
                 catch (OperationCanceledException)
@@ -484,6 +484,8 @@ namespace SEE.Game.City
                 RestoreLayout(layoutGraphNodes, decorationValues).Forget();
                 graphRenderer = null;
             }
+            return;
+
             async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
             {
@@ -511,6 +513,7 @@ namespace SEE.Game.City
                     }
                 });
             }
+
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
             {
                 IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
