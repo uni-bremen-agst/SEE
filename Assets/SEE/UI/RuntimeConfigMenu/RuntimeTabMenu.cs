@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -10,23 +6,26 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.UI.Menu;
 using SEE.GO;
+using SEE.GraphProviders;
 using SEE.Net.Actions.RuntimeConfig;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using SimpleFileBrowser;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
-using SEE.GraphProviders;
-using Sirenix.OdinInspector;
-using Cysharp.Threading.Tasks;
-using DG.Tweening;
-using SEE.UI.PropertyDialog;
-
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -148,6 +147,21 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Triggers when a list element was removed by a different player.
         /// </summary>
         public Action<string> SyncRemoveListElement;
+
+        /// <summary>
+        /// Triggers when a dict entry was added by a different player.
+        /// </summary>
+        public Action<string, string, string> SyncAddDictEntry;
+
+        /// <summary>
+        /// Triggers when a dict entry was removed by a different player.
+        /// </summary>
+        public Action<string, string> SyncRemoveDictEntry;
+
+        /// <summary>
+        /// Triggers when a dict entry should be removed.
+        /// </summary>
+        public Action<string, string> RemoveDictEntryAction;
 
         /// <summary>
         /// Prefab for the menu
@@ -432,6 +446,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => fieldInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => fieldInfo.SetValue(obj, changedValue),
                         memberInfo.GetCustomAttributes()
                     );
@@ -453,6 +468,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => propertyInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => propertyInfo.SetValue(obj, changedValue),
                         memberInfo.GetCustomAttributes()
                     );
@@ -471,7 +487,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent game object</param>
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
-        private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
+        private void CreateSetting(Func<object> getter, string settingName, GameObject parent, bool removable,
             UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
@@ -534,14 +550,14 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case Color:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateColorPicker(settingName,
                         parent,
                         changedValue => setter!(changedValue),
                         () => (Color)getter());
                     break;
                 case DataPath dataPath:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateFilePicker(settingName, dataPath, parent);
                     break;
                 case Enum:
@@ -566,6 +582,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => mapInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -574,6 +591,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => antennaInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -583,6 +601,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -593,6 +612,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline2.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
                         attributeArray);
                     break;
@@ -605,20 +625,21 @@ namespace SEE.UI.RuntimeConfigMenu
                     // not supported
                     break;
                 case IDictionary dict:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable, true);
+                    CreateDictEntryManagement(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
                 case IList<string> list:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(list, parent, () => string.Empty);
                     break;
                 case List<SingleGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(providerList, parent, () => new SingleGraphPipelineProvider());
                     break;
                 case List<MultiGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateList(providerList, parent, () => new MultiGraphPipelineProvider());
                     break;
 
@@ -635,7 +656,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case VisualAttributes:
                 case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 case CSVGraphProvider:
@@ -643,7 +664,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case GXLSingleGraphProvider:
                 case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
@@ -660,14 +681,195 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
+        /// <param name="expandable">Enables the add button to add new items.</param>
+        /// <param name="removable">Enables the remove button to remove this entry from its dictionary.</param>
         /// <returns>container for child settings</returns>
-        private static GameObject CreateNestedSetting(string settingName, GameObject parent)
+        private GameObject CreateNestedSetting(string settingName, GameObject parent,
+            bool removable, bool expandable = false)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
             container.name = settingName;
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
+            if (expandable)
+            {
+                EnableAddButton();
+            }
+            if (removable && CanRemoveKey())
+            {
+                InitRemoveButton();
+            }
             return container.transform.Find("Content").gameObject;
+
+            void EnableAddButton()
+            {
+                Transform addBtnTransform = container.transform.Find("Buttons/AddBtn");
+                addBtnTransform.gameObject.SetActive(true);
+            }
+
+            bool CanRemoveKey()
+            {
+                return !Graph.RootTypes.Contains(settingName);
+            }
+
+            void InitRemoveButton()
+            {
+                Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
+                removeBtnTransform.gameObject.SetActive(true);
+                ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
+                removeBtn.clickEvent.AddListener(() =>
+                {
+                    RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Adds functionality for managing dictionary entries.
+        /// This includes adding new entries as well as removing existing ones.
+        /// </summary>
+        /// <param name="parent">container</param>
+        /// <param name="dict">the dictionary</param>
+        private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
+        {
+            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
+            addBtn.clickEvent.AddListener(() =>
+            {
+                Type keyType = GetType(true);
+                if (keyType != typeof(string))
+                {
+                    string message = keyType != null ?
+                        $"currently {keyType} is not supported as a key value." :
+                        "the key type could not be determined since the dictionary is empty.";
+                    ShowNotification.Error("Entry cannot be added.", $"The entry cannot be added because {message}");
+                    return;
+                }
+                Type valueType = GetType(false);
+                if (valueType != null)
+                {
+                    AddEntry(valueType).Forget();
+                }
+                else
+                {
+                    ShowNotification.Error("Entry cannot be added.", "The entry cannot be added because the " +
+                        "value type could not be determined since the dictionary is empty.");
+                }
+            });
+
+            /// The action to be executed when an entry should be removed from a dictionary.
+            /// Additionally, it is checked whether it is a <see cref="VisualNodeAttributes"/>.
+            /// If this is the case, it is verified whether it can be removed at all.
+            RemoveDictEntryAction += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    if (dict[key].GetType() == typeof(VisualNodeAttributes))
+                    {
+                        ValidateAndRemoveNodeType((VisualNodeAttributes)dict[key], key);
+                    }
+                    else
+                    {
+                        RemoveDictEntry(key);
+                    }
+                }
+            };
+
+            // listeners for net actions; broadcasts the addition of a new dict
+            // entry to all clients
+            SyncAddDictEntry += (widgetPath, key, valueTypeName) =>
+            {
+                if (widgetPath == parent.FullName())
+                {
+                    Type valueType = Type.GetType(valueTypeName);
+                    dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                }
+            };
+
+            // broadcasts the removal of a new dict entry to all cients
+            SyncRemoveDictEntry += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    dict.Remove(key);
+                    UpdateDictChildren(parent, dict);
+                }
+            };
+            return;
+
+            void RemoveDictEntry(string key)
+            {
+                dict.Remove(key);
+                UpdateDictChildren(parent, dict);
+                RemoveDictEntryNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    WidgetPath = parent.FullName(),
+                    Key = key
+                };
+                netAction.Execute();
+            }
+
+            void ValidateAndRemoveNodeType(VisualNodeAttributes nodeType, string key)
+            {
+                if (city.LoadedGraph == null)
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because the graph is not loaded.");
+                    return;
+                }
+                if (city.LoadedGraph.Nodes().Any(node => node.Type == key))
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because it is used in the graph. Only unused node types can be deleted.");
+                }
+                else
+                {
+                    RemoveDictEntry(key);
+                }
+            }
+
+            /// Returns the desired type from a dictionary, depending on searchKeyType.
+            /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
+            /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
+            /// the second case is used, where the base type is examined.
+            /// If the types cannot be determined here either, it tries to extract the types directly from the first entry.
+            /// However, this only works if the dictionary is not empty.
+            /// If none of the cases can determine the desired type, null is returned.
+            Type GetType(bool searchKeyType)
+            {
+                Type dictType = dict.GetType();
+                int i = searchKeyType? 0 : 1;
+                ICollection collection = searchKeyType? dict.Keys : dict.Values;
+                return dictType.GetGenericArguments().Length == 2 ?
+                    dictType.GetGenericArguments()[i] : dictType.BaseType.GetGenericArguments().Length == 2 ?
+                        dictType.BaseType.GetGenericArguments()[i] : collection.Count > 0 ?
+                            collection.Cast<object>().FirstOrDefault()?.GetType() : null;
+            }
+
+            async UniTask AddEntry(Type valueType)
+            {
+                RuntimeMenuAddDictEntryProperty addEntryProperty = new(dict);
+                addEntryProperty.Open();
+                string key = null;
+                await UniTask.WaitUntil(() => addEntryProperty.TryGetKey(out key) || addEntryProperty.WasCanceled());
+                if (key != null)
+                {
+                    dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                    AddDictEntryNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        WidgetPath = parent.FullName(),
+                        Key = key,
+                        ValueType = valueType.FullName
+                    };
+                    netAction.Execute();
+                    ReDraw();
+                }
+            }
         }
 
         /// <summary>
@@ -1392,6 +1594,11 @@ namespace SEE.UI.RuntimeConfigMenu
             // add listener to update list
             OnUpdateMenuValues += () =>
             {
+                // This case can occur if a dictionary entry has been removed.
+                if (parent == null || addButton == null || removeButton == null)
+                {
+                    return;
+                }
                 UpdateListChildren(list, parent);
                 addButton.transform.SetAsLastSibling();
                 removeButton.transform.SetAsLastSibling();
@@ -1429,6 +1636,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => list[iCopy],
                         i.ToString(),
                         parent,
+                        false,
                         changedValue => list[iCopy] = changedValue as T
                     );
                 }
@@ -1447,7 +1655,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (!dict.Contains(child.name))
                 {
-                    Destroyer.Destroy(child);
+                    Destroyer.Destroy(child.gameObject);
                 }
             }
 
@@ -1460,6 +1668,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => dict[key],
                         key.ToString(),
                         parent,
+                        true,
                         changedValue => dict[key] = changedValue
                     );
                 }
@@ -1521,6 +1730,33 @@ namespace SEE.UI.RuntimeConfigMenu
                 yield return 0;
                 city.Invoke(nameof(SEECity.DrawGraph), 0);
             }
+        }
+
+        /// <summary>
+        /// Redraws the city.
+        /// </summary>
+        private void ReDraw()
+        {
+            TriggerReDraw();
+            UpdateCityMethodNetAction netAction = new()
+            {
+                CityIndex = CityIndex,
+                MethodName = nameof(TriggerReDraw)
+            };
+            netAction.Execute();
+        }
+
+        /// <summary>
+        /// Immediately redraws the city using the <see cref="SEECity.ReDrawGraph"/>
+        /// function.
+        /// </summary>
+        private void TriggerReDraw()
+        {
+            if (city.LoadedGraph == null)
+            {
+                return;
+            }
+            city.Invoke(nameof(SEECity.ReDrawGraph), 0);
         }
 
         /// <summary>

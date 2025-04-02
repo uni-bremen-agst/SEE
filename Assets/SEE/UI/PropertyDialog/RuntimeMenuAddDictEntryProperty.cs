@@ -1,50 +1,58 @@
 ﻿using SEE.Controls;
-using SEE.Game.City;
+using SEE.DataModel.DG;
 using SEE.Utils;
+using System.Collections;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog
 {
     /// <summary>
-    /// This class manages the dialog for adding a new node type.
+    /// This class manages the dialog for adding a new dict entry.
     /// </summary>
-    internal class AddNodeTypeProperty : BasePropertyDialog
+    internal class RuntimeMenuAddDictEntryProperty : BasePropertyDialog
     {
         /// <summary>
-        /// The node-type name which the player entered.
+        /// The key name which the player entered.
         /// </summary>
-        private static string nodeType;
+        private static string key;
 
         /// <summary>
-        /// This is the input field where the player can enter a node-type name.
+        /// This is the input field where the player can enter a key name.
         /// </summary>
         private StringProperty selectedName;
 
         /// <summary>
         /// The city where the new node type should be added.
         /// </summary>
-        private AbstractSEECity city;
+        private readonly IDictionary dict;
+
+        /// <summary>
+        /// The constructor of this class.
+        /// </summary>
+        /// <param name="dict">The dictionary to which an entry should be added.</param>
+        public RuntimeMenuAddDictEntryProperty(IDictionary dict)
+        {
+            this.dict = dict;
+        }
 
         /// <summary>
         /// This method instantiates the dialog and then displays it to the player.
         /// </summary>
-        /// <param name="city">The city where the new node type should be added.</param>
-        public void Open(AbstractSEECity city)
+        public void Open()
         {
-            this.city = city;
-            Dialog = new GameObject("Add node type dialog");
+            Dialog = new GameObject("Add entry dialog");
             PropertyGroup group = Dialog.AddComponent<PropertyGroup>();
-            group.Name = "Add node type dialog";
+            group.Name = "Add entry dialog";
 
             selectedName = Dialog.AddComponent<StringProperty>();
-            selectedName.Name = "Node Type Name";
-            selectedName.Description = "Enter a name for the new node type.";
+            selectedName.Name = "Key";
+            selectedName.Description = "Enter a key for the new entry.";
             group.AddProperty(selectedName);
 
             // Adds the property dialog to the dialog.
             PropertyDialog = Dialog.AddComponent<PropertyDialog>();
-            PropertyDialog.Title = "Add new node type";
-            PropertyDialog.Description = "Select a node type name; then hit the OK button.";
+            PropertyDialog.Title = "Add new entry";
+            PropertyDialog.Description = "Select a key; then hit the OK button.";
             PropertyDialog.Icon = Resources.Load<Sprite>("Materials/ModernUIPack/Picker");
             PropertyDialog.AddGroup(group);
 
@@ -65,35 +73,39 @@ namespace SEE.UI.PropertyDialog
         {
             if (string.IsNullOrEmpty(selectedName.Value.Trim()))
             {
-                selectedName.ChangeToValidationFailed("The entered node type name must not be empty.");
+                selectedName.ChangeToValidationFailed("The entered key must not be empty.");
             }
-            else if (city.NodeTypes.TryGetValue(selectedName.Value, out VisualNodeAttributes _))
+            else if (dict.Contains(selectedName.Value))
             {
-                selectedName.ChangeToValidationFailed("Name is already in use. Please enter a unique node type name.");
+                selectedName.ChangeToValidationFailed("Key is already in use. Please enter a unique key.");
+            }
+            else if (Graph.RootTypes.Contains(selectedName.Value))
+            {
+                selectedName.ChangeToValidationFailed("Key is reserved. Please enter a unique key.");
             }
             else
             {
                 SEEInput.KeyboardShortcutsEnabled = true;
-                nodeType = selectedName.Value;
+                key = selectedName.Value;
                 GotInput = true;
                 Destroyer.Destroy(Dialog);
             }
         }
 
         /// <summary>
-        /// Fetches the node type name given by the player.
+        /// Fetches the key given by the player.
         /// </summary>
-        /// <param name="nodeTypeName">If given and not yet fetched, this will be the node type name the player chosen.</param>
+        /// <param name="key">If given and not yet fetched, this will be the key name the player chosen.</param>
         /// <returns>The value of <see cref="BasePropertyDialog.GotInput"/></returns>
-        internal bool TryGetNodeTypeName(out string nodeTypeName)
+        internal bool TryGetKey(out string key)
         {
             if (GotInput)
             {
-                nodeTypeName = nodeType;
+                key = RuntimeMenuAddDictEntryProperty.key;
                 GotInput = false;
                 return true;
             }
-            nodeTypeName = null;
+            key = null;
             return false;
         }
     }

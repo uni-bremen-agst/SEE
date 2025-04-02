@@ -443,7 +443,7 @@ namespace SEE.Game.CityRendering
         /// Adds decoration for the given <paramref name="gameNode"/> with the global settings
         /// for inner node kinds and nodelayout.
         /// </summary>
-        /// <param name="gameNode"></param>
+        /// <param name="gameNode">game node to be decorated</param>
         public void AddDecorations(GameObject gameNode)
         {
             AddDecorations(new List<GameObject> { gameNode });
