@@ -1,85 +1,115 @@
 # SEE Managed Server
 
+## About this Project
 This is the management server for SEE, consisting of a backend and a frontend project.
 
 The management server can be used to configure, run, and stop SEE game server instances.
 Additionally, it provides an API to store and retrieve files for the use in multiple connected SEE clients.
 
+## Build with
 
-## Pre-requirements
-
-Docker (or podman) will be needed for running this Server.
-
-You may need to configure your firewall to allow incoming traffic.
-
-SEE Server Manager will use UDP Ports from 9100 to 9300.
-You can either allow the entire port-range (not recommended for servers reachable from the internet), or allow the individual ports for each server instance.
-
-##  Install SEE Server Manager on your own Server
-
-1. Install docker according to the [Documentation](https://docs.docker.com/engine/install/)
-2. Clone the repository:
-
-Optional:
-
-+ Install [just](https://github.com/casey/just)
-  + You can view all avaliable commands with the command `just` or  `just --list`
-
-```console
-$ git clone
-$ cd
-```
-
-### Docker images
-Now pull the docker images with
-
-```console
-$ docker compose pull
-```
-or using `just`
-
-```
-$ just pull-images
-```
-
-You also need to pull the images of the actual game server
-
-```console
-$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.0
-```
-You may change the version tag of this images if needed.
+* [![React][React.js]][React-url]
+* [![Vite][Vite]][Vite-url]
+* [![Spring Boot][Springboot]][Springboot-url]
+* [![Traefik][Traefik]][Springboot-url]
 
 
-#### Alternative: Building the containers
-You may also build the images by yourself for local testing by using:
-```console
-$ just containerize
-```
+[React.js]: https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB
+[React-url]: https://reactjs.org/
 
-or
-```console
-$ docker compose build
-```
+[Springboot]: https://img.shields.io/badge/Spring%20Boot-6DB33F?logo=springboot&style=for-the-badge&logoColor=fff
+[Springboot-url]: https://spring.io/projects/spring-boot
 
-### Start the Server
+[Traefik]: https://img.shields.io/badge/Traefik-24A1C1?style=for-the-badge&logo=traefikproxy&logoColor=black
+[Traefik-url]: https://traefik.io/
 
-The SEE Server manager uses [Traefik](https://traefik.io/traefik/) as a reverse proxy which will be exposed at port 80 by default
+[Vite]: https://img.shields.io/badge/Vite-B73BFE?style=for-the-badge&logo=vite&logoColor=FFD62E
+[Vite-url]: https://vitejs.dev/
 
-#### Configuration
+## Get Started
 
-In the file `prod.env` you will find the enviroment variables for configuring the Deployment of the Server.
+### Prerequisites
++ Docker (or Podman) need to be installed (https://www.docker.com/)
++ (Optional) Install [just](https://github.com/casey/just)
+  + You can view all available commands with the command `just` or  `just --list`
+
+
+### :key: Environment Variables
+To run this project, you will need to config the following environment variables in the .env file to your needs.
 
 + DOMAIN_NAME: The domain address under which the frontend and backend should be served.
 + EXTERNAL_PORT: The port under which the compose stack will be served (Default is 80).
-+ DOCKER_HOST_EXTERNAL: The address under which the gameserver should be registred - currently this must be a valid, reachable IPv4 adress.
++ DOCKER_HOST_EXTERNAL: The address under which the gameserver should be registered - currently only IPv4 addresses are supported.
 + DOCKER_IMAGE_NAME: The docker image name of the gameserver that should be used for spawning a new instance.
 + JWT_SECRET: The JWT secret that should be used when signing auth tokens
 + JWT_EXPIRATION: The duration of how long a  JWT should live.
++ INITIAL_ADMIN_USERNAME: The initial admin username that will be created when the server is started.
++ INITIAL_ADMIN_PASSWORD: The initial admin password that will be created when the server is started.
 
 You can create a new random jwt secret by running the following just command (openssl required):
 ```console
-just seed-jwt prod.env
+just seed .env
 ```
+It is recommended that you change the JWT secret before using the server iin production.
+
+Before starting make sure that:
++ DOMAIN_NAME matches a reachable address of this machine
++ EXTERNAL_PORT is exposed to the network
++ DOCKER_HOST_EXTERNAL matches a valid, reachable IPv4 address of your machine
+
+### :running: Run Locally
+Please refer to the README files in the Frontend and Backend directories for detailed instructions on how to run the SEE Server Manager locally.
+
+### :triangular_flag_on_post: Deployment
+Clone the project
+
+```bash
+$ git clone https://github.com/uni-bremen-agst/SEE.git
+```
+Then cd into the directory
+```bash 
+$ git clone
+$ cd SEE/Server
+```
+
+Now pull the docker images with
+
+```bash
+$ docker compose pull
+```
+or using the just command
+
+```bash 
+$ just pull-images
+```
+You also need to pull the images of the actual game server.
+The containers from this image will be used to create the server instances.
+
+```bash
+$ docker pull ghcr.io/uni-bremen-agst/see-gameserver:1.0.0
+```
+
+
+#### Start the Server
+
+The SEE Server manager uses [Traefik](https://traefik.io/traefik/) as a reverse proxy for the frontend and backend which will be exposed at port 80 by default.
+
+If the server is reachable from the internet, it is recommended to use the SSL support of Traefik to secure the connection.
+In that case you need to adjust the `compose.yaml` file and and uncomment necessary [configuration](https://doc.traefik.io/traefik/https/tls/) for the SSL certificates.
+
+Note: Traefik also supports automatic certificate generation using [Let's Encrypt](https://doc.traefik.io/traefik/https/acme/).
+
+
+To start the server run:
+```console
+$ docker compose up -d
+```
+or
+```console
+$ just start
+```
+
+After that you can open the frontend by navigating to the domain address you configured in the `prod.env` file in your browser.
 
 --------------------------------------------------------------------------------
 ## Documentation
@@ -174,44 +204,6 @@ This can be mitigated by either:
 - Use Podman in rootless mode.
   - This will usually prevent the frontend to open port 80, which should be no problem as a reverse proxy with HTTPs should be used, anyway.
   - See above for additional information on how to achieve this.
-
-
-### Deployment
-
-Deployment is intended to be done using Podman or Docker.
-
-Please read the `compose.yaml` carefully and adapt the configuration for your needs,
-especially for public/production setups!
-
-The container stack can be run from `Server` directory using `podman-compose` or `docker-compose`.  
-
-To build the containers, you can use:
-
-```
-podman-compose build
-```
-
-Use `--no-cache` parameter to force a rebuild.
-
-To run the container stack, use:
-
-```
-podman-compose up
-```
-
-Use `-d` parameter to run in detached mode.
-
-The following command stops and cleans up the container setup:
-
-```
-podman-compose down
-```
-
-#### Configuration
-
-You can edit the compose file to configure many options.
-
-Read the backend README for security considerations and change `JWT_SECRET` to a unique random secret.
 
 
 --------------------------------------------------------------------------------
