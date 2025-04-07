@@ -123,7 +123,7 @@ namespace SEE.Controls.Actions
                     }
 
                     // An object to be grabbed must be representing a node that is not the root.
-                    if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot())
+                    if (hoveredObject.gameObject.TryGetNode(out Node node) && !node.IsRoot() && !node.IsArchitectureOrImplementationRoot())
                     {
                         XRSEEActions.Selected = false;
                         activeAction = true;

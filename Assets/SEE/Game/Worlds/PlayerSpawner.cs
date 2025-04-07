@@ -83,21 +83,25 @@ namespace SEE.Game.Worlds
         /// The name of the player prefabs used for spawning. These prefabs must be located in the
         /// <see cref="SpawnInfo.playerPrefabFolder"/>.
         /// </summary>
+        /// <remarks>Order by male and female and then by name.</remarks>
         public static List<string> Prefabs = new()
         {
-           "John",
-           "Karl",
-           "Eddy",
-           "Kevin",
-           "Dwayne",
+            // Males
            "Caleb",
            "Carlos",
+           "Dwayne",
+           "Eddy",
+           "John",
+           "Karl",
+           "Kevin",
            "Tao",
-           "Paula",
+           "Yvo",
+           // Females
            "Hanna",
            "Luise",
-           "Susan",
+           "Paula",
            "Shi",
+           "Susan",
         };
 
         /// <summary>
@@ -107,6 +111,7 @@ namespace SEE.Game.Worlds
         {
             if (playerSpawns == null || playerSpawns.Count == 0)
             {
+                // TODO (#832): This should be computed.
                 playerSpawns = new()
                 {
                     new SpawnInfo(Prefabs[0], new Vector3(0.4f, 0f, -5.8f), 270),
@@ -122,6 +127,7 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[10], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[11], new Vector3(-3.5f, 0f, -7.8f), 90),
                     new SpawnInfo(Prefabs[12], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[13], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }

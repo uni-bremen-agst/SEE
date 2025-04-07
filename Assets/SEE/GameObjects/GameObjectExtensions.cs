@@ -1132,5 +1132,23 @@ namespace SEE.GO
 
             return false;
         }
+
+        /// <summary>
+        /// Searches for the first child that starts with the <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose chidlren should be examined.</param>
+        /// <param name="prefix">The prefix to search for.</param>
+        /// <returns>the found child or null.</returns>
+        public static Transform FindChildWithPrefix(this GameObject gameObject, string prefix)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name.StartsWith(prefix))
+                {
+                    return child;
+                }
+            }
+            return null;
+        }
     }
 }

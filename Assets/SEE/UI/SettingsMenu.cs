@@ -140,7 +140,7 @@ namespace SEE.UI
             SEEInput.KeyboardShortcutsEnabled = true;
             bindingNotification.Close();
             string question = $"Do you really want to reassign action \"{descriptor.Name}\" to key {newKey}?";
-            if (!await ConfirmDialog.ConfirmAsync(new(question, title: "Change Key?")))
+            if (!await ConfirmDialog.ConfirmAsync(new(question, Title: "Change Key?")))
             {
                 return;
             }
