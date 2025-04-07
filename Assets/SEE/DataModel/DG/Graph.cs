@@ -45,11 +45,13 @@ namespace SEE.DataModel.DG
         public const string RootType = "ROOT";
 
         /// <summary>
-        /// An immutable list of all root types of the graphs.
+        /// An immutable list of all root node types of the graphs. A root node type
+        /// is a node type whose instances will always be root nodes in the graph.
         /// </summary>
-        public static ImmutableList<string> RootTypes = ImmutableList.Create(RootType,
-            ReflexionGraph.ArchitectureType,
-            ReflexionGraph.ImplementationType);
+        public static ImmutableList<string> RootTypes
+            = ImmutableList.Create(RootType,
+                                   ReflexionGraph.ArchitectureType,
+                                   ReflexionGraph.ImplementationType);
 
         /// <summary>
         /// A toggle marking artificial root nodes as such.

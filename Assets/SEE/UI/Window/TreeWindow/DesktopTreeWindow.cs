@@ -463,6 +463,7 @@ namespace SEE.UI.Window.TreeWindow
                         }, Icons.Hide)
                     };
                     /*
+                     * FIXME(#834). Remove this code or re-activate if still required.
                     if (representedGraphElement is Node node && node.IsRoot())
                     {
                         appends.Add(new("Delete City", () =>

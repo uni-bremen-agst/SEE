@@ -725,7 +725,7 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Adds functinality for managing dictionary entries.
+        /// Adds functionality for managing dictionary entries.
         /// This includes adding new entries as well as removing existing ones.
         /// </summary>
         /// <param name="parent">container</param>
@@ -787,7 +787,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
             };
 
-            // broadcasts the removing of a new dict entry to all cients
+            // broadcasts the removal of a new dict entry to all cients
             SyncRemoveDictEntry += (widgetPath, key) =>
             {
                 if (widgetPath == parent.FullName()
@@ -798,6 +798,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
             };
             return;
+
             void RemoveDictEntry(string key)
             {
                 dict.Remove(key);
@@ -847,6 +848,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         dictType.BaseType.GetGenericArguments()[i] : collection.Count > 0 ?
                             collection.Cast<object>().FirstOrDefault()?.GetType() : null;
             }
+
             async UniTask AddEntry(Type valueType)
             {
                 RuntimeMenuAddDictEntryProperty addEntryProperty = new(dict);
@@ -1731,7 +1733,7 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Performs the redrawing of the city.
+        /// Redraws the city.
         /// </summary>
         private void ReDraw()
         {

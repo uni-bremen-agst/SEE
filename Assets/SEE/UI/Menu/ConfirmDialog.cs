@@ -15,22 +15,21 @@ namespace SEE.UI.Menu
     /// <summary>
     /// Configuration for the confirm dialog.
     /// </summary>
-    /// <param name="description">The description of the dialog, can be up to three lines long.</param>
-    /// <param name="title">The title of the dialog displayed in the top bar. Should be kept short.</param>
-    /// <param name="yesText">The text of the confirm button.</param>
-    /// <param name="noText">The text of the cancel button.</param>
-    /// <param name="yesIcon">The icon of the confirm button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
-    /// <param name="noIcon">The icon of the cancel button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
-    /// <param name="yesColor">The color of the confirm button. Note that the text will be white, so choose a dark color.</param>
+    /// <param name="Description">The description of the dialog, can be up to three lines long.</param>
+    /// <param name="Title">The title of the dialog displayed in the top bar. Should be kept short.</param>
+    /// <param name="YesText">The text of the confirm button.</param>
+    /// <param name="NoText">The text of the cancel button.</param>
+    /// <param name="YesIcon">The icon of the confirm button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
+    /// <param name="NoIcon">The icon of the cancel button, given as a FontAwesome character (see <see cref="Icons"/>).</param>
+    /// <param name="YesColor">The color of the confirm button. Note that the text will be white, so choose a dark color.</param>
     public record ConfirmConfiguration(
-        string description,
-        string title = "Are you sure?",
-        string yesText = "Confirm",
-        string noText = "Cancel",
-        char yesIcon = Icons.Checkmark,
-        char noIcon = 'X',
-        Color? yesColor = null
-    )
+        string Description,
+        string Title = "Are you sure?",
+        string YesText = "Confirm",
+        string NoText = "Cancel",
+        char YesIcon = Icons.Checkmark,
+        char NoIcon = 'X',
+        Color? YesColor = null)
     {
         /// <summary>
         /// A pre-made configuration for a delete dialog.
@@ -39,8 +38,8 @@ namespace SEE.UI.Menu
         /// <returns>A configuration for a delete dialog.</returns>
         public static ConfirmConfiguration Delete(string description)
         {
-            return new ConfirmConfiguration(description, title: "Really delete?",
-                                            yesText: "Delete", yesIcon: Icons.Trash, yesColor: Color.red.Darker());
+            return new ConfirmConfiguration(description, Title: "Really delete?",
+                                            YesText: "Delete", YesIcon: Icons.Trash, YesColor: Color.red.Darker());
         }
     }
 
@@ -143,6 +142,7 @@ namespace SEE.UI.Menu
                 return dialogGameObject;
             }
         }
+
         /// <summary>
         /// The ongoing fade animation of the dialog, if any.
         /// </summary>
@@ -176,15 +176,15 @@ namespace SEE.UI.Menu
         /// <param name="configuration">The configuration for the dialog.</param>
         private void ShowMenu(ConfirmConfiguration configuration)
         {
-            Title.text = configuration.title;
-            Description.text = configuration.description;
-            YesButton.buttonText = configuration.yesText;
+            Title.text = configuration.Title;
+            Description.text = configuration.Description;
+            YesButton.buttonText = configuration.YesText;
             YesButton.UpdateUI();
-            NoButton.buttonText = configuration.noText;
+            NoButton.buttonText = configuration.NoText;
             NoButton.UpdateUI();
-            YesIcon.text = configuration.yesIcon.ToString();
-            YesButtonImage.color = configuration.yesColor ?? defaultColor;
-            NoIcon.text = configuration.noIcon.ToString();
+            YesIcon.text = configuration.YesIcon.ToString();
+            YesButtonImage.color = configuration.YesColor ?? defaultColor;
+            NoIcon.text = configuration.NoIcon.ToString();
 
             Dialog.SetActive(true);
             Dialog.transform.SetAsLastSibling();
