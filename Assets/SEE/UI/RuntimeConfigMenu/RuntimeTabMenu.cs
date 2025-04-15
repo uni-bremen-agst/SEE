@@ -1705,7 +1705,8 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Triggers the immediate redrawn of the city and calls the network behaviour.
+        /// Triggers the immediate redraw <see cref="TriggerImmediateRedraw"/> of the city
+        /// locally and on all connected clients (the latter via <see cref="UpdateCityMethodNetAction"/>).
         /// </summary>
         private void ImmediateRedraw()
         {
