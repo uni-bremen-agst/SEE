@@ -462,16 +462,6 @@ namespace SEE.UI.Window.TreeWindow
                             Rebuild();
                         }, Icons.Hide)
                     };
-                    /*
-                     * FIXME(#834). Remove this code or re-activate if still required.
-                    if (representedGraphElement is Node node && node.IsRoot())
-                    {
-                        appends.Add(new("Delete City", () =>
-                        {
-                            WindowSpace winSpace = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-                            ContextMenuAction.DeleteCityAsync(node, () => winSpace.CloseWindow(this)).Forget();
-                        }, Icons.Trash));
-                    }*/
 
                     IEnumerable<PopupMenuEntry> actions = ContextMenuAction
                         .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);

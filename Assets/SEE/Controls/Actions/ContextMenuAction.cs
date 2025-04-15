@@ -422,7 +422,7 @@ namespace SEE.Controls.Actions
             }
 
             entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
-                "Clear" : (graphElement as Node).IsRoot() ? "Delete City" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+                "Clear" : graphElement is Node nodeElement && nodeElement.IsRoot() ? "Delete City" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
 
             if (appendActions == null && graphElement is Node n && n.IsArchitectureOrImplementationRoot())
             {
