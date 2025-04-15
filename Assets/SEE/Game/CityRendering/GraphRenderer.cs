@@ -308,8 +308,8 @@ namespace SEE.Game.CityRendering
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
-            // the layout to be applied
-            NodeLayout nodeLayout = GetLayout();
+            /// The layout to be applied. If <see cref="doNotAddUniqueRoot"/> is true, use <see cref="NodeLayoutKind.Treemap"/> as the layout.
+            NodeLayout nodeLayout = !doNotAddUniqueRoot? GetLayout() : GetLayout(NodeLayoutKind.Treemap);
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
