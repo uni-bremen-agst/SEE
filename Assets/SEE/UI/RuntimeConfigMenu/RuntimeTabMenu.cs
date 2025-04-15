@@ -1704,7 +1704,6 @@ namespace SEE.UI.RuntimeConfigMenu
             ImmediateRedraw();
         }
 
-
         /// <summary>
         /// Triggers the immediate redrawn of the city and calls the network behaviour.
         /// </summary>
