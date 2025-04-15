@@ -135,7 +135,8 @@ namespace SEE.Game.City
         private void SetupInitialReflexionCity()
         {
             DataProvider.Add(new ReflexionGraphProvider());
-            NodeLayoutSettings.Kind = NodeLayoutKind.Treemap;
+            NodeLayoutSettings.Kind = NodeLayoutKind.Reflexion;
+            NodeLayoutSettings.ArchitectureLayoutProportion = 0.6f;
         }
 
         /// <summary>
@@ -215,9 +216,6 @@ namespace SEE.Game.City
         /// <returns>Nothing, it is an asynchronous method that needs to wait.</returns>
         public async UniTask LoadAndDrawSubgraphAsync(DataPath path, DataPath projectFolder = null)
         {
-            // FIXME (#825): This code should be moved to ReflexionGraph. It updates a subgraph.
-            // Clearly, what this update requires is an implementation detail of ReflexionGraph.
-
             (Graph graph, GraphRenderer renderer) = await LoadGraphAsync(path, projectFolder == null);
             if (projectFolder != null)
             {
@@ -234,31 +232,7 @@ namespace SEE.Game.City
             // Draws the graph.
             await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);
             // Adds the graph to the existing reflexion graph.
-            graph.Nodes().ForEach(node =>
-            {
-                node.ItsGraph = null;
-                if (projectFolder != null)
-                {
-                    ReflexionGraph.AddToImplementation(node);
-                }
-                else
-                {
-                    ReflexionGraph.AddToArchitecture(node);
-                }
-            });
-            graph.GetRoots().ForEach(subRoot => root.AddChild(subRoot));
-            graph.Edges().ForEach((edge) =>
-            {
-                edge.ItsGraph = null;
-                if (projectFolder != null)
-                {
-                    ReflexionGraph.AddToImplementation(edge);
-                }
-                else
-                {
-                    ReflexionGraph.AddToArchitecture(edge);
-                }
-            });
+            ReflexionGraph.AddSubgraphInContext(graph, root, projectFolder != null);
 
             // Ensures that the newly drawn graph is displayed.
             root.GameObject().SetActive(false);

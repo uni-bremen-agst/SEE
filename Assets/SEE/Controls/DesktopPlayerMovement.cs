@@ -42,8 +42,8 @@ namespace SEE.Controls
 
             // Defines the built-in collider of the CharacterController, by default the collider is a capsule.
             // We chose the following values to minimize the collider to roughly fit around the player's head as a sphere.
-            controller.center = new Vector3(0.0f, 1.55f, 0.21f);
-            controller.radius = HeadRadius();
+            controller.center = new Vector3(0.0f, 1.55f, 0.0f);
+            controller.radius = 0.4f;
             controller.height = 0.0f;
 
             if (FocusedObject != null)
@@ -64,23 +64,6 @@ namespace SEE.Controls
                 cameraState.FreeMode = true;
             }
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
-            // Returns the radius of the player's head.
-            float HeadRadius()
-            {
-                //const string headName = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust";
-                const string headName =
-                    "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head/HeadAdjust";
-                Transform head = transform.Find(headName);
-                if (head == null)
-                {
-                    Debug.LogError($"Player {gameObject.name} does not have a child {headName}.\n");
-                    return 1.0f;
-                }
-                // We want to fit the head completely into the CharacterController collider, so we use the maximum value
-                // to calculate the radius
-                return Mathf.Max(head.transform.localScale.x, head.transform.localScale.y, head.transform.localScale.z) / 2;
-            }
         }
 
         private void Update()

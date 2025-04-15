@@ -422,7 +422,12 @@ namespace SEE.Controls.Actions
             }
 
             entries.Add(new PopupMenuAction(graphElement is Node no && no.IsArchitectureOrImplementationRoot() ?
-                "Clear" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+                "Clear" : graphElement is Node nodeElement && nodeElement.IsRoot() ? "Delete City" : "Delete", () => DeleteElement().Forget(), Icons.Trash, Priority: 0));
+
+            if (appendActions == null && graphElement is Node n && n.IsArchitectureOrImplementationRoot())
+            {
+                entries.Add(new PopupMenuAction("Delete City", () => DeleteCityAsync(n.Parent).Forget(), Icons.Trash, Priority: 0));
+            }
 
             entries.Add(new PopupMenuActionDoubleIcon("Inspect", () =>
             {
@@ -465,12 +470,7 @@ namespace SEE.Controls.Actions
             {
                 if (graphElement is Node node && node.IsRoot())
                 {
-                    string deleteMessage = $"Do you really want to delete the city?\r\nThis action cannot be undone.";
-                    if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
-                    {
-                        GameElementDeleter.DeleteRoot(node.GameObject());
-                        new DeleteNetAction(graphElement.ID).Execute();
-                    }
+                    DeleteCityAsync(node).Forget();
                     return;
                 }
                 if (gameObject != null)
@@ -644,7 +644,10 @@ namespace SEE.Controls.Actions
             if (appendActions == null)
             {
                 actions.Add(new PopupMenuAction("Edit Node", EditNode, Icons.PenToSquare, Priority: 1));
-                actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                if (!node.IsArchitectureOrImplementationRoot())
+                {
+                    actions.Add(new PopupMenuAction("Move", MoveNode, Icons.Move, Priority: 5));
+                }
                 actions.Add(new PopupMenuAction("New Edge", NewEdge, Icons.Edge, Priority: 2));
                 actions.Add(new PopupMenuAction("New Node", NewNode, '+', Priority: 3));
 
@@ -677,6 +680,11 @@ namespace SEE.Controls.Actions
 
             void NewNode()
             {
+                if (!AddNodeAction.HasNotOnlyRootNodeTypes(gameObject.ContainingCity()))
+                {
+                    ShowNotification.Warn("No node type available.", "Node could not be added. A node type must be added first.");
+                    return;
+                }
                 ActionStateType previousAction = GlobalActionHistory.Current();
                 GlobalActionHistory.Execute(ActionStateTypes.NewNode);
                 AddNodeAction action = (AddNodeAction)GlobalActionHistory.CurrentAction();
@@ -930,6 +938,27 @@ namespace SEE.Controls.Actions
         {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             menu.UpdateActiveEntry();
+        }
+
+        /// <summary>
+        /// Deletes the root of a city.
+        /// This cannot be undone, so a <see cref="ConfirmDialog"/> is opened first to obtain
+        /// confirmation for the deletion.
+        /// </summary>
+        /// <param name="node">The root node that is to be deleted.</param>
+        /// <returns>Waits until a response from the <see cref="ConfirmDialog"/> is received.</returns>
+        private async static UniTask DeleteCityAsync(Node node)
+        {
+            if (node.IsRoot())
+            {
+                if (await ConfirmDialog.ConfirmAsync
+                    (ConfirmConfiguration.Delete
+                      ("Do you really want to delete the city?\r\nThis action cannot be undone.")))
+                {
+                    GameElementDeleter.DeleteRoot(node.GameObject());
+                    new DeleteNetAction(node.ID).Execute();
+                }
+            }
         }
     }
 }

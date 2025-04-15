@@ -86,7 +86,8 @@ namespace SEE.UI.PropertyDialog
                 nodeType.Name = "Node type";
 
                 nodeType.AddOptions(GetNonRootTypes().OrderBy(t => t));
-                if (!useLastUsed || string.IsNullOrEmpty(lastUsed))
+                if (!useLastUsed || string.IsNullOrEmpty(lastUsed)
+                    || !node.GameObject().ContainingCity().NodeTypes.Types.Contains(lastUsed))
                 {
                     nodeType.Value = node.Type;
                 }
@@ -153,12 +154,10 @@ namespace SEE.UI.PropertyDialog
         /// except for the root types.
         /// </summary>
         /// <returns>The node types execpt the root types.</returns>
-        private ISet<string> GetNonRootTypes()
+        private IEnumerable<string> GetNonRootTypes()
         {
-            ISet<string> types = node.GameObject().ContainingCity().NodeTypes.Types;
-            types.Remove(Graph.RootType);
-            types.Remove(ReflexionGraph.ArchitectureType);
-            types.Remove(ReflexionGraph.ImplementationType);
+            IEnumerable<string> types = node.GameObject().ContainingCity().NodeTypes.Types
+                .Where(type => !Graph.RootTypes.Contains(type));
             return types;
         }
 

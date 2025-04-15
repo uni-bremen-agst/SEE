@@ -210,6 +210,7 @@ namespace SEE.Game.SceneManipulation
             if (rootObject.HasNodeRef() && rootObject.IsRoot())
             {
                 Transform cityHolder = rootObject.transform.parent;
+                rootObject.ItsGraph().NotifyRootNodeDeletion(rootObject.GetNode());
                 if (cityHolder.GetComponent<CitySelectionManager>() != null)
                 {
                     cityHolder.GetComponent<CitySelectionManager>().enabled = true;
