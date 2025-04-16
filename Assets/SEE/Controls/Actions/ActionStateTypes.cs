@@ -290,10 +290,10 @@ namespace SEE.Controls.Actions
             // Table actions.
             Table =
                 new("Table", "Please select the table mode you want to activate.",
-                    Color.blue, Icons.Whiteboard);
+                    new Color(1f, 0.5f, 0f), Icons.City);
             SpawnTable =
-                new("Spawn Table", "Spawnes a new table.",
-                    Color.green, Icons.Palette,
+                new("Spawn Table", "Spawnes a new universal table.",
+                    Color.green, Icons.City,
                     SpawnTableAction.CreateReversibleAction,
                     parent: Table);
         }
