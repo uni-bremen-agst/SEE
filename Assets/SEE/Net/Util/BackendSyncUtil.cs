@@ -87,7 +87,7 @@ namespace SEE.Net.Util
             [JsonProperty(PropertyName = "size")]
             public long Size;
             [JsonProperty(PropertyName = "creationTime")]
-            public long CreationTime;
+            public DateTime CreationTime;
 
             public static FileData FromJson(string json)
             {
