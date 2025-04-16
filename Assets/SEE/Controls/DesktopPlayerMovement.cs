@@ -15,9 +15,23 @@ namespace SEE.Controls
 
         private struct CameraState
         {
-            internal float Distance;
+            /// <summary>
+            ///  The distance to the <see cref="FocusedObject"/> (the code city the player
+            ///  is conntected to). This attribute is considered only if <see cref="FreeMode"/> is false.
+            /// </summary>
+            internal float DistanceToFocusedObject;
+            /// <summary>
+            /// Rotation in Euler degrees around the y-axis (yaw).
+            /// </summary>
             internal float Yaw;
+            /// <summary>
+            /// Rotation in Euler degrees around the x-axis (pitch).
+            /// </summary>
             internal float Pitch;
+            /// <summary>
+            /// If true, the player moves freely in the world; otherwise, the player is
+            /// rotating around the <see cref="FocusedObject"/> (the code city the player is conntected to).
+            /// </summary>
             internal bool FreeMode;
         }
 
@@ -48,11 +62,11 @@ namespace SEE.Controls
 
             if (FocusedObject != null)
             {
-                cameraState.Distance = 2.0f;
+                cameraState.DistanceToFocusedObject = 2.0f;
                 cameraState.Yaw = 0.0f;
                 cameraState.Pitch = 45.0f;
                 transform.position = FocusedObject.CenterTop;
-                transform.position -= transform.forward * cameraState.Distance;
+                transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
                 transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
             }
             else
@@ -74,7 +88,7 @@ namespace SEE.Controls
                 if (!cameraState.FreeMode)
                 {
                     Vector3 positionToFocusedObject = FocusedObject.CenterTop - transform.position;
-                    cameraState.Distance = positionToFocusedObject.magnitude;
+                    cameraState.DistanceToFocusedObject = positionToFocusedObject.magnitude;
                     transform.forward = positionToFocusedObject;
                     Vector3 pitchYawRoll = transform.rotation.eulerAngles;
                     cameraState.Pitch = pitchYawRoll.x;
@@ -99,11 +113,11 @@ namespace SEE.Controls
                 {
                     d -= speed;
                 }
-                cameraState.Distance -= d;
+                cameraState.DistanceToFocusedObject -= d;
 
                 HandleRotation();
                 transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
-                transform.position -= transform.forward * cameraState.Distance;
+                transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
             }
             else // cameraState.freeMode == true
             {
