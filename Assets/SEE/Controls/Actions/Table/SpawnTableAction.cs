@@ -103,7 +103,11 @@ namespace SEE.Controls.Actions.Drawable
             if (!finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 GameTableManager.Move(spawnedTable, raycastHit.point);
-                if (SEEInput.LeftMouseDown())
+                if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
+                {
+                    GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
+                }
+                else if (SEEInput.LeftMouseDown())
                 {
                     finish = true;
                     GameTableManager.FinishSpawn(spawnedTable);
