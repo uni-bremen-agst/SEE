@@ -3,7 +3,6 @@ using NUnit.Framework;
 using SEE.DataModel.DG.IO;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
-using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.TestTools;
@@ -39,6 +38,7 @@ namespace SEE.DataModel.DG
         [SetUp]
         public async Task SetUpAsync()
         {
+            GraphIndex.FileRanges.ReportMissingSourceRange = false;
             DataPath gxlPath = new(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz");
             DataPath xmlPath = new(Application.streamingAssetsPath + "/JLGExample/jacoco.xml");
 
@@ -49,6 +49,7 @@ namespace SEE.DataModel.DG
         [TearDown]
         public void TearDown()
         {
+            GraphIndex.FileRanges.ReportMissingSourceRange = true;
             graph = null;
         }
 
