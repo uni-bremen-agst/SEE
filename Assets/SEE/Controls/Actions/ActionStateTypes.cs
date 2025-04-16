@@ -287,6 +287,15 @@ namespace SEE.Controls.Actions
                     Color.yellow.Darker(), Icons.Load,
                     LoadAction.CreateReversibleAction,
                     parent: Drawable);
+            // Table actions.
+            Table =
+                new("Table", "Please select the table mode you want to activate.",
+                    Color.blue, Icons.Whiteboard);
+            SpawnTable =
+                new("Spawn Table", "Spawnes a new table.",
+                    Color.green, Icons.Palette,
+                    SpawnTableAction.CreateReversibleAction,
+                    parent: Table);
         }
 
         // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
@@ -333,6 +342,9 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType Clear;
         public static readonly ActionStateType Save;
         public static readonly ActionStateType Load;
+
+        public static readonly ActionStateTypeGroup Table;
+        public static readonly ActionStateType SpawnTable;
 
         #endregion
 
