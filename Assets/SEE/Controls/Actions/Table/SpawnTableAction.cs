@@ -1,5 +1,4 @@
-﻿using SEE.Controls.Actions.Table;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Game.Table;
 using SEE.GameObjects;
 using SEE.Utils;
@@ -34,7 +33,31 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private struct Memento
         {
+            /// <summary>
+            /// The name of the table.
+            /// </summary>
+            public string Name;
 
+            /// <summary>
+            /// The position of the table.
+            /// </summary>
+            public Vector3 Position;
+
+            /// <summary>
+            /// The euler angles of the table.
+            /// </summary>
+            public Vector3 EulerAngles;
+
+            /// <summary>
+            /// The constructor.
+            /// </summary>
+            /// <param name="table">The spawned table.</param>
+            public Memento(GameObject table)
+            {
+                Name = table.name;
+                Position = table.transform.position;
+                EulerAngles = table.transform.eulerAngles;
+            }
         }
 
         /// <summary>
@@ -48,20 +71,27 @@ namespace SEE.Controls.Actions.Drawable
 
         /// <summary>
         /// Stops the action and destroys the table if the action was not completed.
-        /// Also removes the table from the <see cref="CitiesHolder"/> component.
         /// </summary>
         public override void Stop()
         {
             base.Stop();
             if (!finish)
             {
-                if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
-                {
-                    citiesHolder.Cities.Remove(spawnedTable.name);
-                }
-                Destroyer.Destroy(spawnedTable);
-
+                DestroyTable();
             }
+        }
+
+        /// <summary>
+        /// Destroys the spawned universal table and
+        /// removes it from the <see cref="CitiesHolder.Cities"/>.
+        /// </summary>
+        private void DestroyTable()
+        {
+            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            {
+                citiesHolder.Cities.Remove(spawnedTable.name);
+            }
+            Destroyer.Destroy(spawnedTable);
         }
 
         /// <summary>
@@ -77,6 +107,8 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     finish = true;
                     GameTableManager.FinishSpawn(spawnedTable);
+                    memento = new(spawnedTable);
+                    CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
             }
@@ -84,19 +116,28 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Reverts this action, i.e., TODO.
+        /// Reverts this action, i.e., it destroys the spawned table.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
+            if (spawnedTable != null)
+            {
+                DestroyTable();
+            }
         }
 
         /// <summary>
-        /// Repeats this action, i.e., TODO.
+        /// Repeats this action, i.e., it respawns the table.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
+            if (spawnedTable == null)
+            {
+                spawnedTable = GameTableManager.Respawn(memento.Name,
+                    memento.Position, memento.EulerAngles);
+            }
         }
 
         /// <summary>
