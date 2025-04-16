@@ -107,7 +107,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
                 }
-                else if (SEEInput.LeftMouseDown())
+                if (SEEInput.LeftMouseDown())
                 {
                     finish = true;
                     GameTableManager.FinishSpawn(spawnedTable);
