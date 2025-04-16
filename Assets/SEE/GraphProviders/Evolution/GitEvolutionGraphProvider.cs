@@ -35,7 +35,7 @@ namespace SEE.GraphProviders.Evolution
         /// The date limit until commits should be analyzed.
         /// </summary>
         [InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analyzed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
         /// <summary>
