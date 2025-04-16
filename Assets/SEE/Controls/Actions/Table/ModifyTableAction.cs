@@ -1,11 +1,13 @@
 ﻿using SEE.UI.Menu;
 using SEE.Utils.History;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions.Table
 {
     /// <summary>
-    ///
+    /// This action provides functionality to move, rotate, scale and delete
+    /// existing tables.
     /// </summary>
     public class ModifyTableAction : AbstractPlayerAction
     {
@@ -13,6 +15,11 @@ namespace SEE.Controls.Actions.Table
         /// The menu for this action.
         /// </summary>
         private ModifyTableMenu menu;
+
+        /// <summary>
+        /// The modified table.
+        /// </summary>
+        private GameObject modifiedTable;
 
         /// <summary>
         /// Enables the table menu.
@@ -32,6 +39,10 @@ namespace SEE.Controls.Actions.Table
             menu.Destroy();
         }
 
+        /// <summary>
+        /// TODO
+        /// </summary>
+        /// <returns></returns>
         public override bool Update()
         {
             return false;
@@ -91,7 +102,8 @@ namespace SEE.Controls.Actions.Table
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new() {  };
+            return modifiedTable != null?
+                new() { modifiedTable.name } : new();
         }
 
     }
