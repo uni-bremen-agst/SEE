@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new();
+            return new() { spawnedTable.name };
         }
     }
 }
