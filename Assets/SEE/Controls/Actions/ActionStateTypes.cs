@@ -2,6 +2,7 @@
 using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
+using SEE.Controls.Actions.Table;
 
 namespace SEE.Controls.Actions
 {
@@ -296,6 +297,11 @@ namespace SEE.Controls.Actions
                     Color.green, Icons.City,
                     SpawnTableAction.CreateReversibleAction,
                     parent: Table);
+            ModifyTable =
+                new("Modify Table", "Modifies a table.",
+                    Color.yellow, Icons.Modify,
+                    ModifyTableAction.CreateReversibleAction,
+                    parent: Table);
         }
 
         // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
@@ -345,6 +351,7 @@ namespace SEE.Controls.Actions
 
         public static readonly ActionStateTypeGroup Table;
         public static readonly ActionStateType SpawnTable;
+        public static readonly ActionStateType ModifyTable;
 
         #endregion
 

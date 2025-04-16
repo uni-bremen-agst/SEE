@@ -6,7 +6,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace SEE.Controls.Actions.Drawable
+namespace SEE.Controls.Actions.Table
 {
     /// <summary>
     /// This class provides the option to spawn a new table.
@@ -100,20 +100,23 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns></returns>
         public override bool Update()
         {
-            if (!finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
+            if (!Raycasting.IsMouseOverGUI())
             {
-                GameTableManager.Move(spawnedTable, raycastHit.point);
-                if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
+                if (!finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
-                    GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
-                }
-                if (SEEInput.LeftMouseDown())
-                {
-                    finish = true;
-                    GameTableManager.FinishSpawn(spawnedTable);
-                    memento = new(spawnedTable);
-                    CurrentState = IReversibleAction.Progress.Completed;
-                    return true;
+                    GameTableManager.Move(spawnedTable, raycastHit.point);
+                    if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
+                    {
+                        GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
+                    }
+                    if (SEEInput.LeftMouseDown())
+                    {
+                        finish = true;
+                        GameTableManager.FinishSpawn(spawnedTable);
+                        memento = new(spawnedTable);
+                        CurrentState = IReversibleAction.Progress.Completed;
+                        return true;
+                    }
                 }
             }
             return false;
