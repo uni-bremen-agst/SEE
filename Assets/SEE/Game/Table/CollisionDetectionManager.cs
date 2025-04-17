@@ -4,7 +4,7 @@ using UnityEngine;
 namespace SEE.Game.Table
 {
     /// <summary>
-    /// This class manages collision detection when spawning a new universal table.
+    /// This class manages collision detection for a universal table.
     /// </summary>
 	public class CollisionDetectionManager : MonoBehaviour
 	{
