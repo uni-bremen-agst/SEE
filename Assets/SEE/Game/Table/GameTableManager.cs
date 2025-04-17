@@ -27,9 +27,11 @@ namespace SEE.Game.Table
 
 		/// <summary>
 		/// Spawns a new universal table with a randomized name.
-		/// Also it deactivates the <see cref="CitySelectionManager"/> component
+		/// Also, it deactivates the <see cref="CitySelectionManager"/> component
 		/// because it would be triggered when the table is placed while the user
 		/// is clicking the left mouse button.
+		/// Additionally, collision detection will be actived to ensure that the
+		/// table does not overlap with another object.
 		/// </summary>
 		/// <returns>The spawned table.</returns>
         public static GameObject Spawn()
@@ -37,17 +39,20 @@ namespace SEE.Game.Table
 			GameObject table = PrefabInstantiator.InstantiatePrefab(universalTablePrefab);
 			table.name = universalTablePrefix + RandomStrings.GetRandomString(10);
 			table.transform.GetComponentInChildren<CitySelectionManager>().enabled = false;
+			table.AddComponent<CollisionDetectionManager>();
 			return table;
 		}
 
 		/// <summary>
 		/// Finishes the placement of a table and reactivates the <see cref="CitySelectionManager"/>
 		/// component.
+		/// Additionally, collision detection will be removed.
 		/// </summary>
 		/// <param name="table">The spawned table.</param>
 		public static void FinishSpawn(GameObject table)
 		{
             table.transform.GetComponentInChildren<CitySelectionManager>().enabled = true;
+			Destroyer.Destroy(table.GetComponent<CollisionDetectionManager>());
         }
 
 		/// <summary>

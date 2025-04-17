@@ -1,6 +1,7 @@
 ﻿using SEE.Game;
 using SEE.Game.Table;
 using SEE.GameObjects;
+using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
@@ -96,6 +97,7 @@ namespace SEE.Controls.Actions.Table
 
         /// <summary>
         /// Moves the table along the raycast until the user clicks the left mouse button.
+        /// Ensures that the table does not overlap with any other object.
         /// </summary>
         /// <returns></returns>
         public override bool Update()
@@ -111,6 +113,13 @@ namespace SEE.Controls.Actions.Table
                     }
                     if (SEEInput.LeftMouseDown())
                     {
+                        if (spawnedTable.TryGetComponent<CollisionDetectionManager>(out CollisionDetectionManager cdManager)
+                            && cdManager.IsInCollision())
+                        {
+                            ShowNotification.Warn("Table can't be placed",
+                                "The table can't be placed because it is colliding with another object.");
+                            return false;
+                        }
                         finish = true;
                         GameTableManager.FinishSpawn(spawnedTable);
                         memento = new(spawnedTable);
