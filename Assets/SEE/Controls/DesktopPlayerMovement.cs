@@ -224,7 +224,7 @@ namespace SEE.Controls
             {
                 // Movement should be started at minimalInitialSpeedFactor * Speed and then
                 // linearly increased to Speed.
-                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed, movingTime / timeToReachSpeed) * Time.deltaTime;
+                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed, Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
                 if (SEEInput.BoostCameraSpeed())
                 {
                     distance *= BoostFactor;
