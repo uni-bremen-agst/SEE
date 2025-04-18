@@ -24,7 +24,7 @@ namespace SEE.Controls
         /// <summary>
         /// The speed of the player movement. This is the distance in Unity units per second.
         /// </summary>
-        /// <remarks>This actual speed depends on the point in time where the player
+        /// <remarks>The actual speed depends on the point in time where the player
         /// has initiated the movement. We will start slower and then gradually increase
         /// the speed until <see cref="Speed"/> has been reached. This phase takes
         /// <see cref="timeToReachSpeed"/> seconds.</remarks>
