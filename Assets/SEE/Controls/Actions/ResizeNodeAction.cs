@@ -8,6 +8,7 @@ using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -584,39 +585,19 @@ namespace SEE.Controls.Actions
                 // Calculate new scale and position
                 // TODO (#806): Make cursorMovement compatible with VR controls
                 Vector3 cursorMovement;
+                Vector3 newCursorPosition;
+
                 if (currentResizeStep.Up)
                 {
-                    cursorMovement = new(0f, (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) / Screen.height, 0f);
+                    Vector3 normalToCamera = upDownHandleTransform.up;
+                    newCursorPosition = GetMouseOnPlane(normalToCamera, Vector3.Scale(normalToCamera, currentResizeStep.InitialHitPoint));
                 }
                 else
                 {
-                    // Update cached camera rotation if necessary
-                    if (!Equals(mainCameraTransform.rotation, lastCameraRotation))
-                    {
-                        // Is camera looking straight up or down?
-                        if (Mathf.Abs(Vector3.Dot(mainCameraTransform.forward, Vector3.up)) >= 1.0)
-                        {
-                            // Use the camera's right vector projected onto the horizontal plane
-                            cameraPlanarRight = Vector3.ProjectOnPlane(mainCameraTransform.right, Vector3.up).normalized;
-                            // Calculate forward based on right, ensuring it's perpendicular
-                            cameraPlanarForward = Vector3.Cross(Vector3.up, cameraPlanarRight).normalized * Mathf.Sign(mainCameraTransform.forward.y);
-                        }
-                        else
-                        {
-                            lastCameraRotation = mainCameraTransform.rotation;
-                            cameraPlanarForward = Vector3.ProjectOnPlane(mainCameraTransform.forward, Vector3.up).normalized;
-                            cameraPlanarRight = Vector3.Cross(Vector3.up, cameraPlanarForward).normalized;
-                        }
-                    }
-
-                    float deltaX = (currentResizeStep.InitialMousePosition.x - Input.mousePosition.x) * currentResizeStep.InvScreenHeight;
-                    float deltaY = (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) * currentResizeStep.InvScreenHeight;
-
-                    cursorMovement = new Vector3(
-                            (cameraPlanarRight.x * deltaX + cameraPlanarForward.x * deltaY) * currentResizeStep.Direction.x,
-                            0f,
-                            (cameraPlanarRight.z * deltaX + cameraPlanarForward.z * deltaY) * currentResizeStep.Direction.z);
+                    newCursorPosition = GetMouseOnPlane(Vector3.up, new(0, currentResizeStep.InitialHitPoint.y, 0));
                 }
+                cursorMovement = Vector3.Scale(currentResizeStep.Direction, currentResizeStep.InitialHitPoint - newCursorPosition);
+
                 Vector3 newLocalSize = currentResizeStep.InitialLocalSize - Vector3.Scale(currentResizeStep.LocalScaleFactor, cursorMovement);
                 Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition
                     - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
@@ -830,6 +811,30 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// Projects the mouse cursor position onto plane defined by given normal and point.
+            /// </summary>
+            /// <param name="planeNormal">The direction in which the normal of the plane faces, e.g., <c>Vector3.up</c>.</param>
+            /// <param name="planePoint">The distance of the plane from the coordinate origin, e.g., <c>new Vector3(0, 5, 0)</c> for a height of <c>5</c>.</param>
+            /// <param name="maxDistance">Cutoff distance.</param>
+            /// <returns>Projected mouse position on the plane.</returns>
+            Vector3 GetMouseOnPlane(Vector3 planeNormal, Vector3 planePoint, float maxDistance = 1000f)
+            {
+                Plane plane = new Plane(planeNormal, planePoint);
+                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
+
+                // Calculate intersection
+                if(plane.Raycast(ray, out float distance))
+                {
+                    // Clamp to max distance if needed
+                    distance = Mathf.Min(distance, maxDistance);
+                    return ray.GetPoint(distance);
+                }
+
+                // Fallback: Project to plane's surface at max distance
+                return ray.GetPoint(maxDistance);
+            }
+
+            /// <summary>
             /// Data structure for the individual resize steps.
             /// </summary>
             private readonly struct ResizeStepData
@@ -843,11 +848,6 @@ namespace SEE.Controls.Actions
                 /// The initial raycast hit from which the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialHitPoint;
-
-                /// <summary>
-                /// The initial mouse position.
-                /// </summary>
-                public readonly Vector2 InitialMousePosition;
 
                 /// <summary>
                 /// The resize direction.
@@ -923,7 +923,6 @@ namespace SEE.Controls.Actions
                 public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Transform transform)
                 {
                     InitialHitPoint = initialHitPoint;
-                    InitialMousePosition = Input.mousePosition;
                     Direction = direction;
                     InitialLocalPosition = transform.localPosition;
                     InitialLocalSize = transform.gameObject.LocalSize();
