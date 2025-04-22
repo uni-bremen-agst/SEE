@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SEE.GraphProviders.VCS;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -12,7 +13,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// The E-Mail/Name of the author.
         /// </summary>
-        public string Author = "";
+        public GitFileAuthor Author;
 
         /// <summary>
         /// The list of all edges the author sphere has and their associated churn.
