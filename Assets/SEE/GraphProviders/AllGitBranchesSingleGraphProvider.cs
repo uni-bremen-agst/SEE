@@ -49,13 +49,13 @@ namespace SEE.GraphProviders
         /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-                         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
-            RuntimeTab(GraphProviderFoldoutGroup),
-                         HideReferenceObjectPicker]
+         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
-                         {
-                             { "**/*", true }
-                         };
+        {
+            { "**/*", true }
+        };
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
@@ -80,16 +80,25 @@ namespace SEE.GraphProviders
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+         EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int PollingInterval = 5;
 
         /// <summary>
         /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
         /// will be marked. This field specifies for how long these markers should appear.
         /// </summary>
-        [Tooltip("The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        [Tooltip(
+             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
+         EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int MarkerTime = 10;
+
+        /// <summary>
+        /// If this is true, the authors of the commits with similar identities will be combined.
+        /// So if two authors have the same name but different email addresses (and vice versa), they will be combined
+        /// </summary>
+        [Tooltip("If true, the authors of the commits with similar identities will be combined."),
+         RuntimeTab(GraphProviderFoldoutGroup)]
+        public bool CombineAuthors = false;
 
         #endregion
 
@@ -104,8 +113,8 @@ namespace SEE.GraphProviders
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
@@ -149,13 +158,14 @@ namespace SEE.GraphProviders
         {
             if (city is not BranchCity branchCity)
             {
-                throw new ArgumentException($"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
+                throw new ArgumentException(
+                    $"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
 
             CheckAttributes(branchCity);
 
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
-                                                       cancellationToken: token);
+                cancellationToken: token);
 
             // Only add the poller when in play mode.
             if (AutoFetch && Application.isPlaying)
@@ -186,6 +196,7 @@ namespace SEE.GraphProviders
             {
                 throw new Exception("The repository path is not set.");
             }
+
             if (!Directory.Exists(repositoryPath))
             {
                 throw new Exception("The repository path does not exist or is not a directory.");
@@ -218,7 +229,7 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, CombineAuthors);
 
                 int counter = 0;
                 int commitLength = commitList.Count();

@@ -58,16 +58,24 @@ namespace SEE.GraphProviders.VCS
         private const float TruckFactorCoreDevRatio = 0.8f;
 
         /// <summary>
+        /// Indicates whether authors with similar attributes (such as name variations)
+        /// should be combined during the processing of commit data.
+        /// </summary>
+        private readonly bool combineSimilarAuthors;
+
+        /// <summary>
         /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
         /// </summary>
         /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
         /// <param name="pathGlobbing">A dictionary of path glob patterns you want to include or exclude</param>
         /// <param name="repositoryFiles">A list of a files which should be displayed in the code-city</param>
+        /// <param name="combineSimilarAuthors">Whenever authors with similar identities should be combined</param>
         public GitFileMetricProcessor(Repository gitRepository, IDictionary<string, bool> pathGlobbing,
-            IEnumerable<string> repositoryFiles)
+            IEnumerable<string> repositoryFiles, bool combineSimilarAuthors)
         {
             this.gitRepository = gitRepository;
             this.pathGlobbing = pathGlobbing;
+            this.combineSimilarAuthors = combineSimilarAuthors;
             this.matcher = new();
 
             foreach (KeyValuePair<string, bool> pattern in this.pathGlobbing)
@@ -86,7 +94,7 @@ namespace SEE.GraphProviders.VCS
             {
                 if (matcher.Match(file).HasMatches)
                 {
-                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<string>(), 0));
+                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<GitFileAuthor>(), 0));
                 }
             }
         }
@@ -110,7 +118,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="developersChurn">The churn of each developer</param>
         /// <returns>The calculated truck factor</returns>
-        private static int CalculateTruckFactor(IDictionary<string, int> developersChurn)
+        private static int CalculateTruckFactor(IDictionary<GitFileAuthor, int> developersChurn)
         {
             if (developersChurn.Count == 0)
             {
@@ -119,11 +127,11 @@ namespace SEE.GraphProviders.VCS
 
             int totalChurn = developersChurn.Select(x => x.Value).Sum();
 
-            HashSet<string> coreDevs = new();
+            HashSet<GitFileAuthor> coreDevs = new();
 
             float cumulativeRatio = 0;
             // Sorting devs by their number of changed files
-            List<string> sortedDevs =
+            List<GitFileAuthor> sortedDevs =
                 developersChurn
                     .OrderByDescending(x => x.Value)
                     .Select(x => x.Key)
@@ -131,7 +139,7 @@ namespace SEE.GraphProviders.VCS
             // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
             while (cumulativeRatio <= TruckFactorCoreDevRatio)
             {
-                string dev = sortedDevs.First();
+                GitFileAuthor dev = sortedDevs[0];
                 float devRatio = (float)developersChurn[dev] / totalChurn;
                 cumulativeRatio += devRatio;
                 coreDevs.Add(dev);
@@ -165,28 +173,49 @@ namespace SEE.GraphProviders.VCS
                 if (!FileToMetrics.ContainsKey(filePath))
                 {
                     FileToMetrics.Add(filePath,
-                        new GitFileMetrics(1, new HashSet<string> { commit.Author.Email },
+                        new GitFileMetrics(1,
+                            new HashSet<GitFileAuthor> { new GitFileAuthor(commit.Author.Name, commit.Author.Email) },
                             changedFile.LinesAdded + changedFile.LinesDeleted));
 
-                    FileToMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
+                    FileToMetrics[filePath].AuthorsChurn.Add(new GitFileAuthor(commit.Author.Name, commit.Author.Email),
                         changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
                 else
                 {
                     FileToMetrics[filePath].NumberOfCommits += 1;
-                    FileToMetrics[filePath].Authors.Add(commit.Author.Email);
+                    FileToMetrics[filePath].Authors.Add(new GitFileAuthor(commit.Author.Name, commit.Author.Email));
                     FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
-                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, () => 0);
+                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(new GitFileAuthor(commit.Author.Name, commit.Author.Email), () => 0);
                     foreach (PatchEntryChanges otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
                     {
                         FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFiles.Path, () => 0);
                         FileToMetrics[filePath].FilesChangesTogether[otherFiles.Path] += 1;
                     }
 
-                    FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
+                    var changedFileLinesDeleted = FileToMetrics[filePath].AuthorsChurn.Keys.First(x => MatchGitAuthors(x, new GitFileAuthor(commit.Author.Name, commit.Author.Email)));
+                    FileToMetrics[filePath].AuthorsChurn[changedFileLinesDeleted] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
             }
+
+        }
+
+        /// <summary>
+        /// Compares two Git file authors to determine if they match.
+        ///
+        /// If <see cref="combineSimilarAuthors"/> is true, the authors are considered a match if either their names or emails are the same.
+        /// Otherwise, both the name and email must be the same for the authors to match.
+        /// </summary>
+        /// <param name="author1">The first Git file author to compare.</param>
+        /// <param name="author2">The second Git file author to compare.</param>
+        /// <returns>
+        /// True if the authors match by name or email; otherwise, false.
+        /// </returns>
+        private bool MatchGitAuthors(GitFileAuthor author1, GitFileAuthor author2)
+        {
+            return combineSimilarAuthors
+                ? author1.Name == author2.Name || author1.Email == author2.Email
+                : author1.Name == author2.Name && author1.Email == author2.Email;
         }
 
         /// <summary>
