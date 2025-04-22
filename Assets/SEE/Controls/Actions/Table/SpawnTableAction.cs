@@ -78,21 +78,8 @@ namespace SEE.Controls.Actions.Table
             base.Stop();
             if (!finish)
             {
-                DestroyTable();
+                GameTableManager.Destroy(spawnedTable);
             }
-        }
-
-        /// <summary>
-        /// Destroys the spawned universal table and
-        /// removes it from the <see cref="CitiesHolder.Cities"/>.
-        /// </summary>
-        private void DestroyTable()
-        {
-            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
-            {
-                citiesHolder.Cities.Remove(spawnedTable.name);
-            }
-            Destroyer.Destroy(spawnedTable);
         }
 
         /// <summary>
@@ -139,7 +126,7 @@ namespace SEE.Controls.Actions.Table
             base.Undo();
             if (spawnedTable != null)
             {
-                DestroyTable();
+                GameTableManager.Destroy(spawnedTable);
             }
         }
 

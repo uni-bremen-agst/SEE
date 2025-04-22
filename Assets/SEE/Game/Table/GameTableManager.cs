@@ -105,5 +105,23 @@ namespace SEE.Game.Table
 			FinishSpawn(table);
 			return table;
 		}
+
+		/// <summary>
+		/// Destroyes the given <paramref name="table"/>.
+		/// Also removes the table from <see cref="CitiesHolder.Cities"/>.
+		/// </summary>
+		/// <param name="table">The table to destroy.</param>
+		public static void Destroy(GameObject table)
+		{
+			if (!GameFinder.HasChildWithTag(table, Tags.CodeCity))
+			{
+				return;
+			}
+            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            {
+                citiesHolder.Cities.Remove(table.name);
+            }
+            Destroyer.Destroy(table);
+        }
 	}
 }
