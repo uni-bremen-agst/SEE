@@ -1,6 +1,5 @@
-﻿using SEE.Game;
-using SEE.Game.Table;
-using SEE.GameObjects;
+﻿using SEE.Game.Table;
+using SEE.Net.Actions.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -110,6 +109,7 @@ namespace SEE.Controls.Actions.Table
                         finish = true;
                         GameTableManager.FinishSpawn(spawnedTable);
                         memento = new(spawnedTable);
+                        new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles).Execute();
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
@@ -126,6 +126,7 @@ namespace SEE.Controls.Actions.Table
             base.Undo();
             if (spawnedTable != null)
             {
+                new DestroyTableNetAction(spawnedTable.name).Execute();
                 GameTableManager.Destroy(spawnedTable);
             }
         }
@@ -140,6 +141,7 @@ namespace SEE.Controls.Actions.Table
             {
                 spawnedTable = GameTableManager.Respawn(memento.Name,
                     memento.Position, memento.EulerAngles);
+                new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles).Execute();
             }
         }
 

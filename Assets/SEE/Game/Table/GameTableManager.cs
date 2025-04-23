@@ -1,4 +1,5 @@
-﻿using SEE.Game.Drawable;
+﻿using SEE.Game.City;
+using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.Utils;
 using UnityEngine;
@@ -33,12 +34,13 @@ namespace SEE.Game.Table
 		/// Additionally, collision detection will be actived to ensure that the
 		/// table does not overlap with another object.
 		/// </summary>
+		/// <param name="name">The name for the table. If null, a randomized name will be used.</param>
 		/// <returns>The spawned table.</returns>
-        public static GameObject Spawn()
+        public static GameObject Spawn(string name = null)
 		{
 			GameObject table = PrefabInstantiator.InstantiatePrefab(universalTablePrefab);
-			table.name = universalTablePrefix + RandomStrings.GetRandomString(10);
-			table.transform.GetComponentInChildren<CitySelectionManager>().enabled = false;
+			table.name = name?? universalTablePrefix + RandomStrings.GetRandomString(10);
+            table.transform.GetComponentInChildren<CitySelectionManager>().enabled = false;
 			table.AddComponent<CollisionDetectionManager>();
 			return table;
 		}
@@ -95,11 +97,10 @@ namespace SEE.Game.Table
 		/// <param name="name">The table name.</param>
 		/// <param name="position">The position of the table.</param>
 		/// <param name="eulerAngles">The euler angles of the table.</param>
-		/// <returns></returns>
+		/// <returns>The spawned table.</returns>
 		public static GameObject Respawn(string name, Vector3 position, Vector3 eulerAngles)
 		{
-			GameObject table = Spawn();
-			table.name = name;
+			GameObject table = Spawn(name);
 			Move(table, position);
 			Rotate(table, eulerAngles);
 			FinishSpawn(table);
