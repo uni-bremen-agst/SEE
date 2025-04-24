@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using SEE.Game.Table;
+﻿using SEE.Game.Table;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Table

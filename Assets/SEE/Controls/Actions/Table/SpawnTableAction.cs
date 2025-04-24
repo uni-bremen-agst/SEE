@@ -1,4 +1,5 @@
-﻿using SEE.Game.Table;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Game.Table;
 using SEE.Net.Actions.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -22,6 +23,12 @@ namespace SEE.Controls.Actions.Table
         /// Indicator if the action is completed.
         /// </summary>
         private bool finish = false;
+
+        /// <summary>
+        /// Indicator whether the action waited for synchronization after the <see cref="Start"/> method.
+        /// Without waiting, the table to be moved might not be found on the other players sides.
+        /// </summary>
+        private bool waitedForSynchronization = false;
 
         /// <summary>
         /// Saves all the information needed to revert or repeat this action.
@@ -67,6 +74,9 @@ namespace SEE.Controls.Actions.Table
         {
             base.Start();
             spawnedTable = GameTableManager.Spawn();
+            new SpawnTableNetAction(spawnedTable.name,
+                spawnedTable.transform.position,
+                spawnedTable.transform.eulerAngles).Execute();
         }
 
         /// <summary>
@@ -78,6 +88,7 @@ namespace SEE.Controls.Actions.Table
             if (!finish)
             {
                 GameTableManager.Destroy(spawnedTable);
+                new DestroyTableNetAction(spawnedTable.name).Execute();
             }
         }
 
@@ -90,12 +101,18 @@ namespace SEE.Controls.Actions.Table
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                if (!finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
+                if (!waitedForSynchronization)
+                {
+                    Wait().Forget();
+                }
+                if (waitedForSynchronization && !finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
                     GameTableManager.Move(spawnedTable, raycastHit.point);
+                    new MoveTableNetAction(spawnedTable.name, spawnedTable.transform.position).Execute();
                     if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
                     {
                         GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
+                        new RotateTableNetAction(spawnedTable.name, spawnedTable.transform.eulerAngles).Execute();
                     }
                     if (SEEInput.LeftMouseDown())
                     {
@@ -109,13 +126,18 @@ namespace SEE.Controls.Actions.Table
                         finish = true;
                         GameTableManager.FinishSpawn(spawnedTable);
                         memento = new(spawnedTable);
-                        new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles).Execute();
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                     }
                 }
             }
             return false;
+
+            async UniTask Wait()
+            {
+                await UniTask.Yield();
+                waitedForSynchronization = true;
+            }
         }
 
         /// <summary>
