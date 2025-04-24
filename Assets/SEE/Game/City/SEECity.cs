@@ -461,92 +461,19 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
-        /// Only the game objects generated for the nodes and edges are deleted first
-        /// and then they are re-created.
+        /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphDrawn))]
-        public void ReDrawGraph()
+        public virtual void ReDrawGraph()
         {
-            const string Prefix = "Text";
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
             else
             {
-                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
-                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 DeleteGraphGameObjects();
                 DrawGraph();
-                RestoreLayout(layoutGraphNodes, decorationValues).Forget();
-                graphRenderer = null;
-            }
-            return;
-
-            async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
-                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
-            {
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
-                layoutGraphNodes.ForEach(nodeLayout =>
-                {
-                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    if (node != null)
-                    {
-                        node.NodeOperator().ScaleTo(nodeLayout.AbsoluteScale, 0);
-                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
-                        node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
-                        {
-                            if (decorationValues.ContainsKey(nodeLayout.ID))
-                            {
-                                RectTransform tmpRect = (RectTransform)tmp.transform;
-                                tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
-                                if (tmp.name.StartsWith(Prefix))
-                                {
-                                    tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
-                                    tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-
-            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
-            {
-                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
-                foreach (GameObject gameObject in gameObjects)
-                {
-                    Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip root or non architecture nodes. Their restoration is handled by the layout itself.
-                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot() || !node.IsInArchitecture())
-                    {
-                        continue;
-                    }
-                    LayoutGraphNode layoutNode = new(node)
-                    {
-                        CenterPosition = gameObject.transform.position,
-                        AbsoluteScale = gameObject.transform.localScale
-                    };
-                    result.Add(layoutNode);
-                    // Case for decorative texts that start with the prefix "Text".
-                    if (gameObject.FindChildWithPrefix(Prefix) != null)
-                    {
-                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
-                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
-                    }
-                    // Case for label texts that start with the prefix "Label".
-                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
-                    {
-                        textValues.Add(node.ID, (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
-                    }
-                }
-                LayoutNodes.SetLevels(result);
-                return (result, textValues);
             }
         }
 
@@ -555,7 +482,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        private GraphRenderer graphRenderer;
+        protected GraphRenderer graphRenderer;
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
