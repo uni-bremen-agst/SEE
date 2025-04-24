@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions
                         XRSEEActions.Selected = false;
                         activeAction = true;
                         grabbedObject.Grab(hoveredObject.gameObject);
-                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject);
+                        AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.PickupSound, hoveredObject.gameObject, true);
                         CurrentState = IReversibleAction.Progress.InProgress;
                     }
                     else
@@ -176,7 +176,7 @@ namespace SEE.Controls.Actions
             {
                 if (grabbedObject.GrabbedGameObject != null)
                 {
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, grabbedObject.GrabbedGameObject, true);
                 }
                 XRSEEActions.Selected = false;
                 activeAction = false;

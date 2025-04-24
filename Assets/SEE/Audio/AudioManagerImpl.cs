@@ -114,9 +114,14 @@ namespace SEE.Audio
         public float SoundEffectVolume;
 
         /// <summary>
-        /// Stores the previous scene name.
+        /// Are sound effects from remote players muted?
         /// </summary>
-        private SceneType previousGameState;
+        public bool RemoteSoundEffectsMuted = false;
+
+        /// <summary>
+        /// Stores the current scene name.
+        /// </summary>
+        private SceneType currentScene;
 
         /// <summary>
         /// Queue of music tracks to be played by the audio manager.
@@ -173,7 +178,7 @@ namespace SEE.Audio
             instance = this; // required since a mono behaviour object cannot be instantiated.
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
-            previousGameState = SceneContext.GetSceneType(SceneManager.GetActiveScene());
+            currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
             QueueMusic();
         }
 
@@ -272,10 +277,10 @@ namespace SEE.Audio
         /// <returns>True if the scene was changed, false otherwise.</returns>
         private bool CheckSceneChanged()
         {
-            SceneType currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
-            if (currentScene != previousGameState)
+            SceneType newScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
+            if (newScene != currentScene)
             {
-                previousGameState = currentScene;
+                currentScene = newScene;
                 return true;
             }
             return false;
@@ -293,6 +298,8 @@ namespace SEE.Audio
                 audioGameObject.ChangeVolume(SoundEffectVolume);
             }
         }
+
+        #region IAudioManager Members
 
         /// <summary>
         /// Decreases music volume by 10%.
@@ -333,14 +340,6 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Queues music based on the loaded scene.
-        /// </summary>
-        private void QueueMusic()
-        {
-            QueueMusic(previousGameState);
-        }
-
-        /// <summary>
         /// Increase music volume by 10%.
         /// </summary>
         public void IncreaseMusicVolume()
@@ -364,9 +363,7 @@ namespace SEE.Audio
             }
         }
 
-        /// <summary>
-        /// Mutes the music.
-        /// </summary>
+        /// <inheritdoc/>
         public void MuteMusic()
         {
             musicVolumeBeforeMute = MusicVolume;
@@ -375,14 +372,18 @@ namespace SEE.Audio
             PauseMusic();
         }
 
-        /// <summary>
-        /// Mutes sound effects.
-        /// </summary>
+        /// <inheritdoc/>
         public void MuteSoundEffects()
         {
             soundEffectVolumeBeforeMute = SoundEffectVolume;
             SoundEffectVolume = 0;
             TriggerVolumeChanges();
+        }
+
+        /// <inheritdoc/>
+        public void MuteRemoteSoundEffects()
+        {
+            RemoteSoundEffectsMuted = true;
         }
 
         /// <summary>
@@ -397,52 +398,64 @@ namespace SEE.Audio
             }
         }
 
-        /// <summary>
-        /// Adds a new music track to the music queue.
-        /// </summary>
-        /// <param name="sceneType">The current type of scene.</param>
-        public void QueueMusic(SceneType sceneType)
+        /// <inheritdoc />
+        public void ResumeMusic()
         {
-            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.Lobby ? Music.LobbySound : Music.WorldSound));
-        }
-
-        /// <summary>
-        /// Public API method for playing sound effects.
-        /// </summary>
-        /// <param name="soundEffect">The sound effect to play.</param>
-        public static void EnqueueSoundEffect(SoundEffect soundEffect)
-        {
-            if (instance != null)
+            if (!musicPlayer.isPlaying)
             {
-                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect);
+                musicPlayer.Play();
+                musicPaused = false;
             }
         }
 
-        /// <summary>
-        /// Public API method for playing sound effects.
-        /// </summary>
-        /// <param name="soundEffect">The sound effect to play.</param>
-        /// <param name="sourceObject">The object the sound should eminate from.</param>
-        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject)
+        /// <inheritdoc />
+        public void UnmuteMusic()
         {
-            if (instance != null)
-            {
-                if (sourceObject == null)
-                {
-                    EnqueueSoundEffect(soundEffect);
-                    return;
-                }
-                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject);
-            }
+            MusicVolume = musicVolumeBeforeMute;
+            musicVolumeBeforeMute = 0;
+            TriggerVolumeChanges();
+            ResumeMusic();
         }
+
+        /// <inheritdoc />
+        public void UnmuteSoundEffects()
+        {
+            SoundEffectVolume = soundEffectVolumeBeforeMute;
+            soundEffectVolumeBeforeMute = 0;
+            TriggerVolumeChanges();
+        }
+
+        /// <inheritdoc />
+        public void UnmuteRemoteSoundEffects()
+        {
+            RemoteSoundEffectsMuted = false;
+        }
+
+        #endregion IAudioManager Members
+
+        #region Public Methods
 
         /// <summary>
         /// Public API method for playing sound effects.
         /// </summary>
         /// <param name="soundEffect">The sound effect to play.</param>
-        /// <param name="sourceObject">The object the sound should eminate from.</param>
         /// <param name="sentToClients">Whether the sound effect should be propagated to other players.</param>
-        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sentToClients)
+        public static void EnqueueSoundEffect(SoundEffect soundEffect, bool sentToClients = false)
+        {
+            if (instance != null)
+            {
+                AudioManagerImpl.Instance().PlaySoundEffect(soundEffect);
+            }
+        }
+
+        /// <summary>
+        /// Public API method for playing sound effects.
+        /// </summary>
+        /// <param name="soundEffect">The sound effect to play.</param>
+        /// <param name="sourceObject">The object the sound should eminate from.</param>
+        /// <param name="sendToPeers">Whether the sound effect should be propagated to other players.</param>
+        /// <param name="receivedFromPeer">Whether the sound effect was received from another player.</param>
+        public static void EnqueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sendToPeers = false, bool receivedFromPeer = false)
         {
             if (instance != null)
             {
@@ -451,15 +464,22 @@ namespace SEE.Audio
                     EnqueueSoundEffect(soundEffect);
                     return;
                 }
-                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject, sentToClients);
+                AudioManagerImpl.Instance().QueueSoundEffect(soundEffect, sourceObject, sendToPeers, receivedFromPeer);
             }
         }
 
+        #endregion Public Methods
+
         /// <summary>
-        /// Plays a new sound effect.
+        /// Plays a sound effect without specifying the object which the sound is originating from.
+        /// <para>
+        /// The GameObject used is the player object itself (ambient sound rather than directional sound is used).
+        /// </para><para>
+        /// Any currently playing sound effect is interrupted.
+        /// </para>
         /// </summary>
-        /// <param name="soundEffect">The sound effect to play.</param>
-        public void QueueSoundEffect(SoundEffect soundEffect)
+        /// <param name="soundEffect">The sound effect that should be played.</param>
+        private void PlaySoundEffect(SoundEffect soundEffect)
         {
             soundEffectPlayer.Stop();
             soundEffectPlayer.clip = GetAudioClipFromSoundEffectName(soundEffect);
@@ -467,27 +487,20 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Plays a new sound effect.
+        /// Adds a sound effect to the sound effect queue while checking,
+        /// if the sound effect was passed from a multiplayer connected player,
+        /// or from the local game instance (to prevent endless sound effect loops).
         /// </summary>
-        /// <param name="soundEffect">The sound effect to play.</param>
-        /// <param name="sourceObject">The object the sound should eminate from.</param>
-        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject) {
-            if (sourceObject == null)
+        /// <param name="soundEffect">The sound effect that should be added to the sound effect queue.</param>
+        /// <param name="sourceObject">The GameObject where the sound originated from.</param>
+        /// <param name="sendToPeers">Whether the sound effect should be propagated to other players.</param>
+        /// <param name="receivedFromPeer">Whether the sound effect was received from another player.</param>
+        private void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sendToPeers = false, bool receivedFromPeer = false)
+        {
+            if (receivedFromPeer && RemoteSoundEffectsMuted)
             {
-                EnqueueSoundEffect(soundEffect);
                 return;
             }
-            QueueSoundEffect(soundEffect, sourceObject, false);
-        }
-
-        /// <summary>
-        /// Plays a new sound effect.
-        /// </summary>
-        /// <param name="soundEffect">The sound effect to play.</param>
-        /// <param name="sourceObject">The object the sound should eminate from.</param>
-        /// <param name="sendToClients">Whether the sound effect should be propagated to other players.</param>
-        public void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool sendToClients)
-        {
             AudioGameObject controlObject = null;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
@@ -503,43 +516,28 @@ namespace SEE.Audio
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
-            if (!sendToClients && previousGameState != SceneType.Lobby)
+
+            if (sendToPeers && !receivedFromPeer && currentScene != SceneType.Lobby)
             {
                 new SoundEffectNetAction(soundEffect, sourceObject.name).Execute();
             }
         }
 
         /// <summary>
-        /// Resumes music after it was paused.
+        /// Queues music based on the loaded scene.
         /// </summary>
-        public void ResumeMusic()
+        private void QueueMusic()
         {
-            if (!musicPlayer.isPlaying)
-            {
-                musicPlayer.Play();
-                musicPaused = false;
-            }
+            QueueMusic(currentScene);
         }
 
         /// <summary>
-        /// Unmutes music.
+        /// Adds a new music track to the music queue.
         /// </summary>
-        public void UnmuteMusic()
+        /// <param name="sceneType">The current type of scene.</param>
+        private void QueueMusic(SceneType sceneType)
         {
-            MusicVolume = musicVolumeBeforeMute;
-            musicVolumeBeforeMute = 0;
-            TriggerVolumeChanges();
-            ResumeMusic();
-        }
-
-        /// <summary>
-        /// Unmutes sound effects.
-        /// </summary>
-        public void UnmuteSoundEffects()
-        {
-            SoundEffectVolume = soundEffectVolumeBeforeMute;
-            soundEffectVolumeBeforeMute = 0;
-            TriggerVolumeChanges();
+            musicQueue.Enqueue(GetAudioClipFromMusicName(sceneType == SceneType.Lobby ? Music.LobbySound : Music.WorldSound));
         }
 
         /// <summary>
