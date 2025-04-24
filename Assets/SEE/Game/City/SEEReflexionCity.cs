@@ -192,6 +192,21 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Extends the existing reset functionality so that,
+        /// in the case of an initial ReflexionCity, the empty initial
+        /// ReflexionCity is loaded again.
+        /// </summary>
+        public override void Reset()
+        {
+            base.Reset();
+            if (initialReflexionCity)
+            {
+                LoadInitial(gameObject.name);
+                DrawGraph();
+            }
+        }
+
         #region SEEReflexionCity creation during in play mode
         /// <summary>
         /// Loads the initial reflexion city.
