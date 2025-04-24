@@ -522,8 +522,8 @@ namespace SEE.Game.City
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip root or implementation nodes. Their restoration is handled by the layout itself.
-                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot() || node.IsInImplementation())
+                    // skip root or non architecture nodes. Their restoration is handled by the layout itself.
+                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot() || !node.IsInArchitecture())
                     {
                         continue;
                     }
