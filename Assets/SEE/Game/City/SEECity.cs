@@ -8,6 +8,7 @@ using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -521,8 +522,8 @@ namespace SEE.Game.City
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip root nodes. Their restoration is handled by the layout itself.
-                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot())
+                    // skip root or implementation nodes. Their restoration is handled by the layout itself.
+                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot() || node.IsInImplementation())
                     {
                         continue;
                     }
