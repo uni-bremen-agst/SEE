@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Audio;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.GO;
@@ -48,6 +49,26 @@ namespace SEE.UI
         private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
 
         /// <summary>
+        /// The cached audio manager instance.
+        /// </summary>
+        private AudioManagerImpl audioManager;
+
+        /// <summary>
+        /// The slider that allows to change the sound effect volume.
+        /// </summary>
+        private Slider sfxVolumeSlider;
+
+        /// <summary>
+        /// The slider that allows to change the music volume.
+        /// </summary>
+        private Slider musicVolumeSlider;
+
+        /// <summary>
+        /// The toggle that allows to mute the remote sound effects.
+        /// </summary>
+        private Toggle remoteSfxToggle;
+
+        /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
@@ -59,6 +80,17 @@ namespace SEE.UI
             // adds the ExitGame method to the exit button
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
+
+            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
+            musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
+            remoteSfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/RemoteSFXToggle").gameObject.MustGetComponent<Toggle>();
+            audioManager = AudioManagerImpl.Instance();
+            sfxVolumeSlider.value = audioManager.SoundEffectVolume;
+            musicVolumeSlider.value = audioManager.MusicVolume;
+            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
+            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectVolume = value; });
+            musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
+            remoteSfxToggle.onValueChanged.AddListener((value) => { audioManager.RemoteSoundEffectsMuted = !value; });
 
             // Displays all bindings grouped by their category.
             foreach (var group in KeyBindings.AllBindings())

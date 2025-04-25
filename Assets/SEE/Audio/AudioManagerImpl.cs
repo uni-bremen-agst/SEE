@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.IO;
+using SEE.Utils.Config;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using static SEE.Audio.IAudioManager;
@@ -11,6 +13,40 @@ namespace SEE.Audio
     /// </summary>
     public class AudioManagerImpl : MonoBehaviour, IAudioManager
     {
+        #region Configuration File
+
+        /// <summary>
+        /// Path to the configuration file relative to StreamingAssets.
+        /// </summary>
+        private const string configFilePath = "audio.cfg";
+
+        /// <summary>
+        /// Label of attribute <see cref="MusicVolume"/> in the configuration file.
+        /// </summary>
+        private const string musicVolumeLabel = "musicVolume";
+
+        /// <summary>
+        /// Label of attribute <see cref="SoundEffectVolume"/> in the configuration file.
+        /// </summary>
+        private const string sfxVolumeLabel = "soundEffectVolume";
+
+        /// <summary>
+        /// Label of attribute <see cref="MusicMuted"/> in the configuration file.
+        /// </summary>
+        private const string musicMutedLabel = "musicMuted";
+
+        /// <summary>
+        /// Label of attribute <see cref="SoundEffectsMuted"/> in the configuration file.
+        /// </summary>
+        private const string soundEffectsMutedLabel = "soundEffectsMuted";
+
+        /// <summary>
+        /// Label of attribute <see cref="RemoteSoundEffectsMuted"/> in the configuration file.
+        /// </summary>
+        private const string remoteSoundEffectsMutedLabel = "remoteSoundEffectsMuted";
+
+        #endregion Configuration File
+
         /// <summary>
         /// The music played in the lobby scene.
         /// </summary>
@@ -114,6 +150,16 @@ namespace SEE.Audio
         public float SoundEffectVolume;
 
         /// <summary>
+        /// Is the music muted?
+        /// </summary>
+        public bool MusicMuted = false;
+
+        /// <summary>
+        /// Are sound local sound effects muted?
+        /// </summary>
+        public bool SoundEffectsMuted = false;
+
+        /// <summary>
         /// Are sound effects from remote players muted?
         /// </summary>
         public bool RemoteSoundEffectsMuted = false;
@@ -173,9 +219,16 @@ namespace SEE.Audio
         /// Default MonoBehaviour method, executed when the object is created.
         /// Initializes a global audio player and starts the lobby music.
         /// </summary>
-        public void Start()
+        private void Start()
         {
             instance = this; // required since a mono behaviour object cannot be instantiated.
+            RestoreConfiguration();
+            // TODO Make sure that volumes are applied:
+            // - Convert attributes to properties and apply on set.
+            // - Throw away manual setters.
+            // TODO Can we drop ...BeforeMute and keep the last volume in the original attribute?
+            // - There are ...Muted flags now to remember mute state.
+            // - Add mute toggles for SFX/music to the settings menu.
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
             currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
@@ -197,7 +250,7 @@ namespace SEE.Audio
         /// plays music according to the loaded scene.
         /// Also ensures that sound effects that should be played are played.
         /// </summary>
-        public void Update()
+        private void Update()
         {
             if (CheckSceneChanged())
             {
@@ -287,6 +340,14 @@ namespace SEE.Audio
         }
 
         /// <summary>
+        /// Called when the object is destroyed.
+        /// </summary>
+        private void OnDestroy()
+        {
+            PersistConfiguration();
+        }
+
+        /// <summary>
         /// Applies the volume changes.
         /// </summary>
         private void TriggerVolumeChanges()
@@ -366,18 +427,28 @@ namespace SEE.Audio
         /// <inheritdoc/>
         public void MuteMusic()
         {
+            if (MusicMuted)
+            {
+                return;
+            }
             musicVolumeBeforeMute = MusicVolume;
             MusicVolume = 0;
             TriggerVolumeChanges();
             PauseMusic();
+            MusicMuted = true;
         }
 
         /// <inheritdoc/>
         public void MuteSoundEffects()
         {
+            if (SoundEffectsMuted)
+            {
+                return;
+            }
             soundEffectVolumeBeforeMute = SoundEffectVolume;
             SoundEffectVolume = 0;
             TriggerVolumeChanges();
+            SoundEffectsMuted = true;
         }
 
         /// <inheritdoc/>
@@ -411,18 +482,28 @@ namespace SEE.Audio
         /// <inheritdoc />
         public void UnmuteMusic()
         {
+            if (!MusicMuted)
+            {
+                return;
+            }
             MusicVolume = musicVolumeBeforeMute;
             musicVolumeBeforeMute = 0;
             TriggerVolumeChanges();
             ResumeMusic();
+            MusicMuted = false;
         }
 
         /// <inheritdoc />
         public void UnmuteSoundEffects()
         {
+            if (!SoundEffectsMuted)
+            {
+                return;
+            }
             SoundEffectVolume = soundEffectVolumeBeforeMute;
             soundEffectVolumeBeforeMute = 0;
             TriggerVolumeChanges();
+            SoundEffectsMuted = false;
         }
 
         /// <inheritdoc />
@@ -571,5 +652,55 @@ namespace SEE.Audio
             SoundEffect.HoverSound => HoverSoundEffect,
             _ => ClickSoundEffect,
         };
+
+        // /// <summary>
+        // /// Saves the audio configuration to <paramref name="filename"/>.
+        // /// </summary>
+        // /// <param name="filename">name of the file in which the settings are stored</param>
+        // public void Save(string filename)
+        // {
+        //     using ConfigWriter writer = new(filename);
+        //     Save(writer);
+        // }
+
+        /// <summary>
+        /// Persists the sound configuration to the file specified by <see cref="configFilePath"/>.
+        /// </summary>
+        private void PersistConfiguration()
+        {
+            using ConfigWriter writer = new(Application.streamingAssetsPath + "/" + configFilePath);
+
+            float sfxVolume = SoundEffectsMuted ? soundEffectVolumeBeforeMute : SoundEffectVolume;
+            float musicVolume = MusicMuted ? musicVolumeBeforeMute : MusicVolume;
+
+            writer.Save(musicVolume, musicVolumeLabel);
+            writer.Save(sfxVolume, sfxVolumeLabel);
+            writer.Save(MusicMuted, musicMutedLabel);
+            writer.Save(SoundEffectsMuted, soundEffectsMutedLabel);
+            writer.Save(RemoteSoundEffectsMuted, remoteSoundEffectsMutedLabel);
+        }
+
+        /// <summary>
+        /// Restores the sound configuration from the file specified by the <see cref="configFilePath"/> property.
+        /// </summary>
+        private void RestoreConfiguration()
+        {
+            string filePath = Application.streamingAssetsPath + "/" + configFilePath;
+            if (!File.Exists(filePath))
+            {
+                Debug.LogError($"Audio configuration file does not exist: {filePath} \n");
+                return;
+            }
+
+            Debug.Log($"Loading audio configuration from file: {filePath}\n");
+            using ConfigReader stream = new(filePath);
+            Dictionary<string, object> attributes = stream.Read();
+
+            ConfigIO.Restore(attributes, musicVolumeLabel, ref MusicVolume);
+            ConfigIO.Restore(attributes, sfxVolumeLabel, ref SoundEffectVolume);
+            ConfigIO.Restore(attributes, musicMutedLabel, ref MusicMuted);
+            ConfigIO.Restore(attributes, soundEffectsMutedLabel, ref SoundEffectsMuted);
+            ConfigIO.Restore(attributes, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
+        }
     }
 }
