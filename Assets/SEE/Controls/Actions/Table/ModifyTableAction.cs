@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.Table
             }
             if (modifiedTable != null)
             {
-                Destroyer.Destroy(modifiedTable.GetComponent<CollisionDetectionManager>());
+                GameTableManager.DisableEditMode(modifiedTable);
             }
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
@@ -217,7 +217,7 @@ namespace SEE.Controls.Actions.Table
                             GameObject city = raycastObj.CompareTag(Tags.CodeCity) ?
                                    raycastObj : raycastObj.ContainingCity().gameObject;
                             modifiedTable = city.transform.parent.gameObject;
-                            modifiedTable.AddComponent<CollisionDetectionManager>();
+                            GameTableManager.EnableEditMode(modifiedTable);
                         }
                         if (modifiedTable != null && SEEInput.MouseUp(MouseButton.Left))
                         {
