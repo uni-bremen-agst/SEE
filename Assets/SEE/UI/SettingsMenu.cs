@@ -173,16 +173,32 @@ namespace SEE.UI
             }
             if (SEEInput.ToggleSettings())
             {
-                Transform keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel");
                 GameObject settingsPanel = settingsMenuGameObject.transform.Find("SettingsPanel").gameObject;
-                if (keybindingsPanel.gameObject.activeSelf && !settingsPanel.activeSelf)
+                GameObject keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject;
+                GameObject audioSettingsPanel = settingsMenuGameObject.transform.Find("AudioSettingsPanel").gameObject;
+                GameObject videoChatPanel = settingsMenuGameObject.transform.Find("VideochatPanel").gameObject;
+                GameObject exitPanel = settingsMenuGameObject.transform.Find("ExitPanel").gameObject;
+
+                // Hide specific setting panels if they are active
+                if (keybindingsPanel.activeSelf)
                 {
-                    // handles the case where the user is in the KeybindingsPanel but wants to close it
-                    keybindingsPanel.gameObject.SetActive(false);
+                    keybindingsPanel.SetActive(false);
                 }
+                else if (audioSettingsPanel.activeSelf)
+                {
+                    audioSettingsPanel.SetActive(false);
+                }
+                else if (videoChatPanel.activeSelf)
+                {
+                    videoChatPanel.SetActive(false);
+                }
+                else if (exitPanel.activeSelf)
+                {
+                    exitPanel.SetActive(false);
+                }
+                // Toggle main settings panel
                 else
                 {
-                    // handles the case where the user wants to open/close the SettingsPanel
                     settingsPanel.SetActive(!settingsPanel.activeSelf);
                 }
             }
