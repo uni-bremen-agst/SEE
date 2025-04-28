@@ -10,6 +10,7 @@ using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using MoreLinq;
+using SEE.Net.Actions.Table;
 
 namespace SEE.Controls.Actions.Table
 {
@@ -233,6 +234,7 @@ namespace SEE.Controls.Actions.Table
                         if (Raycasting.RaycastAnything(out RaycastHit raycast))
                         {
                             GameTableManager.Move(modifiedTable, raycast.point);
+                            new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
                             if (SEEInput.LeftMouseDown())
                             {
                                 if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
