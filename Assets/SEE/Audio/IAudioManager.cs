@@ -8,54 +8,29 @@ namespace SEE.Audio
     public interface IAudioManager
     {
         /// <summary>
-        /// Mutes all music.
+        /// Gets or sets the music volume.
         /// </summary>
-        void MuteMusic();
+        float MusicVolume { get; set; }
 
         /// <summary>
-        /// Increases the music volume.
+        /// Gets or sets the sound effect volume.
         /// </summary>
-        void IncreaseMusicVolume();
+        float SoundEffectsVolume { get; set; }
 
         /// <summary>
-        /// Decreases the music volume.
+        /// Gets or sets a value indicating whether music is muted.
         /// </summary>
-        void DecreaseMusicVolume();
+        bool MusicMuted { get; set; }
 
         /// <summary>
-        /// Unmute the music.
+        /// Gets or sets a value indicating whether sound effects are muted.
         /// </summary>
-        void UnmuteMusic();
+        bool SoundEffectsMuted { get; set; }
 
         /// <summary>
-        /// Mute all sound effects.
+        /// Gets or sets a value indicating whether remote sound effects are muted.
         /// </summary>
-        void MuteSoundEffects();
-
-        /// <summary>
-        /// Increase sound effects volume.
-        /// </summary>
-        void IncreaseSoundEffectVolume();
-
-        /// <summary>
-        /// Decrease sound effects volume.
-        /// </summary>
-        void DecreaseSoundEffectVolume();
-
-        /// <summary>
-        /// Unmute all sound effects.
-        /// </summary>
-        void UnmuteSoundEffects();
-
-        /// <summary>
-        /// Mute sound effects received from remote players.
-        /// </summary>
-        void MuteRemoteSoundEffects();
-
-        /// <summary>
-        /// Unmute sound effects received from remote players.
-        /// </summary>
-        void UnmuteRemoteSoundEffects();
+        bool RemoteSoundEffectsMuted { get; set; }
 
         /// <summary>
         /// Pause the currently playing music.

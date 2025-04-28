@@ -54,6 +54,21 @@ namespace SEE.UI
         private AudioManagerImpl audioManager;
 
         /// <summary>
+        /// The toggle that allows to mute the music.
+        /// </summary>
+        private Toggle musicToggle;
+
+        /// <summary>
+        /// The toggle that allows to mute the local sound effects.
+        /// </summary>
+        private Toggle sfxToggle;
+
+        /// <summary>
+        /// The toggle that allows to mute the remote sound effects.
+        /// </summary>
+        private Toggle remoteSfxToggle;
+
+        /// <summary>
         /// The slider that allows to change the sound effect volume.
         /// </summary>
         private Slider sfxVolumeSlider;
@@ -62,11 +77,6 @@ namespace SEE.UI
         /// The slider that allows to change the music volume.
         /// </summary>
         private Slider musicVolumeSlider;
-
-        /// <summary>
-        /// The toggle that allows to mute the remote sound effects.
-        /// </summary>
-        private Toggle remoteSfxToggle;
 
         /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
@@ -81,15 +91,33 @@ namespace SEE.UI
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
 
-            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
+            musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
             musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
+            sfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXToggle").gameObject.MustGetComponent<Toggle>();
+            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
             remoteSfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/RemoteSFXToggle").gameObject.MustGetComponent<Toggle>();
+
             audioManager = AudioManagerImpl.Instance();
-            sfxVolumeSlider.value = audioManager.SoundEffectVolume;
             musicVolumeSlider.value = audioManager.MusicVolume;
+            musicVolumeSlider.interactable = !audioManager.MusicMuted;
+            musicToggle.isOn = !audioManager.MusicMuted;
+            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
+            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
+            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
             remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
-            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectVolume = value; });
+            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+
+            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectsVolume = value; });
             musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
+            musicToggle.onValueChanged.AddListener((value) => {
+                audioManager.MusicMuted = !value;
+                musicVolumeSlider.interactable = value;
+            });
+            sfxToggle.onValueChanged.AddListener((value) => {
+                audioManager.SoundEffectsMuted = !value;
+                sfxVolumeSlider.interactable = value;
+                remoteSfxToggle.interactable = value;
+            });
             remoteSfxToggle.onValueChanged.AddListener((value) => { audioManager.RemoteSoundEffectsMuted = !value; });
 
             // Displays all bindings grouped by their category.

@@ -73,7 +73,8 @@ namespace SEE.Audio
         /// Changes the audio player's volume to the supplied volume.
         /// </summary>
         /// <param name="volume">The volume the audio player should be set to.</param>
-        public void ChangeVolume(float volume){
+        public void ChangeVolume(float volume)
+        {
             AttachedObject.GetComponent<AudioSource>().volume = volume;
         }
 

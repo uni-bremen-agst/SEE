@@ -26,9 +26,9 @@ namespace SEE.Audio
         private const string musicVolumeLabel = "musicVolume";
 
         /// <summary>
-        /// Label of attribute <see cref="SoundEffectVolume"/> in the configuration file.
+        /// Label of attribute <see cref="SoundEffectsVolume"/> in the configuration file.
         /// </summary>
-        private const string sfxVolumeLabel = "soundEffectVolume";
+        private const string soundEffectsVolumeLabel = "soundEffectVolume";
 
         /// <summary>
         /// Label of attribute <see cref="MusicMuted"/> in the configuration file.
@@ -46,6 +46,8 @@ namespace SEE.Audio
         private const string remoteSoundEffectsMutedLabel = "remoteSoundEffectsMuted";
 
         #endregion Configuration File
+
+        #region Audio Clips
 
         /// <summary>
         /// The music played in the lobby scene.
@@ -107,6 +109,8 @@ namespace SEE.Audio
         /// </summary>
         public AudioClip HoverSoundEffect;
 
+        #endregion Audio Clips
+
         /// <summary>
         /// Contains a list of Game Objects that had an AudioSource attached to them to play a sound effect.
         /// </summary>
@@ -118,51 +122,9 @@ namespace SEE.Audio
         public GameObject PlayerObject;
 
         /// <summary>
-        /// Publicly accessible default for music volume. Can be set by Unity properties.
+        /// Stores whether remote sound effects are muted or not.
         /// </summary>
-        [Range(0,1)]
-        public float DefaultMusicVolume;
-
-        /// <summary>
-        /// Publicly accessible default for sound effect volume. Can be set by Unity properties.
-        /// </summary>
-        [Range(0, 1)]
-        public float DefaultSoundEffectVolume;
-
-        /// <summary>
-        /// Memento that stores the music volume before the music was muted.
-        /// </summary>
-        private float musicVolumeBeforeMute;
-
-        /// <summary>
-        /// Memento that stores the sound effects volume before sound effects were muted.
-        /// </summary>
-        private float soundEffectVolumeBeforeMute;
-
-        /// <summary>
-        /// Current music volume.
-        /// </summary>
-        public float MusicVolume;
-
-        /// <summary>
-        /// Current sound effects volume.
-        /// </summary>
-        public float SoundEffectVolume;
-
-        /// <summary>
-        /// Is the music muted?
-        /// </summary>
-        public bool MusicMuted = false;
-
-        /// <summary>
-        /// Are sound local sound effects muted?
-        /// </summary>
-        public bool SoundEffectsMuted = false;
-
-        /// <summary>
-        /// Are sound effects from remote players muted?
-        /// </summary>
-        public bool RemoteSoundEffectsMuted = false;
+        private bool remoteSoundEffectsMuted = false;
 
         /// <summary>
         /// Stores the current scene name.
@@ -185,14 +147,34 @@ namespace SEE.Audio
         private static AudioManagerImpl instance = null;
 
         /// <summary>
+        /// Audio source used for playing sound effects.
+        /// </summary>
+        private AudioSource soundEffectPlayer;
+
+        /// <summary>
+        /// Current music volume.
+        /// </summary>
+        private float musicVolume;
+
+        /// <summary>
+        /// Indicates whether music is muted.
+        /// </summary>
+        private bool musicMuted = false;
+
+        /// <summary>
         /// Stores the current state of the music player.
         /// </summary>
         private bool musicPaused = false;
 
         /// <summary>
-        /// Audio source used for playing sound effects.
+        /// Current sound effects volume.
         /// </summary>
-        private AudioSource soundEffectPlayer;
+        private float soundEffectsVolume;
+
+        /// <summary>
+        /// Indicates whether sound effects are muted.
+        /// </summary>
+        private bool soundEffectsMuted = false;
 
         /// <summary>
         /// Get the singleton instance.
@@ -210,8 +192,6 @@ namespace SEE.Audio
         {
             PlayerObject.AddComponent<AudioSource>();
             musicPlayer = PlayerObject.GetComponent<AudioSource>();
-            MusicVolume = DefaultMusicVolume;
-            SoundEffectVolume = DefaultSoundEffectVolume;
             musicPlayer.volume = MusicVolume;
         }
 
@@ -223,12 +203,6 @@ namespace SEE.Audio
         {
             instance = this; // required since a mono behaviour object cannot be instantiated.
             RestoreConfiguration();
-            // TODO Make sure that volumes are applied:
-            // - Convert attributes to properties and apply on set.
-            // - Throw away manual setters.
-            // TODO Can we drop ...BeforeMute and keep the last volume in the original attribute?
-            // - There are ...Muted flags now to remember mute state.
-            // - Add mute toggles for SFX/music to the settings menu.
             AttachAudioPlayer();
             InitializeSoundEffectPlayer();
             currentScene = SceneContext.GetSceneType(SceneManager.GetActiveScene());
@@ -241,7 +215,7 @@ namespace SEE.Audio
         private void InitializeSoundEffectPlayer()
         {
             soundEffectPlayer = PlayerObject.AddComponent<AudioSource>();
-            soundEffectPlayer.volume = SoundEffectVolume;
+            soundEffectPlayer.volume = SoundEffectsVolume;
         }
 
         /// <summary>
@@ -352,36 +326,71 @@ namespace SEE.Audio
         /// </summary>
         private void TriggerVolumeChanges()
         {
+
             musicPlayer.volume = MusicVolume;
-            soundEffectPlayer.volume = SoundEffectVolume;
+            musicPlayer.mute = MusicMuted;
+            soundEffectPlayer.volume = SoundEffectsVolume;
+            soundEffectPlayer.mute = SoundEffectsMuted;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                audioGameObject.ChangeVolume(SoundEffectVolume);
+                audioGameObject.ChangeVolume(SoundEffectsMuted ? 0f : SoundEffectsVolume);
             }
         }
 
         #region IAudioManager Members
 
-        /// <summary>
-        /// Decreases music volume by 10%.
-        /// </summary>
-        public void DecreaseMusicVolume()
+        /// <inheritdoc />
+        public float MusicVolume
         {
-            if (MusicVolume > 0.1f)
+            get => musicVolume;
+            set
             {
-                MusicVolume -= 0.1f;
+                musicVolume = Mathf.Clamp(value, 0f, 1f);
                 TriggerVolumeChanges();
             }
         }
 
-        /// <summary>
-        /// Decreases sound effect volume by 10%.
-        /// </summary>
-        public void DecreaseSoundEffectVolume()
+        /// <inheritdoc />
+        public float SoundEffectsVolume
         {
-            if (SoundEffectVolume > 0.1f)
+            get => soundEffectsVolume;
+            set
             {
-                SoundEffectVolume -= 0.1f;
+                soundEffectsVolume = Mathf.Clamp(value, 0f, 1f);
+                TriggerVolumeChanges();
+            }
+        }
+
+        /// <inheritdoc />
+        public bool MusicMuted
+        {
+            get => musicMuted;
+            set
+            {
+                musicMuted = value;
+                TriggerVolumeChanges();
+                PauseMusic();
+            }
+        }
+
+        /// <inheritdoc />
+        public bool SoundEffectsMuted
+        {
+            get => soundEffectsMuted;
+            set
+            {
+                soundEffectsMuted = value;
+                TriggerVolumeChanges();
+            }
+        }
+
+        /// <inheritdoc />
+        public bool RemoteSoundEffectsMuted
+        {
+            get => remoteSoundEffectsMuted;
+            set
+            {
+                remoteSoundEffectsMuted = value;
                 TriggerVolumeChanges();
             }
         }
@@ -400,66 +409,7 @@ namespace SEE.Audio
             musicPlayer.clip = musicQueue.Dequeue();
         }
 
-        /// <summary>
-        /// Increase music volume by 10%.
-        /// </summary>
-        public void IncreaseMusicVolume()
-        {
-            if (MusicVolume <= 0.9f)
-            {
-                MusicVolume += 0.1f;
-                TriggerVolumeChanges();
-            }
-        }
-
-        /// <summary>
-        /// Increase sound effect volume by 10%.
-        /// </summary>
-        public void IncreaseSoundEffectVolume()
-        {
-            if (SoundEffectVolume <= 0.9f)
-            {
-                SoundEffectVolume += 0.1f;
-                TriggerVolumeChanges();
-            }
-        }
-
-        /// <inheritdoc/>
-        public void MuteMusic()
-        {
-            if (MusicMuted)
-            {
-                return;
-            }
-            musicVolumeBeforeMute = MusicVolume;
-            MusicVolume = 0;
-            TriggerVolumeChanges();
-            PauseMusic();
-            MusicMuted = true;
-        }
-
-        /// <inheritdoc/>
-        public void MuteSoundEffects()
-        {
-            if (SoundEffectsMuted)
-            {
-                return;
-            }
-            soundEffectVolumeBeforeMute = SoundEffectVolume;
-            SoundEffectVolume = 0;
-            TriggerVolumeChanges();
-            SoundEffectsMuted = true;
-        }
-
-        /// <inheritdoc/>
-        public void MuteRemoteSoundEffects()
-        {
-            RemoteSoundEffectsMuted = true;
-        }
-
-        /// <summary>
-        /// Pauses the music player.
-        /// </summary>
+        /// <inheritdoc />
         public void PauseMusic()
         {
             if (musicPlayer.isPlaying)
@@ -477,39 +427,6 @@ namespace SEE.Audio
                 musicPlayer.Play();
                 musicPaused = false;
             }
-        }
-
-        /// <inheritdoc />
-        public void UnmuteMusic()
-        {
-            if (!MusicMuted)
-            {
-                return;
-            }
-            MusicVolume = musicVolumeBeforeMute;
-            musicVolumeBeforeMute = 0;
-            TriggerVolumeChanges();
-            ResumeMusic();
-            MusicMuted = false;
-        }
-
-        /// <inheritdoc />
-        public void UnmuteSoundEffects()
-        {
-            if (!SoundEffectsMuted)
-            {
-                return;
-            }
-            SoundEffectVolume = soundEffectVolumeBeforeMute;
-            soundEffectVolumeBeforeMute = 0;
-            TriggerVolumeChanges();
-            SoundEffectsMuted = false;
-        }
-
-        /// <inheritdoc />
-        public void UnmuteRemoteSoundEffects()
-        {
-            RemoteSoundEffectsMuted = false;
         }
 
         #endregion IAudioManager Members
@@ -593,7 +510,7 @@ namespace SEE.Audio
             }
             if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject, SoundEffectVolume);
+                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));
@@ -669,12 +586,8 @@ namespace SEE.Audio
         private void PersistConfiguration()
         {
             using ConfigWriter writer = new(Application.streamingAssetsPath + "/" + configFilePath);
-
-            float sfxVolume = SoundEffectsMuted ? soundEffectVolumeBeforeMute : SoundEffectVolume;
-            float musicVolume = MusicMuted ? musicVolumeBeforeMute : MusicVolume;
-
-            writer.Save(musicVolume, musicVolumeLabel);
-            writer.Save(sfxVolume, sfxVolumeLabel);
+            writer.Save(MusicVolume, musicVolumeLabel);
+            writer.Save(SoundEffectsVolume, soundEffectsVolumeLabel);
             writer.Save(MusicMuted, musicMutedLabel);
             writer.Save(SoundEffectsMuted, soundEffectsMutedLabel);
             writer.Save(RemoteSoundEffectsMuted, remoteSoundEffectsMutedLabel);
@@ -696,11 +609,11 @@ namespace SEE.Audio
             using ConfigReader stream = new(filePath);
             Dictionary<string, object> attributes = stream.Read();
 
-            ConfigIO.Restore(attributes, musicVolumeLabel, ref MusicVolume);
-            ConfigIO.Restore(attributes, sfxVolumeLabel, ref SoundEffectVolume);
-            ConfigIO.Restore(attributes, musicMutedLabel, ref MusicMuted);
-            ConfigIO.Restore(attributes, soundEffectsMutedLabel, ref SoundEffectsMuted);
-            ConfigIO.Restore(attributes, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
+            ConfigIO.Restore(attributes, musicVolumeLabel, ref musicVolume);
+            ConfigIO.Restore(attributes, soundEffectsVolumeLabel, ref soundEffectsVolume);
+            ConfigIO.Restore(attributes, musicMutedLabel, ref musicMuted);
+            ConfigIO.Restore(attributes, soundEffectsMutedLabel, ref soundEffectsMuted);
+            ConfigIO.Restore(attributes, remoteSoundEffectsMutedLabel, ref remoteSoundEffectsMuted);
         }
     }
 }
