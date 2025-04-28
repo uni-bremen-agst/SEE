@@ -1,4 +1,4 @@
-﻿using SEE.Game.City;
+﻿using HighlightPlus;
 using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.Utils;
@@ -6,10 +6,10 @@ using UnityEngine;
 
 namespace SEE.Game.Table
 {
-	/// <summary>
-	/// This class manages the tables modification.
-	/// </summary>
-	public static class GameTableManager
+    /// <summary>
+    /// This class manages the tables modification.
+    /// </summary>
+    public static class GameTableManager
 	{
 		/// <summary>
 		/// The prefab of the universal table.
@@ -41,7 +41,7 @@ namespace SEE.Game.Table
 			GameObject table = PrefabInstantiator.InstantiatePrefab(universalTablePrefab);
 			table.name = name?? universalTablePrefix + RandomStrings.GetRandomString(10);
             table.transform.GetComponentInChildren<CitySelectionManager>().enabled = false;
-			table.AddComponent<CollisionDetectionManager>();
+			EnableEditMode(table);
 			return table;
 		}
 
@@ -54,7 +54,7 @@ namespace SEE.Game.Table
 		public static void FinishSpawn(GameObject table)
 		{
             table.transform.GetComponentInChildren<CitySelectionManager>().enabled = true;
-			Destroyer.Destroy(table.GetComponent<CollisionDetectionManager>());
+			DisableEditMode(table);
         }
 
 		/// <summary>
@@ -124,5 +124,63 @@ namespace SEE.Game.Table
             }
             Destroyer.Destroy(table);
         }
+
+		/// <summary>
+		/// Enables and adds a <see cref="HighlightEffect"/> on the given <paramref name="table"/>
+		/// if it doesn't already exist, then configures and activates the highlight effect.
+		/// </summary>
+		/// <param name="table">The table to which the <see cref="HighlightEffect"/> should be added.</param>
+		private static void ActivateHighlight(GameObject table)
+		{
+			if (table.GetComponent<HighlightEffect>() == null)
+			{
+				table.AddComponent<HighlightEffect>();
+			}
+			HighlightEffect effect = table.GetComponent<HighlightEffect>();
+			effect.enabled = true;
+			effect.highlighted = true;
+			effect.outlineColor = Color.yellow;
+		}
+
+		/// <summary>
+		/// Destroys the <see cref="HighlightEffect"/> component attached to the given <paramref name="table"/>.
+		/// </summary>
+		/// <param name="table">The table whose <see cref="HighlightEffect"/> should be removed.</param>
+		private static void DestroyHighlight(GameObject table)
+		{
+			if (table.GetComponent<HighlightEffect>() != null)
+			{
+				Destroyer.Destroy(table.GetComponent<HighlightEffect>());
+			}
+		}
+
+		/// <summary>
+		/// Enables the edit mode for the given <paramref name="table"/>.
+		/// Adds a <see cref="CollisionDetectionManager"/> to detect collisions and
+		/// activates a <see cref="HighlightEffect"/>.
+		/// </summary>
+		/// <param name="table">The table whose edit mode should be enabled.</param>
+		public static void EnableEditMode(GameObject table)
+		{
+			if (table.GetComponent<CollisionDetectionManager>() == null)
+			{
+				table.AddComponent<CollisionDetectionManager>();
+			}
+			ActivateHighlight(table);
+		}
+
+		/// <summary>
+		/// Disables the edit mode of the given <paramref name="table"/>
+		/// by destroying the dependent components.
+		/// </summary>
+		/// <param name="table">The table whose edit mode should be disabled.</param>
+		public static void DisableEditMode(GameObject table)
+		{
+			if (table.GetComponent<CollisionDetectionManager>() != null)
+			{
+                Destroyer.Destroy(table.GetComponent<CollisionDetectionManager>());
+            }
+			DestroyHighlight(table);
+		}
 	}
 }
