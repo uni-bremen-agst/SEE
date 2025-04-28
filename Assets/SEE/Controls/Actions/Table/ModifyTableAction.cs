@@ -26,8 +26,8 @@ namespace SEE.Controls.Actions.Table
         private enum ProgressState
         {
             None,
-            Selection,
-            ChoseOption,
+            TableSelection,
+            OperationSelection,
             Move,
             Rotate,
             Scale,
@@ -38,7 +38,7 @@ namespace SEE.Controls.Actions.Table
         /// <summary>
         /// The current progress state.
         /// </summary>
-        private ProgressState currentProgressState = ProgressState.Selection;
+        private ProgressState currentProgressState = ProgressState.TableSelection;
 
         /// <summary>
         /// The executed operation.
@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.Table
             {
                 switch (currentProgressState)
                 {
-                    case ProgressState.Selection:
+                    case ProgressState.TableSelection:
                         if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                             && (raycastHit.collider.gameObject.CompareTag(Tags.CodeCity)
                                 || GameFinder.HasParentWithTag(raycastHit.collider.gameObject, Tags.CodeCity))
@@ -221,14 +221,12 @@ namespace SEE.Controls.Actions.Table
                         }
                         if (modifiedTable != null && SEEInput.MouseUp(MouseButton.Left))
                         {
-                            currentProgressState = ProgressState.ChoseOption;
+                            currentProgressState = ProgressState.OperationSelection;
                             menu = new();
                         }
                         break;
-                    case ProgressState.ChoseOption:
-                        memento = new(modifiedTable);
-                        currentProgressState = ProgressState.Move;
-                        executedOperation = ProgressState.Move;
+                    case ProgressState.OperationSelection:
+                        OperationSelection();
                         break;
                     case ProgressState.Move:
                         if (Raycasting.RaycastAnything(out RaycastHit raycast))
@@ -258,6 +256,42 @@ namespace SEE.Controls.Actions.Table
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Waits for the user's input to select an operation
+        /// and then initiates the execution of the chosen operation.
+        /// </summary>
+        private void OperationSelection()
+        {
+            if (menu.TryGetInput(out ModifyTableMenu.ModifyOperation modifyOperation))
+            {
+                memento = new(modifiedTable);
+                executedOperation = DetermineProgressState(modifyOperation);
+                currentProgressState = DetermineProgressState(modifyOperation);
+            }
+        }
+
+        /// <summary>
+        /// Converts a <paramref name="modifyOperation"/> to the corresponding <see cref="ProgressState"/>.
+        /// </summary>
+        /// <param name="modifyOperation">The operation to be converted.</param>
+        /// <returns>The corresponding <see cref="ProgressState"/> value based on the selected operation.</returns>
+        private ProgressState DetermineProgressState(ModifyTableMenu.ModifyOperation modifyOperation)
+        {
+            switch (modifyOperation)
+            {
+                case ModifyTableMenu.ModifyOperation.Move:
+                    return ProgressState.Move;
+                case ModifyTableMenu.ModifyOperation.Delete:
+                    return ProgressState.Delete;
+                case ModifyTableMenu.ModifyOperation.Rotate:
+                    return ProgressState.Rotate;
+                case ModifyTableMenu.ModifyOperation.Scale:
+                    return ProgressState.Scale;
+                default:
+                    return ProgressState.OperationSelection;
+            }
         }
 
         /// <summary>
