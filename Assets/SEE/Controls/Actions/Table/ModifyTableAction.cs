@@ -1,19 +1,17 @@
-﻿using SEE.Game;
+﻿using MoreLinq;
+using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Table;
-using SEE.GO;
 using SEE.GameObjects;
+using SEE.GO;
+using SEE.Net.Actions.Table;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using MoreLinq;
-using SEE.Net.Actions.Table;
 using ModifyOperation = SEE.UI.Menu.ModifyTableMenu.ModifyOperation;
-using SEE.Game.City;
-using System.Linq;
 
 namespace SEE.Controls.Actions.Table
 {
@@ -297,27 +295,25 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Disables the drawn city.
+        /// Calls <see cref="GameTableManager.DisableCity(GameObject)"/>
+        /// and the corresponding network action.
         /// </summary>
         private void DisableCity()
         {
-            if (GameFinder.FindChildWithTag(modifiedTable, Tags.CodeCity) is GameObject city
-                && city.IsCodeCityDrawnAndActive())
-            {
-                GameFinder.FindChildWithTag(city, Tags.Node).SetActive(false);
-            }
+            GameTableManager.DisableCity(modifiedTable);
+            new DisableCityTableNetAction(modifiedTable.name).Execute();
         }
 
         /// <summary>
-        /// Redraws the city if necessary.
+        /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/> if necessary
+        /// and the corresponding network action.
         /// </summary>
         private void RedrawCity()
         {
-            if (executedOperation != ProgressState.Delete
-                && GameFinder.FindChildWithTag(modifiedTable, Tags.CodeCity) is GameObject city
-                && city.IsCodeCityDrawn())
+            if (executedOperation != ProgressState.Delete)
             {
-                city.GetComponent<SEECity>().ReDrawGraph();
+                GameTableManager.EnableCity(modifiedTable);
+                new EnableCityTableNetAction(modifiedTable.name).Execute();
             }
         }
 
@@ -353,6 +349,7 @@ namespace SEE.Controls.Actions.Table
             {
                 modifiedTable = citiesHolder.FindTable(memento.Name);
                 GameTableManager.Move(modifiedTable, memento.Old.Position);
+                // TODO
             }
         }
 
@@ -366,6 +363,7 @@ namespace SEE.Controls.Actions.Table
             {
                 modifiedTable = citiesHolder.FindTable(memento.Name);
                 GameTableManager.Move(modifiedTable, memento.New.Position);
+                // TODO
             }
         }
 
