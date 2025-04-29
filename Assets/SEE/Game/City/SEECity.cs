@@ -7,8 +7,6 @@ using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
-using SEE.Layout;
-using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -20,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
