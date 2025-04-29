@@ -198,9 +198,9 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// TODO
+        /// Executes the user's input to modifying the table.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>True if the action is completed successfully. Otherwise, false.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -227,6 +227,7 @@ namespace SEE.Controls.Actions.Table
                         break;
                     case ProgressState.OperationSelection:
                         OperationSelection();
+                        Unselect();
                         break;
                     case ProgressState.Move:
                         if (Raycasting.RaycastAnything(out RaycastHit raycast))
@@ -269,6 +270,21 @@ namespace SEE.Controls.Actions.Table
                 memento = new(modifiedTable);
                 executedOperation = DetermineProgressState(modifyOperation);
                 currentProgressState = DetermineProgressState(modifyOperation);
+            }
+        }
+
+        /// <summary>
+        /// Unselect the current chosen table.
+        /// </summary>
+        private void Unselect()
+        {
+            if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                && !raycastHit.collider.gameObject.Equals(modifiedTable))
+            {
+                GameTableManager.DisableEditMode(modifiedTable);
+                modifiedTable = null;
+                menu.Destroy();
+                currentProgressState = ProgressState.TableSelection;
             }
         }
 
