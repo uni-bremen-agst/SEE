@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using SEE.Utils.Config;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -193,6 +194,7 @@ namespace SEE.Audio
             PlayerObject.AddComponent<AudioSource>();
             musicPlayer = PlayerObject.GetComponent<AudioSource>();
             musicPlayer.volume = MusicVolume;
+            musicPlayer.mute = MusicMuted;
         }
 
         /// <summary>
@@ -216,6 +218,7 @@ namespace SEE.Audio
         {
             soundEffectPlayer = PlayerObject.AddComponent<AudioSource>();
             soundEffectPlayer.volume = SoundEffectsVolume;
+            soundEffectPlayer.mute = SoundEffectsMuted;
         }
 
         /// <summary>
@@ -253,7 +256,7 @@ namespace SEE.Audio
             ISet<AudioGameObject> removedElements = new HashSet<AudioGameObject>();
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                if (audioGameObject.AttachedObject == null || audioGameObject.EmptyQueue())
+                if (audioGameObject.AttachedObject == null || audioGameObject.IsQueueEmpty())
                 {
                     removedElements.Add(audioGameObject);
                 }
@@ -333,7 +336,8 @@ namespace SEE.Audio
             soundEffectPlayer.mute = SoundEffectsMuted;
             foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
             {
-                audioGameObject.ChangeVolume(SoundEffectsMuted ? 0f : SoundEffectsVolume);
+                audioGameObject.Volume = SoundEffectsVolume;
+                audioGameObject.Mute = SoundEffectsMuted;
             }
         }
 
@@ -499,18 +503,11 @@ namespace SEE.Audio
             {
                 return;
             }
-            AudioGameObject controlObject = null;
-            foreach (AudioGameObject audioGameObject in soundEffectGameObjects)
-            {
-                if (audioGameObject.HasAudioListenerAttached(sourceObject))
-                {
-                    controlObject = audioGameObject;
-                    break;
-                }
-            }
+
+            AudioGameObject controlObject = soundEffectGameObjects.FirstOrDefault(x => x.AttachedObject == sourceObject);
             if (controlObject == null)
             {
-                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume);
+                controlObject = new AudioGameObject(sourceObject, SoundEffectsVolume, soundEffectsMuted);
                 soundEffectGameObjects.Add(controlObject);
             }
             controlObject.EnqueueSoundEffect(GetAudioClipFromSoundEffectName(soundEffect));

@@ -32,14 +32,49 @@ namespace SEE.Audio
         }
 
         /// <summary>
+        /// Set or get the volume of the audio source.
+        /// </summary>
+        public float Volume
+        {
+            get
+            {
+                return audioSource.volume;
+            }
+            set
+            {
+                audioSource.volume = value;
+            }
+        }
+
+        /// <summary>
+        /// Set or get the mute state of the audio source.
+        /// </summary>
+        public bool Mute
+        {
+            get
+            {
+                return audioSource.mute;
+            }
+            set
+            {
+                audioSource.mute = value;
+            }
+        }
+
+        /// <summary>
         /// Default Constructor
         /// </summary>
         /// <param name="attachedObject">The game object this audio management object is attached to.</param>
-        /// <param name="defaultVolume">The default audio volume</param>
-        public AudioGameObject(GameObject attachedObject, float defaultVolume = 1.0f)
+        /// <param name="volume">The audio volume</param>
+        /// <param name="muted">Whether or not the audio should be muted.</param>
+        public AudioGameObject(GameObject attachedObject, float volume = 1.0f, bool muted = false)
         {
             AttachedObject = attachedObject;
-            AttachedObject.AddOrGetComponent<AudioSource>().volume = defaultVolume;
+            audioSource = AttachedObject.AddOrGetComponent<AudioSource>();
+            // Enable spatial (3D) audio
+            audioSource.spatialBlend = 1.0f;
+            audioSource.volume = volume;
+            audioSource.mute = muted;
         }
 
         /// <summary>
@@ -49,7 +84,7 @@ namespace SEE.Audio
         public void EnqueueSoundEffect(AudioClip soundEffect)
         {
             effectsQueue.Enqueue(soundEffect);
-            CheckMusicPlayer();
+            CheckQueue();
         }
 
         /// <summary>
@@ -57,7 +92,7 @@ namespace SEE.Audio
         /// and plays the next sound effect from the queue if no sound effect
         /// is currently playing.
         /// </summary>
-        private void CheckMusicPlayer()
+        private void CheckQueue()
         {
             if (AttachedObject.TryGetComponent(out audioSource))
             {
@@ -70,24 +105,11 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Changes the audio player's volume to the supplied volume.
-        /// </summary>
-        /// <param name="volume">The volume the audio player should be set to.</param>
-        public void ChangeVolume(float volume)
-        {
-            AttachedObject.GetComponent<AudioSource>().volume = volume;
-        }
-
-        /// <summary>
         /// If no sound is playing, the next sound is played. This method is called
         /// by the global audio manager.
         /// </summary>
         public void Update()
         {
-            if (audioSource == null)
-            {
-                audioSource = AttachedObject.GetComponent<AudioSource>();
-            }
             if (!audioSource.isPlaying || effectsQueue.Count > 0)
             {
                 audioSource.Stop();
@@ -97,22 +119,11 @@ namespace SEE.Audio
         }
 
         /// <summary>
-        /// Checks if a game object has an audio game object (and thus
-        /// an audio listener) attached.
-        /// </summary>
-        /// <param name="gameObject">The game object to check.</param>
-        /// <returns>Whether the object given object has an audio game object.</returns>
-        public bool HasAudioListenerAttached(GameObject gameObject)
-        {
-            return AttachedObject.GetInstanceID() == gameObject.GetInstanceID();
-        }
-
-        /// <summary>
         /// Checks if the audio queue of an attached game object is empty.
         /// If the queue is empty, delete this audio game object.
         /// </summary>
         /// <returns>True, if the queue is empty, else false.</returns>
-        public bool EmptyQueue()
+        public bool IsQueueEmpty()
         {
             if (!AttachedObject.TryGetComponent(out AudioSource audioSource))
             {
