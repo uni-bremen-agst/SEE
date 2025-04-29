@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
+using SEE.Game.Table;
 using SEE.Utils;
 using UnityEngine;
 
@@ -29,7 +30,8 @@ namespace SEE.UI.Menu
 			Move,
 			Rotate,
 			Scale,
-			Delete
+			Delete,
+			Cancel
 		}
 
 		/// <summary>
@@ -77,6 +79,13 @@ namespace SEE.UI.Menu
             {
 				ConfirmOperation(ModifyOperation.Delete);
             });
+
+			ButtonManagerBasic cancel = GameFinder.FindChild(menuInstance, "CancelDragger")
+				.GetComponent<ButtonManagerBasic>();
+			cancel.clickEvent.AddListener(() =>
+			{
+				ConfirmOperation(ModifyOperation.Cancel);
+			});
         }
 
 		/// <summary>
@@ -111,7 +120,6 @@ namespace SEE.UI.Menu
 		{
 			if (gotInput)
 			{
-				gotInput = false;
 				operation = selectedOperation;
 				return true;
 			}

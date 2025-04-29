@@ -11,6 +11,9 @@ using System.Collections.Generic;
 using UnityEngine;
 using MoreLinq;
 using SEE.Net.Actions.Table;
+using ModifyOperation = SEE.UI.Menu.ModifyTableMenu.ModifyOperation;
+using SEE.Game.City;
+using System.Linq;
 
 namespace SEE.Controls.Actions.Table
 {
@@ -230,6 +233,7 @@ namespace SEE.Controls.Actions.Table
                         Unselect();
                         break;
                     case ProgressState.Move:
+                        DisableCity();
                         if (Raycasting.RaycastAnything(out RaycastHit raycast))
                         {
                             GameTableManager.Move(modifiedTable, raycast.point);
@@ -251,6 +255,7 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Delete:
                         break;
                     case ProgressState.Finish:
+                        RedrawCity();
                         memento.SetNewData(modifiedTable, executedOperation);
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
@@ -265,7 +270,8 @@ namespace SEE.Controls.Actions.Table
         /// </summary>
         private void OperationSelection()
         {
-            if (menu.TryGetInput(out ModifyTableMenu.ModifyOperation modifyOperation))
+            if (menu.TryGetInput(out ModifyOperation modifyOperation)
+                && modifyOperation != ModifyOperation.Cancel)
             {
                 memento = new(modifiedTable);
                 executedOperation = DetermineProgressState(modifyOperation);
@@ -274,12 +280,14 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Unselect the current chosen table.
+        /// Unselects the current selected table and resets the progress state.
         /// </summary>
         private void Unselect()
         {
             if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                && !raycastHit.collider.gameObject.Equals(modifiedTable))
+                    && !raycastHit.collider.gameObject.Equals(modifiedTable)
+                || menu.TryGetInput(out ModifyOperation operation)
+                    && operation == ModifyOperation.Cancel)
             {
                 GameTableManager.DisableEditMode(modifiedTable);
                 modifiedTable = null;
@@ -289,21 +297,46 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
+        /// Disables the drawn city.
+        /// </summary>
+        private void DisableCity()
+        {
+            if (GameFinder.FindChildWithTag(modifiedTable, Tags.CodeCity) is GameObject city
+                && city.IsCodeCityDrawnAndActive())
+            {
+                GameFinder.FindChildWithTag(city, Tags.Node).SetActive(false);
+            }
+        }
+
+        /// <summary>
+        /// Redraws the city if necessary.
+        /// </summary>
+        private void RedrawCity()
+        {
+            if (executedOperation != ProgressState.Delete
+                && GameFinder.FindChildWithTag(modifiedTable, Tags.CodeCity) is GameObject city
+                && city.IsCodeCityDrawn())
+            {
+                city.GetComponent<SEECity>().ReDrawGraph();
+            }
+        }
+
+        /// <summary>
         /// Converts a <paramref name="modifyOperation"/> to the corresponding <see cref="ProgressState"/>.
         /// </summary>
         /// <param name="modifyOperation">The operation to be converted.</param>
         /// <returns>The corresponding <see cref="ProgressState"/> value based on the selected operation.</returns>
-        private ProgressState DetermineProgressState(ModifyTableMenu.ModifyOperation modifyOperation)
+        private ProgressState DetermineProgressState(ModifyOperation modifyOperation)
         {
             switch (modifyOperation)
             {
-                case ModifyTableMenu.ModifyOperation.Move:
+                case ModifyOperation.Move:
                     return ProgressState.Move;
-                case ModifyTableMenu.ModifyOperation.Delete:
+                case ModifyOperation.Delete:
                     return ProgressState.Delete;
-                case ModifyTableMenu.ModifyOperation.Rotate:
+                case ModifyOperation.Rotate:
                     return ProgressState.Rotate;
-                case ModifyTableMenu.ModifyOperation.Scale:
+                case ModifyOperation.Scale:
                     return ProgressState.Scale;
                 default:
                     return ProgressState.OperationSelection;
@@ -311,7 +344,7 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Reverts this action, i.e., TODO.
+        /// Reverts this action, i.e., it undoes the modification changes.
         /// </summary>
         public override void Undo()
         {
@@ -324,7 +357,7 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Repeats this action, i.e., TODO.
+        /// Repeats this action, i.e., it redoes the modification changes.
         /// </summary>
         public override void Redo()
         {
