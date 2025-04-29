@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Audio;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.GO;
@@ -48,6 +49,36 @@ namespace SEE.UI
         private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
 
         /// <summary>
+        /// The cached audio manager instance.
+        /// </summary>
+        private AudioManagerImpl audioManager;
+
+        /// <summary>
+        /// The toggle that allows to mute the music.
+        /// </summary>
+        private Toggle musicToggle;
+
+        /// <summary>
+        /// The toggle that allows to mute the local sound effects.
+        /// </summary>
+        private Toggle sfxToggle;
+
+        /// <summary>
+        /// The toggle that allows to mute the remote sound effects.
+        /// </summary>
+        private Toggle remoteSfxToggle;
+
+        /// <summary>
+        /// The slider that allows to change the sound effect volume.
+        /// </summary>
+        private Slider sfxVolumeSlider;
+
+        /// <summary>
+        /// The slider that allows to change the music volume.
+        /// </summary>
+        private Slider musicVolumeSlider;
+
+        /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
@@ -59,6 +90,35 @@ namespace SEE.UI
             // adds the ExitGame method to the exit button
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
+
+            musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
+            musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
+            sfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXToggle").gameObject.MustGetComponent<Toggle>();
+            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
+            remoteSfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/RemoteSFXToggle").gameObject.MustGetComponent<Toggle>();
+
+            audioManager = AudioManagerImpl.Instance();
+            musicVolumeSlider.value = audioManager.MusicVolume;
+            musicVolumeSlider.interactable = !audioManager.MusicMuted;
+            musicToggle.isOn = !audioManager.MusicMuted;
+            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
+            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
+            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
+            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
+            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+
+            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectsVolume = value; });
+            musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
+            musicToggle.onValueChanged.AddListener((value) => {
+                audioManager.MusicMuted = !value;
+                musicVolumeSlider.interactable = value;
+            });
+            sfxToggle.onValueChanged.AddListener((value) => {
+                audioManager.SoundEffectsMuted = !value;
+                sfxVolumeSlider.interactable = value;
+                remoteSfxToggle.interactable = value;
+            });
+            remoteSfxToggle.onValueChanged.AddListener((value) => { audioManager.RemoteSoundEffectsMuted = !value; });
 
             // Displays all bindings grouped by their category.
             foreach (var group in KeyBindings.AllBindings())
@@ -113,16 +173,32 @@ namespace SEE.UI
             }
             if (SEEInput.ToggleSettings())
             {
-                Transform keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel");
                 GameObject settingsPanel = settingsMenuGameObject.transform.Find("SettingsPanel").gameObject;
-                if (keybindingsPanel.gameObject.activeSelf && !settingsPanel.activeSelf)
+                GameObject keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject;
+                GameObject audioSettingsPanel = settingsMenuGameObject.transform.Find("AudioSettingsPanel").gameObject;
+                GameObject videoChatPanel = settingsMenuGameObject.transform.Find("VideochatPanel").gameObject;
+                GameObject exitPanel = settingsMenuGameObject.transform.Find("ExitPanel").gameObject;
+
+                // Hide specific setting panels if they are active
+                if (keybindingsPanel.activeSelf)
                 {
-                    // handles the case where the user is in the KeybindingsPanel but wants to close it
-                    keybindingsPanel.gameObject.SetActive(false);
+                    keybindingsPanel.SetActive(false);
                 }
+                else if (audioSettingsPanel.activeSelf)
+                {
+                    audioSettingsPanel.SetActive(false);
+                }
+                else if (videoChatPanel.activeSelf)
+                {
+                    videoChatPanel.SetActive(false);
+                }
+                else if (exitPanel.activeSelf)
+                {
+                    exitPanel.SetActive(false);
+                }
+                // Toggle main settings panel
                 else
                 {
-                    // handles the case where the user wants to open/close the SettingsPanel
                     settingsPanel.SetActive(!settingsPanel.activeSelf);
                 }
             }
