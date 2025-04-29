@@ -567,16 +567,6 @@ namespace SEE.Audio
             _ => ClickSoundEffect,
         };
 
-        // /// <summary>
-        // /// Saves the audio configuration to <paramref name="filename"/>.
-        // /// </summary>
-        // /// <param name="filename">name of the file in which the settings are stored</param>
-        // public void Save(string filename)
-        // {
-        //     using ConfigWriter writer = new(filename);
-        //     Save(writer);
-        // }
-
         /// <summary>
         /// Persists the sound configuration to the file specified by <see cref="configFilePath"/>.
         /// </summary>
