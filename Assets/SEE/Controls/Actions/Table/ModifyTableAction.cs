@@ -348,8 +348,18 @@ namespace SEE.Controls.Actions.Table
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 modifiedTable = citiesHolder.FindTable(memento.Name);
-                GameTableManager.Move(modifiedTable, memento.Old.Position);
-                // TODO
+                switch (memento.Operation)
+                {
+                    case ProgressState.Move:
+                        GameTableManager.Move(modifiedTable, memento.Old.Position);
+                        break;
+                    case ProgressState.Rotate:
+                        break;
+                    case ProgressState.Scale:
+                        break;
+                    case ProgressState.Delete:
+                        break;
+                }
             }
         }
 
@@ -362,8 +372,18 @@ namespace SEE.Controls.Actions.Table
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 modifiedTable = citiesHolder.FindTable(memento.Name);
-                GameTableManager.Move(modifiedTable, memento.New.Position);
-                // TODO
+                switch (memento.Operation)
+                {
+                    case ProgressState.Move:
+                        GameTableManager.Move(modifiedTable, memento.New.Position);
+                        break;
+                    case ProgressState.Rotate:
+                        break;
+                    case ProgressState.Scale:
+                        break;
+                    case ProgressState.Delete:
+                        break;
+                }
             }
         }
 
