@@ -194,9 +194,15 @@ namespace SEE.Controls.Actions.Table
             if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
             {
                 previousCSMState.Keys.ForEach(city =>
-                    city.GetComponent<CitySelectionManager>().enabled = previousCSMState[city]);
+                {
+                    if (city != null)
+                    {
+                        city.GetComponent<CitySelectionManager>().enabled = previousCSMState[city];
+                    }
+                });
             }
         }
+
 
         /// <summary>
         /// Executes the user's input to modifying the table.
@@ -226,8 +232,7 @@ namespace SEE.Controls.Actions.Table
                         DeleteTable();
                         break;
                     case ProgressState.Finish:
-                        RedrawCity();
-                        memento.SetNewData(modifiedTable, executedOperation);
+                        UpdateCityAndSaveMementoIfNeeded();
                         CurrentState = IReversibleAction.Progress.Completed;
                         return true;
                 }
@@ -304,13 +309,19 @@ namespace SEE.Controls.Actions.Table
         /// <summary>
         /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/> if necessary
         /// and the corresponding network action.
+        /// Also it saves the new memento data to repeat this action.
         /// </summary>
-        private void RedrawCity()
+        private void UpdateCityAndSaveMementoIfNeeded()
         {
             if (executedOperation != ProgressState.Delete)
             {
                 GameTableManager.EnableCity(modifiedTable);
                 new EnableCityTableNetAction(modifiedTable.name).Execute();
+                memento.SetNewData(modifiedTable, executedOperation);
+            }
+            else
+            {
+                memento.Operation = executedOperation;
             }
         }
 
@@ -378,6 +389,7 @@ namespace SEE.Controls.Actions.Table
         {
             new DestroyTableNetAction(modifiedTable.name).Execute();
             GameTableManager.Destroy(modifiedTable);
+            currentProgressState = ProgressState.Finish;
         }
 
         /// <summary>
@@ -468,8 +480,7 @@ namespace SEE.Controls.Actions.Table
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return modifiedTable != null ?
-                new() { modifiedTable.name } : new();
+            return new() { memento.Name };
         }
 
     }
