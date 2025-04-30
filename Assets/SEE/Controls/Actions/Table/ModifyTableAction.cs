@@ -217,21 +217,7 @@ namespace SEE.Controls.Actions.Table
                         break;
                     case ProgressState.Move:
                         DisableCity();
-                        if (Raycasting.RaycastAnything(out RaycastHit raycast))
-                        {
-                            GameTableManager.Move(modifiedTable, raycast.point);
-                            new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
-                            if (SEEInput.LeftMouseDown())
-                            {
-                                if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
-                                {
-                                    ShowNotification.Warn("Table can't be placed",
-                                        "The table can't be placed because it is colliding with another object.");
-                                    return false;
-                                }
-                                currentProgressState = ProgressState.Finish;
-                            }
-                        }
+                        MoveTable();
                         break;
                     case ProgressState.Rotate:
                     case ProgressState.Scale:
@@ -345,6 +331,30 @@ namespace SEE.Controls.Actions.Table
                     return ProgressState.Scale;
                 default:
                     return ProgressState.OperationSelection;
+            }
+        }
+
+        /// <summary>
+        /// Moves the table based on a raycast and checks for collisions.
+        /// </summary>
+        private void MoveTable()
+        {
+            if (Raycasting.RaycastAnything(out RaycastHit raycast))
+            {
+                GameTableManager.Move(modifiedTable, raycast.point);
+                new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
+                if (SEEInput.LeftMouseDown())
+                {
+                    if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
+                    {
+                        ShowNotification.Warn("Table can't be placed",
+                            "The table can't be placed because it is colliding with another object.");
+                    }
+                    else
+                    {
+                        currentProgressState = ProgressState.Finish;
+                    }
+                }
             }
         }
 
