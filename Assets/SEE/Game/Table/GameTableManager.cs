@@ -3,7 +3,6 @@ using SEE.Game.City;
 using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.GO;
-using SEE.Net.Actions.Drawable;
 using SEE.Utils;
 using UnityEngine;
 

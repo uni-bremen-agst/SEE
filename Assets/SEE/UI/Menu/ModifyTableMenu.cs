@@ -1,6 +1,5 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game.Drawable;
-using SEE.Game.Table;
 using SEE.Utils;
 using UnityEngine;
 

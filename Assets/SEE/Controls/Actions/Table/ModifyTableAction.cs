@@ -1,5 +1,6 @@
 ﻿using MoreLinq;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.Drawable;
 using SEE.Game.Table;
 using SEE.GameObjects;
@@ -307,6 +308,16 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
+        /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/>
+        /// and the corresponding network action.
+        /// </summary>
+        private void UpdateCity()
+        {
+            GameTableManager.EnableCity(modifiedTable);
+            new EnableCityTableNetAction(modifiedTable.name).Execute();
+        }
+
+        /// <summary>
         /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/> if necessary
         /// and the corresponding network action.
         /// Also it saves the new memento data to repeat this action.
@@ -315,8 +326,7 @@ namespace SEE.Controls.Actions.Table
         {
             if (executedOperation != ProgressState.Delete)
             {
-                GameTableManager.EnableCity(modifiedTable);
-                new EnableCityTableNetAction(modifiedTable.name).Execute();
+                UpdateCity();
                 memento.SetNewData(modifiedTable, executedOperation);
             }
             else
@@ -387,9 +397,18 @@ namespace SEE.Controls.Actions.Table
         /// </summary>
         private void DeleteTable()
         {
-            new DestroyTableNetAction(modifiedTable.name).Execute();
-            GameTableManager.Destroy(modifiedTable);
-            currentProgressState = ProgressState.Finish;
+            if (!modifiedTable.GetComponentInChildren<SEECity>().gameObject.IsCodeCityDrawnAndActive())
+            {
+                new DestroyTableNetAction(modifiedTable.name).Execute();
+                GameTableManager.Destroy(modifiedTable);
+                currentProgressState = ProgressState.Finish;
+            }
+            else
+            {
+                ShowNotification.Warn("Can't delete table", "Only empty tables can be deleted.");
+                currentProgressState = ProgressState.OperationSelection;
+                menu = new();
+            }
         }
 
         /// <summary>
@@ -406,6 +425,7 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Move:
                         GameTableManager.Move(modifiedTable, memento.Old.Position);
                         new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Rotate:
                         break;
@@ -433,6 +453,7 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Move:
                         GameTableManager.Move(modifiedTable, memento.New.Position);
                         new MoveTableNetAction(modifiedTable.name, memento.New.Position).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Rotate:
                         break;
