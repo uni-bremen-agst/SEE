@@ -227,6 +227,9 @@ namespace SEE.Controls.Actions.Table
                         MoveTable();
                         break;
                     case ProgressState.Rotate:
+                        DisableCity();
+                        RotateTable();
+                        break;
                     case ProgressState.Scale:
                         break;
                     case ProgressState.Delete:
@@ -393,6 +396,19 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
+        /// Rotates the table and checks for collisions.
+        /// </summary>
+        private void RotateTable()
+        {
+            if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
+            {
+                GameTableManager.Rotate(modifiedTable, SEEInput.ScrollDown());
+                new RotateTableNetAction(modifiedTable.name, modifiedTable.transform.eulerAngles).Execute();
+            }
+            CheckCollisionWithLeftMouseButton();
+        }
+
+        /// <summary>
         /// Deletes the table.
         /// </summary>
         private void DeleteTable()
@@ -428,6 +444,9 @@ namespace SEE.Controls.Actions.Table
                         UpdateCity();
                         break;
                     case ProgressState.Rotate:
+                        GameTableManager.Rotate(modifiedTable, memento.Old.EulerAngles);
+                        new RotateTableNetAction(modifiedTable.name, memento.Old.EulerAngles).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Scale:
                         break;
@@ -456,6 +475,9 @@ namespace SEE.Controls.Actions.Table
                         UpdateCity();
                         break;
                     case ProgressState.Rotate:
+                        GameTableManager.Rotate(modifiedTable, memento.New.EulerAngles);
+                        new RotateTableNetAction(modifiedTable.name, memento.New.EulerAngles).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Scale:
                         break;
