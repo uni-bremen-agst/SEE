@@ -209,22 +209,7 @@ namespace SEE.Controls.Actions.Table
                 switch (currentProgressState)
                 {
                     case ProgressState.TableSelection:
-                        if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
-                            && (raycastHit.collider.gameObject.CompareTag(Tags.CodeCity)
-                                || GameFinder.HasParentWithTag(raycastHit.collider.gameObject, Tags.CodeCity))
-                            && modifiedTable == null)
-                        {
-                            GameObject raycastObj = raycastHit.collider.gameObject;
-                            GameObject city = raycastObj.CompareTag(Tags.CodeCity) ?
-                                   raycastObj : raycastObj.ContainingCity().gameObject;
-                            modifiedTable = city.transform.parent.gameObject;
-                            GameTableManager.EnableEditMode(modifiedTable);
-                        }
-                        if (modifiedTable != null && SEEInput.MouseUp(MouseButton.Left))
-                        {
-                            currentProgressState = ProgressState.OperationSelection;
-                            menu = new();
-                        }
+                        TableSelection();
                         break;
                     case ProgressState.OperationSelection:
                         OperationSelection();
@@ -260,6 +245,30 @@ namespace SEE.Controls.Actions.Table
                 }
             }
             return false;
+        }
+
+        /// <summary>
+        /// Provides the selection of a table to be modified.
+        /// The table or an object on the table can be chosen for this purpose.
+        /// </summary>
+        private void TableSelection()
+        {
+            if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
+                && (raycastHit.collider.gameObject.CompareTag(Tags.CodeCity)
+                    || GameFinder.HasParentWithTag(raycastHit.collider.gameObject, Tags.CodeCity))
+                && modifiedTable == null)
+            {
+                GameObject raycastObj = raycastHit.collider.gameObject;
+                GameObject city = raycastObj.CompareTag(Tags.CodeCity) ?
+                       raycastObj : raycastObj.ContainingCity().gameObject;
+                modifiedTable = city.transform.parent.gameObject;
+                GameTableManager.EnableEditMode(modifiedTable);
+            }
+            if (modifiedTable != null && SEEInput.MouseUp(MouseButton.Left))
+            {
+                currentProgressState = ProgressState.OperationSelection;
+                menu = new();
+            }
         }
 
         /// <summary>
@@ -423,7 +432,7 @@ namespace SEE.Controls.Actions.Table
         /// <returns>The object id of the changed object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return modifiedTable != null?
+            return modifiedTable != null ?
                 new() { modifiedTable.name } : new();
         }
 
