@@ -221,7 +221,9 @@ namespace SEE.Controls.Actions.Table
                         break;
                     case ProgressState.Rotate:
                     case ProgressState.Scale:
+                        break;
                     case ProgressState.Delete:
+                        DeleteTable();
                         break;
                     case ProgressState.Finish:
                         RedrawCity();
@@ -335,6 +337,28 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
+        /// Checks for a collision when the left mouse button is pressed.
+        /// If a collision is detected, a warning is shown.
+        /// Otherwise, the current progress state is set to finish.
+        /// </summary>
+        private void CheckCollisionWithLeftMouseButton()
+        {
+            if (SEEInput.LeftMouseDown())
+            {
+
+                if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
+                {
+                    ShowNotification.Warn("Table can't be placed",
+                        "The table can't be placed because it is colliding with another object.");
+                }
+                else
+                {
+                    currentProgressState = ProgressState.Finish;
+                }
+            }
+        }
+
+        /// <summary>
         /// Moves the table based on a raycast and checks for collisions.
         /// </summary>
         private void MoveTable()
@@ -343,19 +367,17 @@ namespace SEE.Controls.Actions.Table
             {
                 GameTableManager.Move(modifiedTable, raycast.point);
                 new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
-                if (SEEInput.LeftMouseDown())
-                {
-                    if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
-                    {
-                        ShowNotification.Warn("Table can't be placed",
-                            "The table can't be placed because it is colliding with another object.");
-                    }
-                    else
-                    {
-                        currentProgressState = ProgressState.Finish;
-                    }
-                }
+                CheckCollisionWithLeftMouseButton();
             }
+        }
+
+        /// <summary>
+        /// Deletes the table.
+        /// </summary>
+        private void DeleteTable()
+        {
+            new DestroyTableNetAction(modifiedTable.name).Execute();
+            GameTableManager.Destroy(modifiedTable);
         }
 
         /// <summary>
@@ -377,6 +399,8 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Scale:
                         break;
                     case ProgressState.Delete:
+                        GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles);
+                        new SpawnTableNetAction(memento.Name, memento.Old.Position, memento.Old.EulerAngles).Execute();
                         break;
                 }
             }
@@ -401,6 +425,8 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Scale:
                         break;
                     case ProgressState.Delete:
+                        new DestroyTableNetAction(modifiedTable.name).Execute();
+                        GameTableManager.Destroy(modifiedTable);
                         break;
                 }
             }
