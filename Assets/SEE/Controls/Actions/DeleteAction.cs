@@ -179,7 +179,7 @@ namespace SEE.Controls.Actions
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
             CurrentState = IReversibleAction.Progress.Completed;
-            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
+            AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
             return true;
         }
 

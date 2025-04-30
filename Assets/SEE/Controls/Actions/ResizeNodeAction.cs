@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -194,8 +195,13 @@ namespace SEE.Controls.Actions
 
             // Incompatible type
             GameObject selectedGameObject = interactableObject.gameObject;
-            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef)
-                || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualResize)
+            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef))
+            {
+                return;
+            }
+
+            VisualNodeAttributes attrs = selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type];
+            if (!attrs.AllowManualResize)
             {
                 return;
             }
@@ -203,6 +209,7 @@ namespace SEE.Controls.Actions
             // Start resizing
             memento = new Memento(selectedGameObject);
             gizmo = memento.GameObject.AddOrGetComponent<ResizeGizmo>();
+            gizmo.HeightResizeEnabled = attrs.AllowManualHeightResize;
             gizmo.OnSizeChanged += OnResizeStep;
         }
 
@@ -341,6 +348,11 @@ namespace SEE.Controls.Actions
             /// </summary>
             private Vector3 cameraPlanarRight;
 
+            /// <summary>
+            /// Is height resize active?
+            /// </summary>
+            public bool HeightResizeEnabled = false;
+
             #region Configurations
 
             /// <summary>
@@ -448,10 +460,13 @@ namespace SEE.Controls.Actions
                 Vector3 parentSize = gameObject.WorldSpaceSize();
                 float yPos = parentPosition.y + 0.5f * parentSize.y + SpatialMetrics.PlacementOffset;
                 handles = directions.ToDictionary(CreateHandle);
-                GameObject upDownHandle = CreateHandle(Vector3.up);
-                upDownHandleTransform = upDownHandle.transform;
-                handles[upDownHandle] = Vector3.up;
 
+                if (HeightResizeEnabled)
+                {
+                    GameObject upDownHandle = CreateHandle(Vector3.up);
+                    upDownHandleTransform = upDownHandle.transform;
+                    handles[upDownHandle] = Vector3.up;
+                }
 
                 /// <summary>
                 /// Creates a resize handle game object at the appropriate position.
