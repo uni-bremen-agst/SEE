@@ -405,6 +405,7 @@ namespace SEE.Controls.Actions.Table
                 {
                     case ProgressState.Move:
                         GameTableManager.Move(modifiedTable, memento.Old.Position);
+                        new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         break;
                     case ProgressState.Rotate:
                         break;
@@ -431,6 +432,7 @@ namespace SEE.Controls.Actions.Table
                 {
                     case ProgressState.Move:
                         GameTableManager.Move(modifiedTable, memento.New.Position);
+                        new MoveTableNetAction(modifiedTable.name, memento.New.Position).Execute();
                         break;
                     case ProgressState.Rotate:
                         break;
