@@ -202,6 +202,23 @@ namespace SEE.Controls.Actions.Table
                     }
                 });
             }
+            if (currentProgressState != ProgressState.Finish
+                && executedOperation != ProgressState.None)
+            {
+                switch(executedOperation)
+                {
+                    case ProgressState.Move:
+                        GameTableManager.Move(modifiedTable, memento.Old.Position);
+                        new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
+                        UpdateCity();
+                        break;
+                    case ProgressState.Rotate:
+                        GameTableManager.Rotate(modifiedTable, memento.Old.EulerAngles);
+                        new RotateTableNetAction(modifiedTable.name, memento.Old.EulerAngles).Execute();
+                        UpdateCity();
+                        break;
+                }
+            }
         }
 
 
