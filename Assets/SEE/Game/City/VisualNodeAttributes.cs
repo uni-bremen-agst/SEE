@@ -160,10 +160,16 @@ namespace SEE.Game.City
         [Tooltip("Whether the source name will be added to a node.")]
         public bool ShowNames = false;
         /// <summary>
-        /// Defines if node type may be manually resized by users.
+        /// Should users be allowed to manually change the 2D base node size?
         /// </summary>
         [Tooltip("May users resize this type of node?")]
         public bool AllowManualResize = false;
+
+        /// <summary>
+        /// Should users be allowed to manually change the node height?
+        /// </summary>
+        [Tooltip("May users resize this type of node?")]
+        public bool AllowManualHeightResize = false;
 
         /// <summary>
         /// Saves the settings in the configuration file.

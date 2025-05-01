@@ -469,6 +469,75 @@ namespace SEE.Tools.ReflexionAnalysis
         #endregion
 
         /// <summary>
+        /// Unparents the given <paramref name="child"/> from its parent.
+        /// Refer to <see cref="UnparentInArchitecture"/> or <see cref="UnparentInImplementation"/> for details.
+        /// </summary>
+        /// <param name="child">The node to unparent</param>
+        public void Unparent(Node child)
+        {
+            if (!AnalysisInitialized)
+            {
+                child.Reparent(null);
+                return;
+            }
+
+            switch (DetermineSubgraph(child))
+            {
+                case Architecture:
+                    UnparentInArchitecture(child);
+                    break;
+                case Implementation:
+                    UnparentInImplementation(child);
+                    break;
+                default:
+                    throw new NotSupportedException("Given node must be in architecture or implementation graph!");
+            }
+        }
+
+        /// <summary>
+        /// Adds given <paramref name="child"/> as a direct descendant of given <paramref name="parent"/>
+        /// in the node hierarchy of the reflexion graph.
+        /// Precondition: <paramref name="child"/> and <paramref name="parent"/> must be contained in the
+        /// same subgraph (i.e., implementation or architecture); <paramref name="child"/> has no current parent.
+        /// Postcondition: <paramref name="parent"/> is a parent of <paramref name="child"/> in the
+        /// reflexion graph and the reflexion data is updated; all observers are informed of the change.
+        /// </summary>
+        /// <param name="child">child node</param>
+        /// <param name="parent">parent node</param>
+        /// <exception cref="NotInSubgraphException">When <paramref name="child"/> or <paramref name="parent"/>
+        /// is not contained in the implementation graph.</exception>
+        /// <exception cref="CyclicHierarchyException">When adding <paramref name="child"/> as a child of
+        /// <paramref name="parent"/> would result in cycles in the part-of hierarchy.</exception>
+        /// <exception cref="NotAnOrphanException">When the given <paramref name="child"/>
+        /// already has a parent.</exception>
+        public void AddChild(Node child, Node parent)
+        {
+            if (!AnalysisInitialized)
+            {
+                parent.AddChild(child);
+                return;
+            }
+
+            ReflexionSubgraphs parentSubgraph = DetermineSubgraph(parent);
+            ReflexionSubgraphs childSubgraph = DetermineSubgraph(child);
+            if (parentSubgraph != childSubgraph)
+            {
+                throw new NotSupportedException("Child and parent must be in the same graph!");
+            }
+            switch (parentSubgraph)
+            {
+                case Architecture:
+                    AddChildInArchitecture(child, parent);
+                    break;
+                case Implementation:
+                    AddChildInImplementation(child, parent);
+                    break;
+                default:
+                    throw new NotSupportedException("Given parent must be in architecture or implementation graph!");
+            }
+        }
+
+        /// <summary>
         /// Determines the subgraph this <see cref="element"/> was likely intentioned to have.
         /// Not all callers of AddNode/AddEdge are "reflexion-aware", so we need to
         /// check if we can determine a fitting subgraph type.
@@ -489,7 +558,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 switch (element)
                 {
                     // Node with a parent:
-                    case Node { Parent: { } } node:
+                    case Node { Parent: not null } node:
                         subgraph = DetermineSubgraph(node.Parent);
                         break;
                     case Edge edge:

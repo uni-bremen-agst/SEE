@@ -8,44 +8,29 @@ namespace SEE.Audio
     public interface IAudioManager
     {
         /// <summary>
-        /// Mutes all music.
+        /// Gets or sets the music volume.
         /// </summary>
-        void MuteMusic();
+        float MusicVolume { get; set; }
 
         /// <summary>
-        /// Increases the music volume.
+        /// Gets or sets the sound effect volume.
         /// </summary>
-        void IncreaseMusicVolume();
+        float SoundEffectsVolume { get; set; }
 
         /// <summary>
-        /// Decreases the music volume.
+        /// Gets or sets a value indicating whether music is muted.
         /// </summary>
-        void DecreaseMusicVolume();
+        bool MusicMuted { get; set; }
 
         /// <summary>
-        /// Unmute the music.
+        /// Gets or sets a value indicating whether sound effects are muted.
         /// </summary>
-        void UnmuteMusic();
+        bool SoundEffectsMuted { get; set; }
 
         /// <summary>
-        /// Mute all sound effects.
+        /// Gets or sets a value indicating whether remote sound effects are muted.
         /// </summary>
-        void MuteSoundEffects();
-
-        /// <summary>
-        /// Increase sound effects volume.
-        /// </summary>
-        void IncreaseSoundEffectVolume();
-
-        /// <summary>
-        /// Decrease sound effects volume.
-        /// </summary>
-        void DecreaseSoundEffectVolume();
-
-        /// <summary>
-        /// Unmute all sound effects.
-        /// </summary>
-        void UnmuteSoundEffects();
+        bool RemoteSoundEffectsMuted { get; set; }
 
         /// <summary>
         /// Pause the currently playing music.
@@ -61,30 +46,6 @@ namespace SEE.Audio
         /// Change the currently playing music based on the new game state.
         /// </summary>
         void GameStateChanged();
-
-        /// <summary>
-        /// Queue a sound effect without specifying the object which the sound is originating from.
-        /// The GameObject used is the player object itself (ambient sound rather than directional sound is used).
-        /// </summary>
-        /// <param name="soundEffect">The sound effect that should be played.</param>
-        void QueueSoundEffect(SoundEffect soundEffect);
-
-        /// <summary>
-        /// Adds a sound effect to the sound effect queue.
-        /// </summary>
-        /// <param name="soundEffect">The sound effect that should be added to the sound effect queue.</param>
-        /// <param name="sourceObject">The GameObject where the sound originates from.</param>
-        void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject);
-
-        /// <summary>
-        /// Adds a sound effect to the sound effect queue while checking,
-        /// if the sound effect was passed from a multiplayer connected player,
-        /// or from the local game instance (to prevent endless sound effect loops).
-        /// </summary>
-        /// <param name="soundEffect">The sound effect that should be added to the sound effect queue.</param>
-        /// <param name="sourceObject">The GameObject where the sound originated from.</param>
-        /// <param name="networkAction">Whether the sound effect originated from the local unity instance.</param>
-        void QueueSoundEffect(SoundEffect soundEffect, GameObject sourceObject, bool networkAction);
 
         /// <summary>
         /// Defines abstract names for different sound effects that can be played in-game.
