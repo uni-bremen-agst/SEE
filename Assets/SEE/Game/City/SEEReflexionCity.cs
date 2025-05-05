@@ -15,6 +15,7 @@ using SEE.Utils;
 using SEE.Layout;
 using System.Collections.Generic;
 using TMPro;
+using SEE.Game.Table;
 
 namespace SEE.Game.City
 {
@@ -122,6 +123,10 @@ namespace SEE.Game.City
             {
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
+                Vector3 scale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
+                ScaleState xScale = ScaleDeterminer.DetermineScale(scale.x);
+                ScaleState zScale = ScaleDeterminer.DetermineScale(scale.z);
+                Debug.Log($"xScale: " + xScale + ", zScale: " + zScale);
                 DeleteGraphGameObjects();
                 DrawGraph();
                 RestoreLayout(layoutGraphNodes, decorationValues).Forget();
