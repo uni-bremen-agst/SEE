@@ -1,5 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.UI.Notification;
+using System.Globalization;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -109,7 +110,8 @@ namespace SEE.UI.Drawable
             if (!float.TryParse(newValue, out value))
             {
                 ShowNotification.Warn("Wrong format", "The input field only allows float format.");
-                value = 0.5f;
+                value = oldValue;
+                inputField.text = value.ToString();
             }
 
             /// If the value would be less then the <see cref="minValue"/>.
@@ -165,7 +167,7 @@ namespace SEE.UI.Drawable
             /// Assigns the new value.
             /// Increase by <see cref="upAndDownValue"/>.
             value += upAndDownValue;
-            value = (float)decimal.Round((decimal)value, 2);
+            value = (float)decimal.Round((decimal)value, GetDecimalPlaces());
 
             /// If the maximum is exceeded, set it to the maximum.
             if (value > maxValue) { value = maxValue; }
@@ -186,7 +188,7 @@ namespace SEE.UI.Drawable
             /// Assigns the new value.
             /// Decrease by <see cref="upAndDownValue"/>.
             value -= upAndDownValue;
-            value = (float)decimal.Round((decimal)value, 2);
+            value = (float)decimal.Round((decimal)value, GetDecimalPlaces());
 
             /// If the minimum is undershot, set it to the minimum.
             if (value < minValue) { value = minValue; }
@@ -197,6 +199,18 @@ namespace SEE.UI.Drawable
             /// If an action for proportional increase is provided, execute it.
             OnProportionalValueChanged?.Invoke(-upAndDownValue);
             OnValueChanged.Invoke(value);
+        }
+
+        /// <summary>
+        /// Gets the decimal places of <see cref="upAndDownValue"/>.
+        /// </summary>
+        /// <returns>Tht decimal places of <see cref="upAndDownValue"/></returns>
+        private int GetDecimalPlaces()
+        {
+            string text = upAndDownValue.ToString(CultureInfo.InvariantCulture);
+            int index = text.IndexOf('.');
+            if (index < 0) return 0;
+            return text.Length - index - 1;
         }
 
         /// <summary>
