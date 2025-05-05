@@ -124,8 +124,8 @@ namespace SEE.Game.City
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 Vector3 scale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
-                ScaleState xScale = ScaleDeterminer.DetermineScale(scale.x);
-                ScaleState zScale = ScaleDeterminer.DetermineScale(scale.z);
+                ScaleState xScale = ScaleDeterminer.DetermineInverseScale(scale.x);
+                ScaleState zScale = ScaleDeterminer.DetermineInverseScale(scale.z);
                 Debug.Log($"xScale: " + xScale + ", zScale: " + zScale);
                 DeleteGraphGameObjects();
                 DrawGraph();

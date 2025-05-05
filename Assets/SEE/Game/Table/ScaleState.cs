@@ -18,11 +18,13 @@ namespace SEE.Game.Table
     public static class ScaleDeterminer
     {
         /// <summary>
-        /// Determines the <see cref="ScaleState"/> based on the given <paramref name="scaleValue"/>.
+        /// Determines the <see cref="ScaleState"/> of a parent transform
+        /// based on the child's adjusted <paramref name="scaleValue"/>.
         /// </summary>
-        /// <param name="scaleValue">The value to evaluate.</param>
-        /// <returns>The corresponding <see cref="ScaleState"/> based on the value of <paramref name="scaleValue"/>.</returns>
-        public static ScaleState DetermineScale(float scaleValue)
+        /// <param name="scaleValue">The local scale of a child transform that compensates for its parent's scale.</param>
+        /// <returns>The inferred <see cref="ScaleState"/> of the parent: increased if the child was scaled down,
+        /// decreased if the child was scaled up, or not scaled if the child scale is approximately 1.</returns>
+        public static ScaleState DetermineInverseScale(float scaleValue)
         {
             if (scaleValue < 1f && !Mathf.Approximately(scaleValue, 1f))
             {
