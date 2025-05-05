@@ -53,6 +53,11 @@ namespace SEE.Controls.Actions.Table
         private ModifyTableMenu menu;
 
         /// <summary>
+        /// The menu for scaling.
+        /// </summary>
+        private ScaleTableMenu scaleMenu;
+
+        /// <summary>
         /// The modified table.
         /// </summary>
         private GameObject modifiedTable;
@@ -188,6 +193,10 @@ namespace SEE.Controls.Actions.Table
             {
                 menu.Destroy();
             }
+            if (scaleMenu != null)
+            {
+                scaleMenu.Destroy();
+            }
             if (modifiedTable != null)
             {
                 GameTableManager.DisableEditMode(modifiedTable);
@@ -281,9 +290,17 @@ namespace SEE.Controls.Actions.Table
             }
             if (modifiedTable != null && SEEInput.MouseUp(MouseButton.Left))
             {
-                currentProgressState = ProgressState.OperationSelection;
-                menu = new();
+                OpenOperationSelection();
             }
+        }
+
+        /// <summary>
+        /// Changes the progress state to the operation selection and opens the depending menu.
+        /// </summary>
+        private void OpenOperationSelection()
+        {
+            currentProgressState = ProgressState.OperationSelection;
+            menu = new();
         }
 
         /// <summary>
@@ -380,23 +397,30 @@ namespace SEE.Controls.Actions.Table
 
         /// <summary>
         /// Checks for a collision when the left mouse button is pressed.
-        /// If a collision is detected, a warning is shown.
-        /// Otherwise, the current progress state is set to finish.
         /// </summary>
         private void CheckCollisionWithLeftMouseButton()
         {
             if (SEEInput.LeftMouseDown())
             {
+                CheckCollision();
+            }
+        }
 
-                if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
-                {
-                    ShowNotification.Warn("Table can't be placed",
-                        "The table can't be placed because it is colliding with another object.");
-                }
-                else
-                {
-                    currentProgressState = ProgressState.Finish;
-                }
+        /// <summary>
+        /// Checks for a collision.
+        /// If a collision is detected, a warning is shown.
+        /// Otherwise, the current progress state is set to finish.
+        /// </summary>
+        private void CheckCollision()
+        {
+            if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
+            {
+                ShowNotification.Warn("Table can't be placed",
+                    "The table can't be placed because it is colliding with another object.");
+            }
+            else
+            {
+                currentProgressState = ProgressState.Finish;
             }
         }
 
@@ -431,7 +455,37 @@ namespace SEE.Controls.Actions.Table
         /// </summary>
         private void ScaleTable()
         {
+            InitScaleMenu();
+            CheckScaleMenu();
             CheckCollisionWithLeftMouseButton();
+        }
+
+        /// <summary>
+        /// Instantiates the scale menu.
+        /// </summary>
+        private void InitScaleMenu()
+        {
+            if (scaleMenu == null)
+            {
+                scaleMenu = new ScaleTableMenu(modifiedTable);
+            }
+        }
+
+        /// <summary>
+        /// Listen to the dialog action buttons of the scale menu.
+        /// </summary>
+        private void CheckScaleMenu()
+        {
+            if (scaleMenu.TryGetFinish())
+            {
+                CheckCollision();
+            }
+            if (scaleMenu.TryGetCanceled())
+            {
+                GameTableManager.Scale(modifiedTable, memento.Old.Scale);
+                new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
+                OpenOperationSelection();
+            }
         }
 
         /// <summary>
@@ -475,6 +529,8 @@ namespace SEE.Controls.Actions.Table
                         UpdateCity();
                         break;
                     case ProgressState.Scale:
+                        GameTableManager.Scale(modifiedTable, memento.Old.Scale);
+                        new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
                         break;
                     case ProgressState.Delete:
                         GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale);
@@ -506,6 +562,8 @@ namespace SEE.Controls.Actions.Table
                         UpdateCity();
                         break;
                     case ProgressState.Scale:
+                        GameTableManager.Scale(modifiedTable, memento.New.Scale);
+                        new ScaleTableNetAction(modifiedTable.name, memento.New.Scale).Execute();
                         break;
                     case ProgressState.Delete:
                         new DestroyTableNetAction(modifiedTable.name).Execute();

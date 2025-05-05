@@ -3,7 +3,7 @@ using SEE.Game.Drawable;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.UI.Menu
+namespace SEE.UI.Menu.Table
 {
 	/// <summary>
 	/// This class provides the modify menu for tables.
