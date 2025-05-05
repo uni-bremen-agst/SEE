@@ -56,6 +56,11 @@ namespace SEE.Controls.Actions.Table
             public Vector3 EulerAngles;
 
             /// <summary>
+            /// The scale of the table.
+            /// </summary>
+            public Vector3 Scale;
+
+            /// <summary>
             /// The constructor.
             /// </summary>
             /// <param name="table">The spawned table.</param>
@@ -64,6 +69,7 @@ namespace SEE.Controls.Actions.Table
                 Name = table.name;
                 Position = table.transform.position;
                 EulerAngles = table.transform.eulerAngles;
+                Scale = table.transform.localScale;
             }
         }
 
@@ -76,7 +82,8 @@ namespace SEE.Controls.Actions.Table
             spawnedTable = GameTableManager.Spawn();
             new SpawnTableNetAction(spawnedTable.name,
                 spawnedTable.transform.position,
-                spawnedTable.transform.eulerAngles).Execute();
+                spawnedTable.transform.eulerAngles,
+                spawnedTable.transform.localScale).Execute();
         }
 
         /// <summary>
@@ -162,8 +169,8 @@ namespace SEE.Controls.Actions.Table
             if (spawnedTable == null)
             {
                 spawnedTable = GameTableManager.Respawn(memento.Name,
-                    memento.Position, memento.EulerAngles);
-                new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles).Execute();
+                    memento.Position, memento.EulerAngles, memento.Scale);
+                new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles, memento.Scale).Execute();
             }
         }
 

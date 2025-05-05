@@ -6,13 +6,13 @@ using SEE.Game.Table;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Net.Actions.Table;
-using SEE.UI.Menu;
+using SEE.UI.Menu.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using ModifyOperation = SEE.UI.Menu.ModifyTableMenu.ModifyOperation;
+using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 
 namespace SEE.Controls.Actions.Table
 {
@@ -248,6 +248,7 @@ namespace SEE.Controls.Actions.Table
                         RotateTable();
                         break;
                     case ProgressState.Scale:
+                        ScaleTable();
                         break;
                     case ProgressState.Delete:
                         DeleteTable();
@@ -426,6 +427,14 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
+        /// Scales the table and checks for collisions.
+        /// </summary>
+        private void ScaleTable()
+        {
+            CheckCollisionWithLeftMouseButton();
+        }
+
+        /// <summary>
         /// Deletes the table.
         /// </summary>
         private void DeleteTable()
@@ -468,8 +477,8 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Scale:
                         break;
                     case ProgressState.Delete:
-                        GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles);
-                        new SpawnTableNetAction(memento.Name, memento.Old.Position, memento.Old.EulerAngles).Execute();
+                        GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale);
+                        new SpawnTableNetAction(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale).Execute();
                         break;
                 }
             }

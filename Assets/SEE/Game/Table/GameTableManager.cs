@@ -92,6 +92,16 @@ namespace SEE.Game.Table
         }
 
         /// <summary>
+        /// Scales the specified <paramref name="table"/> to the specified <paramref name="scale"/>.
+        /// </summary>
+        /// <param name="table">The table to scale.</param>
+        /// <param name="scale">The scale where the table should be scaled.</param>
+        public static void Scale(GameObject table, Vector3 scale)
+        {
+            table.transform.localScale = scale;
+        }
+
+        /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
         /// at the specified <paramref name="position"/>,
         /// and with the provided <paramref name="eulerAngles"/>.
@@ -99,12 +109,14 @@ namespace SEE.Game.Table
         /// <param name="name">The table name.</param>
         /// <param name="position">The position of the table.</param>
         /// <param name="eulerAngles">The euler angles of the table.</param>
+        /// <param name="scale">The scale of the table.</param>
         /// <returns>The spawned table.</returns>
-        public static GameObject Respawn(string name, Vector3 position, Vector3 eulerAngles)
+        public static GameObject Respawn(string name, Vector3 position, Vector3 eulerAngles, Vector3 scale)
         {
             GameObject table = Spawn(name);
             Move(table, position);
             Rotate(table, eulerAngles);
+            Scale(table, scale);
             FinishSpawn(table);
             return table;
         }

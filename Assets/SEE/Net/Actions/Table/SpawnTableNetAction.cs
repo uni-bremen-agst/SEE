@@ -25,16 +25,23 @@ namespace SEE.Net.Actions.Table
         public Vector3 EulerAngles;
 
         /// <summary>
+        /// The scale of the table.
+        /// </summary>
+        public Vector3 Scale;
+
+        /// <summary>
         /// The constructor.
         /// </summary>
         /// <param name="name">The name of the table.</param>
         /// <param name="position">The position of the table.</param>
         /// <param name="eulerAngles">The euler angles of the table.</param>
-        public SpawnTableNetAction(string name, Vector3 position, Vector3 eulerAngles)
+        /// <param name="scale">The scale of the table.</param>
+        public SpawnTableNetAction(string name, Vector3 position, Vector3 eulerAngles, Vector3 scale)
         {
             Name = name;
             Position = position;
             EulerAngles = eulerAngles;
+            Scale = scale;
         }
 
         /// <summary>
@@ -42,7 +49,7 @@ namespace SEE.Net.Actions.Table
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameTableManager.Respawn(Name, Position, EulerAngles);
+            GameTableManager.Respawn(Name, Position, EulerAngles, Scale);
         }
     }
 }
