@@ -4,6 +4,7 @@ using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Table
@@ -98,7 +99,18 @@ namespace SEE.Game.Table
         /// <param name="scale">The scale where the table should be scaled.</param>
         public static void Scale(GameObject table, Vector3 scale)
         {
-            table.transform.localScale = scale;
+            GameObject city = GameFinder.FindChildWithTag(table, Tags.CodeCity);
+            if (city.IsCodeCityDrawn())
+            {
+                Transform root = city.transform.Cast<Transform>().First(child => child.gameObject.IsNode());
+                root.parent = null;
+                table.transform.localScale = scale;
+                root.parent = city.transform;
+            }
+            else
+            {
+                table.transform.localScale = scale;
+            }
         }
 
         /// <summary>
