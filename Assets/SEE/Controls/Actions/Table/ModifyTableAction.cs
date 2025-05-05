@@ -268,6 +268,10 @@ namespace SEE.Controls.Actions.Table
                         return true;
                 }
             }
+            else
+            {
+                CheckScaleMenu();
+            }
             return false;
         }
 
@@ -421,6 +425,7 @@ namespace SEE.Controls.Actions.Table
             else
             {
                 currentProgressState = ProgressState.Finish;
+                scaleMenu?.Destroy();
             }
         }
 
@@ -456,7 +461,6 @@ namespace SEE.Controls.Actions.Table
         private void ScaleTable()
         {
             InitScaleMenu();
-            CheckScaleMenu();
             CheckCollisionWithLeftMouseButton();
         }
 
@@ -476,16 +480,19 @@ namespace SEE.Controls.Actions.Table
         /// </summary>
         private void CheckScaleMenu()
         {
-            if (scaleMenu.TryGetFinish())
+            if (scaleMenu != null && currentProgressState == ProgressState.Scale)
             {
-                CheckCollision();
-            }
-            if (scaleMenu.TryGetCanceled())
-            {
-                GameTableManager.Scale(modifiedTable, memento.Old.Scale);
-                new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
-                scaleMenu = null;
-                OpenOperationSelection();
+                if (scaleMenu.TryGetFinish())
+                {
+                    CheckCollision();
+                }
+                if (scaleMenu.TryGetCanceled())
+                {
+                    GameTableManager.Scale(modifiedTable, memento.Old.Scale);
+                    new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
+                    scaleMenu = null;
+                    OpenOperationSelection();
+                }
             }
         }
 
