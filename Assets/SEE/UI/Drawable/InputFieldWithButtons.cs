@@ -221,5 +221,32 @@ namespace SEE.UI.Drawable
         {
             return value;
         }
+
+        /// <summary>
+        /// Sets the <see cref="upAndDownValue"/>.
+        /// </summary>
+        /// <param name="value">The new value for <see cref="upAndDownValue"/>.</param>
+        public void SetUpAndDownValue(float value)
+        {
+            upAndDownValue = value;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="minValue"/>.
+        /// </summary>
+        /// <param name="minValue">The new minimum value.</param>
+        public void SetMinValue(float minValue)
+        {
+            this.minValue = minValue;
+        }
+
+        /// <summary>
+        /// Sets the <see cref="maxValue"/>.
+        /// </summary>
+        /// <param name="maxValue">The new maximum value.</param>
+        public void SetMaxValue(float maxValue)
+        {
+            this.maxValue = maxValue;
+        }
     }
 }

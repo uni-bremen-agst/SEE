@@ -484,6 +484,7 @@ namespace SEE.Controls.Actions.Table
             {
                 GameTableManager.Scale(modifiedTable, memento.Old.Scale);
                 new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
+                scaleMenu = null;
                 OpenOperationSelection();
             }
         }

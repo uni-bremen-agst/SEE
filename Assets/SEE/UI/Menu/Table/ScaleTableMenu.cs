@@ -34,11 +34,6 @@ namespace SEE.UI.Menu.Table
         private bool wasCanceled;
 
         /// <summary>
-        /// The switch for scaling proportionally or unproportionally.
-        /// </summary>
-        private SwitchManager switchManager;
-
-        /// <summary>
         /// Instantiates the menu and displays it.
         /// </summary>
         /// <param name="table">The table to be scaled.</param>
@@ -58,7 +53,11 @@ namespace SEE.UI.Menu.Table
         {
             InputFieldWithButtons xScale = GameFinder.FindChild(menuInstance, "XScale").GetComponent<InputFieldWithButtons>();
             InputFieldWithButtons zScale = GameFinder.FindChild(menuInstance, "ZScale").GetComponent<InputFieldWithButtons>();
+            float step = 0.001f;
 
+            xScale.SetMinValue(step);
+            xScale.SetMaxValue(0.05f);
+            xScale.SetUpAndDownValue(step);
             xScale.AssignValue(table.transform.localScale.x);
             xScale.OnValueChanged.AddListener(xScale =>
             {
@@ -67,6 +66,9 @@ namespace SEE.UI.Menu.Table
                 new ScaleTableNetAction(table.name, newScale).Execute();
             });
 
+            zScale.SetMinValue(step);
+            zScale.SetMaxValue(0.05f);
+            zScale.SetUpAndDownValue(step);
             zScale.AssignValue(table.transform.localScale.z);
             zScale.OnValueChanged.AddListener(zScale =>
             {
