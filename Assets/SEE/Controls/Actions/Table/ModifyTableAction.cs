@@ -539,6 +539,7 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
                         new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Delete:
                         GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale);
@@ -572,6 +573,7 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.New.Scale);
                         new ScaleTableNetAction(modifiedTable.name, memento.New.Scale).Execute();
+                        UpdateCity();
                         break;
                     case ProgressState.Delete:
                         new DestroyTableNetAction(modifiedTable.name).Execute();
