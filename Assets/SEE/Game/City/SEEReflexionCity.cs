@@ -123,24 +123,22 @@ namespace SEE.Game.City
             {
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
-                Vector3 scale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
-                ScaleState xScale = ScaleDeterminer.DetermineInverseScale(scale.x);
-                ScaleState zScale = ScaleDeterminer.DetermineInverseScale(scale.z);
+                Vector3 rootScale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
                 Vector3 scaleFactor = new(
-                    1 / scale.x,
-                    scale.y,
-                    1 / scale.z);
+                    1 / rootScale.x,
+                    rootScale.y,
+                    1 / rootScale.z);
 
                 DeleteGraphGameObjects();
                 DrawGraph();
-                RestoreLayout(layoutGraphNodes, decorationValues, scaleFactor, xScale, zScale).Forget();
+                RestoreLayout(layoutGraphNodes, decorationValues, scaleFactor).Forget();
                 graphRenderer = null;
             }
             return;
 
             async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
-                                        Vector3 scaleFactor, ScaleState xScale, ScaleState zScale)
+                                        Vector3 scaleFactor)
             {
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
                 layoutGraphNodes.ForEach(nodeLayout =>
@@ -148,15 +146,9 @@ namespace SEE.Game.City
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
                     if (node != null)
                     {
-                        Vector3 newLocalScale = nodeLayout.AbsoluteScale;
-                        if (xScale != ScaleState.NotScaled)
-                        {
-                            newLocalScale.x /= scaleFactor.x;
-                        }
-                        if (zScale != ScaleState.NotScaled)
-                        {
-                            newLocalScale.z /= scaleFactor.z;
-                        }
+                        Vector3 newLocalScale = new(nodeLayout.AbsoluteScale.x / scaleFactor.x,
+                            nodeLayout.AbsoluteScale.y,
+                            nodeLayout.AbsoluteScale.z / scaleFactor.z);
 
                         node.NodeOperator().ScaleTo(newLocalScale, 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
