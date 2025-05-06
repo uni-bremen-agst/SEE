@@ -580,11 +580,19 @@ namespace SEE.Net
             }
         }
 
+                
+        private OpenTelemetryManager manager;
+        private TracingHelper tracer;
+        
         /// <summary>
         /// Initializes the game.
         /// </summary>
         private void InitializeGame()
         {
+            manager = new OpenTelemetryManager();
+            manager.Initialize();
+            tracer = new TracingHelper();
+            TracingHelperService.Instance = new TracingHelper();
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             if (HostServer)
@@ -610,7 +618,7 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
-            OpenTelemetryManager.Shutdown();
+            manager.Shutdown();
             ShutdownNetwork();
         }
 

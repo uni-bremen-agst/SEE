@@ -4,172 +4,143 @@ using SEE.Controls.Actions;
 using SEE.Utils.History;
 using UnityEngine;
 
-/// <summary>
-/// The TracingHelper class provides static methods for tracking actions within the system. 
-/// It aims to track every individual instance of objects and interactions that are involved in any action.
-///
-/// Eventually, each instance of the objects being tracked will have its own corresponding method in this class, making it a comprehensive solution 
-/// for tracing SEE's activities and ensuring that all significant changes and interactions are monitored and logged.
-/// </summary>
-public static class TracingHelper
+namespace SEE.Tools.OpenTelemetry
 {
-    private static readonly ActivitySource ActivitySource = new("SEE.Tracing");
-
-    // Starts tracing for adding an action to history
-    public static void TrackAddToHistory(IReversibleAction action, string actionID, HashSet<string> changedObjects)
-    {
-        // Check if the action is of type MoveAction
-        if (action is MoveAction)
-        {
-            return; // If it's a MoveAction, skip tracing. MoveAction is handled separately
-        }
-
-        var tags = new Dictionary<string, object>
-        {
-            { "action.id", actionID }, // Add action ID as a tag
-            { "action.type", action.GetType().FullName } // Add action type as a tag
-        };
-
-        int index = 0;
-        // Iterate through all changed objects and add relevant tags for each
-        foreach (string objectId in changedObjects)
-        {
-            GameObject foundObject = GameObject.Find(objectId);
-            if (foundObject != null)
-            {
-                tags[$"action.affectedObjects[{index}].id"] = foundObject.name; // Add object ID tag
-                tags[$"action.affectedObjects[{index}].instanceID"] = foundObject.GetInstanceID(); // Add instance ID tag
-                tags[$"action.affectedObjects[{index}].position"] = foundObject.transform.position.ToString(); // Add position tag
-                index++;
-            }
-        }
-
-        // Start tracing the "AddToGlobalHistory" activity
-        using (var activity = ActivitySource.StartActivity("AddToGlobalHistory"))
-        {
-            if (activity != null)
-            {
-                // Add all tags to the tracing activity
-                foreach (var tag in tags)
-                {
-                    activity.SetTag(tag.Key, tag.Value);
-                }
-            }
-        }
-    }
-
-    // Starts tracing for removing an action from history
-    public static void TrackRemoveFromHistory(ActionHistory.GlobalHistoryEntry action)
-    {
-        var tags = new Dictionary<string, object>
-        {
-            { "action.id", action.ActionID }, // Add action ID as a tag
-            { "action.type", action.GetType().FullName } // Add action type as a tag
-        };
-
-        int index = 0;
-        // Iterate through all changed objects and add relevant tags for each
-        foreach (string objectId in action.ChangedObjects)
-        {
-            GameObject foundObject = GameObject.Find(objectId);
-            if (foundObject != null)
-            {
-                tags[$"action.affectedObjects[{index}].id"] = foundObject.name; // Add object ID tag
-                tags[$"action.affectedObjects[{index}].instanceID"] = foundObject.GetInstanceID(); // Add instance ID tag
-                tags[$"action.affectedObjects[{index}].position"] = foundObject.transform.position.ToString(); // Add position tag
-                index++;
-            }
-        }
-
-        // Start tracing the "RemoveFromGlobalHistory" activity
-        using (var activity = ActivitySource.StartActivity("RemoveFromGlobalHistory"))
-        {
-            if (activity != null)
-            {
-                // Add all tags to the tracing activity
-                foreach (var tag in tags)
-                {
-                    activity.SetTag(tag.Key, tag.Value);
-                }
-            }
-        }
-    }
-
     /// <summary>
-    /// Tracks the MoveAction and logs the original and final position of the object.
+    /// Provides static methods for tracing key user and system actions within SEE.
+    /// Each method is tailored to record metadata about specific types of actions,
+    /// supporting observability and behavioral analysis via OpenTelemetry.
     /// </summary>
-    public static void TrackMoveAction(GameObject grabbedObject, Vector3 finalPosition,
-        GameObject grabbedObjectNewParent)
+    public class TracingHelper
     {
-        if (grabbedObject == null)
+        private readonly ActivitySource activitySource;
+
+        public TracingHelper(string sourceName = "SEE.Tracing")
         {
-            return; // Skip if no object is grabbed
+            activitySource = new ActivitySource(sourceName);
         }
 
-        var tags = new Dictionary<string, object>
+        /// <summary>
+        /// Traces the addition of a reversible action to the global action history.
+        /// Ignores MoveAction since it is tracked separately.
+        /// </summary>
+        public void TrackAddToHistory(IReversibleAction action, string actionID, HashSet<string> changedObjects)
         {
-            { "action.type", "MoveAction" }, // Type of action
-            { "newParent", grabbedObjectNewParent.name }, // original position as tag
-            { "finalPosition", finalPosition.ToString() } // Final position as tag
-        };
+            if (action is MoveAction) return;
 
-        // Start tracing the "MoveAction" activity
-        using (var activity = ActivitySource.StartActivity("MoveAction"))
-        {
-            if (activity != null)
+            var tags = new Dictionary<string, object>
             {
-                // Add the tags to the tracing activity
-                foreach (var tag in tags)
+                { "action.id", actionID },
+                { "action.type", action.GetType().FullName }
+            };
+
+            int index = 0;
+            foreach (string objectId in changedObjects)
+            {
+                GameObject obj = GameObject.Find(objectId);
+                if (obj != null)
                 {
-                    activity.SetTag(tag.Key, tag.Value);
+                    tags[$"action.affectedObjects[{index}].id"] = obj.name;
+                    tags[$"action.affectedObjects[{index}].instanceID"] = obj.GetInstanceID();
+                    tags[$"action.affectedObjects[{index}].position"] = obj.transform.position.ToString();
+                    index++;
                 }
-
-                activity.SetTag("action.objectId", grabbedObject.name); // Object ID for reference
-                activity.SetTag("action.instanceID", grabbedObject.GetInstanceID()); // Object instance ID for reference
             }
-        }
-    }
 
-    // Start tracing for a key press action 
-    public static void TrackKeyPress(string actionName)
-    {
-        var tags = new Dictionary<string, object>
-        {
-            { "action.name", actionName } // Name of the action 
-        };
-
-        // Start tracing the "KeyPress" activity
-        using (var activity = ActivitySource.StartActivity("KeyPress"))
-        {
+            using var activity = activitySource.StartActivity("AddToGlobalHistory");
             if (activity != null)
             {
-                // Add tags to the tracing activity
                 foreach (var tag in tags)
                 {
                     activity.SetTag(tag.Key, tag.Value);
                 }
             }
         }
-    }
 
-    /// <summary>
-    /// Tracks the player's movement by recording the start and end positions along with the direction.
-    /// </summary>
-    public static void TrackMovement(Vector3 startPosition, Vector3 endPosition)
-    {
-        var tags = new Dictionary<string, object>
+        /// <summary>
+        /// Traces the removal of an action from the global history.
+        /// </summary>
+        public void TrackRemoveFromHistory(ActionHistory.GlobalHistoryEntry action)
         {
-            { "action.type", "PlayerMovement" }, // Action type
-            { "startPosition", startPosition.ToString() }, // Starting position
-            { "endPosition", endPosition.ToString() } // Ending position
-        };
+            var tags = new Dictionary<string, object>
+            {
+                { "action.id", action.ActionID },
+                { "action.type", action.GetType().FullName }
+            };
 
-        // Start tracing the "PlayerMovement" activity
-        using (var activity = ActivitySource.StartActivity("PlayerMovement"))
-        {
+            int index = 0;
+            foreach (string objectId in action.ChangedObjects)
+            {
+                GameObject obj = GameObject.Find(objectId);
+                if (obj != null)
+                {
+                    tags[$"action.affectedObjects[{index}].id"] = obj.name;
+                    tags[$"action.affectedObjects[{index}].instanceID"] = obj.GetInstanceID();
+                    tags[$"action.affectedObjects[{index}].position"] = obj.transform.position.ToString();
+                    index++;
+                }
+            }
+
+            using var activity = activitySource.StartActivity("RemoveFromGlobalHistory");
             if (activity != null)
             {
-                // Add all tags to the tracing activity
+                foreach (var tag in tags)
+                {
+                    activity.SetTag(tag.Key, tag.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Traces a MoveAction, capturing details about the moved object and its new parent and position.
+        /// </summary>
+        public void TrackMoveAction(GameObject grabbedObject, Vector3 finalPosition, GameObject grabbedObjectNewParent)
+        {
+            if (grabbedObject == null) return;
+
+            var tags = new Dictionary<string, object>
+            {
+                { "action.type", "MoveAction" },
+                { "newParent", grabbedObjectNewParent?.name ?? "None" },
+                { "finalPosition", finalPosition.ToString() },
+                { "action.objectId", grabbedObject.name },
+                { "action.instanceID", grabbedObject.GetInstanceID() }
+            };
+
+            using var activity = activitySource.StartActivity("MoveAction");
+            if (activity != null)
+            {
+                foreach (var tag in tags)
+                {
+                    activity.SetTag(tag.Key, tag.Value);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Traces a key press event.
+        /// </summary>
+        public void TrackKeyPress(string actionName)
+        {
+            using var activity = activitySource.StartActivity("KeyPress");
+            activity?.SetTag("action.name", actionName);
+        }
+
+        /// <summary>
+        /// Traces a player's movement by recording both the start and end positions.
+        /// </summary>
+        public void TrackMovement(Vector3 startPosition, Vector3 endPosition)
+        {
+            var tags = new Dictionary<string, object>
+            {
+                { "action.type", "PlayerMovement" },
+                { "startPosition", startPosition.ToString() },
+                { "endPosition", endPosition.ToString() }
+            };
+
+            using var activity = activitySource.StartActivity("PlayerMovement");
+            if (activity != null)
+            {
                 foreach (var tag in tags)
                 {
                     activity.SetTag(tag.Key, tag.Value);

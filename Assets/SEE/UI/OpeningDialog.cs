@@ -217,7 +217,6 @@ namespace SEE.UI
         /// </summary>
         private void Start()
         {
-            OpenTelemetryManager.Initialize();
             menu = CreateMenu();
             SceneSettings.Load();
             inputType = SceneSettings.InputType;

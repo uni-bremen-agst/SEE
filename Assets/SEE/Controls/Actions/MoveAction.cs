@@ -9,6 +9,7 @@ using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.OpenTelemetry;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -188,7 +189,7 @@ namespace SEE.Controls.Actions
                 CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
                 if (wasMoved && grabbedObject.GrabbedGameObject != null)
                 {
-                    TracingHelper.TrackMoveAction(grabbedObject.GrabbedGameObject,
+                    TracingHelperService.Instance?.TrackMoveAction(grabbedObject.GrabbedGameObject,
                         grabbedObject.GrabbedGameObject.transform.position, grabbedObject.NewParent);
                 }
 

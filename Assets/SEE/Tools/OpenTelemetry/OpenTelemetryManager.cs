@@ -8,70 +8,77 @@ using UnityEngine;
 namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
-    /// Manages the initialization, operation, and shutdown of OpenTelemetry tracing.
+    /// Handles the setup, management, and shutdown of OpenTelemetry tracing for Unity applications.
     /// </summary>
-    public class OpenTelemetryManager
+    public class OpenTelemetryManager : IDisposable
     {
-        private static TracerProvider _tracerProvider; // Holds the OpenTelemetry tracer provider instance.
-        private static string _exportDirectoryPath; // Directory path for trace file export.
+        private TracerProvider tracerProvider;
+        private TraceFileExporter traceFileExporter;
+        private readonly string exportDirectoryPath;
+
+        public OpenTelemetryManager(string exportFolderName = "OpenTelemetryLogs")
+        {
+            exportDirectoryPath = Path.Combine(Application.dataPath, "StreamingAssets", exportFolderName, "TraceLogs");
+        }
 
         /// <summary>
-        /// Initializes the OpenTelemetry tracer provider and prepares trace export.
-        /// If already initialized, a warning will be logged.
+        /// Initializes the OpenTelemetry tracer provider and sets up trace export to a file.
+        /// Logs a warning if already initialized.
         /// </summary>
-        public static void Initialize()
+        public void Initialize()
         {
-            if (_tracerProvider != null)
+            if (tracerProvider != null)
             {
-                Debug.LogWarning("TracerProvider is already initialized.");
+                Debug.LogWarning("OpenTelemetry is already initialized.");
                 return;
             }
 
             try
             {
-                // Generate a path for trace export directory.
-                _exportDirectoryPath = Path.Combine(Application.dataPath, "StreamingAssets", "OpenTelemetryLogs", "TraceLogs");
+                traceFileExporter = new TraceFileExporter(exportDirectoryPath);
 
-                // Configure and build the OpenTelemetry tracer provider.
-                _tracerProvider = Sdk.CreateTracerProviderBuilder()
-                    .AddSource("SEE.Tracing") 
+                tracerProvider = Sdk.CreateTracerProviderBuilder()
+                    .AddSource("SEE.Tracing")
                     .SetResourceBuilder(ResourceBuilder.CreateDefault()
                         .AddService("SEEOpenTelemetryTracking"))
-                    .AddProcessor(
-                        new SimpleActivityExportProcessor(
-                            new TraceFileExporter(_exportDirectoryPath))) // Use the new exporter.
+                    .AddProcessor(new SimpleActivityExportProcessor(traceFileExporter))
                     .Build();
 
-                Debug.Log($"TracerProvider initialized. Trace export directory: {_exportDirectoryPath}");
+                Debug.Log($"OpenTelemetry initialized. Logs in: {exportDirectoryPath}");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to initialize OpenTelemetry: {ex.Message}");
+                Debug.LogError($"OpenTelemetry initialization failed: {ex.Message}");
             }
         }
 
         /// <summary>
-        /// Shuts down the OpenTelemetry tracer provider.
+        /// Properly shuts down the OpenTelemetry tracer provider and its associated exporter.
+        /// Logs a warning if not previously initialized.
         /// </summary>
-        public static void Shutdown()
+        public void Shutdown()
         {
-            if (_tracerProvider == null)
+            if (tracerProvider == null)
             {
-                Debug.LogWarning("TracerProvider is not initialized.");
+                Debug.LogWarning("OpenTelemetry is not initialized.");
                 return;
             }
 
-            try
-            {
-                // Dispose of the tracer provider.
-                _tracerProvider.Dispose();
-                _tracerProvider = null;
-                Debug.Log("TracerProvider disposed.");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError($"Failed to shut down OpenTelemetry: {ex.Message}");
-            }
+            tracerProvider.Dispose();
+            tracerProvider = null;
+
+            traceFileExporter?.CheckGracefulShutdown();
+            traceFileExporter = null;
+
+            Debug.Log("OpenTelemetry shutdown complete.");
+        }
+
+        /// <summary>
+        /// Disposes the manager and cleans up the provider and exporter.
+        /// </summary>
+        public void Dispose()
+        {
+            Shutdown();
         }
     }
 }

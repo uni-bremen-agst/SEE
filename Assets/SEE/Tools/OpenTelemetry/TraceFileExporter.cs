@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using OpenTelemetry;
@@ -10,28 +9,27 @@ using Debug = UnityEngine.Debug;
 namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
-    /// Custom exporter that writes activity trace data to a file.
+    /// Custom OpenTelemetry exporter that writes activity trace data to a JSON file.
     /// </summary>
-    public class TraceFileExporter : BaseExporter<Activity>
+    public class TraceFileExporter : BaseExporter<Activity>, IDisposable
     {
-        private readonly string _filePath; // Path to the file where trace data will be written.
+        private readonly string filePath; // Full path to the output trace file.
+        private bool disposed = false;
 
+        /// <summary>
+        /// Initializes the trace file exporter and creates the output file with a session header.
+        /// </summary>
+        /// <param name="directoryPath">Directory where trace files will be stored.</param>
         public TraceFileExporter(string directoryPath)
         {
-            // Ensure the directory exists, otherwise create it.
             Directory.CreateDirectory(directoryPath);
-
-            // Generate a timestamped file path for the trace export.
             string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
-            _filePath = Path.Combine(directoryPath, $"Traces-Session-{timestamp}.json");
+            filePath = Path.Combine(directoryPath, $"Traces-Session-{timestamp}.json");
 
-            // Create the file and write the initial opening line (or headers) if needed.
             try
             {
-                using (var writer = new StreamWriter(_filePath))
-                {
-                    writer.WriteLine("Trace Export Session Started...");
-                }
+                using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
+                writer.WriteLine("Trace Export Session Started...");
             }
             catch (Exception ex)
             {
@@ -39,28 +37,30 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
+        /// <summary>
+        /// Writes a batch of activity traces to the export file.
+        /// </summary>
+        /// <param name="batch">The batch of activity traces.</param>
+        /// <returns>ExportResult.Success if export succeeds; otherwise, ExportResult.Failure.</returns>
         public override ExportResult Export(in Batch<Activity> batch)
         {
             try
             {
-                using (var writer = new StreamWriter(_filePath, true, Encoding.UTF8))
-                {
-                    foreach (var activity in batch)
-                    {
-                        // Serialize activity details into a custom format (you can choose the format as needed).
-                        var activityData = new
-                        {
-                            TraceId = activity.TraceId.ToString(),
-                            DisplayName = activity.DisplayName,
-                            StartTime = activity.StartTimeUtc,
-                            Duration = activity.Duration,
-                            Tags = activity.Tags
-                        };
+                using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
 
-                        // Write activity data to the file.
-                        writer.WriteLine(
-                            $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {JsonConvert.SerializeObject(activityData)}");
-                    }
+                foreach (var activity in batch)
+                {
+                    var activityData = new
+                    {
+                        TraceId = activity.TraceId.ToString(),
+                        DisplayName = activity.DisplayName,
+                        StartTime = activity.StartTimeUtc,
+                        Duration = activity.Duration,
+                        Tags = activity.Tags
+                    };
+
+                    writer.WriteLine(
+                        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {JsonConvert.SerializeObject(activityData)}");
                 }
 
                 return ExportResult.Success;
@@ -70,6 +70,35 @@ namespace SEE.Tools.OpenTelemetry
                 Debug.LogError($"Failed to export traces: {ex.Message}");
                 return ExportResult.Failure;
             }
+        }
+
+        /// <summary>
+        /// Writes a shutdown message to the trace file if the exporter was not already disposed.
+        /// </summary>
+        public void CheckGracefulShutdown()
+        {
+            if (disposed) return;
+
+            try
+            {
+                using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
+                writer.WriteLine("Trace Export Session Ended. Tracer shut down cleanly.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Failed to write trace shutdown message: {ex.Message}");
+            }
+
+            disposed = true;
+        }
+
+        /// <summary>
+        /// Releases all resources used by the exporter.
+        /// </summary>
+        public void Dispose()
+        {
+            CheckGracefulShutdown();
+            GC.SuppressFinalize(this);
         }
     }
 }

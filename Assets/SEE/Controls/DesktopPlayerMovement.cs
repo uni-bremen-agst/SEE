@@ -1,4 +1,5 @@
 ﻿using SEE.GO;
+using SEE.Tools.OpenTelemetry;
 using UnityEngine;
 
 namespace SEE.Controls
@@ -184,7 +185,7 @@ namespace SEE.Controls
                 // Check for key release to trigger movement tracking
                 if (moved && !AnyMovementInput())
                 {
-                    TracingHelper.TrackMovement(lastPosition, transform.position);
+                    TracingHelperService.Instance?.TrackMovement(lastPosition, transform.position);
                     lastPosition = transform.position; // Update last position
                     moved = false;
                 }

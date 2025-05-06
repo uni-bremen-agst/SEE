@@ -1,6 +1,7 @@
 ﻿using SEE.Controls.Actions;
 using SEE.Controls.KeyActions;
 using SEE.GO;
+using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using SEE.XR;
 using UnityEditor;
@@ -55,7 +56,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Help action when the key is pressed
-                TracingHelper.TrackKeyPress("Help");
+                TracingHelperService.Instance?.TrackKeyPress("Help");
             }
 
             return result;
@@ -72,7 +73,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleVoiceControl action when the key is pressed
-                TracingHelper.TrackKeyPress("ToggleVoiceControl");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleVoiceControl");
             }
 
             return result;
@@ -90,7 +91,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleMenu action when the key is pressed
-                TracingHelper.TrackKeyPress("ToggleMenu");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleMenu");
             }
 
             return result;
@@ -108,7 +109,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleSettings action when the key is pressed
-                TracingHelper.TrackKeyPress("ToggleSettings");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleSettings");
             }
 
             return result;
@@ -126,7 +127,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleBrowser action when the key is pressed
-                TracingHelper.TrackKeyPress("ToggleBrowser");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleBrowser");
             }
 
             return result;
@@ -144,7 +145,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleMirror action when the key is pressed
-                TracingHelper.TrackKeyPress("ToggleMirror");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleMirror");
             }
 
             return result;
@@ -166,7 +167,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the digit key press action
-                TracingHelper.TrackKeyPress($"DigitKeyPressed_{digit}");
+                TracingHelperService.Instance?.TrackKeyPress($"DigitKeyPressed_{digit}");
             }
 
             return result;
@@ -184,7 +185,7 @@ namespace SEE.Controls
                 XRSEEActions.UndoToggle = false;
 
                 // Track the Undo action
-                TracingHelper.TrackKeyPress("Undo");
+                TracingHelperService.Instance?.TrackKeyPress("Undo");
 
                 return undo;
             }
@@ -199,7 +200,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Undo action
-                TracingHelper.TrackKeyPress("Undo");
+                TracingHelperService.Instance?.TrackKeyPress("Undo");
             }
 
             return result;
@@ -224,7 +225,7 @@ namespace SEE.Controls
                 XRSEEActions.RedoToggle = false;
 
                 // Track the Redo action
-                TracingHelper.TrackKeyPress("Redo");
+                TracingHelperService.Instance?.TrackKeyPress("Redo");
 
                 return redo;
             }
@@ -239,7 +240,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Redo action
-                TracingHelper.TrackKeyPress("Redo");
+                TracingHelperService.Instance?.TrackKeyPress("Redo");
             }
 
             return result;
@@ -264,7 +265,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling the configuration menu
-                TracingHelper.TrackKeyPress("ConfigMenu");
+                TracingHelperService.Instance?.TrackKeyPress("ConfigMenu");
             }
 
             return result;
@@ -281,7 +282,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling edges visibility
-                TracingHelper.TrackKeyPress("ToggleEdges");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleEdges");
             }
 
             return result;
@@ -298,7 +299,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling tree view visibility
-                TracingHelper.TrackKeyPress("ToggleTreeView");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleTreeView");
             }
 
             return result;
@@ -323,7 +324,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of saving the path position
-                TracingHelper.TrackKeyPress("SavePathPosition");
+                TracingHelperService.Instance?.TrackKeyPress("SavePathPosition");
             }
 
             return result;
@@ -340,7 +341,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling path playing
-                TracingHelper.TrackKeyPress("TogglePathPlaying");
+                TracingHelperService.Instance?.TrackKeyPress("TogglePathPlaying");
             }
 
             return result;
@@ -365,7 +366,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling metric charts
-                TracingHelper.TrackKeyPress("ToggleMetricCharts");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleMetricCharts");
             }
 
             return result;
@@ -382,7 +383,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the action of toggling metric hovering/selection
-                TracingHelper.TrackKeyPress("ToggleMetricHoveringSelection");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleMetricHoveringSelection");
             }
 
             return result;
@@ -433,7 +434,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Unselect action
-                TracingHelper.TrackKeyPress("Unselect");
+                TracingHelperService.Instance?.TrackKeyPress("Unselect");
             }
 
             return result;
@@ -450,7 +451,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleCameraLock action
-                TracingHelper.TrackKeyPress("ToggleCameraLock");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleCameraLock");
             }
 
             return result;
@@ -467,7 +468,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Cancel action
-                TracingHelper.TrackKeyPress("Cancel");
+                TracingHelperService.Instance?.TrackKeyPress("Cancel");
             }
 
             return result;
@@ -484,7 +485,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Reset action
-                TracingHelper.TrackKeyPress("Reset");
+                TracingHelperService.Instance?.TrackKeyPress("Reset");
             }
 
             return result;
@@ -501,7 +502,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ZoomInto action
-                TracingHelper.TrackKeyPress("ZoomInto");
+                TracingHelperService.Instance?.TrackKeyPress("ZoomInto");
             }
 
             return result;
@@ -519,7 +520,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Snap action
-                TracingHelper.TrackKeyPress("Snap");
+                TracingHelperService.Instance?.TrackKeyPress("Snap");
             }
 
             return result;
@@ -536,7 +537,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the DragHovered action
-                TracingHelper.TrackKeyPress("DragHovered");
+                TracingHelperService.Instance?.TrackKeyPress("DragHovered");
             }
 
             return result;
@@ -571,7 +572,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the BoostCameraSpeed action
-                TracingHelper.TrackKeyPress("BoostCameraSpeed");
+                TracingHelperService.Instance?.TrackKeyPress("BoostCameraSpeed");
             }
 
             return result;
@@ -668,7 +669,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Pointing action
-                TracingHelper.TrackKeyPress("Pointing");
+                TracingHelperService.Instance?.TrackKeyPress("Pointing");
             }
 
             return result;
@@ -693,7 +694,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the SetMarker action
-                TracingHelper.TrackKeyPress("SetMarker");
+                TracingHelperService.Instance?.TrackKeyPress("SetMarker");
             }
 
             return result;
@@ -710,7 +711,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the DeleteMarker action
-                TracingHelper.TrackKeyPress("DeleteMarker");
+                TracingHelperService.Instance?.TrackKeyPress("DeleteMarker");
             }
 
             return result;
@@ -727,7 +728,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleEvolutionCanvases action
-                TracingHelper.TrackKeyPress("ToggleEvolutionCanvases");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleEvolutionCanvases");
             }
 
             return result;
@@ -752,7 +753,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Previous action
-                TracingHelper.TrackKeyPress("Previous");
+                TracingHelperService.Instance?.TrackKeyPress("Previous");
             }
 
             return result;
@@ -769,7 +770,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the Next action
-                TracingHelper.TrackKeyPress("Next");
+                TracingHelperService.Instance?.TrackKeyPress("Next");
             }
 
             return result;
@@ -786,7 +787,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleAutoPlay action
-                TracingHelper.TrackKeyPress("ToggleAutoPlay");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleAutoPlay");
             }
 
             return result;
@@ -803,7 +804,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleExecutionOrder action
-                TracingHelper.TrackKeyPress("ToggleExecutionOrder");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleExecutionOrder");
             }
 
             return result;
@@ -820,7 +821,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the FirstStatement action
-                TracingHelper.TrackKeyPress("FirstStatement");
+                TracingHelperService.Instance?.TrackKeyPress("FirstStatement");
             }
 
             return result;
@@ -837,7 +838,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the IncreaseAnimationSpeed action
-                TracingHelper.TrackKeyPress("IncreaseAnimationSpeed");
+                TracingHelperService.Instance?.TrackKeyPress("IncreaseAnimationSpeed");
             }
 
             return result;
@@ -854,7 +855,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the DecreaseAnimationSpeed action
-                TracingHelper.TrackKeyPress("DecreaseAnimationSpeed");
+                TracingHelperService.Instance?.TrackKeyPress("DecreaseAnimationSpeed");
             }
 
             return result;
@@ -879,7 +880,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ExecuteToBreakpoint action
-                TracingHelper.TrackKeyPress("ExecuteToBreakpoint");
+                TracingHelperService.Instance?.TrackKeyPress("ExecuteToBreakpoint");
             }
 
             return result;
@@ -904,7 +905,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ShowWindowMenu action
-                TracingHelper.TrackKeyPress("ShowWindowMenu");
+                TracingHelperService.Instance?.TrackKeyPress("ShowWindowMenu");
             }
 
             return result;
@@ -1040,7 +1041,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the OpenTextChat action
-                TracingHelper.TrackKeyPress("OpenTextChat");
+                TracingHelperService.Instance?.TrackKeyPress("OpenTextChat");
             }
 
             return result;
@@ -1057,7 +1058,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleVoiceChat action
-                TracingHelper.TrackKeyPress("ToggleVoiceChat");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleVoiceChat");
             }
 
             return result;
@@ -1082,7 +1083,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the CloseAllNotifications action
-                TracingHelper.TrackKeyPress("CloseAllNotifications");
+                TracingHelperService.Instance?.TrackKeyPress("CloseAllNotifications");
             }
 
             return result;
@@ -1103,7 +1104,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleFaceCam action
-                TracingHelper.TrackKeyPress("ToggleFaceCam");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleFaceCam");
             }
 
             return result;
@@ -1120,7 +1121,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleFaceCamPosition action
-                TracingHelper.TrackKeyPress("ToggleFaceCamPosition");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleFaceCamPosition");
             }
 
             return result;
@@ -1144,7 +1145,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the PartUndo action
-                TracingHelper.TrackKeyPress("PartUndo");
+                TracingHelperService.Instance?.TrackKeyPress("PartUndo");
             }
 
             return result;
@@ -1161,7 +1162,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectUp action
-                TracingHelper.TrackKeyPress("MoveObjectUp");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectUp");
             }
 
             return result;
@@ -1178,7 +1179,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectDown action
-                TracingHelper.TrackKeyPress("MoveObjectDown");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectDown");
             }
 
             return result;
@@ -1195,7 +1196,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectLeft action
-                TracingHelper.TrackKeyPress("MoveObjectLeft");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectLeft");
             }
 
             return result;
@@ -1212,7 +1213,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectRight action
-                TracingHelper.TrackKeyPress("MoveObjectRight");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectRight");
             }
 
             return result;
@@ -1229,7 +1230,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectForward action
-                TracingHelper.TrackKeyPress("MoveObjectForward");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectForward");
             }
 
             return result;
@@ -1246,7 +1247,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the MoveObjectBackward action
-                TracingHelper.TrackKeyPress("MoveObjectBackward");
+                TracingHelperService.Instance?.TrackKeyPress("MoveObjectBackward");
             }
 
             return result;
@@ -1263,7 +1264,7 @@ namespace SEE.Controls
             if (result)
             {
                 // Track the ToggleDrawableManagerView action
-                TracingHelper.TrackKeyPress("ToggleDrawableManagerView");
+                TracingHelperService.Instance?.TrackKeyPress("ToggleDrawableManagerView");
             }
 
             return result;
