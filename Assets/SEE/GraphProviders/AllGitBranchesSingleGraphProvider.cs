@@ -19,6 +19,10 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
+    [Serializable]
+    public class GitAuthorMapping : Dictionary<GitFileAuthor, List<GitFileAuthor>> { }
+
+
     /// <summary>
     /// This provider analyses all branches of a given git repository specified in
     /// <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
@@ -58,6 +62,21 @@ namespace SEE.GraphProviders
         };
 
         /// <summary>
+        /// A dictionary mapping a commit author's identity (<see cref="GitFileAuthor"/>) to a list of aliases.
+        /// This is used to manually group commit authors with similar identities together.
+        /// The mapping enables aggregating commit data under a single normalized author identity.
+        /// </summary>
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+         Tooltip("Author alias mapping"),
+         RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
+        public GitAuthorMapping AuthorAliasMap = new()
+        {
+            { new GitFileAuthor("", ""), new List<GitFileAuthor>() }
+        };
+
+        /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
         /// and combine directories.
         /// </summary>
@@ -91,14 +110,6 @@ namespace SEE.GraphProviders
              "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
          EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int MarkerTime = 10;
-
-        /// <summary>
-        /// If this is true, the authors of the commits with similar identities will be combined.
-        /// So if two authors have the same name but different email addresses (and vice versa), they will be combined
-        /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined."),
-         RuntimeTab(GraphProviderFoldoutGroup)]
-        public bool CombineAuthors = false;
 
         #endregion
 
@@ -229,7 +240,7 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, CombineAuthors);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();

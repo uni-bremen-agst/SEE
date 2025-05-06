@@ -1,22 +1,39 @@
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using UnityEngine;
 
 namespace SEE.GraphProviders.VCS
 {
     /// <summary>
     /// Represents the author of a file in a git repository.
     /// </summary>
+    [Serializable]
     public class GitFileAuthor
     {
         /// <summary>
         /// A string representing the name of the author.
         /// </summary>
-        public string Name { get; set; }
+        //[ShowInInspector]
+        [SerializeField]
+        public string Name;
 
         /// <summary>
         /// A string representing the email address of the author.
         /// </summary>
-        public string Email { get; set; }
+        //[ShowInInspector]
+        [SerializeField]
+        public string Email;
+
+        /// <summary>
+        /// A collection of alternate authors associated with this Git author.
+        /// Most likely these associations are the result of people using a different email
+        /// address or different writing form of their name.
+        /// </summary>
+        [HideInInspector]
+        public ISet<GitFileAuthor> Aliases;
 
         /// <summary>
         /// Creates a new instance of the <see cref="GitFileAuthor"/> class from a git identifier.
@@ -35,6 +52,7 @@ namespace SEE.GraphProviders.VCS
 
             Name = match.Groups["name"].Value.Trim();
             Email = match.Groups["email"].Value.Trim();
+            Aliases = new HashSet<GitFileAuthor>();
         }
 
         /// <summary>
@@ -46,6 +64,7 @@ namespace SEE.GraphProviders.VCS
         {
             Name = name;
             Email = email;
+            Aliases = new HashSet<GitFileAuthor>();
         }
 
         public override string ToString()
