@@ -6,6 +6,7 @@ using SEE.Game.Table;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Layout.NodeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
@@ -121,36 +122,39 @@ namespace SEE.Game.City
             }
             else
             {
+                // Gather the previous architecture layout.
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
-                Vector3 rootScale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
-                Vector3 scaleFactor = new(
-                    1 / rootScale.x,
-                    rootScale.y,
-                    1 / rootScale.z);
+                // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
+                Vector3 pArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.localPosition;
+                Vector3 pArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
+                // Delete the previous city and draw the new one.
                 DeleteGraphGameObjects();
                 DrawGraph();
-                RestoreLayout(layoutGraphNodes, decorationValues, scaleFactor).Forget();
+                // Restores the previous architecture layout.
+                RestoreLayout(layoutGraphNodes, decorationValues, pArchPos, pArchLossyScale).Forget();
                 graphRenderer = null;
             }
             return;
 
             async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
-                                        Vector3 scaleFactor)
+                                        Vector3 pArchPos, Vector3 pArchLossyScale)
             {
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
+
+                // Checks if the city's layout was rotated.
+                Vector3 newArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.localPosition;
+                bool cityWasRotated = !Mathf.Approximately(pArchPos.x, newArchPos.x)
+                                        && !Mathf.Approximately(pArchPos.z, newArchPos.z);
+
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
                     if (node != null)
                     {
-                        Vector3 newLocalScale = new(nodeLayout.AbsoluteScale.x / scaleFactor.x,
-                            nodeLayout.AbsoluteScale.y,
-                            nodeLayout.AbsoluteScale.z / scaleFactor.z);
-
-                        node.NodeOperator().ScaleTo(newLocalScale, 0);
+                        node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale, cityWasRotated), 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
@@ -167,6 +171,36 @@ namespace SEE.Game.City
                         });
                     }
                 });
+            }
+
+            Vector3 DetermineScale(LayoutGraphNode nodeLayout, Vector3 prevLossyScale, bool cityWasRotated)
+            {
+                Vector3 currentLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+
+                if (!cityWasRotated)
+                {
+                    Vector3 scaleFactor = new(
+                        currentLossyScale.x / prevLossyScale.x,
+                        currentLossyScale.y / prevLossyScale.y,
+                        currentLossyScale.z / prevLossyScale.z);
+
+                    return new(
+                        nodeLayout.AbsoluteScale.x / scaleFactor.x,
+                        nodeLayout.AbsoluteScale.y,
+                        nodeLayout.AbsoluteScale.z / scaleFactor.z);
+                }
+                else
+                {
+                    Vector3 rotatedScaleFactor = new(
+                        currentLossyScale.z / prevLossyScale.x,
+                        currentLossyScale.y / prevLossyScale.y,
+                        currentLossyScale.x / prevLossyScale.z);
+
+                    return new(
+                        nodeLayout.AbsoluteScale.z / rotatedScaleFactor.z,
+                        nodeLayout.AbsoluteScale.y,
+                        nodeLayout.AbsoluteScale.x / rotatedScaleFactor.x);
+                }
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
@@ -348,7 +382,7 @@ namespace SEE.Game.City
             /// Attention: At this point, the root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
             /// If the <see cref="ReflexionGraph.ImplementationRoot"/> or <see cref="ReflexionGraph.ArchitectureRoot"/> is used,
             /// loading doesn't work because, the children are not added to <see cref="Graph.nodes"/>.
-            Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
+            Node root = ReflexionGraph.GetNode(projectFolder == null ? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.
             await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);
