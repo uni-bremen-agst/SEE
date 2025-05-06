@@ -1,21 +1,21 @@
-using System;
 using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.UI.RuntimeConfigMenu;
+using SEE.Game.CityRendering;
+using SEE.Game.Table;
 using SEE.GO;
+using SEE.GraphProviders;
+using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
-using Sirenix.OdinInspector;
-using UnityEngine;
-using SEE.Game.CityRendering;
-using MoreLinq;
-using SEE.GraphProviders;
-using SEE.Utils.Paths;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
-using SEE.Layout;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections.Generic;
 using TMPro;
-using SEE.Game.Table;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -126,16 +126,21 @@ namespace SEE.Game.City
                 Vector3 scale = ReflexionGraph.GetRoots()[0].GameObject().transform.localScale;
                 ScaleState xScale = ScaleDeterminer.DetermineInverseScale(scale.x);
                 ScaleState zScale = ScaleDeterminer.DetermineInverseScale(scale.z);
-                Debug.Log($"xScale: " + xScale + ", zScale: " + zScale);
+                Vector3 scaleFactor = new(
+                    1 / scale.x,
+                    scale.y,
+                    1 / scale.z);
+
                 DeleteGraphGameObjects();
                 DrawGraph();
-                RestoreLayout(layoutGraphNodes, decorationValues).Forget();
+                RestoreLayout(layoutGraphNodes, decorationValues, scaleFactor, xScale, zScale).Forget();
                 graphRenderer = null;
             }
             return;
 
             async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
-                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
+                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
+                                        Vector3 scaleFactor, ScaleState xScale, ScaleState zScale)
             {
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
                 layoutGraphNodes.ForEach(nodeLayout =>
@@ -143,7 +148,17 @@ namespace SEE.Game.City
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
                     if (node != null)
                     {
-                        node.NodeOperator().ScaleTo(nodeLayout.AbsoluteScale, 0);
+                        Vector3 newLocalScale = nodeLayout.AbsoluteScale;
+                        if (xScale != ScaleState.NotScaled)
+                        {
+                            newLocalScale.x /= scaleFactor.x;
+                        }
+                        if (zScale != ScaleState.NotScaled)
+                        {
+                            newLocalScale.z /= scaleFactor.z;
+                        }
+
+                        node.NodeOperator().ScaleTo(newLocalScale, 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
