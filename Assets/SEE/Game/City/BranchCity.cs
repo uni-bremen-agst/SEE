@@ -43,7 +43,6 @@ namespace SEE.Game.City
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
         /// </summary>
-        //[OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
          Tooltip("Author alias mapping"),
          ShowIf("CombineAuthors"),
@@ -51,7 +50,6 @@ namespace SEE.Game.City
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
         public GitAuthorMapping AuthorAliasMap = new();
-
 
     }
 }

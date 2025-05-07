@@ -49,7 +49,7 @@ namespace SEE.GraphProviders
         /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
          RuntimeTab(GraphProviderFoldoutGroup),
          HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
@@ -80,7 +80,7 @@ namespace SEE.GraphProviders
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-         EnableIf(nameof(AutoFetch)), Range(5, 200)]
+            EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int PollingInterval = 5;
 
         /// <summary>
@@ -150,8 +150,7 @@ namespace SEE.GraphProviders
         {
             if (city is not BranchCity branchCity)
             {
-                throw new ArgumentException(
-                    $"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
+                throw new ArgumentException($"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
 
             CheckAttributes(branchCity);

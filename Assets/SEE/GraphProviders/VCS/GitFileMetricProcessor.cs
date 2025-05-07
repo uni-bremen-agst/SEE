@@ -231,7 +231,6 @@ namespace SEE.GraphProviders.VCS
                     changedFileMetrics.Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                     changedFileMetrics.Authors.Add(authorKey);
 
-
                     changedFileMetrics.AuthorsChurn.GetOrAdd(authorKey, () => 0);
                     changedFileMetrics.AuthorsChurn[authorKey] += changedFile.LinesAdded + changedFile.LinesDeleted;
 
