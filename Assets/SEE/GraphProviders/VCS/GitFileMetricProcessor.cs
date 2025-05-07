@@ -58,6 +58,19 @@ namespace SEE.GraphProviders.VCS
         private const float TruckFactorCoreDevRatio = 0.8f;
 
         /// <summary>
+        /// Indicates whether authors with similar attributes (such as name variations)
+        /// should be combined during the processing of commit data.
+        /// </summary>
+        private readonly bool combineSimilarAuthors;
+
+        /// <summary>
+        /// Maps an author to their associated alias authors.
+        /// Used to group and identify authors that represent the same individual
+        /// but may have different names or email identifiers in the commit history.
+        /// </summary>
+        private readonly Dictionary<GitFileAuthor, List<GitFileAuthor>> authorAliasMap;
+
+        /// <summary>
         /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
         /// </summary>
         /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
@@ -86,9 +99,26 @@ namespace SEE.GraphProviders.VCS
             {
                 if (matcher.Match(file).HasMatches)
                 {
-                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<string>(), 0));
+                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<GitFileAuthor>(), 0));
                 }
             }
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
+        /// </summary>
+        /// <param name="gitRepository">The git repository to collect metrics from</param>
+        /// <param name="pathGlobbing">A dictionary containing path globbing patterns for including or excluding files</param>
+        /// <param name="repositoryFiles">A collection of repository files to be processed</param>
+        /// <param name="combineSimilarAuthors">Indicates whether to merge metrics for authors with similar identities using <paramref name="authorAliasMap"/></param>
+        /// <param name="authorAliasMap">A mapping of authors to their aliases</param>
+        public GitFileMetricProcessor(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
+            IEnumerable<string> repositoryFiles, bool combineSimilarAuthors,
+            Dictionary<GitFileAuthor, List<GitFileAuthor>> authorAliasMap) : this(gitRepository, pathGlobbing,
+            repositoryFiles)
+        {
+            this.combineSimilarAuthors = combineSimilarAuthors;
+            this.authorAliasMap = authorAliasMap;
         }
 
         /// <summary>
@@ -110,7 +140,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="developersChurn">The churn of each developer</param>
         /// <returns>The calculated truck factor</returns>
-        private static int CalculateTruckFactor(IDictionary<string, int> developersChurn)
+        private static int CalculateTruckFactor(IDictionary<GitFileAuthor, int> developersChurn)
         {
             if (developersChurn.Count == 0)
             {
@@ -119,11 +149,12 @@ namespace SEE.GraphProviders.VCS
 
             int totalChurn = developersChurn.Select(x => x.Value).Sum();
 
-            HashSet<string> coreDevs = new();
+            HashSet<GitFileAuthor> coreDevs = new();
 
             float cumulativeRatio = 0;
+
             // Sorting devs by their number of changed files
-            List<string> sortedDevs =
+            List<GitFileAuthor> sortedDevs =
                 developersChurn
                     .OrderByDescending(x => x.Value)
                     .Select(x => x.Key)
@@ -131,7 +162,7 @@ namespace SEE.GraphProviders.VCS
             // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
             while (cumulativeRatio <= TruckFactorCoreDevRatio)
             {
-                string dev = sortedDevs.First();
+                GitFileAuthor dev = sortedDevs[0];
                 float devRatio = (float)developersChurn[dev] / totalChurn;
                 cumulativeRatio += devRatio;
                 coreDevs.Add(dev);
@@ -139,6 +170,21 @@ namespace SEE.GraphProviders.VCS
             }
 
             return coreDevs.Count;
+        }
+
+        /// <summary>
+        /// Retrieves the alias of the specified author if it exists in the alias mapping;
+        /// otherwise, returns the original author.
+        ///
+        /// This will be the author added to the <see cref="GitFileMetrics"/>
+        /// </summary>
+        /// <param name="author">The author whose alias is being checked.</param>
+        /// <returns>A <see cref="GitFileAuthor"/> instance representing the alias of the author if found,
+        /// or the original author if no alias exists.</returns>
+        private GitFileAuthor GetAuthorAliasIfExist(GitFileAuthor author)
+        {
+            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
+            return GetAuthorAliasParentIfEnabled(author) ?? author;
         }
 
         /// <summary>
@@ -154,36 +200,59 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
+            GitFileAuthor commitAuthor = new(commit.Author.Name, commit.Author.Email);
+
             foreach (PatchEntryChanges changedFile in commitChanges)
             {
                 string filePath = changedFile.Path;
+
                 if (!matcher.Match(filePath).HasMatches)
                 {
                     continue;
                 }
 
+                GitFileAuthor authorKey = GetAuthorAliasIfExist(commitAuthor);
+
                 if (!FileToMetrics.ContainsKey(filePath))
                 {
+                    // If the file was not added to the metrics yet, add it
                     FileToMetrics.Add(filePath,
-                        new GitFileMetrics(1, new HashSet<string> { commit.Author.Email },
+                        new GitFileMetrics(1,
+                            new HashSet<GitFileAuthor> { authorKey },
                             changedFile.LinesAdded + changedFile.LinesDeleted));
 
-                    FileToMetrics[filePath].AuthorsChurn.Add(commit.Author.Email,
+                    FileToMetrics[filePath].AuthorsChurn.Add(authorKey,
                         changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
                 else
                 {
-                    FileToMetrics[filePath].NumberOfCommits += 1;
-                    FileToMetrics[filePath].Authors.Add(commit.Author.Email);
-                    FileToMetrics[filePath].Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
-                    FileToMetrics[filePath].AuthorsChurn.GetOrAdd(commit.Author.Email, () => 0);
-                    foreach (PatchEntryChanges otherFiles in commitChanges.Where(e => !e.Equals(changedFile)).ToList())
+                    GitFileMetrics changedFileMetrics = FileToMetrics[filePath];
+                    changedFileMetrics.NumberOfCommits += 1;
+                    changedFileMetrics.Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
+                    changedFileMetrics.Authors.Add(authorKey);
+
+                    changedFileMetrics.AuthorsChurn.GetOrAdd(authorKey, () => 0);
+                    changedFileMetrics.AuthorsChurn[authorKey] += changedFile.LinesAdded + changedFile.LinesDeleted;
+
+                    foreach (var otherFilePath in commitChanges
+                                 .Where(e => !e.Equals(changedFile))
+                                 .Select(x => x.Path))
                     {
-                        FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFiles.Path, () => 0);
-                        FileToMetrics[filePath].FilesChangesTogether[otherFiles.Path] += 1;
+                        changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
+                        changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
 
-                    FileToMetrics[filePath].AuthorsChurn[commit.Author.Email] +=
+
+                    foreach (string otherFilesPath in commitChanges
+                                 .Where(e => !e.Equals(changedFile))
+                                 .Select(x => x.Path))
+                    {
+                        // Processing the files which were changed together with the current file
+                        FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFilesPath, () => 0);
+                        FileToMetrics[filePath].FilesChangesTogether[otherFilesPath] += 1;
+                    }
+
+                    FileToMetrics[filePath].AuthorsChurn[authorKey] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
             }
@@ -215,6 +284,26 @@ namespace SEE.GraphProviders.VCS
                 Patch changedFilesPath = gitRepository.Diff.Compare<Patch>(null, commit.Tree);
                 ProcessCommit(commit, changedFilesPath);
             }
+        }
+
+        /// <summary>
+        /// Retrieves the parent author alias for a given author if author aliasing is enabled.
+        /// </summary>
+        /// <param name="author">The author for which to find the parent alias.</param>
+        /// <returns>
+        /// The parent alias of the provided author if author aliasing is enabled and a match is found;
+        /// otherwise, null if aliasing is disabled or no match exists.
+        /// </returns>
+        [CanBeNull]
+        private GitFileAuthor GetAuthorAliasParentIfEnabled(GitFileAuthor author)
+        {
+            if (!combineSimilarAuthors)
+            {
+                return null;
+            }
+
+            return authorAliasMap
+                .FirstOrDefault(alias => alias.Value.Any(x => x.Email == author.Email && x.Name == author.Name)).Key;
         }
     }
 }

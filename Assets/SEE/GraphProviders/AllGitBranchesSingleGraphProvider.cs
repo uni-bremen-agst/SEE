@@ -49,13 +49,13 @@ namespace SEE.GraphProviders
         /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-                         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
-            RuntimeTab(GraphProviderFoldoutGroup),
-                         HideReferenceObjectPicker]
+        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
-                         {
-                             { "**/*", true }
-                         };
+        {
+            { "**/*", true }
+        };
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
@@ -87,8 +87,9 @@ namespace SEE.GraphProviders
         /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
         /// will be marked. This field specifies for how long these markers should appear.
         /// </summary>
-        [Tooltip("The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        [Tooltip(
+             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
+         EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int MarkerTime = 10;
 
         #endregion
@@ -104,8 +105,8 @@ namespace SEE.GraphProviders
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+                    CultureInfo.InvariantCulture,
+                    DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
@@ -155,7 +156,7 @@ namespace SEE.GraphProviders
             CheckAttributes(branchCity);
 
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
-                                                       cancellationToken: token);
+                cancellationToken: token);
 
             // Only add the poller when in play mode.
             if (AutoFetch && Application.isPlaying)
@@ -186,6 +187,7 @@ namespace SEE.GraphProviders
             {
                 throw new Exception("The repository path is not set.");
             }
+
             if (!Directory.Exists(repositoryPath))
             {
                 throw new Exception("The repository path does not exist or is not a directory.");
@@ -218,7 +220,7 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
