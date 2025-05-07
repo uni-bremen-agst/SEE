@@ -1,4 +1,5 @@
-﻿using MoreLinq;
+﻿using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Drawable;
@@ -6,11 +7,13 @@ using SEE.Game.Table;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Net.Actions.Table;
+using SEE.UI.Menu;
 using SEE.UI.Menu.Table;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 
@@ -34,6 +37,7 @@ namespace SEE.Controls.Actions.Table
             Rotate,
             Scale,
             Delete,
+            Wait,
             Finish
         }
 
@@ -189,14 +193,8 @@ namespace SEE.Controls.Actions.Table
         public override void Stop()
         {
             base.Stop();
-            if (menu != null)
-            {
-                menu.Destroy();
-            }
-            if (scaleMenu != null)
-            {
-                scaleMenu.Destroy();
-            }
+            menu?.Destroy();
+            scaleMenu?.Destroy();
             if (modifiedTable != null)
             {
                 GameTableManager.DisableEditMode(modifiedTable);
@@ -235,7 +233,6 @@ namespace SEE.Controls.Actions.Table
             }
         }
 
-
         /// <summary>
         /// Executes the user's input to modifying the table.
         /// </summary>
@@ -265,7 +262,7 @@ namespace SEE.Controls.Actions.Table
                         ScaleTable();
                         break;
                     case ProgressState.Delete:
-                        DeleteTable();
+                        DeleteTableAsync().Forget();
                         break;
                     case ProgressState.Finish:
                         UpdateCityAndSaveMementoIfNeeded();
@@ -504,19 +501,32 @@ namespace SEE.Controls.Actions.Table
         /// <summary>
         /// Deletes the table.
         /// </summary>
-        private void DeleteTable()
+        private async UniTask DeleteTableAsync()
         {
-            if (!modifiedTable.GetComponentInChildren<SEECity>().gameObject.IsCodeCityDrawnAndActive())
+            currentProgressState = ProgressState.Wait;
+            if (!modifiedTable.GetComponentInChildren<SEECity>()
+                || !modifiedTable.GetComponentInChildren<SEECity>().gameObject.IsCodeCityDrawnAndActive())
+            {
+                Delete();
+            }
+            else
+            {
+                string deleteMessage = "Do you really want to delete this table?\nThe city cannot be rebuild using undo.";
+                if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
+                {
+                    Delete();
+                }
+                else
+                {
+                    currentProgressState = ProgressState.OperationSelection;
+                    menu = new();
+                }
+            }
+            void Delete()
             {
                 new DestroyTableNetAction(modifiedTable.name).Execute();
                 GameTableManager.Destroy(modifiedTable);
                 currentProgressState = ProgressState.Finish;
-            }
-            else
-            {
-                ShowNotification.Warn("Can't delete table", "Only empty tables can be deleted.");
-                currentProgressState = ProgressState.OperationSelection;
-                menu = new();
             }
         }
 
