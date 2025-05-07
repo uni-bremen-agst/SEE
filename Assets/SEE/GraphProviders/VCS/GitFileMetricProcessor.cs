@@ -104,6 +104,14 @@ namespace SEE.GraphProviders.VCS
             }
         }
 
+        /// <summary>
+        /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
+        /// </summary>
+        /// <param name="gitRepository">The git repository to collect metrics from</param>
+        /// <param name="pathGlobbing">A dictionary containing path globbing patterns for including or excluding files</param>
+        /// <param name="repositoryFiles">A collection of repository files to be processed</param>
+        /// <param name="combineSimilarAuthors">Indicates whether to merge metrics for authors with similar identities using <paramref name="authorAliasMap"/></param>
+        /// <param name="authorAliasMap">A mapping of authors to their aliases</param>
         public GitFileMetricProcessor(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
             IEnumerable<string> repositoryFiles, bool combineSimilarAuthors,
             Dictionary<GitFileAuthor, List<GitFileAuthor>> authorAliasMap) : this(gitRepository, pathGlobbing,
@@ -245,9 +253,7 @@ namespace SEE.GraphProviders.VCS
                         FileToMetrics[filePath].FilesChangesTogether[otherFilesPath] += 1;
                     }
 
-                    var changedFileLinesDeleted = FileToMetrics[filePath].AuthorsChurn.Keys.First(x =>
-                        MatchGitAuthors(x, commitAuthor));
-                    FileToMetrics[filePath].AuthorsChurn[changedFileLinesDeleted] +=
+                    FileToMetrics[filePath].AuthorsChurn[authorKey] +=
                         (changedFile.LinesAdded + changedFile.LinesDeleted);
                 }
             }
@@ -281,6 +287,15 @@ namespace SEE.GraphProviders.VCS
             }
         }
 
+        /// <summary>
+        /// Retrieves the parent author alias for a given author if author aliasing is enabled.
+        /// </summary>
+        /// <param name="author">The author for which to find the parent alias.</param>
+        /// <returns>
+        /// The parent alias of the provided author if author aliasing is enabled and a match is found;
+        /// otherwise, null if aliasing is disabled or no match exists.
+        /// </returns>
+        [CanBeNull]
         private GitFileAuthor GetAuthorAliasParentIfEnabled(GitFileAuthor author)
         {
             if (!combineSimilarAuthors)
@@ -290,24 +305,6 @@ namespace SEE.GraphProviders.VCS
 
             return authorAliasMap
                 .FirstOrDefault(alias => alias.Value.Any(x => x.Email == author.Email && x.Name == author.Name)).Key;
-        }
-
-        /// <summary>
-        /// Compares two Git file authors to determine if they match.
-        ///
-        /// If <see cref="combineSimilarAuthors"/> is true, the authors are considered a match if either their names or emails are the same.
-        /// Otherwise, both the name and email must be the same for the authors to match.
-        /// </summary>
-        /// <param name="author1">The first Git file author to compare.</param>
-        /// <param name="author2">The second Git file author to compare.</param>
-        /// <returns>
-        /// True if the authors match by name or email; otherwise, false.
-        /// </returns>
-        private bool MatchGitAuthors(GitFileAuthor author1, GitFileAuthor author2)
-        {
-            return combineSimilarAuthors
-                ? author1.Name == author2.Name || author1.Email == author2.Email
-                : author1.Name == author2.Name && author1.Email == author2.Email;
         }
     }
 }

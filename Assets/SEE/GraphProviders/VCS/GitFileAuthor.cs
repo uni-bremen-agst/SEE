@@ -55,10 +55,18 @@ namespace SEE.GraphProviders.VCS
             Email = email;
         }
 
+        /// <summary>
+        /// Empty constructor for serialization purposes.
+        /// </summary>
         GitFileAuthor()
         {
         }
 
+        /// <summary>
+        /// Returns a string representation of the <see cref="GitFileAuthor"/> instance,
+        /// combining the author's name and email in the format "Name&lt;Email&gt;".
+        /// </summary>
+        /// <returns>A string representation of the author's name and email.</returns>
         public override string ToString()
         {
             return $"{Name}<{Email}>";

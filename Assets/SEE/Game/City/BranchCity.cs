@@ -36,16 +36,7 @@ namespace SEE.Game.City
         [Tooltip("If true, the authors of the commits with similar identities will be combined."),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup)]
-        public bool CombineAuthors = false;
-
-        /// <summary>
-        /// If true, the authors with similar identities will be combined automatically.
-        /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined automaticly."),
-         TabGroup(VCSFoldoutGroup),
-         ShowIf("@this.CombineAuthors"),
-         RuntimeTab(VCSFoldoutGroup)]
-        public bool AutoMapAuthors = false;
+        public bool CombineAuthors;
 
         /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="GitFileAuthor"/>) to a list of aliases.
@@ -55,6 +46,7 @@ namespace SEE.Game.City
         //[OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
          Tooltip("Author alias mapping"),
+         ShowIf("CombineAuthors"),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
