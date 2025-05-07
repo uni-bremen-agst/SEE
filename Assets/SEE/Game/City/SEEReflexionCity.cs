@@ -126,7 +126,7 @@ namespace SEE.Game.City
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
-                Vector3 pArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.localPosition;
+                Vector3 pArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
                 Vector3 pArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
                 // Delete the previous city and draw the new one.
@@ -145,7 +145,7 @@ namespace SEE.Game.City
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
 
                 // Checks if the city's layout was rotated.
-                Vector3 newArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.localPosition;
+                Vector3 newArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
                 bool cityWasRotated = !Mathf.Approximately(pArchPos.x, newArchPos.x)
                                         && !Mathf.Approximately(pArchPos.z, newArchPos.z);
 
@@ -155,7 +155,8 @@ namespace SEE.Game.City
                     if (node != null)
                     {
                         node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale, cityWasRotated), 0);
-                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
+                        node.NodeOperator().MoveTo(DeterminePosition(nodeLayout, cityWasRotated), 0);
+                        //node.transform.localPosition = nodeLayout.LPosition;
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
                             if (decorationValues.ContainsKey(nodeLayout.ID))
@@ -203,6 +204,16 @@ namespace SEE.Game.City
                 }
             }
 
+            Vector3 DeterminePosition(LayoutGraphNode nodeLayout, bool cityWasRotated)
+            {
+                Vector3 pos = nodeLayout.CenterPosition;
+                if (cityWasRotated)
+                {
+                    pos = new(pos.x, pos.y, -pos.z);
+                }
+                return ReflexionGraph.ArchitectureRoot.GameObject().transform.TransformPoint(pos);
+            }
+
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
             {
                 IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
@@ -217,8 +228,8 @@ namespace SEE.Game.City
                     }
                     LayoutGraphNode layoutNode = new(node)
                     {
-                        CenterPosition = gameObject.transform.position,
-                        AbsoluteScale = gameObject.transform.localScale
+                        CenterPosition = gameObject.transform.localPosition,
+                        AbsoluteScale = gameObject.transform.localScale,
                     };
                     result.Add(layoutNode);
                     // Case for decorative texts that start with the prefix "Text".
