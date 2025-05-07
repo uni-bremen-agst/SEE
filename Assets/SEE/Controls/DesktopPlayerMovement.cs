@@ -8,19 +8,68 @@ namespace SEE.Controls
     /// </summary>
     public class DesktopPlayerMovement : PlayerMovement
     {
+        /// <summary>
+        /// The time in seconds it takes to reach the speed defined in <see cref="Speed"/>
+        /// after the player has initiated a movement.
+        /// </summary>
+        private const float timeToReachSpeed = 0.5f;
+
+        /// <summary>
+        /// The minimal speed factor when the player has just started to move. The initial
+        /// speed when the user initiated a movement will be
+        /// <see cref="Speed"/> * <see cref="minimalInitialSpeedFactor"/>.
+        /// </summary>
+        private const float minimalInitialSpeedFactor = 0.1f;
+
+        /// <summary>
+        /// The speed of the player movement. This is the distance in Unity units per second.
+        /// </summary>
+        /// <remarks>The actual speed depends on the point in time where the player
+        /// has initiated the movement. We will start slower and then gradually increase
+        /// the speed until <see cref="Speed"/> has been reached. This phase takes
+        /// <see cref="timeToReachSpeed"/> seconds.</remarks>
         [Tooltip("Speed of movements")]
         public float Speed = 2f;
+
+        /// <summary>
+        /// The time (in seconds) past since the player has initiated a movement.
+        /// </summary>
+        private float movingTime = 0f;
+
+        /// <summary>
+        /// The factor by which the speed is multiplied when the shift key is pressed.
+        /// </summary>
         [Tooltip("Boost factor of speed, applied when shift is pressed.")]
         public float BoostFactor = 2f;
 
+        /// <summary>
+        /// The state of the camera.
+        /// </summary>
         private struct CameraState
         {
-            internal float Distance;
+            /// <summary>
+            /// Rotation in Euler degrees around the y-axis (yaw).
+            /// </summary>
             internal float Yaw;
+            /// <summary>
+            /// Rotation in Euler degrees around the x-axis (pitch).
+            /// </summary>
             internal float Pitch;
+            /// <summary>
+            /// If true, the player moves freely in the world; otherwise, the player is
+            /// rotating around the <see cref="FocusedObject"/> (the code city the player is conntected to).
+            /// </summary>
             internal bool FreeMode;
+            /// <summary>
+            ///  The distance to the <see cref="FocusedObject"/> (the code city the player
+            ///  is conntected to). This attribute is considered only if <see cref="FreeMode"/> is false.
+            /// </summary>
+            internal float DistanceToFocusedObject;
         }
 
+        /// <summary>
+        /// The current state of the camera.
+        /// </summary>
         private CameraState cameraState;
 
         /// <summary>
@@ -29,9 +78,15 @@ namespace SEE.Controls
         /// </summary>
         private CharacterController controller;
 
+        /// <summary>
+        /// The code city which the player is focusing on if not in free mode.
+        /// </summary>
         [Tooltip("The code city which the player is focusing on.")]
         public GO.Plane FocusedObject;
 
+        /// <summary>
+        /// Sets up the <see cref="CharacterController"/> and the <see cref="cameraState"/>.
+        /// </summary>
         private void Start()
         {
             controller = gameObject.MustGetComponent<CharacterController>();
@@ -48,11 +103,11 @@ namespace SEE.Controls
 
             if (FocusedObject != null)
             {
-                cameraState.Distance = 2.0f;
+                cameraState.DistanceToFocusedObject = 2.0f;
                 cameraState.Yaw = 0.0f;
                 cameraState.Pitch = 45.0f;
                 transform.position = FocusedObject.CenterTop;
-                transform.position -= transform.forward * cameraState.Distance;
+                transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
                 transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
             }
             else
@@ -66,6 +121,9 @@ namespace SEE.Controls
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
+        /// <summary>
+        /// Reacts to the user input.
+        /// </summary>
         private void Update()
         {
             if (FocusedObject != null && SEEInput.ToggleCameraLock())
@@ -74,7 +132,7 @@ namespace SEE.Controls
                 if (!cameraState.FreeMode)
                 {
                     Vector3 positionToFocusedObject = FocusedObject.CenterTop - transform.position;
-                    cameraState.Distance = positionToFocusedObject.magnitude;
+                    cameraState.DistanceToFocusedObject = positionToFocusedObject.magnitude;
                     transform.forward = positionToFocusedObject;
                     Vector3 pitchYawRoll = transform.rotation.eulerAngles;
                     cameraState.Pitch = pitchYawRoll.x;
@@ -82,60 +140,75 @@ namespace SEE.Controls
                 }
             }
 
-            float speed = Speed * Time.deltaTime;
-            if (SEEInput.BoostCameraSpeed())
-            {
-                speed *= BoostFactor;
-            }
-
             if (!cameraState.FreeMode)
             {
-                float d = 0.0f;
+                float distance = GetDistance();
+                float step = 0.0f;
                 if (SEEInput.MoveForward())
                 {
-                    d += speed;
+                    step += distance;
                 }
                 if (SEEInput.MoveBackward())
                 {
-                    d -= speed;
+                    step -= distance;
                 }
-                cameraState.Distance -= d;
+                if (step == 0)
+                {
+                    // No movement has been initiated, so we reset the moving time.
+                    movingTime = 0f;
+                }
+                else
+                {
+                    movingTime += Time.deltaTime;
+                }
+                cameraState.DistanceToFocusedObject -= step;
 
                 HandleRotation();
                 transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
-                transform.position -= transform.forward * cameraState.Distance;
+                transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
             }
             else // cameraState.freeMode == true
             {
-                Vector3 velocity = Vector3.zero;
+                // The directed distance the player should be moved in this frame.
+                Vector3 step = Vector3.zero;
+                // Determine the direction of the movement.
                 if (SEEInput.MoveForward())
                 {
-                    velocity += transform.forward;
+                    step += transform.forward;
                 }
                 if (SEEInput.MoveBackward())
                 {
-                    velocity -= transform.forward;
+                    step -= transform.forward;
                 }
                 if (SEEInput.MoveRight())
                 {
-                    velocity += transform.right;
+                    step += transform.right;
                 }
                 if (SEEInput.MoveLeft())
                 {
-                    velocity -= transform.right;
+                    step -= transform.right;
                 }
                 if (SEEInput.MoveUp())
                 {
-                    velocity += Vector3.up;
+                    step += Vector3.up;
                 }
                 if (SEEInput.MoveDown())
                 {
-                    velocity += Vector3.down;
+                    step += Vector3.down;
                 }
-                velocity.Normalize();
-                velocity *= speed;
+                step.Normalize();
+                if (step == Vector3.zero)
+                {
+                    // No movement has been initiated, so we reset the moving time.
+                    movingTime = 0f;
+                }
+                else
+                {
+                    movingTime += Time.deltaTime;
+                }
+                step *= GetDistance();
                 // The following two lines may look strange, yet both are actually needed.
-                controller.Move(velocity); // this is the actual movement
+                controller.Move(step); // this is the actual movement
                 controller.Move(Vector3.zero); // this prevents the player from sliding without input
 
                 HandleRotation();
@@ -143,6 +216,20 @@ namespace SEE.Controls
                 transform.rotation = Quaternion.Euler(0.0f, cameraState.Yaw, 0.0f);
                 // Cameras Pitch and Yaw
                 Camera.main.transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
+            }
+
+            // The distance the player should be moved in this frame (in any direction) taking
+            // into account the movingTime and potentially the boost factor.
+            float GetDistance()
+            {
+                // Movement should be started at minimalInitialSpeedFactor * Speed and then
+                // linearly increased to Speed.
+                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed, Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
+                if (SEEInput.BoostCameraSpeed())
+                {
+                    distance *= BoostFactor;
+                }
+                return distance;
             }
         }
 
