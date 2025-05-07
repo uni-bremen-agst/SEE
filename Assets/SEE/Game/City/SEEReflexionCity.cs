@@ -156,7 +156,6 @@ namespace SEE.Game.City
                     {
                         node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale, cityWasRotated), 0);
                         node.NodeOperator().MoveTo(DeterminePosition(nodeLayout, cityWasRotated), 0);
-                        //node.transform.localPosition = nodeLayout.LPosition;
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
                             if (decorationValues.ContainsKey(nodeLayout.ID))
@@ -241,7 +240,8 @@ namespace SEE.Game.City
                     // Case for label texts that start with the prefix "Label".
                     else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
                     {
-                        textValues.Add(node.ID, (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                        textValues.Add(node.ID,
+                            (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
                     }
                 }
                 LayoutNodes.SetLevels(result);
