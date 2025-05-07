@@ -11,7 +11,7 @@ namespace SEE.GameObjects
     public class AuthorSphere : MonoBehaviour
     {
         /// <summary>
-        /// The E-Mail/Name of the author.
+        /// The identity of the author.
         /// </summary>
         public GitFileAuthor Author;
 

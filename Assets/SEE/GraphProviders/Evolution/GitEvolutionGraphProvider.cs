@@ -190,7 +190,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files, CombineAuthors);
+            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {

@@ -19,10 +19,6 @@ using UnityEngine;
 
 namespace SEE.GraphProviders
 {
-    [Serializable]
-    public class GitAuthorMapping : Dictionary<GitFileAuthor, List<GitFileAuthor>> { }
-
-
     /// <summary>
     /// This provider analyses all branches of a given git repository specified in
     /// <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
@@ -59,21 +55,6 @@ namespace SEE.GraphProviders
         public Dictionary<string, bool> PathGlobbing = new()
         {
             { "**/*", true }
-        };
-
-        /// <summary>
-        /// A dictionary mapping a commit author's identity (<see cref="GitFileAuthor"/>) to a list of aliases.
-        /// This is used to manually group commit authors with similar identities together.
-        /// The mapping enables aggregating commit data under a single normalized author identity.
-        /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Author alias mapping"),
-         RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
-        public GitAuthorMapping AuthorAliasMap = new()
-        {
-            { new GitFileAuthor("", ""), new List<GitFileAuthor>() }
         };
 
         /// <summary>
@@ -240,7 +221,7 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, AuthorAliasMap);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();

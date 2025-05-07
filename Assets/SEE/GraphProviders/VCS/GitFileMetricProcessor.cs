@@ -165,6 +165,21 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
+        /// Retrieves the alias of the specified author if it exists in the alias mapping;
+        /// otherwise, returns the original author.
+        ///
+        /// This will be the author added to the <see cref="GitFileMetrics"/>
+        /// </summary>
+        /// <param name="author">The author whose alias is being checked.</param>
+        /// <returns>A <see cref="GitFileAuthor"/> instance representing the alias of the author if found,
+        /// or the original author if no alias exists.</returns>
+        private GitFileAuthor GetAuthorAliasIfExist(GitFileAuthor author)
+        {
+            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
+            return GetAuthorAliasParentIfEnabled(author) ?? author;
+        }
+
+        /// <summary>
         /// Processes a commit and calculates the metrics.
         /// </summary>
         /// <param name="commit">The commit that should be processed</param>
@@ -188,9 +203,7 @@ namespace SEE.GraphProviders.VCS
                     continue;
                 }
 
-                GitFileAuthor parent = GetAuthorAliasParentIfEnabled(commitAuthor);
-                // If the author is not in the alias map or combining of author aliases is disabled, use the original author
-                GitFileAuthor authorKey = parent ?? commitAuthor;
+                GitFileAuthor authorKey = GetAuthorAliasIfExist(commitAuthor);
 
                 if (!FileToMetrics.ContainsKey(filePath))
                 {
@@ -209,10 +222,7 @@ namespace SEE.GraphProviders.VCS
                     changedFileMetrics.NumberOfCommits += 1;
                     changedFileMetrics.Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                     changedFileMetrics.Authors.Add(authorKey);
-                    if (parent != null)
-                    {
-                        parent.Aliases.Add(commitAuthor);
-                    }
+
 
                     changedFileMetrics.AuthorsChurn.GetOrAdd(authorKey, () => 0);
                     changedFileMetrics.AuthorsChurn[authorKey] += changedFile.LinesAdded + changedFile.LinesDeleted;
@@ -279,7 +289,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             return authorAliasMap
-                .FirstOrDefault(alias => alias.Value.Contains(author)).Key;
+                .FirstOrDefault(alias => alias.Value.Any(x => x.Email == author.Email && x.Name == author.Name)).Key;
         }
 
         /// <summary>
