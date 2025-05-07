@@ -226,6 +226,11 @@ namespace SEE.Controls.Actions.Table
                         new RotateTableNetAction(modifiedTable.name, memento.Old.EulerAngles).Execute();
                         UpdateCity();
                         break;
+                    case ProgressState.Scale:
+                        GameTableManager.Scale(modifiedTable, memento.Old.Scale);
+                        new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
+                        UpdateCity();
+                        break;
                 }
             }
         }
