@@ -1,7 +1,0 @@
-.git
-.gitignore
-*.md
-.idea
-
-filestorage
-/server/target

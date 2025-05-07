@@ -35,7 +35,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Signature of one developer.
         /// </summary>
-        private readonly Signature testSig =
+        private readonly Signature developerA =
             new(
                 "John Doe",
                 "doe@example.com",
@@ -45,7 +45,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Signature of another developer.
         /// </summary>
-        private readonly Signature testSig2 =
+        private readonly Signature developerB =
             new(
                 "Jan Muller",
                 "muller@example.com",
@@ -71,7 +71,7 @@ namespace SEE.GraphProviders
             File.AppendAllText(Path.Combine(gitDirPath, path), text);
             repo.Index.Add(path);
             repo.Index.Write();
-            testSig.When.AddHours(1);
+            developerA.When.AddHours(1);
             repo.Commit("One Commit", author, author);
         }
 
@@ -85,8 +85,10 @@ namespace SEE.GraphProviders
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             city.VCSPath = new DataPath(gitDirPath);
-            AllGitBranchesSingleGraphProvider provider = new();
-            provider.PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } };
+            AllGitBranchesSingleGraphProvider provider = new()
+            {
+                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+            };
             city.Date = date;
 
             static void ReportProgress(float x)
@@ -109,15 +111,14 @@ namespace SEE.GraphProviders
         /// <returns>The generated Graph</returns>
         private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = "01/01/2024")
         {
-            GameObject go = new();
-            SEECityEvolution city = go.AddComponent<SEECityEvolution>();
-
-            GitEvolutionGraphProvider provider = new();
-            provider.Date = date;
-            provider.GitRepository = new GitRepository()
+            GitEvolutionGraphProvider provider = new()
             {
-                RepositoryPath = new DataPath(gitDirPath),
-                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                Date = date,
+                GitRepository = new GitRepository()
+                {
+                    RepositoryPath = new DataPath(gitDirPath),
+                    PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                }
             };
 
             static void ReportProgress(float x)
@@ -127,7 +128,7 @@ namespace SEE.GraphProviders
 
             List<Graph> g = await provider.ProvideAsync(
                 new List<Graph>(),
-                city,
+                null, // This is not used in the evolution provider.
                 changePercentage: ReportProgress
             );
             return g;
@@ -138,9 +139,9 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerB);
 
                 IList<Graph> series = await ProvidingGraphSeriesAsync();
                 Assert.AreEqual(3, series.Count);
@@ -175,13 +176,13 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerB);
                 WriteFile(
                     Path.Combine("dir1", "dir2", "actualFile.cs"),
                     "This is a test",
-                    testSig2
+                    developerB
                 );
 
                 Graph g = await ProvidingGraphAsync();
@@ -204,7 +205,7 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync(date: "01/12/2024");
                 // This file should be too old by now
@@ -223,8 +224,8 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is a test from Jan", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is a test from Jan", developerB);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
@@ -241,9 +242,9 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
                 repo.CreateBranch("newBranch");
-                WriteFile("firstFile.cs", "This is a test on newBranch", testSig);
+                WriteFile("firstFile.cs", "This is a test on newBranch", developerA);
                 Branch branch = repo.Branches["main"] ?? repo.Branches["master"];
                 if (branch == null)
                 {
@@ -268,9 +269,9 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is another test", testSig);
-                WriteFile("otherfile.notcs", "This is another test in another file", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is another test", developerA);
+                WriteFile("otherfile.notcs", "This is another test in another file", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
@@ -289,8 +290,8 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is another test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is another test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
@@ -307,7 +308,7 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 Assert.IsNull(g.GetNode("file/does/not/exists"));
@@ -319,7 +320,7 @@ namespace SEE.GraphProviders
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs

@@ -102,7 +102,7 @@ namespace SEE.Controls.Actions
                 case ProgressState.Finish:
                     result = true;
                     CurrentState = IReversibleAction.Progress.Completed;
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, addedGameNode);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, addedGameNode, true);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled case {nameof(progress)}.");

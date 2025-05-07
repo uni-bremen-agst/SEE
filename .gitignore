@@ -156,3 +156,7 @@ Packages/Microsoft.VisualStudio.Threading.Analyzers.17.6.40/tools/uninstall.ps1
 /Assets/StreamingAssets/Multiplayer.meta
 Assets/StreamingAssets/KeyBindings.json
 Assets/StreamingAssets/KeyBindings.json.meta
+
+# Personal configurations
+Assets/StreamingAssets/audio.cfg
+Assets/StreamingAssets/audio.cfg.meta
