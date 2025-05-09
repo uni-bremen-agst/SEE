@@ -1,11 +1,16 @@
 ﻿using HighlightPlus;
+using MoreLinq;
+using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 namespace SEE.Game.Table
 {
@@ -100,18 +105,167 @@ namespace SEE.Game.Table
         public static void Scale(GameObject table, Vector3 scale)
         {
             GameObject city = GameFinder.FindChildWithTag(table, Tags.CodeCity);
-            if (city.IsCodeCityDrawn())
+
+            if (!city.IsCodeCityDrawn())
             {
-                Transform root = city.transform.Cast<Transform>().First(child => child.gameObject.IsNode());
-                root.parent = null;
                 table.transform.localScale = scale;
-                root.parent = city.transform;
+                return;
             }
-            else
+
+            Transform root = city.transform.Cast<Transform>().First(child => child.gameObject.IsNode());
+            Node rootNode = root.gameObject.GetNode();
+            bool isReflexion = city.GetComponent<SEEReflexionCity>() != null;
+
+            DetachChildren(rootNode, isReflexion);
+            table.transform.localScale = scale;
+            Portal.SetPortal(city);
+            ReattachChildren(rootNode, root, isReflexion);
+
+            void DetachChildren(Node rootNode, bool isReflexion)
             {
-                table.transform.localScale = scale;
+                if (isReflexion)
+                {
+                    rootNode.Children().ForEach(subroot =>
+                        subroot.Children().ForEach(n => n.GameObject().transform.parent = null));
+                }
+                else
+                {
+                    rootNode.Children().ForEach(n => n.GameObject().transform.parent = null);
+                }
+            }
+
+            void ReattachChildren(Node rootNode, Transform rootTransform, bool isReflexion)
+            {
+                if (isReflexion)
+                {
+                    rootNode.Children().ForEach(subroot =>
+                        subroot.Children().ForEach(n => n.GameObject().transform.parent = subroot.GameObject().transform));
+                }
+                else
+                {
+                    rootNode.Children().ForEach(n => n.GameObject().transform.parent = root);
+                }
             }
         }
+
+        /// <summary>
+        /// Checks whether the table can be scaled down.
+        /// A table cannot be scaled down if any node would be cut off.
+        /// </summary>
+        /// <param name="table">The table to be scaled.</param>
+        /// <param name="scale">The new scale of the table.</param>
+        /// <returns>True if the table can be scaled down; otherwise, false.</returns>
+        public static bool CanScaleDown(GameObject table, Vector3 scale)
+        {
+            SEEReflexionCity city = table.GetComponentInChildren<SEEReflexionCity>();
+            if (city == null || !city.gameObject.IsCodeCityDrawnAndActive())
+            {
+                return true;
+            }
+            Node archRoot = city.ReflexionGraph.GetNode(city.ReflexionGraph.ArchitectureRoot.ID);
+            Transform archTrans = archRoot.GameObject().transform;
+            Vector3 oTableScale = table.transform.localScale;
+
+            archRoot.Children().ForEach(child => child.GameObject().transform.SetParent(null, true));
+            table.transform.localScale = scale;
+
+            Bounds newBounds = GetCombinedBounds(archRoot.GameObject());
+            foreach (Node n in archRoot.Children())
+            {
+                Transform trans = n.GameObject().transform;
+                Renderer r = trans.GetComponent<Renderer>();
+                if (r != null && !AreCornersInsideXZ(r.bounds, newBounds))
+                {
+                    table.transform.localScale = oTableScale;
+                    foreach (Node no in archRoot.Children())
+                    {
+                        no.GameObject().transform.SetParent(archTrans);
+                    }
+                    return false;
+                }
+            }
+
+            foreach (Node n in archRoot.Children())
+            {
+                n.GameObject().transform.SetParent(archTrans, true);
+            }
+
+            return true;
+            Bounds GetCombinedBounds(GameObject obj)
+            {
+                Renderer[] renderers = obj.GetComponents<Renderer>();
+                if (renderers.Length == 0)
+                {
+                    return new Bounds(obj.transform.position, Vector3.zero);
+                }
+
+                Bounds combined = renderers[0].bounds;
+                for (int i = 1; i < renderers.Length; i++)
+                {
+                    combined.Encapsulate(renderers[i].bounds);
+                }
+
+                return combined;
+            }
+            bool AreCornersInsideXZ(Bounds childBounds, Bounds parentBounds)
+            {
+                Vector3[] corners = new Vector3[4];
+
+                Vector3 min = childBounds.min;
+                Vector3 max = childBounds.max;
+
+                corners[0] = new Vector3(min.x, min.y, min.z);
+                corners[1] = new Vector3(min.x, min.y, max.z);
+                corners[2] = new Vector3(max.x, min.y, min.z);
+                corners[3] = new Vector3(max.x, min.y, max.z);
+
+                foreach (Vector3 corner in corners)
+                {
+                    if (!IsInsideXZ(corner, parentBounds))
+                        return false;
+                }
+
+                return true;
+            }
+            bool IsInsideXZ(Vector3 point, Bounds bounds)
+            {
+                return point.x >= bounds.min.x && point.x <= bounds.max.x &&
+                       point.z >= bounds.min.z && point.z <= bounds.max.z;
+            }
+        }
+
+        //Bounds archBoundsBefore = CalculateWorldBounds(archTrans);
+        //archTrans.localScale = scale;
+        //Bounds archBoundsAfter = CalculateWorldBounds(archTrans);
+        //archTrans.localScale = oScale;
+
+        //foreach (Node n in archRoot.Children())
+        //{
+        //    Debug.Log("Wird das hier durchlaufen?");
+        //    //n.GameObject().transform.parent = archTrans;
+        //    Bounds nBounds = n.GameObject().GetComponent<Renderer>().bounds;
+        //    if (!archBoundsAfter.Contains(nBounds.min) || !archBoundsAfter.Contains(nBounds.max))
+        //    {
+        //        return false;
+        //    }
+        //}
+
+        //return true;
+        //Bounds CalculateWorldBounds(Transform root)
+        //{
+        //    Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
+        //    if (renderers.Length == 0)
+        //        return new Bounds(root.position, Vector3.zero);
+
+        //    Bounds bounds = renderers[0].bounds;
+        //    for (int i = 1; i < renderers.Length; i++)
+        //    {
+        //        bounds.Encapsulate(renderers[i].bounds);
+        //    }
+
+        //    return bounds;
+        //}
+        //}
 
         /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
@@ -217,7 +371,8 @@ namespace SEE.Game.Table
         {
             if (GameFinder.FindChildWithTag(table, Tags.CodeCity) is GameObject city)
             {
-                if (city.IsCodeCityDrawnAndActive()) {
+                if (city.IsCodeCityDrawnAndActive())
+                {
                     GameFinder.FindChildWithTag(city, Tags.Node).SetActive(false);
                 }
                 else

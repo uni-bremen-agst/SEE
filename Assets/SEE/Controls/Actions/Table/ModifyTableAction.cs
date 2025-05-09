@@ -210,7 +210,8 @@ namespace SEE.Controls.Actions.Table
                 });
             }
             if (currentProgressState != ProgressState.Finish
-                && executedOperation != ProgressState.None)
+                && executedOperation != ProgressState.None
+                && modifiedTable != null)
             {
                 switch(executedOperation)
                 {

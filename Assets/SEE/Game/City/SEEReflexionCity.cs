@@ -210,7 +210,7 @@ namespace SEE.Game.City
                 {
                     pos = new(pos.x, pos.y, -pos.z);
                 }
-                return ReflexionGraph.ArchitectureRoot.GameObject().transform.TransformPoint(pos);
+                return pos;//ReflexionGraph.ArchitectureRoot.GameObject().transform.TransformPoint(pos);
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
@@ -227,7 +227,7 @@ namespace SEE.Game.City
                     }
                     LayoutGraphNode layoutNode = new(node)
                     {
-                        CenterPosition = gameObject.transform.localPosition,
+                        CenterPosition = gameObject.transform.position,
                         AbsoluteScale = gameObject.transform.localScale,
                     };
                     result.Add(layoutNode);

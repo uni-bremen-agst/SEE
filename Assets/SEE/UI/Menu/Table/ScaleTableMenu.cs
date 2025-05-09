@@ -51,31 +51,44 @@ namespace SEE.UI.Menu.Table
         /// <param name="table">The table to scale.</param>
         private void InitScale(GameObject table)
         {
-            InputFieldWithButtons xScale = GameFinder.FindChild(menuInstance, "XScale").GetComponent<InputFieldWithButtons>();
-            InputFieldWithButtons zScale = GameFinder.FindChild(menuInstance, "ZScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons xScaleArea = GameFinder.FindChild(menuInstance, "XScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons zScaleArea = GameFinder.FindChild(menuInstance, "ZScale").GetComponent<InputFieldWithButtons>();
             float step = 0.001f;
+            float max = 0.05f;
 
-            xScale.SetMinValue(step);
-            xScale.SetMaxValue(0.05f);
-            xScale.SetUpAndDownValue(step);
-            xScale.AssignValue(table.transform.localScale.x);
-            xScale.OnValueChanged.AddListener(xScale =>
+            xScaleArea.SetMinValue(step);
+            xScaleArea.SetMaxValue(max);
+            xScaleArea.SetUpAndDownValue(step);
+            xScaleArea.AssignValue(table.transform.localScale.x);
+            xScaleArea.OnValueChanged.AddListener(xScale =>
             {
-                Vector3 newScale = new(xScale, table.transform.localScale.y, zScale.GetValue());
-                GameTableManager.Scale(table, newScale);
-                new ScaleTableNetAction(table.name, newScale).Execute();
+                Vector3 newScale = new(xScale, table.transform.localScale.y, zScaleArea.GetValue());
+                TryScale(newScale, true, table.transform.localScale.x > xScale);
             });
 
-            zScale.SetMinValue(step);
-            zScale.SetMaxValue(0.05f);
-            zScale.SetUpAndDownValue(step);
-            zScale.AssignValue(table.transform.localScale.z);
-            zScale.OnValueChanged.AddListener(zScale =>
+            zScaleArea.SetMinValue(step);
+            zScaleArea.SetMaxValue(max);
+            zScaleArea.SetUpAndDownValue(step);
+            zScaleArea.AssignValue(table.transform.localScale.z);
+            zScaleArea.OnValueChanged.AddListener(zScale =>
             {
-                Vector3 newScale = new(xScale.GetValue(), table.transform.localScale.y, zScale);
-                GameTableManager.Scale(table, newScale);
-                new ScaleTableNetAction(table.name, newScale).Execute();
+                Vector3 newScale = new(xScaleArea.GetValue(), table.transform.localScale.y, zScale);
+                TryScale(newScale, false, table.transform.localScale.z > zScale);
             });
+
+            void TryScale(Vector3 newScale, bool scalesX, bool scaleDown)
+            {
+                if (!scaleDown || GameTableManager.CanScaleDown(table, newScale))
+                {
+                    GameTableManager.Scale(table, newScale);
+                    new ScaleTableNetAction(table.name, newScale).Execute();
+                }
+                else
+                {
+                    Vector3 originalScale = table.transform.localScale;
+                    (scalesX ? xScaleArea : zScaleArea).AssignValue(scalesX ? originalScale.x : originalScale.z);
+                }
+            }
         }
 
         /// <summary>
