@@ -152,10 +152,10 @@ namespace SEE.Game.City
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    if (node != null)
+                    if (node != null && !node.IsArchitectureOrImplementationRoot())
                     {
                         node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale, cityWasRotated), 0);
-                        node.NodeOperator().MoveTo(DeterminePosition(nodeLayout, cityWasRotated), 0);
+                        node.NodeOperator().MoveTo(DeterminePosition(nodeLayout, pArchPos, newArchPos, pArchLossyScale, cityWasRotated), 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
                             if (decorationValues.ContainsKey(nodeLayout.ID))
@@ -203,14 +203,20 @@ namespace SEE.Game.City
                 }
             }
 
-            Vector3 DeterminePosition(LayoutGraphNode nodeLayout, bool cityWasRotated)
+            Vector3 DeterminePosition(LayoutGraphNode nodeLayout, Vector3 prevParentPos, Vector3 newParentPos, Vector3 prevParentScale, bool cityWasRotated)
             {
                 Vector3 pos = nodeLayout.CenterPosition;
-                if (cityWasRotated)
-                {
-                    pos = new(pos.x, pos.y, -pos.z);
-                }
-                return pos;//ReflexionGraph.ArchitectureRoot.GameObject().transform.TransformPoint(pos);
+
+                //if (cityWasRotated)
+                //{
+                //    Vector3 newParentScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+                //    float scaleFactorX = newParentScale.z / prevParentScale.x;
+                //    float scaleFactorZ = newParentScale.x / prevParentScale.z;
+                //    Vector3 localOffset = pos - prevParentPos;
+                //    Vector3 rotatedOffset = new(localOffset.z * scaleFactorX, localOffset.y, localOffset.x * scaleFactorZ);
+                //    pos = newParentPos + rotatedOffset;
+                //}
+                return pos;
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
@@ -220,8 +226,8 @@ namespace SEE.Game.City
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip root or non architecture nodes. Their restoration is handled by the layout itself.
-                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot() || !node.IsInArchitecture())
+                    // skip non architecture nodes. Their restoration is handled by the layout itself.
+                    if (!node.IsInArchitecture())
                     {
                         continue;
                     }
