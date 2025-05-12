@@ -234,39 +234,6 @@ namespace SEE.Game.Table
             }
         }
 
-        //Bounds archBoundsBefore = CalculateWorldBounds(archTrans);
-        //archTrans.localScale = scale;
-        //Bounds archBoundsAfter = CalculateWorldBounds(archTrans);
-        //archTrans.localScale = oScale;
-
-        //foreach (Node n in archRoot.Children())
-        //{
-        //    Debug.Log("Wird das hier durchlaufen?");
-        //    //n.GameObject().transform.parent = archTrans;
-        //    Bounds nBounds = n.GameObject().GetComponent<Renderer>().bounds;
-        //    if (!archBoundsAfter.Contains(nBounds.min) || !archBoundsAfter.Contains(nBounds.max))
-        //    {
-        //        return false;
-        //    }
-        //}
-
-        //return true;
-        //Bounds CalculateWorldBounds(Transform root)
-        //{
-        //    Renderer[] renderers = root.GetComponentsInChildren<Renderer>();
-        //    if (renderers.Length == 0)
-        //        return new Bounds(root.position, Vector3.zero);
-
-        //    Bounds bounds = renderers[0].bounds;
-        //    for (int i = 1; i < renderers.Length; i++)
-        //    {
-        //        bounds.Encapsulate(renderers[i].bounds);
-        //    }
-
-        //    return bounds;
-        //}
-        //}
-
         /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
         /// at the specified <paramref name="position"/>,
