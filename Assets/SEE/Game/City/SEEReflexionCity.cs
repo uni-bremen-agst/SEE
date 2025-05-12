@@ -145,6 +145,7 @@ namespace SEE.Game.City
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
 
                 // Checks if the city's layout was rotated.
+                GameObject arch = ReflexionGraph.ArchitectureRoot.GameObject();
                 Vector3 newArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
                 bool cityWasRotated = !Mathf.Approximately(pArchPos.x, newArchPos.x)
                                         && !Mathf.Approximately(pArchPos.z, newArchPos.z);
@@ -206,12 +207,21 @@ namespace SEE.Game.City
             Vector3 DeterminePosition(LayoutGraphNode nodeLayout, Vector3 prevParentPos, Vector3 newParentPos, Vector3 prevParentScale, bool cityWasRotated)
             {
                 Vector3 pos = nodeLayout.CenterPosition;
+                Vector3 newParentScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
                 if (cityWasRotated)
                 {
-                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    pos = node.transform.position;
-                    //pos = new(pos.z - prevParentPos.x, pos.y, pos.x - prevParentPos.z);
+                    Vector3 relative = pos - prevParentPos;
+                    relative.x /= prevParentScale.x;
+                    relative.y /= prevParentScale.y;
+                    relative.z /= prevParentScale.z;
+                    Vector3 newOffset = new(relative.x * newParentScale.z, relative.y, relative.z * newParentScale.x);
+                    pos = newParentPos + newOffset;
                 }
+                //if (cityWasRotated)
+                //{
+                //    //GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
+                //    //pos = node.transform.position;
+                //}
                 return pos;
             }
 
