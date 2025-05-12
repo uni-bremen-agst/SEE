@@ -36,13 +36,13 @@
       "hash": "fe31ad0904abee296b5ea72c6073157accba59e8"
     },
     "com.openai.unity": {
-      "version": "8.6.3",
+      "version": "8.6.6",
       "depth": 0,
       "source": "registry",
       "dependencies": {
-        "com.utilities.rest": "3.3.2",
+        "com.utilities.rest": "3.3.3",
         "com.utilities.websockets": "1.0.3",
-        "com.utilities.encoder.wav": "2.2.1"
+        "com.utilities.encoder.wav": "2.2.2"
       },
       "url": "https://package.openupm.com"
     },
@@ -410,23 +410,23 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.audio": {
-      "version": "2.2.1",
+      "version": "2.2.3",
       "depth": 2,
       "source": "registry",
       "dependencies": {
         "com.unity.modules.androidjni": "1.0.0",
         "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.unitywebrequestaudio": "1.0.0",
-        "com.utilities.async": "2.2.1"
+        "com.utilities.async": "2.2.2"
       },
       "url": "https://package.openupm.com"
     },
     "com.utilities.encoder.wav": {
-      "version": "2.2.1",
+      "version": "2.2.2",
       "depth": 1,
       "source": "registry",
       "dependencies": {
-        "com.utilities.audio": "2.2.1"
+        "com.utilities.audio": "2.2.3"
       },
       "url": "https://package.openupm.com"
     },
@@ -441,7 +441,7 @@
       "url": "https://package.openupm.com"
     },
     "com.utilities.rest": {
-      "version": "3.3.2",
+      "version": "3.3.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
