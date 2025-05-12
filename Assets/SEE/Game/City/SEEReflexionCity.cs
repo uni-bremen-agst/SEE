@@ -206,16 +206,12 @@ namespace SEE.Game.City
             Vector3 DeterminePosition(LayoutGraphNode nodeLayout, Vector3 prevParentPos, Vector3 newParentPos, Vector3 prevParentScale, bool cityWasRotated)
             {
                 Vector3 pos = nodeLayout.CenterPosition;
-
-                //if (cityWasRotated)
-                //{
-                //    Vector3 newParentScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
-                //    float scaleFactorX = newParentScale.z / prevParentScale.x;
-                //    float scaleFactorZ = newParentScale.x / prevParentScale.z;
-                //    Vector3 localOffset = pos - prevParentPos;
-                //    Vector3 rotatedOffset = new(localOffset.z * scaleFactorX, localOffset.y, localOffset.x * scaleFactorZ);
-                //    pos = newParentPos + rotatedOffset;
-                //}
+                if (cityWasRotated)
+                {
+                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
+                    pos = node.transform.position;
+                    //pos = new(pos.z - prevParentPos.x, pos.y, pos.x - prevParentPos.z);
+                }
                 return pos;
             }
 
