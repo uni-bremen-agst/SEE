@@ -320,7 +320,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "2.4.0",
+      "version": "2.5.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
