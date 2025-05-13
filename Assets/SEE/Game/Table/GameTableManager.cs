@@ -287,6 +287,8 @@ namespace SEE.Game.Table
             effect.enabled = true;
             effect.highlighted = true;
             effect.outlineColor = Color.yellow;
+            effect.outlineWidth = 0.3f;
+            effect.effectGroup = TargetOptions.OnlyThisObject;
         }
 
         /// <summary>
