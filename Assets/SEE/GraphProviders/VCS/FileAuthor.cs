@@ -10,7 +10,7 @@ namespace SEE.GraphProviders.VCS
     /// <remarks>The author is the person who originally wrote the work, whereas the
     /// committer is the person who last applied (committed) the work.</remarks>
     [Serializable]
-    public class GitFileAuthor
+    public class FileAuthor
     {
         /// <summary>
         /// A string representing the name of the author.
@@ -25,18 +25,18 @@ namespace SEE.GraphProviders.VCS
         public string Email;
 
         /// <summary>
-        /// Creates a new instance of the <see cref="GitFileAuthor"/> class from a git identifier.
+        /// Creates a new instance of the <see cref="FileAuthor"/> class from a VCS identifier.
         ///
         /// The <paramref name="identifier"/> must be in the format "Name &lt;email&gt;".
         /// </summary>
         /// <param name="identifier">The git identifier to create the instance from</param>
-        /// <exception cref="ArgumentException">When <paramref name="identifier"/> don't match the required format</exception>
-        public GitFileAuthor(string identifier)
+        /// <exception cref="ArgumentException">When <paramref name="identifier"/> doesn't match the required format</exception>
+        public FileAuthor(string identifier)
         {
             Match match = Regex.Match(identifier, @"^(?<name>.+?)<(?<email>.+?)>$");
             if (!match.Success)
             {
-                throw new ArgumentException("identifier is not a valid git author string ", nameof(identifier));
+                throw new ArgumentException("Odentifier is not a valid VCS author string ", nameof(identifier));
             }
 
             Name = match.Groups["name"].Value.Trim();
@@ -44,11 +44,11 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="GitFileAuthor"/> class.
+        /// Initializes a new instance of the <see cref="FileAuthor"/> class.
         /// </summary>
         /// <param name="name">The name of the author.</param>
         /// <param name="email">The email address of the author.</param>
-        public GitFileAuthor(string name, string email)
+        public FileAuthor(string name, string email)
         {
             Name = name;
             Email = email;
@@ -57,13 +57,13 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// Empty constructor for serialization purposes.
         /// </summary>
-        GitFileAuthor()
+        FileAuthor()
         {
             // Intentionally left blank.
         }
 
         /// <summary>
-        /// Returns a string representation of the <see cref="GitFileAuthor"/> instance,
+        /// Returns a string representation of the <see cref="FileAuthor"/> instance,
         /// combining the author's name and email in the format "Name&lt;Email&gt;".
         /// </summary>
         /// <returns>A string representation of the author's name and email.</returns>

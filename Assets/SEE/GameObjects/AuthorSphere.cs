@@ -13,7 +13,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// The identity of the author.
         /// </summary>
-        public GitFileAuthor Author;
+        public FileAuthor Author;
 
         /// <summary>
         /// The list of all edges the author sphere has and their associated churn.

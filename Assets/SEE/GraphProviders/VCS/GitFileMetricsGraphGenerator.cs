@@ -57,7 +57,7 @@ namespace SEE.GraphProviders.VCS
                     n.SetString(DataModel.DG.VCS.AuthorAttributeName, String.Join(',', file.Value.Authors));
                 }
 
-                foreach (KeyValuePair<GitFileAuthor, int> authorChurn in file.Value.AuthorsChurn)
+                foreach (KeyValuePair<FileAuthor, int> authorChurn in file.Value.AuthorsChurn)
                 {
                     n.SetInt(DataModel.DG.VCS.Churn + ":" + authorChurn.Key, authorChurn.Value);
                 }

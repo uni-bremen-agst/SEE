@@ -36,7 +36,7 @@ namespace SEE.Game.City
         public bool CombineAuthors;
 
         /// <summary>
-        /// A dictionary mapping a commit author's identity (<see cref="GitFileAuthor"/>) to a list of aliases.
+        /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
         /// </summary>
