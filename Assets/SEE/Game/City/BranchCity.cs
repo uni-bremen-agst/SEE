@@ -44,12 +44,11 @@ namespace SEE.Game.City
         /// The mapping enables aggregating commit data under a single normalized author identity.
         /// </summary>
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Author alias mapping"),
+         Tooltip("Author alias mapping."),
          ShowIf("CombineAuthors"),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
         public GitAuthorMapping AuthorAliasMap = new();
-
     }
 }

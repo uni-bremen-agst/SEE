@@ -105,8 +105,8 @@ namespace SEE.GraphProviders
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                    CultureInfo.InvariantCulture,
-                    DateTimeStyles.None, out _))
+                CultureInfo.InvariantCulture,
+                DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
@@ -156,7 +156,7 @@ namespace SEE.GraphProviders
             CheckAttributes(branchCity);
 
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
-                cancellationToken: token);
+                                                       cancellationToken: token);
 
             // Only add the poller when in play mode.
             if (AutoFetch && Application.isPlaying)

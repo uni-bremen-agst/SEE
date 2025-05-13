@@ -46,14 +46,6 @@ namespace SEE.GraphProviders.Evolution
         public bool SimplifyGraph;
 
         /// <summary>
-        /// If this is true, the authors of the commits with similar identities will be combined.
-        /// So if two authors have the same name but different email addresses (and vice versa), they will be combined
-        /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined."),
-         RuntimeTab(GraphProviderFoldoutGroup)]
-        public bool CombineAuthors = false;
-
-        /// <summary>
         /// Provides the evolution graph of the git repository.
         ///
         /// This provider will run the calculations on the thread pool.

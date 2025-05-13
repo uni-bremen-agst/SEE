@@ -159,10 +159,11 @@ namespace SEE.GraphProviders.VCS
                     .OrderByDescending(x => x.Value)
                     .Select(x => x.Key)
                     .ToList();
+
             // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
             while (cumulativeRatio <= TruckFactorCoreDevRatio)
             {
-                GitFileAuthor dev = sortedDevs[0];
+                GitFileAuthor dev = sortedDevs.First();
                 float devRatio = (float)developersChurn[dev] / totalChurn;
                 cumulativeRatio += devRatio;
                 coreDevs.Add(dev);
@@ -174,7 +175,7 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Retrieves the alias of the specified author if it exists in the alias mapping;
-        /// otherwise, returns the original author.
+        /// otherwise returns the original author.
         ///
         /// This will be the author added to the <see cref="GitFileMetrics"/>
         /// </summary>
@@ -184,7 +185,7 @@ namespace SEE.GraphProviders.VCS
         private GitFileAuthor GetAuthorAliasIfExist(GitFileAuthor author)
         {
             // If the author is not in the alias map or combining of author aliases is disabled, use the original author
-            return GetAuthorAliasParentIfEnabled(author) ?? author;
+            return ResolveAuthorAliasIfEnabled(author) ?? author;
         }
 
         /// <summary>
@@ -230,26 +231,16 @@ namespace SEE.GraphProviders.VCS
                     changedFileMetrics.NumberOfCommits += 1;
                     changedFileMetrics.Churn += changedFile.LinesAdded + changedFile.LinesDeleted;
                     changedFileMetrics.Authors.Add(authorKey);
-
                     changedFileMetrics.AuthorsChurn.GetOrAdd(authorKey, () => 0);
                     changedFileMetrics.AuthorsChurn[authorKey] += changedFile.LinesAdded + changedFile.LinesDeleted;
 
-                    foreach (var otherFilePath in commitChanges
-                                 .Where(e => !e.Equals(changedFile))
-                                 .Select(x => x.Path))
-                    {
-                        changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
-                        changedFileMetrics.FilesChangesTogether[otherFilePath]++;
-                    }
-
-
-                    foreach (string otherFilesPath in commitChanges
+                    foreach (string otherFilePath in commitChanges
                                  .Where(e => !e.Equals(changedFile))
                                  .Select(x => x.Path))
                     {
                         // Processing the files which were changed together with the current file
-                        FileToMetrics[filePath].FilesChangesTogether.GetOrAdd(otherFilesPath, () => 0);
-                        FileToMetrics[filePath].FilesChangesTogether[otherFilesPath] += 1;
+                        changedFileMetrics.FilesChangesTogether.GetOrAdd(otherFilePath, () => 0);
+                        changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
 
                     FileToMetrics[filePath].AuthorsChurn[authorKey] +=
@@ -287,15 +278,15 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Retrieves the parent author alias for a given author if author aliasing is enabled.
+        /// Tries to resolve the given alias <paramref name="author"/> to its main identity in the mapping.
         /// </summary>
-        /// <param name="author">The author for which to find the parent alias.</param>
+        /// <param name="author">The author for which to find the main alias identity.</param>
         /// <returns>
-        /// The parent alias of the provided author if author aliasing is enabled and a match is found;
+        /// The main identity of the provided author if author aliasing is enabled and a match is found;
         /// otherwise, null if aliasing is disabled or no match exists.
         /// </returns>
         [CanBeNull]
-        private GitFileAuthor GetAuthorAliasParentIfEnabled(GitFileAuthor author)
+        private GitFileAuthor ResolveAuthorAliasIfEnabled(GitFileAuthor author)
         {
             if (!combineSimilarAuthors)
             {
