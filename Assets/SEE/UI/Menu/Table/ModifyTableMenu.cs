@@ -27,7 +27,6 @@ namespace SEE.UI.Menu.Table
 		{
 			None,
 			Move,
-			Rotate,
 			Scale,
 			Delete,
 			Cancel
@@ -57,13 +56,6 @@ namespace SEE.UI.Menu.Table
 			{
 				ConfirmOperation(ModifyOperation.Move);
 			});
-
-            ButtonManagerBasic rotate = GameFinder.FindChild(menuInstance, "Rotate")
-				.GetComponent<ButtonManagerBasic>();
-            rotate.clickEvent.AddListener(() =>
-            {
-				ConfirmOperation(ModifyOperation.Rotate);
-            });
 
             ButtonManagerBasic scale = GameFinder.FindChild(menuInstance, "Scale")
 				.GetComponent<ButtonManagerBasic>();

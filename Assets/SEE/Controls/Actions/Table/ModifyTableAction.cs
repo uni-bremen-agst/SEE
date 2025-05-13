@@ -13,7 +13,6 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 
@@ -34,7 +33,6 @@ namespace SEE.Controls.Actions.Table
             TableSelection,
             OperationSelection,
             Move,
-            Rotate,
             Scale,
             Delete,
             Wait,
@@ -220,11 +218,6 @@ namespace SEE.Controls.Actions.Table
                         new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         UpdateCity();
                         break;
-                    case ProgressState.Rotate:
-                        GameTableManager.Rotate(modifiedTable, memento.Old.EulerAngles);
-                        new RotateTableNetAction(modifiedTable.name, memento.Old.EulerAngles).Execute();
-                        UpdateCity();
-                        break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
                         new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
@@ -254,10 +247,6 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Move:
                         DisableCity();
                         MoveTable();
-                        break;
-                    case ProgressState.Rotate:
-                        DisableCity();
-                        RotateTable();
                         break;
                     case ProgressState.Scale:
                         ScaleTable();
@@ -393,8 +382,6 @@ namespace SEE.Controls.Actions.Table
                     return ProgressState.Move;
                 case ModifyOperation.Delete:
                     return ProgressState.Delete;
-                case ModifyOperation.Rotate:
-                    return ProgressState.Rotate;
                 case ModifyOperation.Scale:
                     return ProgressState.Scale;
                 default:
@@ -443,19 +430,6 @@ namespace SEE.Controls.Actions.Table
                 new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
                 CheckCollisionWithLeftMouseButton();
             }
-        }
-
-        /// <summary>
-        /// Rotates the table and checks for collisions.
-        /// </summary>
-        private void RotateTable()
-        {
-            if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
-            {
-                GameTableManager.Rotate(modifiedTable, SEEInput.ScrollDown());
-                new RotateTableNetAction(modifiedTable.name, modifiedTable.transform.eulerAngles).Execute();
-            }
-            CheckCollisionWithLeftMouseButton();
         }
 
         /// <summary>
@@ -547,11 +521,6 @@ namespace SEE.Controls.Actions.Table
                         new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         UpdateCity();
                         break;
-                    case ProgressState.Rotate:
-                        GameTableManager.Rotate(modifiedTable, memento.Old.EulerAngles);
-                        new RotateTableNetAction(modifiedTable.name, memento.Old.EulerAngles).Execute();
-                        UpdateCity();
-                        break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
                         new ScaleTableNetAction(modifiedTable.name, memento.Old.Scale).Execute();
@@ -579,11 +548,6 @@ namespace SEE.Controls.Actions.Table
                     case ProgressState.Move:
                         GameTableManager.Move(modifiedTable, memento.New.Position);
                         new MoveTableNetAction(modifiedTable.name, memento.New.Position).Execute();
-                        UpdateCity();
-                        break;
-                    case ProgressState.Rotate:
-                        GameTableManager.Rotate(modifiedTable, memento.New.EulerAngles);
-                        new RotateTableNetAction(modifiedTable.name, memento.New.EulerAngles).Execute();
                         UpdateCity();
                         break;
                     case ProgressState.Scale:
