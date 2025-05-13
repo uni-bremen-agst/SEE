@@ -15,6 +15,7 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -104,14 +105,14 @@ namespace SEE.GraphProviders
         /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes(BranchCity branchCity)
         {
-            if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+            if (branchCity.Date.IsNullOrWhitespace()
+                || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
+                                           DateTimeStyles.None, out _))
             {
                 throw new ArgumentException("Date is not set or cant be parsed");
             }
 
-            if (branchCity.VCSPath.Path == "" || !Directory.Exists(branchCity.VCSPath.Path))
+            if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
             {
                 throw new ArgumentException("Repository path is not set or does not exists");
             }
