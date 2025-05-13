@@ -211,12 +211,11 @@ namespace SEE.Controls.Actions.Table
                 && executedOperation != ProgressState.None
                 && modifiedTable != null)
             {
-                switch(executedOperation)
+                switch (executedOperation)
                 {
                     case ProgressState.Move:
-                        GameTableManager.Move(modifiedTable, memento.Old.Position);
-                        new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
-                        UpdateCity();
+                        GameTableManager.MoveIncPortal(modifiedTable, memento.Old.Position);
+                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
@@ -245,7 +244,6 @@ namespace SEE.Controls.Actions.Table
                         Unselect();
                         break;
                     case ProgressState.Move:
-                        DisableCity();
                         MoveTable();
                         break;
                     case ProgressState.Scale:
@@ -311,6 +309,14 @@ namespace SEE.Controls.Actions.Table
                 memento = new(modifiedTable);
                 executedOperation = DetermineProgressState(modifyOperation);
                 currentProgressState = DetermineProgressState(modifyOperation);
+
+                if (executedOperation == ProgressState.Move
+                    && modifiedTable.GetComponentInChildren<AbstractSEECity>() is { } city
+                    && city.gameObject.IsCodeCityDrawn())
+                {
+                    Portal.SetInfinitePortal(modifiedTable.GetComponentInChildren<AbstractSEECity>().gameObject);
+                    new SetInfinitePortalTableNetAction(modifiedTable.name).Execute();
+                }
             }
         }
 
@@ -331,15 +337,15 @@ namespace SEE.Controls.Actions.Table
             }
         }
 
-        /// <summary>
-        /// Calls <see cref="GameTableManager.DisableCity(GameObject)"/>
-        /// and the corresponding network action.
-        /// </summary>
-        private void DisableCity()
-        {
-            GameTableManager.DisableCity(modifiedTable);
-            new DisableCityTableNetAction(modifiedTable.name).Execute();
-        }
+        ///// <summary>
+        ///// Calls <see cref="GameTableManager.DisableCity(GameObject)"/>
+        ///// and the corresponding network action.
+        ///// </summary>
+        //private void DisableCity()
+        //{
+        //    GameTableManager.DisableCity(modifiedTable);
+        //    new DisableCityTableNetAction(modifiedTable.name).Execute();
+        //}
 
         /// <summary>
         /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/>
@@ -353,14 +359,24 @@ namespace SEE.Controls.Actions.Table
 
         /// <summary>
         /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/> if necessary
-        /// and the corresponding network action.
-        /// Also it saves the new memento data to repeat this action.
+        /// and performs the corresponding network action.
+        /// Also saves the new memento data to repeat this action.
+        /// If a move was executed and the city is drawn, the portal will be adjusted accordingly.
         /// </summary>
         private void UpdateCityAndSaveMementoIfNeeded()
         {
             if (executedOperation != ProgressState.Delete)
             {
-                UpdateCity();
+                if (executedOperation == ProgressState.Move
+                    && modifiedTable.GetComponentInChildren<AbstractSEECity>() is { } city
+                    && city.gameObject.IsCodeCityDrawn())
+                {
+                    Portal.SetPortal(modifiedTable.GetComponentInChildren<AbstractSEECity>().gameObject);
+                    new MoveIncPortalTableNetAction(modifiedTable.name, modifiedTable.transform.position).Execute();
+                } else
+                {
+                    UpdateCity();
+                }
                 memento.SetNewData(modifiedTable, executedOperation);
             }
             else
@@ -517,9 +533,8 @@ namespace SEE.Controls.Actions.Table
                 switch (memento.Operation)
                 {
                     case ProgressState.Move:
-                        GameTableManager.Move(modifiedTable, memento.Old.Position);
-                        new MoveTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
-                        UpdateCity();
+                        GameTableManager.MoveIncPortal(modifiedTable, memento.Old.Position);
+                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
@@ -546,9 +561,8 @@ namespace SEE.Controls.Actions.Table
                 switch (memento.Operation)
                 {
                     case ProgressState.Move:
-                        GameTableManager.Move(modifiedTable, memento.New.Position);
-                        new MoveTableNetAction(modifiedTable.name, memento.New.Position).Execute();
-                        UpdateCity();
+                        GameTableManager.MoveIncPortal(modifiedTable, memento.New.Position);
+                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.New.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.New.Scale);

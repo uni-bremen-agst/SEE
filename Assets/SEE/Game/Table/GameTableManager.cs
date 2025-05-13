@@ -73,6 +73,27 @@ namespace SEE.Game.Table
         public static void Move(GameObject table, Vector3 position)
         {
             table.transform.position = new Vector3(position.x, standardTableHeight, position.z);
+            //if (table.GetComponentInChildren<AbstractSEECity>() is { } city
+            //    && city.gameObject.IsCodeCityDrawn())
+            //{
+            //    Portal.SetPortal(city.gameObject);
+            //}
+        }
+
+        /// <summary>
+        /// Moves the specified <paramref name="table"/> to the specified <paramref name="position"/>,
+        /// including the associated portal, if the city is drawn.
+        /// </summary>
+        /// <param name="table">The table to move.</param>
+        /// <param name="position">The position where the table should be placed.</param>
+        public static void MoveIncPortal(GameObject table, Vector3 position)
+        {
+            table.transform.position = new Vector3(position.x, standardTableHeight, position.z);
+            if (table.GetComponentInChildren<AbstractSEECity>() is { } city
+                && city.gameObject.IsCodeCityDrawn())
+            {
+                Portal.SetPortal(city.gameObject);
+            }
         }
 
         /// <summary>
