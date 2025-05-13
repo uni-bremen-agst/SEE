@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
@@ -164,8 +165,7 @@ namespace SEE.GraphProviders.VCS
             while (cumulativeRatio <= TruckFactorCoreDevRatio)
             {
                 GitFileAuthor dev = sortedDevs.First();
-                float devRatio = (float)developersChurn[dev] / totalChurn;
-                cumulativeRatio += devRatio;
+                cumulativeRatio += (float)((float)developersChurn[dev] / totalChurn);
                 coreDevs.Add(dev);
                 sortedDevs.Remove(dev);
             }
@@ -182,7 +182,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="author">The author whose alias is being checked.</param>
         /// <returns>A <see cref="GitFileAuthor"/> instance representing the alias of the author if found,
         /// or the original author if no alias exists.</returns>
-        private GitFileAuthor GetAuthorAliasIfExist(GitFileAuthor author)
+        private GitFileAuthor GetAuthorAliasIfExists(GitFileAuthor author)
         {
             // If the author is not in the alias map or combining of author aliases is disabled, use the original author
             return ResolveAuthorAliasIfEnabled(author) ?? author;
@@ -212,7 +212,7 @@ namespace SEE.GraphProviders.VCS
                     continue;
                 }
 
-                GitFileAuthor authorKey = GetAuthorAliasIfExist(commitAuthor);
+                GitFileAuthor authorKey = GetAuthorAliasIfExists(commitAuthor);
 
                 if (!FileToMetrics.ContainsKey(filePath))
                 {
@@ -294,7 +294,8 @@ namespace SEE.GraphProviders.VCS
             }
 
             return authorAliasMap
-                .FirstOrDefault(alias => alias.Value.Any(x => x.Email == author.Email && x.Name == author.Name)).Key;
+                .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
+                                                         && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
         }
     }
 }
