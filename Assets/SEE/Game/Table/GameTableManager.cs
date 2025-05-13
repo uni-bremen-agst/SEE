@@ -6,11 +6,8 @@ using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SocialPlatforms;
 
 namespace SEE.Game.Table
 {
@@ -73,11 +70,6 @@ namespace SEE.Game.Table
         public static void Move(GameObject table, Vector3 position)
         {
             table.transform.position = new Vector3(position.x, standardTableHeight, position.z);
-            //if (table.GetComponentInChildren<AbstractSEECity>() is { } city
-            //    && city.gameObject.IsCodeCityDrawn())
-            //{
-            //    Portal.SetPortal(city.gameObject);
-            //}
         }
 
         /// <summary>
@@ -354,21 +346,14 @@ namespace SEE.Game.Table
         }
 
         /// <summary>
-        /// Disables the active, drawn city or its associated <see cref="CitySelectionManager"/>.
+        /// Disables the active associated <see cref="CitySelectionManager"/>.
         /// </summary>
-		/// <param name="table">The table whose city should be disabled.</param>
-        public static void DisableCity(GameObject table)
+		/// <param name="table">The table whose <see cref="CitySelectionManager"/> should be disabled.</param>
+        public static void DisableCSM(GameObject table)
         {
             if (GameFinder.FindChildWithTag(table, Tags.CodeCity) is GameObject city)
             {
-                if (city.IsCodeCityDrawnAndActive())
-                {
-                    GameFinder.FindChildWithTag(city, Tags.Node).SetActive(false);
-                }
-                else
-                {
-                    city.GetComponent<CitySelectionManager>().enabled = false;
-                }
+                city.GetComponent<CitySelectionManager>().enabled = false;
             }
         }
 

@@ -13,6 +13,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using ModifyOperation = SEE.UI.Menu.Table.ModifyTableMenu.ModifyOperation;
 
@@ -309,14 +310,46 @@ namespace SEE.Controls.Actions.Table
                 memento = new(modifiedTable);
                 executedOperation = DetermineProgressState(modifyOperation);
                 currentProgressState = DetermineProgressState(modifyOperation);
+                PrepareSelectedOperation();
+            }
+        }
 
-                if (executedOperation == ProgressState.Move
-                    && modifiedTable.GetComponentInChildren<AbstractSEECity>() is { } city
-                    && city.gameObject.IsCodeCityDrawn())
+        /// <summary>
+        /// Prepares the selected operation by performing necessary setup steps.
+        /// It applicable, it reset a zoom and activates an infinity portal for movement.
+        /// </summary>
+        private void PrepareSelectedOperation()
+        {
+            if (modifiedTable.GetComponentInChildren<AbstractSEECity>() is { } city
+                && city.gameObject.IsCodeCityDrawn())
+            {
+                if (LocalPlayer.TryGetZoomActionDesktop(out ZoomActionDesktop zoomActionDesktop))
                 {
-                    Portal.SetInfinitePortal(modifiedTable.GetComponentInChildren<AbstractSEECity>().gameObject);
+                    Transform rootTransform = city.gameObject.transform.Cast<Transform>()
+                        .First(child => child.gameObject.IsNode());
+                    if (zoomActionDesktop.TriggerReset(rootTransform))
+                    {
+                        currentProgressState = ProgressState.Wait;
+                        ShowNotification.Info("Zoom reset",
+                            "The currently chosen zoom will be reset, and may take a little bit.");
+                        WaitForReset(rootTransform).Forget();
+                    }
+                }
+                if (executedOperation == ProgressState.Move)
+                {
+                    Portal.SetInfinitePortal(city.gameObject);
                     new SetInfinitePortalTableNetAction(modifiedTable.name).Execute();
                 }
+            }
+            else
+            {
+                DisableCitySelectionManager();
+            }
+            async UniTask WaitForReset(Transform rootTransform)
+            {
+                await UniTask.WaitUntil(() => rootTransform.localPosition.Equals(new(0, rootTransform.localPosition.y, 0)));
+                await UniTask.Delay(500);
+                currentProgressState = executedOperation;
             }
         }
 
@@ -337,15 +370,15 @@ namespace SEE.Controls.Actions.Table
             }
         }
 
-        ///// <summary>
-        ///// Calls <see cref="GameTableManager.DisableCity(GameObject)"/>
-        ///// and the corresponding network action.
-        ///// </summary>
-        //private void DisableCity()
-        //{
-        //    GameTableManager.DisableCity(modifiedTable);
-        //    new DisableCityTableNetAction(modifiedTable.name).Execute();
-        //}
+        /// <summary>
+        /// Calls <see cref="GameTableManager.DisableCSM(GameObject)"/>
+        /// and the corresponding network action.
+        /// </summary>
+        private void DisableCitySelectionManager()
+        {
+            GameTableManager.DisableCSM(modifiedTable);
+            new DisableCSMTableNetAction(modifiedTable.name).Execute();
+        }
 
         /// <summary>
         /// Calls <see cref="GameTableManager.EnableCity(GameObject)"/>
@@ -367,16 +400,7 @@ namespace SEE.Controls.Actions.Table
         {
             if (executedOperation != ProgressState.Delete)
             {
-                if (executedOperation == ProgressState.Move
-                    && modifiedTable.GetComponentInChildren<AbstractSEECity>() is { } city
-                    && city.gameObject.IsCodeCityDrawn())
-                {
-                    Portal.SetPortal(modifiedTable.GetComponentInChildren<AbstractSEECity>().gameObject);
-                    new MoveIncPortalTableNetAction(modifiedTable.name, modifiedTable.transform.position).Execute();
-                } else
-                {
-                    UpdateCity();
-                }
+                UpdateCity();
                 memento.SetNewData(modifiedTable, executedOperation);
             }
             else

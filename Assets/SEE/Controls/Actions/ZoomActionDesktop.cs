@@ -115,5 +115,17 @@ namespace SEE.Controls.Actions
                 }
             }
         }
+
+        /// <summary>
+        /// Triggers a zoom reset caused by an other action.
+        /// </summary>
+        public bool TriggerReset(Transform rootTransform)
+        {
+            ZoomState zoomState = GetZoomStateCopy(rootTransform);
+            float steps = zoomState.CurrentTargetZoomSteps;
+            zoomState.PushResetCommand(ZoomState.DefaultZoomDuration);
+            UpdateZoomState(rootTransform, zoomState);
+            return steps > 0;
+        }
     }
 }
