@@ -1,15 +1,14 @@
 using System;
-using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using UnityEngine;
 
 namespace SEE.GraphProviders.VCS
 {
     /// <summary>
-    /// Represents the author of a file in a git repository.
+    /// Represents the author of a file in a VCS.
     /// </summary>
+    /// <remarks>The author is the person who originally wrote the work, whereas the
+    /// committer is the person who last applied (committed) the work.</remarks>
     [Serializable]
     public class GitFileAuthor
     {
@@ -60,6 +59,7 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         GitFileAuthor()
         {
+            // Intentionally left blank.
         }
 
         /// <summary>
