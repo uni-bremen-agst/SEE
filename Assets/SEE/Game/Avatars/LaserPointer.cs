@@ -2,7 +2,7 @@
 using SEE.GO;
 using SEE.Utils;
 using System;
-using UnityEngine.Serialization;
+using SEE.Controls;
 
 namespace SEE.Game.Avatars
 {
@@ -12,12 +12,6 @@ namespace SEE.Game.Avatars
     /// </summary>
     public class LaserPointer : MonoBehaviour
     {
-        /// <summary>
-        /// Maximal length of laser beam.
-        /// </summary>
-        [Tooltip("Maximal length of laser beam.")]
-        public float LaserLength = 2.0f;
-
         /// <summary>
         /// The width of the laser beam.
         /// </summary>
@@ -103,8 +97,8 @@ namespace SEE.Game.Avatars
         /// The end point will be the hit point using a ray cast from the
         /// pointing device of the user towards the direction in which this
         /// pointing device is directing. If nothing is hit, the end of the drawn
-        /// line is <see cref="LaserLength"/> units away from the pointing device's
-        /// origin (again into the direction the pointing device is pointing to).
+        /// line is <see cref="Raycasting.InteractionRadius"/> units away from the pointing
+        /// device's origin (again into the direction the pointing device is pointing to).
         /// </summary>
         /// <returns>the end of the line drawn, that is, the point where it hit
         /// anything or the end point of the length-restricted beam, respectively</returns>
@@ -113,7 +107,9 @@ namespace SEE.Game.Avatars
         {
             Vector3 result;
             Color color;
-            if (Raycasting.RaycastAnything(out RaycastHit raycastHit, LaserLength))
+            if (Raycasting.RaycastAnything(out RaycastHit raycastHit, Raycasting.InteractionRadius) && (
+                (raycastHit.collider.gameObject.TryGetComponent(out InteractableObject o) && o.IsInteractable(raycastHit.point)) ||
+                raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
                 result = LastHit = raycastHit.point;
                 color = HitColor;
@@ -121,7 +117,7 @@ namespace SEE.Game.Avatars
             else
             {
                 Ray ray = Raycasting.UserPointsTo();
-                result = ray.origin + ray.direction * LaserLength;
+                result = ray.origin + ray.direction * Raycasting.InteractionRadius;
                 color = MissColor;
             }
             laserMaterial.color = color;
@@ -136,7 +132,7 @@ namespace SEE.Game.Avatars
         /// <returns>the position of the tip of the laser beam in world space</returns>
         internal Vector3 PointTowards(Vector3 direction)
         {
-            Vector3 target = Source.position + direction * LaserLength;
+            Vector3 target = Source.position + direction * Raycasting.InteractionRadius;
             Draw(target);
             return target;
         }

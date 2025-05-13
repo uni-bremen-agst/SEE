@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using MoreLinq;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
@@ -207,13 +208,15 @@ namespace SEE.Game.Operator
         /// </param>
         /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">if true, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ResizeTo
-            (Vector3 newLocalScale,
+        public IOperationCallback<Action> ResizeTo(
+            Vector3 newLocalScale,
             Vector3 newPosition,
             float factor = 1,
             bool updateEdges = true,
-            bool reparentChildren = true)
+            bool reparentChildren = true,
+            bool updateLayers = false)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
@@ -244,19 +247,36 @@ namespace SEE.Game.Operator
                     scale.AnimateTo(newLocalScale, duration)
                   },
                  a => a);
-            animation.OnComplete(() => reparent(originalParent));
-            animation.OnKill(() => reparent(originalParent));
+            animation.OnComplete(() => onEnd(originalParent));
+            animation.OnKill(() => onEnd(originalParent));
             return animation;
+
+            void onEnd(Transform originalParent)
+            {
+                if (reparentChildren)
+                {
+                    reparent(originalParent);
+                }
+                if (updateLayers)
+                {
+                    updatePortalLayers();
+                }
+            }
 
             void reparent(Transform newParent)
             {
-                if (!reparentChildren)
-                {
-                    return;
-                }
                 foreach (Transform child in children)
                 {
                     child.SetParent(newParent);
+                }
+            }
+
+            void updatePortalLayers()
+            {
+                InteractableObject[] children = transform.GetComponentsInChildren<InteractableObject>();
+                foreach (InteractableObject child in children)
+                {
+                    child.UpdateLayer();
                 }
             }
         }

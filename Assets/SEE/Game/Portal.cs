@@ -18,9 +18,10 @@ namespace SEE.Game
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
         /// complete area of <paramref name="parent"/>.
-        ///
+        /// <para>
         /// Precondition: <paramref name="parent"/> must have a plane component
         /// attached to it.
+        /// </para>
         /// </summary>
         /// <param name="parent">game objects whose children should be culled if they leave
         /// the area of the <paramref name="parent"/></param>
@@ -35,9 +36,10 @@ namespace SEE.Game
 
         /// <summary>
         /// Sets the portal of <paramref name="to"/> to the portal of <paramref name="from"/>.
-        ///
+        /// <para>
         /// Postcondition: The portals of <paramref name="from"/> and <paramref name="to"/>
         /// are equal and <paramref name="from"/> has its original portal.
+        /// </para>
         /// </summary>
         /// <param name="from">the game object from which to retrieve the portal</param>
         /// <param name="to">the game object receiving the portal of <paramref name="from"/></param>
@@ -48,58 +50,66 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the portal of <paramref name="gameObject"/> a rectangle in the x/z plane
+        /// Returns the portal of <paramref name="gameObject"/>, a rectangle in the x/z plane
         /// with <paramref name="leftFront"/> corner and <paramref name="rightBack"/> corner.
-        ///
+        /// <para>
         /// Precondition: <paramref name="gameObject"/> must have a <see cref="Renderer"/>.
         /// If there is no renderer, <paramref name="leftFront"/> and <paramref name="rightBack"/>
         /// are both <see cref="Vector2.zero"/>.
+        /// </para>
         /// </summary>
         /// <param name="gameObject">game objects whose portal is requested</param>
         /// <param name="leftFront">the left front corner of the rectangular portal</param>
         /// <param name="rightBack">the right back corner of the rectangular portal</param>
-        public static void GetPortal(GameObject gameObject, out Vector2 leftFront, out Vector2 rightBack)
+        /// <returns><c>true</c> iff a portal is found.</returns>
+        public static bool GetPortal(GameObject gameObject, out Vector2 leftFront, out Vector2 rightBack)
         {
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                GetPortal(renderer.sharedMaterial, out leftFront, out rightBack);
+                return GetPortal(renderer.sharedMaterial, out leftFront, out rightBack);
             }
-            else
-            {
-                Debug.LogError($"Game object {gameObject.name} does not have a renderer.\n");
-                leftFront = Vector2.zero;
-                rightBack = Vector2.zero;
-            }
+
+            leftFront = Vector2.zero;
+            rightBack = Vector2.zero;
+            return false;
         }
 
         /// <summary>
         /// Returns the portal of <paramref name="material"/>, a rectangle on the x/z plane,
         /// defined by its <paramref name="leftFront"/> and <paramref name="rightBack"/> corners.
         /// <para>
-        /// Precondition: <paramref name="material"/> must have the <c>_Portal</c> attribute.
-        /// If it does not exist, the result is undefined.
+        /// The values will be zero if the material does not have a portal.
         /// </para>
         /// </summary>
         /// <param name="material">the material from which the portal coordinates should be extracted</param>
         /// <param name="leftFront">the left front corner of the rectangular portal</param>
         /// <param name="rightBack">the right back corner of the rectangular portal</param>
-        private static void GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
+        /// <returns><c>true</c> iff the material has a portal.</returns>
+        private static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
-            // The _Portal property contains both the min and the max position of the portal plane
-            // that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-            Vector4 portal = material.GetVector(portalProp);
-            leftFront.x = portal.x;
-            leftFront.y = portal.y;
-            rightBack.x = portal.z;
-            rightBack.y = portal.w;
+            if (material.HasProperty(portalProp))
+            {
+                // The _Portal property contains both the min and the max position of the portal plane
+                // that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                Vector4 portal = material.GetVector(portalProp);
+                leftFront.x = portal.x;
+                leftFront.y = portal.y;
+                rightBack.x = portal.z;
+                rightBack.y = portal.w;
+                return true;
+            }
+            leftFront = Vector2.zero;
+            rightBack = Vector2.zero;
+            return false;
         }
 
         /// <summary>
         /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
-        ///
+        /// <para>
         /// Precondition: <paramref name="gameObject"/> must have a plane component
         /// attached to it.
+        /// </para>
         /// </summary>
         /// <param name="gameObject">the game object whose plane dimensions are to be retrieved</param>
         /// <param name="leftFrontCorner">the left front corner in the X/Z plane of the plane component</param>
@@ -123,8 +133,9 @@ namespace SEE.Game
         /// Recursively sets the culling area (portal) of the <paramref name="gameObject"/> and all
         /// its children to the rectangle in the x/z plane defined by the given <paramref name="leftFront"/>
         /// and <paramref name="rightBack"/> corner.
-        ///
+        /// </ara>
         /// N.B. equivalent to SetPortal(gameObject.transform, leftFront, rightBack).
+        /// </para>
         /// </summary>
         /// <param name="gameObject">object whose culling area is to be set</param>
         /// <param name="leftFront">left front corner of the culling area</param>

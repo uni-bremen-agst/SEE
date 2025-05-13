@@ -1,4 +1,6 @@
-﻿using System;
+﻿using SEE.GO;
+using SEE.Utils;
+using System;
 using UnityEngine;
 
 namespace SEE.Game.SceneManipulation
@@ -32,7 +34,7 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// The minimal size of a node in world space.
         /// </summary>
-        public static readonly Vector3 MinNodeSize = new (0.06f, 0.001f, 0.06f);
+        public static readonly Vector3 MinNodeSize = new(0.06f, 0.001f, 0.06f);
 
         /// <summary>
         /// The minimal world-space distance between nodes for placing or resizing (x/z, y).
@@ -92,6 +94,60 @@ namespace SEE.Game.SceneManipulation
         }
 
         /// <summary>
+        /// Creates a new <see cref="Bounds2D"/> from 2D position and size.
+        /// <para>
+        /// The origin is assumed to be dead center.
+        /// </para>
+        /// </summary>
+        /// <param name="position">The position of the object.</param>
+        /// <param name="size">The size of the object.</param>
+        /// <returns>The new <see cref="Bounds2D"/>.</returns>
+        public Bounds2D(Vector2 position, Vector2 size)
+        {
+            Left = position.x - size.x / 2f;
+            Right = position.x + size.x / 2f;
+            Back = position.y - size.y / 2f;
+            Front = position.y + size.y / 2f;
+        }
+
+        /// <summary>
+        /// Creates a new <see cref="Bounds2D"/> from 3D position and size.
+        /// <para>
+        /// The origin is assumed to be dead center and the directions will be taken from the x/z axes.
+        /// </para>
+        /// </summary>
+        /// <param name="position">The position of the 3D object.</param>
+        /// <param name="size">The size of the 3D object.</param>
+        /// <returns>The new <see cref="Bounds2D"/>.</returns>
+        public Bounds2D(Vector3 position, Vector3 size) : this(position.XZ(), size.XZ()) { }
+
+        /// <summary>
+        /// Creates a new <see cref="Bounds2D"/> from a <see cref="GameObject"/>.
+        /// <para>
+        /// Passes world-space <see cref="Transform.position"/> and <see cref="GameObject.WorldSpaceSize"/> to <see cref="Bounds2D(Vector3, Vector3)"/>.
+        /// </para>
+        /// </summary>
+        /// <param name="go">The <see cref="GameObject"/> to create the <see cref="Bounds2D"/> from.</param>
+        public Bounds2D(GameObject go) : this(go.transform.position, go.WorldSpaceSize()) { }
+
+        /// <summary>
+        /// Creates a new <see cref="Bounds2D"/> from a <see cref="Portal"/>.
+        /// </summary>
+        /// <param name="leftFront">The portal's lower bounds (x_min, z_min).</param>
+        /// <param name="rightBack">The portal's upper bounds (x_max, z_max).</param>
+        /// <returns>The new <see cref="Bounds2D"/>.</returns>
+        public static Bounds2D FromPortal(Vector2 leftFront, Vector2 rightBack)
+        {
+            Vector2 size = rightBack - leftFront;
+            return new(
+                leftFront.x,
+                leftFront.x + size.x,
+                leftFront.y,
+                leftFront.y + size.y
+            );
+        }
+
+        /// <summary>
         /// Gets or sets the element at the specified direction.
         /// </summary>
         /// <param name="dir">The direction of the element to get or set.</param>
@@ -101,7 +157,8 @@ namespace SEE.Game.SceneManipulation
         /// </exception>
         public float this[Vector3 dir]
         {
-            get {
+            get
+            {
                 if (dir == Vector3.left)
                 {
                     return Left;
@@ -121,7 +178,8 @@ namespace SEE.Game.SceneManipulation
                 throw new IndexOutOfRangeException($"Given direction is not possible in {nameof(Bounds2D)}: {dir}");
             }
 
-            set {
+            set
+            {
                 if (dir == Vector3.left)
                 {
                     Left = value;
@@ -152,7 +210,8 @@ namespace SEE.Game.SceneManipulation
         /// </exception>
         public float this[Direction2D dir]
         {
-            get {
+            get
+            {
                 return dir switch
                 {
                     Direction2D.Left => Left,
@@ -163,7 +222,8 @@ namespace SEE.Game.SceneManipulation
                 };
             }
 
-            set {
+            set
+            {
                 switch (dir)
                 {
                     case Direction2D.Left:
@@ -198,6 +258,16 @@ namespace SEE.Game.SceneManipulation
         public readonly override string ToString()
         {
             return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Back: {Back}, Front: {Front})";
+        }
+
+        /// <summary>
+        /// Checks if the <paramref name="other"/> bounds are contained in this bounds.
+        /// </summary>
+        /// <param name="other">The bounds of another object.</param>
+        /// <returns></returns>
+        public bool Contains(Bounds2D other)
+        {
+            return other.Left >= Left && other.Right <= Right && other.Back >= Back && other.Front <= Front;
         }
 
         /// <summary>

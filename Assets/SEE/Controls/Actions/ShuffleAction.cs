@@ -84,6 +84,7 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
+            // TODO: Update layer for all elements after shuffle is finished to make elements outside their portal non-interactable (cmp. NodeOperator.ResizeTo)
             bool synchronize = false;
 
             if (SEEInput.Cancel()) // cancel shuffling
@@ -102,13 +103,11 @@ namespace SEE.Controls.Actions
             {
                 if (!shuffling)
                 {
-                    // Retrieve cityRootNode.
-                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
                     // Let's see whether we have hit a code-city element.
-                    if (hoveredObject)
+                    if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef, false) != HitGraphElement.None)
                     {
                         // cityRootNode is the node containing the hoveredObject
-                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject.transform);
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(elementRef.gameObject.transform);
                         Assert.IsNotNull(cityRootNode);
                         // Remember the original position of the city-root node so that it can be reset
                         // to its original position.

@@ -95,8 +95,14 @@ namespace SEE.Game.Operator
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
-                Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack);
-                Portal.SetPortal(nodeLabel, leftFront, rightBack);
+                if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
+                {
+                    Portal.SetPortal(nodeLabel, leftFront, rightBack);
+                }
+                else
+                {
+                    Debug.LogError("Could not retrieve portal for node label.", gameObject);
+                }
 
                 // Make it invisible, initially.
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))

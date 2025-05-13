@@ -11,7 +11,9 @@ using Valve.VR.InteractionSystem;
 #endif
 using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.Game;
 using SEE.Game.Operator;
+using SEE.Game.SceneManipulation;
 
 namespace SEE.Controls
 {
@@ -62,9 +64,13 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new();
 
         /// <summary>
-        /// The object, that is currently hovered by this player. There is always only ever
-        /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
-        /// set.
+        /// The object, that is currently hovered by this player.
+        /// <para>
+        /// There is always at most one object hovered by this player with the flag
+        /// <see cref="HoverFlag.World"/> set.
+        /// </para><para>
+        /// The object is tested against <see cref="IsInteractable"/> before being set.
+        /// </para>
         /// </summary>
         public static InteractableObject HoveredObjectWithWorldFlag { get; private set; }
 
@@ -209,6 +215,69 @@ namespace SEE.Controls
         #region Interaction
 
         /// <summary>
+        /// Whether the object is currently interactable (at the given hit point).
+        /// <para>
+        /// If the object has a portal:
+        /// if a hit point is given, it is checked against the portal bounds,
+        /// else the object boundaries are checked against the portal bounds.
+        /// </para>
+        /// </summary>
+        /// <param name="point">The hit point on the object.</param>
+        public bool IsInteractable(Vector3? point = null)
+        {
+            if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
+            {
+                // Check interaction point
+                if (point != null)
+                {
+                    if (point.Value.x < leftFront.x || point.Value.x > rightBack.x || point.Value.z < leftFront.y || point.Value.z > rightBack.y)
+                    {
+                        return false;
+                    }
+                }
+                // Check if the object is (partially) within the portal bounds.
+                else
+                {
+                    Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
+                    Bounds2D bounds = new Bounds2D(gameObject);
+
+                    if (!portalBounds.Contains(bounds))
+                    {
+                        return false;
+                    }
+                }
+            }
+            // Potential further checks go here
+            return true;
+        }
+
+        /// <summary>
+        /// Updates the layer of the <see cref="GameObject"/> to match the current interactable state.
+        /// <para>
+        /// Switches between layser <see cref="Layers.InteractableGraphElements"/> and
+        /// <see cref="Layers.NonInteractableGraphElements"/> based on the result of
+        /// <see cref="IsInteractable"/>.
+        /// </para>
+        /// </summary>
+        public void UpdateLayer()
+        {
+            if (IsInteractable())
+            {
+                if (gameObject.layer == Layers.NonInteractableGraphElements)
+                {
+                    gameObject.layer = Layers.InteractableGraphElements;
+                }
+            }
+            else
+            {
+                if (gameObject.layer == Layers.InteractableGraphElements)
+                {
+                    gameObject.layer = Layers.NonInteractableGraphElements;
+                }
+            }
+        }
+
+        /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if
         /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/>
         /// and <see cref="AnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
@@ -258,19 +327,22 @@ namespace SEE.Controls
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HoverSound, this.gameObject);
+
+                    if (IsHoverFlagSet(HoverFlag.World))
+                    {
+                        // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
+                        //   investigation.
+                        //if (HoveredObjectWithWorldFlag != null)
+                        //{
+                        //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
+                        //}
+                        // Note (TK): Is this still the case now that `isInitiator` is checked first?
+
+                        HoveredObjectWithWorldFlag = this;
+                    }
                 }
 
                 HoveredObjects.Add(this);
-                if (IsHoverFlagSet(HoverFlag.World))
-                {
-                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
-                    //   investigation.
-                    //if (HoveredObjectWithWorldFlag != null)
-                    //{
-                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
-                    //}
-                    HoveredObjectWithWorldFlag = this;
-                }
             }
             else
             {
@@ -839,7 +911,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI() && IsInteractable())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -858,13 +930,14 @@ namespace SEE.Controls
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
-                if (isFlagSet && isMouseOverGUI)
+                bool isInteractable = IsInteractable();
+                if (isFlagSet && (isMouseOverGUI || !isInteractable))
                 {
                     // If the Hoverflag.World flag is set, but we are currently hovering over the GUI,
                     // we need to reset the Hoverflag.World flag to false.
                     SetHoverFlag(HoverFlag.World, false, true);
                 }
-                else if (!isFlagSet && !isMouseOverGUI)
+                else if (!isFlagSet && !isMouseOverGUI && isInteractable)
                 {
                     // If the Hoverflag.World flag is not set and no longer hovering over the GUI,
                     // we need to set the Hoverflag.World flag to true again.
