@@ -274,55 +274,27 @@ namespace SEE.Layout.NodeLayouts
             }
             else
             {
-                if (xIsLongerEdge)
+                // The reference point from which to start laying out the areas.
+                Vector3 referencePoint = centerPosition;
+                // The mid point of the lower edge of the code city.
+                referencePoint.z -= depth / 2;
+
+                // The implementationArea.
                 {
-                    // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = centerPosition;
-                    // The mid point of the left edge of the code city.
-                    referencePoint.x -= width / 2;
-
-                    // The implementationArea.
-                    {
-                        float length = width * (float)(1 - architectureLayoutProportion);
-                        Vector3 position = referencePoint;
-                        position.x += length / 2;
-                        implementionArea = new(position, length, depth);
-                        // Move the reference point to the right end of the implementation area.
-                        referencePoint.x += length;
-                    }
-
-                    // The architectureArea.
-                    {
-                        float length = width * architectureLayoutProportion;
-                        Vector3 position = referencePoint;
-                        position.x += length / 2;
-                        architectureArea = new(position, length, depth);
-                    }
+                    float length = depth * (float)(1 - architectureLayoutProportion);
+                    Vector3 position = referencePoint;
+                    position.z += length / 2;
+                    implementionArea = new(position, width, length);
+                    // Move the reference point to the lower end of the implementation area.
+                    referencePoint.z += length;
                 }
-                else
+
+                // The architectureArea.
                 {
-                    // The reference point from which to start laying out the areas.
-                    Vector3 referencePoint = centerPosition;
-                    // The mid point of the lower edge of the code city.
-                    referencePoint.z -= depth / 2;
-
-                    // The implementationArea.
-                    {
-                        float length = depth * (float)(1 - architectureLayoutProportion);
-                        Vector3 position = referencePoint;
-                        position.z += length / 2;
-                        implementionArea = new(position, width, length);
-                        // Move the reference point to the lower end of the implementation area.
-                        referencePoint.z += length;
-                    }
-
-                    // The architectureArea.
-                    {
-                        float length = depth * architectureLayoutProportion;
-                        Vector3 position = referencePoint;
-                        position.z += length / 2;
-                        architectureArea = new(position, width, length);
-                    }
+                    float length = depth * architectureLayoutProportion;
+                    Vector3 position = referencePoint;
+                    position.z += length / 2;
+                    architectureArea = new(position, width, length);
                 }
             }
         }
