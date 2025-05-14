@@ -37,6 +37,11 @@ namespace SEE.Net.Actions
         public bool ReparentChildren;
 
         /// <summary>
+        /// Factor used to animate the resize.
+        /// </summary>
+        public float AnimationFactor;
+
+        /// <summary>
         /// Constructs a <see cref="ResizeNodeNetAction"/>.
         /// </summary>
         /// <param name="gameObjectID">The unique name of the <see cref="GameObject"/> that should be resized</param>
@@ -44,13 +49,16 @@ namespace SEE.Net.Actions
         /// <param name="position">The new world-space position of the <see cref="GameObject"/></param>
         /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
-        public ResizeNodeNetAction(string gameObjectID, Vector3 localScale, Vector3 position, bool updateEdges = true, bool reparentChildren = true)
+        /// <param name="animationFactor">The factor used to animate the resize. The default is 1f.</param>
+        public ResizeNodeNetAction(string gameObjectID, Vector3 localScale, Vector3 position,
+            bool updateEdges = true, bool reparentChildren = true, float animationFactor = 1f)
         {
             GameObjectID = gameObjectID;
             LocalScale = localScale;
             Position = position;
             UpdateEdges = updateEdges;
             ReparentChildren = reparentChildren;
+            AnimationFactor = animationFactor;
         }
 
         /// <summary>
@@ -61,7 +69,7 @@ namespace SEE.Net.Actions
             GameObject go = Find(GameObjectID);
             if (go != null)
             {
-                go.NodeOperator().ResizeTo(LocalScale, Position, factor: 1, UpdateEdges, ReparentChildren);
+                go.NodeOperator().ResizeTo(LocalScale, Position, AnimationFactor, UpdateEdges, ReparentChildren);
             }
             else
             {
