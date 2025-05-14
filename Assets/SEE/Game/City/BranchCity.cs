@@ -1,7 +1,11 @@
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -41,12 +45,50 @@ namespace SEE.Game.City
         /// This is used to manually group commit authors with similar identities together.
         /// The mapping enables aggregating commit data under a single normalized author identity.
         /// </summary>
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+        [NonSerialized, OdinSerialize,
+         DictionaryDrawerSettings(
+              DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
+              KeyLabel = "Author", ValueLabel = "Aliases"),
          Tooltip("Author alias mapping."),
          ShowIf("CombineAuthors"),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
         public GitAuthorMapping AuthorAliasMap = new();
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="Date"/> in the configuration file.
+        /// </summary>
+        private const string dateLabel = "Date";
+
+        /// <summary>
+        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
+        /// </summary>
+        private const string combineAuthorsLabel = "CombineAuthors";
+
+        /// <summary>
+        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
+        /// </summary>
+        private const string authorAliasMapLabel = "AuthorAliasMap";
+
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            writer.Save(Date, dateLabel);
+            writer.Save(CombineAuthors, combineAuthorsLabel);
+            AuthorAliasMap.Save(writer, authorAliasMapLabel);
+        }
+
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            ConfigIO.Restore(attributes, dateLabel, ref Date);
+            ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
+            AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
+        }
+
+        #endregion
     }
 }

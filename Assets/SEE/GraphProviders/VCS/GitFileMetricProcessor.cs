@@ -69,7 +69,7 @@ namespace SEE.GraphProviders.VCS
         /// Used to group and identify authors that represent the same individual
         /// but may have different names or email identifiers in the commit history.
         /// </summary>
-        private readonly Dictionary<FileAuthor, List<FileAuthor>> authorAliasMap;
+        private readonly Dictionary<FileAuthor, FileAuthorList> authorAliasMap;
 
         /// <summary>
         /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
@@ -115,7 +115,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">A mapping of authors to their aliases</param>
         public GitFileMetricProcessor(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
             IEnumerable<string> repositoryFiles, bool combineSimilarAuthors,
-            Dictionary<FileAuthor, List<FileAuthor>> authorAliasMap) : this(gitRepository, pathGlobbing,
+            Dictionary<FileAuthor, FileAuthorList> authorAliasMap) : this(gitRepository, pathGlobbing,
             repositoryFiles)
         {
             this.combineSimilarAuthors = combineSimilarAuthors;

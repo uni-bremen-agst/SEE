@@ -1,4 +1,7 @@
+using SEE.Utils.Config;
+using Sirenix.OdinInspector;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
@@ -9,7 +12,8 @@ namespace SEE.GraphProviders.VCS
     /// </summary>
     /// <remarks>The author is the person who originally wrote the work, whereas the
     /// committer is the person who last applied (committed) the work.</remarks>
-    [Serializable]
+    [Serializable,
+     HideReferenceObjectPicker]
     public class FileAuthor : IEquatable<FileAuthor>
     {
         /// <summary>
@@ -57,7 +61,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// Empty constructor for serialization purposes.
         /// </summary>
-        FileAuthor()
+        public FileAuthor()
         {
             // Intentionally left blank.
         }
@@ -92,5 +96,48 @@ namespace SEE.GraphProviders.VCS
         {
             return $"{Name}<{Email}>";
         }
+
+        #region Config I/O
+
+        /// <summary>
+        /// The label of the <see cref="Name"/> in the configuration file.
+        /// </summary>
+        private const string nameLabel = "Name";
+
+        /// <summary>
+        /// The label of the <see cref="Email"/> in the configuration file.
+        /// </summary>
+        private const string emailLabel = "Email";
+
+        internal void Save(ConfigWriter writer, string label = "")
+        {
+            writer.BeginGroup(label);
+            writer.Save(Name, nameLabel);
+            writer.Save(Email, emailLabel);
+            writer.EndGroup();
+        }
+
+        public bool Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                return Restore(values);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public bool Restore(Dictionary<string, object> attributes)
+        {
+            bool result = true;
+            result &= ConfigIO.Restore(attributes, nameLabel, ref Name);
+            result &= ConfigIO.Restore(attributes, emailLabel, ref Email);
+            return result;
+        }
+
+        #endregion Config I/O
     }
 }
