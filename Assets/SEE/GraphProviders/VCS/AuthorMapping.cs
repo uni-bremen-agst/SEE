@@ -48,8 +48,6 @@ namespace SEE.GraphProviders.VCS
                     aliases.Restore(dict, aliasesLabel);
                     this[author] = aliases;
                 }
-
-                Debug.Log(this);
             }
         }
 
