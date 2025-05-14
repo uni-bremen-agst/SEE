@@ -144,19 +144,13 @@ namespace SEE.Game.City
             {
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
 
-                // Checks if the city's layout was rotated.
-                GameObject arch = ReflexionGraph.ArchitectureRoot.GameObject();
-                Vector3 newArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
-                bool cityWasRotated = !Mathf.Approximately(pArchPos.x, newArchPos.x)
-                                        && !Mathf.Approximately(pArchPos.z, newArchPos.z);
-
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
                     if (node != null && !node.IsArchitectureOrImplementationRoot())
                     {
-                        node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale, cityWasRotated), 0);
-                        node.NodeOperator().MoveTo(DeterminePosition(nodeLayout, pArchPos, newArchPos, pArchLossyScale, cityWasRotated), 0);
+                        node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale), 0);
+                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
                         node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
                         {
                             if (decorationValues.ContainsKey(nodeLayout.ID))
@@ -174,55 +168,19 @@ namespace SEE.Game.City
                 });
             }
 
-            Vector3 DetermineScale(LayoutGraphNode nodeLayout, Vector3 prevLossyScale, bool cityWasRotated)
+            Vector3 DetermineScale(LayoutGraphNode nodeLayout, Vector3 prevLossyScale)
             {
                 Vector3 currentLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
-                if (!cityWasRotated)
-                {
-                    Vector3 scaleFactor = new(
-                        currentLossyScale.x / prevLossyScale.x,
-                        currentLossyScale.y / prevLossyScale.y,
-                        currentLossyScale.z / prevLossyScale.z);
+                Vector3 scaleFactor = new(
+                    currentLossyScale.x / prevLossyScale.x,
+                    currentLossyScale.y / prevLossyScale.y,
+                    currentLossyScale.z / prevLossyScale.z);
 
-                    return new(
-                        nodeLayout.AbsoluteScale.x / scaleFactor.x,
-                        nodeLayout.AbsoluteScale.y,
-                        nodeLayout.AbsoluteScale.z / scaleFactor.z);
-                }
-                else
-                {
-                    Vector3 rotatedScaleFactor = new(
-                        currentLossyScale.z / prevLossyScale.x,
-                        currentLossyScale.y / prevLossyScale.y,
-                        currentLossyScale.x / prevLossyScale.z);
-
-                    return new(
-                        nodeLayout.AbsoluteScale.z / rotatedScaleFactor.z,
-                        nodeLayout.AbsoluteScale.y,
-                        nodeLayout.AbsoluteScale.x / rotatedScaleFactor.x);
-                }
-            }
-
-            Vector3 DeterminePosition(LayoutGraphNode nodeLayout, Vector3 prevParentPos, Vector3 newParentPos, Vector3 prevParentScale, bool cityWasRotated)
-            {
-                Vector3 pos = nodeLayout.CenterPosition;
-                Vector3 newParentScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
-                if (cityWasRotated)
-                {
-                    Vector3 relative = pos - prevParentPos;
-                    relative.x /= prevParentScale.x;
-                    relative.y /= prevParentScale.y;
-                    relative.z /= prevParentScale.z;
-                    Vector3 newOffset = new(relative.x * newParentScale.z, relative.y, relative.z * newParentScale.x);
-                    pos = newParentPos + newOffset;
-                }
-                //if (cityWasRotated)
-                //{
-                //    //GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                //    //pos = node.transform.position;
-                //}
-                return pos;
+                return new(
+                    nodeLayout.AbsoluteScale.x / scaleFactor.x,
+                    nodeLayout.AbsoluteScale.y,
+                    nodeLayout.AbsoluteScale.z / scaleFactor.z);
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
