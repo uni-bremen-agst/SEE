@@ -350,6 +350,7 @@ namespace SEE.Controls.Actions.Table
 
                 await UniTask.WaitUntil(() => IsApproximatelyZero(rootTransform.localPosition.x)
                                                 && IsApproximatelyZero(rootTransform.localPosition.z));
+                await UniTask.Yield();
                 currentProgressState = executedOperation;
 
                 bool IsApproximatelyZero(float value, float tolerance = 1e-6f)
