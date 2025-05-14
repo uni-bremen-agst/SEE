@@ -15,7 +15,7 @@ namespace SEE.Game.City
     /// made to a git repository across all branches from a given
     /// date until now.
     /// </summary>
-    public class BranchCity : VCSCity
+    public class BranchCity : VCSCity, ISelfValidator
     {
         /// <summary>
         /// A date string in the <see cref="SEEDate.DateFormat"/> format.
@@ -55,6 +55,19 @@ namespace SEE.Game.City
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
         public AuthorMapping AuthorAliasMap = new();
+
+        /// <summary>
+        /// Validates <see cref="Date"/>.
+        /// </summary>
+        /// <param name="result">where the error results are to be added (if any)</param>
+        /// <remarks>Will be used by Odin Validator.</remarks>
+        public void Validate(SelfValidationResult result)
+        {
+            if (!SEEDate.IsValid(Date))
+            {
+                result.AddError("Invalid date!");
+            }
+        }
 
         #region Config I/O
 
