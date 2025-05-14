@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
+using SEE.Game.Operator;
 using SEE.Game.Table;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -15,6 +16,7 @@ using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 
@@ -122,6 +124,7 @@ namespace SEE.Game.City
             }
             else
             {
+                Debug.Log("ReDrawGraph");
                 // Gather the previous architecture layout.
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
@@ -142,7 +145,8 @@ namespace SEE.Game.City
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
                                         Vector3 pArchPos, Vector3 pArchLossyScale)
             {
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
+                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
+                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
 
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
