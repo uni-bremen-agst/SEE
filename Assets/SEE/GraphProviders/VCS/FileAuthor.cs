@@ -10,7 +10,7 @@ namespace SEE.GraphProviders.VCS
     /// <remarks>The author is the person who originally wrote the work, whereas the
     /// committer is the person who last applied (committed) the work.</remarks>
     [Serializable]
-    public class FileAuthor
+    public class FileAuthor : IEquatable<FileAuthor>
     {
         /// <summary>
         /// A string representing the name of the author.
@@ -60,6 +60,27 @@ namespace SEE.GraphProviders.VCS
         FileAuthor()
         {
             // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// Determines whether the specified <see cref="FileAuthor"/> is equal to the current instance.
+        /// </summary>
+        /// <param name="other">The instance to check for equality.</param>
+        /// <returns>True if they are equal, false otherwise.</returns>
+        public bool Equals(FileAuthor other)
+        {
+            return Name == other.Name && Email == other.Email;
+        }
+
+        /// <summary>
+        /// Generates a hash code based on the <see cref="Name"/> and <see cref="Email"/> properties.
+        /// </summary>
+        /// <returns>
+        /// A hash code that represents the current object.
+        /// </returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(Name, Email);
         }
 
         /// <summary>
