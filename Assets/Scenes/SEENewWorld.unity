@@ -1707,6 +1707,121 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: AuthorAliasMap
+      Entry: 7
+      Data: 37|SEE.GraphProviders.VCS.GitAuthorMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 38|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 39|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Rainer Koschke
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 40|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 41|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: axivionsee
+    - Name: Email
+      Entry: 1
+      Data: rainer.koschke@qt.io
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 42|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Tim Kuhlmann
+    - Name: Email
+      Entry: 1
+      Data: tim.kuhlmann@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: tinxx
+    - Name: Email
+      Entry: 1
+      Data: 13608545+tinxx@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
@@ -1793,7 +1908,8 @@ MonoBehaviour:
     Root: 1
     RelativePath: /
     AbsolutePath: 
-  Date: 31/12/2024
+  Date: 2025/01/01
+  CombineAuthors: 1
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21504,7 +21620,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
