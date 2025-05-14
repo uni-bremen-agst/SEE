@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace SEE.GraphProviders.VCS
 {
-
     /// <summary>
     /// Represents a mapping between a <see cref="FileAuthor"/> and a list of aliases
     /// of associated <see cref="FileAuthor"/>. This can be used in grouping equivalent
