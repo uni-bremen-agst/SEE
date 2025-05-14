@@ -1709,7 +1709,7 @@ MonoBehaviour:
       Data: 
     - Name: AuthorAliasMap
       Entry: 7
-      Data: 37|SEE.GraphProviders.VCS.GitAuthorMapping, SEE
+      Data: 37|SEE.GraphProviders.VCS.AuthorMapping, SEE
     - Name: comparer
       Entry: 7
       Data: 38|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
@@ -1719,7 +1719,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 2
+      Data: 3
     - Name: 
       Entry: 7
       Data: 
@@ -1804,6 +1804,48 @@ MonoBehaviour:
     - Name: Email
       Entry: 1
       Data: 13608545+tinxx@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 46|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: "Hannes Ku\xDF"
+    - Name: Email
+      Entry: 1
+      Data: hkuss@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 47|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 48|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Hannes Lennart Kuss
+    - Name: Email
+      Entry: 1
+      Data: 102760046+hlkuss@users.noreply.github.com
     - Name: 
       Entry: 8
       Data: 
