@@ -1,6 +1,8 @@
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
 using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -13,15 +15,20 @@ namespace SEE.Game.City
     public class BranchCity : VCSCity
     {
         /// <summary>
-        /// A date string in the dd/mm/yyyy format.
+        /// A date string in the <see cref="SEEDate.DateFormat"/> format.
         ///
         /// All commits from the most recent to the latest commit
         /// before the date are used for the analysis.
         /// </summary>
-        [InspectorName("Date Limit (DD/MM/YYYY)"),
-         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"),
+        [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
+         Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public string Date = "";
+        public string Date = string.Empty;
+
+        [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
+         Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
+         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
+        public DateTime StartDate = DateTime.Now;
 
         /// <summary>
         /// If this is true, the authors of the commits with similar identities will be combined.

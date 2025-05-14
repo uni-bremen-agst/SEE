@@ -106,10 +106,10 @@ namespace SEE.GraphProviders
         private void CheckAttributes(BranchCity branchCity)
         {
             if (branchCity.Date.IsNullOrWhitespace()
-                || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
+                || !DateTime.TryParseExact(branchCity.Date, SEEDate.DateFormat, CultureInfo.InvariantCulture,
                                            DateTimeStyles.None, out _))
             {
-                throw new ArgumentException("Date is not set or cant be parsed");
+                throw new ArgumentException($"Date is not set or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
             }
 
             if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
@@ -201,7 +201,7 @@ namespace SEE.GraphProviders
             GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
 
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
-            DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime timeLimit = DateTime.ParseExact(branchCity.Date, SEEDate.DateFormat, CultureInfo.InvariantCulture);
 
             using (Repository repo = new(graph.BasePath))
             {
