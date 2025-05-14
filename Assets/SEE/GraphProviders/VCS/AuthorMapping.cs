@@ -15,7 +15,7 @@ namespace SEE.GraphProviders.VCS
     /// while the values are the aliases of the respective <see cref="FileAuthor"/>.
     /// </summary>
     [Serializable]
-    public class GitAuthorMapping : Dictionary<FileAuthor, FileAuthorList>
+    public class AuthorMapping : Dictionary<FileAuthor, FileAuthorList>
     {
         #region Config I/O
 
@@ -41,7 +41,7 @@ namespace SEE.GraphProviders.VCS
                     FileAuthor author = new();
                     if (!author.Restore(dict, authorLabel))
                     {
-                        Debug.LogError($"Entry of {typeof(GitAuthorMapping)} has no value for {authorLabel}\n");
+                        Debug.LogError($"Entry of {typeof(AuthorMapping)} has no value for {authorLabel}\n");
                         continue;
                     }
                     // aliases

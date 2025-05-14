@@ -54,7 +54,7 @@ namespace SEE.Game.City
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]
-        public GitAuthorMapping AuthorAliasMap = new();
+        public AuthorMapping AuthorAliasMap = new();
 
         #region Config I/O
 
