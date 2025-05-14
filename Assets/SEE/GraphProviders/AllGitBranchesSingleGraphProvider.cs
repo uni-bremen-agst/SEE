@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -105,11 +104,9 @@ namespace SEE.GraphProviders
         /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes(BranchCity branchCity)
         {
-            if (branchCity.Date.IsNullOrWhitespace()
-                || !DateTime.TryParseExact(branchCity.Date, SEEDate.DateFormat, CultureInfo.InvariantCulture,
-                                           DateTimeStyles.None, out _))
+            if (!SEEDate.IsValid(branchCity.Date))
             {
-                throw new ArgumentException($"Date is not set or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
+                throw new ArgumentException($"Date is impossible or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
             }
 
             if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
@@ -201,7 +198,7 @@ namespace SEE.GraphProviders
             GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
 
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
-            DateTime timeLimit = DateTime.ParseExact(branchCity.Date, SEEDate.DateFormat, CultureInfo.InvariantCulture);
+            DateTime timeLimit = SEEDate.ToDate(branchCity.Date);
 
             using (Repository repo = new(graph.BasePath))
             {

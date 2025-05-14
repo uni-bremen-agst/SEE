@@ -2,7 +2,6 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using Sirenix.OdinInspector;
-using System;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -23,12 +22,7 @@ namespace SEE.Game.City
         [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
          Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public string Date = string.Empty;
-
-        [InspectorName("Date Limit (" + SEEDate.DateFormat + ")"),
-         Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
-         TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public DateTime StartDate = DateTime.Now;
+        public string Date = SEEDate.Now();
 
         /// <summary>
         /// If this is true, the authors of the commits with similar identities will be combined.

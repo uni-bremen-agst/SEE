@@ -6,7 +6,7 @@ namespace SEE.Utils
     /// <summary>
     /// This class is intended to encapsulate the syntactic format of a date string.
     /// </summary>
-    public class SEEDate
+    public static class SEEDate
     {
         /// <summary>
         /// The format of <see cref="Date"/>.
@@ -14,60 +14,42 @@ namespace SEE.Utils
         public const string DateFormat = "yyyy/MM/dd";
 
         /// <summary>
-        /// Creates a new instance of <see cref="SEEDate"/> and sets it to the current date.
-        /// </summary>
-        public SEEDate()
-        {
-            date = DateTime.Now;
-        }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SEEDate"/> and sets it to <paramref name="date"/>
-        /// </summary>
-        /// <param name="date">date value to be assigned</param>
-        /// <exception cref="ArgumentException">thrown in <paramref name="date"/> has not the required
-        /// syntax <see cref="DateFormat"/></exception>
-        public SEEDate(string date)
-        {
-            Set(date);
-        }
-
-        /// <summary>
-        /// The date.
-        /// </summary>
-        private DateTime date;
-
-        /// <summary>
         /// Sets the date.
         /// </summary>
         /// <param name="date">date value to be assigned</param>
         /// <exception cref="ArgumentException">thrown in <paramref name="date"/> has not the required
         /// syntax <see cref="DateFormat"/></exception>
-        public void Set(string date)
+        public static DateTime ToDate(string date)
         {
             if (DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime dateTime))
             {
-                this.date = dateTime;
+                return dateTime;
             }
             else
             {
-                throw new ArgumentException($"Date '{date}' is not in the correct format '{DateFormat}'.");
+                throw new ArgumentException($"Date '{date}' is not in the correct format '{DateFormat}' or an impossible date.");
             }
         }
 
         /// <summary>
-        /// The set date.
+        /// Returns the current date in the syntax of <see cref="DateFormat"/>.
         /// </summary>
-        /// <returns>set date</returns>
-        public DateTime Get() => date;
+        /// <returns>current date</returns>
+        public static string Now()
+        {
+            return DateTime.Now.ToString(DateFormat, CultureInfo.InvariantCulture);
+        }
 
         /// <summary>
-        /// Returns the date in the format <see cref="DateFormat"/>.
+        /// True if given <paramref name="date"/> conforms to the syntax <see cref="DateFormat"/>
+        /// and is a possible date (e.g., 2023/02/29 is syntactically correct but not a possible
+        /// date because 2023 is not a leap year).
         /// </summary>
-        /// <returns>the set date as a string</returns>
-        override public string ToString()
+        /// <param name="date"></param>
+        /// <returns></returns>
+        public static bool IsValid(string date)
         {
-            return date.ToString(DateFormat, CultureInfo.InvariantCulture);
+            return DateTime.TryParseExact(date, DateFormat, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _);
         }
     }
 }

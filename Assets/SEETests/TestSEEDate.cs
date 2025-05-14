@@ -9,63 +9,43 @@ namespace SEE.Utils
     /// </summary>
     internal class TestSEEDate
     {
-        private const string aDate = "2023/10/01";
+        private const string aDate = "2023/02/28";
 
         /// <summary>
-        /// Tests the empty constructor.
+        /// Tests <see cref="SEEDate.ToDate"/>.
         /// </summary>
         [Test]
-        public void TestEmptyConstructor()
+        public void TestToDate()
         {
-            DateTime now = DateTime.Now;
-            SEEDate date = new();
-            Assert.AreEqual(now, date.Get());
+            Assert.AreEqual(new DateTime(2023, 2, 28), SEEDate.ToDate(aDate));
         }
 
         /// <summary>
-        /// Tests the constructor.
+        /// Tests <see cref="SEEDate.ToDate"/> with an invalid date.
         /// </summary>
         [Test]
-        public void TestConstructor()
+        public void TestInvalidDate()
         {
-            SEEDate date = new(aDate);
-            Assert.AreEqual(new DateTime(2023, 10, 1), date.Get());
+            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023-10-01"));
         }
 
         /// <summary>
-        /// Tests the setter.
+        /// Tests <see cref="SEEDate.ToDate"/> with an impossible date (no leap year).
         /// </summary>
         [Test]
-        public void TestSet()
+        public void TestImpossibleDate1()
         {
-            SEEDate date = new();
-            date.Set(aDate);
-            Assert.AreEqual(new DateTime(2023, 10, 1), date.Get());
+            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023/02/29"));
         }
+
         /// <summary>
-        /// Tests the setter with an invalid date.
+        /// Tests <see cref="SEEDate.ToDate"/> with an impossible date (wrong
+        /// number of days of month).
         /// </summary>
         [Test]
-        public void TestSetInvalidDate()
+        public void TestImpossibleDate2()
         {
-            SEEDate date = new();
-            Assert.Throws<ArgumentException>(() => date.Set("2023-10-01"));
-        }
-
-        [Test]
-        public void TestToString1()
-        {
-            SEEDate date = new(aDate);
-            Assert.AreEqual(aDate, date.ToString());
-        }
-
-        [Test]
-        public void TestToString2()
-        {
-            DateTime now = DateTime.Now;
-            SEEDate date = new();
-            Assert.AreEqual(now.ToString(SEEDate.DateFormat, CultureInfo.InvariantCulture), date.ToString());
-            UnityEngine.Debug.Log(date.ToString());
+            Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023/04/31"));
         }
 
         [Test]
