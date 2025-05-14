@@ -327,11 +327,11 @@ namespace SEE.Controls.Actions.Table
                 {
                     Transform rootTransform = city.gameObject.transform.Cast<Transform>()
                         .First(child => child.gameObject.IsNode());
-                    if (zoomActionDesktop.TriggerReset(rootTransform))
+                    if (zoomActionDesktop.TriggerImmediateReset(rootTransform))
                     {
                         currentProgressState = ProgressState.Wait;
-                        ShowNotification.Info("Zoom reset",
-                            "The currently chosen zoom will be reset, and may take a little bit.");
+                        //ShowNotification.Info("Zoom reset",
+                        //    "The currently chosen zoom will be reset, and may take a little bit.");
                         WaitForReset(rootTransform).Forget();
                     }
                 }
@@ -347,16 +347,8 @@ namespace SEE.Controls.Actions.Table
             }
             async UniTask WaitForReset(Transform rootTransform)
             {
-
-                await UniTask.WaitUntil(() => IsApproximatelyZero(rootTransform.localPosition.x)
-                                                && IsApproximatelyZero(rootTransform.localPosition.z));
                 await UniTask.Yield();
                 currentProgressState = executedOperation;
-
-                bool IsApproximatelyZero(float value, float tolerance = 1e-6f)
-                {
-                    return Mathf.Abs(value) < tolerance;
-                }
             }
         }
 
