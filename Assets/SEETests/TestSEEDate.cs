@@ -1,11 +1,10 @@
 ﻿using NUnit.Framework;
 using System;
-using System.Globalization;
 
 namespace SEE.Utils
 {
     /// <summary>
-    /// Test for <see cref="SEEDate"/>.
+    /// Tests for <see cref="SEEDate"/>.
     /// </summary>
     internal class TestSEEDate
     {
@@ -46,13 +45,6 @@ namespace SEE.Utils
         public void TestImpossibleDate2()
         {
             Assert.Throws<ArgumentException>(() => SEEDate.ToDate("2023/04/31"));
-        }
-
-        [Test]
-        public void TestFormat()
-        {
-            Assert.IsTrue(DateTime.TryParseExact("30/01/2009", "dd/MM/yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _));
-            Assert.IsTrue(DateTime.TryParseExact("2009/01/30", "yyyy/MM/dd", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTime _));
         }
     }
 }
