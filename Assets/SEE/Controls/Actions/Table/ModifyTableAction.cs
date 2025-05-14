@@ -347,9 +347,15 @@ namespace SEE.Controls.Actions.Table
             }
             async UniTask WaitForReset(Transform rootTransform)
             {
-                await UniTask.WaitUntil(() => rootTransform.localPosition.Equals(new(0, rootTransform.localPosition.y, 0)));
-                await UniTask.Delay(500);
+
+                await UniTask.WaitUntil(() => IsApproximatelyZero(rootTransform.localPosition.x)
+                                                && IsApproximatelyZero(rootTransform.localPosition.z));
                 currentProgressState = executedOperation;
+
+                bool IsApproximatelyZero(float value, float tolerance = 1e-6f)
+                {
+                    return Mathf.Abs(value) < tolerance;
+                }
             }
         }
 
