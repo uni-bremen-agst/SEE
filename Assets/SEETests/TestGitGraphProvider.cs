@@ -23,6 +23,11 @@ namespace SEE.GraphProviders
     public class TestGitGraphProvider
     {
         /// <summary>
+        /// The default value for the start date of relevant commits.
+        /// </summary>
+        private const string defaultDate = "2024/01/01";
+
+        /// <summary>
         /// Path to the git directory.
         /// </summary>
         private string gitDirPath;
@@ -80,7 +85,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<Graph> ProvidingGraphAsync(string date = "01/01/2024")
+        private async UniTask<Graph> ProvidingGraphAsync(string date = defaultDate)
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
@@ -109,7 +114,7 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = "01/01/2024")
+        private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
             GitEvolutionGraphProvider provider = new()
             {
@@ -207,7 +212,7 @@ namespace SEE.GraphProviders
             {
                 WriteFile("firstFile.cs", "This is a test", developerA);
 
-                Graph g = await ProvidingGraphAsync(date: "01/12/2024");
+                Graph g = await ProvidingGraphAsync(date: "2024/12/01");
                 // This file should be too old by now
                 Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfDevelopers]);
                 Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[CommitFrequency]);
@@ -347,7 +352,7 @@ namespace SEE.GraphProviders
             repo?.Dispose();
             if (Directory.Exists(gitDirPath))
             {
-                SEE.Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
+                Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
             }
         }
     }

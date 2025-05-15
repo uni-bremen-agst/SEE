@@ -102,6 +102,8 @@ namespace SEE.Game.City
             return this.GetEnumerator();
         }
 
+        #region Config I/O
+
         /// <summary>
         /// Saves this <see cref="NodeTypeVisualsMap"/> as a list of groups (node-type name, <see cref="NodeTypeVisualsMap"/>)
         /// using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -145,7 +147,7 @@ namespace SEE.Game.City
                         continue;
                     }
                     // VisualNodeAttributes
-                    VisualNodeAttributes visualNodeAttributes = new VisualNodeAttributes();
+                    VisualNodeAttributes visualNodeAttributes = new();
                     visualNodeAttributes.Restore(dict, visualNodeAttributesLabel);
 
                     map[name] = visualNodeAttributes;
@@ -168,5 +170,7 @@ namespace SEE.Game.City
         /// The label of the <see cref="VisualNodeAttributes"/> in the configuration file.
         /// </summary>
         private const string visualNodeAttributesLabel = "visualNodeAttributes";
+
+        #endregion Config I/O
     }
 }
