@@ -79,31 +79,35 @@ namespace SEE.Game.Drawable
         /// <returns>The searched child, if found. Otherwise, null</returns>
         public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
         {
-            Transform[] allChildren;
-            if (parent.CompareTag(Tags.Drawable))
-            {
-                GameObject attachedObjects = GetHighestParent(parent).FindChildWithTag(Tags.AttachedObjects);
-                if (attachedObjects != null)
-                {
-                    allChildren = attachedObjects.GetComponentsInChildren<Transform>(includeInactive);
-                }
-                else
-                {
-                    allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-                }
-            }
-            else
-            {
-                allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-            }
-            foreach (Transform child in allChildren)
-            {
-                if (child.gameObject.name.Equals(childName))
-                {
-                    return child.gameObject;
-                }
-            }
-            return null;
+            GameObject attachedObjects = GetHighestParent(parent).FindChildWithTag(Tags.AttachedObjects);
+            return attachedObjects != null?
+                attachedObjects.FindChild(childName, includeInactive)
+                : parent.FindChild(childName, includeInactive);
+
+            //Transform[] allChildren;
+            //if (parent.CompareTag(Tags.Drawable))
+            //{
+            //    if (attachedObjects != null)
+            //    {
+            //        allChildren = attachedObjects.GetComponentsInChildren<Transform>(includeInactive);
+            //    }
+            //    else
+            //    {
+            //        allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
+            //    }
+            //}
+            //else
+            //{
+            //    allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
+            //}
+            //foreach (Transform child in allChildren)
+            //{
+            //    if (child.gameObject.name.Equals(childName))
+            //    {
+            //        return child.gameObject;
+            //    }
+            //}
+            //return null;
         }
 
         /// <summary>
@@ -307,8 +311,8 @@ namespace SEE.Game.Drawable
         /// <returns>The unique ID.</returns>
         public static string GetUniqueID(GameObject surface)
         {
-            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface))?
-                GetDrawableSurfaceParentName(surface): surface.name;
+            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface)) ?
+                GetDrawableSurfaceParentName(surface) : surface.name;
         }
 
         /// <summary>
