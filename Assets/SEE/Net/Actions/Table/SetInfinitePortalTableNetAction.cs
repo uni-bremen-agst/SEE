@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.GO;
 
 namespace SEE.Net.Actions.Table
 {
@@ -20,7 +21,7 @@ namespace SEE.Net.Actions.Table
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            Portal.SetInfinitePortal(GameFinder.FindChildWithTag(Table, Tags.CodeCity));
+            Portal.SetInfinitePortal(Table.FindChildWithTag(Tags.CodeCity));
         }
     }
 }

@@ -2,6 +2,7 @@
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
@@ -157,7 +158,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeBorder.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                LineMenu.Instance.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf, callback);
+                LineMenu.Instance.EnableForEditing(node.FindChildWithTag(Tags.Line), conf.BorderConf, callback);
             });
         }
 
@@ -176,7 +177,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeText.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                TextMenu.EnableForEditing(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf, callback);
+                TextMenu.EnableForEditing(node.FindChildWithTag(Tags.DText), conf.TextConf, callback);
             });
         }
 

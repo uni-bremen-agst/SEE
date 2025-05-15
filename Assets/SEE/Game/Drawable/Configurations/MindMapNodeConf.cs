@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
@@ -78,8 +79,8 @@ namespace SEE.Game.Drawable.Configurations
                     OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Layer = valueHolder.Layer,
                     NodeKind = valueHolder.NodeKind,
-                    BorderConf = LineConf.GetLine(GameFinder.FindChildWithTag(obj, Tags.Line)),
-                    TextConf = TextConf.GetText(GameFinder.FindChildWithTag(obj, Tags.DText)),
+                    BorderConf = LineConf.GetLine(obj.FindChildWithTag(Tags.Line)),
+                    TextConf = TextConf.GetText(obj.FindChildWithTag(Tags.DText)),
                     Children = valueHolder.GetChildren()
                 };
                 /// Set the parent information.

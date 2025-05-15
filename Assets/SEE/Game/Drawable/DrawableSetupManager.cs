@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -50,7 +51,7 @@ namespace SEE.Game.Drawable
                 {
                     /// Block if the drawable holder already exists.
                     highestParent = parent;
-                    attachedObjects = GameFinder.FindChildWithTag(highestParent, Tags.AttachedObjects);
+                    attachedObjects = highestParent.FindChildWithTag(Tags.AttachedObjects);
                 }
             }
             else

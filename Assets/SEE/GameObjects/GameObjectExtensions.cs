@@ -1165,5 +1165,21 @@ namespace SEE.GO
                     .FirstOrDefault(t => t.gameObject.name == childName)?
                     .gameObject;
         }
+
+
+        /// <summary>
+        /// Searches for a child with a specific tag.
+        /// </summary>
+        /// <param name="gameObject">The parent game object of the children.</param>
+        /// <param name="tag">The tag to be searched.</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
+        /// <returns>the first found child with the searched tag.</returns>
+        public static GameObject FindChildWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .FirstOrDefault(t => t.gameObject.CompareTag(tag))?
+                .gameObject;
+        }
     }
 }
