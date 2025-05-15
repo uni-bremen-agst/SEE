@@ -4,6 +4,7 @@ using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
+using SEE.Net.Actions.RuntimeConfig;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -47,6 +48,11 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool blockOpening;
 
         /// <summary>
+        /// Indicator of whether the menu was build before.
+        /// </summary>
+        private bool wasBuildBefore = false;
+
+        /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
         private void Start()
@@ -66,6 +72,13 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void BuildTabMenus()
         {
+            if (wasBuildBefore)
+            {
+                ShowNotification.Info("Rebuilding Runtime Config Menu",
+                    "The runtime config menu is being rebuilt. This may take a moment. Please wait.");
+            }
+            wasBuildBefore = true;
+
             if (cityMenus != null)
             {
                 cityMenus.ForEach(c => Destroyer.Destroy(c));
@@ -76,6 +89,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 AddCity(i);
             }
             currentMenuCities = GetCities();
+            needsRebuild = false;
         }
 
         /// <summary>
@@ -111,8 +125,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
                 if (!currentMenuCities.SequenceEqual(GetCities()) || needsRebuild)
                 {
+                    new RebuildNetAction().Execute();
                     BuildTabMenus();
-                    needsRebuild = false;
                 }
                 cityMenus[currentCity].ToggleMenu();
             }
@@ -179,7 +193,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void BlockOpening()
         {
-            blockOpening= true;
+            blockOpening = true;
         }
 
         /// <summary>
