@@ -145,6 +145,7 @@ namespace SEE.Game.City
                     .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
                 // Restores the previous architecture layout.
                 RestoreLayout(layoutGraphNodes, decorationValues, pArchPos, pArchLossyScale);
+                visualization.InitializeEdges();
                 graphRenderer = null;
             }
 
