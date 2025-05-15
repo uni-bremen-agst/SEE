@@ -51,11 +51,6 @@ namespace SEE.Controls.Actions.Table
             public Vector3 Position;
 
             /// <summary>
-            /// The euler angles of the table.
-            /// </summary>
-            public Vector3 EulerAngles;
-
-            /// <summary>
             /// The scale of the table.
             /// </summary>
             public Vector3 Scale;
@@ -68,7 +63,6 @@ namespace SEE.Controls.Actions.Table
             {
                 Name = table.name;
                 Position = table.transform.position;
-                EulerAngles = table.transform.eulerAngles;
                 Scale = table.transform.localScale;
             }
         }
@@ -82,7 +76,6 @@ namespace SEE.Controls.Actions.Table
             spawnedTable = GameTableManager.Spawn();
             new SpawnTableNetAction(spawnedTable.name,
                 spawnedTable.transform.position,
-                spawnedTable.transform.eulerAngles,
                 spawnedTable.transform.localScale).Execute();
         }
 
@@ -116,11 +109,6 @@ namespace SEE.Controls.Actions.Table
                 {
                     GameTableManager.Move(spawnedTable, raycastHit.point);
                     new MoveTableNetAction(spawnedTable.name, spawnedTable.transform.position).Execute();
-                    if (SEEInput.ScrollDown() || SEEInput.ScrollUp())
-                    {
-                        GameTableManager.Rotate(spawnedTable, SEEInput.ScrollDown());
-                        new RotateTableNetAction(spawnedTable.name, spawnedTable.transform.eulerAngles).Execute();
-                    }
                     if (SEEInput.LeftMouseDown())
                     {
                         if (spawnedTable.TryGetComponent<CollisionDetectionManager>(out CollisionDetectionManager cdManager)
@@ -169,8 +157,8 @@ namespace SEE.Controls.Actions.Table
             if (spawnedTable == null)
             {
                 spawnedTable = GameTableManager.Respawn(memento.Name,
-                    memento.Position, memento.EulerAngles, memento.Scale);
-                new SpawnTableNetAction(memento.Name, memento.Position, memento.EulerAngles, memento.Scale).Execute();
+                    memento.Position, memento.Scale);
+                new SpawnTableNetAction(memento.Name, memento.Position, memento.Scale).Execute();
             }
         }
 

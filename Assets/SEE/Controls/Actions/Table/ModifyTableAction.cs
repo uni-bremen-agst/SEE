@@ -116,11 +116,6 @@ namespace SEE.Controls.Actions.Table
                 public Vector3 Position;
 
                 /// <summary>
-                /// The euler angles.
-                /// </summary>
-                public Vector3 EulerAngles;
-
-                /// <summary>
                 /// The scale.
                 /// </summary>
                 public Vector3 Scale;
@@ -133,7 +128,6 @@ namespace SEE.Controls.Actions.Table
                 {
                     Transform transform = table.transform;
                     Position = transform.position;
-                    EulerAngles = transform.eulerAngles;
                     Scale = transform.localScale;
                 }
             }
@@ -565,8 +559,8 @@ namespace SEE.Controls.Actions.Table
                         UpdateCity();
                         break;
                     case ProgressState.Delete:
-                        GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale);
-                        new SpawnTableNetAction(memento.Name, memento.Old.Position, memento.Old.EulerAngles, memento.Old.Scale).Execute();
+                        GameTableManager.Respawn(memento.Name, memento.Old.Position, memento.Old.Scale);
+                        new SpawnTableNetAction(memento.Name, memento.Old.Position, memento.Old.Scale).Execute();
                         break;
                 }
             }
