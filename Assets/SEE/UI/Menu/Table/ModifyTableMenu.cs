@@ -1,14 +1,14 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.UI.Menu.Table
 {
-	/// <summary>
-	/// This class provides the modify menu for tables.
-	/// </summary>
-	public class ModifyTableMenu
+    /// <summary>
+    /// This class provides the modify menu for tables.
+    /// </summary>
+    public class ModifyTableMenu
 	{
         /// <summary>
         /// The location where the menu prefeb is placed.
@@ -50,28 +50,28 @@ namespace SEE.UI.Menu.Table
 			menuInstance = PrefabInstantiator.InstantiatePrefab(tableMenuPrefab,
 								UICanvas.Canvas.transform, false);
 
-			ButtonManagerBasic move = GameFinder.FindChild(menuInstance, "Move")
+			ButtonManagerBasic move = menuInstance.FindChild("Move")
 				.GetComponent<ButtonManagerBasic>();
 			move.clickEvent.AddListener(() =>
 			{
 				ConfirmOperation(ModifyOperation.Move);
 			});
 
-            ButtonManagerBasic scale = GameFinder.FindChild(menuInstance, "Scale")
+            ButtonManagerBasic scale = menuInstance.FindChild("Scale")
 				.GetComponent<ButtonManagerBasic>();
             scale.clickEvent.AddListener(() =>
             {
 				ConfirmOperation(ModifyOperation.Scale);
             });
 
-            ButtonManagerBasic delete = GameFinder.FindChild(menuInstance, "Delete")
+            ButtonManagerBasic delete = menuInstance.FindChild("Delete")
 				.GetComponent<ButtonManagerBasic>();
             delete.clickEvent.AddListener(() =>
             {
 				ConfirmOperation(ModifyOperation.Delete);
             });
 
-			ButtonManagerBasic cancel = GameFinder.FindChild(menuInstance, "CancelDragger")
+			ButtonManagerBasic cancel = menuInstance.FindChild("CancelDragger")
 				.GetComponent<ButtonManagerBasic>();
 			cancel.clickEvent.AddListener(() =>
 			{

@@ -170,7 +170,7 @@ namespace SEE.Game.City
                     // Case for decorative texts that start with the prefix "Text".
                     if (gameObject.FindChildWithPrefix(Prefix) != null)
                     {
-                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
+                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
                         textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
                     }
                     // Case for label texts that start with the prefix "Label".

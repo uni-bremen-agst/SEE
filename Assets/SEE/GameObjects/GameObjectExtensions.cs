@@ -653,7 +653,7 @@ namespace SEE.GO
         /// we wish to return</param>
         /// <typeparam name="T">The component to get / add</typeparam>
         /// <returns>The existing or newly created component</returns>
-        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T : Component
         {
             return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
         }
@@ -1136,19 +1136,34 @@ namespace SEE.GO
         /// <summary>
         /// Searches for the first child that starts with the <paramref name="prefix"/>.
         /// </summary>
-        /// <param name="gameObject">The game object whose chidlren should be examined.</param>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
         /// <param name="prefix">The prefix to search for.</param>
         /// <returns>the found child or null.</returns>
-        public static Transform FindChildWithPrefix(this GameObject gameObject, string prefix)
+        public static GameObject FindChildWithPrefix(this GameObject gameObject, string prefix)
         {
             foreach (Transform child in gameObject.transform)
             {
                 if (child.name.StartsWith(prefix))
                 {
-                    return child;
+                    return child.gameObject;
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Searches for a child with the given name.
+        /// </summary>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
+        /// <param name="childName">The id of the searched child.</param>
+        /// <param name="includeInactive">whether the inactive objects should be included.</param>
+        /// <returns>The searched child, if found. Otherwise, null</returns>
+        public static GameObject FindChild(this GameObject gameObject, string childName, bool includeInactive = true)
+        {
+            return gameObject
+                    .GetComponentsInChildren<Transform>(includeInactive)
+                    .FirstOrDefault(t => t.gameObject.name == childName)?
+                    .gameObject;
         }
     }
 }

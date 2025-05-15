@@ -1,6 +1,6 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
 using SEE.Game.Table;
+using SEE.GO;
 using SEE.Net.Actions.Table;
 using SEE.UI.Drawable;
 using SEE.Utils;
@@ -51,8 +51,8 @@ namespace SEE.UI.Menu.Table
         /// <param name="table">The table to scale.</param>
         private void InitScale(GameObject table)
         {
-            InputFieldWithButtons xScaleArea = GameFinder.FindChild(menuInstance, "XScale").GetComponent<InputFieldWithButtons>();
-            InputFieldWithButtons zScaleArea = GameFinder.FindChild(menuInstance, "ZScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons xScaleArea = menuInstance.FindChild("XScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons zScaleArea = menuInstance.FindChild("ZScale").GetComponent<InputFieldWithButtons>();
             float step = 0.001f;
             float max = 0.05f;
 
@@ -96,12 +96,12 @@ namespace SEE.UI.Menu.Table
         /// </summary>
         private void DialogActionButtons()
         {
-            ButtonManagerBasic finish = GameFinder.FindChild(menuInstance, "Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic finish = menuInstance.FindChild("Finish").GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
                 isFinish = true;
             });
-            ButtonManagerBasic cancel = GameFinder.FindChild(menuInstance, "Cancel").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic cancel = menuInstance.FindChild("Cancel").GetComponent<ButtonManagerBasic>();
             cancel.clickEvent.AddListener(() =>
             {
                 wasCanceled = true;
