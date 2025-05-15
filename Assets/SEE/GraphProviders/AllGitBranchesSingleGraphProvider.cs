@@ -169,7 +169,7 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Calculates and returns the actual graph.
         ///
-        /// This method will collect all commit from all branches which are not older than <see cref="Date"/>.
+        /// This method will collect all commits from all branches which are not older than <see cref="Date"/>.
         /// Then from all these commits the metrics are calculated with
         /// <see cref="GitFileMetricProcessor.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
         /// </summary>
@@ -198,18 +198,15 @@ namespace SEE.GraphProviders
             GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
 
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
-            DateTime timeLimit = SEEDate.ToDate(branchCity.Date);
+            DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
             using (Repository repo = new(graph.BasePath))
             {
-                CommitFilter filter;
-
-                filter = new CommitFilter { IncludeReachableFrom = repo.Branches };
-
                 IEnumerable<Commit> commitList = repo.Commits
-                    .QueryBy(filter)
+                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
+                    // Commits after startDate
                     .Where(commit =>
-                        DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
+                        DateTime.Compare(commit.Author.When.Date, startDate) > 0)
                     // Filter out merge commits.
                     .Where(commit => commit.Parents.Count() <= 1);
 
