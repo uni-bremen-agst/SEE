@@ -12,6 +12,7 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using Sirenix.Utilities;
@@ -202,13 +203,7 @@ namespace SEE.GraphProviders
 
             using (Repository repo = new(graph.BasePath))
             {
-                IEnumerable<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter { IncludeReachableFrom = repo.Branches })
-                    // Commits after startDate
-                    .Where(commit =>
-                        DateTime.Compare(commit.Author.When.Date, startDate) > 0)
-                    // Filter out merge commits.
-                    .Where(commit => commit.Parents.Count() <= 1);
+                IEnumerable<Commit> commitList = repo.CommitsAfter(startDate);
 
                 // Select all files of this repo.
                 IEnumerable<string> files = repo.Branches
