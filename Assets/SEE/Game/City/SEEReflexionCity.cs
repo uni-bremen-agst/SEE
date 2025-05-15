@@ -124,7 +124,12 @@ namespace SEE.Game.City
             }
             else
             {
-                Debug.Log("ReDrawGraph");
+                ReDrawGraphAsync().Forget();
+
+            }
+            return;
+            async UniTask ReDrawGraphAsync()
+            {
                 // Gather the previous architecture layout.
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
@@ -134,20 +139,54 @@ namespace SEE.Game.City
 
                 // Delete the previous city and draw the new one.
                 DeleteGraphGameObjects();
+                await UniTask.DelayFrame(2);
                 DrawGraph();
+                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
+                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
                 // Restores the previous architecture layout.
-                RestoreLayout(layoutGraphNodes, decorationValues, pArchPos, pArchLossyScale).Forget();
+                RestoreLayout(layoutGraphNodes, decorationValues, pArchPos, pArchLossyScale);
                 graphRenderer = null;
             }
-            return;
 
-            async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
+            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
+            {
+                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
+                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
+                foreach (GameObject gameObject in gameObjects)
+                {
+                    Node node = gameObject.GetComponent<NodeRef>().Value;
+                    // skip non architecture nodes. Their restoration is handled by the layout itself.
+                    if (!node.IsInArchitecture())
+                    {
+                        continue;
+                    }
+                    LayoutGraphNode layoutNode = new(node)
+                    {
+                        CenterPosition = gameObject.transform.position,
+                        AbsoluteScale = gameObject.transform.localScale,
+                    };
+                    result.Add(layoutNode);
+                    // Case for decorative texts that start with the prefix "Text".
+                    if (gameObject.FindChildWithPrefix(Prefix) != null)
+                    {
+                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
+                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
+                    }
+                    // Case for label texts that start with the prefix "Label".
+                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
+                    {
+                        textValues.Add(node.ID,
+                            (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                    }
+                }
+                LayoutNodes.SetLevels(result);
+                return (result, textValues);
+            }
+
+            void RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
                                         Vector3 pArchPos, Vector3 pArchLossyScale)
             {
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
-                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
-
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
@@ -185,41 +224,6 @@ namespace SEE.Game.City
                     nodeLayout.AbsoluteScale.x / scaleFactor.x,
                     nodeLayout.AbsoluteScale.y,
                     nodeLayout.AbsoluteScale.z / scaleFactor.z);
-            }
-
-            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
-            {
-                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
-                foreach (GameObject gameObject in gameObjects)
-                {
-                    Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip non architecture nodes. Their restoration is handled by the layout itself.
-                    if (!node.IsInArchitecture())
-                    {
-                        continue;
-                    }
-                    LayoutGraphNode layoutNode = new(node)
-                    {
-                        CenterPosition = gameObject.transform.position,
-                        AbsoluteScale = gameObject.transform.localScale,
-                    };
-                    result.Add(layoutNode);
-                    // Case for decorative texts that start with the prefix "Text".
-                    if (gameObject.FindChildWithPrefix(Prefix) != null)
-                    {
-                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
-                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
-                    }
-                    // Case for label texts that start with the prefix "Label".
-                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
-                    {
-                        textValues.Add(node.ID,
-                            (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
-                    }
-                }
-                LayoutNodes.SetLevels(result);
-                return (result, textValues);
             }
         }
 
