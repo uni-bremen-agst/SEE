@@ -2,7 +2,6 @@
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
