@@ -102,7 +102,7 @@ namespace SEE.Game.Drawable
         /// <returns>true, if the child has a drawable. Otherwise false</returns>
         public static bool HasDrawableSurface(GameObject child)
         {
-            if (HasParentWithTag(child, Tags.AttachedObjects))
+            if (child.HasParentWithTag(Tags.AttachedObjects))
             {
                 return GetDrawableSurface(child) != null;
             }
