@@ -249,7 +249,7 @@ namespace SEE.Game.Table
         /// <param name="table">The table to destroy.</param>
         public static void Destroy(GameObject table)
         {
-            if (table.HasDescendantWithTag(Tags.CodeCity))
+            if (!table.HasDescendantWithTag(Tags.CodeCity))
             {
                 return;
             }
