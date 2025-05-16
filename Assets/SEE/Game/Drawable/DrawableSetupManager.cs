@@ -23,7 +23,7 @@ namespace SEE.Game.Drawable
         {
             if (GameFinder.HasParent(surface))
             {
-                GameObject parent = GameFinder.GetHighestParent(surface);
+                GameObject parent = surface.GetRootParent();
                 /// Block for drawable holder creation.
                 if (!parent.name.StartsWith(ValueHolder.DrawableHolderPrefix))
                 {

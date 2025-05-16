@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -199,12 +200,12 @@ namespace SEE.Game.Drawable
                     order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
                 }
                 bool lighting = false;
-                if (GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>() != null)
+                if (surface.GetRootParent().transform.GetComponentInChildren<Light>() != null)
                 {
-                    lighting = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
+                    lighting = surface.GetRootParent().transform.GetComponentInChildren<Light>().enabled;
                 }
 
-                bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
+                bool visibility = surface.GetRootParent().activeInHierarchy;
 
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
 

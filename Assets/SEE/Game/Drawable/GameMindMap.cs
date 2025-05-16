@@ -375,7 +375,7 @@ namespace SEE.Game.Drawable
             positions[0] = startPoint;
             positions[1] = endPoint;
             /// Convert the positions to local space.
-            GameFinder.GetHighestParent(child).transform.InverseTransformPoints(positions);
+            child.GetRootParent().transform.InverseTransformPoints(positions);
 
             GameObject surface = GameFinder.GetDrawableSurface(child);
             /// If no name was chosen, use <see cref="ValueHolder.MindMapBranchLine"/> - ParentID - NodeID.

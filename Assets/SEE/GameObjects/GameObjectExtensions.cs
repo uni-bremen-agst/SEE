@@ -1219,5 +1219,18 @@ namespace SEE.GO
             }
             return false;
         }
+
+        /// <summary>
+        /// Traverses up the hierachy from the given <paramref name="gameObject"/>
+        /// and returns the highest parent.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> in the hierarchy.</param>
+        /// <returns>The root <see cref="GameObject"/> at the top of the hierarchy.
+        /// If the given object has no parent, it is returned itself.</returns>
+        public static GameObject GetRootParent(this GameObject gameObject)
+        {
+            Transform parent = gameObject.transform.parent;
+            return parent != null ? GetRootParent(parent.gameObject) : gameObject;
+        }
     }
 }

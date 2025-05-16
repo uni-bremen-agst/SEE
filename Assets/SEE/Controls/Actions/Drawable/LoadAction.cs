@@ -1,22 +1,21 @@
 ﻿using HighlightPlus;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
-using SEE.UI.Notification;
+using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI;
 using SEE.UI.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
+using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.Utils.Paths;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ValueHolders;
-using SEE.Game.Drawable.ActionHelpers;
-using System.Linq;
-using SEE.UI;
-using System;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -390,7 +389,7 @@ namespace SEE.Controls.Actions.Drawable
                             GameObject surface = GameFinder.FindDrawableSurface(config.ID,
                                 config.ParentID);
                             new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                            Destroyer.Destroy(GameFinder.GetHighestParent(surface));
+                            Destroyer.Destroy(surface.GetRootParent());
                         }
                         else
                         {

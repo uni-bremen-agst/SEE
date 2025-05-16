@@ -79,7 +79,7 @@ namespace SEE.Game.Drawable
         /// <returns>The searched child, if found. Otherwise, null</returns>
         public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
         {
-            GameObject attachedObjects = GetHighestParent(parent).FindDescendantWithTag(Tags.AttachedObjects);
+            GameObject attachedObjects = parent.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
             return attachedObjects != null?
                 attachedObjects.FindDescendant(childName, includeInactive)
                 : parent.FindDescendant(childName, includeInactive);
@@ -92,7 +92,7 @@ namespace SEE.Game.Drawable
         /// <returns>The drawable object.</returns>
         public static GameObject GetDrawableSurface(GameObject obj)
         {
-            return GetHighestParent(obj).FindDescendantWithTag(Tags.Drawable);
+            return obj.GetRootParent().FindDescendantWithTag(Tags.Drawable);
         }
 
         /// <summary>
@@ -284,7 +284,7 @@ namespace SEE.Game.Drawable
         /// <returns>True if an object with a <see cref="Tags.Whiteboard"/> exists in the object tree.</returns>
         public static bool IsWhiteboard(GameObject obj)
         {
-            return GetHighestParent(obj).FindDescendantWithTag(Tags.Whiteboard) != null;
+            return obj.GetRootParent().FindDescendantWithTag(Tags.Whiteboard) != null;
         }
 
         /// <summary>
@@ -294,19 +294,7 @@ namespace SEE.Game.Drawable
         /// <returns>True if an object with a <see cref="Tags.StickyNote"/> exists in the object tree.</returns>
         public static bool IsStickyNote(GameObject obj)
         {
-            return GetHighestParent(obj).FindDescendantWithTag(Tags.StickyNote) != null;
-        }
-
-        /// <summary>
-        /// Gets the highest parent of the given <paramref name="descendant"/>.
-        /// Usually the drawable holder.
-        /// </summary>
-        /// <param name="descendant">The descendant.</param>
-        /// <returns>The highest parent</returns>
-        public static GameObject GetHighestParent(GameObject descendant)
-        {
-            Transform parent = descendant.transform.parent;
-            return parent != null ? GetHighestParent(parent.gameObject) : descendant;
+            return obj.GetRootParent().FindDescendantWithTag(Tags.StickyNote) != null;
         }
 
         /// <summary>
@@ -317,7 +305,7 @@ namespace SEE.Game.Drawable
         /// <returns>the object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {
-            return GetHighestParent(obj).FindDescendantWithTag(Tags.AttachedObjects);
+            return obj.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
         }
 
         /// <summary>
