@@ -2,7 +2,6 @@
 using MoreLinq;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.Game.Table;
 using SEE.GameObjects;
 using SEE.GO;
@@ -268,7 +267,7 @@ namespace SEE.Controls.Actions.Table
         {
             if (SEEInput.LeftMouseDown() && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                 && (raycastHit.collider.gameObject.CompareTag(Tags.CodeCity)
-                    || GameFinder.HasParentWithTag(raycastHit.collider.gameObject, Tags.CodeCity))
+                    ||raycastHit.collider.gameObject.HasParentWithTag(Tags.CodeCity))
                 && modifiedTable == null)
             {
                 GameObject raycastObj = raycastHit.collider.gameObject;

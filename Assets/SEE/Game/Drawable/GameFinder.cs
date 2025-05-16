@@ -205,26 +205,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Query wheter the child has a parent with the given tag.
-        /// </summary>
-        /// <param name="child">The child.</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <returns>true, if a parent with the given tag exists.</returns>
-        public static bool HasParentWithTag(GameObject child, string tag)
-        {
-            Transform transform = child.transform;
-            while (transform.parent != null)
-            {
-                if (transform.parent.gameObject.CompareTag(tag))
-                {
-                    return true;
-                }
-                transform = transform.parent;
-            }
-            return false;
-        }
-
-        /// <summary>
         /// Returns the next higher <see cref="DrawableType"/> object.
         /// It will be needed if a child object of the <see cref="DrawableType"/> object was selected.
         /// </summary>

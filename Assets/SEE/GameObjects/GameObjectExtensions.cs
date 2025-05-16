@@ -1198,5 +1198,26 @@ namespace SEE.GO
         {
             return gameObject.FindDescendantWithTag(tag) != null;
         }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="gameObject"/> has any ancestor
+        /// with the given <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> whose parent hierarhcy will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a parent or ancestor with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasParentWithTag(this GameObject gameObject, string tag)
+        {
+            Transform transform = gameObject.transform;
+            while (transform.parent != null)
+            {
+                if (transform.parent.gameObject.CompareTag(tag))
+                {
+                    return true;
+                }
+                transform = transform.parent;
+            }
+            return false;
+        }
     }
 }

@@ -1,16 +1,15 @@
 ﻿using Assets.SEE.UI.Window.PropertyWindow;
 using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
+using SEE.XR;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.XR;
 
 namespace SEE.UI.Window.PropertyWindow
 {
