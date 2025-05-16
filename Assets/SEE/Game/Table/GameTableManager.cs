@@ -95,7 +95,7 @@ namespace SEE.Game.Table
         /// <param name="scale">The scale where the table should be scaled.</param>
         public static void Scale(GameObject table, Vector3 scale)
         {
-            GameObject city = table.FindChildWithTag(Tags.CodeCity);
+            GameObject city = table.FindDescendantWithTag(Tags.CodeCity);
 
             if (!city.IsCodeCityDrawn())
             {
@@ -327,7 +327,7 @@ namespace SEE.Game.Table
 		/// <param name="table">The table whose <see cref="CitySelectionManager"/> should be disabled.</param>
         public static void DisableCSM(GameObject table)
         {
-            if (table.FindChildWithTag(Tags.CodeCity) is GameObject city)
+            if (table.FindDescendantWithTag(Tags.CodeCity) is GameObject city)
             {
                 city.GetComponent<CitySelectionManager>().enabled = false;
             }
@@ -340,7 +340,7 @@ namespace SEE.Game.Table
         /// <param name="table">The table whose city needs to be redrawn.</param>
         public static void EnableCity(GameObject table)
         {
-            if (table.FindChildWithTag(Tags.CodeCity) is GameObject city)
+            if (table.FindDescendantWithTag(Tags.CodeCity) is GameObject city)
             {
                 if (city.IsCodeCityDrawn())
                 {

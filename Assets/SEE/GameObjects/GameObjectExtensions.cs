@@ -1152,29 +1152,34 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Searches for a child with the given name.
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">The game object whose children should be examined.</param>
-        /// <param name="childName">The id of the searched child.</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>The searched child, if found. Otherwise, null</returns>
-        public static GameObject FindChild(this GameObject gameObject, string childName, bool includeInactive = true)
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="descendantName">The name of the descendant to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search wil include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The frist matching descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>,
+        /// or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendant(this GameObject gameObject, string descendantName, bool includeInactive = true)
         {
             return gameObject
                     .GetComponentsInChildren<Transform>(includeInactive)
-                    .FirstOrDefault(t => t.gameObject.name == childName)?
+                    .FirstOrDefault(t => t.gameObject.name == descendantName)?
                     .gameObject;
         }
 
 
         /// <summary>
-        /// Searches for a child with a specific tag.
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="tag"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">The parent game object of the children.</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>the first found child with the searched tag.</returns>
-        public static GameObject FindChildWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search will include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The first matching descendant <see cref="GameObject"/> with the specified tag, or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendantWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
         {
             return gameObject
                 .GetComponentsInChildren<Transform>(includeInactive)

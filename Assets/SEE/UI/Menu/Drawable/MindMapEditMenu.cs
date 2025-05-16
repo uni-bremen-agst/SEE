@@ -158,7 +158,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeBorder.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                LineMenu.Instance.EnableForEditing(node.FindChildWithTag(Tags.Line), conf.BorderConf, callback);
+                LineMenu.Instance.EnableForEditing(node.FindDescendantWithTag(Tags.Line), conf.BorderConf, callback);
             });
         }
 
@@ -177,7 +177,7 @@ namespace SEE.Game.UI.Menu.Drawable
             changeText.clickEvent.AddListener(() =>
             {
                 Instance.gameObject.SetActive(false);
-                TextMenu.EnableForEditing(node.FindChildWithTag(Tags.DText), conf.TextConf, callback);
+                TextMenu.EnableForEditing(node.FindDescendantWithTag(Tags.DText), conf.TextConf, callback);
             });
         }
 

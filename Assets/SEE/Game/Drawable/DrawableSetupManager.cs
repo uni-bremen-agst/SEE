@@ -51,7 +51,7 @@ namespace SEE.Game.Drawable
                 {
                     /// Block if the drawable holder already exists.
                     highestParent = parent;
-                    attachedObjects = highestParent.FindChildWithTag(Tags.AttachedObjects);
+                    attachedObjects = highestParent.FindDescendantWithTag(Tags.AttachedObjects);
                 }
             }
             else

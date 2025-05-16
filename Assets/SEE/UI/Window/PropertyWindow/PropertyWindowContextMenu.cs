@@ -202,14 +202,14 @@ namespace SEE.UI.Window.PropertyWindow
 
                 new PopupMenuAction("Attribute Name", () =>
                 {
-                    ToggleSortAction("Name", x => x.FindChild("AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
+                    ToggleSortAction("Name", x => x.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
                 }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false),
 
                 new PopupMenuAction("Attribute Value", () =>
                 {
                     ToggleSortAction("Value", x =>
                     {
-                        string text = x.FindChild("ValueLine").MustGetComponent<TextMeshProUGUI>().text;
+                        string text = x.FindDescendant("ValueLine").MustGetComponent<TextMeshProUGUI>().text;
                         if (int.TryParse(text, out int intValue))
                         {
                             if (!Grouper) {

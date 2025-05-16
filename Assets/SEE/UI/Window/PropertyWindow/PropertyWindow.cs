@@ -297,7 +297,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 else
                 {
-                    if (go.FindChild("Expand Icon") != null)
+                    if (go.FindDescendant("Expand Icon") != null)
                     {
                         RotateExpandIcon(go, false);
                     }
@@ -643,7 +643,7 @@ namespace SEE.UI.Window.PropertyWindow
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
             group.name = name;
-            group.FindChild("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+            group.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
             Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
             OrderGroup();
             RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
@@ -713,7 +713,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="expanded">Whether the group should be expanded or not.</param>
         private void RotateExpandIcon(GameObject group, bool expanded, float duration = 0.5f)
         {
-            if (group.FindChild("Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+            if (group.FindDescendant("Expand Icon").TryGetComponentOrLog(out RectTransform transform))
             {
                 Vector3 endValue = expanded ? new Vector3(0, 0, -180) : new Vector3(0, 0, -90);
                 transform.DORotate(endValue, duration: duration);
@@ -787,7 +787,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>the TMP holding the attribute name</returns>
         private TextMeshProUGUI Attribute(GameObject propertyRow)
         {
-            return propertyRow.FindChild("AttributeLine").MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
@@ -809,7 +809,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>the TMP holding the attribute value</returns>
         private TextMeshProUGUI Value(GameObject propertyRow)
         {
-            return propertyRow.FindChild("ValueLine")?.MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("ValueLine")?.MustGetComponent<TextMeshProUGUI>();
         }
         #endregion
 

@@ -79,8 +79,8 @@ namespace SEE.Game.Drawable.Configurations
                     OrderInLayer = obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer,
                     Layer = valueHolder.Layer,
                     NodeKind = valueHolder.NodeKind,
-                    BorderConf = LineConf.GetLine(obj.FindChildWithTag(Tags.Line)),
-                    TextConf = TextConf.GetText(obj.FindChildWithTag(Tags.DText)),
+                    BorderConf = LineConf.GetLine(obj.FindDescendantWithTag(Tags.Line)),
+                    TextConf = TextConf.GetText(obj.FindDescendantWithTag(Tags.DText)),
                     Children = valueHolder.GetChildren()
                 };
                 /// Set the parent information.

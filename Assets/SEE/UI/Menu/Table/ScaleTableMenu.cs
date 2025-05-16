@@ -51,8 +51,8 @@ namespace SEE.UI.Menu.Table
         /// <param name="table">The table to scale.</param>
         private void InitScale(GameObject table)
         {
-            InputFieldWithButtons xScaleArea = menuInstance.FindChild("XScale").GetComponent<InputFieldWithButtons>();
-            InputFieldWithButtons zScaleArea = menuInstance.FindChild("ZScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons xScaleArea = menuInstance.FindDescendant("XScale").GetComponent<InputFieldWithButtons>();
+            InputFieldWithButtons zScaleArea = menuInstance.FindDescendant("ZScale").GetComponent<InputFieldWithButtons>();
             float step = 0.001f;
             float max = 0.05f;
 
@@ -96,12 +96,12 @@ namespace SEE.UI.Menu.Table
         /// </summary>
         private void DialogActionButtons()
         {
-            ButtonManagerBasic finish = menuInstance.FindChild("Finish").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic finish = menuInstance.FindDescendant("Finish").GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
                 isFinish = true;
             });
-            ButtonManagerBasic cancel = menuInstance.FindChild("Cancel").GetComponent<ButtonManagerBasic>();
+            ButtonManagerBasic cancel = menuInstance.FindDescendant("Cancel").GetComponent<ButtonManagerBasic>();
             cancel.clickEvent.AddListener(() =>
             {
                 wasCanceled = true;

@@ -21,7 +21,7 @@ namespace SEE.Net.Actions.Table
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            Portal.SetInfinitePortal(Table.FindChildWithTag(Tags.CodeCity));
+            Portal.SetInfinitePortal(Table.FindDescendantWithTag(Tags.CodeCity));
         }
     }
 }

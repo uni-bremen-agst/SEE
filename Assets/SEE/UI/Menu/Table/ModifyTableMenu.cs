@@ -50,28 +50,28 @@ namespace SEE.UI.Menu.Table
 			menuInstance = PrefabInstantiator.InstantiatePrefab(tableMenuPrefab,
 								UICanvas.Canvas.transform, false);
 
-			ButtonManagerBasic move = menuInstance.FindChild("Move")
+			ButtonManagerBasic move = menuInstance.FindDescendant("Move")
 				.GetComponent<ButtonManagerBasic>();
 			move.clickEvent.AddListener(() =>
 			{
 				ConfirmOperation(ModifyOperation.Move);
 			});
 
-            ButtonManagerBasic scale = menuInstance.FindChild("Scale")
+            ButtonManagerBasic scale = menuInstance.FindDescendant("Scale")
 				.GetComponent<ButtonManagerBasic>();
             scale.clickEvent.AddListener(() =>
             {
 				ConfirmOperation(ModifyOperation.Scale);
             });
 
-            ButtonManagerBasic delete = menuInstance.FindChild("Delete")
+            ButtonManagerBasic delete = menuInstance.FindDescendant("Delete")
 				.GetComponent<ButtonManagerBasic>();
             delete.clickEvent.AddListener(() =>
             {
 				ConfirmOperation(ModifyOperation.Delete);
             });
 
-			ButtonManagerBasic cancel = menuInstance.FindChild("CancelDragger")
+			ButtonManagerBasic cancel = menuInstance.FindDescendant("CancelDragger")
 				.GetComponent<ButtonManagerBasic>();
 			cancel.clickEvent.AddListener(() =>
 			{

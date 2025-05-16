@@ -117,7 +117,7 @@ namespace SEE.UI.PropertyDialog
                 {
                     if (showValidationFailedMessage)
                     {
-                        inputField.FindChild("Validation Area").SetActive(false);
+                        inputField.FindDescendant("Validation Area").SetActive(false);
                         ChangeColorOfValidation(Color.white);
                         showValidationFailedMessage = false;
                     }
@@ -181,7 +181,7 @@ namespace SEE.UI.PropertyDialog
         /// <param name="errorMessage">The error message which should be displayed.</param>
         public void ChangeToValidationFailed(string errorMessage)
         {
-            GameObject validationArea = inputField.FindChild("Validation Area");
+            GameObject validationArea = inputField.FindDescendant("Validation Area");
             validationArea.SetActive(true);
             validationArea.GetComponentInChildren<TextMeshProUGUI>().text = errorMessage;
             showValidationFailedMessage = true;
@@ -208,9 +208,9 @@ namespace SEE.UI.PropertyDialog
                 fadeDuration = 0.1f
             };
             // Change the color of the input text and of the placeholder text.
-            TextMeshProUGUI textTMP = inputField.FindChild("Text Area").GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI textTMP = inputField.FindDescendant("Text Area").GetComponentInChildren<TextMeshProUGUI>();
             textTMP.faceColor = color;
-            inputField.FindChild("Placeholder").GetComponent<TextMeshProUGUI>().color = color;
+            inputField.FindDescendant("Placeholder").GetComponent<TextMeshProUGUI>().color = color;
 
             // Change the color of the input field background (the underlaying line).
             UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();
