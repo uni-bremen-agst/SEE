@@ -1170,23 +1170,6 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Finds all descendant <see cref="GameObject"/>s of the given <paramref name="gameObject"/>
-        /// that have the specified tag.
-        /// </summary>
-        /// <param name="gameObject">The root <see cref="GameObject"/> to start the search from.</param>
-        /// <param name="tag">The tag that matching descendants must have.</param>
-        /// <param name="includeInactive">Whether to include inactive <see cref="GameObject"/>s in the search.</param>
-        /// <returns>A list of all descendant <see cref="GameObject"/>s with the specified tag.</returns>
-        public static IList<GameObject> FindAllDescendantsWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
-        {
-            return gameObject
-                .GetComponentsInChildren<Transform>(includeInactive)
-                .Where(t => t.CompareTag(tag))
-                .Select(t => t.gameObject)
-                .ToList();
-        }
-
-        /// <summary>
         /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="tag"/>
         /// within the hierarchy of the given <paramref name="gameObject"/>.
         /// </summary>
@@ -1215,6 +1198,22 @@ namespace SEE.GO
             return gameObject.FindDescendantWithTag(tag) != null;
         }
 
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s of the given <paramref name="gameObject"/>
+        /// that have the specified tag.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to start the search from.</param>
+        /// <param name="tag">The tag that matching descendants must have.</param>
+        /// <param name="includeInactive">Whether to include inactive <see cref="GameObject"/>s in the search.</param>
+        /// <returns>A list of all descendant <see cref="GameObject"/>s with the specified tag.</returns>
+        public static IList<GameObject> FindAllDescendantsWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .Where(t => t.CompareTag(tag))
+                .Select(t => t.gameObject)
+                .ToList();
+        }
         /// <summary>
         /// Finds all descendant <see cref="GameObject"/>s with the specified <paramref name="descendantTag"/>,
         /// exluding those whose immediate parent has the specified <paramref name="immediateParentTag"/>.
