@@ -195,17 +195,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Query whether the parent has a child with the searched tag.
-        /// </summary>
-        /// <param name="parent">The parent</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <returns>true, if a child with the searched tag exists.</returns>
-        public static bool HasChildWithTag(GameObject parent, string tag)
-        {
-            return parent.FindDescendantWithTag(tag) != null;
-        }
-
-        /// <summary>
         /// Query whether the child has a parent.
         /// </summary>
         /// <param name="child">The child.</param>

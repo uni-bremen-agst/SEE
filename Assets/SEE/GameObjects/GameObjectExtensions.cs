@@ -1186,5 +1186,17 @@ namespace SEE.GO
                 .FirstOrDefault(t => t.gameObject.CompareTag(tag))?
                 .gameObject;
         }
+
+        /// <summary>
+        /// QDetermines whether the <paramref name="gameObject"/> has any descendant
+        /// with the specified <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a descendant with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasDescendantWithTag(this GameObject gameObject, string tag)
+        {
+            return gameObject.FindDescendantWithTag(tag) != null;
+        }
     }
 }
