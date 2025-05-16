@@ -754,7 +754,7 @@ namespace SEE.Game.Drawable
         private static bool ChangeIsPossible(GameObject selectedNode)
         {
             GameObject attacheds = GameFinder.GetAttachedObjectsObject(selectedNode);
-            foreach (GameObject node in GameFinder.FindAllChildrenWithTag(attacheds, Tags.MindMapNode))
+            foreach (GameObject node in attacheds.FindAllDescendantsWithTag(Tags.MindMapNode))
             {
                 if (node.GetComponent<MMNodeValueHolder>().NodeKind == NodeKind.Theme
                     && ParentChangeIsValid(selectedNode, node))

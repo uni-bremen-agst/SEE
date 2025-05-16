@@ -421,8 +421,8 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects,
-                Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null
+                && attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode).Count > 0)
             {
                 return true;
             }
