@@ -1,6 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Tools.OpenTelemetry;
 using SEE.UI3D;
 using SEE.Utils;
 using UnityEngine;
@@ -45,7 +49,8 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogWarning($"{name} has no {nameof(AbstractSEECity)} component attached to it. {nameof(CityCursor)} will be disabled.\n");
+                Debug.LogWarning(
+                    $"{name} has no {nameof(AbstractSEECity)} component attached to it. {nameof(CityCursor)} will be disabled.\n");
                 enabled = false;
             }
         }
@@ -56,24 +61,37 @@ namespace SEE.GO
         /// </summary>
         private void OnDestroy()
         {
-            InteractableObject.AnyHoverIn  -= AnyHoverIn;
+            InteractableObject.AnyHoverIn -= AnyHoverIn;
             InteractableObject.AnyHoverOut -= AnyHoverOut;
             Destroyer.Destroy(Cursor);
         }
+
+        private readonly Dictionary<InteractableObject, float> hoverStartTimes = new();
+        private readonly HashSet<InteractableObject> hoverThresholdReached = new();
+        private readonly float hoverThreshold = 5.0f; // Sekunden
 
         /// <summary>
         /// Makes <paramref name="interactableObject"/> the <see cref="Cursor"/> focus when
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is selected.
         /// </summary>
-        /// <param name="interactableObject">the selected object</param>
-        private void AnyHoverIn(InteractableObject interactableObject, bool _)
+        private async void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph != null && city.LoadedGraph != null
-                && selectedGraph.Equals(city.LoadedGraph))
+                                      && selectedGraph.Equals(city.LoadedGraph))
             {
                 Cursor.AddFocus(interactableObject);
+                hoverStartTimes[interactableObject] = Time.time;
+
+                float start = Time.time;
+                await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
+
+                if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime) &&
+                    Math.Abs(hoverTime - start) < 0.1f)
+                {
+                    hoverThresholdReached.Add(interactableObject);
+                }
             }
         }
 
@@ -82,13 +100,22 @@ namespace SEE.GO
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is unselected.
         /// </summary>
-        /// <param name="interactableObject">the unselected object</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
             Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
             if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
             {
                 Cursor.RemoveFocus(interactableObject);
+
+                if (hoverStartTimes.TryGetValue(interactableObject, out float startTime) &&
+                    hoverThresholdReached.Contains(interactableObject))
+                {
+                    float duration = Time.time - startTime;
+                    TracingHelperService.Instance?.TrackHoverDuration(interactableObject.gameObject, duration);
+                }
+
+                hoverStartTimes.Remove(interactableObject);
+                hoverThresholdReached.Remove(interactableObject);
             }
         }
     }

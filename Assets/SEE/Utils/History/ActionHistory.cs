@@ -233,7 +233,7 @@ namespace SEE.Utils.History
             string actionID = action.GetId();
             HashSet<string> changedObjects = action.GetChangedObjects();
             Push(new GlobalHistoryEntry(true, HistoryType.Action, actionID, changedObjects));
-            TracingHelperService.Instance?.TrackAddToHistory(action, actionID, changedObjects);
+            TracingHelperService.Instance?.TrackAddToHistory(action, changedObjects);
             if (syncOverNetwork)
             {
                 new NetActionHistory().Push(HistoryType.Action, actionID, changedObjects);

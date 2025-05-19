@@ -95,7 +95,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <summary>
         /// Releases all resources used by the exporter.
         /// </summary>
-        public void Dispose()
+        public new void Dispose()
         {
             CheckGracefulShutdown();
             GC.SuppressFinalize(this);

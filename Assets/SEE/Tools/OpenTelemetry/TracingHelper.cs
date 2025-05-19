@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using SEE.Controls.Actions;
 using SEE.Utils.History;
@@ -7,7 +8,7 @@ using UnityEngine;
 namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
-    /// Provides static methods for tracing key user and system actions within SEE.
+    /// Provides methods for tracing key user and system actions within SEE.
     /// Each method is tailored to record metadata about specific types of actions,
     /// supporting observability and behavioral analysis via OpenTelemetry.
     /// </summary>
@@ -15,22 +16,41 @@ namespace SEE.Tools.OpenTelemetry
     {
         private readonly ActivitySource activitySource;
 
-        public TracingHelper(string sourceName = "SEE.Tracing")
+        /// <summary>
+        /// The name of the player whose actions are being tracked.
+        /// </summary>
+        private readonly string playerName;
+
+        /// <summary>
+        /// List of action types that should not be tracked.
+        /// Add action types to this set to exclude them from tracing.
+        /// </summary>
+        private readonly HashSet<Type> excludedActionTypes = new()
+        {
+            typeof(MoveAction) // MoveAction is tracked separately
+        };
+
+        public TracingHelper(string sourceName = "SEE.Tracing", string playerName = "UnknownPlayer")
         {
             activitySource = new ActivitySource(sourceName);
+            this.playerName = playerName;
         }
 
         /// <summary>
         /// Traces the addition of a reversible action to the global action history.
-        /// Ignores MoveAction since it is tracked separately.
+        /// Ignores actions listed in <see cref="excludedActionTypes"/>.
         /// </summary>
-        public void TrackAddToHistory(IReversibleAction action, string actionID, HashSet<string> changedObjects)
+        public void TrackAddToHistory(IReversibleAction action, HashSet<string> changedObjects)
         {
-            if (action is MoveAction) return;
+            if (excludedActionTypes.Contains(action.GetType()))
+            {
+                return;
+            }
 
             var tags = new Dictionary<string, object>
             {
-                { "action.id", actionID },
+                { "action.id", action.GetId() },
+                { "player.name", playerName },
                 { "action.type", action.GetType().FullName }
             };
 
@@ -64,8 +84,10 @@ namespace SEE.Tools.OpenTelemetry
         {
             var tags = new Dictionary<string, object>
             {
+                { "action.type", action.GetType().FullName },
+                { "player.name", playerName },
                 { "action.id", action.ActionID },
-                { "action.type", action.GetType().FullName }
+                { "isOwner", action.IsOwner }
             };
 
             int index = 0;
@@ -101,6 +123,7 @@ namespace SEE.Tools.OpenTelemetry
             var tags = new Dictionary<string, object>
             {
                 { "action.type", "MoveAction" },
+                { "player.name", playerName },
                 { "newParent", grabbedObjectNewParent?.name ?? "None" },
                 { "finalPosition", finalPosition.ToString() },
                 { "action.objectId", grabbedObject.name },
@@ -122,20 +145,34 @@ namespace SEE.Tools.OpenTelemetry
         /// </summary>
         public void TrackKeyPress(string actionName)
         {
+            var tags = new Dictionary<string, object>
+            {
+                { "action.type", "KeyPress" },
+                { "player.name", playerName },
+                { "action.name", actionName }
+            };
+
             using var activity = activitySource.StartActivity("KeyPress");
-            activity?.SetTag("action.name", actionName);
+            if (activity != null)
+            {
+                foreach (var tag in tags)
+                {
+                    activity.SetTag(tag.Key, tag.Value);
+                }
+            }
         }
 
         /// <summary>
         /// Traces a player's movement by recording both the start and end positions.
         /// </summary>
-        public void TrackMovement(Vector3 startPosition, Vector3 endPosition)
+        public void TrackMovement(Vector3 start, Vector3 end)
         {
             var tags = new Dictionary<string, object>
             {
                 { "action.type", "PlayerMovement" },
-                { "startPosition", startPosition.ToString() },
-                { "endPosition", endPosition.ToString() }
+                { "player.name", playerName },
+                { "startPosition", start.ToString() },
+                { "endPosition", end.ToString() }
             };
 
             using var activity = activitySource.StartActivity("PlayerMovement");
@@ -147,5 +184,35 @@ namespace SEE.Tools.OpenTelemetry
                 }
             }
         }
+        
+        /// <summary>
+        /// Traces a hover event if the user hovers over an object for more than a threshold duration (e.g., 5 seconds).
+        /// </summary>
+        /// <param name="hoveredObject">The object that was hovered.</param>
+        /// <param name="duration">The duration in seconds the object was hovered over.</param>
+        public void TrackHoverDuration(GameObject hoveredObject, float duration)
+        {
+            if (hoveredObject == null) return;
+
+            var tags = new Dictionary<string, object>
+            {
+                { "action.type", "Hover" },
+                { "player.name", playerName },
+                { "hovered.objectId", hoveredObject.name },
+                { "hovered.instanceID", hoveredObject.GetInstanceID() },
+                { "hovered.position", hoveredObject.transform.position.ToString() },
+                { "hover.duration", duration }
+            };
+
+            using var activity = activitySource.StartActivity("HoverDuration");
+            if (activity != null)
+            {
+                foreach (var tag in tags)
+                {
+                    activity.SetTag(tag.Key, tag.Value);
+                }
+            }
+        }
+
     }
 }

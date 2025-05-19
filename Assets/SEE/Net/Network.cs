@@ -581,18 +581,16 @@ namespace SEE.Net
         }
 
                 
-        private OpenTelemetryManager manager;
-        private TracingHelper tracer;
-        
         /// <summary>
         /// Initializes the game.
         /// </summary>
         private void InitializeGame()
         {
-            manager = new OpenTelemetryManager();
-            manager.Initialize();
-            tracer = new TracingHelper();
-            TracingHelperService.Instance = new TracingHelper();
+            if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsClient)
+            {
+                TracingHelperService.Initialize(PlayerName);
+            }
+            
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             if (HostServer)
@@ -618,7 +616,6 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
-            manager.Shutdown();
             ShutdownNetwork();
         }
 
@@ -869,6 +866,8 @@ namespace SEE.Net
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
+            TracingHelperService.Initialize(PlayerName);
+            
         }
 
         /// <summary>
@@ -883,6 +882,7 @@ namespace SEE.Net
                                    $"The server {ServerAddress} has refused the connection due to the following reason: "
                                      + NetworkManager.Singleton.DisconnectReason);
             callbackToMenu = null;
+            TracingHelperService.Shutdown();
         }
 
         /// <summary>
@@ -989,6 +989,9 @@ namespace SEE.Net
         /// </summary>
         private void OnApplicationQuit()
         {
+            
+            TracingHelperService.Shutdown();
+            
             switch (VoiceChat)
             {
                 case VoiceChatSystems.None:
