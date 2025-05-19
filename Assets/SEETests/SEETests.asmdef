@@ -41,7 +41,8 @@
         "nunit.framework.dll",
         "Sirenix.Serialization.dll",
         "LibGit2Sharp.dll",
-        "MoreLinq.dll"
+        "MoreLinq.dll",
+        "Microsoft.Extensions.FileSystemGlobbing.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [

@@ -153,7 +153,7 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IList<string> files = Utils.Filenames.GetFilteredFiles(SEE.VCS.Queries.ListTree(tree), pathGlobbing);
+                IList<string> files = Utils.PathGlobbing.Filter(SEE.VCS.Queries.ListTree(tree), pathGlobbing);
 
                 float totalSteps = files.Count;
                 int currentStep = 0;
