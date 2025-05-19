@@ -15,7 +15,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// A list of the authors which contributed to this file.
         /// </summary>
-        public ISet<string> Authors { get; set; }
+        public ISet<FileAuthor> Authors { get; set; }
 
         /// <summary>
         /// A collection of other files, which where changed together in the same commit.
@@ -26,7 +26,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// The churn (total number of changed lines) of each author.
         /// </summary>
-        public IDictionary<string, int> AuthorsChurn { get; set; }
+        public IDictionary<FileAuthor, int> AuthorsChurn { get; set; }
 
         /// <summary>
         /// The truck/bus factor of this file.
@@ -46,12 +46,12 @@ namespace SEE.GraphProviders.VCS
         /// <param name="numberOfCommits">The number of commits.</param>
         /// <param name="authors">A list of authors.</param>
         /// <param name="churn">The churn.</param>
-        public GitFileMetrics(int numberOfCommits, HashSet<string> authors, int churn)
+        public GitFileMetrics(int numberOfCommits, HashSet<FileAuthor> authors, int churn)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
             Churn = churn;
-            AuthorsChurn = new Dictionary<string, int>();
+            AuthorsChurn = new Dictionary<FileAuthor, int>();
             FilesChangesTogether = new Dictionary<string, int>();
             TruckFactor = 0;
         }
