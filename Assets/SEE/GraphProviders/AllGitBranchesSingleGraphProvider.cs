@@ -206,9 +206,7 @@ namespace SEE.GraphProviders
                 IEnumerable<Commit> commitList = repo.CommitsAfter(startDate);
 
                 // Select all files of this repo.
-                IEnumerable<string> files = repo.Branches
-                    .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
-                    .Distinct();
+                IEnumerable<string> files = repo.AllFiles();
 
                 GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 

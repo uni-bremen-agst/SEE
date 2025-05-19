@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.FileSystemGlobbing;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -299,6 +300,53 @@ namespace SEE.Utils
 
             return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
                 .Split(Path.DirectorySeparatorChar).Last();
+        }
+
+        /// <summary>
+        /// Filtering the files after include/exclude patterns.
+        /// </summary>
+        /// <param name="files">all files, unfiltered</param>
+        /// <param name="pathGlobbing">the include/exclude patterns</param>
+        /// <returns>filtered files</returns>
+        public static IList<string> GetFilteredFiles(IList<string> files, IDictionary<string, bool> pathGlobbing)
+        {
+            Matcher matcher = ToMatcher(pathGlobbing);
+
+            List<string> result = new();
+
+            foreach (string file in files)
+            {
+                if (matcher.Match(file).HasMatches)
+                {
+                    result.Add(file);
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Yields a <see cref="Matcher"/> for the given <paramref name="pathGlobbing"/>.
+        /// </summary>
+        /// <param name="pathGlobbing"></param>
+        /// <returns></returns>
+        public static Matcher ToMatcher(IDictionary<string, bool> pathGlobbing)
+        {
+            Matcher matcher = new();
+
+            foreach (KeyValuePair<string, bool> pattern in pathGlobbing)
+            {
+                if (pattern.Value)
+                {
+                    matcher.AddInclude(pattern.Key);
+                }
+                else
+                {
+                    matcher.AddExclude(pattern.Key);
+                }
+            }
+
+            return matcher;
         }
     }
 }

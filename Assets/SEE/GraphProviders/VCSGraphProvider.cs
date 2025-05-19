@@ -132,7 +132,13 @@ namespace SEE.GraphProviders
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>the resulting graph</returns>
-        private static Graph GetVCSGraph(Dictionary<string, bool> pathGlobbing, string repositoryPath, string commitID, string baselineCommitID, Action<float> changePercentage, CancellationToken token)
+        private static Graph GetVCSGraph
+            (IDictionary<string, bool> pathGlobbing,
+            string repositoryPath,
+            string commitID,
+            string baselineCommitID,
+            Action<float> changePercentage,
+            CancellationToken token)
         {
             string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
 
@@ -147,7 +153,7 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IList<string> files = GetFilteredFiles(ListTree(tree), pathGlobbing);
+                IList<string> files = Utils.Filenames.GetFilteredFiles(SEE.VCS.Queries.ListTree(tree), pathGlobbing);
 
                 float totalSteps = files.Count;
                 int currentStep = 0;
@@ -178,41 +184,6 @@ namespace SEE.GraphProviders
             graph.FinalizeNodeHierarchy();
             changePercentage?.Invoke(1f);
             return graph;
-        }
-
-        /// <summary>
-        /// Filtering the files after include/exclude patterns.
-        /// </summary>
-        /// <param name="files">all files, unfiltered</param>
-        /// <param name="pathGlobbing">the include/exclude patterns</param>
-        /// <returns>filtered files</returns>
-        private static IList<string> GetFilteredFiles(IList<string> files, Dictionary<string, bool> pathGlobbing)
-        {
-            Matcher matcher = new();
-
-            foreach(KeyValuePair<string, bool> pattern in pathGlobbing)
-            {
-                if (pattern.Value)
-                {
-                    matcher.AddInclude(pattern.Key);
-                }
-                else
-                {
-                    matcher.AddExclude(pattern.Key);
-                }
-            }
-
-            List<string> matchedFiles = new();
-
-            foreach (string file in files)
-            {
-                if (matcher.Match(file).HasMatches)
-                {
-                    matchedFiles.Add(file);
-                }
-            }
-
-            return matchedFiles;
         }
 
         /// <summary>
@@ -304,32 +275,6 @@ namespace SEE.GraphProviders
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Gets the paths from a repository at the time of a given commitID.
-        /// It is equivalent to "git ls-tree --name-only -r commitID"
-        /// </summary>
-        /// <param name="tree">The tree of the given commit.</param>
-        /// <returns>a list of paths.</returns>
-        public static IList<string> ListTree(LibGit2Sharp.Tree tree)
-        {
-            List<string> fileList = new();
-
-            foreach (TreeEntry entry in tree)
-            {
-                if (entry.TargetType == TreeEntryTargetType.Blob)
-                {
-                    fileList.Add(entry.Path);
-                }
-                else if (entry.TargetType == TreeEntryTargetType.Tree)
-                {
-                    LibGit2Sharp.Tree subtree = (LibGit2Sharp.Tree)entry.Target;
-                    fileList.AddRange(ListTree(subtree));
-                }
-            }
-
-            return fileList;
         }
 
         /// <summary>

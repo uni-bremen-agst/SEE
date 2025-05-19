@@ -12,6 +12,7 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -131,9 +132,7 @@ namespace SEE.GraphProviders.Evolution
                     x.Value.Any(y =>
                         matcher.Match(y.Path).HasMatches)).Count();
 
-                IList<string> files = repo.Branches
-                    .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
-                    .Distinct().ToList();
+                IList<string> files = repo.AllFiles().ToList();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (KeyValuePair<Commit, Patch> currentCommit in
