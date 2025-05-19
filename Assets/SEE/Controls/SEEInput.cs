@@ -561,22 +561,31 @@ namespace SEE.Controls
 
         //-----------------------------------------------------
 
+        private static bool wasBoosting = false;
+
+        
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool BoostCameraSpeed()
         {
-            bool result = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.BoostCameraSpeed);
-    
-            if (result)
+            bool isPressed = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.BoostCameraSpeed);
+
+            if (isPressed && !wasBoosting)
             {
-                // Track the BoostCameraSpeed action
-                TracingHelperService.Instance?.TrackKeyPress("BoostCameraSpeed");
+                TracingHelperService.Instance?.StartBoostCameraTracking();
+                wasBoosting = true;
+            }
+            else if (!isPressed && wasBoosting)
+            {
+                TracingHelperService.Instance?.StopBoostCameraTracking();
+                wasBoosting = false;
             }
 
-            return result;
+            return isPressed;
         }
+
 
 
         /// <summary>

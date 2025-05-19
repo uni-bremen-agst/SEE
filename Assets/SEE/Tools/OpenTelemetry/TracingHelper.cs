@@ -141,7 +141,7 @@ namespace SEE.Tools.OpenTelemetry
         }
 
         /// <summary>
-        /// Traces a key press event.
+        /// Traces a key press event, unless it is excluded (e.g. frequent inputs like BoostCamera).
         /// </summary>
         public void TrackKeyPress(string actionName)
         {
@@ -163,27 +163,44 @@ namespace SEE.Tools.OpenTelemetry
         }
 
         /// <summary>
-        /// Traces a player's movement by recording both the start and end positions.
+        /// Traces a player's movement by recording both the start and end positions,
+        /// including the time taken to move (based on a provided duration).
         /// </summary>
-        public void TrackMovement(Vector3 start, Vector3 end)
+        /// <param name="start">starting position.</param>
+        /// <param name="end">ending position</param>
+        /// <param name="durationSeconds">duration</param>
+        public void TrackMovement(Vector3 start, Vector3 end, float durationSeconds)
         {
             var tags = new Dictionary<string, object>
             {
                 { "action.type", "PlayerMovement" },
                 { "player.name", playerName },
                 { "startPosition", start.ToString() },
-                { "endPosition", end.ToString() }
+                { "endPosition", end.ToString() },
+                { "movement.duration", (double)durationSeconds } 
             };
 
-            using var activity = activitySource.StartActivity("PlayerMovement");
+            DateTimeOffset startTime = DateTimeOffset.UtcNow - TimeSpan.FromSeconds(durationSeconds);
+
+            var activity = activitySource.StartActivity(
+                "PlayerMovement",
+                ActivityKind.Internal,
+                parentContext: default,
+                tags: null,
+                startTime: startTime
+            );
+
             if (activity != null)
             {
                 foreach (var tag in tags)
                 {
                     activity.SetTag(tag.Key, tag.Value);
                 }
+
+                activity.Stop(); // manuelles Beenden = korrekte Dauer im Trace
             }
         }
+
         
         /// <summary>
         /// Traces a hover event if the user hovers over an object for more than a threshold duration (e.g., 5 seconds).
@@ -201,18 +218,77 @@ namespace SEE.Tools.OpenTelemetry
                 { "hovered.objectId", hoveredObject.name },
                 { "hovered.instanceID", hoveredObject.GetInstanceID() },
                 { "hovered.position", hoveredObject.transform.position.ToString() },
-                { "hover.duration", duration }
+                { "hover.duration", (double)duration } 
             };
 
-            using var activity = activitySource.StartActivity("HoverDuration");
+            DateTimeOffset startTime = DateTimeOffset.UtcNow - TimeSpan.FromSeconds(duration);
+
+            var activity = activitySource.StartActivity(
+                "HoverDuration",
+                ActivityKind.Internal,
+                parentContext: default,
+                tags: null,
+                startTime: startTime
+            );
+
             if (activity != null)
             {
                 foreach (var tag in tags)
                 {
                     activity.SetTag(tag.Key, tag.Value);
                 }
+
+                activity.Stop(); 
             }
         }
+        
+        private readonly Dictionary<string, DateTimeOffset> boostKeyStartTimes = new();
 
+        /// <summary>
+        /// Call this when BoostCamera key is pressed.
+        /// </summary>
+        public void StartBoostCameraTracking()
+        {
+            boostKeyStartTimes[playerName] = DateTimeOffset.UtcNow;
+        }
+
+        /// <summary>
+        /// Call this when BoostCamera key is released.
+        /// </summary>
+        public void StopBoostCameraTracking()
+        {
+            if (boostKeyStartTimes.TryGetValue(playerName, out var startTime))
+            {
+                var endTime = DateTimeOffset.UtcNow;
+                var duration = (endTime - startTime).TotalSeconds;
+
+                var tags = new Dictionary<string, object>
+                {
+                    { "action.type", "BoostCamera" },
+                    { "player.name", playerName },
+                    { "boost.duration", duration }
+                };
+
+                var activity = activitySource.StartActivity(
+                    "BoostCamera",
+                    ActivityKind.Internal,
+                    parentContext: default,
+                    tags: null,
+                    startTime: startTime
+                );
+
+                if (activity != null)
+                {
+                    foreach (var tag in tags)
+                    {
+                        activity.SetTag(tag.Key, tag.Value);
+                    }
+
+                    activity.Stop();
+                }
+
+                boostKeyStartTimes.Remove(playerName);
+            }
+        }
     }
 }

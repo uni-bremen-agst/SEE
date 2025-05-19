@@ -90,6 +90,8 @@ namespace SEE.Controls
 
         bool moved; // Flag to track if there was any movement
         bool keyReleased = false; // Flag to track if a key was just released
+        private float movementStartTime; // Tracks start time
+
         
         private void Update()
         {
@@ -136,36 +138,42 @@ namespace SEE.Controls
                 Vector3 velocity = Vector3.zero;
                 if (SEEInput.MoveForward())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity += transform.forward;
                     moved = true;
                 }
 
                 if (SEEInput.MoveBackward())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity -= transform.forward;
                     moved = true;
                 }
 
                 if (SEEInput.MoveRight())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity += transform.right;
                     moved = true;
                 }
 
                 if (SEEInput.MoveLeft())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity -= transform.right;
                     moved = true;
                 }
 
                 if (SEEInput.MoveUp())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity += Vector3.up;
                     moved = true;
                 }
 
                 if (SEEInput.MoveDown())
                 {
+                    if (!moved) movementStartTime = Time.time;
                     velocity += Vector3.down;
                     moved = true;
                 }
@@ -185,7 +193,8 @@ namespace SEE.Controls
                 // Check for key release to trigger movement tracking
                 if (moved && !AnyMovementInput())
                 {
-                    TracingHelperService.Instance?.TrackMovement(lastPosition, transform.position);
+                    float movementDuration = Time.time - movementStartTime;
+                    TracingHelperService.Instance?.TrackMovement(lastPosition, transform.position, movementDuration);
                     lastPosition = transform.position; // Update last position
                     moved = false;
                 }
