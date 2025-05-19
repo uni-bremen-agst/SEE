@@ -238,22 +238,13 @@ namespace SEE.Layout.NodeLayouts
                                   out Area implementionArea,
                                   out Area architectureArea)
         {
-            bool xIsLongerEdge = width >= depth;
-
             if (architectureLayoutProportion <= 0)
             {
                 // the implemenation takes all the available space
                 implementionArea = new(centerPosition, width, depth);
                 // the architecture sits at the end of the longer edge of the implementation with zero space
                 Vector3 architecturePos = implementionArea.Position;
-                if (xIsLongerEdge)
-                {
-                    architecturePos.x = implementionArea.Position.x + implementionArea.Width / 2;
-                }
-                else
-                {
-                    architecturePos.z = implementionArea.Position.z + implementionArea.Depth / 2;
-                }
+                architecturePos.z = implementionArea.Position.z + implementionArea.Depth / 2;
                 architectureArea = new(architecturePos, 0, 0);
             }
             else if (architectureLayoutProportion >= 1)
@@ -262,14 +253,7 @@ namespace SEE.Layout.NodeLayouts
                 architectureArea = new(centerPosition, width, depth);
                 // the implementation sits at the begin of the longer edge of the architecture with zero space
                 Vector3 implementationPos = architectureArea.Position;
-                if (xIsLongerEdge)
-                {
-                    implementationPos.x = architectureArea.Position.x - architectureArea.Width / 2;
-                }
-                else
-                {
-                    implementationPos.z = architectureArea.Position.z - architectureArea.Depth / 2;
-                }
+                implementationPos.z = architectureArea.Position.z - architectureArea.Depth / 2;
                 implementionArea = new(implementationPos, 0, 0);
             }
             else
