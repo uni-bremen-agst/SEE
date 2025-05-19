@@ -134,8 +134,14 @@ namespace SEE.Game.City
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
-                Vector3 pArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
-                Vector3 pArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+                Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
+                Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+
+                (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
+                if (mapped.EdgeCount > 0)
+                {
+                    await RestoreImplementation(impl);
+                }
 
                 // Delete the previous city and draw the new one.
                 DeleteGraphGameObjects();
@@ -144,7 +150,7 @@ namespace SEE.Game.City
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
                     .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
                 // Restores the previous architecture layout.
-                RestoreLayout(layoutGraphNodes, decorationValues, pArchPos, pArchLossyScale);
+                RestoreLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
                 visualization.InitializeEdges();
                 graphRenderer = null;
             }
@@ -182,6 +188,26 @@ namespace SEE.Game.City
                 }
                 LayoutNodes.SetLevels(result);
                 return (result, textValues);
+            }
+
+            async UniTask RestoreImplementation(Graph impl)
+            {
+                GameObject n = new($"COPY OF {gameObject.name}");
+                SEEReflexionCity nCity = n.AddComponent<SEEReflexionCity>(); ;
+                nCity.LoadInitial(n.name);
+                Graph implCopy = await nCity.GetReflexionGraphProvider().LoadGraphAsync(GetReflexionGraphProvider().Implementation, nCity);
+                if (impl.GetRoots().Count > 1)
+                {
+                    foreach (Node copyNode in impl.GetRoots())
+                    {
+                        if (copyNode.Type != ReflexionGraph.ImplementationType)
+                        {
+                            Node originalParent = VisualizedSubGraph.GetNode(implCopy.GetNode(copyNode.ID).Parent.ID);
+                            VisualizedSubGraph.GetNode(copyNode.ID).Reparent(originalParent);
+                        }
+                    }
+                }
+                Destroyer.Destroy(n);
             }
 
             void RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
