@@ -291,7 +291,7 @@ namespace SEE.Game.City
                     {
                         LayoutGraphNode sourceLayout = layoutGraphNodes.First(layout =>
                             layout.ID.Equals(source.ID));
-                        sourceGO.NodeOperator().MoveTo(sourceLayout.CenterPosition);
+                        sourceGO.NodeOperator().MoveTo(sourceLayout.CenterPosition, 0);
                         ReflexionMapper.SetParent(sourceGO, target.GameObject());
                     }
                 });
