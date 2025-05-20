@@ -130,17 +130,20 @@ namespace SEE.Game.City
             return;
             async UniTask ReDrawGraphAsync()
             {
-                // Gather the previous architecture layout.
+                // Gather the previous node layouts.
                 (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
                     = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
                 Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
                 Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
+                // Restore the original implementation graph.
                 (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
                 if (mapped.EdgeCount > 0)
                 {
                     await RestoreImplementation(impl);
+                    mapped.Edges().ForEach(edge =>
+                        ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
                 }
 
                 // Delete the previous city and draw the new one.
@@ -150,7 +153,7 @@ namespace SEE.Game.City
                 await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
                     .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
                 // Restores the previous architecture layout.
-                RestoreLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
+                RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
                 visualization.InitializeEdges();
                 graphRenderer = null;
             }
@@ -162,8 +165,8 @@ namespace SEE.Game.City
                 foreach (GameObject gameObject in gameObjects)
                 {
                     Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip non architecture nodes. Their restoration is handled by the layout itself.
-                    if (!node.IsInArchitecture())
+                    // Skip the root node. For implementation nodes, we only need the position.
+                    if (node.IsRoot())
                     {
                         continue;
                     }
@@ -173,17 +176,22 @@ namespace SEE.Game.City
                         AbsoluteScale = gameObject.transform.localScale,
                     };
                     result.Add(layoutNode);
-                    // Case for decorative texts that start with the prefix "Text".
-                    if (gameObject.FindChildWithPrefix(Prefix) != null)
+
+                    // Skip non-architecture nodes. Their text restoration is handled by the layout itself.
+                    if (node.IsInArchitecture())
                     {
-                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
-                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
-                    }
-                    // Case for label texts that start with the prefix "Label".
-                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
-                    {
-                        textValues.Add(node.ID,
-                            (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                        // Case for decorative texts that start with the prefix "Text".
+                        if (gameObject.FindChildWithPrefix(Prefix) != null)
+                        {
+                            RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
+                            textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
+                        }
+                        // Case for label texts that start with the prefix "Label".
+                        else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
+                        {
+                            textValues.Add(node.ID,
+                                (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                        }
                     }
                 }
                 LayoutNodes.SetLevels(result);
@@ -226,14 +234,14 @@ namespace SEE.Game.City
                 Destroyer.Destroy(tempGO);
             }
 
-            void RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
+            void RestoreArchitectureLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
                                         Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
                                         Vector3 pArchPos, Vector3 pArchLossyScale)
             {
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    if (node != null && !node.IsArchitectureOrImplementationRoot())
+                    if (node != null && node.GetNode().IsInArchitecture())
                     {
                         node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale), 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
