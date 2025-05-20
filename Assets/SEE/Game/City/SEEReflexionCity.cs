@@ -190,24 +190,40 @@ namespace SEE.Game.City
                 return (result, textValues);
             }
 
-            async UniTask RestoreImplementation(Graph impl)
+            async UniTask RestoreImplementation(Graph copyCurrentImpl)
             {
-                GameObject n = new($"COPY OF {gameObject.name}");
-                SEEReflexionCity nCity = n.AddComponent<SEEReflexionCity>(); ;
-                nCity.LoadInitial(n.name);
-                Graph implCopy = await nCity.GetReflexionGraphProvider().LoadGraphAsync(GetReflexionGraphProvider().Implementation, nCity);
-                if (impl.GetRoots().Count > 1)
+                // Create a copy of the original implementation graph to restore the current one to its original state.
+                GameObject tempGO = new($"COPY OF {gameObject.name}");
+                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>(); ;
+                tempCity.LoadInitial(tempGO.name);
+                Graph implCopy = await tempCity.GetReflexionGraphProvider()
+                    .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
+                Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
+                implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
+
+                // Restore to the original parents.
+                foreach (Node copyNode in copyCurrentImpl.Nodes())
                 {
-                    foreach (Node copyNode in impl.GetRoots())
+                    if (copyNode == null
+                        || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
                     {
-                        if (copyNode.Type != ReflexionGraph.ImplementationType)
-                        {
-                            Node originalParent = VisualizedSubGraph.GetNode(implCopy.GetNode(copyNode.ID).Parent.ID);
-                            VisualizedSubGraph.GetNode(copyNode.ID).Reparent(originalParent);
-                        }
+                        continue;
+                    }
+
+                    Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
+                    Node copyOriginalParent = copyOriginalNode?.Parent;
+                    Node copyCurrentParent = copyNode.Parent;
+                    bool shouldReparent = copyOriginalParent != null
+                        && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
+
+                    if (shouldReparent)
+                    {
+                        Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
+                        VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
+
                     }
                 }
-                Destroyer.Destroy(n);
+                Destroyer.Destroy(tempGO);
             }
 
             void RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
