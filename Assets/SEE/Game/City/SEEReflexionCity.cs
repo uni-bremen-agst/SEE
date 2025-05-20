@@ -154,6 +154,8 @@ namespace SEE.Game.City
                     .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
                 // Restores the previous architecture layout.
                 RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
+                // Restores the previous mapping.
+                RestoreMapping(layoutGraphNodes, mapped);
                 visualization.InitializeEdges();
                 graphRenderer = null;
             }
@@ -275,6 +277,24 @@ namespace SEE.Game.City
                     nodeLayout.AbsoluteScale.x / scaleFactor.x,
                     nodeLayout.AbsoluteScale.y,
                     nodeLayout.AbsoluteScale.z / scaleFactor.z);
+            }
+
+            void RestoreMapping(ICollection<LayoutGraphNode> layoutGraphNodes,
+                                Graph previousMapping)
+            {
+                previousMapping.Edges().ForEach(edge =>
+                {
+                    Node source = ReflexionGraph.GetNode(edge.Source.ID);
+                    Node target = ReflexionGraph.GetNode(edge.Target.ID);
+                    GameObject sourceGO = source.GameObject();
+                    if (sourceGO != null)
+                    {
+                        LayoutGraphNode sourceLayout = layoutGraphNodes.First(layout =>
+                            layout.ID.Equals(source.ID));
+                        sourceGO.NodeOperator().MoveTo(sourceLayout.CenterPosition);
+                        ReflexionMapper.SetParent(sourceGO, target.GameObject());
+                    }
+                });
             }
         }
 
