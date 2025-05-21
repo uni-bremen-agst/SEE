@@ -910,22 +910,8 @@ namespace SEE.UI.RuntimeConfigMenu
             slider.maxValue = range.max;
             slider.value = getter();
 
-            // add listeners
-            RuntimeSliderManager endEditManager = slider.gameObject.AddComponent<RuntimeSliderManager>();
-
-            endEditManager.OnEndEdit += () => setter(slider.value);
-            endEditManager.OnEndEdit += () =>
-            {
-                UpdateCityAttributeNetAction<float> action = new()
-                {
-                    CityIndex = CityIndex,
-                    WidgetPath = getWidgetName(),
-                    Value = slider.value
-                };
-                action.Execute();
-            };
-
-            endEditManager.OnEndEdit += CheckImmediateRedraw;
+            // add and init listeners
+            InitSlider(slider.gameObject.AddComponent<RuntimeSliderManager>());
 
             OnUpdateMenuValues += () =>
             {
@@ -964,6 +950,37 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
+            }
+
+            void InitSlider(RuntimeSliderManager endEditManager)
+            {
+                //if (!settingName.Equals("ArchitectureLayoutProportion"))
+                //{
+                    endEditManager.OnEndEdit += () => setter(slider.value);
+                    endEditManager.OnEndEdit += () =>
+                    {
+                        UpdateCityAttributeNetAction<float> action = new()
+                        {
+                            CityIndex = CityIndex,
+                            WidgetPath = getWidgetName(),
+                            Value = slider.value
+                        };
+                        action.Execute();
+                    };
+
+                    endEditManager.OnEndEdit += CheckImmediateRedraw;
+                //}
+                //else
+                //{
+                //    endEditManager.OnEndEdit += () =>
+                //    {
+                //        // TODO: Bounds check
+                //        // When porportion okay
+                //        // set setter
+                //        // UpdateCityAttributeNetAction
+                //        // CheckImmediateRedraw
+                //    };
+                //}
             }
         }
 
