@@ -243,7 +243,7 @@ namespace SEE.Game.City
                 layoutGraphNodes.ForEach(nodeLayout =>
                 {
                     GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    if (node != null && node.GetNode().IsInArchitecture())
+                    if (node != null && !node.IsArchitectureOrImplementationRoot() && node.GetNode().IsInArchitecture())
                     {
                         node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale), 0);
                         node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
