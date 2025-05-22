@@ -2,12 +2,15 @@ using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
+using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using OpenAI.Chat;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GraphProviders;
+using SEE.Layout.NodeLayouts;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
@@ -841,8 +844,8 @@ namespace SEE.UI.RuntimeConfigMenu
             Type GetType(bool searchKeyType)
             {
                 Type dictType = dict.GetType();
-                int i = searchKeyType? 0 : 1;
-                ICollection collection = searchKeyType? dict.Keys : dict.Values;
+                int i = searchKeyType ? 0 : 1;
+                ICollection collection = searchKeyType ? dict.Keys : dict.Values;
                 return dictType.GetGenericArguments().Length == 2 ?
                     dictType.GetGenericArguments()[i] : dictType.BaseType.GetGenericArguments().Length == 2 ?
                         dictType.BaseType.GetGenericArguments()[i] : collection.Count > 0 ?
@@ -954,8 +957,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
             void InitSlider(RuntimeSliderManager endEditManager)
             {
-                //if (!settingName.Equals("ArchitectureLayoutProportion"))
-                //{
+                if (!settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)))
+                {
                     endEditManager.OnEndEdit += () => setter(slider.value);
                     endEditManager.OnEndEdit += () =>
                     {
@@ -969,18 +972,59 @@ namespace SEE.UI.RuntimeConfigMenu
                     };
 
                     endEditManager.OnEndEdit += CheckImmediateRedraw;
-                //}
-                //else
-                //{
-                //    endEditManager.OnEndEdit += () =>
-                //    {
-                //        // TODO: Bounds check
-                //        // When porportion okay
-                //        // set setter
-                //        // UpdateCityAttributeNetAction
-                //        // CheckImmediateRedraw
-                //    };
-                //}
+                }
+                else
+                {
+                    endEditManager.OnEndEdit += () =>
+                    {
+                        if (!ValidateChildrenFitAfterProportionChange())
+                        {
+                            return;
+                        }
+                        setter(slider.value);
+                        UpdateCityAttributeNetAction<float> action = new()
+                        {
+                            CityIndex = CityIndex,
+                            WidgetPath = getWidgetName(),
+                            Value = slider.value
+                        };
+                        action.Execute();
+                        //CheckImmediateRedraw();
+                    };
+                }
+            }
+
+            bool ValidateChildrenFitAfterProportionChange()
+            {
+                SEEReflexionCity rc = (SEEReflexionCity)city;
+                GameObject archRoot = rc.ReflexionGraph.ArchitectureRoot.GameObject();
+                if (archRoot.transform.localScale.z <= slider.value
+                    || archRoot.GetNode().Children().Count() == 0)
+                {
+                    return true;
+                }
+                if (archRoot.GetNode().Children().Count() > 0)
+                {
+                    if (slider.value > 0)
+                    {
+                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.parent = null);
+                        Transform root = archRoot.ContainingCity().gameObject.transform;
+                        float depth = root.lossyScale.z;
+                        Vector3 referencePoint = new(root.position.x, archRoot.transform.position.y, root.position.z);
+                        referencePoint.z += depth / 2;
+
+                        float length = depth * slider.value;
+                        Vector3 position = referencePoint;
+                        position.z -= length / 2;
+                        archRoot.NodeOperator().ScaleTo(new Vector3(1, archRoot.transform.localScale.y, slider.value));
+                        archRoot.NodeOperator().MoveTo(position);
+                        // TODO: Bounds check.
+                    }
+                }
+                ShowNotification.Warn("Proportion change failed.",
+                                $"The specified value {slider.value} would cause the children to exceed the new boundaries.");
+                slider.value = archRoot.transform.localScale.z;
+                return false;
             }
         }
 

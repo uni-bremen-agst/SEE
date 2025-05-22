@@ -204,7 +204,7 @@ namespace SEE.Game.City
             {
                 // Create a copy of the original implementation graph to restore the current one to its original state.
                 GameObject tempGO = new($"COPY OF {gameObject.name}");
-                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>(); ;
+                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
                 tempCity.LoadInitial(tempGO.name);
                 Graph implCopy = await tempCity.GetReflexionGraphProvider()
                     .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
