@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using HSVPicker;
+using Markdig.Extensions.Tables;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
@@ -8,6 +9,7 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.Table;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout.NodeLayouts;
@@ -989,7 +991,7 @@ namespace SEE.UI.RuntimeConfigMenu
                             Value = slider.value
                         };
                         action.Execute();
-                        //CheckImmediateRedraw();
+                        CheckImmediateRedraw();
                     };
                 }
             }
@@ -1007,7 +1009,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (slider.value > 0)
                     {
-                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.parent = null);
+                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.SetParent(null, true));
+                        Vector3 prevScale = archRoot.transform.localScale;
+                        Vector3 prevPos = archRoot.transform.position;
+
                         Transform root = archRoot.ContainingCity().gameObject.transform;
                         float depth = root.lossyScale.z;
                         Vector3 referencePoint = new(root.position.x, archRoot.transform.position.y, root.position.z);
@@ -1016,9 +1021,28 @@ namespace SEE.UI.RuntimeConfigMenu
                         float length = depth * slider.value;
                         Vector3 position = referencePoint;
                         position.z -= length / 2;
-                        archRoot.NodeOperator().ScaleTo(new Vector3(1, archRoot.transform.localScale.y, slider.value));
-                        archRoot.NodeOperator().MoveTo(position);
-                        // TODO: Bounds check.
+                        archRoot.transform.localScale = new Vector3(1, archRoot.transform.localScale.y, slider.value);
+                        archRoot.transform.position = position;
+                        bool overlap = false;
+
+                        Bounds newBounds = GameTableManager.GetCombinedBounds(archRoot);
+                        foreach (Node child in archRoot.GetNode().Children())
+                        {
+                            Transform trans = child.GameObject().transform;
+                            Renderer r = trans.GetComponent<Renderer>();
+                            if (r != null && !GameTableManager.AreCornersInsideXZ(r.bounds, newBounds))
+                            {
+                                archRoot.transform.localScale = prevScale;
+                                archRoot.transform.position = prevPos;
+                                overlap = true;
+                            }
+                        }
+                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.SetParent(archRoot.transform));
+                        if (!overlap)
+                        {
+                            immediateRedraw = true;
+                            return true;
+                        }
                     }
                 }
                 ShowNotification.Warn("Proportion change failed.",

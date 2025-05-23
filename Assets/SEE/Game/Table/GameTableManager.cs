@@ -181,48 +181,92 @@ namespace SEE.Game.Table
             }
 
             return true;
-            Bounds GetCombinedBounds(GameObject obj)
+            //Bounds GetCombinedBounds(GameObject obj)
+            //{
+            //    Renderer[] renderers = obj.GetComponents<Renderer>();
+            //    if (renderers.Length == 0)
+            //    {
+            //        return new Bounds(obj.transform.position, Vector3.zero);
+            //    }
+
+            //    Bounds combined = renderers[0].bounds;
+            //    for (int i = 1; i < renderers.Length; i++)
+            //    {
+            //        combined.Encapsulate(renderers[i].bounds);
+            //    }
+
+            //    return combined;
+            //}
+            //bool AreCornersInsideXZ(Bounds childBounds, Bounds parentBounds)
+            //{
+            //    Vector3[] corners = new Vector3[4];
+
+            //    Vector3 min = childBounds.min;
+            //    Vector3 max = childBounds.max;
+
+            //    corners[0] = new Vector3(min.x, min.y, min.z);
+            //    corners[1] = new Vector3(min.x, min.y, max.z);
+            //    corners[2] = new Vector3(max.x, min.y, min.z);
+            //    corners[3] = new Vector3(max.x, min.y, max.z);
+
+            //    foreach (Vector3 corner in corners)
+            //    {
+            //        if (!IsInsideXZ(corner, parentBounds))
+            //            return false;
+            //    }
+
+            //    return true;
+            //}
+            //bool IsInsideXZ(Vector3 point, Bounds bounds)
+            //{
+            //    return point.x >= bounds.min.x && point.x <= bounds.max.x &&
+            //           point.z >= bounds.min.z && point.z <= bounds.max.z;
+            //}
+        }
+
+        public static Bounds GetCombinedBounds(GameObject obj)
+        {
+            Renderer[] renderers = obj.GetComponents<Renderer>();
+            if (renderers.Length == 0)
             {
-                Renderer[] renderers = obj.GetComponents<Renderer>();
-                if (renderers.Length == 0)
-                {
-                    return new Bounds(obj.transform.position, Vector3.zero);
-                }
-
-                Bounds combined = renderers[0].bounds;
-                for (int i = 1; i < renderers.Length; i++)
-                {
-                    combined.Encapsulate(renderers[i].bounds);
-                }
-
-                return combined;
+                return new Bounds(obj.transform.position, Vector3.zero);
             }
-            bool AreCornersInsideXZ(Bounds childBounds, Bounds parentBounds)
+
+            Bounds combined = renderers[0].bounds;
+            for (int i = 1; i < renderers.Length; i++)
             {
-                Vector3[] corners = new Vector3[4];
-
-                Vector3 min = childBounds.min;
-                Vector3 max = childBounds.max;
-
-                corners[0] = new Vector3(min.x, min.y, min.z);
-                corners[1] = new Vector3(min.x, min.y, max.z);
-                corners[2] = new Vector3(max.x, min.y, min.z);
-                corners[3] = new Vector3(max.x, min.y, max.z);
-
-                foreach (Vector3 corner in corners)
-                {
-                    if (!IsInsideXZ(corner, parentBounds))
-                        return false;
-                }
-
-                return true;
+                combined.Encapsulate(renderers[i].bounds);
             }
+
+            return combined;
+        }
+
+        public static bool AreCornersInsideXZ(Bounds childBounds, Bounds parentBounds)
+        {
+            Vector3[] corners = new Vector3[4];
+
+            Vector3 min = childBounds.min;
+            Vector3 max = childBounds.max;
+
+            corners[0] = new Vector3(min.x, min.y, min.z);
+            corners[1] = new Vector3(min.x, min.y, max.z);
+            corners[2] = new Vector3(max.x, min.y, min.z);
+            corners[3] = new Vector3(max.x, min.y, max.z);
+
+            foreach (Vector3 corner in corners)
+            {
+                if (!IsInsideXZ(corner, parentBounds))
+                    return false;
+            }
+
+            return true;
             bool IsInsideXZ(Vector3 point, Bounds bounds)
             {
                 return point.x >= bounds.min.x && point.x <= bounds.max.x &&
                        point.z >= bounds.min.z && point.z <= bounds.max.z;
             }
         }
+
 
         /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
