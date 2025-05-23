@@ -1,18 +1,14 @@
 using Cysharp.Threading.Tasks;
 using HSVPicker;
-using Markdig.Extensions.Tables;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
-using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
-using OpenAI.Chat;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Table;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.GraphProviders;
-using SEE.Layout.NodeLayouts;
 using SEE.Net.Actions.RuntimeConfig;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
@@ -1009,36 +1005,30 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (slider.value > 0)
                     {
-                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.SetParent(null, true));
+                        archRoot.GetNode().Children().ForEach(child =>
+                            child.GameObject().transform.SetParent(null, true));
                         Vector3 prevScale = archRoot.transform.localScale;
                         Vector3 prevPos = archRoot.transform.position;
 
+                        // Calculates the new position and scale for the architecture node.
                         Transform root = archRoot.ContainingCity().gameObject.transform;
                         float depth = root.lossyScale.z;
                         Vector3 referencePoint = new(root.position.x, archRoot.transform.position.y, root.position.z);
                         referencePoint.z += depth / 2;
-
                         float length = depth * slider.value;
                         Vector3 position = referencePoint;
                         position.z -= length / 2;
                         archRoot.transform.localScale = new Vector3(1, archRoot.transform.localScale.y, slider.value);
                         archRoot.transform.position = position;
-                        bool overlap = false;
-
-                        Bounds newBounds = GameTableManager.GetCombinedBounds(archRoot);
-                        foreach (Node child in archRoot.GetNode().Children())
+                        // Check whether every child fits within the new architecture's bounds.
+                        bool valid = BoundsChecker.ValidateChildrenInBounds(archRoot.GetNode(), () =>
                         {
-                            Transform trans = child.GameObject().transform;
-                            Renderer r = trans.GetComponent<Renderer>();
-                            if (r != null && !GameTableManager.AreCornersInsideXZ(r.bounds, newBounds))
-                            {
-                                archRoot.transform.localScale = prevScale;
-                                archRoot.transform.position = prevPos;
-                                overlap = true;
-                            }
-                        }
-                        archRoot.GetNode().Children().ForEach(child => child.GameObject().transform.SetParent(archRoot.transform));
-                        if (!overlap)
+                            archRoot.transform.localScale = prevScale;
+                            archRoot.transform.position = prevPos;
+                        });
+                        archRoot.GetNode().Children().ForEach(child =>
+                            child.GameObject().transform.SetParent(archRoot.transform));
+                        if (valid)
                         {
                             immediateRedraw = true;
                             return true;
