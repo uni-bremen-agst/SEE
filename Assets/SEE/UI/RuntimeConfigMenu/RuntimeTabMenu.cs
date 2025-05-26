@@ -910,6 +910,10 @@ namespace SEE.UI.RuntimeConfigMenu
             slider.minValue = range.min;
             slider.maxValue = range.max;
             slider.value = getter();
+            if (settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)))
+            {
+                sliderManager.mainSlider.onValueChanged.AddListener((f) => RoundAfterFrame().Forget());
+            }
 
             // add and init listeners
             InitSlider(slider.gameObject.AddComponent<RuntimeSliderManager>());
@@ -927,6 +931,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     setter((float)value);
                     slider.value = (float)value;
                     sliderManager.UpdateUI();
+                    TwoDecimalPlaces(settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)));
                 }
             };
 
@@ -951,6 +956,28 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
+            }
+
+            async UniTask RoundAfterFrame()
+            {
+                await UniTask.Yield();
+                TwoDecimalPlaces(true);
+            }
+
+            void TwoDecimalPlaces(bool condition)
+            {
+                if (!condition)
+                {
+                    return;
+                }
+                if (sliderManager.valueText != null)
+                {
+                    sliderManager.valueText.text = slider.value.ToString("F2");
+                }
+                if (sliderManager.popupValueText != null)
+                {
+                    sliderManager.popupValueText.text = slider.value.ToString("F2");
+                }
             }
 
             void InitSlider(RuntimeSliderManager endEditManager)
