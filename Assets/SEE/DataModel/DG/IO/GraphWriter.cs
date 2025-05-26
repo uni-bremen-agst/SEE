@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Xml;
-using Joveler.Compression.XZ;
 using SEE.Utils;
 using UnityEngine;
-using UnityEngine.Assertions;
 using Stream = System.IO.Stream;
 using XmlElement = System.Xml.XmlElement;
 
