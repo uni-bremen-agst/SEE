@@ -14,8 +14,8 @@ using System.Linq;
 using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
-using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Scanner.Antlr;
+using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
@@ -52,12 +52,15 @@ namespace SEE.GraphProviders
         public string BaselineCommitID = string.Empty;
 
         /// <summary>
-        /// The list of path globbings to include or exclude files.
+        /// The list of path globbings to include or exclude files. A path matches the globbing
+        ///
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-            Tooltip("Path globbings to include (true) or exclude files (false)"), RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
+            Tooltip("Path globbings to include (true) or exclude files (false). A path matches the globbing "
+                    + "if it matches at least one inclusion pattern and does not match any exclusion pattern."),
+            RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
+        public Globbing PathGlobbing = new()
         {
             { "**/*", true }
         };
@@ -133,7 +136,7 @@ namespace SEE.GraphProviders
         /// <param name="token">Cancellation token.</param>
         /// <returns>the resulting graph</returns>
         private static Graph GetVCSGraph
-            (IDictionary<string, bool> pathGlobbing,
+            (Globbing pathGlobbing,
             string repositoryPath,
             string commitID,
             string baselineCommitID,
@@ -153,7 +156,7 @@ namespace SEE.GraphProviders
             {
                 LibGit2Sharp.Tree tree = repo.Lookup<Commit>(commitID).Tree;
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                IList<string> files = Utils.PathGlobbing.Filter(SEE.VCS.Queries.ListTree(tree), pathGlobbing);
+                ICollection<string> files = SEE.VCS.Queries.ListTree(tree, pathGlobbing: pathGlobbing);
 
                 float totalSteps = files.Count;
                 int currentStep = 0;

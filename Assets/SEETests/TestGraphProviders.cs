@@ -1,6 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
@@ -232,7 +233,7 @@ namespace SEE.GraphProviders
         /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
-            Dictionary<string, bool> pathGlobbing = new()
+            Globbing pathGlobbing = new()
                 {
                     { "Assets/SEE/GraphProviders/**/*.cs", true }
                 };

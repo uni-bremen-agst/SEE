@@ -430,7 +430,7 @@ namespace SEE.GraphProviders
 
         private VCSGraphProvider GetVCSGraphProvider()
         {
-            Dictionary<string, bool> pathGlobbing = new()
+            Globbing pathGlobbing = new()
                 {
                     { "Assets/SEE/**/*.cs", true }
                 };

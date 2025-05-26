@@ -4,6 +4,17 @@ using System.Collections.Generic;
 namespace SEE.Utils
 {
     /// <summary>
+    /// A dictionary for inclusive and exclusive path globbings.
+    ///
+    /// If the value of a key is true, the key is considered an inclusion pattern;
+    /// otherwise an exclusion pattern.
+    ///
+    /// A path matches the globbing if it matches at least one inclusion pattern and
+    /// does not match any exclusion pattern.
+    /// </summary>
+    public class Globbing : Dictionary<string, bool> {}
+
+    /// <summary>
     /// Handles path globbings.
     /// </summary>
     public static class PathGlobbing
@@ -28,7 +39,7 @@ namespace SEE.Utils
         /// <param name="pathGlobbing">the include/exclude patterns</param>
         /// <returns>matching files</returns>
         /// <exception cref="System.ArgumentNullException">in case <paramref name="paths"/> is null</exception>
-        public static IList<string> Filter(IList<string> paths, IDictionary<string, bool> pathGlobbing = null)
+        public static ICollection<string> Filter(ICollection<string> paths, Globbing pathGlobbing = null)
         {
             if (paths == null)
             {
@@ -56,7 +67,7 @@ namespace SEE.Utils
         /// <param name="matcher">the <see cref="Matcher"/> to be applied</param>
         /// <returns>filtered files</returns>
         /// <exception cref="System.ArgumentNullException">in case <paramref name="paths"/> is null</exception>
-        public static IList<string> Filter(IList<string> paths, Matcher matcher = null)
+        public static ICollection<string> Filter(ICollection<string> paths, Matcher matcher = null)
         {
             if (paths == null)
             {
@@ -88,7 +99,7 @@ namespace SEE.Utils
         /// <param name="path">the path to be matched</param>
         /// <returns>true if <paramref name="path"/> fulfills at least one inclusion and
         /// does not fulfill any exclusion criteria of <paramref name="matcher"/></returns>
-        public static bool Matches(Matcher matcher, string path)
+        public static bool Matches(this Matcher matcher, string path)
         {
             return matcher.Match(path).HasMatches;
         }
@@ -97,11 +108,17 @@ namespace SEE.Utils
         /// Yields a <see cref="Matcher"/> for the given <paramref name="pathGlobbing"/>.
         /// If <paramref name="pathGlobbing"/>[i].Value is true, the Key is considered
         /// an inclusion pattern, otherwise as an exclusion pattern.
+        ///
+        /// If <paramref name="pathGlobbing"/> is null, null is returned.
         /// </summary>
         /// <param name="pathGlobbing">the path globbing for inclusion/exclusion</param>
-        /// <returns>the corresponding <see cref="Matcher"/></returns>
-        public static Matcher ToMatcher(IDictionary<string, bool> pathGlobbing)
+        /// <returns>the corresponding <see cref="Matcher"/> or null</returns>
+        public static Matcher ToMatcher(Globbing pathGlobbing)
         {
+            if (pathGlobbing == null)
+            {
+                return null;
+            }
             Matcher matcher = new();
 
             foreach (KeyValuePair<string, bool> pattern in pathGlobbing)

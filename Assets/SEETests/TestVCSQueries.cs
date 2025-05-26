@@ -56,9 +56,13 @@ namespace SEE.VCS
         {
             string branchName = "master";
             using Repository repo = new(ProjectFolder());
-            LibGit2Sharp.Tree tree = repo.Branches[branchName].Tip.Tree;
+            Branch branch = repo.Branches[branchName];
+            Commit tip = branch.Tip;
+            LibGit2Sharp.Tree tree = tip.Tree;
             Performance p = Performance.Begin(nameof(Queries.ListTree));
-            IEnumerable<string> files = Queries.ListTree(tree);
+            IEnumerable<string> files
+                = Queries.ListTree(tree,
+                                   PathGlobbing.ToMatcher(new Globbing() { { "Assets/SEE/**/*.cs", true } }));
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
@@ -69,7 +73,7 @@ namespace SEE.VCS
         {
             using Repository repo = new(ProjectFolder());
             Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles();
+            IEnumerable<string> files = repo.AllFiles(new Globbing() { { "Assets/SEE/**/*.cs", true } });
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);

@@ -18,35 +18,35 @@ namespace SEE.Utils
         public void TestFilterSimple()
         {
             Assert.AreEqual(new List<string>() { helloC },
-                            PathGlobbing.Filter(hellos, new Dictionary<string, bool>() { { "*.c", true } }));
+                            PathGlobbing.Filter(hellos, new Globbing() { { "*.c", true } }));
         }
 
         [Test]
         public void TestContraDictingFilter1()
         {
             Assert.AreEqual(new List<string>(),
-                            PathGlobbing.Filter(hellos, new Dictionary<string, bool>() { { "*.c", true }, { helloC, false } }));
+                            PathGlobbing.Filter(hellos, new Globbing() { { "*.c", true }, { helloC, false } }));
         }
 
         [Test]
         public void TestContraDictingFilter2()
         {
             Assert.AreEqual(EmptyList,
-                            PathGlobbing.Filter(hellos, new Dictionary<string, bool>() { { "*.c", false }, { helloC, true } }));
+                            PathGlobbing.Filter(hellos, new Globbing() { { "*.c", false }, { helloC, true } }));
         }
 
         [Test]
         public void TestContraDictingFilter3()
         {
             Assert.AreEqual(EmptyList,
-                            PathGlobbing.Filter(hellos, new Dictionary<string, bool>() { { helloC, true }, { "*.c", false } }));
+                            PathGlobbing.Filter(hellos, new Globbing() { { helloC, true }, { "*.c", false } }));
         }
 
         [Test]
         public void TestContraDictingFilter4()
         {
             Assert.AreEqual(EmptyList,
-                            PathGlobbing.Filter(hellos, new Dictionary<string, bool>() { { helloC, false }, { "*.c", true } }));
+                            PathGlobbing.Filter(hellos, new Globbing() { { helloC, false }, { "*.c", true } }));
         }
 
         [Test]
@@ -60,14 +60,14 @@ namespace SEE.Utils
         public void TestEmptyGlobbing()
         {
             Assert.AreEqual(EmptyList,
-                            PathGlobbing.Filter(hellos, pathGlobbing: new Dictionary<string, bool>()));
+                            PathGlobbing.Filter(hellos, pathGlobbing: new Globbing()));
         }
 
         [Test]
         public void TestNullPaths1()
         {
             Assert.Throws<System.ArgumentNullException>
-                (() => PathGlobbing.Filter(null, pathGlobbing: new Dictionary<string, bool>()));
+                (() => PathGlobbing.Filter(null, pathGlobbing: new Globbing()));
         }
 
         [Test]
@@ -83,7 +83,7 @@ namespace SEE.Utils
             Assert.AreEqual(new List<string>() { helloC },
                             PathGlobbing.Filter
                                (hellos,
-                                PathGlobbing.ToMatcher(new Dictionary<string, bool>() { { "*.c", true } })));
+                                PathGlobbing.ToMatcher(new Globbing() { { "*.c", true } })));
         }
 
         [Test]
