@@ -32,27 +32,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Yields all distinct file paths of all branches of given <paramref name="repository"/>.
-        /// </summary>
-        /// <param name="repository">the repository from which to retrieve the paths</param>
-        /// <param name="pathGlobbing">the inclusion/exclusion path globbings</param>
-        /// <returns>all distinct file paths</returns>
-        public static IEnumerable<string> AllFiles(this Repository repository, Globbing pathGlobbing = null)
-        {
-            if (repository == null)
-            {
-                throw new ArgumentNullException(nameof(repository));
-            }
-            HashSet<string> result = new();
-            Matcher matcher = PathGlobbing.ToMatcher(pathGlobbing);
-            foreach (Branch branch in repository.Branches)
-            {
-                ListTree(branch.Tip.Tree, matcher, result);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Yields the canonical name of all branches in <paramref name="repository"/>.
         /// </summary>
         /// <param name="repository"></param>
@@ -63,44 +42,139 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Gets all distinct repository-relative paths contained in <paramref name="tree"/>.
+        /// Yields all distinct file paths of all branches of given <paramref name="repository"/>
+        /// that fulfill the given <paramref name="filter"/>. If <paramref name="filter"/>
+        /// is null, all files of all branches will be retrieved.
         ///
-        /// If <paramref name="pathGlobbing"/> is null, all paths are returned.
-        /// Otherwise, a path in <paramref name="tree"/> will be returned if it fulfills at least one
-        /// inclusion and does not fulfill any exclusion criteria of <paramref name="pathGlobbing"/>.
+        /// If <paramref name="filter"/> is different from null, the constraints for a
+        /// file to be reported are as follows:
         ///
-        /// By the nature of Git, paths always identify files, not directories.
-        /// It is equivalent to "git ls-tree --name-only".
+        /// If attribute <see cref="Filter.Branches"/> of <paramref name="filter"/>
+        /// is null or empty, the file can be on any of the current branches of the <paramref name="repository"/>.
+        /// Otherwise, a file must be contained in at leasts one of the branches listed in attribute
+        /// <see cref="Filter.Branches"/>. These can be canonical of friendly branch names.
+        ///
+        /// If attribute <see cref="Filter.RepositoryPaths"/> is null or empty, every file in
+        /// the repository will be considered. Otherwise only the files contained in any of
+        /// the subdirectories of the <paramref name="repository"/> listed in the <see cref="Filter.RepositoryPaths"/>.
+        ///
+        /// If attribute <see cref="Filter.Matcher"/> is null, a file path can take on any name.
+        /// Otherwise a file will be reported only if it fulfills at least on inclusive criterion
+        /// of <see cref="Filter.Matcher"/> and does not violate any exclusive criterion in
+        /// <see cref="Filter.Matcher"/>.
         /// </summary>
-        /// <param name="tree">The tree whose files are requested.</param>
-        /// <param name="pathGlobbing">the inclusion/exclusion path globbings</param>
-        /// <returns>a list of paths.</returns>
-        /// <remarks>Trees are collections of files and folders to make up the
-        /// repository hierarchy.</remarks>
-        public static HashSet<string> ListTree(Tree tree, Globbing pathGlobbing = null)
+        /// <param name="repository">the repository from which to retrieve the paths</param>
+        /// <param name="filter">the filter to be used to retrieve the files</param>
+        /// <returns>all distinct file paths</returns>
+        public static IEnumerable<string> AllFiles(this Repository repository, Filter filter = null)
         {
-            return ListTree(tree, PathGlobbing.ToMatcher(pathGlobbing));
+            if (repository == null)
+            {
+                throw new ArgumentNullException(nameof(repository));
+            }
+            HashSet<string> result = new();
+            bool allBranches = filter == null || filter.Branches == null || filter.Branches.Count == 0;
+            foreach (Branch branch in repository.Branches)
+            {
+                if (allBranches || filter.Branches.Contains(branch.CanonicalName) || filter.Branches.Contains(branch.FriendlyName))
+                {
+                    AllFiles(branch.Tip.Tree, filter, result);
+                }
+            }
+            return result;
         }
 
         /// <summary>
-        /// Gets all distinct repository-relative paths contained in <paramref name="tree"/>
-        /// fulfilling at least one inclusion and not fulfilling any exclusion criteria
-        /// of <paramref name="matcher"/>.
+        /// Yields all distinct file paths of the given <paramref name="tree"/>
+        /// that fulfill the given <paramref name="filter"/>. If <paramref name="filter"/>
+        /// is null, all files of <paramref name="tree"/> will be retrieved.
         ///
-        /// By the nature of Git, paths always identify files, not directories.
+        /// If <paramref name="filter"/> is different from null, the constraints for a
+        /// file to be reported are as follows:
         ///
-        /// It is equivalent to "git ls-tree --name-only".
+        /// If attribute <see cref="Filter.RepositoryPaths"/> is null or empty, every file in
+        /// the <paramref name="tree"/> will be considered. Otherwise only the files contained in any of
+        /// the subdirectories of <paramref name="tree"/> listed in the <see cref="Filter.RepositoryPaths"/>.
+        ///
+        /// If attribute <see cref="Filter.Matcher"/> is null, a file path can take on any name.
+        /// Otherwise a file will be reported only if it fulfills at least on inclusive criterion
+        /// of <see cref="Filter.Matcher"/> and does not violate any exclusive criterion in
+        /// <see cref="Filter.Matcher"/>.
         /// </summary>
-        /// <param name="tree">The tree whose files are requested.</param>
-        /// <param name="matcher">the inclusion/exclusion path globbings</param>
-        /// <returns>the set of distinct paths.</returns>
-        /// <remarks>Trees are collections of files and folders to make up the
-        /// repository hierarchy.</remarks>
-        public static HashSet<string> ListTree(Tree tree, Matcher matcher = null)
+        /// <param name="tree">the tree for which to retrieve the files</param>
+        /// <param name="filter">the filter to be used to retrieve the files</param>
+        /// <returns>all distinct file paths</returns>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="tree"/> is null</exception>
+        internal static ICollection<string> AllFiles(Tree tree, Filter filter = null)
         {
+            if (tree == null)
+            {
+                throw new ArgumentNullException(nameof(tree));
+            }
             HashSet<string> result = new();
-            ListTree(tree, matcher, result);
+            AllFiles(tree, filter, result);
             return result;
+        }
+
+        /// <summary>
+        /// Adds the distinct filenames in the given <paramref name="tree"/> passing
+        /// the criteria <see cref="Filter.RepositoryPaths"/> and <see cref="Filter.Matcher"/>
+        /// of the given <paramref name="filter"/>.
+        /// </summary>
+        /// <param name="tree">the tree for which to retrieve the files</param>
+        /// <param name="filter">the filter to be used to retrieve the files</param>
+        /// <param name="paths">where the passing files are to be added</param>
+        /// <exception cref="Exception">thrown if attribute <see cref="Filter.RepositoryPaths"/> of
+        /// <paramref name="filter"/> is different from null and at least one of the paths in
+        /// <see cref="Filter.RepositoryPaths"/> does not exist in the <paramref name="tree"/>
+        /// or does not denote a directory.</exception>
+        private static void AllFiles(Tree tree, Filter filter, HashSet<string> paths)
+        {
+            if (filter.RepositoryPaths == null || filter.RepositoryPaths.Length == 0)
+            {
+                AllFiles(tree, filter.Matcher, paths);
+            }
+            else
+            {
+                foreach (string repositoryPath in filter.RepositoryPaths)
+                {
+                    if (!string.IsNullOrWhiteSpace(repositoryPath))
+                    {
+                        AllFiles(Find(tree, repositoryPath), filter.Matcher, paths);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the descendant tree for the given <paramref name="repositoryPath"/>.
+        /// <paramref name="repositoryPath"/> is assumed to be a path relative to <paramref name="tree"/>.
+        /// The delimiter to separate different subtrees is assumed to be the forward slash.
+        /// For instance, "Assets/SEE/UI" identifies the folder UI, nested in folder SEE nested in folder
+        /// Assets.
+        /// </summary>
+        /// <param name="tree">the root tree</param>
+        /// <param name="repositoryPath">relative path of descendants nested in <paramref name="tree"/></param>
+        /// <returns>the subtree</returns>
+        /// <exception cref="Exception">thrown if <paramref name="repositoryPath"/> does not match
+        /// any descendant in <paramref name="tree"/> or if <paramref name="repositoryPath"/>
+        /// is not a tree (for instance, a blob).</exception>
+        private static Tree Find(Tree tree, string repositoryPath)
+        {
+            TreeEntry result = tree[repositoryPath];
+            if (result == null)
+            {
+                throw new Exception($"The path {repositoryPath} does not exist in the repository.");
+            }
+
+            if (result.TargetType == TreeEntryTargetType.Tree)
+            {
+                return (Tree)result.Target;
+            }
+            else
+            {
+                throw new Exception($"The path {repositoryPath} is not a directory in the repository.");
+            }
         }
 
         /// <summary>
@@ -117,16 +191,10 @@ namespace SEE.VCS
         /// <param name="matcher">the inclusion/exclusion path globbings</param>
         /// <param name="paths">the set of paths to which the paths are to be added</param>
         /// <returns>the set of distinct paths.</returns>
-        private static void ListTree(Tree tree, Matcher matcher, HashSet<string> paths)
+        private static void AllFiles(Tree tree, Matcher matcher, HashSet<string> paths)
         {
-            TreeEntry e = tree["Assets"];
-            if (e == null)
-            {
-                UnityEngine.Debug.Log("No Assets folder found in the repository.");
-            }
             foreach (TreeEntry entry in tree)
             {
-                UnityEngine.Debug.Log(entry.Path);
                 if (entry.TargetType == TreeEntryTargetType.Blob)
                 {
                     if (matcher == null || matcher.Matches(entry.Path))
@@ -137,7 +205,7 @@ namespace SEE.VCS
                 else if (entry.TargetType == TreeEntryTargetType.Tree)
                 {
                     Tree subtree = (Tree)entry.Target;
-                    ListTree(subtree, matcher, paths);
+                    AllFiles(subtree, matcher, paths);
                 }
             }
         }

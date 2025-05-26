@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
+using SEE.Layout.Utils;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -51,29 +52,45 @@ namespace SEE.VCS
             //Print(commits);
         }
 
+        private static Filter GetFilter(params string[] branches)
+        {
+            return new Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                              repositoryPaths: new List<string>() { "Assets/SEE" },
+                              branches: branches);
+        }
+
         [Test]
-        public void TestListTree()
+        public void TestMasterFiles1()
         {
             string branchName = "master";
             using Repository repo = new(ProjectFolder());
-            Branch branch = repo.Branches[branchName];
-            Commit tip = branch.Tip;
-            LibGit2Sharp.Tree tree = tip.Tree;
-            Performance p = Performance.Begin(nameof(Queries.ListTree));
+            Performance p = Performance.Begin(nameof(Queries.AllFiles));
             IEnumerable<string> files
-                = Queries.ListTree(tree,
-                                   PathGlobbing.ToMatcher(new Globbing() { { "Assets/SEE/**/*.cs", true } }));
+                = Queries.AllFiles(repo.Branches[branchName].Tip.Tree,
+                                   GetFilter());
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
         }
 
         [Test]
-        public void TestAllFiles()
+        public void TestMasterFiles2()
+        {
+            string branchName = "master";
+            using Repository repo = new(ProjectFolder());
+            Performance p = Performance.Begin(nameof(Queries.AllFiles));
+            IEnumerable<string> files = repo.AllFiles(GetFilter(branchName));
+            p.End(true);
+            Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
+            //Print(files);
+        }
+
+        [Test]
+        public void TestAllBranchesFiles()
         {
             using Repository repo = new(ProjectFolder());
             Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles(new Globbing() { { "Assets/SEE/**/*.cs", true } });
+            IEnumerable<string> files = repo.AllFiles(GetFilter());
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);
