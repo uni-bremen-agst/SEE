@@ -1,6 +1,5 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.Layout.Utils;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
