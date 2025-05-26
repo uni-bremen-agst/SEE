@@ -61,7 +61,7 @@ namespace SEE.Utils
 
             if (Application.isEditor)
             {
-                if (!File.Exists(libDir))
+                if (!Directory.Exists(libDir))
                 {
                     throw new Exception($"Unable to find liblzma path [{libDir}].");
                 }
