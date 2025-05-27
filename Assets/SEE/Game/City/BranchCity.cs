@@ -2,6 +2,7 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -67,6 +68,27 @@ namespace SEE.Game.City
             {
                 result.AddError("Invalid date!");
             }
+        }
+
+        /// <summary>
+        /// Returns or adds a <see cref="GitPoller"/> component to the game object this
+        /// <paramref name="city"/> is attached to.
+        /// </summary>
+        /// <param name="pollingInterval">VCS polling interval in seconds.</param>
+        /// <param name="markerTime">Time in seconds for how long the markers should be shown.</param>
+        /// <returns>The <see cref="GitPoller"/> component</returns>
+        public GitPoller GetOrAddGitPollerComponent(int pollingInterval, int markerTime)
+        {
+            if (TryGetComponent(out GitPoller poller))
+            {
+                return poller;
+            }
+
+            GitPoller newPoller = gameObject.AddComponent<GitPoller>();
+            newPoller.CodeCity = this;
+            newPoller.PollingInterval = pollingInterval;
+            newPoller.MarkerTime = markerTime;
+            return newPoller;
         }
 
         #region Config I/O

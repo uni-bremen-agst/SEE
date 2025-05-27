@@ -117,25 +117,6 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Returns or adds the <see cref="GitPoller"/> component to the current gameobject/code city <paramref name="city"/>.
-        /// </summary>
-        /// <param name="city">The code city where the <see cref="GitPoller"/> component should be attached.</param>
-        /// <returns>The <see cref="GitPoller"/> component</returns>
-        private GitPoller GetOrAddGitPollerComponent(SEECity city)
-        {
-            if (city.TryGetComponent(out GitPoller poller))
-            {
-                return poller;
-            }
-
-            GitPoller newPoller = city.gameObject.AddComponent<GitPoller>();
-            newPoller.CodeCity = city;
-            newPoller.PollingInterval = PollingInterval;
-            newPoller.MarkerTime = MarkerTime;
-            return newPoller;
-        }
-
-        /// <summary>
         /// Provides the graph of the git history.
         /// </summary>
         /// <param name="graph">The graph of the previous provider.</param>
@@ -160,8 +141,8 @@ namespace SEE.GraphProviders
             // Only add the poller when in play mode.
             if (AutoFetch && Application.isPlaying)
             {
-                GitPoller poller = GetOrAddGitPollerComponent(branchCity);
-                poller.WatchedRepositories.Add(branchCity.VCSPath.Path);
+                branchCity.GetOrAddGitPollerComponent(PollingInterval, MarkerTime)
+                    .WatchedRepositories.Add(branchCity.VCSPath.Path);
             }
 
             return task;
