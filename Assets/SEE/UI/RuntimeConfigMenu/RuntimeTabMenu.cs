@@ -491,26 +491,48 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
         private bool ValidateShowIf(MemberInfo memberInfo, object obj)
         {
-            if (memberInfo.GetCustomAttribute<ShowIfAttribute>() is { } showIf && showIf.Value == null)
+            if (memberInfo.GetCustomAttribute<ShowIfAttribute>() is { } showIf)
             {
                 Debug.Log($"{memberInfo.Name} has a ShowIfAttribut with condition: {showIf.Condition}, value: {showIf.Value}, value null?: {showIf.Value == null}, field? {memberInfo is FieldInfo}, property? {memberInfo is PropertyInfo}, method? {memberInfo is MethodInfo}");
                 Type type = obj.GetType();
                 FieldInfo field = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetField(n, flags));
-                if (field != null && field.FieldType == typeof(bool))
+                if (field != null)
                 {
-                    Debug.Log($"{field.Name} hat {(bool)field.GetValue(obj)}");
-                    if (!(bool)field.GetValue(obj))
+                    if (field.FieldType == typeof(bool))
                     {
-                        return false;
+                        Debug.Log($"{field.Name} has {(bool)field.GetValue(obj)}");
+                        if (!(bool)field.GetValue(obj))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (showIf.Value != null)
+                        {
+                            Debug.Log($"Field value check {Equals(field.GetValue(obj), showIf.Value)}");
+                            return Equals(field.GetValue(obj), showIf.Value);
+                        }
                     }
                 }
                 PropertyInfo prop = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetProperty(n, flags));
-                if (prop != null && prop.PropertyType == typeof(bool))
+                if (prop != null)
                 {
-                    Debug.Log($"{prop.Name} has {(bool)prop.GetValue(obj)}");
-                    if (!(bool)prop.GetValue(obj))
+                    if (prop.PropertyType == typeof(bool))
                     {
-                        return false;
+                        Debug.Log($"{prop.Name} has {(bool)prop.GetValue(obj)}");
+                        if (!(bool)prop.GetValue(obj))
+                        {
+                            return false;
+                        }
+                    }
+                    else
+                    {
+                        if (showIf.Value != null)
+                        {
+                            Debug.Log($"Prop value check {Equals(prop.GetValue(obj), showIf.Value)}");
+                            return Equals(prop.GetValue(obj), showIf.Value);
+                        }
                     }
                 }
                 MethodInfo m = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetMethod(n, flags));
