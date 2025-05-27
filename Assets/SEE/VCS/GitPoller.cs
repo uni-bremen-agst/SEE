@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -72,20 +71,7 @@ namespace SEE.VCS
         {
             foreach (string repoPath in WatchedRepositories)
             {
-                using Repository repo = new(repoPath);
-                // Fetch all remote branches
-                foreach (Remote remote in repo.Network.Remotes)
-                {
-                    IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                    try
-                    {
-                        Commands.Fetch(repo, remote.Name, refSpecs, null, "");
-                    }
-                    catch (LibGit2SharpException e)
-                    {
-                        Debug.LogError($"Error while running git fetch for repository path {repoPath} and remote name {remote.Name}: {e.Message}.\n");
-                    }
-                }
+                Queries.FetchRemotes(repoPath);
             }
         }
 
@@ -96,14 +82,7 @@ namespace SEE.VCS
         /// commits.</returns>
         private Dictionary<string, List<string>> GetTipHashes()
         {
-            Dictionary<string, List<string>> result = new();
-            foreach (string repoPath in WatchedRepositories)
-            {
-                using Repository repo = new Repository(repoPath);
-                result.Add(repoPath, repo.Branches.Select(x => x.Tip.Sha).ToList());
-            }
-
-            return result;
+            return Queries.GetTipHashes(WatchedRepositories);
         }
 
         /// <summary>
