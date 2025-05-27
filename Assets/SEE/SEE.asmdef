@@ -71,6 +71,8 @@
         "OpenTelemetry.dll",
         "OpenTelemetry.Api.dll",
         "OpenTelemetry.Exporter.Console.dll",
+        "OpenTelemetry.Exporter.OpenTelemetryProtocol.dll",
+        "OpenTelemetry.Exporter.dll",
         "System.Diagnostics.DiagnosticSource.dll",
         "System.Diagnostics.dll"
 

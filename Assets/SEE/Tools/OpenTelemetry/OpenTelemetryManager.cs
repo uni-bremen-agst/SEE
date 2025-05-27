@@ -5,6 +5,9 @@ using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SEE.Controls;
 using UnityEngine;
+using OpenTelemetry.Exporter;
+
+
 
 namespace SEE.Tools.OpenTelemetry
 {
@@ -69,27 +72,34 @@ namespace SEE.Tools.OpenTelemetry
         }
 
         /// <summary>
-        /// Initializes the OpenTelemetry system with a remote OTLP exporter.
+        /// Initializes the OpenTelemetry system with a remote OTLP exporter using HTTP/Protobuf.
+        /// Internally uses a <see cref="BatchActivityExportProcessor"/> with default settings.
+        /// 
+        /// Export behavior:
+        /// - Traces are buffered in memory.
+        /// - Up to 512 spans are exported in a batch every 5 seconds.
+        /// - All remaining spans are exported immediately upon shutdown or disposal.
+        /// - The internal export queue has a maximum capacity of 2048 spans. If full, it triggers an export automatically.
         /// </summary>
-        /// <param name="serverUrl">The URL of the remote telemetry endpoint. Must not be null or empty.</param>
+        /// <param name="serverUrl">
+        /// The URL of the remote telemetry endpoint
+        /// Must not be null or empty. The endpoint must support OTLP/HTTP protocol.
+        /// </param>
         private void InitializeRemoteExporter(string serverUrl)
         {
             try
             {
-                // Uncomment and configure this block when using remote OTLP exporter.
-                /*
                 tracerProvider = Sdk.CreateTracerProviderBuilder()
                     .AddSource("SEE.Tracing")
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SEEOpenTelemetryTracking"))
-                    .AddOtlpExporter(o =>
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SEEOpenTelemetryClient"))
+                    .AddOtlpExporter(otlpOptions =>
                     {
-                        o.Endpoint = new Uri(serverUrl);
-                        o.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc;
+                        otlpOptions.Endpoint = new Uri(serverUrl);
+                        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
                     })
-                    .Build();
-                */
+                    .Build(); 
 
-                Debug.Log($"OpenTelemetry (remote) initialized. Sending to: {serverUrl}");
+                Debug.Log($"OpenTelemetry (remote) initialized with HTTP/Protobuf and batching. Sending to: {serverUrl}");
             }
             catch (Exception exception)
             {
@@ -97,6 +107,8 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
+
+        
         /// <summary>
         /// Initializes the OpenTelemetry system with a local file-based trace exporter.
         /// </summary>
