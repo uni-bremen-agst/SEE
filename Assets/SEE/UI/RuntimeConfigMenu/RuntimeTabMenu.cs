@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -239,7 +240,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupMenu()
         {
             // creates the widgets for fields
-
+            Debug.Log($"---- City {city.name}");
             // For all *public* fields of city annotated by RuntimeTab.
             // Note that Type.GetMember yields only public members.
             // A member can be a field, property, method, event, or other things.
@@ -433,7 +434,10 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-
+            if (!ValidateShowIf(memberInfo, obj))
+            {
+                return;
+            }
             switch (memberInfo)
             {
                 case FieldInfo fieldInfo:
@@ -474,6 +478,67 @@ namespace SEE.UI.RuntimeConfigMenu
                         memberInfo.GetCustomAttributes()
                     );
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the specified <see cref="MemberInfo"/>
+        /// has a <see cref="ShowIfAttribute"/> and evaluates its condition.
+        /// If the condition is not met, the member should be skipped (not shown).
+        /// </summary>
+        /// <param name="memberInfo">The member to check.</param>
+        /// <param name="obj">The instance that contains the member.</param>
+        /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
+        private bool ValidateShowIf(MemberInfo memberInfo, object obj)
+        {
+            if (memberInfo.GetCustomAttribute<ShowIfAttribute>() is { } showIf && showIf.Value == null)
+            {
+                Debug.Log($"{memberInfo.Name} has a ShowIfAttribut with condition: {showIf.Condition}, value: {showIf.Value}, value null?: {showIf.Value == null}, field? {memberInfo is FieldInfo}, property? {memberInfo is PropertyInfo}, method? {memberInfo is MethodInfo}");
+                Type type = obj.GetType();
+                FieldInfo field = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetField(n, flags));
+                if (field != null && field.FieldType == typeof(bool))
+                {
+                    Debug.Log($"{field.Name} hat {(bool)field.GetValue(obj)}");
+                    if (!(bool)field.GetValue(obj))
+                    {
+                        return false;
+                    }
+                }
+                PropertyInfo prop = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetProperty(n, flags));
+                if (prop != null && prop.PropertyType == typeof(bool))
+                {
+                    Debug.Log($"{prop.Name} has {(bool)prop.GetValue(obj)}");
+                    if (!(bool)prop.GetValue(obj))
+                    {
+                        return false;
+                    }
+                }
+                MethodInfo m = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetMethod(n, flags));
+                if (m != null && m.ReturnType == typeof(bool))
+                {
+                    Debug.Log($"{m.Name} has {(bool)m.Invoke(obj, null)}");
+                    if (!(bool)m.Invoke(obj, null))
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
+
+            T FindMemberRecursive<T>(Type type, string name, Func<Type, string, BindingFlags, T> resolver)
+                where T : MemberInfo
+            {
+                while (type != null)
+                {
+                    T member = resolver(type, name,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (member != null)
+                    {
+                        return member;
+                    }
+                    type = type.BaseType;
+                }
+                return null;
             }
         }
 
