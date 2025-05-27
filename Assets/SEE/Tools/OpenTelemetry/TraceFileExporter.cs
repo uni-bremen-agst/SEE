@@ -4,6 +4,7 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using OpenTelemetry;
+using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Tools.OpenTelemetry
@@ -13,13 +14,20 @@ namespace SEE.Tools.OpenTelemetry
     /// </summary>
     public class TraceFileExporter : BaseExporter<Activity>, IDisposable
     {
-        private readonly string filePath; // Full path to the output trace file.
+        /// <summary>
+        /// Full path to the output trace file.
+        /// </summary>
+        private readonly string filePath;
+
+        /// <summary>
+        /// Indicates whether the exporter has already been disposed.
+        /// </summary>
         private bool disposed = false;
 
         /// <summary>
         /// Initializes the trace file exporter and creates the output file with a session header.
         /// </summary>
-        /// <param name="directoryPath">Directory where trace files will be stored.</param>
+        /// <param name="directoryPath">Directory where trace files will be stored. Must not be null.</param>
         public TraceFileExporter(string directoryPath)
         {
             Directory.CreateDirectory(directoryPath);
@@ -28,29 +36,30 @@ namespace SEE.Tools.OpenTelemetry
 
             try
             {
-                using var writer = new StreamWriter(filePath, false, Encoding.UTF8);
+                StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8);
                 writer.WriteLine("Trace Export Session Started...");
+                writer.Dispose();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Debug.LogError($"Failed to create trace file: {ex.Message}");
+                Debug.LogError($"Failed to create trace file: {exception.Message}");
             }
         }
 
         /// <summary>
         /// Writes a batch of activity traces to the export file.
         /// </summary>
-        /// <param name="batch">The batch of activity traces.</param>
-        /// <returns>ExportResult.Success if export succeeds; otherwise, ExportResult.Failure.</returns>
+        /// <param name="batch">The batch of activity traces to export. Must not be null.</param>
+        /// <returns><see cref="ExportResult.Success"/> if export succeeds; otherwise, <see cref="ExportResult.Failure"/>.</returns>
         public override ExportResult Export(in Batch<Activity> batch)
         {
             try
             {
-                using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
+                StreamWriter writer = new StreamWriter(filePath, true, Encoding.UTF8);
 
-                foreach (var activity in batch)
+                foreach (Activity activity in batch)
                 {
-                    var activityData = new
+                    object activityData = new
                     {
                         TraceId = activity.TraceId.ToString(),
                         DisplayName = activity.DisplayName,
@@ -59,15 +68,16 @@ namespace SEE.Tools.OpenTelemetry
                         Tags = activity.Tags
                     };
 
-                    writer.WriteLine(
-                        $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {JsonConvert.SerializeObject(activityData)}");
+                    string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+                    writer.WriteLine($"[{timestamp}] {JsonConvert.SerializeObject(activityData)}");
                 }
 
+                writer.Dispose();
                 return ExportResult.Success;
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Debug.LogError($"Failed to export traces: {ex.Message}");
+                Debug.LogError($"Failed to export traces: {exception.Message}");
                 return ExportResult.Failure;
             }
         }
@@ -77,23 +87,27 @@ namespace SEE.Tools.OpenTelemetry
         /// </summary>
         public void CheckGracefulShutdown()
         {
-            if (disposed) return;
+            if (disposed)
+            {
+                return;
+            }
 
             try
             {
-                using var writer = new StreamWriter(filePath, true, Encoding.UTF8);
+                StreamWriter writer = new StreamWriter(filePath, true, Encoding.UTF8);
                 writer.WriteLine("Trace Export Session Ended. Tracer shut down cleanly.");
+                writer.Dispose();
             }
-            catch (Exception ex)
+            catch (Exception exception)
             {
-                Debug.LogError($"Failed to write trace shutdown message: {ex.Message}");
+                Debug.LogError($"Failed to write trace shutdown message: {exception.Message}");
             }
 
             disposed = true;
         }
 
         /// <summary>
-        /// Releases all resources used by the exporter.
+        /// Releases all resources used by the exporter and performs a graceful shutdown.
         /// </summary>
         public new void Dispose()
         {

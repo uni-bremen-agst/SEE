@@ -9,6 +9,16 @@ using UnityEngine;
 namespace SEE.Controls
 {
     /// <summary>
+    /// Enumeration for the different telemetry modes.
+    /// </summary>
+    public enum TelemetryMode
+    {
+        Disabled,
+        Local,
+        Remote
+    }
+
+    /// <summary>
     /// Manages the kind of environment (desktop or VR).
     /// </summary>
     /// <remarks>This component is assumed to be attached to a game object in the
@@ -23,6 +33,36 @@ namespace SEE.Controls
         [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
         [ShowInInspector]
         public static PlayerInputType InputType = PlayerInputType.DesktopPlayer;
+        
+        [Tooltip("The current telemetry mode.")]
+        [ShowInInspector]
+        public static TelemetryMode telemetryMode = TelemetryMode.Local;
+
+        [Tooltip("Custom endpoint for telemetry export (used in remote mode).")]
+        [ShowInInspector]
+        public static string CustomTelemetryServerURL = "http://localhost:4317";
+
+        public static void SaveTelemetrySettings()
+        {
+            File.WriteAllText(Application.persistentDataPath + "/TelemetryMode.cfg", telemetryMode.ToString());
+            File.WriteAllText(Application.persistentDataPath + "/TelemetryServerURL.cfg", CustomTelemetryServerURL);
+        }
+
+        public static void LoadTelemetrySettings()
+        {
+            string modePath = Application.persistentDataPath + "/TelemetryMode.cfg";
+            if (File.Exists(modePath) &&
+                Enum.TryParse(File.ReadAllText(modePath).Trim(), out TelemetryMode mode))
+            {
+                telemetryMode = mode;
+            }
+
+            string urlPath = Application.persistentDataPath + "/TelemetryServerURL.cfg";
+            if (File.Exists(urlPath))
+            {
+                CustomTelemetryServerURL = File.ReadAllText(urlPath).Trim();
+            }
+        }
 
         /// <summary>
         /// The path of the configuration file in which to store the selected <see cref="InputType"/>.

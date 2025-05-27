@@ -21,7 +21,7 @@
         /// Initializes the tracing service with the given player name.
         /// Should only be called once for the local player.
         /// </summary>
-        /// <param name="playerName">The name of the player whose actions will be traced.</param>
+        /// <param name="playerName">The name of the player whose actions will be traced. Must not be null.</param>
         public static void Initialize(string playerName)
         {
             manager = new OpenTelemetryManager();
@@ -35,8 +35,12 @@
         /// </summary>
         public static void Shutdown()
         {
-            manager?.Shutdown();
-            manager = null;
+            if (manager != null)
+            {
+                manager.Shutdown();
+                manager = null;
+            }
+
             Instance = null;
         }
     }

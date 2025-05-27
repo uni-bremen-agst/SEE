@@ -72,6 +72,13 @@ namespace SEE.UI
                     Description: "Toggles between desktop and VR hardware.",
                     EntryColor: NextColor(),
                     Icon: Icons.VR),
+                new(
+                    SelectAction: TelemetrySettings,
+                    Title: "Telemetry Mode",
+                    Description: $"Currently: {SceneSettings.telemetryMode}",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Export), 
+
 #endif
                 new(SelectAction: NetworkSettings,
                     Title: "Settings",
@@ -191,6 +198,21 @@ namespace SEE.UI
             NetworkPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
+        private void TelemetrySettings()
+        {
+            TelemetryPropertyDialog dialog = new(Reactivate);
+            dialog.Open();
+            menu.ShowMenu = false;
+        }
+        
+        private void SetTelemetryMode(TelemetryMode mode)
+        {
+            SceneSettings.telemetryMode = mode;
+            SceneSettings.SaveTelemetrySettings();
+            ShowNotification.Info("Telemetry Mode", $"Mode set to {mode}");
+        }
+
+
 
         /// <summary>
         /// Turns on the <see cref="menu"/>.
