@@ -240,7 +240,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetupMenu()
         {
             // creates the widgets for fields
-            Debug.Log($"---- City {city.name}");
+
             // For all *public* fields of city annotated by RuntimeTab.
             // Note that Type.GetMember yields only public members.
             // A member can be a field, property, method, event, or other things.
@@ -493,13 +493,14 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             if (memberInfo.GetCustomAttribute<ShowIfAttribute>() is { } showIf)
             {
-                Debug.Log($"{memberInfo.Name} has a ShowIfAttribut with condition: {showIf.Condition}, value: {showIf.Value}, value null?: {showIf.Value == null}, field? {memberInfo is FieldInfo}, property? {memberInfo is PropertyInfo}, method? {memberInfo is MethodInfo}");
                 Type type = obj.GetType();
                 if (showIf.Condition.StartsWith("@"))
                 {
-                    throw new Exception($"Conditions of this form ({showIf.Condition}) are not supported in the RuntimeConfigMenu.");
+                    throw new Exception($"Conditions of this form ({showIf.Condition}) " +
+                        $"are not supported in the RuntimeConfigMenu.");
                 }
-                FieldInfo field = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetField(n, flags));
+                FieldInfo field = FindMemberRecursive(type, showIf.Condition,
+                    (t, n, flags) => t.GetField(n, flags));
                 if (field != null)
                 {
                     if (field.FieldType == typeof(bool))
@@ -517,7 +518,8 @@ namespace SEE.UI.RuntimeConfigMenu
                         }
                     }
                 }
-                PropertyInfo prop = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetProperty(n, flags));
+                PropertyInfo prop = FindMemberRecursive(type, showIf.Condition,
+                    (t, n, flags) => t.GetProperty(n, flags));
                 if (prop != null)
                 {
                     if (prop.PropertyType == typeof(bool))
@@ -535,7 +537,8 @@ namespace SEE.UI.RuntimeConfigMenu
                         }
                     }
                 }
-                MethodInfo m = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetMethod(n, flags));
+                MethodInfo m = FindMemberRecursive(type, showIf.Condition,
+                    (t, n, flags) => t.GetMethod(n, flags));
                 if (m != null && m.ReturnType == typeof(bool))
                 {
                     if (!(bool)m.Invoke(obj, null))
