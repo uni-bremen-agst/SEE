@@ -12,7 +12,7 @@ using SEE.UI.Notification;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.VCS
 {
     /// <summary>
     /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
