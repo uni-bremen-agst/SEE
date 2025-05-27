@@ -29,21 +29,24 @@ namespace SEE.GraphProviders.Evolution
         /// The git repository which should be analyzed.
         /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
+            RuntimeTab("Data")]
         public GitRepository GitRepository = new();
 
         /// <summary>
         /// The date limit until commits should be analyzed.
         /// </summary>
         [InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+         Tooltip("The date until commits should be analyzed (" + SEEDate.DateFormat + ")"),
+         RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
         /// <summary>
         /// Specifies if the resulting graph should be simplified.
         /// This means that directories which only contains other directories will be combined to safe space in the code city.
         /// </summary>
-        [Tooltip("If true, chains in the hierarchy will be simplified."), RuntimeTab(GraphProviderFoldoutGroup)]
+        [Tooltip("If true, chains in the hierarchy will be simplified."),
+            RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
         /// <summary>
