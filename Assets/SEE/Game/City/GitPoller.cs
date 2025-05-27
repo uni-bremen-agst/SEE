@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.Game.City;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
+using SEE.VCS;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
-namespace SEE.VCS
+namespace SEE.Game.City
 {
     /// <summary>
     /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
