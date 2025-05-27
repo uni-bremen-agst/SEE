@@ -1,7 +1,9 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing;
+﻿using LibGit2Sharp;
+using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Utils;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace SEE.VCS
 {
@@ -49,7 +51,35 @@ namespace SEE.VCS
         ///
         /// If null or empty, all currently existing branches will be considered. Otherwise
         /// only files that exist in at least one of those branches will pass the filter.
+        ///
+        /// The names in this set can be regular expressions.
         /// </summary>
         public HashSet<string> Branches;
+
+        /// <summary>
+        /// True if any of the regular expressions in <see cref="Branches"/>
+        /// matches a part the FriendlyName of the given <paramref name="branch"/>.
+        ///
+        /// For instance, if "71" is in <see cref="Branches"/>, then every branch
+        /// containing "71" in its FriendlyName will match, such as "feature/710-fix-bug"
+        /// or "feature/fix-bug-711".
+        /// </summary>
+        /// <param name="branch">branch whose FriendlyName is to be matched</param>
+        /// <returns>true if there is at least one regular expressions
+        /// in <see cref="Branches"/> matches the FriendlyName of
+        /// <paramref name="branch"/></returns>
+        public bool Matches(Branch branch)
+        {
+            if (Branches == null || Branches.Count == 0)
+            {
+                return true; // all branches match
+            }
+            return Matches(branch.FriendlyName);
+
+            bool Matches(string branchName)
+            {
+                return Branches.Any(b => Regex.IsMatch(branchName, b));
+            }
+        }
     }
 }

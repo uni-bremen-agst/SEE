@@ -42,7 +42,7 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Yields all distinct file paths of all branches of given <paramref name="repository"/>
+        /// Yields all distinct file paths of the given <paramref name="repository"/>
         /// that fulfill the given <paramref name="filter"/>. If <paramref name="filter"/>
         /// is null, all files of all branches will be retrieved.
         ///
@@ -50,9 +50,11 @@ namespace SEE.VCS
         /// file to be reported are as follows:
         ///
         /// If attribute <see cref="Filter.Branches"/> of <paramref name="filter"/>
-        /// is null or empty, the file can be on any of the current branches of the <paramref name="repository"/>.
-        /// Otherwise, a file must be contained in at leasts one of the branches listed in attribute
-        /// <see cref="Filter.Branches"/>. These can be canonical of friendly branch names.
+        /// is null or empty, the file can be contained in any of the current branches of the <paramref name="repository"/>.
+        /// Otherwise, a file must be contained in at leasts one of the branches described in attribute
+        /// <see cref="Filter.Branches"/>. The actual matching is done using the <see cref="Filter.Matches(Branch)"/>,
+        /// thus, a branch is considered only if its FriendlyName is matched by at least one of the
+        /// regular expressions in <see cref="Filter.Branches"/>.
         ///
         /// If attribute <see cref="Filter.RepositoryPaths"/> is null or empty, every file in
         /// the repository will be considered. Otherwise only the files contained in any of
@@ -73,10 +75,9 @@ namespace SEE.VCS
                 throw new ArgumentNullException(nameof(repository));
             }
             HashSet<string> result = new();
-            bool allBranches = filter == null || filter.Branches == null || filter.Branches.Count == 0;
             foreach (Branch branch in repository.Branches)
             {
-                if (allBranches || filter.Branches.Contains(branch.CanonicalName) || filter.Branches.Contains(branch.FriendlyName))
+                if (filter == null || filter.Matches(branch))
                 {
                     AllFiles(branch.Tip.Tree, filter, result);
                 }
