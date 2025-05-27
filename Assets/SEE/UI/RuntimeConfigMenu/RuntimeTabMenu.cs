@@ -495,12 +495,15 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 Debug.Log($"{memberInfo.Name} has a ShowIfAttribut with condition: {showIf.Condition}, value: {showIf.Value}, value null?: {showIf.Value == null}, field? {memberInfo is FieldInfo}, property? {memberInfo is PropertyInfo}, method? {memberInfo is MethodInfo}");
                 Type type = obj.GetType();
+                if (showIf.Condition.StartsWith("@"))
+                {
+                    throw new Exception($"Conditions of this form ({showIf.Condition}) are not supported in the RuntimeConfigMenu.");
+                }
                 FieldInfo field = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetField(n, flags));
                 if (field != null)
                 {
                     if (field.FieldType == typeof(bool))
                     {
-                        Debug.Log($"{field.Name} has {(bool)field.GetValue(obj)}");
                         if (!(bool)field.GetValue(obj))
                         {
                             return false;
@@ -510,7 +513,6 @@ namespace SEE.UI.RuntimeConfigMenu
                     {
                         if (showIf.Value != null)
                         {
-                            Debug.Log($"Field value check {Equals(field.GetValue(obj), showIf.Value)}");
                             return Equals(field.GetValue(obj), showIf.Value);
                         }
                     }
@@ -520,7 +522,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (prop.PropertyType == typeof(bool))
                     {
-                        Debug.Log($"{prop.Name} has {(bool)prop.GetValue(obj)}");
                         if (!(bool)prop.GetValue(obj))
                         {
                             return false;
@@ -530,7 +531,6 @@ namespace SEE.UI.RuntimeConfigMenu
                     {
                         if (showIf.Value != null)
                         {
-                            Debug.Log($"Prop value check {Equals(prop.GetValue(obj), showIf.Value)}");
                             return Equals(prop.GetValue(obj), showIf.Value);
                         }
                     }
@@ -538,7 +538,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 MethodInfo m = FindMemberRecursive(type, showIf.Condition, (t, n, flags) => t.GetMethod(n, flags));
                 if (m != null && m.ReturnType == typeof(bool))
                 {
-                    Debug.Log($"{m.Name} has {(bool)m.Invoke(obj, null)}");
                     if (!(bool)m.Invoke(obj, null))
                     {
                         return false;
