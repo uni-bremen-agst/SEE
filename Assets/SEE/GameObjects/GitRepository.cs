@@ -1,11 +1,13 @@
-using System;
-using System.Collections.Generic;
+using LibGit2Sharp;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -56,6 +58,30 @@ namespace SEE.GraphProviders
             RepositoryPath = repositoryPath ??
                 throw new ArgumentNullException(nameof(repositoryPath), "Repository path must not be null.");
             VCSFilter = filter;
+        }
+
+        /// <summary>
+        /// Fetches all remote branches for the given repository path.
+        /// </summary>
+        /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
+        public void FetchRemotes()
+        {
+            using Repository repo = new(RepositoryPath.Path);
+
+            // Fetch all remote branches
+            foreach (Remote remote in repo.Network.Remotes)
+            {
+                IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
+                try
+                {
+                    Commands.Fetch(repo, remote.Name, refSpecs, null, "");
+                }
+                catch (LibGit2SharpException e)
+                {
+                    throw new Exception
+                        ($"Error while running git fetch for repository path {RepositoryPath.Path} and remote name {remote.Name}: {e.Message}.\n");
+                }
+            }
         }
 
         #region Config I/O

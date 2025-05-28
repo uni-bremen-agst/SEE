@@ -28,7 +28,7 @@ namespace SEE.Game.City
         /// The code city where the <see cref="AllGitBranchesSingleGraphProvider"/> graph provider
         /// was executed and which should be updated when a new commit is detected.
         /// </summary>
-        public SEECity CodeCity;
+        public BranchCity CodeCity;
 
         /// <summary>
         /// The full paths to the repositories that should be watched for updates.
@@ -68,9 +68,10 @@ namespace SEE.Game.City
         /// </summary>
         private void RunGitFetch()
         {
+            throw new NotImplementedException("RunGitFetch is not implemented yet.");
             foreach (string repoPath in WatchedRepositories)
             {
-                Queries.FetchRemotes(repoPath);
+                //CodeCity.GitRepository.FetchRemotes();
             }
         }
 

@@ -12,30 +12,7 @@ namespace SEE.VCS
     /// </summary>
     internal static class Queries
     {
-        /// <summary>
-        /// Fetches all remote branches for the given repository path.
-        /// </summary>
-        /// <param name="repositoryPath">Path to the repository</param>
-        /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
-        public static void FetchRemotes(string repositoryPath)
-        {
-            using Repository repo = new(repositoryPath);
 
-            // Fetch all remote branches
-            foreach (Remote remote in repo.Network.Remotes)
-            {
-                IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                try
-                {
-                    Commands.Fetch(repo, remote.Name, refSpecs, null, "");
-                }
-                catch (LibGit2SharpException e)
-                {
-                    throw new Exception
-                        ($"Error while running git fetch for repository path {repositoryPath} and remote name {remote.Name}: {e.Message}.\n");
-                }
-            }
-        }
 
         /// <summary>
         /// Returns the hashes of all tip commits from all branches in the given
