@@ -28,7 +28,7 @@ namespace SEE.VCS
         {
             p = Performance.Begin(nameof(TestVCS));
             // We are using our own git repository of SEE as a guinea pig.
-            vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, DataPath.ProjectFolder());
+            vcs = new GitVersionControl(DataPath.ProjectFolder());
             Assert.IsNotNull(vcs);
             Assert.IsTrue(vcs is GitVersionControl);
         }
