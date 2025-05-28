@@ -7,7 +7,6 @@ using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
@@ -40,23 +39,12 @@ namespace SEE.GraphProviders
     {
         #region Attributes
 
-        /// <summary>
-        /// The list of file globbings for file inclusion/exclusion.
-        /// The key is the globbing pattern and the value is the inclusion status.
-        /// If the latter is true, the pattern is included, otherwise it is excluded.
-        /// </summary>
-        /// <remarks>We use <see cref="Dictionary{TKey, TValue}"/> rather than
-        /// <see cref="IDictionary{TKey, TValue}"/> because otherwise our config I/O
-        /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         Tooltip("Filter to identify the relevant files in the repository."),
          RuntimeTab(GraphProviderFoldoutGroup),
          HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
-        {
-            { "**/*", true }
-        };
+        public SEE.VCS.Filter VCSFilter = new();
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
@@ -112,7 +100,7 @@ namespace SEE.GraphProviders
 
             if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
             {
-                throw new ArgumentException("Repository path is not set or does not exists");
+                throw new ArgumentException("Repository path is not set or does not exist.");
             }
         }
 
@@ -187,9 +175,10 @@ namespace SEE.GraphProviders
                 IEnumerable<Commit> commitList = repo.CommitsAfter(startDate);
 
                 // Select all files of this repo.
-                IEnumerable<string> files = repo.AllFiles();
+                IEnumerable<string> files = repo.AllFiles(VCSFilter);
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
+                GitFileMetricProcessor metricProcessor
+                    = new(repo, VCSFilter.Globbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
@@ -201,8 +190,8 @@ namespace SEE.GraphProviders
                 }
 
                 metricProcessor.CalculateTruckFactor();
-                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricProcessor, graph, repositoryName,
-                    SimplifyGraph);
+                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
+                    (metricProcessor, graph, repositoryName, SimplifyGraph);
                 changePercentage(1f);
             }
 
@@ -224,9 +213,9 @@ namespace SEE.GraphProviders
         #region Config I/O
 
         /// <summary>
-        /// Label for serializing the <see cref="PathGlobbing"/> field.
+        /// Label for serializing the <see cref="VCSFilter"/> field.
         /// </summary>
-        private const string pathGlobbingLabel = "PathGlobbing";
+        private const string vcsFilterLabel = "VCSFilter";
 
         /// <summary>
         /// Label for serializing the <see cref="SimplifyGraph"/> field.
@@ -254,7 +243,7 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(PathGlobbing, pathGlobbingLabel);
+            VCSFilter.Save(writer, vcsFilterLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
@@ -267,7 +256,7 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
+            VCSFilter.Restore(attributes, vcsFilterLabel);
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
             ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
             ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
