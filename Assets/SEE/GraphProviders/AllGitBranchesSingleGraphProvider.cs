@@ -39,6 +39,9 @@ namespace SEE.GraphProviders
     {
         #region Attributes
 
+        /// <summary>
+        /// Filter to be used to retrieve the relevant files from the repository.
+        /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
          Tooltip("Filter to identify the relevant files in the repository."),
@@ -62,7 +65,7 @@ namespace SEE.GraphProviders
         /// Note: the repository must be fetch-able without any credentials
         /// since we can't store them securely yet.
         /// </summary>
-        [Tooltip("If true, the repository will be polled regularly for new changes")]
+        [Tooltip("If true, the repository will be polled regularly for new changes.")]
         public bool AutoFetch = false;
 
         /// <summary>
