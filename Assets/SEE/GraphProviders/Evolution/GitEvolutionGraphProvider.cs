@@ -42,11 +42,21 @@ namespace SEE.GraphProviders.Evolution
         public string Date = "";
 
         /// <summary>
+        /// Filter to be used to retrieve the relevant files from the repository.
+        /// </summary>
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+         Tooltip("Filter to identify the relevant files in the repository."),
+         RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
+        public SEE.VCS.Filter VCSFilter = new();
+
+        /// <summary>
         /// Specifies if the resulting graph should be simplified.
         /// This means that directories which only contains other directories will be combined to safe space in the code city.
         /// </summary>
         [Tooltip("If true, chains in the hierarchy will be simplified."),
-            RuntimeTab(GraphProviderFoldoutGroup)]
+         RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
 
         /// <summary>
@@ -135,7 +145,7 @@ namespace SEE.GraphProviders.Evolution
                     x.Value.Any(y =>
                         matcher.Match(y.Path).HasMatches)).Count();
 
-                IList<string> files = repo.AllFiles().ToList();
+                IList<string> files = repo.AllFiles(VCSFilter).ToList();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (KeyValuePair<Commit, Patch> currentCommit in
@@ -232,6 +242,16 @@ namespace SEE.GraphProviders.Evolution
         private const string gitRepositoryLabel = "Repository";
 
         /// <summary>
+        /// Label for serializing the <see cref="VCSFilter"/> field.
+        /// </summary>
+        private const string vcsFilterLabel = "VCSFilter";
+
+        /// <summary>
+        /// Label for serializing the <see cref="SimplifyGraph"/> field.
+        /// </summary>
+        private const string simplifyGraphLabel = "SimplifyGraph";
+
+        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
@@ -239,6 +259,8 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(Date, dateLabel);
+            VCSFilter.Save(writer, vcsFilterLabel);
+            writer.Save(SimplifyGraph, simplifyGraphLabel);
         }
 
         /// <summary>
@@ -249,6 +271,8 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
+            VCSFilter.Restore(attributes, vcsFilterLabel);
+            ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
         }
         #endregion Config IO
     }
