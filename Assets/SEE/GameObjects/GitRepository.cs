@@ -66,15 +66,15 @@ namespace SEE.GraphProviders
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
         public void FetchRemotes()
         {
-            using Repository repo = new(RepositoryPath.Path);
+            using Repository repository = new(RepositoryPath.Path);
 
             // Fetch all remote branches
-            foreach (Remote remote in repo.Network.Remotes)
+            foreach (Remote remote in repository.Network.Remotes)
             {
                 IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
                 try
                 {
-                    Commands.Fetch(repo, remote.Name, refSpecs, null, "");
+                    Commands.Fetch(repository, remote.Name, refSpecs, null, "");
                 }
                 catch (LibGit2SharpException e)
                 {
@@ -82,6 +82,27 @@ namespace SEE.GraphProviders
                         ($"Error while running git fetch for repository path {RepositoryPath.Path} and remote name {remote.Name}: {e.Message}.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
+        /// until today.
+        /// </summary>
+        /// <param name="repository">the repository from which to retrieve the commits</param>
+        /// <param name="startDate">the date after which commits should be retrieved</param>
+        /// <returns></returns>
+        public IEnumerable<Commit> CommitsAfter(DateTime startDate)
+        {
+            using Repository repository = new(RepositoryPath.Path);
+
+            IEnumerable<Commit> commitList = repository.Commits
+                .QueryBy(new CommitFilter { IncludeReachableFrom = repository.Branches })
+                // Commits after startDate
+                .Where(commit =>
+                    DateTime.Compare(commit.Author.When.Date, startDate) > 0)
+                // Filter out merge commits.
+                .Where(commit => commit.Parents.Count() <= 1);
+            return commitList;
         }
 
         #region Config I/O

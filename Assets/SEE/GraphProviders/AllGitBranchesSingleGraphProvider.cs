@@ -171,10 +171,10 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
+            IEnumerable<Commit> commitList = GitRepository.CommitsAfter(startDate);
+
             using (Repository repo = new(graph.BasePath))
             {
-                IEnumerable<Commit> commitList = repo.CommitsAfter(startDate);
-
                 // Select all files of this repo.
                 IEnumerable<string> files = repo.AllFiles(GitRepository.VCSFilter);
 

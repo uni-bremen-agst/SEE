@@ -1,6 +1,8 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
+using SEE.GraphProviders;
 using SEE.Utils;
+using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,7 @@ using UnityEngine;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Tests for <see cref="SEE.VCS.Queries"/>.
+    /// Tests for <see cref="VCS.GitRepository"/>.
     /// </summary>
     internal class TestVCSQueries
     {
@@ -21,6 +23,29 @@ namespace SEE.VCS
         private static string ProjectFolder()
         {
             return Regex.Replace(Application.dataPath, "/Assets$", string.Empty);
+        }
+
+        /// <summary>
+        /// Returns a filter that matches all C# files in the Assets/SEE folder
+        /// on the given <paramref name="branches"/>.
+        /// </summary>
+        /// <param name="branches">the branches to be considered; can be null in which
+        /// case the filter will consider all existing branches</param>
+        /// <returns>filter for C# files in Assets/Folder for given <paramref name="branches"/></returns>
+        private static Filter GetFilter(params string[] branches)
+        {
+            return new Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                              repositoryPaths: new List<string>() { "Assets/SEE" },
+                              branches: branches);
+        }
+
+        /// <summary>
+        /// Returns a <see cref="GitRepository"/> instance for the SEE project.
+        /// </summary>
+        /// <returns>a git repository</returns>
+        private static GitRepository GetRepository()
+        {
+            return new(new DataPath(ProjectFolder()), GetFilter());
         }
 
         /// <summary>
@@ -41,28 +66,14 @@ namespace SEE.VCS
         {
             DateTime date = new(2000, 1, 1);
 
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.CommitsAfter));
+            GitRepository repo = GetRepository();
+            Performance p = Performance.Begin(nameof(GitRepository.CommitsAfter));
             IEnumerable<Commit> commits = repo.CommitsAfter(date);
             p.End(true);
             // commits.Count() should be the same as:
             //  git log --oneline --no-merges | wc -l
             Debug.Log($"Number of commits: {commits.Count()}\n");
             //Print(commits);
-        }
-
-        /// <summary>
-        /// Returns a filter that matches all C# files in the Assets/SEE folder
-        /// on the given <paramref name="branches"/>.
-        /// </summary>
-        /// <param name="branches">the branches to be considered; can be null in which
-        /// case the filter will consider all existing branches</param>
-        /// <returns>filter for C# files in Assets/Folder for given <paramref name="branches"/></returns>
-        private static Filter GetFilter(params string[] branches)
-        {
-            return new Filter(globbing: new Globbing() { { "**/*.cs", true } },
-                              repositoryPaths: new List<string>() { "Assets/SEE" },
-                              branches: branches);
         }
 
         /// <summary>
