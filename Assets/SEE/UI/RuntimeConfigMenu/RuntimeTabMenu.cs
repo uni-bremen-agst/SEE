@@ -433,10 +433,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-            if (!ValidateShowIf(memberInfo, obj))
-            {
-                return;
-            }
+
             switch (memberInfo)
             {
                 case FieldInfo fieldInfo:
@@ -452,7 +449,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         false,
                         changedValue => fieldInfo.SetValue(obj, changedValue),
-                        memberInfo.GetCustomAttributes()
+                        memberInfo.GetCustomAttributes(),
+                        fieldInfo,
+                        obj
                     );
                     break;
                 case PropertyInfo propertyInfo:
@@ -474,7 +473,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         false,
                         changedValue => propertyInfo.SetValue(obj, changedValue),
-                        memberInfo.GetCustomAttributes()
+                        memberInfo.GetCustomAttributes(),
+                        propertyInfo,
+                        obj
                     );
                     break;
             }
@@ -574,10 +575,14 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="settingName">setting name; in case of a list element, this would be index of the list
         /// element; otherwise this would be the name of the field</param>
         /// <param name="parent">parent game object</param>
+        /// <param name="removable">Enables the remove button to remove this object. Needed for nested settings</param>
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
+        /// <param name="memberInfo">field or property info from <see cref="CreateSetting"/></param>
+        /// <param name="obj">object which contains the field or property from <see cref="CreateSetting"/></param>
         private void CreateSetting(Func<object> getter, string settingName, GameObject parent, bool removable,
-            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
+            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null,
+            MemberInfo memberInfo = null, object obj = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
             Attribute[] attributeArray = attributes?.ToArray() ?? Array.Empty<Attribute>();
@@ -599,17 +604,18 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-
+            bool visibility = memberInfo == null && obj == null || ValidateShowIf(memberInfo, obj);
+            GameObject createdObj = null;
             switch (value)
             {
                 case bool:
-                    CreateSwitch(settingName,
+                    createdObj = CreateSwitch(settingName,
                         changedValue => setter!(changedValue),
                         () => (bool)getter(),
                         parent);
                     break;
                 case int:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!((int)changedValue),
                         () => (int)getter(),
@@ -617,7 +623,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case uint:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!((uint)changedValue),
                         () => (uint)getter(),
@@ -625,7 +631,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case float:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!(changedValue),
                         () => (float)getter(),
@@ -633,13 +639,14 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case string:
-                    CreateStringField(settingName,
+                    createdObj = CreateStringField(settingName,
                         changedValue => setter!(changedValue),
                         () => (string)getter(),
                         parent);
                     break;
                 case Color:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateColorPicker(settingName,
                         parent,
                         changedValue => setter!(changedValue),
@@ -647,10 +654,11 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case DataPath dataPath:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateFilePicker(settingName, dataPath, parent);
                     break;
                 case Enum:
-                    CreateDropDown(settingName,
+                    createdObj = CreateDropDown(settingName,
                         // changedValue is the enum value as an integer; here we will
                         // convert it back to the enum. We pass on the value to the
                         // setter of the caller because only the caller has the context to
@@ -673,7 +681,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        mapInfo,
+                        obj);
                     break;
                 case AntennaAttributes:
                     FieldInfo antennaInfo = value.GetType().GetField(nameof(AntennaAttributes.AntennaSections))!;
@@ -682,7 +692,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        antennaInfo,
+                        obj);
                     break;
 
                 case SingleGraphPipelineProvider:
@@ -692,7 +704,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        pipeline,
+                        obj);
                     break;
 
                 case MultiGraphPipelineProvider:
@@ -703,7 +717,9 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent,
                         removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        pipeline2,
+                        obj);
                     break;
                 // types that shouldn't be in the configuration menu
                 case Graph:
@@ -715,20 +731,24 @@ namespace SEE.UI.RuntimeConfigMenu
                     break;
                 case IDictionary dict:
                     parent = CreateNestedSetting(settingName, parent, removable, true);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateDictEntryManagement(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
                 case IList<string> list:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(list, parent, () => string.Empty);
                     break;
                 case List<SingleGraphProvider> providerList:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(providerList, parent, () => new SingleGraphPipelineProvider());
                     break;
                 case List<MultiGraphProvider> providerList:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(providerList, parent, () => new MultiGraphPipelineProvider());
                     break;
 
@@ -746,6 +766,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 case CSVGraphProvider:
@@ -754,6 +775,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
                     parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
@@ -761,6 +783,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     Debug.LogWarning($"Missing: {settingName}, {value.GetType().FullName}.\n");
                     break;
             }
+
+            createdObj?.SetActive(visibility);
         }
 
         /// <summary>
@@ -972,7 +996,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
+        private GameObject CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
             Func<float> getter, bool useRoundValue, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -1045,6 +1069,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
             }
+            return sliderGameObject;
 
             async UniTask RoundAfterFrame()
             {
@@ -1166,7 +1191,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
+        private GameObject CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
@@ -1253,6 +1278,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
+            return switchGameObject;
         }
 
         /// <summary>
@@ -1264,7 +1290,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
+        private GameObject CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
             GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
@@ -1334,6 +1360,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
+            return stringGameObject;
         }
 
         private void CreateTypeField(GameObject parent, MultiGraphProvider provider)
@@ -1421,7 +1448,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
+        private GameObject CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
             Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // convert the value names to an array
@@ -1496,6 +1523,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
             }
+            return dropDownGameObject;
         }
 
         /// <summary>
