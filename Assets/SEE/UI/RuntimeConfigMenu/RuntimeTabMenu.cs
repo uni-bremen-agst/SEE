@@ -165,6 +165,12 @@ namespace SEE.UI.RuntimeConfigMenu
         public Action<string, string> RemoveDictEntryAction;
 
         /// <summary>
+        /// This list contains all the data needed to determine the visibility
+        /// and interactability of a member info or its associated GameObject.
+        /// </summary>
+        private readonly List<(MemberInfo, GameObject, object)> controlConditions = new();
+
+        /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
@@ -785,6 +791,23 @@ namespace SEE.UI.RuntimeConfigMenu
             }
 
             createdObj?.SetActive(visibility);
+            if (memberInfo != null && obj != null && createdObj != null)
+            {
+                controlConditions.Add((memberInfo, createdObj, obj));
+            }
+        }
+
+        /// <summary>
+        /// Iterates over all <see cref="MemberInfo"/> with a control condition (<see cref="ShowIfAttribute"/>)
+        /// and updates the active state of each associated <see cref="GameObject"/>
+        /// based on the result of <see cref="ValidateShowIf"/> for the corresponding member.
+        /// </summary>
+        private void CheckControlConditions()
+        {
+            foreach((MemberInfo m, GameObject go, object obj) in controlConditions)
+            {
+                go.SetActive(ValidateShowIf(m, obj));
+            }
         }
 
         /// <summary>
@@ -1487,6 +1510,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
+            dropdown.dropdownEvent.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 
@@ -1496,6 +1520,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     setter((int)value);
                     dropdown.ChangeDropdownInfo((int)value);
+                    CheckControlConditions();
                 }
             };
 
