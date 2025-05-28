@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
+﻿using LibGit2Sharp;
+using NUnit.Framework;
+using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
 using System.IO;
-using SEE.GraphProviders.Evolution;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -317,13 +318,13 @@ namespace SEE.GraphProviders
         {
             return new AllGitBranchesSingleGraphProvider()
             {
-                PathGlobbing = new Dictionary<string, bool>()
-                {
-                    {".cs", true},
-                },
+                VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
+                                               repositoryPaths: new List<string>() { "path1", "path2" },
+                                               branches: new List<string>() { "^branch1$", "master" }),
+                SimplifyGraph = true,
                 AutoFetch = true,
-                PollingInterval = 5,
-                MarkerTime = 10,
+                PollingInterval = 60,
+                MarkerTime = 3,
             };
         }
 

@@ -1,17 +1,17 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.Evolution;
+using SEE.Utils;
 using SEE.Utils.Paths;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
-
 using static SEE.DataModel.DG.VCS;
 
 namespace SEE.GraphProviders
@@ -92,7 +92,13 @@ namespace SEE.GraphProviders
             city.VCSPath = new DataPath(gitDirPath);
             AllGitBranchesSingleGraphProvider provider = new()
             {
-                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
+                                               repositoryPaths: new List<string>() { "path1", "path2" },
+                                               branches: new List<string>() { "^branch1$", "master" }),
+                SimplifyGraph = true,
+                AutoFetch = true,
+                PollingInterval = 60,
+                MarkerTime = 3,
             };
             city.Date = date;
 
