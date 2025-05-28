@@ -4,6 +4,7 @@ using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
@@ -60,7 +61,14 @@ namespace SEE.GraphProviders
             GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
             Assert.AreEqual(gitLoaded.Date, saved.Date);
             AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
-            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
+            AreEqualFilters(gitLoaded.GitRepository.VCSFilter, saved.GitRepository.VCSFilter);
+        }
+
+        private static void AreEqualFilters(SEE.VCS.Filter expected, SEE.VCS.Filter actual)
+        {
+            Assert.AreEqual(expected.Globbing, actual.Globbing);
+            Assert.AreEqual(expected.RepositoryPaths, actual.RepositoryPaths);
+            Assert.AreEqual(expected.Branches, actual.Branches);
         }
 
         /// <summary>
@@ -318,9 +326,11 @@ namespace SEE.GraphProviders
         {
             return new AllGitBranchesSingleGraphProvider()
             {
-                VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
-                                               repositoryPaths: new List<string>() { "path1", "path2" },
-                                               branches: new List<string>() { "^branch1$", "master" }),
+                GitRepository = new GitRepository
+                                      (new DataPath("path/to/repo"),
+                                       new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
+                                                          repositoryPaths: new List<string>() { "path1", "path2" },
+                                                          branches: new List<string>() { "^branch1$", "master" })),
                 SimplifyGraph = true,
                 AutoFetch = true,
                 PollingInterval = 60,
@@ -330,11 +340,11 @@ namespace SEE.GraphProviders
 
         private GitRepository GetGitRepository()
         {
-            return new GitRepository()
-            {
-                RepositoryPath = new DataPath("/path/to/repo"),
-                PathGlobbing = new Dictionary<string, bool>() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
-            };
+            return new GitRepository
+                        (new DataPath("anotherpath/to/repoX"),
+                         new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cpp", true } },
+                                            repositoryPaths: new List<string>() { "path2", "path3" },
+                                            branches: new List<string>() { "^branch5$", "main" }));
         }
 
         #endregion

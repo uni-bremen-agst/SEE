@@ -29,19 +29,34 @@ namespace SEE.GraphProviders
         public DataPath RepositoryPath = new();
 
         /// <summary>
-        /// The list of file globbings for file inclusion/exclusion.
-        /// The key is the globbing pattern and the value is the inclusion status.
-        /// If the latter is true, the pattern is included, otherwise it is excluded.
+        /// Filter to be used to retrieve the relevant files from the repository.
         /// </summary>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
-            RuntimeTab(graphProviderFoldoutGroup),
+         Tooltip("Filter to identify the relevant files in the repository."),
+         RuntimeTab(graphProviderFoldoutGroup),
          HideReferenceObjectPicker]
-        public Dictionary<string, bool> PathGlobbing = new()
+        public SEE.VCS.Filter VCSFilter = new();
+
+        /// <summary>
+        /// Constructor setting default values for the fields.
+        /// </summary>
+        public GitRepository()
         {
-            { "", false }
-        };
+            // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="repositoryPath">path to the repository</param>
+        /// <param name="filter">the filter to be used to retrieve the relevant files from the repository</param>
+        public GitRepository(DataPath repositoryPath, SEE.VCS.Filter filter)
+        {
+            RepositoryPath = repositoryPath ??
+                throw new ArgumentNullException(nameof(repositoryPath), "Repository path must not be null.");
+            VCSFilter = filter;
+        }
 
         #region Config I/O
 
@@ -51,9 +66,9 @@ namespace SEE.GraphProviders
         private const string repositoryPathLabel = "RepositoryPath";
 
         /// <summary>
-        /// Label for serializing the <see cref="PathGlobbing"/> field.
+        /// Label for serializing the <see cref="VCSFilter"/> field.
         /// </summary>
-        private const string pathGlobbingLabel = "PathGlobbing";
+        private const string vcsFilterLabel = "VCSFilter";
 
         /// <summary>
         /// Saves the attributes to the configuration file under the given <paramref name="label"/>
@@ -64,8 +79,8 @@ namespace SEE.GraphProviders
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(PathGlobbing as Dictionary<string, bool>, pathGlobbingLabel);
             RepositoryPath.Save(writer, repositoryPathLabel);
+            VCSFilter.Save(writer, vcsFilterLabel);
             writer.EndGroup();
         }
 
@@ -78,11 +93,10 @@ namespace SEE.GraphProviders
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.Restore(values, pathGlobbingLabel, ref PathGlobbing);
                 RepositoryPath.Restore(values, repositoryPathLabel);
+                VCSFilter.Restore(attributes, vcsFilterLabel);
             }
         }
-
     }
     #endregion
 }

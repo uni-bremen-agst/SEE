@@ -92,9 +92,11 @@ namespace SEE.GraphProviders
             city.VCSPath = new DataPath(gitDirPath);
             AllGitBranchesSingleGraphProvider provider = new()
             {
-                VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
-                                               repositoryPaths: new List<string>() { "path1", "path2" },
-                                               branches: new List<string>() { "^branch1$", "master" }),
+                GitRepository = new GitRepository
+                                      (new DataPath("path/to/repo"),
+                                       new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
+                                                          repositoryPaths: new List<string>() { "path1", "path2" },
+                                                          branches: new List<string>() { "^branch1$", "master" })),
                 SimplifyGraph = true,
                 AutoFetch = true,
                 PollingInterval = 60,
@@ -128,7 +130,9 @@ namespace SEE.GraphProviders
                 GitRepository = new GitRepository()
                 {
                     RepositoryPath = new DataPath(gitDirPath),
-                    PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                    VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.h", false } },
+                                                   repositoryPaths: new List<string>() { "path" },
+                                                   branches: new List<string>() { "feature1", "feature2" })
                 }
             };
 

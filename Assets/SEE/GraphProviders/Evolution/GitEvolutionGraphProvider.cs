@@ -26,14 +26,6 @@ namespace SEE.GraphProviders.Evolution
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
         /// <summary>
-        /// The git repository which should be analyzed.
-        /// </summary>
-        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
-            RuntimeTab("Data")]
-        public GitRepository GitRepository = new();
-
-        /// <summary>
         /// The date limit until commits should be analyzed.
         /// </summary>
         [InspectorName("Date Limit"),
@@ -42,14 +34,12 @@ namespace SEE.GraphProviders.Evolution
         public string Date = "";
 
         /// <summary>
-        /// Filter to be used to retrieve the relevant files from the repository.
+        /// The git repository which should be analyzed.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Filter to identify the relevant files in the repository."),
-         RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
-        public SEE.VCS.Filter VCSFilter = new();
+        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
+            RuntimeTab("Data")]
+        public GitRepository GitRepository = new();
 
         /// <summary>
         /// Specifies if the resulting graph should be simplified.
@@ -110,7 +100,7 @@ namespace SEE.GraphProviders.Evolution
 
             Matcher matcher = new();
 
-            foreach (KeyValuePair<string, bool> pattern in GitRepository.PathGlobbing)
+            foreach (KeyValuePair<string, bool> pattern in GitRepository.VCSFilter.Globbing)
             {
                 if (pattern.Value)
                 {
@@ -145,7 +135,7 @@ namespace SEE.GraphProviders.Evolution
                     x.Value.Any(y =>
                         matcher.Match(y.Path).HasMatches)).Count();
 
-                IList<string> files = repo.AllFiles(VCSFilter).ToList();
+                IList<string> files = repo.AllFiles(GitRepository.VCSFilter).ToList();
 
                 // iterate over all commits where at least one file with a file extension in includedFiles is present
                 foreach (KeyValuePair<Commit, Patch> currentCommit in
@@ -193,7 +183,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files);
+            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.VCSFilter.Globbing, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
@@ -259,7 +249,6 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(Date, dateLabel);
-            VCSFilter.Save(writer, vcsFilterLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
         }
 
@@ -271,7 +260,6 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
-            VCSFilter.Restore(attributes, vcsFilterLabel);
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
         }
         #endregion Config IO

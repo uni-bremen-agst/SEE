@@ -40,14 +40,12 @@ namespace SEE.GraphProviders
         #region Attributes
 
         /// <summary>
-        /// Filter to be used to retrieve the relevant files from the repository.
+        /// The git repository which should be analyzed.
         /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-         Tooltip("Filter to identify the relevant files in the repository."),
-         RuntimeTab(GraphProviderFoldoutGroup),
-         HideReferenceObjectPicker]
-        public SEE.VCS.Filter VCSFilter = new();
+        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
+            RuntimeTab("Data")]
+        public GitRepository GitRepository = new();
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
@@ -178,10 +176,10 @@ namespace SEE.GraphProviders
                 IEnumerable<Commit> commitList = repo.CommitsAfter(startDate);
 
                 // Select all files of this repo.
-                IEnumerable<string> files = repo.AllFiles(VCSFilter);
+                IEnumerable<string> files = repo.AllFiles(GitRepository.VCSFilter);
 
                 GitFileMetricProcessor metricProcessor
-                    = new(repo, VCSFilter.Globbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
+                    = new(repo, GitRepository.VCSFilter.Globbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();
@@ -216,11 +214,6 @@ namespace SEE.GraphProviders
         #region Config I/O
 
         /// <summary>
-        /// Label for serializing the <see cref="VCSFilter"/> field.
-        /// </summary>
-        private const string vcsFilterLabel = "VCSFilter";
-
-        /// <summary>
         /// Label for serializing the <see cref="SimplifyGraph"/> field.
         /// </summary>
         private const string simplifyGraphLabel = "SimplifyGraph";
@@ -246,7 +239,6 @@ namespace SEE.GraphProviders
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            VCSFilter.Save(writer, vcsFilterLabel);
             writer.Save(SimplifyGraph, simplifyGraphLabel);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
@@ -259,7 +251,6 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            VCSFilter.Restore(attributes, vcsFilterLabel);
             ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
             ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
             ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
