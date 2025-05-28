@@ -2,7 +2,6 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
-using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -33,8 +32,6 @@ namespace SEE.Game.City
         /// If this is true, the authors of the commits with similar identities will be combined.
         /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
         /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
-        /// <seealso cref="AutoMapAuthors"/>
-        /// <seealso cref="AuthorAliasMap"/>
         /// </summary>
         [Tooltip("If true, the authors of the commits with similar identities will be combined."),
          TabGroup(VCSFoldoutGroup),
@@ -104,7 +101,7 @@ namespace SEE.Game.City
         private const string combineAuthorsLabel = "CombineAuthors";
 
         /// <summary>
-        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
+        /// Label of attribute <see cref="AuthorAliasMap"/> in the configuration file.
         /// </summary>
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
