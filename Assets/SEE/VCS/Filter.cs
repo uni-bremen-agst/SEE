@@ -1,16 +1,23 @@
 ﻿using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Utils;
+using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using UnityEngine;
 
 namespace SEE.VCS
 {
     /// <summary>
     /// A filter for VCS queries.
     /// </summary>
-    internal class Filter
+    [Serializable]
+    [HideReferenceObjectPicker]
+    public class Filter
     {
         /// <summary>
         /// Constructor.
@@ -20,10 +27,31 @@ namespace SEE.VCS
         /// <param name="branches">the name of the branches</param>
         public Filter(Globbing globbing = null, IEnumerable<string> repositoryPaths = null, IEnumerable<string> branches = null)
         {
-            Matcher = PathGlobbing.ToMatcher(globbing);
+            Globbing = globbing;
             RepositoryPaths = repositoryPaths?.ToArray();
             Branches = branches?.ToHashSet();
         }
+
+        /// <summary>
+        /// The inclusion/exclusion file globbings for relevant files in the repository.
+        /// Can be null or empty, in which case all files will pass the filter.
+        /// </summary>
+        /// <summary>
+        /// The list of file globbings for file inclusion/exclusion.
+        /// The key is the globbing pattern and the value is the inclusion status.
+        /// If the latter is true, the pattern is included, otherwise it is excluded.
+        /// </summary>
+        /// <remarks>We use <see cref="Dictionary{TKey, TValue}"/> rather than
+        /// <see cref="IDictionary{TKey, TValue}"/> because otherwise our config I/O
+        /// would not work.</remarks>
+        [OdinSerialize]
+        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
+        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         HideReferenceObjectPicker]
+         public Globbing Globbing = new()
+         {
+            { "**/*", true }
+         };
 
         /// <summary>
         /// The <see cref="Matcher"/> corresponding to the <see cref="Globbing"/> parameter
@@ -34,7 +62,7 @@ namespace SEE.VCS
         /// If the matcher is not null, a file will only pass the filter if it fulfills at least
         /// one inclusion criterion and does not fulfill any of the exclusion criteria.
         /// </summary>
-        public Matcher Matcher { get; set; }
+        public Matcher Matcher => PathGlobbing.ToMatcher(Globbing);
 
         /// <summary>
         /// Directory paths relative to the root of the repository, where the forward slash is
@@ -81,5 +109,44 @@ namespace SEE.VCS
                 return Branches.Any(b => Regex.IsMatch(branchName, b));
             }
         }
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="Globbing"/> in the configuration file.
+        /// </summary>
+        private const string globbingLabel = "Globbing";
+
+        /// <summary>
+        /// Label of attribute <see cref="RepositoryPaths"/> in the configuration file.
+        /// </summary>
+        private const string repositoryPathsLabel = "RepositoryPaths";
+
+        /// <summary>
+        /// Label of attribute <see cref="Branches"/> in the configuration file.
+        /// </summary>
+        private const string branchesLabel = "Branches";
+
+        public void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(Globbing, globbingLabel);
+            writer.Save(RepositoryPaths, repositoryPathsLabel);
+            writer.Save(Branches, branchesLabel);
+            writer.EndGroup();
+        }
+
+        public void Restore(Dictionary<string, object> attributes, string label)
+        {
+            if (attributes.TryGetValue(label, out object dictionary))
+            {
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+                ConfigIO.Restore(attributes, globbingLabel, ref Globbing);
+                ConfigIO.Restore(attributes, repositoryPathsLabel, ref RepositoryPaths);
+                ConfigIO.Restore(attributes, branchesLabel, ref Branches);
+            }
+        }
+
+        #endregion
     }
 }
