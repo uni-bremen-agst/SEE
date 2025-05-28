@@ -105,6 +105,17 @@ namespace SEE.GraphProviders
             return commitList;
         }
 
+        /// <summary>
+        /// Yields the canonical name of all branches in <paramref name="repository"/>.
+        /// </summary>
+        /// <param name="repository"></param>
+        /// <returns>canonical name of all branches</returns>
+        public IEnumerable<string> AllBranches()
+        {
+            using Repository repository = new(RepositoryPath.Path);
+            return repository.Branches.Select(b => b.CanonicalName);
+        }
+
         #region Config I/O
 
         /// <summary>

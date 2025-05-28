@@ -34,16 +34,6 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Yields the canonical name of all branches in <paramref name="repository"/>.
-        /// </summary>
-        /// <param name="repository"></param>
-        /// <returns>canonical name of all branches</returns>
-        public static IEnumerable<string> AllBranches(this Repository repository)
-        {
-            return repository.Branches.Select(b => b.CanonicalName);
-        }
-
-        /// <summary>
         /// Yields all distinct file paths of the given <paramref name="repository"/>
         /// that fulfill the given <paramref name="filter"/>. If <paramref name="filter"/>
         /// is null, all files of all branches will be retrieved.

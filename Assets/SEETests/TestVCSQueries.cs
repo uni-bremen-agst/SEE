@@ -61,6 +61,9 @@ namespace SEE.VCS
             }
         }
 
+        /// <summary>
+        /// Test for <see cref="GitRepository.CommitsAfter(DateTime)"/>.
+        /// </summary>
         [Test]
         public void TestCommitsAfter()
         {
@@ -155,13 +158,13 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Test for <see cref="Queries.AllBranches(Repository)"/>.
+        /// Test for <see cref="GitRepository.AllBranches()"/>.
         /// </summary>
         [Test]
         public void TestAllBranches()
         {
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllBranches));
+            GitRepository repo = GetRepository();
+            Performance p = Performance.Begin(nameof(GitRepository.AllBranches));
             IEnumerable<string> branches = repo.AllBranches();
             p.End(true);
             Debug.Log($"Number of branches: {branches.Count()}\n");
