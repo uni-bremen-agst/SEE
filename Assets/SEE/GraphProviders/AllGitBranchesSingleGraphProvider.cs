@@ -11,7 +11,6 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
-using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using Sirenix.Utilities;
@@ -151,7 +150,7 @@ namespace SEE.GraphProviders
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
         {
             // Note: repositoryPath is platform dependent.
-            string repositoryPath = branchCity.VCSPath.Path;
+            string repositoryPath = GitRepository.RepositoryPath.Path;
             if (string.IsNullOrWhiteSpace(repositoryPath))
             {
                 throw new Exception("The repository path is not set.");
@@ -173,28 +172,24 @@ namespace SEE.GraphProviders
 
             IEnumerable<Commit> commitList = GitRepository.CommitsAfter(startDate);
 
-            using (Repository repo = new(graph.BasePath))
+            HashSet<string> files = GitRepository.AllFiles();
+
+            GitFileMetricProcessor metricProcessor
+                = new(GitRepository, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
+
+            int counter = 0;
+            int commitLength = commitList.Count();
+            foreach (Commit commit in commitList)
             {
-                // Select all files of this repo.
-                IEnumerable<string> files = repo.AllFiles(GitRepository.VCSFilter);
-
-                GitFileMetricProcessor metricProcessor
-                    = new(repo, GitRepository.VCSFilter.Globbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
-
-                int counter = 0;
-                int commitLength = commitList.Count();
-                foreach (Commit commit in commitList)
-                {
-                    metricProcessor.ProcessCommit(commit);
-                    changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
-                    counter++;
-                }
-
-                metricProcessor.CalculateTruckFactor();
-                GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
-                    (metricProcessor, graph, repositoryName, SimplifyGraph);
-                changePercentage(1f);
+                metricProcessor.ProcessCommit(commit);
+                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
+                counter++;
             }
+
+            metricProcessor.CalculateTruckFactor();
+            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
+                (metricProcessor, graph, repositoryName, SimplifyGraph);
+            changePercentage(1f);
 
             graph.FinalizeNodeHierarchy();
             return graph;

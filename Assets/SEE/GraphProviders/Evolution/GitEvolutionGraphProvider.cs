@@ -12,7 +12,6 @@ using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
-using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -26,10 +25,10 @@ namespace SEE.GraphProviders.Evolution
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
         /// <summary>
-        /// The date limit until commits should be analyzed.
+        /// All commits after the date specified in <see cref="Date"/> will be considered.
         /// </summary>
-        [InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analyzed (" + SEEDate.DateFormat + ")"),
+        [InspectorName("Start Date"),
+         Tooltip("All commits after the date specified will be considered (" + SEEDate.DateFormat + ")."),
          RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
@@ -88,72 +87,45 @@ namespace SEE.GraphProviders.Evolution
         }
 
         /// <summary>
-        /// Calculates and returns the actual graph series.
-        ///
+        /// Calculates and returns the graph series, one graph for each commit in the git repository.
         /// </summary>
         /// <param name="graph">The input graph series.</param>
         /// <param name="changePercentage">Keeps track of the current progess.</param>
         /// <returns>The calculated graph series.</returns>
         private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
         {
-            DateTime timeLimit = SEEDate.ToDate(Date);
-
-            Matcher matcher = new();
-
-            foreach (KeyValuePair<string, bool> pattern in GitRepository.VCSFilter.Globbing)
-            {
-                if (pattern.Value)
-                {
-                    matcher.AddInclude(pattern.Key);
-                }
-                else
-                {
-                    matcher.AddExclude(pattern.Key);
-                }
-            }
+            DateTime startDate = SEEDate.ToDate(Date);
 
             string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
             string repositoryName = pathSegments[^1];
 
-            using (Repository repo = new(GitRepository.RepositoryPath.Path))
+            List<Commit> commitList = GitRepository.CommitsAfter(startDate).Reverse().ToList();
+            changePercentage(0.1f);
+
+            Dictionary<Commit, Patch> commitChanges
+                = commitList.ToDictionary(commit => commit, commit => GitRepository.GetFileChanges(commit));
+            changePercentage(0.2f);
+
+            int counter = 0;
+
+            HashSet<string> files = GitRepository.AllFiles();
+
+            IEnumerable<KeyValuePair<Commit, Patch>> commits
+                = commitChanges.Where(x => x.Value.Any(patch => files.Contains(patch.Path)));
+
+            int commitLength = commits.Count();
+
+            foreach (KeyValuePair<Commit, Patch> currentCommit in commits)
             {
-                List<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter
-                    { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None })
-                    .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
-                    .Where(commit => commit.Parents.Count() <= 1)
-                    .Reverse()
-                    .ToList();
-                changePercentage(0.1f);
+                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
 
-                Dictionary<Commit, Patch> commitChanges =
-                    commitList.ToDictionary(commit => commit, commit => GetFileChanges(commit, repo));
-                changePercentage(0.2f);
+                // All commits between the first commit in commitList and the current commit
+                List<Commit> commitsInBetween =
+                    commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
 
-                int counter = 0;
-                int commitLength = commitChanges.Where(x =>
-                    x.Value.Any(y =>
-                        matcher.Match(y.Path).HasMatches)).Count();
-
-                IList<string> files = repo.AllFiles(GitRepository.VCSFilter).ToList();
-
-                // iterate over all commits where at least one file with a file extension in includedFiles is present
-                foreach (KeyValuePair<Commit, Patch> currentCommit in
-                         commitChanges.Where(x =>
-                             x.Value.Any(y =>
-                                 matcher.Match(y.Path).HasMatches)))
-                {
-                    changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
-
-                    // All commits between the first commit in commitList and the current commit
-                    List<Commit> commitsInBetween =
-                        commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
-
-                    graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
-                        commitChanges,
-                        repo, files));
-                    counter++;
-                }
+                graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
+                                           commitChanges, files));
+                counter++;
             }
 
             return graph;
@@ -168,11 +140,10 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="currentCommit">The current commit to generate the graph.</param>
         /// <param name="commitsInBetween">All commits in between these two points.</param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
-        /// <param name="repo">The git repository in which the commit was made.</param>
         /// <param name="files">A List of all files in the git repository.</param>
         /// <returns>The graoh of the evolution step.</returns>
         private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, Repository repo, IList<string> files)
+            IDictionary<Commit, Patch> commitChanges, HashSet<string> files)
         {
             Graph g = new(GitRepository.RepositoryPath.Path)
             {
@@ -183,7 +154,7 @@ namespace SEE.GraphProviders.Evolution
             g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             g.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.VCSFilter.Globbing, files);
+            GitFileMetricProcessor metricProcessor = new(GitRepository, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
@@ -192,25 +163,9 @@ namespace SEE.GraphProviders.Evolution
 
             metricProcessor.CalculateTruckFactor();
 
-            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricProcessor, g, repoName, SimplifyGraph,
-                idSuffix: "-Evo");
+            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
+                                     (metricProcessor, g, repoName, SimplifyGraph, idSuffix: "-Evo");
             return g;
-        }
-
-        /// <summary>
-        /// Returns all changed files in a commit.
-        /// </summary>
-        /// <param name="commit">The commit which files should be returned.</param>
-        /// <param name="repo">The git repository in which the commit was made.</param>
-        /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>).</returns>
-        private static Patch GetFileChanges(Commit commit, Repository repo)
-        {
-            if (commit.Parents.Any())
-            {
-                return repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
-            }
-
-            return repo.Diff.Compare<Patch>(null, commit.Tree);
         }
 
         /// <summary>

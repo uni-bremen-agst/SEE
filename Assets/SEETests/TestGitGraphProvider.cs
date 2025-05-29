@@ -93,10 +93,10 @@ namespace SEE.GraphProviders
             AllGitBranchesSingleGraphProvider provider = new()
             {
                 GitRepository = new GitRepository
-                                      (new DataPath("path/to/repo"),
+                                      (new DataPath(gitDirPath),
                                        new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
-                                                          repositoryPaths: new List<string>() { "path1", "path2" },
-                                                          branches: new List<string>() { "^branch1$", "master" })),
+                                                          repositoryPaths: null,
+                                                          branches: null)),
                 SimplifyGraph = true,
                 AutoFetch = true,
                 PollingInterval = 60,
@@ -130,9 +130,9 @@ namespace SEE.GraphProviders
                 GitRepository = new GitRepository()
                 {
                     RepositoryPath = new DataPath(gitDirPath),
-                    VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.h", false } },
-                                                   repositoryPaths: new List<string>() { "path" },
-                                                   branches: new List<string>() { "feature1", "feature2" })
+                    VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
+                                                   repositoryPaths: null,
+                                                   branches: null)
                 }
             };
 

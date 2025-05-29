@@ -43,9 +43,9 @@ namespace SEE.VCS
         /// Returns a <see cref="GitRepository"/> instance for the SEE project.
         /// </summary>
         /// <returns>a git repository</returns>
-        private static GitRepository GetRepository()
+        private static GitRepository GetRepository(params string[] branches)
         {
-            return new(new DataPath(ProjectFolder()), GetFilter());
+            return new(new DataPath(ProjectFolder()), GetFilter(branches));
         }
 
         /// <summary>
@@ -80,63 +80,46 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Test for <see cref="Queries.AllFiles(LibGit2Sharp.Tree, Filter)"/> on the master branch.
+        /// Test for <see cref="GitRepository.AllFiles()"/> on the master branch.
         /// /// Should be equivalent to <see cref="TestMasterFiles2"/>.
         /// </summary>
         [Test]
         public void TestMasterFiles1()
         {
             string branchName = "master";
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files
-                = Queries.AllFiles(repo.Branches[branchName].Tip.Tree, GetFilter());
+            GitRepository repo = GetRepository(branchName);
+            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
+            HashSet<string> files = repo.AllFiles("HEAD");
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
         }
 
         /// <summary>
-        /// Test for <see cref="Queries.AllFiles(Filter)"/> on the master branch.
+        /// Test for <see cref="GitRepository.AllFiles()"/> on the master branch.
         /// Should be equivalent to <see cref="TestMasterFiles1"/>.
         /// </summary>
         [Test]
         public void TestMasterFiles2()
         {
             string branchName = "master";
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles(GetFilter(branchName));
+            GitRepository repo = GetRepository(branchName);
+            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
+            HashSet<string> files = repo.AllFiles();
             p.End(true);
             Debug.Log($"Number of files in branch '{branchName}': {files.Count()}\n");
             //Print(files);
         }
 
         /// <summary>
-        /// Test for <see cref="Queries.AllFiles(Filter)"/> on all existing branches.
+        /// Test for <see cref="GitRepository.AllFiles()"/> on all existing branches.
         /// </summary>
         [Test]
         public void TestAllBranchesFiles()
         {
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles(GetFilter());
-            p.End(true);
-            Debug.Log($"Number of files: {files.Count()}\n");
-            //Print(files);
-        }
-
-        /// <summary>
-        /// Test for <see cref="Queries.AllFiles(Filter)"/> for particular branches.
-        /// </summary>
-        [Test]
-        public void TestSpecificBranchesFiles()
-        {
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles(GetFilter("origin/645-debug-adapter-protocol",
-                                                                "origin/682-save-and-load-keybindings",
-                                                                "origin/723-git-metrics-in-diff-city"));
+            GitRepository repo = GetRepository();
+            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
+            HashSet<string> files = repo.AllFiles();
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);
@@ -144,14 +127,31 @@ namespace SEE.VCS
 
         /// <summary>
         /// Test for <see cref="Queries.AllFiles(Filter)"/> for particular branches
+        /// given as complete branch names.
+        /// </summary>
+        [Test]
+        public void TestSpecificBranchesFiles()
+        {
+            GitRepository repo = GetRepository("origin/645-debug-adapter-protocol",
+                                               "origin/682-save-and-load-keybindings",
+                                               "origin/723-git-metrics-in-diff-city");
+            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
+            HashSet<string> files = repo.AllFiles();
+            p.End(true);
+            Debug.Log($"Number of files: {files.Count()}\n");
+            //Print(files);
+        }
+
+        /// <summary>
+        /// Test for <see cref="GitRepository.AllFiles()"/> for particular branches
         /// matching a regular expression.
         /// </summary>
         [Test]
         public void TestRegularExpressionBranchesFiles()
         {
-            using Repository repo = new(ProjectFolder());
-            Performance p = Performance.Begin(nameof(Queries.AllFiles));
-            IEnumerable<string> files = repo.AllFiles(GetFilter("71"));
+            GitRepository repo = GetRepository("71");
+            Performance p = Performance.Begin(nameof(GitRepository.AllFiles));
+            HashSet<string> files = repo.AllFiles();
             p.End(true);
             Debug.Log($"Number of files: {files.Count()}\n");
             //Print(files);

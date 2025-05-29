@@ -423,12 +423,18 @@ namespace SEE.GraphProviders
         {
             Assert.IsTrue(saved.GetType() == loaded.GetType());
             VCSGraphProvider loadedProvider = loaded as VCSGraphProvider;
-            AreEqual(saved.RepositoryPath, loadedProvider.RepositoryPath);
+            AreEqual(saved.GitRepository, loadedProvider.GitRepository);
             Assert.AreEqual(saved.CommitID, loadedProvider.CommitID);
             Assert.AreEqual(saved.BaselineCommitID, loadedProvider.BaselineCommitID);
-            AreEqual(saved.PathGlobbing, loadedProvider.PathGlobbing);
         }
 
+        private static void AreEqual(GitRepository expected, GitRepository actual)
+        {
+            Assert.IsNotNull(expected);
+            Assert.IsNotNull(actual);
+            AreEqual(expected.RepositoryPath, actual.RepositoryPath);
+            AreEqualFilters(expected.VCSFilter, actual.VCSFilter);
+        }
         private void AreEqual(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
         {
             Assert.AreEqual(expected.Count, actual.Count);
@@ -448,13 +454,11 @@ namespace SEE.GraphProviders
 
             return new VCSGraphProvider()
             {
-                RepositoryPath = new DataPath()
-                {
-                    Path = Path.GetDirectoryName(Application.dataPath)
-                },
+                GitRepository = new GitRepository
+                    (new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                     new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
                 BaselineCommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
-                PathGlobbing = pathGlobbing
             };
         }
 

@@ -1,10 +1,8 @@
 using Cysharp.Threading.Tasks;
-using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -15,7 +13,6 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using SEE.Scanner.Antlr;
-using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
@@ -31,10 +28,12 @@ namespace SEE.GraphProviders
     public class VCSGraphProvider : SingleGraphProvider
     {
         /// <summary>
-        /// The path to the git repository.
+        /// The git repository which should be analyzed.
         /// </summary>
-        [ShowInInspector, Tooltip("Path to the version control repository."), HideReferenceObjectPicker]
-        public DataPath RepositoryPath = new();
+        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
+            RuntimeTab("Data")]
+        public GitRepository GitRepository = new();
 
         /// <summary>
         /// The commit id.
@@ -50,20 +49,6 @@ namespace SEE.GraphProviders
         [ShowInInspector, Tooltip("VCS metrics will be gathered relative to this commit id. If undefined, no VCS metrics will be gathered"),
             HideReferenceObjectPicker]
         public string BaselineCommitID = string.Empty;
-
-        /// <summary>
-        /// The list of path globbings to include or exclude files. A path matches the globbing
-        ///
-        /// </summary>
-        [OdinSerialize]
-        [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-            Tooltip("Path globbings to include (true) or exclude files (false). A path matches the globbing "
-                    + "if it matches at least one inclusion pattern and does not match any exclusion pattern."),
-            RuntimeTab(GraphProviderFoldoutGroup), HideReferenceObjectPicker]
-        public Globbing PathGlobbing = new()
-        {
-            { "**/*", true }
-        };
 
         public override SingleGraphProviderKind GetKind()
         {
@@ -82,7 +67,7 @@ namespace SEE.GraphProviders
                                                           CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(PathGlobbing, RepositoryPath.Path, CommitID, BaselineCommitID,
+            return await UniTask.FromResult<Graph>(GetVCSGraph(GitRepository, CommitID, BaselineCommitID,
                                                                changePercentage, token));
         }
 
@@ -97,13 +82,17 @@ namespace SEE.GraphProviders
         /// is undefined or does not exist or <paramref name="city"/> is null</exception>
         protected void CheckArguments(AbstractSEECity city)
         {
-            if (string.IsNullOrEmpty(RepositoryPath.Path))
+            if (GitRepository == null)
+            {
+                throw new ArgumentException("GitRepository is null.\n");
+            }
+            if (string.IsNullOrEmpty(GitRepository.RepositoryPath.Path))
             {
                 throw new ArgumentException("Empty repository path.\n");
             }
-            if (!Directory.Exists(RepositoryPath.Path))
+            if (!Directory.Exists(GitRepository.RepositoryPath.Path))
             {
-                throw new ArgumentException($"Directory {RepositoryPath.Path} does not exist.\n");
+                throw new ArgumentException($"Directory {GitRepository.RepositoryPath.Path} does not exist.\n");
             }
             if (string.IsNullOrEmpty(CommitID))
             {
@@ -136,27 +125,24 @@ namespace SEE.GraphProviders
         /// <param name="token">Cancellation token.</param>
         /// <returns>the resulting graph</returns>
         private static Graph GetVCSGraph
-            (Globbing pathGlobbing,
-            string repositoryPath,
+            (GitRepository repository,
             string commitID,
             string baselineCommitID,
             Action<float> changePercentage,
             CancellationToken token)
         {
-            string[] pathSegments = repositoryPath.Split(Path.DirectorySeparatorChar);
+            string[] pathSegments = repository.RepositoryPath.RelativePath.Split(Path.DirectorySeparatorChar);
 
-            Graph graph = new(repositoryPath, pathSegments[^1]);
+            Graph graph = new(repository.RepositoryPath.Path, pathSegments[^1]);
             graph.CommitID(commitID);
-            graph.RepositoryPath(repositoryPath);
+            graph.RepositoryPath(repository.RepositoryPath.Path);
 
             // The main directory.
             NewNode(graph, pathSegments[^1], directoryNodeType, pathSegments[^1]);
 
-            using (Repository repo = new(repositoryPath))
             {
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
-                ICollection<string> files = SEE.VCS.Queries.AllFiles(repo.Lookup<Commit>(commitID).Tree,
-                                                                     new SEE.VCS.Filter(globbing: pathGlobbing));
+                ICollection<string> files = repository.AllFiles(commitID);
 
                 float totalSteps = files.Count;
                 int currentStep = 0;
@@ -181,8 +167,8 @@ namespace SEE.GraphProviders
                     currentStep++;
                     changePercentage?.Invoke(currentStep / totalSteps);
                 }
-                AddCodeMetrics(graph, repo, commitID);
-                ADDVCSMetrics(graph, repo, baselineCommitID, commitID);
+                AddCodeMetrics(graph, repository, commitID);
+                ADDVCSMetrics(graph, repository, baselineCommitID, commitID);
             }
             graph.FinalizeNodeHierarchy();
             changePercentage?.Invoke(1f);
@@ -289,20 +275,19 @@ namespace SEE.GraphProviders
         /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
-        public static ICollection<AntlrToken> RetrieveTokens(string repositoryFilePath, Repository repository,
-                                                           string commitID, AntlrLanguage language)
+        public static ICollection<AntlrToken> RetrieveTokens
+            (string repositoryFilePath,
+            GitRepository repository,
+             string commitID,
+             AntlrLanguage language)
         {
-            Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
-
-            if (blob != null)
+            try
             {
-                string fileContent = blob.GetContentText();
-                return AntlrToken.FromString(fileContent, language);
+                return AntlrToken.FromString(repository.GetFileContent(repositoryFilePath, commitID), language);
             }
-            else
+            catch (Exception e)
             {
-                // Blob does not exist.
-                Debug.LogWarning($"File {repositoryFilePath} does not exist.\n");
+                Debug.LogError($"Error retrieving file content for {repositoryFilePath} at commit {commitID}: {e.Message}");
                 return new List<AntlrToken>();
             }
         }
@@ -315,7 +300,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">The graph where the metric should be added.</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="commitID">The commitID where the files exist.</param>
-        private static void AddCodeMetrics(Graph graph, Repository repository, string commitID)
+        private static void AddCodeMetrics(Graph graph, GitRepository repository, string commitID)
         {
             foreach (Node node in graph.Nodes())
             {
@@ -357,7 +342,7 @@ namespace SEE.GraphProviders
         /// <param name="repository">The repository from which the file content is retrieved.</param>
         /// <param name="oldCommit">The starting commit ID (baseline).</param>
         /// <param name="newCommit">The ending commit.</param>
-        private static void ADDVCSMetrics(Graph graph, Repository repository, string oldCommit, string newCommit)
+        private static void ADDVCSMetrics(Graph graph, GitRepository repository, string oldCommit, string newCommit)
         {
             if (!string.IsNullOrWhiteSpace(oldCommit))
             {
@@ -368,14 +353,9 @@ namespace SEE.GraphProviders
         #region Config I/O
 
         /// <summary>
-        /// Label of attribute <see cref="PathGlobbing"/> in the configuration file.
+        /// Label of attribute <see cref="GitRepository"/> in the configuration file.
         /// </summary>
-        private const string pathGlobbingLabel = "PathGlobbing";
-
-        /// <summary>
-        /// Label of attribute <see cref="RepositoryPath"/> in the configuration file.
-        /// </summary>
-        private const string repositoryPathLabel = "RepositoryPath";
+        private const string gitRepositoryLabel = "GitRepository";
 
         /// <summary>
         /// Label of attribute <see cref="CommitID"/> in the configuration file.
@@ -388,18 +368,16 @@ namespace SEE.GraphProviders
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(PathGlobbing, pathGlobbingLabel);
             writer.Save(CommitID, commitIDLabel);
             writer.Save(BaselineCommitID, baselineCommitIDLabel);
-            RepositoryPath.Save(writer, repositoryPathLabel);
+            GitRepository.Save(writer, gitRepositoryLabel);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, pathGlobbingLabel, ref PathGlobbing);
             ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
             ConfigIO.Restore(attributes, baselineCommitIDLabel, ref BaselineCommitID);
-            RepositoryPath.Restore(attributes, repositoryPathLabel);
+            GitRepository.Restore(attributes, gitRepositoryLabel);
         }
 
         #endregion

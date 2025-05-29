@@ -240,10 +240,11 @@ namespace SEE.GraphProviders
 
             VCSGraphProvider provider = new()
             {
-                RepositoryPath = new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                GitRepository = new GitRepository
+                                     (new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                                     new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
                 CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
-                PathGlobbing = pathGlobbing
             };
 
             return await provider.ProvideAsync(new Graph(""), NewCity());
@@ -255,9 +256,7 @@ namespace SEE.GraphProviders
         /// <returns></returns>
         private static SEECity NewCity()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-            return city;
+            return new GameObject().AddComponent<SEECity>();
         }
     }
 }

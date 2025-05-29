@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using JetBrains.Annotations;
 using LibGit2Sharp;
-using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Utils;
 
 namespace SEE.GraphProviders.VCS
@@ -18,7 +17,7 @@ namespace SEE.GraphProviders.VCS
     /// </summary>
     /// <example>
     /// <code>
-    /// GitFileMetricRepository fileRepo = new(gitRepo, includedFiles, excludedFiles);
+    /// GitFileMetricRepository fileRepo = new(gitRepo, files);
     /// foreach (var commit in gitRepo.Commits)
     /// {
     ///     fileRepo.ProcessCommit(commit);
@@ -31,7 +30,7 @@ namespace SEE.GraphProviders.VCS
     public class GitFileMetricProcessor
     {
         /// <summary>
-        /// Maps the filename to the collected git metrics of that file
+        /// Maps the filename to the collected git metrics of that file.
         /// </summary>
         public IDictionary<string, GitFileMetrics> FileToMetrics { get; }
             = new Dictionary<string, GitFileMetrics>();
@@ -39,17 +38,9 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// The git repository to collect the metrics from
         /// </summary>
-        private readonly Repository gitRepository;
+        private readonly GitRepository gitRepository;
 
-        /// <summary>
-        /// A list of file extensions which should be included
-        /// </summary>
-        private readonly IDictionary<string, bool> pathGlobbing;
-
-        /// <summary>
-        /// Matcher is used to check by a glob pattern if a file should be included in the analysis or not.
-        /// </summary>
-        private readonly Matcher matcher;
+        private readonly HashSet<string> files;
 
         /// <summary>
         /// Used in the calculation of the truck factor.
@@ -75,33 +66,15 @@ namespace SEE.GraphProviders.VCS
         /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
         /// </summary>
         /// <param name="gitRepository">The git repository you want to collect the metrics from</param>
-        /// <param name="pathGlobbing">A dictionary of path glob patterns you want to include or exclude</param>
-        /// <param name="repositoryFiles">A list of a files which should be displayed in the code-city</param>
-        public GitFileMetricProcessor(Repository gitRepository, IDictionary<string, bool> pathGlobbing,
-            IEnumerable<string> repositoryFiles)
+        /// <param name="repositoryFiles">A set of a files whose metrics should be calculated</param>
+        public GitFileMetricProcessor(GitRepository gitRepository, HashSet<string> repositoryFiles)
         {
             this.gitRepository = gitRepository;
-            this.pathGlobbing = pathGlobbing;
-            this.matcher = new();
-
-            foreach (KeyValuePair<string, bool> pattern in this.pathGlobbing)
-            {
-                if (pattern.Value)
-                {
-                    matcher.AddInclude(pattern.Key);
-                }
-                else
-                {
-                    matcher.AddExclude(pattern.Key);
-                }
-            }
+            this.files = repositoryFiles;
 
             foreach (string file in repositoryFiles)
             {
-                if (matcher.Match(file).HasMatches)
-                {
-                    FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<FileAuthor>(), 0));
-                }
+                FileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<FileAuthor>(), 0));
             }
         }
 
@@ -109,14 +82,16 @@ namespace SEE.GraphProviders.VCS
         /// Creates a new instance of <see cref="GitFileMetricProcessor"/>
         /// </summary>
         /// <param name="gitRepository">The git repository to collect metrics from</param>
-        /// <param name="pathGlobbing">A dictionary containing path globbing patterns for including or excluding files</param>
         /// <param name="repositoryFiles">A collection of repository files to be processed</param>
-        /// <param name="combineSimilarAuthors">Indicates whether to merge metrics for authors with similar identities using <paramref name="authorAliasMap"/></param>
+        /// <param name="combineSimilarAuthors">Indicates whether to merge metrics for authors with
+        /// similar identities using <paramref name="authorAliasMap"/></param>
         /// <param name="authorAliasMap">A mapping of authors to their aliases</param>
-        public GitFileMetricProcessor(Repository gitRepository, Dictionary<string, bool> pathGlobbing,
-            IEnumerable<string> repositoryFiles, bool combineSimilarAuthors,
-            Dictionary<FileAuthor, FileAuthorList> authorAliasMap) : this(gitRepository, pathGlobbing,
-            repositoryFiles)
+        public GitFileMetricProcessor
+            (GitRepository gitRepository,
+            HashSet<string> repositoryFiles,
+            bool combineSimilarAuthors,
+            Dictionary<FileAuthor, FileAuthorList> authorAliasMap)
+            : this(gitRepository, repositoryFiles)
         {
             this.combineSimilarAuthors = combineSimilarAuthors;
             this.authorAliasMap = authorAliasMap;
@@ -207,7 +182,7 @@ namespace SEE.GraphProviders.VCS
             {
                 string filePath = changedFile.Path;
 
-                if (!matcher.Match(filePath).HasMatches)
+                if (!files.Contains(filePath))
                 {
                     continue;
                 }
@@ -265,16 +240,11 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
-            if (commit.Parents.Any())
-            {
-                Patch changedFilesPath = gitRepository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
-                ProcessCommit(commit, changedFilesPath);
-            }
-            else
-            {
-                Patch changedFilesPath = gitRepository.Diff.Compare<Patch>(null, commit.Tree);
-                ProcessCommit(commit, changedFilesPath);
-            }
+            Patch changedFilesPath = commit.Parents.Any()
+                ? gitRepository.Diff(commit, commit.Parents.First())
+                : gitRepository.Diff(null, commit);
+
+            ProcessCommit(commit, changedFilesPath);
         }
 
         /// <summary>

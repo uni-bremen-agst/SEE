@@ -25,7 +25,7 @@ namespace SEE.GraphProviders
         /// <exception cref="System.Exception">thrown if <paramref name="oldRevision"/>
         /// or <paramref name="newRevision"/> is null or empty or if they do not
         /// refer to an existing revision</exception>
-        internal static void AddMetrics(Graph graph, Repository repository, string oldRevision, string newRevision)
+        internal static void AddMetrics(Graph graph, GitRepository repository, string oldRevision, string newRevision)
         {
             if (string.IsNullOrWhiteSpace(oldRevision))
             {
@@ -35,12 +35,12 @@ namespace SEE.GraphProviders
             {
                 throw new System.Exception("The new revision must neither be null nor empty.");
             }
-            Commit oldCommit = repository.Lookup<Commit>(oldRevision);
+            Commit oldCommit = repository.GetCommit(oldRevision);
             if (oldCommit == null)
             {
                 throw new System.Exception($"There is no revision {oldCommit}");
             }
-            Commit newCommit = repository.Lookup<Commit>(newRevision);
+            Commit newCommit = repository.GetCommit(newRevision);
             if (newCommit == null)
             {
                 throw new System.Exception($"There is no revision {newCommit}");
@@ -58,9 +58,9 @@ namespace SEE.GraphProviders
         /// <param name="repository">the VCS containing the two revisions to be compared</param>
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
-        private static void AddLinesOfCodeChurnMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
+        private static void AddLinesOfCodeChurnMetric(Graph graph, GitRepository repository, Commit oldCommit, Commit newCommit)
         {
-            Patch changes = repository.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
+            Patch changes = repository.Diff(oldCommit, newCommit);
 
             foreach (PatchEntryChanges change in changes)
             {
@@ -84,9 +84,9 @@ namespace SEE.GraphProviders
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
         /// to be compared</param>
-        private static void AddNumberOfDevelopersMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
+        private static void AddNumberOfDevelopersMetric(Graph graph, GitRepository repository, Commit oldCommit, Commit newCommit)
         {
-            ICommitLog commits = repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
+            ICommitLog commits = repository.CommitLog();
 
             Dictionary<string, HashSet<string>> uniqueContributorsPerFile = new();
 
@@ -96,7 +96,7 @@ namespace SEE.GraphProviders
                 {
                     foreach (Commit parent in commit.Parents)
                     {
-                        Patch changes = repository.Diff.Compare<Patch>(parent.Tree, commit.Tree);
+                        Patch changes = repository.Diff(parent, commit);
 
                         foreach (PatchEntryChanges change in changes)
                         {
@@ -134,13 +134,9 @@ namespace SEE.GraphProviders
         /// <param name="oldCommit">the older commit that constitutes the baseline of the comparison</param>
         /// <param name="newCommit">the newer commit against which the <paramref name="oldCommit"/> is
         /// to be compared</param>
-        private static void AddCommitFrequencyMetric(Graph graph, Repository repository, Commit oldCommit, Commit newCommit)
+        private static void AddCommitFrequencyMetric(Graph graph, GitRepository repository, Commit oldCommit, Commit newCommit)
         {
-            ICommitLog commitsBetween = repository.Commits.QueryBy(new CommitFilter
-            {
-                IncludeReachableFrom = newCommit,
-                ExcludeReachableFrom = oldCommit
-            });
+            ICommitLog commitsBetween = repository.CommitLog(oldCommit, newCommit);
 
             Dictionary<string, int> fileCommitCounts = new();
 
@@ -148,7 +144,7 @@ namespace SEE.GraphProviders
             {
                 foreach (Commit parent in commit.Parents)
                 {
-                    TreeChanges changes = repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
+                    TreeChanges changes = repository.TreeDiff(parent, commit);
 
                     foreach (TreeEntryChanges change in changes)
                     {
