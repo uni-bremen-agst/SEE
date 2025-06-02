@@ -525,7 +525,6 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Checks whether the specified <see cref="MemberInfo"/>
         /// has a <see cref="RuntimeShowIfAttribute"/> or a <see cref="RuntimeHideIfAttribute"/>
         /// and evaluates its condition.
-        /// If the condition is not met, the member should be skipped (not shown).
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
         /// <param name="obj">The instance that contains the member.</param>
@@ -545,39 +544,73 @@ namespace SEE.UI.RuntimeConfigMenu
             }
 
             return true;
+        }
 
-            bool EvaluateCondition(string condition, object expectedValue, object obj)
+        /// <summary>
+        /// Checks whether the specified <see cref="MemberInfo"/>
+        /// has a <see cref="RuntimeEnableIfAttribute"/> or a <see cref="RuntimeDisableIfAttribute"/>
+        /// and evaluates its condition.
+        /// </summary>
+        /// <param name="memberInfo">The member to check.</param>
+        /// <param name="obj">The instance that contains the member.</param>
+        /// <returns><c>true</c> if the member should be interacable. Otherwise, <c>false</c>.</returns>
+        private bool ValidateInteracableAttributes(MemberInfo memberInfo, object obj)
+        {
+            if (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() is { } enableIf
+                && !EvaluateCondition(enableIf.Condition, enableIf.Value, obj))
             {
-                Type type = obj.GetType();
-                if (condition.StartsWith("@"))
-                {
-                    throw new Exception($"Conditions of this form ({condition}) " +
-                        $"are not supported in the RuntimeConfigMenu.");
-                }
-
-                FieldInfo field = FindMemberRecursive(type, condition,
-                    (t, n, flags) => t.GetField(n, flags));
-                if (field != null)
-                {
-                    return Compare(field.GetValue(obj), expectedValue);
-                }
-
-                PropertyInfo prop = FindMemberRecursive(type, condition,
-                    (t, n, flags) => t.GetProperty(n, flags));
-                if (prop != null)
-                {
-                    return Compare(prop.GetValue(obj), expectedValue);
-                }
-
-                MethodInfo m = FindMemberRecursive(type, condition,
-                    (t, n, flags) => t.GetMethod(n, flags));
-                if (m != null && m.ReturnType == typeof(bool))
-                {
-                    return (bool)m.Invoke(obj, null);
-                }
-
-                return true;
+                return false;
             }
+
+            if (memberInfo.GetCustomAttribute<RuntimeDisableIfAttribute>() is { } disableIf
+                && EvaluateCondition(disableIf.Condition, disableIf.Value, obj))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Evaluates the specified <paramref name="condition"/> by searching for the
+        /// corresponding <see cref="FieldInfo"/>, <see cref="PropertyInfo"/> or <see cref="MethodInfo"/>
+        /// in the given <paramref name="obj"/>, and then evaluates it accordingly.
+        /// </summary>
+        /// <param name="condition">The condition to be checked.</param>
+        /// <param name="expectedValue">The expected value to compare against. Can be <c>null</c>.</param>
+        /// <param name="obj">The object on whcih to evaluate the condition.</param>
+        /// <returns><c>true</c> if the condition is met. Otherwise, <c>false</c>.</returns>
+        /// <exception cref="Exception">Thrown if the <paramref name="condition"/> is in an unsupported or incorrect format.</exception>
+        private bool EvaluateCondition(string condition, object expectedValue, object obj)
+        {
+            Type type = obj.GetType();
+            if (condition.StartsWith("@"))
+            {
+                throw new Exception($"Conditions of this form ({condition}) " +
+                    $"are not supported in the RuntimeConfigMenu.");
+            }
+
+            FieldInfo field = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetField(n, flags));
+            if (field != null)
+            {
+                return Compare(field.GetValue(obj), expectedValue);
+            }
+
+            PropertyInfo prop = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetProperty(n, flags));
+            if (prop != null)
+            {
+                return Compare(prop.GetValue(obj), expectedValue);
+            }
+
+            MethodInfo m = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetMethod(n, flags));
+            if (m != null && m.ReturnType == typeof(bool))
+            {
+                return (bool)m.Invoke(obj, null);
+            }
+
+            return true;
 
             bool Compare(object actual, object expected)
             {
@@ -585,7 +618,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     return b;
                 }
-                return expected != null ? Equals(actual, expected) : true;
+                return expected == null || Equals(actual, expected);
             }
 
             T FindMemberRecursive<T>(Type type, string name, Func<Type, string, BindingFlags, T> resolver)
@@ -644,6 +677,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
             bool visibility = memberInfo == null && obj == null || ValidateVisibilityAttributes(memberInfo, obj);
+            bool interacable = memberInfo == null && obj == null || ValidateInteracableAttributes(memberInfo, obj);
             GameObject createdObj = null;
             switch (value)
             {
@@ -822,11 +856,67 @@ namespace SEE.UI.RuntimeConfigMenu
                     Debug.LogWarning($"Missing: {settingName}, {value.GetType().FullName}.\n");
                     break;
             }
-
             createdObj?.SetActive(visibility);
+            if (createdObj != null && HasInteractableAttribute(memberInfo))
+            {
+                SetInteractableRecursive(createdObj, interacable);
+            }
             if (memberInfo != null && obj != null && createdObj != null)
             {
                 controlConditions.Add((memberInfo, createdObj, obj));
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <paramref name="memberInfo"/> has a <see cref="RuntimeEnableIfAttribute"/>
+        /// or a <see cref="RuntimeDisableIfAttribute"/>.
+        /// </summary>
+        /// <param name="memberInfo">The member info to be checked.</param>
+        /// <returns><c>true</c> if a corresponding attribute was found. Otherwise, <c>false</c>.</c></returns>
+        private bool HasInteractableAttribute(MemberInfo memberInfo)
+        {
+            return memberInfo != null && (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() != null
+                || memberInfo.GetCustomAttribute<RuntimeDisableIfAttribute>() != null);
+        }
+
+        /// <summary>
+        /// Sets the interactability of all applicable components on the given GameObject.
+        /// </summary>
+        /// <param name="obj">The GameObject whose components should be updated.</param>
+        /// <param name="interactable">The desired interactable state.</param>
+        private void SetInteractableOnAll(GameObject obj, bool interactable)
+        {
+            const string interact = "interactable";
+            foreach (Component comp in obj.GetComponents<Component>())
+            {
+                if (comp == null)
+                {
+                    continue;
+                }
+                Type type = comp.GetType();
+                // Check property
+                PropertyInfo prop = type.GetProperty(interact, BindingFlags.Public | BindingFlags.Instance);
+                if (prop != null && prop.CanWrite && prop.PropertyType == typeof(bool))
+                {
+                    prop.SetValue(comp, interactable);
+                    continue;
+                }
+
+                // Check field
+                FieldInfo field = type.GetField(interact, BindingFlags.Public | BindingFlags.Instance);
+                if (field != null && field.FieldType == typeof(bool))
+                {
+                    field.SetValue(comp, interactable);
+                }
+            }
+        }
+
+        private void SetInteractableRecursive(GameObject root, bool interactable)
+        {
+            SetInteractableOnAll(root, interactable);
+            foreach(Transform child in root.transform)
+            {
+                SetInteractableRecursive(child.gameObject, interactable);
             }
         }
 
@@ -840,6 +930,10 @@ namespace SEE.UI.RuntimeConfigMenu
             foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
                 go.SetActive(ValidateVisibilityAttributes(m, obj));
+                if (HasInteractableAttribute(m))
+                {
+                    SetInteractableRecursive(go, ValidateInteracableAttributes(m, obj));
+                }
             }
         }
 
@@ -1194,6 +1288,11 @@ namespace SEE.UI.RuntimeConfigMenu
             bool ValidateChildrenFitAfterProportionChange()
             {
                 SEEReflexionCity rc = (SEEReflexionCity)city;
+                if (!city.gameObject.IsCodeCityDrawnAndActive())
+                {
+                    return false;
+                }
+
                 GameObject archRoot = rc.ReflexionGraph.ArchitectureRoot.GameObject();
                 if (archRoot.transform.localScale.z <= slider.value
                     || archRoot.GetNode().Children().Count() == 0)
