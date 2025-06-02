@@ -1387,6 +1387,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             inputField.onEndEdit.AddListener(_ => CheckImmediateRedraw());
+            inputField.onEndEdit.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => inputField.text = getter();
 
@@ -1396,6 +1397,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     setter(value as string);
                     inputField.text = value as string;
+                    CheckControlConditions();
                 }
             };
 
