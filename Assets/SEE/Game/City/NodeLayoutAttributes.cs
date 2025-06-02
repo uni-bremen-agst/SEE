@@ -6,6 +6,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine;
 using Sirenix.OdinInspector;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Game.City
 {
@@ -25,7 +26,7 @@ namespace SEE.Game.City
         /// Settings for the <see cref="Layout.NodeLayouts.IncrementalTreeMapLayout"/>.
         /// </summary>
         [Tooltip("Settings for the IncrementalTreeMap layout. Used only for this kind of layout.")]
-        [ShowIf(nameof(Kind), NodeLayoutKind.IncrementalTreeMap)]
+        [ShowIf(nameof(Kind), NodeLayoutKind.IncrementalTreeMap), RuntimeShowIf(nameof(Kind), NodeLayoutKind.IncrementalTreeMap)]
         public IncrementalTreeMapAttributes IncrementalTreeMap = new();
 
         /// <summary>
@@ -33,7 +34,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <remarks>Relevant only for the reflexion layout.</remarks>
         [Tooltip("Layout for the architecture. Used only for the reflexion layout.")]
-        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
+        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion), RuntimeShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
         public NodeLayoutKind Architecture = NodeLayoutKind.Treemap;
 
         /// <summary>
@@ -41,7 +42,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <remarks>Relevant only for the reflexion layout.</remarks>
         [Tooltip("Layout for the implementation. Used only for the reflexion layout.")]
-        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
+        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion), RuntimeShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
         public NodeLayoutKind Implementation = NodeLayoutKind.Treemap;
 
         /// <summary>
@@ -67,7 +68,7 @@ namespace SEE.Game.City
          "If the file extension is GVL, the layout is expected to be stored in Axivion's Gravis layout (GVL) with 2D co-ordinates. " +
          "Otherwise the layout format SDL is expected, which saves all three dimensions of a node. " +
          "This information is used only if 'From File' is selected as node layout.")]
-        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
+        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion), RuntimeShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
         public DataPath ArchitectureLayoutPath = new();
 
         /// <summary>
@@ -76,7 +77,7 @@ namespace SEE.Game.City
         /// </summary>
         /// <remarks>Relevant only for the reflexion layout.</remarks>
         [Tooltip("The proportion of space allocated for the architecture. This number relates to the longer edge of the available rectangle.")]
-        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
+        [ShowIf(nameof(Kind), NodeLayoutKind.Reflexion), RuntimeShowIf(nameof(Kind), NodeLayoutKind.Reflexion)]
         [Range(0f, 1f)]
         public float ArchitectureLayoutProportion = 0.6f;
 

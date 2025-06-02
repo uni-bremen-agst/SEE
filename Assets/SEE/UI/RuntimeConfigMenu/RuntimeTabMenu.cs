@@ -440,6 +440,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
 
+            AssertConditionalAttributePairsValid(memberInfo);
+
             switch (memberInfo)
             {
                 case FieldInfo fieldInfo:
@@ -488,6 +490,38 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
+        /// Validates the given <paramref name="memberInfo"/> decorated with a conditional
+        /// design-time attribute (e.g., <see cref="ShowIfAttribute"/> also has the corresponding
+        /// runtime attribute (e.g., <see cref="RuntimeShowIfAttribute"/>.
+        /// </summary>
+        /// <param name="memberInfo">The object to validate.</param>
+        /// <exception cref="Exception">Thrown if a conditional design-time attribute is present on the member
+        /// but the corresponding runtime attribute is missing.</exception>
+        private void AssertConditionalAttributePairsValid(MemberInfo memberInfo)
+        {
+            if (memberInfo == null || memberInfo is not FieldInfo && memberInfo is not PropertyInfo)
+            {
+                return;
+            }
+            (Type, Type)[] attributePairs = new (Type designTime, Type runtime)[]
+            {
+                (typeof(ShowIfAttribute), typeof(RuntimeShowIfAttribute)),
+                //(typeof(HideIfAttribute), typeof(RuntimeHideIfAttribute)),
+                //(typeof(EnableIfAttribute), typeof(RuntimeEnableIfAttribute)),
+                //(typeof(DisableIfAttribute), typeof(RuntimeDisableIfAttribute)),
+            };
+
+            foreach ((Type designAttr, Type runtimeAttr) in attributePairs)
+            {
+                if (memberInfo.GetCustomAttribute(designAttr) != null
+                    && memberInfo.GetCustomAttribute(runtimeAttr) == null)
+                {
+                    throw new InvalidOperationException($"{memberInfo.Name} has {designAttr.Name} but no corresponding {runtimeAttr.Name}.");
+                }
+            }
+        }
+
+        /// <summary>
         /// Checks whether the specified <see cref="MemberInfo"/>
         /// has a <see cref="ShowIfAttribute"/> and evaluates its condition.
         /// If the condition is not met, the member should be skipped (not shown).
@@ -497,7 +531,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
         private bool ValidateShowIf(MemberInfo memberInfo, object obj)
         {
-            if (memberInfo.GetCustomAttribute<ShowIfAttribute>() is { } showIf)
+            if (memberInfo.GetCustomAttribute<RuntimeShowIfAttribute>() is { } showIf)
             {
                 Type type = obj.GetType();
                 if (showIf.Condition.StartsWith("@"))
@@ -804,7 +838,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private void CheckControlConditions()
         {
-            foreach((MemberInfo m, GameObject go, object obj) in controlConditions)
+            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
                 go.SetActive(ValidateShowIf(m, obj));
             }

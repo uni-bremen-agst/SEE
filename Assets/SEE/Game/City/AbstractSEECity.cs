@@ -180,7 +180,7 @@ namespace SEE.Game.City
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
         [PropertyOrder(999)]
-        [ShowIf(nameof(ShowProgressBar))]
+        [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
         public float ProgressBar;
