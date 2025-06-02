@@ -507,8 +507,8 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 (typeof(ShowIfAttribute), typeof(RuntimeShowIfAttribute)),
                 (typeof(HideIfAttribute), typeof(RuntimeHideIfAttribute)),
-                //(typeof(EnableIfAttribute), typeof(RuntimeEnableIfAttribute)),
-                //(typeof(DisableIfAttribute), typeof(RuntimeDisableIfAttribute)),
+                (typeof(EnableIfAttribute), typeof(RuntimeEnableIfAttribute)),
+                (typeof(DisableIfAttribute), typeof(RuntimeDisableIfAttribute)),
             };
 
             foreach ((Type designAttr, Type runtimeAttr) in attributePairs)
@@ -831,7 +831,7 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Iterates over all <see cref="MemberInfo"/> with a control condition (<see cref="ShowIfAttribute"/>)
+        /// Iterates over all <see cref="MemberInfo"/> with a control condition (e.g., <see cref="RuntimeShowIfAttribute"/>)
         /// and updates the active state of each associated <see cref="GameObject"/>
         /// based on the result of <see cref="ValidateVisibilityAttributes"/> for the corresponding member.
         /// </summary>
