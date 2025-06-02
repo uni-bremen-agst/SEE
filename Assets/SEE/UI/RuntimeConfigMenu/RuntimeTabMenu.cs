@@ -506,7 +506,7 @@ namespace SEE.UI.RuntimeConfigMenu
             (Type, Type)[] attributePairs = new (Type designTime, Type runtime)[]
             {
                 (typeof(ShowIfAttribute), typeof(RuntimeShowIfAttribute)),
-                //(typeof(HideIfAttribute), typeof(RuntimeHideIfAttribute)),
+                (typeof(HideIfAttribute), typeof(RuntimeHideIfAttribute)),
                 //(typeof(EnableIfAttribute), typeof(RuntimeEnableIfAttribute)),
                 //(typeof(DisableIfAttribute), typeof(RuntimeDisableIfAttribute)),
             };
@@ -523,71 +523,70 @@ namespace SEE.UI.RuntimeConfigMenu
 
         /// <summary>
         /// Checks whether the specified <see cref="MemberInfo"/>
-        /// has a <see cref="ShowIfAttribute"/> and evaluates its condition.
+        /// has a <see cref="RuntimeShowIfAttribute"/> or a <see cref="RuntimeHideIfAttribute"/>
+        /// and evaluates its condition.
         /// If the condition is not met, the member should be skipped (not shown).
         /// </summary>
         /// <param name="memberInfo">The member to check.</param>
         /// <param name="obj">The instance that contains the member.</param>
         /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
-        private bool ValidateShowIf(MemberInfo memberInfo, object obj)
+        private bool ValidateVisibilityAttributes(MemberInfo memberInfo, object obj)
         {
-            if (memberInfo.GetCustomAttribute<RuntimeShowIfAttribute>() is { } showIf)
+            if (memberInfo.GetCustomAttribute<RuntimeShowIfAttribute>() is { } showIf
+                && !EvaluateCondition(showIf.Condition, showIf.Value, obj))
+            {
+                return false;
+            }
+
+            if (memberInfo.GetCustomAttribute<RuntimeHideIfAttribute>() is { } hideIf
+                && EvaluateCondition(hideIf.Condition, hideIf.Value, obj))
+            {
+                return false;
+            }
+
+            return true;
+
+            bool EvaluateCondition(string condition, object expectedValue, object obj)
             {
                 Type type = obj.GetType();
-                if (showIf.Condition.StartsWith("@"))
+                if (condition.StartsWith("@"))
                 {
-                    throw new Exception($"Conditions of this form ({showIf.Condition}) " +
+                    throw new Exception($"Conditions of this form ({condition}) " +
                         $"are not supported in the RuntimeConfigMenu.");
                 }
-                FieldInfo field = FindMemberRecursive(type, showIf.Condition,
+
+                FieldInfo field = FindMemberRecursive(type, condition,
                     (t, n, flags) => t.GetField(n, flags));
                 if (field != null)
                 {
-                    if (field.FieldType == typeof(bool))
-                    {
-                        if (!(bool)field.GetValue(obj))
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        if (showIf.Value != null)
-                        {
-                            return Equals(field.GetValue(obj), showIf.Value);
-                        }
-                    }
+                    return Compare(field.GetValue(obj), expectedValue);
                 }
-                PropertyInfo prop = FindMemberRecursive(type, showIf.Condition,
+
+                PropertyInfo prop = FindMemberRecursive(type, condition,
                     (t, n, flags) => t.GetProperty(n, flags));
                 if (prop != null)
                 {
-                    if (prop.PropertyType == typeof(bool))
-                    {
-                        if (!(bool)prop.GetValue(obj))
-                        {
-                            return false;
-                        }
-                    }
-                    else
-                    {
-                        if (showIf.Value != null)
-                        {
-                            return Equals(prop.GetValue(obj), showIf.Value);
-                        }
-                    }
+                    return Compare(prop.GetValue(obj), expectedValue);
                 }
-                MethodInfo m = FindMemberRecursive(type, showIf.Condition,
+
+                MethodInfo m = FindMemberRecursive(type, condition,
                     (t, n, flags) => t.GetMethod(n, flags));
                 if (m != null && m.ReturnType == typeof(bool))
                 {
-                    if (!(bool)m.Invoke(obj, null))
-                    {
-                        return false;
-                    }
+                    return (bool)m.Invoke(obj, null);
                 }
+
+                return true;
             }
-            return true;
+
+            bool Compare(object actual, object expected)
+            {
+                if (actual is bool b)
+                {
+                    return b;
+                }
+                return expected != null ? Equals(actual, expected) : true;
+            }
 
             T FindMemberRecursive<T>(Type type, string name, Func<Type, string, BindingFlags, T> resolver)
                 where T : MemberInfo
@@ -644,7 +643,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-            bool visibility = memberInfo == null && obj == null || ValidateShowIf(memberInfo, obj);
+            bool visibility = memberInfo == null && obj == null || ValidateVisibilityAttributes(memberInfo, obj);
             GameObject createdObj = null;
             switch (value)
             {
@@ -834,13 +833,13 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Iterates over all <see cref="MemberInfo"/> with a control condition (<see cref="ShowIfAttribute"/>)
         /// and updates the active state of each associated <see cref="GameObject"/>
-        /// based on the result of <see cref="ValidateShowIf"/> for the corresponding member.
+        /// based on the result of <see cref="ValidateVisibilityAttributes"/> for the corresponding member.
         /// </summary>
         private void CheckControlConditions()
         {
             foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
-                go.SetActive(ValidateShowIf(m, obj));
+                go.SetActive(ValidateVisibilityAttributes(m, obj));
             }
         }
 
