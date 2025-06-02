@@ -1101,6 +1101,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     slider.value = (float)value;
                     sliderManager.UpdateUI();
                     TwoDecimalPlaces(settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)));
+                    CheckControlConditions();
                 }
             };
 
@@ -1167,6 +1168,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     };
 
                     endEditManager.OnEndEdit += CheckImmediateRedraw;
+                    endEditManager.OnEndEdit += CheckControlConditions;
                 }
                 else
                 {
@@ -1185,6 +1187,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         };
                         action.Execute();
                         CheckImmediateRedraw();
+                        CheckControlConditions();
                     };
                 }
             }
