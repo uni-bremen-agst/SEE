@@ -1281,6 +1281,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             switchManager.OnEvents.AddListener(CheckImmediateRedraw);
+            switchManager.OnEvents.AddListener(CheckControlConditions);
 
             switchManager.OffEvents.AddListener(() => setter(false));
             switchManager.OffEvents.AddListener(() =>
@@ -1295,6 +1296,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             switchManager.OffEvents.AddListener(CheckImmediateRedraw);
+            switchManager.OffEvents.AddListener(CheckControlConditions);
 
             OnUpdateMenuValues += () =>
             {
@@ -1309,6 +1311,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     setter((bool)value);
                     switchManager.isOn = (bool)value;
                     switchManager.UpdateUI();
+                    CheckControlConditions();
                 }
             };
 
