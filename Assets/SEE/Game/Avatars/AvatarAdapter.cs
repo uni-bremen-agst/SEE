@@ -8,9 +8,6 @@ using SEE.GO;
 using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
-using SEE.Controls.Actions;
-using TMPro;
-using UnityEngine.UI;
 using SEE.GO.Menu;
 
 #if ENABLE_VR

@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.GraphProviders.VCS;
 using SEE.Utils;
 using TinySpline;
 using TMPro;
@@ -34,11 +35,12 @@ namespace SEE.Game.CityRendering
         /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
         {
-            List<string> authors =
+            List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
+                    .Select(x => new FileAuthor(x))
                     .ToList();
 
             IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent);
@@ -72,14 +74,14 @@ namespace SEE.Game.CityRendering
             foreach (GameObject sphere in spheresObjects)
             {
                 AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
-                string authorName = authorSphere.Author;
+                FileAuthor authorName = authorSphere.Author;
 
                 IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
                     .Where(x =>
                         x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
                             .Split(',')
-                            .Contains(authorName));
+                            .Contains(authorName.ToString()));
 
                 foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
                 {
@@ -151,7 +153,7 @@ namespace SEE.Game.CityRendering
         /// <param name="authors">The authors to create the spheres for.</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<string> authors, GameObject parent)
+        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent)
         {
             IList<GameObject> result = new List<GameObject>();
             Renderer parentRenderer = parent.GetComponent<Renderer>();
@@ -213,7 +215,7 @@ namespace SEE.Game.CityRendering
                     TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
                     tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
                     tm.fontSize = fontSize;
-                    tm.text = authors[counter];
+                    tm.text = authors[counter].ToString();
                     tm.color = Color.white;
                     tm.alignment = TextAlignmentOptions.Center;
 

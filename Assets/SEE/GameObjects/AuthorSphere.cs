@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using SEE.GraphProviders.VCS;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -10,9 +11,9 @@ namespace SEE.GameObjects
     public class AuthorSphere : MonoBehaviour
     {
         /// <summary>
-        /// The E-Mail/Name of the author.
+        /// The identity of the author.
         /// </summary>
-        public string Author = "";
+        public FileAuthor Author;
 
         /// <summary>
         /// The list of all edges the author sphere has and their associated churn.

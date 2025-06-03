@@ -1,25 +1,27 @@
+using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.Game.CityRendering;
+using SEE.GameObjects;
+using SEE.GO;
+using SEE.GraphProviders;
+using SEE.Layout;
+using SEE.UI;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
-using MoreLinq;
-using SEE.DataModel.DG;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.GO;
-using SEE.Utils;
-using Sirenix.OdinInspector;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.Game.CityRendering;
-using SEE.UI;
-using SEE.Utils.Config;
-using Sirenix.Serialization;
-using SEE.GraphProviders;
-using SEE.UI.Notification;
-using SEE.DataModel.DG.IO;
-using SEE.DataModel;
-using SEE.GameObjects;
 
 namespace SEE.Game.City
 {
@@ -338,17 +340,17 @@ namespace SEE.Game.City
                     {
                         IsPipelineRunning = true;
 
+                        ReportProgress(0.01f);
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
+                                                                      cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
+
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
                             reportProgress(x);
                         }
-
-                        ReportProgress(0.01f);
-
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                            cancellationTokenSource.Token);
-                        IsPipelineRunning = false;
                     }
                 }
                 catch (OperationCanceledException)
@@ -468,14 +470,82 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphDrawn))]
         public void ReDrawGraph()
         {
+            const string Prefix = "Text";
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
             else
             {
+                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
+                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 DeleteGraphGameObjects();
                 DrawGraph();
+                RestoreLayout(layoutGraphNodes, decorationValues).Forget();
+                graphRenderer = null;
+            }
+            return;
+
+            async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
+                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
+            {
+                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
+                layoutGraphNodes.ForEach(nodeLayout =>
+                {
+                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
+                    if (node != null)
+                    {
+                        node.NodeOperator().ScaleTo(nodeLayout.AbsoluteScale, 0);
+                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
+                        node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
+                        {
+                            if (decorationValues.ContainsKey(nodeLayout.ID))
+                            {
+                                RectTransform tmpRect = (RectTransform)tmp.transform;
+                                tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
+                                if (tmp.name.StartsWith(Prefix))
+                                {
+                                    tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
+                                    tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
+            {
+                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
+                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
+                foreach (GameObject gameObject in gameObjects)
+                {
+                    Node node = gameObject.GetComponent<NodeRef>().Value;
+                    // skip root nodes. Their restoration is handled by the layout itself.
+                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot())
+                    {
+                        continue;
+                    }
+                    LayoutGraphNode layoutNode = new(node)
+                    {
+                        CenterPosition = gameObject.transform.position,
+                        AbsoluteScale = gameObject.transform.localScale
+                    };
+                    result.Add(layoutNode);
+                    // Case for decorative texts that start with the prefix "Text".
+                    if (gameObject.FindChildWithPrefix(Prefix) != null)
+                    {
+                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
+                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
+                    }
+                    // Case for label texts that start with the prefix "Label".
+                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
+                    {
+                        textValues.Add(node.ID, (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                    }
+                }
+                LayoutNodes.SetLevels(result);
+                return (result, textValues);
             }
         }
 

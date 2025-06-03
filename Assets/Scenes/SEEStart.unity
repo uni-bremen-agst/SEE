@@ -384,6 +384,7 @@ MonoBehaviour:
   DefaultSoundEffectVolume: 1
   MusicVolume: 0
   SoundEffectVolume: 0
+  RemoteSoundEffectsMuted: 0
 --- !u!114 &831127270
 MonoBehaviour:
   m_ObjectHideFlags: 0

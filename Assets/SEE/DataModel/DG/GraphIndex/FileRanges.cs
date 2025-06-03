@@ -9,6 +9,12 @@ namespace SEE.DataModel.DG.GraphIndex
     internal class FileRanges
     {
         /// <summary>
+        /// If true, a warning will be logged in <see cref="Add(Node)"/> if a node does
+        /// not have a source-code range.
+        /// </summary>
+        public static bool ReportMissingSourceRange = true;
+
+        /// <summary>
         /// The children sorted by the SourceLine.
         /// </summary>
         public readonly SortedRanges Children = new();
@@ -33,7 +39,7 @@ namespace SEE.DataModel.DG.GraphIndex
                     descendant.Add(node);
                 }
             }
-            else
+            else if (ReportMissingSourceRange)
             {
                 Debug.LogWarning($"{node.ID} does not have a source range. Will be ignored.\n");
             }

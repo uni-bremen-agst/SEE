@@ -327,7 +327,7 @@ namespace SEE.Net.Dashboard
         /// </summary>
         private void Start()
         {
-            if (FindObjectsOfType<DashboardRetriever>().Length > 1)
+            if (FindObjectsByType<DashboardRetriever>(FindObjectsSortMode.None).Length > 1)
             {
                 throw new InvalidOperationException($"Only one {nameof(DashboardRetriever)} may exist "
                                                     + "in a given scene!");

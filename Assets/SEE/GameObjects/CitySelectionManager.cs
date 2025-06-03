@@ -48,9 +48,9 @@ namespace SEE.GameObjects
             async UniTask WaitForLocalPlayerInstantiation()
             {
                 await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
-                if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citysHolder))
+                if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
                 {
-                    citysHolder.Cities.Add(transform.parent.name, gameObject);
+                    citiesHolder.Cities.Add(transform.parent.name, gameObject);
                 }
             }
         }

@@ -1,6 +1,7 @@
-﻿using Sirenix.Utilities;
+﻿using SEE.Tools.ReflexionAnalysis;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -42,6 +43,15 @@ namespace SEE.DataModel.DG
         /// when we do not have a real node type derived from the input graph.
         /// </summary>
         public const string RootType = "ROOT";
+
+        /// <summary>
+        /// An immutable list of all root node types of the graphs. A root node type
+        /// is a node type whose instances will always be root nodes in the graph.
+        /// </summary>
+        public static ImmutableList<string> RootTypes
+            = ImmutableList.Create(RootType,
+                                   ReflexionGraph.ArchitectureType,
+                                   ReflexionGraph.ImplementationType);
 
         /// <summary>
         /// A toggle marking artificial root nodes as such.
@@ -1484,6 +1494,18 @@ namespace SEE.DataModel.DG
         public static implicit operator bool(Graph graph)
         {
             return graph != null;
+        }
+
+        /// <summary>
+        /// Notifies the observers about the deletion of the root node of the graph.
+        /// </summary>
+        /// <param name="node">The root node.</param>
+        public void NotifyRootNodeDeletion(Node node)
+        {
+            if (node.IsRoot() && GetRoots().Contains(node))
+            {
+                Notify(new NodeEvent(Version, node, ChangeType.Removal));
+            }
         }
     }
 }

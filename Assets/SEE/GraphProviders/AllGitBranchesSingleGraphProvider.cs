@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -15,6 +14,7 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -49,13 +49,13 @@ namespace SEE.GraphProviders
         /// would not work.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-                         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
-            RuntimeTab(GraphProviderFoldoutGroup),
-                         HideReferenceObjectPicker]
+        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         RuntimeTab(GraphProviderFoldoutGroup),
+         HideReferenceObjectPicker]
         public Dictionary<string, bool> PathGlobbing = new()
-                         {
-                             { "**/*", true }
-                         };
+        {
+            { "**/*", true }
+        };
 
         /// <summary>
         /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
@@ -87,8 +87,9 @@ namespace SEE.GraphProviders
         /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
         /// will be marked. This field specifies for how long these markers should appear.
         /// </summary>
-        [Tooltip("The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
+        [Tooltip(
+             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
+         EnableIf(nameof(AutoFetch)), Range(5, 200)]
         public int MarkerTime = 10;
 
         #endregion
@@ -103,14 +104,12 @@ namespace SEE.GraphProviders
         /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes(BranchCity branchCity)
         {
-            if (branchCity.Date == "" || !DateTime.TryParseExact(branchCity.Date, "dd/MM/yyyy",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None, out _))
+            if (!SEEDate.IsValid(branchCity.Date))
             {
-                throw new ArgumentException("Date is not set or cant be parsed");
+                throw new ArgumentException($"Date is impossible or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
             }
 
-            if (branchCity.VCSPath.Path == "" || !Directory.Exists(branchCity.VCSPath.Path))
+            if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
             {
                 throw new ArgumentException("Repository path is not set or does not exists");
             }
@@ -186,6 +185,7 @@ namespace SEE.GraphProviders
             {
                 throw new Exception("The repository path is not set.");
             }
+
             if (!Directory.Exists(repositoryPath))
             {
                 throw new Exception("The repository path does not exist or is not a directory.");
@@ -198,7 +198,7 @@ namespace SEE.GraphProviders
             GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
 
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
-            DateTime timeLimit = DateTime.ParseExact(branchCity.Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime timeLimit = SEEDate.ToDate(branchCity.Date);
 
             using (Repository repo = new(graph.BasePath))
             {
@@ -218,7 +218,7 @@ namespace SEE.GraphProviders
                     .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
                     .Distinct();
 
-                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files);
+                GitFileMetricProcessor metricProcessor = new(repo, PathGlobbing, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
 
                 int counter = 0;
                 int commitLength = commitList.Count();

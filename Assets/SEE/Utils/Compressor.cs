@@ -41,24 +41,30 @@ namespace SEE.Utils
         /// <exception cref="PlatformNotSupportedException">If the system platform is not supported</exception>
         private static string GetLiblzmaPath()
         {
-            // The library liblzma.dll is located in Assets/Plugins/Native/LZMA/<arch>/native/liblzma.dll
+            // The library liblzma.dll is located in
+            // Assets/Packages/Joveler.Compression.XZ.5.0.2/runtimes/<arch>/native/liblzma.dll
             // where <arch> specifies the operating system the Unity editor is currently running on
             // and the hardware architecture (e.g., win-x64).
             //
             // If SEE is started from the Unity editor, the library will be looked up
             // under this path.
-            // In a build application of SEE (i.e., an executable running independently
+            // In a built application of SEE (i.e., an executable running independently
             // from the Unity editor), the library is located in
             // SEE_Data/Plugins/<arch>/liblzma.dll instead, where <arch> specifies
             // the hardware architecture (e.g., x86_64; see also
             // https://docs.unity3d.com/Manual/PluginInspector.html).
 
+            // IMPORTANT NOTE: We need to adjust to Joveler.Compression.XZ whenever the version changes.
             string libDir = Application.isEditor ?
-                                Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins", "Native", "LZMA")
-                              : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
+                    Path.Combine(Path.GetFullPath(Application.dataPath), "Packages", "Joveler.Compression.XZ.5.0.2", "runtimes")
+                  : Path.Combine(Path.GetFullPath(Application.dataPath), "Plugins");
 
             if (Application.isEditor)
             {
+                if (!Directory.Exists(libDir))
+                {
+                    throw new Exception($"Unable to find liblzma path [{libDir}].");
+                }
                 // In the editor, the <arch> specifier is a combination of the OS and the process
                 // architecture. We will first handle the OS.
                 OSPlatform platform = GetOSPlatform();
