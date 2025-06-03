@@ -114,7 +114,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphDrawn))]
+        [EnableIf(nameof(IsGraphDrawn)), RuntimeEnableIf(nameof(IsGraphDrawn))]
         public override void ReDrawGraph()
         {
             const string Prefix = "Text";

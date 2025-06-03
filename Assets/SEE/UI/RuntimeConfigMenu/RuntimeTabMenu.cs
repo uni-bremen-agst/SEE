@@ -348,6 +348,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <see cref="RuntimeButtonAttribute"/>
         private void CreateButton(MethodInfo methodInfo)
         {
+            AssertConditionalAttributePairsValid(methodInfo);
             RuntimeButtonAttribute buttonAttribute =
                 methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
             // only methods with the button attribute
@@ -500,7 +501,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// but the corresponding runtime attribute is missing.</exception>
         private void AssertConditionalAttributePairsValid(MemberInfo memberInfo)
         {
-            if (memberInfo == null || memberInfo is not FieldInfo && memberInfo is not PropertyInfo)
+            if (memberInfo == null)
             {
                 return;
             }
@@ -514,10 +515,11 @@ namespace SEE.UI.RuntimeConfigMenu
 
             foreach ((Type designAttr, Type runtimeAttr) in attributePairs)
             {
-                if (memberInfo.GetCustomAttribute(designAttr) != null
-                    && memberInfo.GetCustomAttribute(runtimeAttr) == null)
+                if (memberInfo.GetCustomAttribute(designAttr, inherit: false) != null
+                    && memberInfo.GetCustomAttribute(runtimeAttr, inherit: false) == null)
                 {
-                    throw new InvalidOperationException($"{memberInfo.Name} has {designAttr.Name} but no corresponding {runtimeAttr.Name}.");
+                    throw new InvalidOperationException($"{memberInfo.Name} of {memberInfo.DeclaringType} " +
+                        $"has {designAttr.Name} but no corresponding {runtimeAttr.Name}.");
                 }
             }
         }
