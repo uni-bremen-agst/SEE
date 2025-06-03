@@ -572,21 +572,10 @@ namespace SEE.Controls
         {
             bool isPressed = KeyboardShortcutsEnabled && KeyBindings.IsPressed(KeyAction.BoostCameraSpeed);
 
-            if (isPressed && !wasBoosting)
-            {
-                TracingHelperService.Instance?.StartBoostCameraTracking();
-                wasBoosting = true;
-            }
-            else if (!isPressed && wasBoosting)
-            {
-                TracingHelperService.Instance?.StopBoostCameraTracking();
-                wasBoosting = false;
-            }
+            TracingHelperService.Instance?.UpdateBoostCameraTracking(isPressed);
 
             return isPressed;
         }
-
-
 
         /// <summary>
         /// Move camera (player) forward.

@@ -4,6 +4,7 @@ using System.Diagnostics;
 using SEE.Controls.Actions;
 using SEE.Utils.History;
 using UnityEngine;
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Tools.OpenTelemetry
 {
@@ -27,6 +28,11 @@ namespace SEE.Tools.OpenTelemetry
             this.playerName = playerName;
         }
 
+        /// <summary>
+        /// Tracks the addition of an action to the global history, including affected objects.
+        /// </summary>
+        /// <param name="action">The reversible action that was added.</param>
+        /// <param name="changedObjects">The set of object IDs that were affected by the action.</param>
         public void TrackAddToHistory(IReversibleAction action, HashSet<string> changedObjects)
         {
             if (excludedActionTypes.Contains(action.GetType()))
@@ -64,6 +70,10 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
+        /// <summary>
+        /// Tracks the removal of an action from the global history.
+        /// </summary>
+        /// <param name="action">The action entry that was removed.</param>
         public void TrackRemoveFromHistory(ActionHistory.GlobalHistoryEntry action)
         {
             Dictionary<string, object> tags = new Dictionary<string, object>
@@ -97,6 +107,12 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
+        /// <summary>
+        /// Tracks the result of a move action, including final position and new parent.
+        /// </summary>
+        /// <param name="grabbedObject">The object that was moved.</param>
+        /// <param name="finalPosition">The final position of the object after movement.</param>
+        /// <param name="grabbedObjectNewParent">The new parent object, if any.</param>
         public void TrackMoveAction(GameObject grabbedObject, Vector3 finalPosition, GameObject grabbedObjectNewParent)
         {
             if (grabbedObject == null)
@@ -124,6 +140,10 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
+        /// <summary>
+        /// Tracks a discrete key press action (e.g. user toggling a view or activating a feature).
+        /// </summary>
+        /// <param name="actionName">The name of the key-bound action.</param>
         public void TrackKeyPress(string actionName)
         {
             Dictionary<string, object> tags = new Dictionary<string, object>
@@ -143,11 +163,17 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
-        public void TrackMovement(Vector3 start, Vector3 end, float durationSeconds)
+        /// <summary>
+        /// Tracks a desktop movement event, logging the start and end position as well as duration.
+        /// </summary>
+        /// <param name="start">The position at the start of the movement.</param>
+        /// <param name="end">The position at the end of the movement.</param>
+        /// <param name="durationSeconds">The duration of the movement in seconds.</param>
+        public void TrackDesktopMovement(Vector3 start, Vector3 end, float durationSeconds)
         {
             Dictionary<string, object> tags = new Dictionary<string, object>
             {
-                { "action.type", "PlayerMovement" },
+                { "action.type", "PlayerDesktopMovement" },
                 { "player.name", playerName },
                 { "startPosition", start.ToString() },
                 { "endPosition", end.ToString() },
@@ -171,7 +197,32 @@ namespace SEE.Tools.OpenTelemetry
                 activity.Stop();
             }
         }
+        
+        /// <summary>
+        /// Tracks a camera yaw rotation event when the mouse is released.
+        /// </summary>
+        /// <param name="previousYaw">Yaw before the rotation.</param>
+        /// <param name="currentYaw">Yaw after the rotation.</param>
+        public void TrackRotation(float previousYaw, float currentYaw)
+        {
+            float rotationDelta = Mathf.Abs(Mathf.DeltaAngle(previousYaw, currentYaw));
 
+            using Activity activity = activitySource.StartActivity("RotationChange");
+            if (activity != null)
+            {
+                activity.SetTag("action.type", "RotationChange");
+                activity.SetTag("player.name", playerName);
+                activity.SetTag("rotation.previousYaw", previousYaw.ToString("F2"));
+                activity.SetTag("rotation.currentYaw", currentYaw.ToString("F2"));
+                activity.SetTag("rotation.delta", rotationDelta.ToString("F2"));
+            }
+        }
+        
+        /// <summary>
+        /// Tracks how long the player hovered over a specific object.
+        /// </summary>
+        /// <param name="hoveredObject">The GameObject that was hovered over.</param>
+        /// <param name="duration">The duration of the hover in seconds.</param>
         public void TrackHoverDuration(GameObject hoveredObject, float duration)
         {
             if (hoveredObject == null)
@@ -207,42 +258,52 @@ namespace SEE.Tools.OpenTelemetry
             }
         }
 
-        public void StartBoostCameraTracking()
+        /// <summary>
+        /// Updates the camera boost tracking state based on the current key press status.
+        /// Starts tracking when boost begins and logs the duration when boost ends.
+        /// </summary>
+        /// <param name="isPressed">Whether the boost key is currently pressed.</param>
+        public void UpdateBoostCameraTracking(bool isPressed)
         {
-            boostKeyStartTimes[playerName] = DateTimeOffset.UtcNow;
-        }
-
-        public void StopBoostCameraTracking()
-        {
-            if (boostKeyStartTimes.TryGetValue(playerName, out DateTimeOffset startTime))
+            if (isPressed)
             {
-                DateTimeOffset endTime = DateTimeOffset.UtcNow;
-                double duration = (endTime - startTime).TotalSeconds;
-
-                Dictionary<string, object> tags = new Dictionary<string, object>
+                if (!boostKeyStartTimes.ContainsKey(playerName))
                 {
-                    { "action.type", "BoostCamera" },
-                    { "player.name", playerName },
-                    { "boost.duration", duration }
-                };
-
-                ActivityContext parentContext = default;
-
-                Activity activity = activitySource.StartActivity(
-                    "BoostCamera",
-                    ActivityKind.Internal,
-                    parentContext,
-                    tags,
-                    null,
-                    startTime
-                );
-
-                if (activity != null)
-                {
-                    activity.Stop();
+                    boostKeyStartTimes[playerName] = DateTimeOffset.UtcNow;
                 }
+            }
+            else
+            {
+                if (boostKeyStartTimes.TryGetValue(playerName, out DateTimeOffset startTime))
+                {
+                    DateTimeOffset endTime = DateTimeOffset.UtcNow;
+                    double duration = (endTime - startTime).TotalSeconds;
 
-                boostKeyStartTimes.Remove(playerName);
+                    Dictionary<string, object> tags = new Dictionary<string, object>
+                    {
+                        { "action.type", "BoostCamera" },
+                        { "player.name", playerName },
+                        { "boost.duration", duration }
+                    };
+
+                    ActivityContext parentContext = default;
+
+                    Activity activity = activitySource.StartActivity(
+                        "BoostCamera",
+                        ActivityKind.Internal,
+                        parentContext,
+                        tags,
+                        null,
+                        startTime
+                    );
+
+                    if (activity != null)
+                    {
+                        activity.Stop();
+                    }
+
+                    boostKeyStartTimes.Remove(playerName);
+                }
             }
         }
     }

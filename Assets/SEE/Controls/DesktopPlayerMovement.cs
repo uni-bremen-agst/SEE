@@ -1,6 +1,7 @@
 ﻿using SEE.GO;
 using SEE.Tools.OpenTelemetry;
 using UnityEngine;
+using Plane = SEE.GO.Plane;
 
 namespace SEE.Controls
 {
@@ -29,8 +30,7 @@ namespace SEE.Controls
         /// has initiated the movement. We will start slower and then gradually increase
         /// the speed until <see cref="Speed"/> has been reached. This phase takes
         /// <see cref="timeToReachSpeed"/> seconds.</remarks>
-        [Tooltip("Speed of movements")]
-        public float Speed = 2f;
+        [Tooltip("Speed of movements")] public float Speed = 2f;
 
         /// <summary>
         /// The time (in seconds) past since the player has initiated a movement.
@@ -52,15 +52,18 @@ namespace SEE.Controls
             /// Rotation in Euler degrees around the y-axis (yaw).
             /// </summary>
             internal float Yaw;
+
             /// <summary>
             /// Rotation in Euler degrees around the x-axis (pitch).
             /// </summary>
             internal float Pitch;
+
             /// <summary>
             /// If true, the player moves freely in the world; otherwise, the player is
             /// rotating around the <see cref="FocusedObject"/> (the code city the player is conntected to).
             /// </summary>
             internal bool FreeMode;
+
             /// <summary>
             ///  The distance to the <see cref="FocusedObject"/> (the code city the player
             ///  is conntected to). This attribute is considered only if <see cref="FreeMode"/> is false.
@@ -83,7 +86,7 @@ namespace SEE.Controls
         /// The code city which the player is focusing on if not in free mode.
         /// </summary>
         [Tooltip("The code city which the player is focusing on.")]
-        public GO.Plane FocusedObject;
+        public Plane FocusedObject;
 
         private Vector3 lastPosition; // For tracking the player's previous position
 
@@ -123,6 +126,7 @@ namespace SEE.Controls
                 cameraState.Pitch = rotation.x;
                 cameraState.FreeMode = true;
             }
+
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
 
             // Returns the radius of the player's head.
@@ -137,17 +141,34 @@ namespace SEE.Controls
                     Debug.LogError($"Player {gameObject.name} does not have a child {headName}.\n");
                     return 1.0f;
                 }
+
                 // We want to fit the head completely into the CharacterController collider, so we use the maximum value
                 // to calculate the radius
-                return Mathf.Max(head.transform.localScale.x, head.transform.localScale.y, head.transform.localScale.z) / 2;
+                return Mathf.Max(head.transform.localScale.x, head.transform.localScale.y,
+                    head.transform.localScale.z) / 2;
             }
         }
 
         bool moved; // Flag to track if there was any movement
         bool keyReleased = false; // Flag to track if a key was just released
         private float movementStartTime; // Tracks start time
+        private Vector3 movementStartPosition; // Tracks position at the start of a movement
 
-        
+        /// <summary>
+        /// Initializes movement tracking if it hasn't started yet.
+        /// </summary>
+        private void StartMovementIfNeeded()
+        {
+            if (!moved)
+            {
+                movementStartTime = Time.time;
+                movementStartPosition = transform.position;
+                moved = true;
+                keyReleased = false;
+            }
+        }
+
+
         /// <summary>
         /// Reacts to the user input.
         /// </summary>
@@ -175,10 +196,12 @@ namespace SEE.Controls
                 {
                     step += distance;
                 }
+
                 if (SEEInput.MoveBackward())
                 {
                     step -= distance;
                 }
+
                 if (step == 0)
                 {
                     // No movement has been initiated, so we reset the moving time.
@@ -188,88 +211,88 @@ namespace SEE.Controls
                 {
                     movingTime += Time.deltaTime;
                 }
+
                 cameraState.DistanceToFocusedObject -= step;
 
                 HandleRotation();
-                transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
+                transform.SetPositionAndRotation(FocusedObject.CenterTop,
+                    Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
                 transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
             }
             else // cameraState.freeMode == true
             {
                 // The directed distance the player should be moved in this frame.
                 Vector3 step = Vector3.zero;
+
                 // Determine the direction of the movement.
                 if (SEEInput.MoveForward())
                 {
-                    if (!moved) movementStartTime = Time.time;
+                    StartMovementIfNeeded();
                     step += transform.forward;
-                    moved = true;
                 }
 
                 if (SEEInput.MoveBackward())
                 {
-                    if (!moved) movementStartTime = Time.time;
+                    StartMovementIfNeeded();
                     step -= transform.forward;
-                    moved = true;
                 }
 
                 if (SEEInput.MoveRight())
                 {
-                    if (!moved) movementStartTime = Time.time;
+                    StartMovementIfNeeded();
                     step += transform.right;
-                    moved = true;
                 }
 
                 if (SEEInput.MoveLeft())
                 {
-                    if (!moved) movementStartTime = Time.time;
+                    StartMovementIfNeeded();
                     step -= transform.right;
-                    moved = true;
                 }
 
                 if (SEEInput.MoveUp())
                 {
-                    if (!moved) movementStartTime = Time.time;
+                    StartMovementIfNeeded();
                     step += Vector3.up;
-                    moved = true;
                 }
 
                 if (SEEInput.MoveDown())
                 {
+                    StartMovementIfNeeded();
                     step += Vector3.down;
                 }
+
                 step.Normalize();
                 if (step == Vector3.zero)
                 {
-                    // No movement has been initiated, so we reset the moving time.
                     movingTime = 0f;
-                    if (!moved) movementStartTime = Time.time;
-                    step += Vector3.down;
-                    moved = true;
+
+                    if (moved && !keyReleased && !AnyMovementInput())
+                    {
+                        float movementDuration = Time.time - movementStartTime;
+                        TracingHelperService.Instance?.TrackDesktopMovement(movementStartPosition, transform.position,
+                            movementDuration);
+                        movementStartPosition = transform.position;
+                        moved = false;
+                        keyReleased = true;
+                    }
                 }
                 else
                 {
                     movingTime += Time.deltaTime;
                 }
+
                 step *= GetDistance();
+
                 // The following two lines may look strange, yet both are actually needed.
                 controller.Move(step); // this is the actual movement
                 controller.Move(Vector3.zero); // this prevents the player from sliding without input
 
                 HandleRotation();
+
                 // Players Yaw
                 transform.rotation = Quaternion.Euler(0.0f, cameraState.Yaw, 0.0f);
                 // Cameras Pitch and Yaw
                 Camera.main.transform.rotation = Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f);
-
-                // Check for key release to trigger movement tracking
-                if (moved && !AnyMovementInput())
-                {
-                    float movementDuration = Time.time - movementStartTime;
-                    TracingHelperService.Instance?.TrackMovement(lastPosition, transform.position, movementDuration);
-                    lastPosition = transform.position; // Update last position
-                    moved = false;
-                }
             }
 
             // The distance the player should be moved in this frame (in any direction) taking
@@ -278,11 +301,13 @@ namespace SEE.Controls
             {
                 // Movement should be started at minimalInitialSpeedFactor * Speed and then
                 // linearly increased to Speed.
-                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed, Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
+                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed,
+                    Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
                 if (SEEInput.BoostCameraSpeed())
                 {
                     distance *= BoostFactor;
                 }
+
                 return distance;
             }
         }
@@ -311,6 +336,10 @@ namespace SEE.Controls
         /// The mouse position of the last frame.
         /// </summary>
         private Vector2 lastAxis;
+        
+        private bool wasRotating = false;
+        private float rotationStartYaw;
+
 
         /// <summary>
         /// If the user wants us, we rotate the gameobject according to mouse input.
@@ -321,8 +350,15 @@ namespace SEE.Controls
         /// </summary>
         private void HandleRotation()
         {
-            if (SEEInput.RotateCamera())
+            bool isRotating = SEEInput.RotateCamera();
+            if (isRotating)
             {
+                if (!wasRotating)
+                {
+                    rotationStartYaw = cameraState.Yaw;
+                    wasRotating = true;
+                }
+
                 float x = -(lastAxis.x - Input.mousePosition.x) * 0.1f;
                 float y = -(lastAxis.y - Input.mousePosition.y) * 0.1f;
 
@@ -335,6 +371,12 @@ namespace SEE.Controls
                 cameraState.Pitch -= y;
                 // locks the camera, so the player can look up and down, but can't fully rotate the camera.
                 cameraState.Pitch = Mathf.Clamp(cameraState.Pitch, -90, 90);
+            }
+            else if (wasRotating)
+            {
+                // Rotation has just ended
+                wasRotating = false;
+                TracingHelperService.Instance?.TrackRotation(rotationStartYaw, cameraState.Yaw);
             }
 
             lastAxis.x = Input.mousePosition.x;
