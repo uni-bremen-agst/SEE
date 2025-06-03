@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -349,6 +350,9 @@ namespace SEE.UI.RuntimeConfigMenu
         private void CreateButton(MethodInfo methodInfo)
         {
             AssertConditionalAttributePairsValid(methodInfo);
+            bool visibility = ValidateVisibilityAttributes(methodInfo, city);
+            bool interactable = ValidateInteractableAttributes(methodInfo, city);
+
             RuntimeButtonAttribute buttonAttribute =
                 methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
             // only methods with the button attribute
@@ -385,6 +389,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 };
                 netAction.Execute();
             });
+            buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
 
             // add network listener
             SyncMethod += methodName =>
@@ -394,8 +399,16 @@ namespace SEE.UI.RuntimeConfigMenu
                     // calls the method and updates the menu
                     methodInfo.Invoke(city, null);
                     OnUpdateMenuValues?.Invoke();
+                    CheckControlConditionsWithDelay();
                 }
             };
+
+            button.SetActive(visibility);
+            if (HasInteractableAttribute(methodInfo))
+            {
+                SetInteractableRecursive(button, interactable);
+            }
+            controlConditions.Add((methodInfo, button, city));
         }
 
         /// <summary>
@@ -557,7 +570,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="memberInfo">The member to check.</param>
         /// <param name="obj">The instance that contains the member.</param>
         /// <returns><c>true</c> if the member should be interacable. Otherwise, <c>false</c>.</returns>
-        private bool ValidateInteracableAttributes(MemberInfo memberInfo, object obj)
+        private bool ValidateInteractableAttributes(MemberInfo memberInfo, object obj)
         {
             if (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() is { } enableIf
                 && !EvaluateCondition(enableIf.Condition, enableIf.Value, obj))
@@ -680,7 +693,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
             bool visibility = memberInfo == null && obj == null || ValidateVisibilityAttributes(memberInfo, obj);
-            bool interacable = memberInfo == null && obj == null || ValidateInteracableAttributes(memberInfo, obj);
+            bool interactable = memberInfo == null && obj == null || ValidateInteractableAttributes(memberInfo, obj);
             GameObject createdObj = null;
             switch (value)
             {
@@ -862,7 +875,7 @@ namespace SEE.UI.RuntimeConfigMenu
             createdObj?.SetActive(visibility);
             if (createdObj != null && HasInteractableAttribute(memberInfo))
             {
-                SetInteractableRecursive(createdObj, interacable);
+                SetInteractableRecursive(createdObj, interactable);
             }
             if (memberInfo != null && obj != null && createdObj != null)
             {
@@ -945,18 +958,40 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Iterates over all <see cref="MemberInfo"/> with a control condition (e.g., <see cref="RuntimeShowIfAttribute"/>)
-        /// and updates the active state of each associated <see cref="GameObject"/>
-        /// based on the result of <see cref="ValidateVisibilityAttributes"/> for the corresponding member.
+        /// Calls <see cref="CheckControlConditionsAsync(int)"/> without waiting.
         /// </summary>
         private void CheckControlConditions()
         {
+            CheckControlConditionsAsync(0).Forget();
+        }
+
+        /// <summary>
+        /// Similar to <see cref="CheckControlConditions"/>, but waits ten frames before executing.
+        /// </summary>
+        private void CheckControlConditionsWithDelay()
+        {
+            CheckControlConditionsAsync(10).Forget();
+        }
+
+        /// <summary>
+        /// Asynchronously iterates over all control conditions after an optional frame delay,
+        /// then updates the active state and interactability of associated <see cref="GameObject"/> instances.
+        /// </summary>
+        /// <param name="delay">
+        /// Number of frames to wait before evaluating the control conditions.
+        /// Use this to ensure that all relevant states and components are initialized before applying changes.
+        /// </param>
+        /// <returns>A <see cref="UniTask"/> representing the asynchronous operation.</returns>
+        private async UniTask CheckControlConditionsAsync(int delay)
+        {
+            // Waits enough frames to ensure that the changes will occur.
+            await UniTask.DelayFrame(delay);
             foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
                 go.SetActive(ValidateVisibilityAttributes(m, obj));
                 if (HasInteractableAttribute(m))
                 {
-                    SetInteractableRecursive(go, ValidateInteracableAttributes(m, obj));
+                    SetInteractableRecursive(go, ValidateInteractableAttributes(m, obj));
                 }
             }
         }
