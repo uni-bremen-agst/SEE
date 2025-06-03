@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -897,6 +898,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     continue;
                 }
                 Type type = comp.GetType();
+
                 // Check property
                 PropertyInfo prop = type.GetProperty(interact, BindingFlags.Public | BindingFlags.Instance);
                 if (prop != null && prop.CanWrite && prop.PropertyType == typeof(bool))
@@ -910,6 +912,17 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (field != null && field.FieldType == typeof(bool))
                 {
                     field.SetValue(comp, interactable);
+                }
+
+                // Handle disable colors gradients.
+                HandleColor(comp);
+            }
+
+            void HandleColor(Component comp)
+            {
+                if (comp is UIGradient uig)
+                {
+                    uig.enabled = interactable;
                 }
             }
         }
