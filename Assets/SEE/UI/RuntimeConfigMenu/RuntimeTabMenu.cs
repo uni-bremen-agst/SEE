@@ -880,12 +880,15 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Sets the interactability of all applicable components on the given GameObject.
+        /// Sets the interactability (<paramref name="interactable"/>) of all applicable
+        /// components on the given <paramref name="obj"/>.
+        /// Waits one frame to ensure all components are initialized.
         /// </summary>
-        /// <param name="obj">The GameObject whose components should be updated.</param>
+        /// <param name="obj">The game object whose components should be updated.</param>
         /// <param name="interactable">The desired interactable state.</param>
-        private void SetInteractableOnAll(GameObject obj, bool interactable)
+        private async UniTask SetInteractableAsync(GameObject obj, bool interactable)
         {
+            await UniTask.Yield();
             const string interact = "interactable";
             foreach (Component comp in obj.GetComponents<Component>())
             {
@@ -911,9 +914,15 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
+        /// <summary>
+        /// Recursively sets the interactability of the specified <paramref name="root"/>
+        /// and all of its child game objects.
+        /// </summary>
+        /// <param name="root">The root game object whose hierarchy will be updated.</param>
+        /// <param name="interactable">The desired interactable state to apply.</param>
         private void SetInteractableRecursive(GameObject root, bool interactable)
         {
-            SetInteractableOnAll(root, interactable);
+            SetInteractableAsync(root, interactable).Forget();
             foreach(Transform child in root.transform)
             {
                 SetInteractableRecursive(child.gameObject, interactable);
