@@ -9,6 +9,7 @@ using SEE.UI.StateIndicator;
 using SEE.Utils;
 using UnityEngine;
 using SEE.XR;
+using MoreLinq;
 
 namespace SEE.GO.Menu
 {
@@ -38,7 +39,7 @@ namespace SEE.GO.Menu
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject modeMenuGO = attachTo ? attachTo : new GameObject {name = "Mode Menu"};
+            GameObject modeMenuGO = attachTo ? attachTo : new GameObject { name = "Mode Menu" };
 
             ActionStateType firstType = ActionStateTypes.FirstActionStateType();
             IList<MenuEntry> entries = MenuEntries(ActionStateTypes.AllRootTypes);
@@ -145,7 +146,7 @@ namespace SEE.GO.Menu
         private static ActionStateIndicator CreateActionStateIndicator(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
-            GameObject actionStateGO = attachTo ? attachTo : new GameObject {name = "Action State Indicator"};
+            GameObject actionStateGO = attachTo ? attachTo : new GameObject { name = "Action State Indicator" };
             return actionStateGO.AddComponent<ActionStateIndicator>();
         }
 
@@ -236,7 +237,10 @@ namespace SEE.GO.Menu
             if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
             {
                 // We cannot use PlayerActionHistory.Current here
-                playerMenu.modeMenu.ActiveEntry = playerMenu.modeMenu.Entries.First(x => x.Title.Equals(actionName));
+                MenuEntry entry = playerMenu.modeMenu.Entries
+                    .FirstOrDefault(x => x.Title.Equals(actionName))
+                    ?? SearchForEntry(actionName);
+                playerMenu.modeMenu.ActiveEntry = entry;
             }
             foreach (MenuEntry toggleMenuEntry in playerMenu.modeMenu.Entries)
             {
@@ -245,6 +249,69 @@ namespace SEE.GO.Menu
                     playerMenu.modeMenu.ActiveEntry = toggleMenuEntry;
                     break;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Searches for the specified <paramref name="actionName"/>
+        /// and returns the corresponding <see cref="MenuEntry"/>.
+        /// </summary>
+        /// <param name="actionName">The name of the action to search for.</param>
+        /// <returns>The corresponding <see cref="MenuEntry"/> if found. Otherwise, <c>null</c>.</returns>
+        private static MenuEntry SearchForEntry(string actionName)
+        {
+            if (!LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))
+            {
+                return null;
+            }
+
+            if (playerMenu.modeMenu.CurrentLevel > 0)
+            {
+                playerMenu.modeMenu.ResetToBase();
+            }
+
+            // Try to find top-level entry.
+            MenuEntry entry = playerMenu.modeMenu.Entries
+                .FirstOrDefault(x => x.Title.Equals(actionName));
+
+            if (entry != null)
+            {
+                return entry;
+            }
+
+            // Otherwise search recursively in nested entries.
+            foreach (NestedMenuEntry<MenuEntry> nested in playerMenu.modeMenu.Entries
+                .OfType<NestedMenuEntry<MenuEntry>>())
+            {
+                entry ??= SearchRecursive(nested, actionName, playerMenu);
+                if (entry != null)
+                {
+                    return entry;
+                }
+            }
+
+            return null;
+
+            static MenuEntry SearchRecursive(NestedMenuEntry<MenuEntry> group, string actionName, PlayerMenu playerMenu)
+            {
+                MenuEntry entry = null;
+                foreach (MenuEntry e in group.InnerEntries)
+                {
+                    if (e is NestedMenuEntry<MenuEntry> nested)
+                    {
+                        playerMenu.modeMenu.SelectEntry(group);
+                        entry = SearchRecursive(nested, actionName, playerMenu);
+                    }
+                    else
+                    {
+                        if (e.Title.Equals(actionName))
+                        {
+                            playerMenu.modeMenu.SelectEntry(group);
+                            entry = e;
+                        }
+                    }
+                }
+                return entry;
             }
         }
 
