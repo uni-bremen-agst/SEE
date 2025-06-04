@@ -242,7 +242,7 @@ namespace SEE.GraphProviders
             {
                 GitRepository = new GitRepository
                                      (new DataPath(Path.GetDirectoryName(Application.dataPath)),
-                                     new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
+                                      new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
                 CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
             };
