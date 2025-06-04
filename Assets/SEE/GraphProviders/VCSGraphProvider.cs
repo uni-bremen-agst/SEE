@@ -13,6 +13,7 @@ using UnityEngine;
 using SEE.Scanner;
 using System.Threading;
 using SEE.Scanner.Antlr;
+using SEE.Utils;
 
 namespace SEE.GraphProviders
 {
@@ -116,8 +117,6 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Builds the VCS graph with specific metrics.
         /// </summary>
-        /// <param name="pathGlobbing">The paths which get included/excluded.</param>
-        /// <param name="repositoryPath">The path to the repository.</param>
         /// <param name="commitID">The commit id where the files exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics</param>
@@ -131,14 +130,15 @@ namespace SEE.GraphProviders
             Action<float> changePercentage,
             CancellationToken token)
         {
-            string[] pathSegments = repository.RepositoryPath.RelativePath.Split(Path.DirectorySeparatorChar);
+            string repositoryPath = repository.RepositoryPath.Path;
+            string rootDirectory = Filenames.InnermostDirectoryName(repositoryPath);
 
-            Graph graph = new(repository.RepositoryPath.Path, pathSegments[^1]);
+            Graph graph = new(repositoryPath, rootDirectory);
             graph.CommitID(commitID);
-            graph.RepositoryPath(repository.RepositoryPath.Path);
+            graph.RepositoryPath(repositoryPath);
 
             // The main directory.
-            NewNode(graph, pathSegments[^1], directoryNodeType, pathSegments[^1]);
+            NewNode(graph, rootDirectory, directoryNodeType, rootDirectory);
 
             {
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
@@ -157,12 +157,12 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(pathSegments[^1]).AddChild(NewNode(graph, filePath, fileNodeType, filePath));
+                        graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, fileNodeType, filePath));
                     }
                     // Other directories/files.
                     else
                     {
-                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(pathSegments[^1]));
+                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(rootDirectory));
                     }
                     currentStep++;
                     changePercentage?.Invoke(currentStep / totalSteps);
