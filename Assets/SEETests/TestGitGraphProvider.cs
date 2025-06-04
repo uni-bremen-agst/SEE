@@ -90,13 +90,13 @@ namespace SEE.GraphProviders
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             city.VCSPath = new DataPath(gitDirPath);
+            using GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                       repositoryPaths: null,
+                                                                       branches: null));
             AllGitBranchesSingleGraphProvider provider = new()
             {
-                GitRepository = new GitRepository
-                                      (new DataPath(gitDirPath),
-                                       new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
-                                                          repositoryPaths: null,
-                                                          branches: null)),
+                GitRepository = gitRepository,
                 SimplifyGraph = true,
                 AutoFetch = true,
                 PollingInterval = 60,
@@ -124,16 +124,15 @@ namespace SEE.GraphProviders
         /// <returns>The generated Graph</returns>
         private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
+
+            using GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                       repositoryPaths: null,
+                                                                       branches: null));
             GitEvolutionGraphProvider provider = new()
             {
                 Date = date,
-                GitRepository = new GitRepository()
-                {
-                    RepositoryPath = new DataPath(gitDirPath),
-                    VCSFilter = new SEE.VCS.Filter(globbing: new Globbing() { { "**/.cs", true } },
-                                                   repositoryPaths: null,
-                                                   branches: null)
-                }
+                GitRepository = gitRepository
             };
 
             static void ReportProgress(float x)
