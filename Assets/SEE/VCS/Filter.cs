@@ -41,9 +41,7 @@ namespace SEE.VCS
         /// The key is the globbing pattern and the value is the inclusion status.
         /// If the latter is true, the pattern is included, otherwise it is excluded.
         /// </summary>
-        /// <remarks>We use <see cref="Dictionary{TKey, TValue}"/> rather than
-        /// <see cref="IDictionary{TKey, TValue}"/> because otherwise our config I/O
-        /// would not work.</remarks>
+        /// <remarks>Can be null.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
@@ -62,6 +60,7 @@ namespace SEE.VCS
         /// If the matcher is not null, a file will only pass the filter if it fulfills at least
         /// one inclusion criterion and does not fulfill any of the exclusion criteria.
         /// </summary>
+        /// <remarks>Can be null.</remarks>
         public Matcher Matcher => PathGlobbing.ToMatcher(Globbing);
 
         /// <summary>
@@ -72,6 +71,7 @@ namespace SEE.VCS
         /// will be considered. Otherwise, a file must exist in one of the subdirectories
         /// in <see cref="RepositoryPaths"/> to pass the filter.
         /// </summary>
+        /// <remarks>Can be null.</remarks>
         public string[] RepositoryPaths;
 
         /// <summary>
@@ -82,6 +82,7 @@ namespace SEE.VCS
         ///
         /// The names in this set can be regular expressions.
         /// </summary>
+        /// <remarks>Can be null.</remarks>
         public HashSet<string> Branches;
 
         /// <summary>
@@ -130,9 +131,15 @@ namespace SEE.VCS
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Globbing, globbingLabel);
-            writer.Save(RepositoryPaths, repositoryPathsLabel);
-            writer.Save(Branches, branchesLabel);
+            Globbing?.Save(writer, globbingLabel);
+            if (RepositoryPaths != null)
+            {
+                writer.Save(RepositoryPaths, repositoryPathsLabel);
+            }
+            if (Branches != null)
+            {
+                writer.Save(Branches, branchesLabel);
+            }
             writer.EndGroup();
         }
 
@@ -141,9 +148,49 @@ namespace SEE.VCS
             if (attributes.TryGetValue(label, out object dictionary))
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                ConfigIO.Restore(attributes, globbingLabel, ref Globbing);
-                ConfigIO.Restore(attributes, repositoryPathsLabel, ref RepositoryPaths);
-                ConfigIO.Restore(attributes, branchesLabel, ref Branches);
+                // Restore the Globbing from the values.
+                {
+                    if (Globbing == null)
+                    {
+                        Globbing loadedGlobbing = new();
+                        if (loadedGlobbing.Restore(values, globbingLabel))
+                        {
+                            Globbing = loadedGlobbing;
+                        }
+                    }
+                    else
+                    {
+                        Globbing.Clear();
+                        Globbing.Restore(values, globbingLabel);
+                    }
+                }
+
+                // Restore the RepositoryPaths from the values.
+                {
+                    IList<string> loadedRepositoryPaths = new List<string>();
+
+                    if (ConfigIO.RestoreStringList(values, repositoryPathsLabel, ref loadedRepositoryPaths))
+                    {
+                        RepositoryPaths = loadedRepositoryPaths.ToArray();
+                    }
+                    else
+                    {
+                        RepositoryPaths = null; // No repository paths loaded
+                    }
+                }
+
+                // Restore the Branches from the values.
+                {
+                    HashSet<string> loadedBranches = new();
+                    if (ConfigIO.Restore(values, branchesLabel, ref loadedBranches))
+                    {
+                        Branches = loadedBranches;
+                    }
+                    else
+                    {
+                        Branches = null; // No branches loaded
+                    }
+                }
             }
         }
 
