@@ -301,9 +301,5 @@ namespace SEE.Utils
             return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
                 .Split(Path.DirectorySeparatorChar).Last();
         }
-
-        #region Path globbing
-
-        #endregion Path globbing
     }
 }
