@@ -71,7 +71,7 @@ namespace SEE.VCS
 
             GitRepository repo = GetRepository();
             Performance p = Performance.Begin(nameof(GitRepository.CommitsAfter));
-            IEnumerable<Commit> commits = repo.CommitsAfter(date);
+            IList<Commit> commits = repo.CommitsAfter(date);
             p.End(true);
             // commits.Count() should be the same as:
             //  git log --oneline --no-merges | wc -l
