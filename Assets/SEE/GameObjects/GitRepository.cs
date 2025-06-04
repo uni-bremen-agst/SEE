@@ -18,8 +18,43 @@ namespace SEE.GraphProviders
     /// Represents the needed information about a git repository for a <see cref="SEECityEvolution"/>.
     /// </summary>
     [Serializable]
-    public class GitRepository
+    public class GitRepository: IDisposable
     {
+        /// <summary>
+        /// The underlying <see cref="Repository"/> object that provides access to
+        /// the Git repository.
+        /// </summary>
+        private Repository repository;
+
+        /// <summary>
+        /// Disposes the repository if it is not null.
+        /// </summary>
+        public void Dispose()
+        {
+            // Dispose of the repository if it is not null to release resources.
+            repository?.Dispose();
+            // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
+            // finalization when Dispose is called explicitly.
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Finalizer in case <see cref="Dispose"/> is not called explicitly
+        /// </summary>
+        ~GitRepository()
+        {
+            Dispose();
+        }
+
+        /// <summary>
+        /// Returns a string representation of the object, the repository path, more precisely.
+        /// </summary>
+        /// <returns>the repository path</returns>
+        public override string ToString()
+        {
+            return $"GitRepository: {RepositoryPath.Path}";
+        }
+
         /// <summary>
         /// Used for the tab name in runtime config menu.
         /// </summary>
@@ -63,12 +98,29 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
+        /// Creates a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>
+        /// if none exists yet.
+        /// </summary>
+        /// <exception cref="ArgumentException">thrown if <see cref="RepositoryPath"/> is null or empty</exception>
+        private void OpenRepository()
+        {
+            if (repository == null)
+            {
+                if (RepositoryPath == null || string.IsNullOrWhiteSpace(RepositoryPath.Path))
+                {
+                    throw new ArgumentException("Repository path must not be null or empty.", nameof(RepositoryPath));
+                }
+                repository = new(RepositoryPath.Path);
+            }
+        }
+
+        /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
         public void FetchRemotes()
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
 
             // Fetch all remote branches
             foreach (Remote remote in repository.Network.Remotes)
@@ -92,9 +144,9 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <param name="startDate">the date after which commits should be retrieved</param>
         /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
-        public IEnumerable<Commit> CommitsAfter(DateTime startDate)
+        public IList<Commit> CommitsAfter(DateTime startDate)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
 
             IEnumerable<Commit> commitList = repository.Commits
                 .QueryBy(new CommitFilter { IncludeReachableFrom = repository.Branches, SortBy = CommitSortStrategies.None })
@@ -103,7 +155,7 @@ namespace SEE.GraphProviders
                     DateTime.Compare(commit.Author.When.Date, startDate) > 0)
                 // Filter out merge commits.
                 .Where(commit => commit.Parents.Count() <= 1);
-            return commitList;
+            return commitList.ToList();
         }
 
         /// <summary>
@@ -113,7 +165,7 @@ namespace SEE.GraphProviders
         /// <returns>the commit corresponding to <paramref name="commitId"/></returns>
         internal Commit GetCommit(string commitId)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return repository.Lookup<Commit>(commitId);
         }
 
@@ -125,7 +177,7 @@ namespace SEE.GraphProviders
         /// <returns>commit log between the two given commits</returns>
         internal ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = newCommit,
@@ -139,7 +191,7 @@ namespace SEE.GraphProviders
         /// <returns>commit log of the repository in topological order</returns>
         internal ICommitLog CommitLog()
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
         }
 
@@ -147,13 +199,13 @@ namespace SEE.GraphProviders
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
         /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
         /// </summary>
-        /// <param name="oldCommit">earlier commit ID</param>
-        /// <param name="newCommit">later commit ID</param>
+        /// <param name="oldCommit">earlier commit ID; can be null</param>
+        /// <param name="newCommit">later commit ID; must not be null</param>
         /// <returns>diff between the two given commits</returns>
         internal Patch Diff(Commit oldCommit, Commit newCommit)
         {
-            using Repository repository = new(RepositoryPath.Path);
-            return repository.Diff.Compare<Patch>(oldCommit.Tree, newCommit.Tree);
+            OpenRepository();
+            return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree);
         }
 
         /// <summary>
@@ -164,7 +216,7 @@ namespace SEE.GraphProviders
         /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>).</returns>
         public Patch GetFileChanges(Commit commit)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
 
             if (commit.Parents.Any())
             {
@@ -183,7 +235,7 @@ namespace SEE.GraphProviders
         /// <returns>diff between the two given commits</returns>
         internal TreeChanges TreeDiff(Commit parent, Commit commit)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
         }
 
@@ -197,7 +249,8 @@ namespace SEE.GraphProviders
         /// <exception cref="Exception"></exception>
         public string GetFileContent(string repositoryFilePath, string commitID)
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
+
             Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
 
             if (blob != null)
@@ -218,7 +271,7 @@ namespace SEE.GraphProviders
         /// <returns>canonical name of all branches</returns>
         public IEnumerable<string> AllBranches()
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return repository.Branches.Select(b => b.CanonicalName);
         }
 
@@ -251,7 +304,7 @@ namespace SEE.GraphProviders
         /// <returns>all distinct file paths</returns>
         public HashSet<string> AllFiles()
         {
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             HashSet<string> result = new();
             foreach (Branch branch in repository.Branches)
             {
@@ -310,7 +363,7 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
-            using Repository repository = new(RepositoryPath.Path);
+            OpenRepository();
             return AllFiles(repository.Lookup<Commit>(commitID).Tree);
         }
 
@@ -358,12 +411,7 @@ namespace SEE.GraphProviders
         /// is not a tree (for instance, a blob).</exception>
         private static LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
         {
-            TreeEntry result = tree[repositoryPath];
-            if (result == null)
-            {
-                throw new Exception($"The path {repositoryPath} does not exist in the repository.");
-            }
-
+            TreeEntry result = tree[repositoryPath] ?? throw new Exception($"The path {repositoryPath} does not exist in the repository.");
             if (result.TargetType == TreeEntryTargetType.Tree)
             {
                 return (LibGit2Sharp.Tree)result.Target;
@@ -443,7 +491,7 @@ namespace SEE.GraphProviders
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 RepositoryPath.Restore(values, repositoryPathLabel);
-                VCSFilter.Restore(attributes, vcsFilterLabel);
+                VCSFilter.Restore(values, vcsFilterLabel);
             }
         }
     }
