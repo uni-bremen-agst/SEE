@@ -86,13 +86,13 @@ namespace SEE.GraphProviders
             }
         }
 
-    /// <summary>
-    /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
-    /// until today across all branches.
-    /// </summary>
-    /// <param name="startDate">the date after which commits should be retrieved</param>
-    /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
-    public IEnumerable<Commit> CommitsAfter(DateTime startDate)
+        /// <summary>
+        /// Yields all commits (excluding merge commits) after <paramref name="startDate"/>
+        /// until today across all branches.
+        /// </summary>
+        /// <param name="startDate">the date after which commits should be retrieved</param>
+        /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
+        public IEnumerable<Commit> CommitsAfter(DateTime startDate)
         {
             using Repository repository = new(RepositoryPath.Path);
 
