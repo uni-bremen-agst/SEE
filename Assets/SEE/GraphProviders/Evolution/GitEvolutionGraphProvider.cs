@@ -5,7 +5,6 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
-using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
@@ -185,11 +184,6 @@ namespace SEE.GraphProviders.Evolution
         /// The label for <see cref="GitRepository"/> in the configuration file.
         /// </summary>
         private const string gitRepositoryLabel = "Repository";
-
-        /// <summary>
-        /// Label for serializing the <see cref="VCSFilter"/> field.
-        /// </summary>
-        private const string vcsFilterLabel = "VCSFilter";
 
         /// <summary>
         /// Label for serializing the <see cref="SimplifyGraph"/> field.
