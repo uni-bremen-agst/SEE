@@ -4,17 +4,6 @@ using System.Collections.Generic;
 namespace SEE.Utils
 {
     /// <summary>
-    /// A dictionary for inclusive and exclusive path globbings.
-    ///
-    /// If the value of a key is true, the key is considered an inclusion pattern;
-    /// otherwise an exclusion pattern.
-    ///
-    /// A path matches the globbing if it matches at least one inclusion pattern and
-    /// does not match any exclusion pattern.
-    /// </summary>
-    public class Globbing : Dictionary<string, bool> {}
-
-    /// <summary>
     /// Handles path globbings.
     /// </summary>
     public static class PathGlobbing
