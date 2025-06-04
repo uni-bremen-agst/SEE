@@ -170,7 +170,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            IEnumerable<Commit> commitList = GitRepository.CommitsAfter(startDate);
+            IList<Commit> commitList = GitRepository.CommitsAfter(startDate);
 
             HashSet<string> files = GitRepository.AllFiles();
 
@@ -229,6 +229,11 @@ namespace SEE.GraphProviders
         private const string markerTimeLabel = "MarkerTime";
 
         /// <summary>
+        /// Label for serializing the <see cref="GitRepository"/> field.
+        /// </summary>
+        private const string gitRepositoryLabel = "Repository";
+
+        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
@@ -238,6 +243,7 @@ namespace SEE.GraphProviders
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
             writer.Save(MarkerTime, markerTimeLabel);
+            GitRepository.Save(writer, gitRepositoryLabel);
         }
 
         /// <summary>
@@ -250,6 +256,7 @@ namespace SEE.GraphProviders
             ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
             ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
             ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
+            GitRepository.Restore(attributes, gitRepositoryLabel);
         }
 
         #endregion Config I/O
