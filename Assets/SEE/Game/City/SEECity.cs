@@ -12,7 +12,6 @@ using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
-using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -614,11 +613,6 @@ namespace SEE.Game.City
         {
             base.Reset();
             ResetGraphData();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
         }
 
         /// <summary>

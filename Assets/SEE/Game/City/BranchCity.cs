@@ -55,6 +55,25 @@ namespace SEE.Game.City
         public AuthorMapping AuthorAliasMap = new();
 
         /// <summary>
+        /// Resets everything that is specific to a given graph. Here in addition to
+        /// the overridden method, the <see cref="GitPoller"/> component will be
+        /// removed.
+        /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Remove the poller.
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroyer.Destroy(poller);
+            }
+        }
+
+        /// <summary>
         /// Validates <see cref="Date"/>.
         /// </summary>
         /// <param name="result">where the error results are to be added (if any)</param>
