@@ -12,42 +12,46 @@ namespace SEE.GraphProviders.VCS
     public static class GitFileMetricsGraphGenerator
     {
         /// <summary>
-        /// Fills and adds all files and their metrics from <paramref name="metricProcessor"/>
+        /// Fills and adds all files and their metrics from <paramref name="fileToMetrics"/>
         /// to the passed graph <paramref name="initialGraph"/>.
         /// </summary>
-        /// <param name="metricProcessor">The metrics to add.</param>
+        /// <param name="fileToMetrics">The metrics to add.</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
-        public static void FillGraphWithGitMetrics(GitFileMetricProcessor metricProcessor, Graph initialGraph,
+        public static void FillGraphWithGitMetrics(IDictionary<string, GitFileMetrics> fileToMetrics, Graph initialGraph,
             string repositoryName, bool simplifyGraph)
         {
-            FillGraphWithGitMetrics(metricProcessor, initialGraph, repositoryName, simplifyGraph, "");
+            FillGraphWithGitMetrics(fileToMetrics, initialGraph, repositoryName, simplifyGraph, "");
         }
 
         /// <summary>
-        /// Fills and adds all files and their metrics from <paramref name="metricProcessor"/>
+        /// Fills and adds all files and their metrics from <paramref name="fileToMetrics"/>
         /// to the passed graph <paramref name="initialGraph"/>.
         /// </summary>
-        /// <param name="metricProcessor">The metrics to add.</param>
+        /// <param name="fileToMetrics">The metrics to add.</param>
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is
         /// loaded in two code cities at the same time.</param>
-        public static void FillGraphWithGitMetrics(GitFileMetricProcessor metricProcessor, Graph initialGraph,
-            string repositoryName, bool simplifyGraph, string idSuffix)
+        public static void FillGraphWithGitMetrics
+            (IDictionary<string, GitFileMetrics> fileToMetrics,
+            Graph initialGraph,
+            string repositoryName,
+            bool simplifyGraph,
+            string idSuffix)
         {
-            if (initialGraph == null || metricProcessor == null)
+            if (initialGraph == null || fileToMetrics == null)
             {
                 return;
             }
 
-            foreach (KeyValuePair<string, GitFileMetrics> file in metricProcessor.FileToMetrics)
+            foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
-                Node n = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
-                    initialGraph,
-                    idSuffix: idSuffix);
+                Node n
+                    = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
+                                              initialGraph, idSuffix: idSuffix);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
                 n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
                 n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);
@@ -73,7 +77,8 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Simplifies a given graph by combining common directories.
+        /// Simplifies a given graph by combining common directories (nodes of type
+        /// <see cref="DataModel.DG.VCS.DirectoryType"/>.
         ///
         /// If a directory has only other directories as children, their paths will be combined.
         /// For instance the file structure:
@@ -102,9 +107,10 @@ namespace SEE.GraphProviders.VCS
         private static void SimplifyGraph(Node root)
         {
             Graph graph = root.ItsGraph;
-            if (root.Children().ToList().TrueForAll(x => x.Type != "file") && root.Children().Any())
+            IList<Node> children = root.Children();
+            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.VCS.FileType) && children.Any())
             {
-                foreach (Node child in root.Children().ToList())
+                foreach (Node child in children.ToList())
                 {
                     child.Reparent(root.Parent);
                     SimplifyGraph(child);
@@ -117,7 +123,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                foreach (Node node in root.Children().Where(x => x.Type == "directory").ToList())
+                foreach (Node node in children.Where(x => x.Type == DataModel.DG.VCS.DirectoryType).ToList())
                 {
                     SimplifyGraph(node);
                 }

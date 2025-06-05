@@ -35,8 +35,9 @@ namespace SEE.GraphProviders.Evolution
         /// The git repository which should be analyzed.
         /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         Tooltip("The Git repository from which to retrieve the data."),
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
-            RuntimeTab("Data")]
+         RuntimeTab("Data")]
         public GitRepository GitRepository = new();
 
         /// <summary>
@@ -139,32 +140,26 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="currentCommit">The current commit to generate the graph.</param>
         /// <param name="commitsInBetween">All commits in between these two points.</param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
-        /// <param name="files">A List of all files in the git repository.</param>
-        /// <returns>The graoh of the evolution step.</returns>
-        private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, HashSet<string> files)
+        /// <param name="files">The set of files in the git repository to be considered.</param>
+        /// <returns>The graph of the evolution step.</returns>
+        private Graph GetGraphOfCommit
+            (string repoName,
+            Commit currentCommit,
+            List<Commit> commitsInBetween,
+            IDictionary<Commit, Patch> commitChanges,
+            HashSet<string> files)
         {
-            Graph g = new(GitRepository.RepositoryPath.Path)
+            Graph graph = new(GitRepository.RepositoryPath.Path)
             {
                 BasePath = GitRepository.RepositoryPath.Path
             };
-            GraphUtils.NewNode(g, repoName + "-Evo", DataModel.DG.VCS.RepositoryType, repoName + "-Evo");
+            GraphUtils.NewNode(graph, repoName + "-Evo", DataModel.DG.VCS.RepositoryType, repoName + "-Evo");
 
-            g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
-            g.StringAttributes.Add("CommitId", currentCommit.Sha);
+            graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
+            graph.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor metricProcessor = new(GitRepository, files);
-
-            foreach (Commit commitInBetween in commitsInBetween)
-            {
-                metricProcessor.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
-            }
-
-            metricProcessor.CalculateTruckFactor();
-
-            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
-                                     (metricProcessor, g, repoName, SimplifyGraph, idSuffix: "-Evo");
-            return g;
+            GitFileMetricProcessor.AddVCSFileMetrics(graph, SimplifyGraph, repoName, files, commitsInBetween, commitChanges);
+            return graph;
         }
 
         /// <summary>

@@ -1,10 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
@@ -42,13 +40,14 @@ namespace SEE.GraphProviders
         /// The git repository which should be analyzed.
         /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
+         Tooltip("The Git repository from which to retrieve the data."),
          ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
-            RuntimeTab("Data")]
+         RuntimeTab("Data")]
         public GitRepository GitRepository = new();
 
         /// <summary>
-        /// This option fill simplify the graph with <see cref="GitFileMetricsGraphGenerator.SimplifyGraph"/>
-        /// and combine directories.
+        /// If true, the graph will be simplified by merging serial chains of nested
+        /// directories into one.
         /// </summary>
         [Tooltip("If true, chains in the hierarchy will be simplified.")]
         public bool SimplifyGraph = false;
@@ -170,25 +169,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            IList<Commit> commitList = GitRepository.CommitsAfter(startDate);
-
-            HashSet<string> files = GitRepository.AllFiles();
-
-            GitFileMetricProcessor metricProcessor
-                = new(GitRepository, files, branchCity.CombineAuthors, branchCity.AuthorAliasMap);
-
-            int counter = 0;
-            int commitLength = commitList.Count();
-            foreach (Commit commit in commitList)
-            {
-                metricProcessor.ProcessCommit(commit);
-                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
-                counter++;
-            }
-
-            metricProcessor.CalculateTruckFactor();
-            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics
-                (metricProcessor, graph, repositoryName, SimplifyGraph);
+            GitFileMetricProcessor.AddVCSFileMetrics(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
             changePercentage(1f);
 
             graph.FinalizeNodeHierarchy();
