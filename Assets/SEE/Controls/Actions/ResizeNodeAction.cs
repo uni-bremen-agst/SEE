@@ -62,9 +62,9 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return memento.GameObject == null || CurrentState == IReversibleAction.Progress.NoEffect
+            return String.IsNullOrEmpty(memento.ID) || CurrentState == IReversibleAction.Progress.NoEffect
                 ? new HashSet<string>()
-                : new HashSet<string>() { memento.GameObject.name };
+                : new HashSet<string>() { memento.ID };
         }
 
         /// <summary
@@ -123,13 +123,16 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
+            new ResizeNodeNetAction(memento.ID, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         /// <summary>
@@ -139,13 +142,16 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.NewLocalScale, memento.NewPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
+            new ResizeNodeNetAction(memento.ID, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
         #endregion ReversibleAction
@@ -245,6 +251,11 @@ namespace SEE.Controls.Actions
             public readonly GameObject GameObject;
 
             /// <summary>
+            /// The ID of the game object.
+            /// </summary>
+            public readonly string ID;
+
+            /// <summary>
             /// The original world-space position of the game object.
             /// </summary>
             public readonly Vector3 OriginalPosition;
@@ -270,6 +281,7 @@ namespace SEE.Controls.Actions
             public Memento(GameObject go)
             {
                 GameObject = go;
+                ID = go.name;
                 OriginalPosition = go.transform.position;
                 OriginalLocalScale = go.transform.localScale;
                 NewPosition = OriginalPosition;
@@ -332,23 +344,6 @@ namespace SEE.Controls.Actions
             private bool clicked = false;
 
             /// <summary>
-            /// The last recorded rotation of the camera. Used to detect camera orientation changes.
-            /// </summary>
-            private Quaternion lastCameraRotation;
-
-            /// <summary>
-            /// The forward vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarForward;
-
-            /// <summary>
-            /// The right vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarRight;
-
-            /// <summary>
             /// Is height resize active?
             /// </summary>
             public bool HeightResizeEnabled = false;
@@ -359,11 +354,6 @@ namespace SEE.Controls.Actions
             /// The size of the handles.
             /// </summary>
             private static readonly Vector3 handleScale = new(0.005f, 0.005f, 0.005f);
-
-            /// <summary>
-            /// The color of the handles.
-            /// </summary>
-            private static Color handleColor = Color.cyan;
 
             #endregion Configurations
 
