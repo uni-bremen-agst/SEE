@@ -47,7 +47,8 @@ namespace SEE.Net.Actions
         public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
-            NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
+            NodeTypeList = nodeTypes != null && nodeTypes.Count > 0?
+                NodeTypesSerializer.Serialize(nodeTypes) : "";
         }
 
         /// <summary>
