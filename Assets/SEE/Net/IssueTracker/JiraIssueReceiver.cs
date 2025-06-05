@@ -4,11 +4,15 @@ using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Dynamic;
 using System.IO;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.Networking;
 using static IssueReceiverInterface;
+
 
 public class JiraIssueReceiver : IssueReceiverInterface
 {
@@ -1233,28 +1237,41 @@ public class JiraIssueReceiver : IssueReceiverInterface
         {
             outputFile.Write(request.downloadHandler.text);
         }
-  
 
-        //DeserializeObject der Json response
-        Rootobject rootobject = JsonConvert.DeserializeObject<Rootobject>(request.downloadHandler.text);
-          
-            UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
-            total = rootobject.total;
-            // -1 da die 0 mit zählt
-            startAT = rootobject.startAt + rootobject.maxResults;
-            //// gibt den descriptions aller Issues in der Console aus.
-            ///   
-            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJiraDescipt.txt"),true))
-            {
+
+
             
-                foreach (Issue issue in rootobject.issues)
-        {
+            //DeserializeObject der Json response
+          //  JsonConvert.DeserializeObject(request.downloadHandler.text);
+
+            Dictionary<string,System.Object >  dic =  JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
+
+            total = Convert.ToInt32( dic["total"]);
+
+            UnityEngine.Debug.Log($"IssueConvert:{total}");
+            // total = (int)dic["total"];
+
+            // // UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
+            // startAT = (int)dic["startAt"]+ (int)dic["maxResults"];// rootobject.startAt + rootobject.maxResults;
+            // //total = rootobject.total;
+            // //// -1 da die 0 mit zählt
+            // //startAT = rootobject.startAt + rootobject.maxResults;
+            // //// gibt den descriptions aller Issues in der Console aus.
+            // ///   
+            // Dictionary<string, string> issuesDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>((string)dic["issues"]);
+
+            // using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJiraDescipt.txt"),true))
+            // {
+            //     foreach(KeyValuePair<string,string> keypair in issuesDictionary)
+            //// foreach (Issue issue in rootobject.issues)
+            //     {
 
 
-                    outputFile.Write($"Description:  {issue.fields.issuetype.description}/n");
-                    UnityEngine.Debug.Log($"Description:  {issue.fields.issuetype.description}/n");
-            }
-            }
+            //         outputFile.Write($"{keypair.Key}:  {keypair.Value}/n");
+            //       //  UnityEngine.Debug.Log($"Description:  {issue.fields.issuetype.description}/n");
+            //     }
+            // }
+
         }
     }
     public List<RootIssue> getIssues(Settings settings)

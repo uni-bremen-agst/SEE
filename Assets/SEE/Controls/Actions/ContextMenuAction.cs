@@ -15,6 +15,7 @@ using SEE.UI.PopupMenu;
 using SEE.UI.PropertyDialog.CitySelection;
 using SEE.UI.Window;
 using SEE.UI.Window.PropertyWindow;
+
 using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -51,7 +52,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Tries to open the context menu with multiselection.
         /// </summary>
-        private bool multiselection = false;
+        private bool multiselection = true;
 
         /// The position of the mouse when the user started opening the context menu.
         /// </summary>
@@ -70,8 +71,11 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
+            
             if (SEEInput.OpenContextMenuStart() || (XRSEEActions.TooltipToggle && !XRSEEActions.OnSelectToggle))
             {
+                ShowNotification.Error("Show Notification Issue Update ContextMenuAction.", "Notify", 2, true);
+
                 if (InteractableObject.SelectedObjects.Count <= 1)
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
@@ -102,11 +106,15 @@ namespace SEE.Controls.Actions
             }
             if (SEEInput.OpenContextMenuEnd() || (XRSEEActions.OnSelectToggle && onSelect))
             {
+                
                 if (!multiselection)
                 {
+                 
+
                     HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
                     if (hit == HitGraphElement.None)
                     {
+             
                         return;
                     }
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer
@@ -121,6 +129,7 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
+                        ShowNotification.Error("Show Notification Issue Contextmenu GetApplicableOptions.", "Notify", 2, true);
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
@@ -131,6 +140,7 @@ namespace SEE.Controls.Actions
                     HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
                     if (hit == HitGraphElement.None)
                     {
+                        ShowNotification.Error("Show Notification Issue Contextmenu else Raycast not hit.", "Notify", 2, true);
                         return;
                     }
                     if (InteractableObject.SelectedObjects.Contains(o))
@@ -144,6 +154,7 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
+                        ShowNotification.Error("Show Notification Issue Contextmenu Raycastomg.", "Notify", 10, true);
                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
@@ -172,25 +183,35 @@ namespace SEE.Controls.Actions
         /// <returns>Options available for the selected objects.</returns>
         private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection(PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
         {
+
+            ShowNotification.Error("Show Notification Issue Contexmenu.", "Notify", 10, true);
             List<PopupMenuEntry> entries = new()
             {
                 new PopupMenuHeading($"{selectedObjects.Count} elements selected!", int.MaxValue),
 
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
+                   new PopupMenuAction("Show Issues", () =>
+{
+    var action = ShowIssueAction.CreateReversibleAction();
+    action.Start(); // <-- dies ist entscheidend
+}, Icons.Info);
                     List<PopupMenuEntry> submenuEntries = new()
                     {
                         new PopupMenuAction("Inspect", () =>
                         {
                             UpdateEntries(popupMenu, position, GetApplicableOptionsForMultiselection(popupMenu, selectedObjects));
                         }, Icons.ArrowLeft, CloseAfterClick: false),
+                      
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
                         new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
                         new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
                     };
-
+                          submenuEntries.Add(new PopupMenuAction("Show Issues55",    ShowIssue, Icons.Code));
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
+                          ShowNotification.Error("Show Notification Issue Contextmenu Issues55.", "Notify", 2, true);
+                     
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                         if (selectedObjects.Any(o => o.gameObject.ContainingCity<VCSCity>() != null))
                         {
@@ -248,6 +269,8 @@ namespace SEE.Controls.Actions
                 }
             }
 
+           
+
             void ShowMetrics()
             {
                 foreach (InteractableObject iO in selectedObjects)
@@ -255,6 +278,35 @@ namespace SEE.Controls.Actions
                     if (iO.gameObject != null)
                     {
                         ActivateWindow(CreateMetricWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowIssue()
+            {
+
+                
+                ShowNotification.Error("Show Notification Issue ShowIssue ContextMenu.", "Notify", 10, true);
+                foreach (InteractableObject iO in selectedObjects)
+                {
+
+                    ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    var refComponent = iO.gameObject.MustGetComponent<GraphElementRef>();
+                    var window = ShowIssueAction.ShowIssues(refComponent);
+                    if (window == null)
+                    {
+                        Debug.LogError("ShowIssueTrackerAction.ShowIssues hat NULL zurückgegeben.");
+                    }
+                    else
+                    {
+                        Debug.Log(" IssueWindow erzeugt: " + window);
+                        ActivateWindow(window);
+                    }
+                    if (iO.gameObject != null)
+                    {
+                        
+                            //ActivateWindow(CreateIsseTrackerWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                          ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -433,6 +485,7 @@ namespace SEE.Controls.Actions
             {
                 List<PopupMenuEntry> subMenuEntries = new()
                     {
+
                         new PopupMenuAction("Inspect", () =>
                         {
                             ProvideParentMenuActions(popupMenu, position, raycastHitPosition, graphElement, gameObject, appendActions);
@@ -445,9 +498,13 @@ namespace SEE.Controls.Actions
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
                 }
+                ShowNotification.Error("Show Notification Issue Contextmenu subMenuEntries Issuesx.", "Notify", 2, true);
+                subMenuEntries.Add(new PopupMenuAction("Show Issuesx", ShowIssue, Icons.Bars));
 
                 if (graphElement.Filename != null)
                 {
+                    subMenuEntries.Add(new PopupMenuAction("Show Issuesx", ShowIssue, Icons.Code));
+
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                     if (gameObject.ContainingCity<VCSCity>() != null)
                     {
@@ -501,6 +558,12 @@ namespace SEE.Controls.Actions
                 ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
+
+            void ShowIssue()
+            {
+                ShowNotification.Error("ShowIssues() called", "DEBUG", 5, true);
+                ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
+            }
             void ShowCode()
             {
                 ActivateWindow(ShowCodeAction.ShowCode(gameObject.MustGetComponent<GraphElementRef>()));
@@ -850,6 +913,23 @@ namespace SEE.Controls.Actions
                 metricMenu.GraphElement = graphElementRef.Elem;
             }
             return metricMenu;
+        }
+
+        /// <summary>
+        /// Returns a <see cref="IssueTrackerWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the property window for</param>
+        /// <returns>The <see cref="IssueWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static IssueWindow CreateIsseTrackerWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out IssueWindow issueyMenu))
+            {
+                issueyMenu = graphElementRef.gameObject.AddComponent<IssueWindow>();
+                issueyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
+                issueyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return issueyMenu;
         }
 
         /// <summary>

@@ -5,8 +5,12 @@ using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-
-
+using SEE.Controls;
+using SEE.Controls.Actions;
+using SEE.UI.Notification;
+using SEE.UI.PopupMenu;
+using SEE.UI.Window;
+using SEE.UI.Window.PropertyWindow;
 using SEE.Utils;
 using System;
 using System.Collections;
@@ -29,7 +33,15 @@ public class IssueReceiver : MonoBehaviour
     //  [Tooltip("The public key for the authority from the Rest API.")]
 
 
-
+    private static void ActivateWindow(BaseWindow window)
+    {
+        WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+        if (!manager.Windows.Contains(window))
+        {
+            manager.AddWindow(window);
+        }
+        manager.ActiveWindow = window;
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -41,12 +53,39 @@ public class IssueReceiver : MonoBehaviour
         //IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?filter=all" };
         //GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
         //gitHUbReceiver.getIssues(settings);
+        ShowNotification.Error("Show Notification Issue Start.","Notify", 10,true);
+        // PopupMenuAction popup = new PopupMenuAction("test", , Icons.Code, false,1);
 
+      //  ShowIssueTrackerAction showIssueTrackerAction = new ShowIssueTrackerAction();
         //  GetIssuesJira("korusatix@gmail.com");
         IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
         JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
         jiraReceiver.getIssues(settings);
+       
+        //UnityEngine.Debug.Log($"ListCount:{jiraReceiver.issues.Count}");
+        // Create new window for active selection, or use existing one
+        //if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
+        //{
+        //propertyMenu = graphElementRef.gameObject.AddComponent<PropertyWindow>();
+        //propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
+        //propertyMenu.GraphElement = graphElementRef.Elem;
 
+
+
+     //   PropertyWindow pWindow = new PropertyWindow();
+     //   pWindow.Title = "test";
+     ////   pWindow.CreateUIInstance();
+
+     //   UnityEngine.Debug.Log("start GUIc");
+     //  // ActivateWindow(ShowIssueTrackerAction.ShowIssue()));
+
+     //   WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+     //   if (!manager.Windows.Contains(pWindow))
+     //   {
+     //       manager.AddWindow(pWindow);
+     //   }
+     //   manager.ActiveWindow = pWindow;
+       // manager.
     }
 
     // Update is called once per frame
@@ -865,6 +904,11 @@ public class IssueReceiver : MonoBehaviour
         //DeserializeObject der Json response
 
         List<Issue> issueList = JsonConvert.DeserializeObject<List<Issue>>(request.downloadHandler.text);
+ 
+
+
+
+
 
         // gibt den Titel aller Issues in der Console aus.
         foreach (Issue issue in issueList)

@@ -1,0 +1,283 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE gxl SYSTEM "http://www.gupro.de/GXL/gxl-1.0.dtd">
+<gxl xmlns:xlink="http://www.w3.org/1999/xlink">
+  <graph id="Version 2" edgeids="true">
+    <node id="N1">
+      <type xlink:href="Method"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
+      <attr name="Source.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c1.m1</string>
+      </attr>
+    </node>
+    <node id="N3">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>c1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c1</string>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>5</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>5</int>
+      </attr>	  
+    </node>
+    <node id="N5">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>c3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c3</string>
+      </attr>
+    </node>
+    <node id="N6">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>c4</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c4</string>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+      </attr>
+    </node>
+    <node id="N7">
+      <type xlink:href="Package"/>
+      <attr name="Metric.Number_Of_Descendants">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>p1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1</string>
+      </attr>
+    </node>
+    <edge id="E1" from="N1" to="N3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E3" from="N3" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E5" from="N5" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E6" from="N6" to="N7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="E10" from="N3" to="N6">
+      <type xlink:href="Call"/>
+    </edge>
+
+<node id="NC1">
+      <type xlink:href="Method"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>1</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+	  </attr>
+      <attr name="Source.Name">
+        <string>m1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>pC1.cC1.mC1</string>
+      </attr>
+    </node>
+    <node id="NC3">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>cC1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>pC1.cC1</string>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>5</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>5</int>
+      </attr>	  
+    </node>
+    <node id="NC5">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>2</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>cC3</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>p1.c3</string>
+      </attr>
+    </node>
+    <node id="NC6">
+      <type xlink:href="Class"/>
+      <attr name="Metric.Number_Of_Calling_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Number_Of_Called_Routines">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.Lines.LOC">
+        <int>1</int>
+      </attr>
+      <attr name="Metric.McCabe_Complexity">
+        <int>1</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>cC4</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>pC1.c4</string>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Added">
+        <int>0</int>
+      </attr>
+	  <attr name="Metric.Vcs2See.Commit.Lines_Edited">
+        <int>0</int>
+      </attr>
+	  	  <attr name="Metric.Vcs2See.Commit.Lines_Deleted">
+        <int>0</int>
+      </attr>
+    </node>
+    <node id="NC7">
+      <type xlink:href="Package"/>
+      <attr name="Metric.Number_Of_Descendants">
+        <int>3</int>
+      </attr>
+      <attr name="Source.Name">
+        <string>pC1</string>
+      </attr>
+      <attr name="Linkage.Name">
+        <string>pC1</string>
+      </attr>
+    </node>
+    <edge id="EC1" from="NC1" to="NC3">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EC3" from="NC3" to="NC7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EC5" from="NC5" to="NC7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EC6" from="NC6" to="NC7">
+      <type xlink:href="Belongs_To"/>
+    </edge>
+    <edge id="EC10" from="NC3" to="NC6">
+      <type xlink:href="Call"/>
+    </edge>
+  </graph>
+</gxl>
