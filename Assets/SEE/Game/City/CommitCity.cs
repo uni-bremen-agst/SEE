@@ -7,8 +7,6 @@ using UnityEngine;
 namespace SEE.Game.City
 {
     /// <summary>
-    /// Former DiffCity.
-    ///
     /// This city can visualize the differences between two commits in a VCS system.
     /// Currently only git is supported here.
     /// </summary>
