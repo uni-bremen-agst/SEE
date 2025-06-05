@@ -69,7 +69,6 @@
         public const string Prefix = "Metric.";
     }
 
-
     /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
     /// </summary>
