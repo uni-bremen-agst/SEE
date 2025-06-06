@@ -5,7 +5,6 @@ using SEE.Game.City;
 using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
-using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -14,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static TreeEditor.TreeEditorHelper;
 
 namespace SEE.Game.SceneManipulation
 {
