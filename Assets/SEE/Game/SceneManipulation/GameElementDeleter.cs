@@ -2,6 +2,7 @@
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -13,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static TreeEditor.TreeEditorHelper;
 
 namespace SEE.Game.SceneManipulation
 {
@@ -358,26 +360,11 @@ namespace SEE.Game.SceneManipulation
         /// <param name="nodeTypes">node types to be added.</param>
         public static void Revive(ISet<GameObject> nodesOrEdges, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
-            if (nodeTypes != null && nodeTypes.Count > 0)
-            {
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
-                nodesOrEdges.ForEach(go =>
-                {
-                    if (go.HasNodeRef() && go.ContainingCity<SEEReflexionCity>() != null)
-                    {
-                        SEEReflexionCity city = go.ContainingCity<SEEReflexionCity>();
-                        Node node = go.GetNode();
-                        if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
-                        {
-                            city.NodeTypes[node.Type] = nodeTypes[node.Type];
-                        }
-                    }
-                });
-            }
+            RestoreNodeTypes(nodesOrEdges
+                .Select(go => go.TryGetNode(out Node node)? node : null)
+                .Where(node => node != null)
+                .ToList(),
+                nodeTypes);
             RestoreGraph(nodesOrEdges);
             foreach (GameObject nodeOrEdge in nodesOrEdges)
             {
@@ -498,6 +485,58 @@ namespace SEE.Game.SceneManipulation
                 }
                 return null;
             }
+        }
+
+        /// <summary>
+        /// Restores the deleted node types.
+        /// </summary>
+        /// <param name="nodes">The nodes to be restored.</param>
+        /// <param name="nodeTypes">The node types properties.</param>
+        private static void RestoreNodeTypes(List<Node> nodes, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
+        {
+            if (nodeTypes != null && nodeTypes.Count > 0)
+            {
+                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                }
+                nodes.ForEach(node =>
+                {
+                    GameObject obj = node.GameObject() != null ? node.GameObject() : TryGetFirstParentGameObject(node);
+                    if (obj != null && obj.ContainingCity<SEEReflexionCity>() is { } city)
+                    {
+                        if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
+                        {
+                            city.NodeTypes[node.Type] = nodeTypes[node.Type];
+                        }
+                    }
+                });
+            }
+
+            GameObject TryGetFirstParentGameObject(Node node)
+            {
+                if (node.Parent != null && node.Parent.GameObject() == null)
+                {
+                    return TryGetFirstParentGameObject(node.Parent);
+                }
+                else if (node.Parent != null && node.Parent.GameObject() != null)
+                {
+                    return node.Parent.GameObject();
+                }
+                return node.GameObject();
+            }
+        }
+
+        /// <summary>
+        /// Restores the specified <see cref="GraphElement"/>s and their corresponding node types.
+        /// </summary>
+        /// <param name="nodesOrEdges">The graph elements to be restored.</param>
+        /// <param name="nodeTypes">The node types to be restored.</param>
+        public static void Restore(Dictionary<GraphElement, LayoutGameNode> nodesOrEdges,
+            Dictionary<string, VisualNodeAttributes> nodeTypes = null)
+        {
+
         }
     }
 }
