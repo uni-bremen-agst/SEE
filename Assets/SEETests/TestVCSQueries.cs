@@ -158,14 +158,14 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Test for <see cref="GitRepository.AllBranches()"/>.
+        /// Test for <see cref="GitRepository.AllBranchNames()"/>.
         /// </summary>
         [Test]
         public void TestAllBranches()
         {
             GitRepository repo = GetRepository();
-            Performance p = Performance.Begin(nameof(GitRepository.AllBranches));
-            IEnumerable<string> branches = repo.AllBranches();
+            Performance p = Performance.Begin(nameof(GitRepository.AllBranchNames));
+            IEnumerable<string> branches = repo.AllBranchNames();
             p.End(true);
             Debug.Log($"Number of branches: {branches.Count()}\n");
             Print(branches);

@@ -267,12 +267,35 @@ namespace SEE.GraphProviders
         /// <summary>
         /// Yields the canonical name of all branches in <paramref name="repository"/>.
         /// </summary>
-        /// <param name="repository"></param>
         /// <returns>canonical name of all branches</returns>
-        public IEnumerable<string> AllBranches()
+        public IEnumerable<string> AllBranchNames()
         {
             OpenRepository();
             return repository.Branches.Select(b => b.CanonicalName);
+        }
+
+        /// <summary>
+        /// Returns the hashes of all tip commits from all branches in this <see cref="GitRepository"/>.
+        /// </summary>
+        /// <returns>The hashes of the tip commits of all branches.</returns>
+        public IList<string> GetTipHashes()
+        {
+            OpenRepository();
+            return RelevantBranches().Select(x => x.Tip.Sha).ToList();
+        }
+
+        /// <summary>
+        /// If <see cref="VCSFilter"/> is null, all branches of <see cref="repository"/> are
+        /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
+        /// </summary>
+        /// <returns>all relevant branches of the <see cref="repository"/></returns>
+        private IEnumerable<Branch> RelevantBranches()
+        {
+            if (VCSFilter == null)
+            {
+                return repository.Branches;
+            }
+            return repository.Branches.Where(branch => VCSFilter.Matches(branch));
         }
 
         /// <summary>
@@ -306,12 +329,9 @@ namespace SEE.GraphProviders
         {
             OpenRepository();
             HashSet<string> result = new();
-            foreach (Branch branch in repository.Branches)
+            foreach (Branch branch in RelevantBranches())
             {
-                if (VCSFilter == null || VCSFilter.Matches(branch))
-                {
-                    AllFiles(branch.Tip.Tree, result);
-                }
+                AllFiles(branch.Tip.Tree, result);
             }
             return result;
         }

@@ -128,8 +128,7 @@ namespace SEE.GraphProviders
             // Only add the poller when in play mode.
             if (AutoFetch && Application.isPlaying)
             {
-                branchCity.GetOrAddGitPollerComponent(PollingInterval, MarkerTime)
-                    .WatchedRepositories.Add(branchCity.VCSPath.Path);
+                branchCity.GetOrAddGitPollerComponent(PollingInterval, MarkerTime).Repository = GitRepository;
             }
 
             return task;
