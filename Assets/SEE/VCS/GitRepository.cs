@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.GraphProviders
+namespace SEE.VCS
 {
     /// <summary>
     /// Represents the needed information about a git repository for a <see cref="SEECityEvolution"/>.

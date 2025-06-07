@@ -1,5 +1,6 @@
 ﻿using LibGit2Sharp;
 using SEE.DataModel.DG;
+using SEE.VCS;
 using System.Collections.Generic;
 using System.Linq;
 

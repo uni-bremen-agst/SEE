@@ -1,7 +1,7 @@
-using JetBrains.Annotations;
 using LibGit2Sharp;
 using SEE.DataModel.DG;
 using SEE.Utils;
+using SEE.VCS;
 using System;
 using System.Collections.Generic;
 using System.Linq;

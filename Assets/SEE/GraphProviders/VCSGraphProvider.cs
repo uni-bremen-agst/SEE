@@ -14,6 +14,7 @@ using SEE.Scanner;
 using System.Threading;
 using SEE.Scanner.Antlr;
 using SEE.Utils;
+using SEE.VCS;
 
 namespace SEE.GraphProviders
 {

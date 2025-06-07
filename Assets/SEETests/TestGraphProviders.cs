@@ -3,6 +3,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
