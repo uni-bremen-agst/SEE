@@ -17,7 +17,8 @@ using SEE.VCS;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Creates a graph based on the content of a version control system.
+    /// Creates a graph based on the content of a version control system
+    /// between two commits.
     /// Nodes represent directories and files. Their nesting corresponds to
     /// the directory structure of the repository. Files are leaf nodes.
     /// File nodes contain metrics that can be gathered based on a simple
