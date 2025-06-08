@@ -27,7 +27,7 @@ namespace SEE.GraphProviders
     /// well as from the version control system, such as number of developers,
     /// number of commits, or code churn.
     /// </summary>
-    public class VCSGraphProvider : SingleGraphProvider
+    public class BetweenCommitsGraphProvider : SingleGraphProvider
     {
         /// <summary>
         /// The git repository which should be analyzed.

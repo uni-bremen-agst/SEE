@@ -413,15 +413,15 @@ namespace SEE.GraphProviders
 
         public void TestVCSGraphProvider()
         {
-            VCSGraphProvider saved = GetVCSGraphProvider();
+            BetweenCommitsGraphProvider saved = GetVCSGraphProvider();
             Save(saved);
             AreEqualVCSGraphProviders(saved, LoadSingleGraph());
         }
 
-        private void AreEqualVCSGraphProviders(VCSGraphProvider expected, SingleGraphProvider actual)
+        private void AreEqualVCSGraphProviders(BetweenCommitsGraphProvider expected, SingleGraphProvider actual)
         {
             Assert.IsTrue(expected.GetType() == actual.GetType());
-            VCSGraphProvider loadedProvider = actual as VCSGraphProvider;
+            BetweenCommitsGraphProvider loadedProvider = actual as BetweenCommitsGraphProvider;
             AreEqual(expected.GitRepository, loadedProvider.GitRepository);
             Assert.AreEqual(expected.CommitID, loadedProvider.CommitID);
             Assert.AreEqual(expected.BaselineCommitID, loadedProvider.BaselineCommitID);
@@ -445,14 +445,14 @@ namespace SEE.GraphProviders
             }
         }
 
-        private VCSGraphProvider GetVCSGraphProvider()
+        private BetweenCommitsGraphProvider GetVCSGraphProvider()
         {
             Globbing pathGlobbing = new()
                 {
                     { "Assets/SEE/**/*.cs", true }
                 };
 
-            return new VCSGraphProvider()
+            return new BetweenCommitsGraphProvider()
             {
                 GitRepository = new GitRepository
                     (new DataPath(Path.GetDirectoryName(Application.dataPath)),

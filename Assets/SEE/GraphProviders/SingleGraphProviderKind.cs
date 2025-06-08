@@ -55,7 +55,7 @@
         LSP,
 
         /// <summary>
-        /// For <see cref="VCSGraphProvider"/>.
+        /// For <see cref="BetweenCommitsGraphProvider"/>.
         /// </summary>
         VCS,
     }

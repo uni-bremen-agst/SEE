@@ -239,7 +239,7 @@ namespace SEE.GraphProviders
                     { "Assets/SEE/GraphProviders/**/*.cs", true }
                 };
 
-            VCSGraphProvider provider = new()
+            BetweenCommitsGraphProvider provider = new()
             {
                 GitRepository = new GitRepository
                                      (new DataPath(Path.GetDirectoryName(Application.dataPath)),
