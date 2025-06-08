@@ -112,7 +112,9 @@ namespace SEE.GraphProviders
         /// <param name="changePercentage">The current status of the process.</param>
         /// <param name="token">Can be used to cancel the action.</param>
         /// <returns>The graph generated from the git repository <see cref="RepositoryData"/>.</returns>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
+        public override async UniTask<Graph> ProvideAsync
+            (Graph graph,
+            AbstractSEECity city,
             Action<float> changePercentage = null,
             CancellationToken token = default)
         {
@@ -157,7 +159,7 @@ namespace SEE.GraphProviders
 
             if (!Directory.Exists(repositoryPath))
             {
-                throw new Exception("The repository path does not exist or is not a directory.");
+                throw new Exception($"The repository path {repositoryPath} does not exist or is not a directory.");
             }
 
             graph.BasePath = repositoryPath;
