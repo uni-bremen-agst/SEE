@@ -12,7 +12,7 @@ namespace SEE.GraphProviders.VCS
     /// <summary>
     /// Processes and collects all metrics from all files of a git repository.
     /// </example>
-    public static class GitFileMetricProcessor
+    public static class GitGraphGenerator
     {
         /// <summary>
         /// A mapping of filenames (relative paths in a repository) onto their <see cref="GitFileMetrics"/>.

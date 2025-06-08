@@ -126,7 +126,7 @@ namespace SEE.GraphProviders
         ///
         /// This method will collect all commits from all branches which are not older than <see cref="Date"/>.
         /// Then from all these commits the metrics are calculated with
-        /// <see cref="GitFileMetricProcessor.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
+        /// <see cref="GitGraphGenerator.ProcessCommit(LibGit2Sharp.Commit,LibGit2Sharp.Patch)"/>.
         /// </summary>
         /// <param name="graph">The input graph.</param>
         /// <param name="changePercentage">The current status of the process.</param>
@@ -155,7 +155,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            GitFileMetricProcessor.AddVCSFileMetrics(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
+            GitGraphGenerator.AddVCSFileMetrics(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
             changePercentage(1f);
 
             graph.FinalizeNodeHierarchy();

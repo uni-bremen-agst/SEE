@@ -159,7 +159,7 @@ namespace SEE.GraphProviders.Evolution
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor.AddVCSFileMetrics(graph, SimplifyGraph, repoName, files, commitsInBetween, commitChanges);
+            GitGraphGenerator.AddVCSFileMetrics(graph, SimplifyGraph, repoName, files, commitsInBetween, commitChanges);
             return graph;
         }
 
