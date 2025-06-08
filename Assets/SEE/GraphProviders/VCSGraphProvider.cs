@@ -107,15 +107,6 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// The node type for directories.
-        /// </summary>
-        private const string directoryNodeType = "Directory";
-        /// <summary>
-        /// The node type for files.
-        /// </summary>
-        private const string fileNodeType = "File";
-
-        /// <summary>
         /// Builds the VCS graph with specific metrics.
         /// </summary>
         /// <param name="commitID">The commit id where the files exist.</param>
@@ -139,7 +130,7 @@ namespace SEE.GraphProviders
             graph.RepositoryPath(repositoryPath);
 
             // The main directory.
-            NewNode(graph, rootDirectory, directoryNodeType, rootDirectory);
+            NewNode(graph, rootDirectory, DataModel.DG.VCS.DirectoryType, rootDirectory);
 
             {
                 // Get all files using "git ls-tree -r <CommitID> --name-only".
@@ -158,7 +149,7 @@ namespace SEE.GraphProviders
                     // Files in the main directory.
                     if (filePathSegments.Length == 1)
                     {
-                        graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, fileNodeType, filePath));
+                        graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, DataModel.DG.VCS.FileType, filePath));
                     }
                     // Other directories/files.
                     else
@@ -228,7 +219,7 @@ namespace SEE.GraphProviders
                 // Directory does not exist.
                 if (pathSegments.Length > 1 && parent == null)
                 {
-                    rootNode.AddChild(NewNode(graph, pathSegments[0], directoryNodeType, pathSegments[0]));
+                    rootNode.AddChild(NewNode(graph, pathSegments[0], DataModel.DG.VCS.DirectoryType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(pathSegments[0]),
                         pathSegments[0], graph, rootNode);
                 }
@@ -250,7 +241,7 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment does not exist, and the node is a directory.
                 if (pathSegments.Length > 1)
                 {
-                    parent.AddChild(NewNode(graph, currentPathSegment, directoryNodeType, pathSegments[0]));
+                    parent.AddChild(NewNode(graph, currentPathSegment, DataModel.DG.VCS.DirectoryType, pathSegments[0]));
                     return BuildGraphFromPath(nodePath, graph.GetNode(currentPathSegment),
                         currentPathSegment, graph, rootNode);
                 }
@@ -258,7 +249,7 @@ namespace SEE.GraphProviders
                 // The node for the current pathSegment does not exist, and the node is a file.
                 if (pathSegments.Length == 1)
                 {
-                    Node addedFileNode = NewNode(graph, currentPathSegment, fileNodeType, pathSegments[0]);
+                    Node addedFileNode = NewNode(graph, currentPathSegment, DataModel.DG.VCS.FileType, pathSegments[0]);
                     parent.AddChild(addedFileNode);
                     return addedFileNode;
                 }
@@ -305,7 +296,7 @@ namespace SEE.GraphProviders
         {
             foreach (Node node in graph.Nodes())
             {
-                if (node.Type == fileNodeType)
+                if (node.Type == DataModel.DG.VCS.FileType)
                 {
                     string repositoryFilePath = node.ID;
                     AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
