@@ -58,19 +58,22 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Loads the metrics and nodes from the given git repository and commitID into the <paramref name="graph"/>.
+        /// Loads the metrics and nodes from <see cref="GitRepository"/> and
+        /// <see cref="CommitID"/> into the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">The graph into which the metrics shall be loaded</param>
         /// <param name="city">This parameter is currently ignored.</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
-        public override async UniTask<Graph> ProvideAsync(Graph graph, AbstractSEECity city,
-                                                          Action<float> changePercentage = null,
-                                                          CancellationToken token = default)
+        public override async UniTask<Graph> ProvideAsync
+            (Graph graph,
+            AbstractSEECity city,
+            Action<float> changePercentage = null,
+            CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetVCSGraph(GitRepository, CommitID, BaselineCommitID,
-                                                               changePercentage, token));
+            return await UniTask.FromResult<Graph>(GetGraph(GitRepository, CommitID, BaselineCommitID,
+                                                            changePercentage, token));
         }
 
         /// <summary>
@@ -115,7 +118,7 @@ namespace SEE.GraphProviders
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>the resulting graph</returns>
-        private static Graph GetVCSGraph
+        private static Graph GetGraph
             (GitRepository repository,
             string commitID,
             string baselineCommitID,
