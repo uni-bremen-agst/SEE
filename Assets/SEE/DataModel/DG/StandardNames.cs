@@ -67,6 +67,16 @@
         /// Prefix for all metrics.
         /// </summary>
         public const string Prefix = "Metric.";
+
+        /// <summary>
+        /// Name of lines of code (LOC) metric.
+        /// </summary>
+        public const string LOC = Prefix + "LOC";
+
+        /// <summary>
+        /// Name of McCabe complexity metric.
+        /// </summary>
+        public const string McCabe = Prefix + "McCabe_Complexity";
     }
 
     /// <summary>
