@@ -40,7 +40,7 @@
         Reflexion,
 
         /// <summary>
-        /// For <see cref="AllGitBranchesSingleGraphProvider"/>.
+        /// For <see cref="GitBranchesGraphProvider"/>.
         /// </summary>
         GitAllBranches,
 

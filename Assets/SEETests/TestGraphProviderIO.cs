@@ -307,23 +307,23 @@ namespace SEE.GraphProviders
         [Test]
         public void TestAllBranchGitSingleProvider()
         {
-            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
+            GitBranchesGraphProvider saved = GetAllBranchGitSingleProvider();
             Save(saved);
             AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
         }
 
-        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider expected,
+        private void AreEqualAllBranchGitSingleProvider(GitBranchesGraphProvider expected,
                                                         SingleGraphProvider actual)
         {
             Assert.AreEqual(expected.GetType(), actual.GetType());
-            AllGitBranchesSingleGraphProvider gitBranchesLoaded = actual as AllGitBranchesSingleGraphProvider;
+            GitBranchesGraphProvider gitBranchesLoaded = actual as GitBranchesGraphProvider;
             Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, expected.SimplifyGraph);
             Assert.AreEqual(gitBranchesLoaded.AutoFetch, expected.AutoFetch);
         }
 
-        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
+        private GitBranchesGraphProvider GetAllBranchGitSingleProvider()
         {
-            return new AllGitBranchesSingleGraphProvider()
+            return new GitBranchesGraphProvider()
             {
                 GitRepository = new GitRepository
                                       (new DataPath("path/to/repo"),

@@ -18,7 +18,7 @@ using static SEE.DataModel.DG.VCS;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
+    /// Tests of <see cref="GitBranchesGraphProvider"/> and
     /// <see cref="GitEvolutionGraphProvider"/>"/>.
     /// </summary>
     public class TestGitGraphProvider
@@ -95,7 +95,7 @@ namespace SEE.GraphProviders
                                                     new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
                                                                        repositoryPaths: null,
                                                                        branches: null));
-            AllGitBranchesSingleGraphProvider provider = new()
+            GitBranchesGraphProvider provider = new()
             {
                 GitRepository = gitRepository,
                 SimplifyGraph = true,

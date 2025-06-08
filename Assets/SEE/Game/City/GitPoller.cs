@@ -18,13 +18,13 @@ namespace SEE.Game.City
     /// When a new commit was detected on any branch, a refresh of the CodeCity is initiated.
     /// Newly added or changed nodes will be marked after the refresh.
     ///
-    /// This component will be added automatically by <see cref="AllGitBranchesSingleGraphProvider"/>
-    /// if <see cref="AllGitBranchesSingleGraphProvider.AutoFetch"/> is set to true.
+    /// This component will be added automatically by <see cref="GitBranchesGraphProvider"/>
+    /// if <see cref="GitBranchesGraphProvider.AutoFetch"/> is set to true.
     /// </summary>
     public class GitPoller : MonoBehaviour
     {
         /// <summary>
-        /// The code city where the <see cref="AllGitBranchesSingleGraphProvider"/> graph provider
+        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
         /// was executed and which should be updated when a new commit is detected.
         /// </summary>
         public BranchCity CodeCity;

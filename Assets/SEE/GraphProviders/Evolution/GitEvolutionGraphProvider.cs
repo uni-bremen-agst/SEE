@@ -19,7 +19,7 @@ using UnityEngine;
 namespace SEE.GraphProviders.Evolution
 {
     /// <summary>
-    /// Provides an evolution for git repositories similar to <see cref="AllGitBranchesSingleGraphProvider"/>.
+    /// Provides an evolution for git repositories similar to <see cref="GitBranchesGraphProvider"/>.
     /// </summary>
     [Serializable]
     public class GitEvolutionGraphProvider : MultiGraphProvider

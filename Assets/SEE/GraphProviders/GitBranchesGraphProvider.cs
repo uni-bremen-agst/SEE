@@ -33,7 +33,7 @@ namespace SEE.GraphProviders
     /// </list>
     /// </summary>
     [Serializable]
-    public class AllGitBranchesSingleGraphProvider : SingleGraphProvider
+    public class GitBranchesGraphProvider : SingleGraphProvider
     {
         #region Attributes
 
@@ -120,7 +120,7 @@ namespace SEE.GraphProviders
         {
             if (city is not BranchCity branchCity)
             {
-                throw new ArgumentException($"A {nameof(AllGitBranchesSingleGraphProvider)} works only for a {nameof(BranchCity)}.");
+                throw new ArgumentException($"A {nameof(GitBranchesGraphProvider)} works only for a {nameof(BranchCity)}.");
             }
 
             CheckAttributes(branchCity);
