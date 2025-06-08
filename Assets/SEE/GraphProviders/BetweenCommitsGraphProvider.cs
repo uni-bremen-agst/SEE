@@ -1,10 +1,8 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -27,16 +25,8 @@ namespace SEE.GraphProviders
     /// well as from the version control system, such as number of developers,
     /// number of commits, or code churn.
     /// </summary>
-    public class BetweenCommitsGraphProvider : SingleGraphProvider
+    internal class BetweenCommitsGraphProvider : GitGraphProvider
     {
-        /// <summary>
-        /// The git repository which should be analyzed.
-        /// </summary>
-        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
-            RuntimeTab("Data")]
-        public GitRepository GitRepository = new();
-
         /// <summary>
         /// The commit id.
         /// </summary>
@@ -306,8 +296,8 @@ namespace SEE.GraphProviders
                     if (language != AntlrLanguage.Plain)
                     {
                         ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
-                        node.SetInt(Metrics.Prefix + "LOC", TokenMetrics.CalculateLinesOfCode(tokens));
-                        node.SetInt(Metrics.Prefix + "McCabe_Complexity", TokenMetrics.CalculateMcCabeComplexity(tokens));
+                        node.SetInt(Metrics.LOC, TokenMetrics.CalculateLinesOfCode(tokens));
+                        node.SetInt(Metrics.McCabe, TokenMetrics.CalculateMcCabeComplexity(tokens));
                         TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
                         node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
                         node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
@@ -348,11 +338,6 @@ namespace SEE.GraphProviders
         #region Config I/O
 
         /// <summary>
-        /// Label of attribute <see cref="GitRepository"/> in the configuration file.
-        /// </summary>
-        private const string gitRepositoryLabel = "GitRepository";
-
-        /// <summary>
         /// Label of attribute <see cref="CommitID"/> in the configuration file.
         /// </summary>
         private const string commitIDLabel = "CommitID";
@@ -363,16 +348,16 @@ namespace SEE.GraphProviders
 
         protected override void SaveAttributes(ConfigWriter writer)
         {
+            base.SaveAttributes(writer);
             writer.Save(CommitID, commitIDLabel);
             writer.Save(BaselineCommitID, baselineCommitIDLabel);
-            GitRepository.Save(writer, gitRepositoryLabel);
         }
 
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
+            base.RestoreAttributes(attributes);
             ConfigIO.Restore(attributes, commitIDLabel, ref CommitID);
             ConfigIO.Restore(attributes, baselineCommitIDLabel, ref BaselineCommitID);
-            GitRepository.Restore(attributes, gitRepositoryLabel);
         }
 
         #endregion

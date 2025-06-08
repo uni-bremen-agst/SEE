@@ -33,25 +33,9 @@ namespace SEE.GraphProviders
     /// </list>
     /// </summary>
     [Serializable]
-    public class GitBranchesGraphProvider : SingleGraphProvider
+    internal class GitBranchesGraphProvider : GitGraphProvider
     {
         #region Attributes
-
-        /// <summary>
-        /// The git repository which should be analyzed.
-        /// </summary>
-        [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         Tooltip("The Git repository from which to retrieve the data."),
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
-         RuntimeTab("Data")]
-        public GitRepository GitRepository = new();
-
-        /// <summary>
-        /// If true, the graph will be simplified by merging serial chains of nested
-        /// directories into one.
-        /// </summary>
-        [Tooltip("If true, chains in the hierarchy will be simplified.")]
-        public bool SimplifyGraph = false;
 
         /// <summary>
         /// Specifies if SEE should automatically fetch for new commits in the
@@ -192,11 +176,6 @@ namespace SEE.GraphProviders
         #region Config I/O
 
         /// <summary>
-        /// Label for serializing the <see cref="SimplifyGraph"/> field.
-        /// </summary>
-        private const string simplifyGraphLabel = "SimplifyGraph";
-
-        /// <summary>
         /// Label for serializing the <see cref="AutoFetch"/> field.
         /// </summary>
         private const string autoFetchLabel = "AutoFetch";
@@ -212,21 +191,15 @@ namespace SEE.GraphProviders
         private const string markerTimeLabel = "MarkerTime";
 
         /// <summary>
-        /// Label for serializing the <see cref="GitRepository"/> field.
-        /// </summary>
-        private const string gitRepositoryLabel = "Repository";
-
-        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
         protected override void SaveAttributes(ConfigWriter writer)
         {
-            writer.Save(SimplifyGraph, simplifyGraphLabel);
+            base.SaveAttributes(writer);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
             writer.Save(MarkerTime, markerTimeLabel);
-            GitRepository.Save(writer, gitRepositoryLabel);
         }
 
         /// <summary>
@@ -235,11 +208,10 @@ namespace SEE.GraphProviders
         /// <param name="attributes">The attributes to restore from.</param>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
-            ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
+            base.RestoreAttributes(attributes);
             ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
             ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
             ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
-            GitRepository.Restore(attributes, gitRepositoryLabel);
         }
 
         #endregion Config I/O
