@@ -145,7 +145,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitChanges">The changes associated with each commit in <paramref name="commitsInBetween"/>;
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
-        internal static void AddVCSFileMetrics
+        internal static void AddNodes
             (Graph graph,
              bool simplifyGraph,
              string repositoryName,
@@ -162,7 +162,7 @@ namespace SEE.GraphProviders.VCS
 
             CalculateTruckFactor(fileToMetrics);
 
-            FillGraphWithGitMetrics(fileToMetrics, graph, repositoryName, simplifyGraph, idSuffix: "-Evo");
+            AddVCSMetrics(fileToMetrics, graph, repositoryName, simplifyGraph, idSuffix: "-Evo");
         }
 
         /// <summary>
@@ -232,7 +232,7 @@ namespace SEE.GraphProviders.VCS
                     }
 
                     fileToMetrics[filePath].AuthorsChurn[authorKey] +=
-                        (changedFile.LinesAdded + changedFile.LinesDeleted);
+                        changedFile.LinesAdded + changedFile.LinesDeleted;
                 }
             }
         }
@@ -251,7 +251,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
-        internal static void AddVCSFileMetrics
+        internal static void AddNodes
             (Graph graph,
              bool simplifyGraph,
              GitRepository repository,
@@ -277,7 +277,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             CalculateTruckFactor(fileToMetrics);
-            FillGraphWithGitMetrics(fileToMetrics, graph, repositoryName, simplifyGraph);
+            AddMetrics(fileToMetrics, graph, repositoryName, simplifyGraph);
         }
 
         /// <summary>
@@ -320,10 +320,10 @@ namespace SEE.GraphProviders.VCS
         /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
-        private static void FillGraphWithGitMetrics(IDictionary<string, GitFileMetrics> fileToMetrics, Graph initialGraph,
+        private static void AddMetrics(IDictionary<string, GitFileMetrics> fileToMetrics, Graph initialGraph,
             string repositoryName, bool simplifyGraph)
         {
-            FillGraphWithGitMetrics(fileToMetrics, initialGraph, repositoryName, simplifyGraph, "");
+            AddVCSMetrics(fileToMetrics, initialGraph, repositoryName, simplifyGraph, "");
         }
 
         /// <summary>
@@ -336,7 +336,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is
         /// loaded in two code cities at the same time.</param>
-        private static void FillGraphWithGitMetrics
+        private static void AddVCSMetrics
             (IDictionary<string, GitFileMetrics> fileToMetrics,
             Graph initialGraph,
             string repositoryName,
@@ -348,11 +348,11 @@ namespace SEE.GraphProviders.VCS
                 return;
             }
 
+            Node rootNode = initialGraph.GetNode(repositoryName + idSuffix);
+
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
-                Node n
-                    = GraphUtils.GetOrAddNode(file.Key, initialGraph.GetNode(repositoryName + idSuffix),
-                                              initialGraph, idSuffix: idSuffix);
+                Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, initialGraph, idSuffix: idSuffix);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
                 n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
                 n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);

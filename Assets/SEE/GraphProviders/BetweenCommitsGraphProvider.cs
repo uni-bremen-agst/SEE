@@ -126,36 +126,35 @@ namespace SEE.GraphProviders
             // The main directory.
             NewNode(graph, rootDirectory, DataModel.DG.VCS.DirectoryType, rootDirectory);
 
-            {
-                // Get all files using "git ls-tree -r <CommitID> --name-only".
-                ICollection<string> files = repository.AllFiles(commitID);
+            // Get all files using "git ls-tree -r <CommitID> --name-only".
+            ICollection<string> files = repository.AllFiles(commitID);
 
-                float totalSteps = files.Count;
-                int currentStep = 0;
-                // Build the graph structure.
-                foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
+            float totalSteps = files.Count;
+            int currentStep = 0;
+            // Build the graph structure.
+            foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
+            {
+                if (token.IsCancellationRequested)
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(token);
-                    }
-                    string[] filePathSegments = filePath.Split('/');
-                    // Files in the main directory.
-                    if (filePathSegments.Length == 1)
-                    {
-                        graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, DataModel.DG.VCS.FileType, filePath));
-                    }
-                    // Other directories/files.
-                    else
-                    {
-                        BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(rootDirectory));
-                    }
-                    currentStep++;
-                    changePercentage?.Invoke(currentStep / totalSteps);
+                    throw new OperationCanceledException(token);
                 }
-                AddCodeMetrics(graph, repository, commitID);
-                ADDVCSMetrics(graph, repository, baselineCommitID, commitID);
+                string[] filePathSegments = filePath.Split('/');
+                // Files in the main directory.
+                if (filePathSegments.Length == 1)
+                {
+                    graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, DataModel.DG.VCS.FileType, filePath));
+                }
+                // Other directories/files.
+                else
+                {
+                    BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(rootDirectory));
+                }
+                currentStep++;
+                changePercentage?.Invoke(currentStep / totalSteps);
             }
+            AddCodeMetrics(graph, repository, commitID);
+            ADDVCSMetrics(graph, repository, baselineCommitID, commitID);
+
             graph.FinalizeNodeHierarchy();
             changePercentage?.Invoke(1f);
             return graph;

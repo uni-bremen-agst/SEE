@@ -155,7 +155,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            GitGraphGenerator.AddVCSFileMetrics(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
+            GitGraphGenerator.AddNodes(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
             changePercentage(1f);
 
             graph.FinalizeNodeHierarchy();
