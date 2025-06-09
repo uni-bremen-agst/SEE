@@ -241,27 +241,33 @@ namespace SEE.VCS
 
         /// <summary>
         /// Returns the content of the file at <paramref name="repositoryFilePath"/>
-        /// present in the repository at the given <paramref name="commitID"/>.
+        /// present in the repository in any of the branches passing the filter.
+        ///
+        /// Note: A file may exist in multiple branches, but this method will
+        /// return the content of the first file found in the branches.
         /// </summary>
         /// <param name="repositoryFilePath">relative path of the file within the repository</param>
-        /// <param name="commitID">commit ID</param>
         /// <returns>the content of the file</returns>
         /// <exception cref="Exception">thrown if the file does not exist</exception>
-        public string GetFileContent(string repositoryFilePath, string commitID)
+        public string GetFileContent(string repositoryFilePath)
         {
             OpenRepository();
 
-            Blob blob = repository.Lookup<Blob>($"{commitID}:{repositoryFilePath}");
+            if (string.IsNullOrWhiteSpace(repositoryFilePath))
+            {
+                throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
+            }
 
-            if (blob != null)
+            foreach (Branch branch in RelevantBranches())
             {
-                return blob.GetContentText();
+                Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
+                if (blob != null)
+                {
+                    return blob.GetContentText();
+                }
             }
-            else
-            {
-                // Blob does not exist.
-                throw new Exception($"File {repositoryFilePath} does not exist.\n");
-            }
+            // Blob does not exist.
+            throw new Exception($"File {repositoryFilePath} does not exist.\n");
         }
 
         /// <summary>
