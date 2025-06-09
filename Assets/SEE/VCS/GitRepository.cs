@@ -245,8 +245,8 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryFilePath">relative path of the file within the repository</param>
         /// <param name="commitID">commit ID</param>
-        /// <returns></returns>
-        /// <exception cref="Exception"></exception>
+        /// <returns>the content of the file</returns>
+        /// <exception cref="Exception">thrown if the file does not exist</exception>
         public string GetFileContent(string repositoryFilePath, string commitID)
         {
             OpenRepository();
