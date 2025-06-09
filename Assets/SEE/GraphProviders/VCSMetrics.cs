@@ -93,7 +93,7 @@ namespace SEE.GraphProviders
 
             foreach (Commit commit in commits)
             {
-                if (commit.Author.When >= oldCommit.Author.When && commit.Author.When <= newCommit.Author.When)
+                if (oldCommit.Author.When <= commit.Author.When && commit.Author.When <= newCommit.Author.When)
                 {
                     foreach (Commit parent in commit.Parents)
                     {
