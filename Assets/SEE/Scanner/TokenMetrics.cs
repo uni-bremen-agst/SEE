@@ -62,7 +62,7 @@ namespace SEE.Scanner
         /// <param name="numberOfTokens">the number of tokens in the sequence (excluding whitespace,
         /// comment, and newline tokens</param>
         public static void Gather
-            (ICollection<AntlrToken> tokens,
+            (IEnumerable<AntlrToken> tokens,
             out LineMetrics lineMetrics,
             out int numberOfTokens,
             out int mccabeComplexity,
@@ -175,7 +175,9 @@ namespace SEE.Scanner
         {
             return token.TokenType == TokenType.Whitespace ||
                    token.TokenType == TokenType.Newline ||
-                   token.TokenType == AntlrTokenType.Comment;
+                   token.TokenType == AntlrTokenType.Comment ||
+                   token.TokenType == AntlrTokenType.Ignored ||
+                   token.TokenType == AntlrTokenType.EOF;
         }
     }
 }
