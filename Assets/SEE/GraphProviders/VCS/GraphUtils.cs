@@ -57,26 +57,30 @@ namespace SEE.GraphProviders.VCS
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file.
         /// This will become the ID of the newly created node.</param>
-        /// <param name="rootNode">The root node of the repository.</param>
+        /// <param name="parent">The parent under which the searched/created node is contained.</param>
         /// <param name="graph">The graph to add the nodes to.</param>
         /// <returns>The found or newly create file node</returns>
-        public static Node GetOrAddFileNode(string fullRelativePath, Node rootNode, Graph graph, string idSuffix = "") =>
-            GetOrAddFileNode(fullRelativePath, fullRelativePath, rootNode, graph, idSuffix: idSuffix);
+        public static Node GetOrAddFileNode
+            (string fullRelativePath,
+             Node parent,
+             Graph graph,
+             string idSuffix = "")
+            => GetOrAddFileNode(fullRelativePath, fullRelativePath, parent, graph, idSuffix: idSuffix);
 
         /// <summary>
         /// The same as <see cref="GetOrAddFileNode"/> but with the actual logic.
         /// </summary>
         /// <param name="fullRelativePath">The full relative path of the file.</param>
         /// <param name="path">The root node of the repository.</param>
-        /// <param name="parent">The parent of the current node.</param>
+        /// <param name="parent">The parent under which the searched/created node is contained.</param>
         /// <param name="graph">The graph to add the nodes to.</param>
         /// <returns>The newly created or found node.</returns>
         private static Node GetOrAddFileNode
             (string fullRelativePath,
-            string path,
-            Node parent,
-            Graph graph,
-            string idSuffix = "")
+             string path,
+             Node parent,
+             Graph graph,
+             string idSuffix = "")
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
             // If we are in the directory of the file.
@@ -91,11 +95,11 @@ namespace SEE.GraphProviders.VCS
                 string[] fileDirectorySplit = fullRelativePath.Split(Path.AltDirectorySeparatorChar);
 
                 string fileDir = String.Join(Path.AltDirectorySeparatorChar,
-                    fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
+                                             fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
 
                 // Create a new file node and return it.
                 Node addedFileNode = NewNode(graph, fullRelativePath + idSuffix,
-                    DataModel.DG.VCS.FileType, path);
+                                             DataModel.DG.VCS.FileType, path);
                 addedFileNode.Filename = path;
                 addedFileNode.Directory = fileDir;
                 parent.AddChild(addedFileNode);
@@ -110,7 +114,7 @@ namespace SEE.GraphProviders.VCS
                 Node dirNode = parent.Children().First(x =>
                     x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
                 return GetOrAddFileNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                    dirNode, graph, idSuffix: idSuffix);
+                                        dirNode, graph, idSuffix: idSuffix);
             }
 
             // Create a new directory node.
@@ -119,7 +123,7 @@ namespace SEE.GraphProviders.VCS
             addedDirectoryNode.Directory = directoryName;
             parent.AddChild(addedDirectoryNode);
             return GetOrAddFileNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                addedDirectoryNode, graph, idSuffix: idSuffix);
+                                    addedDirectoryNode, graph, idSuffix: idSuffix);
         }
     }
 }
