@@ -8,9 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
-using SEE.Scanner;
 using System.Threading;
-using SEE.Scanner.Antlr;
 using SEE.Utils;
 using SEE.VCS;
 
@@ -152,8 +150,6 @@ namespace SEE.GraphProviders
                 currentStep++;
                 changePercentage?.Invoke(currentStep / totalSteps);
             }
-            AddCodeMetrics(graph, repository, commitID);
-            ADDVCSMetrics(graph, repository, baselineCommitID, commitID);
 
             graph.FinalizeNodeHierarchy();
             changePercentage?.Invoke(1f);
@@ -249,90 +245,6 @@ namespace SEE.GraphProviders
             }
 
             return null;
-        }
-
-        /// <summary>
-        /// Retrieves the token stream for given file content from its repository and commit ID.
-        /// </summary>
-        /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
-        /// in the syntax of the repository regarding the directory separator</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
-        /// <param name="language">The language the given text is written in.</param>
-        /// <returns>The token stream for the specified file and commit.</returns>
-        public static ICollection<AntlrToken> RetrieveTokens
-            (string repositoryFilePath,
-            GitRepository repository,
-             string commitID,
-             AntlrLanguage language)
-        {
-            try
-            {
-                return AntlrToken.FromString(repository.GetFileContent(repositoryFilePath, commitID), language);
-            }
-            catch (Exception e)
-            {
-                Debug.LogError($"Error retrieving file content for {repositoryFilePath} at commit {commitID}: {e.Message}");
-                return new List<AntlrToken>();
-            }
-        }
-
-        /// <summary>
-        /// Adds Halstead, McCabe and lines of code metrics to the corresponding node for the supported TokenLanguages
-        /// in <paramref name="graph"/>.
-        /// Otherwise, metrics are not available.
-        /// </summary>
-        /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
-        private static void AddCodeMetrics(Graph graph, GitRepository repository, string commitID)
-        {
-            foreach (Node node in graph.Nodes())
-            {
-                if (node.Type == DataModel.DG.VCS.FileType)
-                {
-                    string repositoryFilePath = node.ID;
-                    AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
-                    if (language != AntlrLanguage.Plain)
-                    {
-                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repository, commitID, language);
-                        node.SetInt(Metrics.LOC, TokenMetrics.CalculateLinesOfCode(tokens));
-                        node.SetInt(Metrics.McCabe, TokenMetrics.CalculateMcCabeComplexity(tokens));
-                        TokenMetrics.HalsteadMetrics halsteadMetrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
-                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
-                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
-                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
-                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
-                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
-                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
-                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
-                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
-                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
-                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
-                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
-                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// Adds VCS metrics to all nodes in <paramref name="graph"/> based on the
-        /// VCS information derived from <paramref name="repository"/>. The metrics are gathered
-        /// in between the <paramref name="oldCommit"/> and <paramref name="newCommit"/>.
-        /// If <paramref name="oldCommit"/> is null or empty, no metrics will be
-        /// gathered.
-        /// </summary>
-        /// <param name="graph">The graph where the metric should be added.</param>
-        /// <param name="repository">The repository from which the file content is retrieved.</param>
-        /// <param name="oldCommit">The starting commit ID (baseline).</param>
-        /// <param name="newCommit">The ending commit.</param>
-        private static void ADDVCSMetrics(Graph graph, GitRepository repository, string oldCommit, string newCommit)
-        {
-            if (!string.IsNullOrWhiteSpace(oldCommit))
-            {
-                VCSMetrics.AddMetrics(graph, repository, oldCommit, newCommit);
-            }
         }
 
         #region Config I/O

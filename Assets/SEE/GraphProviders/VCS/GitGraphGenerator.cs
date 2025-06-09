@@ -1,9 +1,12 @@
 using LibGit2Sharp;
 using SEE.DataModel.DG;
+using SEE.Scanner;
+using SEE.Scanner.Antlr;
 using SEE.Utils;
 using SEE.VCS;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
 
@@ -139,6 +142,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node</param>
+        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="files">The files for which to calculate the metrics.</param>
         /// <param name="commitsInBetween">The metrics will be gathered for only the commits in this list.</param>
@@ -148,6 +152,7 @@ namespace SEE.GraphProviders.VCS
         internal static void AddNodes
             (Graph graph,
              bool simplifyGraph,
+             GitRepository repository,
              string repositoryName,
              HashSet<string> files,
              List<Commit> commitsInBetween,
@@ -162,7 +167,7 @@ namespace SEE.GraphProviders.VCS
 
             CalculateTruckFactor(fileToMetrics);
 
-            AddVCSMetrics(fileToMetrics, graph, repositoryName, simplifyGraph, idSuffix: "-Evo");
+            AddVCSMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, idSuffix: "-Evo", repository);
         }
 
         /// <summary>
@@ -189,7 +194,8 @@ namespace SEE.GraphProviders.VCS
 
             HashSet<string> files = new(fileToMetrics.Keys);
 
-            FileAuthor commitAuthor = new(commit.Author.Name, commit.Author.Email);
+            FileAuthor authorKey = GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
+                                                          consultAliasMap, authorAliasMap);
 
             foreach (PatchEntryChanges changedFile in commitChanges)
             {
@@ -199,8 +205,6 @@ namespace SEE.GraphProviders.VCS
                 {
                     continue;
                 }
-
-                FileAuthor authorKey = GetAuthorAliasIfExists(commitAuthor, consultAliasMap, authorAliasMap);
 
                 if (!fileToMetrics.ContainsKey(filePath))
                 {
@@ -244,6 +248,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node</param>
+        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="startDate">The date after which commits in the history should be considered.
         /// Older commits will be ignored.</param>
@@ -277,7 +282,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             CalculateTruckFactor(fileToMetrics);
-            AddMetrics(fileToMetrics, graph, repositoryName, simplifyGraph);
+            AddMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, repository);
         }
 
         /// <summary>
@@ -314,45 +319,125 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="fileToMetrics"/>
-        /// to the passed graph <paramref name="initialGraph"/>.
+        /// to the passed graph <paramref name="graph"/>.
         /// </summary>
         /// <param name="fileToMetrics">The metrics to add.</param>
-        /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
-        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="graph">The graph where the files and metrics should be generated.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
-        private static void AddMetrics(IDictionary<string, GitFileMetrics> fileToMetrics, Graph initialGraph,
-            string repositoryName, bool simplifyGraph)
+        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
+        private static void AddMetrics
+            (IDictionary<string, GitFileMetrics> fileToMetrics,
+             Graph graph,
+             bool simplifyGraph,
+             string repositoryName,
+             GitRepository repository)
         {
-            AddVCSMetrics(fileToMetrics, initialGraph, repositoryName, simplifyGraph, "");
+            AddVCSMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, "", repository);
+        }
+
+        /// <summary>
+        /// Retrieves the token stream for given file content from its repository and commit ID.
+        /// </summary>
+        /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
+        /// in the syntax of the repository regarding the directory separator</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        /// <param name="commitID">The commitID where the files exist.</param>
+        /// <param name="language">The language the given text is written in.</param>
+        /// <returns>The token stream for the specified file and commit.</returns>
+        private static ICollection<AntlrToken> RetrieveTokens
+            (string repositoryFilePath,
+             GitRepository repository,
+             AntlrLanguage language)
+        {
+            try
+            {
+                return AntlrToken.FromString(repository.GetFileContent(repositoryFilePath), language);
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}");
+                return new List<AntlrToken>();
+            }
+        }
+
+        /// <summary>
+        /// Adds Halstead, McCabe, number of tokens and lines of code metrics and comments
+        /// to the corresponding node for the supported TokenLanguages in <paramref name="graph"/>.
+        /// Otherwise, metrics are not available.
+        ///
+        /// Note: A file may exist in multiple branches. We will pick the first one we find.
+        /// </summary>
+        /// <param name="graph">The graph where the metric should be added.</param>
+        /// <param name="repository">The repository from which the file content is retrieved.</param>
+        private static void AddCodeMetrics(Graph graph, GitRepository repository)
+        {
+            foreach (Node node in graph.Nodes())
+            {
+                if (node.Type == DataModel.DG.VCS.FileType)
+                {
+                    string repositoryFilePath = node.ID;
+                    AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
+                    if (language != AntlrLanguage.Plain)
+                    {
+                        ICollection<AntlrToken> tokens = RetrieveTokens(repositoryFilePath, repository, language);
+                        TokenMetrics.Gather(tokens,
+                                            out TokenMetrics.LineMetrics lineMetrics, out int numberOfTokens,
+                                            out int mccabeComplexity, out TokenMetrics.HalsteadMetrics halsteadMetrics);
+
+
+                        node.SetInt(Metrics.LOC, lineMetrics.LOC);
+                        node.SetInt(Metrics.LOC, lineMetrics.Comments);
+                        node.SetInt(Metrics.LOC, numberOfTokens);
+
+                        node.SetInt(Metrics.McCabe, mccabeComplexity);
+
+                        node.SetInt(Halstead.DistinctOperators, halsteadMetrics.DistinctOperators);
+                        node.SetInt(Halstead.DistinctOperands, halsteadMetrics.DistinctOperands);
+                        node.SetInt(Halstead.TotalOperators, halsteadMetrics.TotalOperators);
+                        node.SetInt(Halstead.TotalOperands, halsteadMetrics.TotalOperands);
+                        node.SetInt(Halstead.ProgramVocabulary, halsteadMetrics.ProgramVocabulary);
+                        node.SetInt(Halstead.ProgramLength, halsteadMetrics.ProgramLength);
+                        node.SetFloat(Halstead.EstimatedProgramLength, halsteadMetrics.EstimatedProgramLength);
+                        node.SetFloat(Halstead.Volume, halsteadMetrics.Volume);
+                        node.SetFloat(Halstead.Difficulty, halsteadMetrics.Difficulty);
+                        node.SetFloat(Halstead.Effort, halsteadMetrics.Effort);
+                        node.SetFloat(Halstead.TimeRequiredToProgram, halsteadMetrics.TimeRequiredToProgram);
+                        node.SetFloat(Halstead.NumberOfDeliveredBugs, halsteadMetrics.NumberOfDeliveredBugs);
+                    }
+                }
+            }
         }
 
         /// <summary>
         /// Fills and adds all files and their metrics from <paramref name="fileToMetrics"/>
-        /// to the passed graph <paramref name="initialGraph"/>.
+        /// to the passed graph <paramref name="graph"/>.
         /// </summary>
         /// <param name="fileToMetrics">The metrics to add.</param>
-        /// <param name="initialGraph">The initial graph where the files and metrics should be generated.</param>
-        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="graph">The initial graph where the files and metrics should be generated.</param>
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
+        /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is
         /// loaded in two code cities at the same time.</param>
+        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
         private static void AddVCSMetrics
             (IDictionary<string, GitFileMetrics> fileToMetrics,
-            Graph initialGraph,
-            string repositoryName,
+            Graph graph,
             bool simplifyGraph,
-            string idSuffix)
+            string repositoryName,
+            string idSuffix,
+            GitRepository repository)
         {
-            if (initialGraph == null || fileToMetrics == null)
+            if (graph == null || fileToMetrics == null)
             {
                 return;
             }
 
-            Node rootNode = initialGraph.GetNode(repositoryName + idSuffix);
+            Node rootNode = graph.GetNode(repositoryName + idSuffix);
 
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
-                Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, initialGraph, idSuffix: idSuffix);
+                Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, graph, idSuffix: idSuffix);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
                 n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
                 n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);
@@ -368,9 +453,21 @@ namespace SEE.GraphProviders.VCS
                 }
             }
 
+            AddCodeMetrics(graph, repository);
+            Simplify(graph, simplifyGraph);
+        }
+
+        /// <summary>
+        /// If <paramref name="simplifyGraph"/> is true, the graph will be simplified by
+        /// compressing single chains of directory nodes into the inner most directory node.
+        /// </summary>
+        /// <param name="graph">graph to be simplified</param>
+        /// <param name="simplifyGraph">whether the graph should be simplified</param>
+        private static void Simplify(Graph graph, bool simplifyGraph)
+        {
             if (simplifyGraph)
             {
-                foreach (Node child in initialGraph.GetRoots()[0].Children().ToList())
+                foreach (Node child in graph.GetRoots()[0].Children().ToList())
                 {
                     SimplifyGraph(child);
                 }
