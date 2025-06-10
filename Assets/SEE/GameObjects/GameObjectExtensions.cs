@@ -476,67 +476,160 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
         /// <para>
-        /// This is a shorthand to get the <c>bounds.size</c> of the <see cref="Renderer"/> component, if present.
-        /// This value reflects the actual world-space bounds of the cuboid that contains the rendered object.
+        /// This value reflects the actual world-space bounds of the axis-aligned cuboid that contains the rendered
+        /// object.
+        /// Please note that the <see cref="Transform.lossyScale"/> is only the scale factor and not the actual size of
+        /// a rendered object.
+        /// Similarly, <see cref="Transform.position"/> is not necessarily the center point of the rendered object.
         /// </para><para>
-        /// This value should often be used instead of the <c>transform.lossyScale</c> because the scale only reflects
-        /// the size for objects with a standardized size like cube primitives.
+        /// <list type="bullet">
+        /// <item>
+        /// If a <see cref="Renderer"/> is attached, the <see cref="Renderer.bounds"/> will be used.
+        /// </item><item>
+        /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
+        /// performance penalty.
+        /// </item><item>
+        /// Else, <see cref="Transform.lossyScale"/> and <see cref="Transform.position"/> are provided and a warning
+        /// is logged.
+        /// It means that either the object is not rendered at all or this method needs to be extended.
+        /// </item>
+        /// </list>
         /// </para><para>
-        /// Local-space counterpart: <see cref="LocalSize"/>
+        /// Local-space counterpart: <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/>
         /// </para>
         /// </summary>
-        /// <remarks>
-        /// If the game object has no renderer, its <c>lossyScale</c> is returned.
-        /// </remarks>
         /// <param name="gameObject">object whose scale is requested</param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
-        public static Vector3 WorldSpaceSize(this GameObject gameObject)
+        /// <param name="position">out parameter for the world-space position of the object</param>
+        /// <param name="size">out parameter for the world-space size of the object</param>
+        /// <returns><c>true</c> if the size was successfully retrieved, <c>false</c> if the fallback was used.</returns>
+        public static bool WorldSpaceSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
-            // For some objects, such as capsules, lossyScale gives wrong results.
-            // The more reliable option to determine the scale is using the
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                Bounds lineBounds = GeometryUtils.CalculateLineBounds(lineRenderer, true);
+                size = lineBounds.size;
+                position = lineBounds.center;
+                return true;
+            }
+
+            // For some objects, such as capsules or custom meshes, lossyScale gives wrong results.
+            // The more reliable option to determine the size is using the
             // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                return renderer.bounds.size;
+                size = renderer.bounds.size;
+                position = renderer.bounds.center;
+                return true;
             }
-            else
+
+            // No renderer, so we use lossyScale as a fallback.
+            // Note: This should not happen. If the object has no renderer, it has no size at all.
+            Debug.LogWarning($"GameObject has no Renderer component, using lossyScale as fallback: {gameObject.name}");
+            size = gameObject.transform.lossyScale;
+            position = gameObject.transform.position;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// <para>
+        /// This is a shorthand method for <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
+        /// See there for additional documentation.
+        /// </para><para>
+        /// Use <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> directly if you need both position and size.
+        /// </para><para>
+        /// Local-space counterpart: <see cref="LocalSize(GameObject)"/>
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">object whose size is requested</param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceSize(this GameObject gameObject)
+        {
+            WorldSpaceSize(gameObject, out Vector3 size, out Vector3 _);
+            return size;
+        }
+
+        /// <summary>
+        /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in local space,
+        /// i.e., in relation to its parent.
+        /// <para>
+        /// This value should often be used instead of the <see cref="Transform.localScale"/> because the scale only
+        /// reflects the size for objects with a standardized size like cube primitives. Similarly, the
+        /// <see cref="Transform.localPosition"/> can be significantly off the object's center.
+        /// </para><para>
+        /// <list type="bullet">
+        /// <item>
+        /// If a <see cref="MeshFilter"/> is attached, the <see cref="MeshFilter.sharedMesh.bounds"/> will be used.
+        /// </item><item>
+        /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
+        /// performance penalty.
+        /// </item><item>
+        /// Else, <see cref="Transform.localScale"/> and <see cref="Transform.localPosition"/> are provided and a
+        /// warning is logged.
+        /// It means that either the object is not rendered at all or this method needs to be extended.
+        /// </item>
+        /// </list>
+        /// </para><para>
+        /// World-space counterpart: <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/>
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">object whose scale is requested</param>
+        /// <param name="size">out parameter for the local size of the object</param>
+        /// <param name="position">out parameter for the local position of the object</param>
+        /// <returns><c>true</c> if the <paramref name="gameObject"/> has a size, <c>false</c> if the fallback was used.</returns>
+        public static bool LocalSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
+        {
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                // No renderer, so we use lossyScale as a fallback.
-                return gameObject.transform.lossyScale;
+                Bounds lineBounds = GeometryUtils.CalculateLineBounds(lineRenderer, false);
+                size = lineBounds.size;
+                position = lineBounds.center;
+                return true;
             }
+
+            // For some objects, such as capsules or custom meshes, localScale gives wrong results.
+            // The more reliable option to determine the size is using the object's mesh if it has one.
+            Mesh sharedMesh;
+            if (gameObject.TryGetComponent(out MeshFilter meshFilter) && (sharedMesh = meshFilter.sharedMesh) != null)
+            {
+                size = Vector3.Scale(sharedMesh.bounds.size, gameObject.transform.localScale);
+                // position = Vector3.Scale(sharedMesh.bounds.center, gameObject.transform.localPosition);
+                position = sharedMesh.bounds.center + gameObject.transform.localPosition;
+                return true;
+            }
+
+            // No mesh, so we use localScale as a fallback.
+            // Note: This should not happen. If the object has no mesh, it has no size at all.
+            Debug.LogWarning($"GameObject has no mesh or LineRenderer, using localScale as fallback: {gameObject.name}");
+            size = gameObject.transform.localScale;
+            position = gameObject.transform.localPosition;
+            return false;
         }
 
         /// <summary>
         /// Returns the size of the given <paramref name="gameObject"/> in local space,
         /// i.e., in relation to its parent.
         /// <para>
-        /// This value should often be used instead of the <c>transform.localScale</c> because the scale only reflects
-        /// the size for objects with a standardized size like cube primitives.
+        /// This is a shorthand method for <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
+        /// See there for additional documentation.
         /// </para><para>
-        /// World-space counterpart: <see cref="WorldSpaceSize"/>
+        /// Use <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/> directly if you need both position and size.
+        /// </para><para>
+        /// World-space counterpart: <see cref="WorldSpaceSize(GameObject)"/>
         /// </para>
         /// </summary>
-        /// <remarks>
-        /// If the game object has no renderer, its <c>localScale</c> is returned.
-        /// </remarks>
-        /// <param name="gameObject">object whose scale is requested</param>
+        /// <param name="gameObject">object whose size is requested</param>
         /// <returns>size of given <paramref name="gameObject"/></returns>
         public static Vector3 LocalSize(this GameObject gameObject)
         {
-            // For some objects, such as capsules, localScale gives wrong results.
-            // The more reliable option to determine the scale is using the
-            // object's renderer if it has one.
-            if (gameObject.TryGetComponent(out Renderer renderer))
-            {
-                return Vector3.Scale(renderer.localBounds.size, gameObject.transform.localScale);
-            }
-            else
-            {
-                // No renderer, so we use localScale as a fallback.
-                return gameObject.transform.localScale;
-            }
+            LocalSize(gameObject, out Vector3 size, out Vector3 _);
+            return size;
         }
 
         /// <summary>
@@ -552,6 +645,12 @@ namespace SEE.GO
         /// <returns>Local-space bounds of <paramref name="gameObject"/>.</returns>
         public static Bounds LocalBounds(this GameObject gameObject)
         {
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                return GeometryUtils.CalculateLineBounds(lineRenderer, false);
+            }
             if (gameObject.TryGetComponent(out MeshFilter meshFilter))
             {
                 return meshFilter.sharedMesh.bounds;
@@ -653,7 +752,7 @@ namespace SEE.GO
         /// we wish to return</param>
         /// <typeparam name="T">The component to get / add</typeparam>
         /// <returns>The existing or newly created component</returns>
-        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T : Component
         {
             return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
         }

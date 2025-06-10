@@ -333,22 +333,23 @@ namespace SEE.Controls.Actions
             /// <item><description><see cref="grabbedObject"/> fits in the 2D area of <see cref="NewParent"/>, and</description></item>
             /// <item><description><see cref="grabbedObject"/> does not overlap with its new siblings in <see cref="NewParent"/></description></item>
             /// </list>
+            /// </para>
             ///</summary>
             /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
             public readonly bool CanBePlaced()
             {
                 Bounds2D parentBounds = new(NewParent);
                 Bounds2D grabbedBounds = new(GrabbedGameObject);
-                bool portalCheck = true;
+                bool portalCheckPassed = true;
 
                 if (Portal.GetPortal(GrabbedGameObject, out Vector2 leftFront, out Vector2 rightBack))
                 {
                     Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
-                    portalCheck = portalBounds.Contains(grabbedBounds);
+                    portalCheckPassed = portalBounds.Contains(grabbedBounds);
                 }
 
                 return parentBounds.Contains(grabbedBounds)
-                        && portalCheck
+                        && portalCheckPassed
                         && !GrabbedGameObject.OverlapsWithSiblings();
             }
 

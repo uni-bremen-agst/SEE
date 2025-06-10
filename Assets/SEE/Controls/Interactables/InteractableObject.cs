@@ -217,30 +217,35 @@ namespace SEE.Controls
         /// <summary>
         /// Whether the object is currently interactable (at the given hit point).
         /// <para>
+        /// If the object is grabbed, it is not interactable.
+        /// </para><para>
         /// If the object has a portal:
-        /// if a hit point is given, it is checked against the portal bounds,
-        /// else the object boundaries are checked against the portal bounds.
+        /// <list type="bullet">
+        /// <item>
+        /// If a hit point is given, it is checked against the portal bounds.
+        /// </item><item>
+        /// Else, the object boundaries are checked against the portal bounds.
+        /// </item></list>
+        /// If either given point or the object's bounds are outside the portal bounds, the object is not interactable.
         /// </para>
         /// </summary>
         /// <param name="point">The hit point on the object.</param>
         public bool IsInteractable(Vector3? point = null)
         {
+            if (IsGrabbed) return false;
             if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
             {
+                Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
+
                 // Check interaction point
-                if (point != null)
+                if (point != null && !portalBounds.Contains(point.Value))
                 {
-                    if (point.Value.x < leftFront.x || point.Value.x > rightBack.x || point.Value.z < leftFront.y || point.Value.z > rightBack.y)
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 // Check if the object is (partially) within the portal bounds.
                 else
                 {
-                    Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
                     Bounds2D bounds = new Bounds2D(gameObject);
-
                     if (!portalBounds.Contains(bounds))
                     {
                         return false;

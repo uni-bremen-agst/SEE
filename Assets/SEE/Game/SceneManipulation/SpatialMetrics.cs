@@ -124,11 +124,20 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Creates a new <see cref="Bounds2D"/> from a <see cref="GameObject"/>.
         /// <para>
-        /// Passes world-space <see cref="Transform.position"/> and <see cref="GameObject.WorldSpaceSize"/> to <see cref="Bounds2D(Vector3, Vector3)"/>.
+        /// Calls <see cref="GameObjectExtensions.WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> to retrieve
+        /// position and size.
         /// </para>
         /// </summary>
         /// <param name="go">The <see cref="GameObject"/> to create the <see cref="Bounds2D"/> from.</param>
-        public Bounds2D(GameObject go) : this(go.transform.position, go.WorldSpaceSize()) { }
+        public Bounds2D(GameObject go)
+        {
+            go.WorldSpaceSize(out Vector3 size, out Vector3 position);
+
+            Left = position.x - size.x / 2f;
+            Right = position.x + size.x / 2f;
+            Back = position.z - size.z / 2f;
+            Front = position.z + size.z / 2f;
+        }
 
         /// <summary>
         /// Creates a new <see cref="Bounds2D"/> from a <see cref="Portal"/>.
@@ -269,6 +278,26 @@ namespace SEE.Game.SceneManipulation
         {
             return other.Left >= Left && other.Right <= Right && other.Back >= Back && other.Front <= Front;
         }
+
+        /// <summary>
+        /// Checks if the <paramref name="point"/> is contained in this bounds.
+        /// </summary>
+        /// <param name="point">The point to check against.</param>
+        /// <returns></returns>
+        public bool Contains(Vector2 point)
+        {
+            return point.x >= Left && point.x <= Right && point.y >= Back && point.y <= Front;
+        }
+
+        /// <summary>
+        /// Checks if the 2D equivalent of <paramref name="point"/> is contained in this bounds.
+        /// <para>
+        /// Takes the x and z coordinates of the point and converts them to 2D coordinates.
+        /// </para>
+        /// </summary>
+        /// <param name="point">The point to check against.</param>
+        /// <returns></returns>
+        public bool Contains(Vector3 point) { return Contains(point.XZ()); }
 
         /// <summary>
         /// Checks if there is an overlap between two bounds.
