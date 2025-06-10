@@ -4,57 +4,51 @@ using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 namespace SEE.UI.PropertyDialog
 {
     /// <summary>
     /// Dialog to configure telemetry settings (mode and optional remote URL).
+    /// The URL field is shown only when "Remote" is selected.
+    /// Visibility is updated once per frame.
     /// </summary>
     internal class TelemetryPropertyDialog
     {
-        /// <summary>
-        /// The root GameObject of this dialog.
-        /// </summary>
         private GameObject dialog;
-
-        /// <summary>
-        /// The property dialog component.
-        /// </summary>
         private PropertyDialog propertyDialog;
-
-        /// <summary>
-        /// Dropdown for selecting telemetry mode.
-        /// </summary>
         private SelectionProperty telemetryModeSelection;
-
-        /// <summary>
-        /// Text input field for specifying the remote telemetry URL.
-        /// </summary>
         private StringProperty urlField;
-
-        /// <summary>
-        /// The callback invoked after confirmation or cancellation.
-        /// </summary>
         private readonly Action callback;
-
-        /// <summary>
-        /// Default URL used if none is provided for remote telemetry.
-        /// </summary>
         private readonly string defaultRemoteURL = "https://telemetry.see.uni-bremen.de";
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TelemetryPropertyDialog"/> class.
-        /// </summary>
-        /// <param name="callback">Optional callback to invoke on close.</param>
+        // remembers last selection to detect changes
+        private string lastSelection;
+
         public TelemetryPropertyDialog(Action callback = null)
         {
             this.callback = callback;
         }
 
+        /// <summary>Call this once per frame from außen, um Änderungen zu erkennen.</summary>
+        public void Update()
+        {
+            string current = telemetryModeSelection.Value;
+            if (current != lastSelection)
+            {
+                lastSelection = current;
+                UpdateURLFieldVisibility(current);
+            }
+        }
+
         /// <summary>
-        /// Opens the dialog and initializes all components.
+        /// Opens the telemetry settings dialog and initializes all UI components,
+        /// including the telemetry mode dropdown and the optional remote URL field.
+        /// The dialog is shown immediately and blocks closing until the user confirms or cancels.
         /// </summary>
         public void Open()
+
         {
             dialog = new GameObject("Telemetry Settings");
 
@@ -62,7 +56,7 @@ namespace SEE.UI.PropertyDialog
             group.Name = "Telemetry Settings";
 
             telemetryModeSelection = dialog.AddComponent<SelectionProperty>();
-            telemetryModeSelection.Name = "Telemetry Mode";
+            telemetryModeSelection.Name  = "Telemetry Mode";
             telemetryModeSelection.Description = "Choose how telemetry data should be handled.";
             telemetryModeSelection.AddOptions(new[] { "Disabled", "Local", "Remote" });
             telemetryModeSelection.Value = GetInitialSelectionName();
@@ -79,38 +73,50 @@ namespace SEE.UI.PropertyDialog
             propertyDialog.Description = "Configure telemetry mode and optional remote endpoint.";
             propertyDialog.AddGroup(group);
             propertyDialog.AllowClosing(false);
-
             propertyDialog.OnConfirm.AddListener(ConfirmPressed);
             propertyDialog.OnCancel.AddListener(CancelPressed);
 
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
+
+            // nach einem Frame UI gebaut -> Sichtbarkeit setzen
+            dialog.AddComponent<DelayedUIAction>().Run(() =>
+            {
+                lastSelection = telemetryModeSelection.Value;     // initial speichern
+                UpdateURLFieldVisibility(lastSelection);
+            });
         }
 
         /// <summary>
-        /// Returns the name of the initially selected telemetry mode.
+        /// Returns the name of the currently selected telemetry mode,
+        /// based on the stored scene settings.
+        /// Used to initialize the dropdown selection when opening the dialog.
         /// </summary>
-        /// <returns>One of "Disabled", "Local", or "Remote".</returns>
+        /// <returns>
+        /// A string representation of the telemetry mode: "Disabled", "Local", or "Remote".
+        /// </returns>
         private string GetInitialSelectionName()
+
         {
             return SceneSettings.telemetryMode switch
             {
                 TelemetryMode.Disabled => "Disabled",
-                TelemetryMode.Local => "Local",
-                TelemetryMode.Remote => "Remote",
-                _ => "Disabled"
+                TelemetryMode.Local    => "Local",
+                TelemetryMode.Remote   => "Remote",
+                _                      => "Disabled"
             };
         }
 
         /// <summary>
-        /// Called when the confirm button is pressed.
-        /// Applies settings and invokes callback.
+        /// Handles the confirmation logic when the user presses the confirm button.
+        /// The selected telemetry mode is applied to the scene settings, and in case of
+        /// remote telemetry, a valid URL is required. If successful, the dialog is closed
+        /// and the callback is invoked.
         /// </summary>
         private void ConfirmPressed()
-        {
-            string selected = telemetryModeSelection.Value;
 
-            switch (selected)
+        {
+            switch (telemetryModeSelection.Value)
             {
                 case "Disabled":
                     SceneSettings.telemetryMode = TelemetryMode.Disabled;
@@ -123,15 +129,15 @@ namespace SEE.UI.PropertyDialog
                 case "Remote":
                     if (!string.IsNullOrWhiteSpace(urlField.Value))
                     {
-                        SceneSettings.telemetryMode = TelemetryMode.Remote;
+                        SceneSettings.telemetryMode       = TelemetryMode.Remote;
                         SceneSettings.CustomTelemetryServerURL = urlField.Value.Trim();
                     }
                     else
                     {
-                        ShowNotification.Error("URL missing", "Please enter a valid URL for remote telemetry.");
+                        ShowNotification.Error("URL missing",
+                            "Please enter a valid URL for remote telemetry.");
                         return;
                     }
-
                     break;
             }
 
@@ -142,10 +148,11 @@ namespace SEE.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Called when the cancel button is pressed.
-        /// Closes dialog and invokes callback.
+        /// Handles cancellation of the dialog. No changes are applied to the settings.
+        /// The dialog is closed and the optional callback is invoked.
         /// </summary>
         private void CancelPressed()
+
         {
             Close();
             callback?.Invoke();
@@ -153,12 +160,40 @@ namespace SEE.UI.PropertyDialog
         }
 
         /// <summary>
-        /// Closes and destroys the dialog GameObject.
+        /// Destroys the root GameObject of the dialog and resets internal references.
         /// </summary>
         private void Close()
+
         {
             Destroyer.Destroy(dialog);
             dialog = null;
         }
+
+        /// <summary>
+        /// Updates the visibility of the URL input field based on the selected telemetry mode.
+        /// If the mode is "Remote", the field is shown; otherwise, it is hidden. Additionally,
+        /// if the field is shown, the layout is forcefully rebuilt to ensure correct rendering
+        /// of the updated UI elements.
+        /// </summary>
+        /// <param name="selectedMode">The currently selected telemetry mode (e.g., "Disabled", "Local", or "Remote").</param>
+        private void UpdateURLFieldVisibility(string selectedMode)
+        {
+            bool showURL = selectedMode == "Remote";
+
+            if (urlField.InputFieldObject != null)
+            {
+                urlField.InputFieldObject.SetActive(showURL);
+
+                if (showURL)
+                {
+                    RectTransform rect = urlField.InputFieldObject.GetComponent<RectTransform>();
+                    if (rect != null)
+                    {
+                        LayoutRebuilder.ForceRebuildLayoutImmediate(rect);
+                    }
+                }
+            }
+        }
+
     }
 }

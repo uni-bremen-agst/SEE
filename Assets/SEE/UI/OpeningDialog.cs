@@ -198,21 +198,33 @@ namespace SEE.UI
             NetworkPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
+        
+        private TelemetryPropertyDialog telemetryDialog;
+
+        
+        /// <summary>
+        /// Opens the telemetry settings dialog and disables the main menu while the dialog is active.
+        /// When the dialog is closed, the <see cref="Reactivate"/> method will be called to show the menu again.
+        /// </summary>
         private void TelemetrySettings()
         {
-            TelemetryPropertyDialog dialog = new(Reactivate);
-            dialog.Open();
+            telemetryDialog = new TelemetryPropertyDialog(Reactivate);
+            telemetryDialog.Open();
             menu.ShowMenu = false;
         }
-        
+
+
+        /// <summary>
+        /// Sets the telemetry mode in the scene settings, persists the change,
+        /// and displays an informational notification to the user.
+        /// </summary>
+        /// <param name="mode">The telemetry mode to apply.</param>
         private void SetTelemetryMode(TelemetryMode mode)
         {
             SceneSettings.telemetryMode = mode;
             SceneSettings.SaveTelemetrySettings();
             ShowNotification.Info("Telemetry Mode", $"Mode set to {mode}");
         }
-
-
 
         /// <summary>
         /// Turns on the <see cref="menu"/>.
@@ -297,6 +309,20 @@ namespace SEE.UI
                     PlayerInputType.None => "No environment is selected.",
                     _ => throw new NotImplementedException($"Case {inputType} is not handled")
                 };
+            }
+        }
+        
+        /// <summary>
+        /// Delegates the Unity frame-based update call to the telemetry dialog,
+        /// so that changes in the dropdown selection can be polled and handled.
+        /// This ensures that the telemetry mode is updated dynamically even
+        /// without event-based support from the underlying UI component.
+        /// </summary>
+        private void Update()
+        {
+            if (telemetryDialog != null)
+            {
+                telemetryDialog.Update();
             }
         }
     }

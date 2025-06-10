@@ -42,12 +42,19 @@ namespace SEE.Controls
         [ShowInInspector]
         public static string CustomTelemetryServerURL = "http://localhost:4317";
 
+
+        /// <summary>
+        /// Saves the current telemetry configuration (mode, remote URL, and local path)
+        /// </summary>
         public static void SaveTelemetrySettings()
         {
             File.WriteAllText(Application.persistentDataPath + "/TelemetryMode.cfg", telemetryMode.ToString());
             File.WriteAllText(Application.persistentDataPath + "/TelemetryServerURL.cfg", CustomTelemetryServerURL);
         }
 
+        /// <summary>
+        /// Loads the telemetry configuration (mode, remote URL, and local path)
+        /// </summary>
         public static void LoadTelemetrySettings()
         {
             string modePath = Application.persistentDataPath + "/TelemetryMode.cfg";
