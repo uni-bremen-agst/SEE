@@ -58,7 +58,8 @@ namespace SEE.Net.Actions
         {
             ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
             ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-            Dictionary<string, VisualNodeAttributes> nodeTypes = NodeTypesSerializer.Unserialize(NodeTypeList);
+            Dictionary<string, VisualNodeAttributes> nodeTypes = !string.IsNullOrEmpty(NodeTypeList)?
+                NodeTypesSerializer.Unserialize(NodeTypeList) : new();
             GameElementDeleter.Revive(gameObjects, nodeTypes);
         }
     }
