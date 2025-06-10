@@ -5,7 +5,6 @@ using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.DebugAdapterProtocol.DebugAdapter;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
@@ -238,7 +237,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this AcceptDivergenceAction.
+        /// Undoes this <see cref="AcceptDivergenceAction"/>.
         /// </summary>
         public override void Undo()
         {
@@ -255,7 +254,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="edge">The edge divergence to remove.</param>
         /// <exception cref="Exception">If the edge not contained in a graph.</exception>
-        private void RemoveDivergence(Edge edge)
+        private static void RemoveDivergence(Edge edge)
         {
             // remove the synced edge (its info is saved in memento)
             ReflexionGraph graph = (ReflexionGraph)edge.ItsGraph;
@@ -277,11 +276,10 @@ namespace SEE.Controls.Actions
             {
                 throw new Exception($"Edge {edge.ID} to be removed is not contained in a graph.");
             }
-
         }
 
         /// <summary>
-        /// Redoes this AcceptDivergenceAction.
+        /// Redoes this <see cref="AcceptDivergenceAction"/>.
         /// </summary>
         public override void Redo()
         {
