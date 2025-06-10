@@ -35,7 +35,7 @@ namespace SEE.Net.Dashboard
         /// Latest supported version of the Axivion Dashboard.
         /// Should be updated when new (supported and tested) versions come out.
         /// </summary>
-        public static readonly DashboardVersion SupportedVersion = new(7, 8, 0, 15004);
+        public static readonly DashboardVersion SupportedVersion = new(7, 9, 4, 16514);
 
         /// <summary>
         /// Represents the difference of another version in comparison to this one.
