@@ -167,7 +167,43 @@ namespace SEE.VCS
             IEnumerable<string> branches = repo.AllBranchNames();
             p.End(true);
             Debug.Log($"Number of branches: {branches.Count()}\n");
-            Print(branches);
+            //Print(branches);
+        }
+
+        /// <summary>
+        /// Diff of two successive commits in the repository.
+        /// </summary>
+        [Test]
+        public void TestDiffImmediate()
+        {
+            Print(GetRepository().Diff("ea764b42cdd5d94ca3d1fc2a1f581c8d75409f22", "e9183c9e67448738f3428f22e05dec178bc383fb"));
+        }
+
+        /// <summary>
+        /// Diff of two commits farther away in the repository.
+        /// </summary>
+        [Test]
+        public void TestDiffLargerHistory()
+        {
+            Print(GetRepository().Diff("b0aa9acadf6f7ea7c90494099eccd9e431da3523", "95e392c4fd66df3a25c99bf64c4062725e0b0979"));
+        }
+
+        /// <summary>
+        /// Prints the given <paramref name="patch"/> to the debug log.
+        /// </summary>
+        /// <param name="patch">to be printed</param>
+        private static void Print(Patch patch)
+        {
+            foreach (PatchEntryChanges entry in patch)
+            {
+                Debug.Log($"Path: {entry.Path}\n");
+                Debug.Log($"OldPath: {entry.OldPath}\n");
+                Debug.Log($"Status: {entry.Status}\n");
+                Debug.Log($"LinesAdded: {entry.LinesAdded}\n");
+                Debug.Log($"LinesDeleted: {entry.LinesDeleted}\n");
+                Debug.Log($"Patch: {entry.Patch}\n");
+
+            }
         }
 
         /// <summary>

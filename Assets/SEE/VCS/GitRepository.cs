@@ -205,16 +205,37 @@ namespace SEE.VCS
         internal Patch Diff(Commit oldCommit, Commit newCommit)
         {
             OpenRepository();
+            if (newCommit == null)
+            {
+                throw new ArgumentNullException(nameof(newCommit), "New commit must not be null.");
+            }
             return repository.Diff.Compare<Patch>(oldCommit?.Tree, newCommit.Tree);
         }
 
         /// <summary>
-        /// Returns all changed files in a commit.
+        /// Generates a patch representing the differences between two commits.
+        /// Analogous to <see cref="Diff(Commit, Commit)"/>, but takes commit IDs as strings.
         /// </summary>
-        /// <param name="commit">The commit which files should be returned.</param>
-        /// <param name="repo">The git repository in which the commit was made.</param>
-        /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>).</returns>
-        public Patch GetFileChanges(Commit commit)
+        /// <param name="oldCommit">The identifier of the older commit to compare.</param>
+        /// <param name="newCommit">The identifier of the newer commit to compare.</param>
+        /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
+        internal Patch Diff(string oldCommit, string newCommit)
+        {
+            OpenRepository();
+            return Diff(repository.Lookup<Commit>(oldCommit), repository.Lookup<Commit>(newCommit));
+        }
+
+        /// <summary>
+        /// Returns the <see cref="Patch"/> needed to turn the parent of <paramref name="commit"/>
+        /// into the <paramref name="commit"/> itself. If <paramref name="commit"/> has no
+        /// parent (very first commit in the version history), the <see cref="Patch"/> f
+        /// rom the empty tree to <paramref name="commit"/> is returned. If <paramref name="commit"/>
+        /// has multiple parents, the <see cref="Patch"/> from the first parent to <paramref name="commit"/>
+        /// is returned.
+        /// </summary>
+        /// <param name="commit">The commit whose <see cref="Patch"/> is to be returned.</param>
+        /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/></returns>
+        public Patch GetPatchRelativeToParent(Commit commit)
         {
             OpenRepository();
 
@@ -222,7 +243,6 @@ namespace SEE.VCS
             {
                 return repository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
             }
-
             return repository.Diff.Compare<Patch>(null, commit.Tree);
         }
 
