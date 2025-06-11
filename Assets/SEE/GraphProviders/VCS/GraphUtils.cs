@@ -63,9 +63,8 @@ namespace SEE.GraphProviders.VCS
         public static Node GetOrAddFileNode
             (string fullRelativePath,
              Node parent,
-             Graph graph,
-             string idSuffix = "")
-            => GetOrAddFileNode(fullRelativePath, fullRelativePath, parent, graph, idSuffix: idSuffix);
+             Graph graph)
+            => GetOrAddFileNode(fullRelativePath, fullRelativePath, parent, graph);
 
         /// <summary>
         /// The same as <see cref="GetOrAddFileNode"/> but with the actual logic.
@@ -79,17 +78,16 @@ namespace SEE.GraphProviders.VCS
             (string fullRelativePath,
              string path,
              Node parent,
-             Graph graph,
-             string idSuffix = "")
+             Graph graph)
         {
             string[] pathSegments = path.Split(Path.AltDirectorySeparatorChar);
             // If we are in the directory of the file.
             if (pathSegments.Length == 1)
             {
                 // If the file node exists.
-                if (parent.Children().Any(x => x.ID + idSuffix == fullRelativePath))
+                if (parent.Children().Any(x => x.ID == fullRelativePath))
                 {
-                    return parent.Children().First(x => x.ID + idSuffix == fullRelativePath);
+                    return parent.Children().First(x => x.ID == fullRelativePath);
                 }
 
                 string[] fileDirectorySplit = fullRelativePath.Split(Path.AltDirectorySeparatorChar);
@@ -98,7 +96,7 @@ namespace SEE.GraphProviders.VCS
                                              fileDirectorySplit.Take(fileDirectorySplit.Length - 1));
 
                 // Create a new file node and return it.
-                Node addedFileNode = NewNode(graph, fullRelativePath + idSuffix,
+                Node addedFileNode = NewNode(graph, fullRelativePath,
                                              DataModel.DG.VCS.FileType, path);
                 addedFileNode.Filename = path;
                 addedFileNode.Directory = fileDir;
@@ -106,15 +104,15 @@ namespace SEE.GraphProviders.VCS
                 return addedFileNode;
             }
 
-            string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix;
+            string directoryName = parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First();
 
             // If the current Node parent already has the next directory with the name directoryName.
             if (parent.Children().Any(x => x.ID == directoryName))
             {
                 Node dirNode = parent.Children().First(x =>
-                    x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First() + idSuffix);
+                    x.ID == parent.ID + Path.AltDirectorySeparatorChar + pathSegments.First());
                 return GetOrAddFileNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                                        dirNode, graph, idSuffix: idSuffix);
+                                        dirNode, graph);
             }
 
             // Create a new directory node.
@@ -123,7 +121,7 @@ namespace SEE.GraphProviders.VCS
             addedDirectoryNode.Directory = directoryName;
             parent.AddChild(addedDirectoryNode);
             return GetOrAddFileNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
-                                    addedDirectoryNode, graph, idSuffix: idSuffix);
+                                    addedDirectoryNode, graph);
         }
     }
 }
