@@ -1,6 +1,5 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.GraphProviders;
 using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
