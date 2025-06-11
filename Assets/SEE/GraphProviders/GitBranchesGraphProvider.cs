@@ -16,11 +16,8 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// This provider analyses all branches of a given git repository specified in
-    /// <see cref="VCSCity.VCSPath"/> within the given time range (<see cref="BranchCity.Date"/>).
-    ///
-    /// This provider will collect all commits from the latest to the last one
-    /// before <see cref="BranchCity.Date"/>.
+    /// This generates nodes and their metrics for all files in all branches
+    /// of a given git repository as specified.
     ///
     /// The collected metrics are:
     /// <list type="bullet">
@@ -153,7 +150,7 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            GitGraphGenerator.AddNodes(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
+            GitGraphGenerator.AddNodesAfterDate(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
             changePercentage(1f);
 
             graph.FinalizeNodeHierarchy();

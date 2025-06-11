@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.GraphProviders.VCS
@@ -27,7 +28,7 @@ namespace SEE.GraphProviders.VCS
         /// for each and only the filenames contained in <paramref name="repositoryFiles"/>.
         /// </summary>
         /// <param name="repositoryFiles">A set of a files whose metrics should be calculated</param>
-        private static FileToMetrics ToFileToMetrics(HashSet<string> repositoryFiles)
+        private static FileToMetrics InitialFileToMetrics(HashSet<string> repositoryFiles)
         {
             FileToMetrics fileToMetrics = new();
             foreach (string file in repositoryFiles)
@@ -136,6 +137,55 @@ namespace SEE.GraphProviders.VCS
         #endregion Author Aliasing
 
         /// <summary>
+        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// for the relevant files in the given <paramref name="repository"/> present at the given
+        /// <paramref name="commitID"/> to the <paramref name="graph"/>.
+        ///
+        /// </summary>
+        /// <param name="commitID">The commit id at which the files must exist.</param>
+        /// <param name="baselineCommitID">The commit id of the baseline against which to gather
+        /// the VCS metrics</param>
+        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
+        /// <param name="token">Cancellation token.</param>
+        /// <returns>the input <paramref name="graph"/> with the added nodes</returns>
+        internal static Graph AddNodesForCommit
+            (Graph graph,
+             bool simplifyGraph,
+             GitRepository repository,
+             string commitID,
+             string baselineCommitID,
+             Action<float> changePercentage,
+             CancellationToken token)
+        {
+            string repositoryPath = repository.RepositoryPath.Path;
+            string rootDirectory = Filenames.InnermostDirectoryName(repositoryPath);
+
+            if (string.IsNullOrWhiteSpace(repositoryPath))
+            {
+                graph.BasePath = repositoryPath;
+            }
+            graph.Name = rootDirectory;
+            graph.CommitID(commitID);
+            graph.RepositoryPath(repositoryPath);
+
+            // Get all files using "git ls-tree -r <CommitID> --name-only".
+            HashSet<string> files = repository.AllFiles(commitID);
+
+            FileToMetrics fileToMetrics = InitialFileToMetrics(files);
+
+            // FIXME: Add baselineCommitID. Metrics will be gathered for the time between
+            // baselineCommitID and commitID.
+            // TODO: Must calculate the metrics for the files in between the two commits.
+            AddNodesAndMetrics(
+                fileToMetrics, graph, simplifyGraph, rootDirectory, idSuffix: string.Empty, repository: repository);
+
+            graph.FinalizeNodeHierarchy();
+
+            changePercentage?.Invoke(1f);
+            return graph;
+        }
+
+        /// <summary>
         /// Calculates <see cref="GitFileMetrics"/> for all <paramref name="files"/> and adds
         /// these to their corresponding nodes in the <paramref name="graph"/>.
         /// </summary>
@@ -149,16 +199,16 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitChanges">The changes associated with each commit in <paramref name="commitsInBetween"/>;
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
-        internal static void AddNodes
+        internal static void AddNodesForCommits
             (Graph graph,
              bool simplifyGraph,
              GitRepository repository,
              string repositoryName,
              HashSet<string> files,
-             List<Commit> commitsInBetween,
+             IList<Commit> commitsInBetween,
              IDictionary<Commit, Patch> commitChanges)
         {
-            FileToMetrics fileToMetrics = ToFileToMetrics(files);
+            FileToMetrics fileToMetrics = InitialFileToMetrics(files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
@@ -167,7 +217,7 @@ namespace SEE.GraphProviders.VCS
 
             CalculateTruckFactor(fileToMetrics);
 
-            AddVCSMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, idSuffix: "-Evo", repository);
+            AddNodesAndMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, idSuffix: "-Evo", repository);
         }
 
         /// <summary>
@@ -242,8 +292,11 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Calculates <see cref="GitFileMetrics"/> for all relevant files in <paramref name="repository"/> and adds
-        /// these to their corresponding nodes in the <paramref name="graph"/>.
+        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// for the relevant files in the given <paramref name="repository"/> present after the given
+        /// <paramref name="startDate"/> to the <paramref name="graph"/>.
+        ///
+        /// Calculates and adds <see cref="GitFileMetrics"/> for all added files, too.
         /// </summary>
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
@@ -256,7 +309,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
-        internal static void AddNodes
+        internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
              GitRepository repository,
@@ -270,7 +323,7 @@ namespace SEE.GraphProviders.VCS
 
             HashSet<string> files = repository.AllFiles();
 
-            FileToMetrics fileToMetrics = ToFileToMetrics(files);
+            FileToMetrics fileToMetrics = InitialFileToMetrics(files);
 
             int counter = 0;
             int commitLength = commitList.Count();
@@ -282,7 +335,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             CalculateTruckFactor(fileToMetrics);
-            AddMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, repository);
+            AddNodesAndMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, repository);
         }
 
         /// <summary>
@@ -326,14 +379,14 @@ namespace SEE.GraphProviders.VCS
         /// <param name="simplifyGraph">If the final graph should be simplified.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
-        private static void AddMetrics
+        private static void AddNodesAndMetrics
             (IDictionary<string, GitFileMetrics> fileToMetrics,
              Graph graph,
              bool simplifyGraph,
              string repositoryName,
              GitRepository repository)
         {
-            AddVCSMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, "", repository);
+            AddNodesAndMetrics(fileToMetrics, graph, simplifyGraph, repositoryName, "", repository);
         }
 
         /// <summary>
@@ -420,7 +473,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="idSuffix">A suffix to add to all nodes. This can be used when the same repository is
         /// loaded in two code cities at the same time.</param>
         /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
-        private static void AddVCSMetrics
+        private static void AddNodesAndMetrics
             (IDictionary<string, GitFileMetrics> fileToMetrics,
             Graph graph,
             bool simplifyGraph,
@@ -428,9 +481,9 @@ namespace SEE.GraphProviders.VCS
             string idSuffix,
             GitRepository repository)
         {
-            if (graph == null || fileToMetrics == null)
+            if (graph == null)
             {
-                return;
+                throw new ArgumentNullException(nameof(graph), "Graph cannot be null.");
             }
 
             Node rootNode = graph.GetNode(repositoryName + idSuffix);

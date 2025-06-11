@@ -159,7 +159,7 @@ namespace SEE.GraphProviders.Evolution
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitGraphGenerator.AddNodes(graph, SimplifyGraph, GitRepository, repoName, files, commitsInBetween, commitChanges);
+            GitGraphGenerator.AddNodesForCommits(graph, SimplifyGraph, GitRepository, repoName, files, commitsInBetween, commitChanges);
             return graph;
         }
 

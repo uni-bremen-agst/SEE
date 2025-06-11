@@ -11,6 +11,7 @@ using UnityEngine;
 using System.Threading;
 using SEE.Utils;
 using SEE.VCS;
+using SEE.GraphProviders.VCS;
 
 namespace SEE.GraphProviders
 {
@@ -56,13 +57,14 @@ namespace SEE.GraphProviders
         /// <param name="token">Cancellation token.</param>
         public override async UniTask<Graph> ProvideAsync
             (Graph graph,
-            AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default)
+             AbstractSEECity city,
+             Action<float> changePercentage = null,
+             CancellationToken token = default)
         {
             CheckArguments(city);
-            return await UniTask.FromResult<Graph>(GetGraph(GitRepository, CommitID, BaselineCommitID,
-                                                            changePercentage, token));
+            return await UniTask.FromResult<Graph>(GitGraphGenerator.AddNodesForCommit
+                                                      (graph, SimplifyGraph, GitRepository, CommitID, BaselineCommitID,
+                                                       changePercentage, token));
         }
 
         /// <summary>
@@ -98,63 +100,7 @@ namespace SEE.GraphProviders
             }
         }
 
-        /// <summary>
-        /// Builds the VCS graph with specific metrics.
-        /// </summary>
-        /// <param name="commitID">The commit id where the files exist.</param>
-        /// <param name="baselineCommitID">The commit id of the baseline against which to gather
-        /// the VCS metrics</param>
-        /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
-        /// <param name="token">Cancellation token.</param>
-        /// <returns>the resulting graph</returns>
-        private static Graph GetGraph
-            (GitRepository repository,
-            string commitID,
-            string baselineCommitID,
-            Action<float> changePercentage,
-            CancellationToken token)
-        {
-            string repositoryPath = repository.RepositoryPath.Path;
-            string rootDirectory = Filenames.InnermostDirectoryName(repositoryPath);
 
-            Graph graph = new(repositoryPath, rootDirectory);
-            graph.CommitID(commitID);
-            graph.RepositoryPath(repositoryPath);
-
-            // The main directory.
-            NewNode(graph, rootDirectory, DataModel.DG.VCS.DirectoryType, rootDirectory);
-
-            // Get all files using "git ls-tree -r <CommitID> --name-only".
-            ICollection<string> files = repository.AllFiles(commitID);
-
-            float totalSteps = files.Count;
-            int currentStep = 0;
-            // Build the graph structure.
-            foreach (string filePath in files.Where(path => !string.IsNullOrEmpty(path)))
-            {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
-                string[] filePathSegments = filePath.Split('/');
-                // Files in the main directory.
-                if (filePathSegments.Length == 1)
-                {
-                    graph.GetNode(rootDirectory).AddChild(NewNode(graph, filePath, DataModel.DG.VCS.FileType, filePath));
-                }
-                // Other directories/files.
-                else
-                {
-                    BuildGraphFromPath(filePath, null, null, graph, graph.GetNode(rootDirectory));
-                }
-                currentStep++;
-                changePercentage?.Invoke(currentStep / totalSteps);
-            }
-
-            graph.FinalizeNodeHierarchy();
-            changePercentage?.Invoke(1f);
-            return graph;
-        }
 
         /// <summary>
         /// Creates and adds a new node to <paramref name="graph"/> and returns it.
@@ -164,7 +110,7 @@ namespace SEE.GraphProviders
         /// <param name="type">Type of the new node</param>
         /// <param name="name">The source name of the node</param>
         /// <returns>a new node added to <paramref name="graph"/></returns>
-        public static Node NewNode(Graph graph, string id, string type, string name)
+        private static Node NewNode(Graph graph, string id, string type, string name)
         {
             Node result = new()
             {
@@ -188,7 +134,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">The graph to which the new node belongs to</param>
         /// <param name="rootNode">The root node of the main directory</param>
         /// <returns>The node for the given path or null.</returns>
-        public static Node BuildGraphFromPath(string path, Node parent, string parentPath,
+        private static Node BuildGraphFromPath(string path, Node parent, string parentPath,
             Graph graph, Node rootNode)
         {
             string[] pathSegments = path.Split('/');
