@@ -1649,109 +1649,7 @@ MonoBehaviour:
       Entry: 12
       Data: 1
     - Name: 
-      Entry: 7
-      Data: 34|SEE.GraphProviders.AllGitBranchesSingleGraphProvider, SEE
-    - Name: GitRepository
-      Entry: 7
-      Data: 35|SEE.GraphProviders.GitRepository, SEE
-    - Name: RepositoryPath
-      Entry: 7
-      Data: 36|SEE.Utils.Paths.DataPath, SEE
-    - Name: Root
-      Entry: 3
-      Data: 1
-    - Name: RelativePath
-      Entry: 1
-      Data: 
-    - Name: AbsolutePath
-      Entry: 1
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: VCSFilter
-      Entry: 7
-      Data: 37|SEE.VCS.Filter, SEE
-    - Name: Globbing
-      Entry: 7
-      Data: 38|SEE.Utils.Globbing, SEE
-    - Name: comparer
-      Entry: 9
-      Data: 4
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 1
-      Data: '**/*.cs'
-    - Name: $v
-      Entry: 5
-      Data: true
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: RepositoryPaths
-      Entry: 7
-      Data: 39|System.String[], mscorlib
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Assets/SEE/GraphProviders
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: Branches
-      Entry: 7
-      Data: 40|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 1
-      Data: 849-encapsulate-all-vcs-queries
-    - Name: 
-      Entry: 1
-      Data: master
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: SimplifyGraph
-      Entry: 5
-      Data: false
-    - Name: AutoFetch
-      Entry: 5
-      Data: false
-    - Name: PollingInterval
-      Entry: 3
-      Data: 5
-    - Name: MarkerTime
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
+      Entry: 6
       Data: 
     - Name: 
       Entry: 13
@@ -1764,10 +1662,10 @@ MonoBehaviour:
       Data: 
     - Name: AuthorAliasMap
       Entry: 7
-      Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
+      Data: 34|SEE.GraphProviders.VCS.AuthorMapping, SEE
     - Name: comparer
       Entry: 7
-      Data: 42|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
+      Data: 35|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
         SEE]], mscorlib
     - Name: 
       Entry: 8
@@ -1780,7 +1678,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 7
-      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 36|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: Rainer Koschke
@@ -1792,13 +1690,13 @@ MonoBehaviour:
       Data: 
     - Name: $v
       Entry: 7
-      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
+      Data: 37|SEE.GraphProviders.VCS.FileAuthorList, SEE
     - Name: 
       Entry: 12
       Data: 2
     - Name: 
       Entry: 7
-      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 38|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: axivionsee
@@ -1810,7 +1708,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 7
-      Data: 46|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 39|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: koschke@uni-bremen.de
@@ -1834,7 +1732,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 7
-      Data: 47|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 40|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: Tim Kuhlmann
@@ -1846,13 +1744,13 @@ MonoBehaviour:
       Data: 
     - Name: $v
       Entry: 7
-      Data: 48|SEE.GraphProviders.VCS.FileAuthorList, SEE
+      Data: 41|SEE.GraphProviders.VCS.FileAuthorList, SEE
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 49|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 42|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: tinxx
@@ -1876,7 +1774,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 7
-      Data: 50|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: "Hannes Ku\xDF"
@@ -1888,13 +1786,13 @@ MonoBehaviour:
       Data: 
     - Name: $v
       Entry: 7
-      Data: 51|SEE.GraphProviders.VCS.FileAuthorList, SEE
+      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 52|SEE.GraphProviders.VCS.FileAuthor, SEE
+      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
     - Name: Name
       Entry: 1
       Data: Hannes Lennart Kuss
@@ -31337,12 +31235,12 @@ SceneRoots:
   - {fileID: 2034689789}
   - {fileID: 1334775387}
   - {fileID: 1358598350}
+  - {fileID: 1301391584}
+  - {fileID: 1450271878}
   - {fileID: 1462978785}
   - {fileID: 1324886875}
   - {fileID: 2134247849}
   - {fileID: 365534681}
   - {fileID: 387723966}
   - {fileID: 1706202779}
-  - {fileID: 1301391584}
-  - {fileID: 1450271878}
   - {fileID: 229995737}
