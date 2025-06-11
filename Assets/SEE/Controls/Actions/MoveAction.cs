@@ -268,25 +268,6 @@ namespace SEE.Controls.Actions
             internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
 
             /// <summary>
-            /// The position of the grabbed object in world space.
-            /// </summary>
-            /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
-            internal readonly Vector3 Position
-            {
-                get
-                {
-                    if (IsGrabbed && GrabbedGameObject != null)
-                    {
-                        return GrabbedGameObject.transform.position;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("No object is being grabbed.");
-                    }
-                }
-            }
-
-            /// <summary>
             /// The node reference associated with the grabbed object. May be null if no
             /// node is associated with the grabbed object.
             /// </summary>
