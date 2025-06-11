@@ -99,18 +99,21 @@ namespace SEE.Game.SceneManipulation
                         deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
                             .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                         ISet<GameObject> deletedGameObjects = new HashSet<GameObject>();
+                        SubgraphMemento subgraphMemento = new(deletedNode.ItsGraph);
                         foreach (Node child in deletedNode.Children().ToList())
                         {
-                            (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
+                            (GraphElementsMemento mem, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
                             deletedGameObjects.UnionWith(deleted);
                             deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                            SubgraphMemento subMem = (SubgraphMemento)mem;
+                            subMem.Parents.ForEach(pair => subgraphMemento.Parents.Add(pair));
+                            subMem.Edges.ForEach(edge => subgraphMemento.Edges.Add(edge));
                         }
                         if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                         {
                             runtimeConfigMenu.BlockOpening();
                         }
-                        SubgraphMemento subgraphMemento = null;
                         return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }
                     else
@@ -531,10 +534,10 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="nodesOrEdges">The graph elements to be restored.</param>
         /// <param name="nodeTypes">The node types to be restored.</param>
-        public static void Restore(Dictionary<GraphElement, LayoutGameNode> nodesOrEdges,
+        public static void Restore(List<RestoreGraphElementHelper> nodesOrEdges,
             Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
-
+            ShowNotification.Info("Restore", "Restore placeholder");
         }
     }
 }

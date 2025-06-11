@@ -121,7 +121,8 @@ namespace SEE.Controls.Actions
         /// The elements from <see cref="deletedGameObjects"/>.
         /// The value is only set when the <see cref="GraphElement"/> is a <see cref="Node"/>.
         /// </summary>
-        private Dictionary<GraphElement, LayoutGameNode> deletedElements;
+        //private Dictionary<GraphElement, LayoutGameNode> deletedElements;
+        private List<RestoreGraphElementHelper> deletedElements;
 
         /// <summary>
         /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow
@@ -180,27 +181,31 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
+
                 new DeleteNetAction(go.name).Execute();
-                (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                (GraphElementsMemento mem,
+                    ISet<GameObject> deleted,
+                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+
                 if (deleted == null)
                 {
                     continue;
                 }
+
                 deletedGameObjects.UnionWith(deleted);
                 deleted.ForEach(go =>
                 {
+                    SEECity city = go.ContainingCity<SEECity>();
+
                     GraphElement ele = GetGraphElement(go);
-                    if (ele is Node)
+                    if (ele is Node node)
                     {
-                        deletedElements.Add(ele, new LayoutGameNode(go)
-                        {
-                            CenterPosition = go.transform.position,
-                            AbsoluteScale = go.transform.localScale
-                        });
+                        deletedElements.Add(new RestoreNodeElement(((SubgraphMemento)mem).Parents[node].ID,
+                            node.ID, go.transform.position, go.transform.localScale, node.Type, node.SourceName));
                     }
-                    else
+                    else if (ele is Edge edge)
                     {
-                        deletedElements.Add(ele, null);
+                        deletedElements.Add(new RestoreEdgeElement(edge.ID, edge.Source.ID, edge.Target.ID, edge.Type));
                     }
                 });
                 deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
@@ -258,7 +263,7 @@ namespace SEE.Controls.Actions
             if (deletedGameObjects.All(go => go == null))
             {
                 deletedGameObjects.Clear();
-                deletedGameObjects.UnionWith(deletedElements.Select(pair => GraphElementIDMap.Find(pair.Key.ID)));
+                deletedGameObjects.UnionWith(deletedElements.Select(ele => GraphElementIDMap.Find(ele.ID)));
             }
             /// Revive the objects.
             if (deletedGameObjects.All(go => go != null))
@@ -270,7 +275,7 @@ namespace SEE.Controls.Actions
             /// Occurs if the corresponding <see cref="GameObject"/>s cannot be found. This typically happens after a redraw.
             {
                 GameElementDeleter.Restore(deletedElements, deletedNodeTypes);
-                // TODO: Network call.
+                new RestoreNetAction(deletedElements, deletedNodeTypes).Execute();
             }
         }
 
@@ -309,7 +314,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                return new HashSet<string>(deletedElements.Keys.Select(key => key.ID));
+                return new HashSet<string>(deletedElements.Select(ele => ele.ID));
             }
         }
     }
