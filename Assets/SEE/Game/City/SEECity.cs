@@ -581,6 +581,21 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Checks whether the <see cref="Graph.UnknownType"/> is present in <see cref="AbstractSEECity.NodeTypes"/>
+        /// and adds it with a magenta color if missing.
+        /// </summary>
+        public void CheckAndAddUnknownNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.UnknownType, out VisualNodeAttributes _))
+            {
+                VisualNodeAttributes visualNodeAttributes = new();
+                visualNodeAttributes.ColorProperty.TypeColor = Color.magenta;
+                visualNodeAttributes.ShowNames = true;
+                NodeTypes[Graph.UnknownType] = visualNodeAttributes;
+            }
+        }
+
         #region Config I/O
 
         /// <summary>

@@ -9,23 +9,8 @@ namespace SEE.Game.SceneManipulation
 	/// in the scene.
 	/// </summary>
 	[Serializable]
-	public abstract class RestoreGraphElementHelper
+	public abstract class RestoreGraphElement
 	{
-		/// <summary>
-		/// Defines the kind of graph element being restored.
-		/// </summary>
-        [Serializable]
-        public enum ElementType
-		{
-			Node,
-			Edge
-		}
-
-		/// <summary>
-		/// The type of the graph element.
-		/// </summary>
-		public ElementType Type;
-
 		/// <summary>
 		/// The unique identifier of the graph element.
 		/// </summary>
@@ -38,7 +23,7 @@ namespace SEE.Game.SceneManipulation
 	/// used to restore it with its properties.
 	/// </summary>
     [Serializable]
-    public class RestoreNodeElement : RestoreGraphElementHelper
+    public class RestoreNodeElement : RestoreGraphElement
 	{
 		/// <summary>
 		/// ID of the parent node.
@@ -66,6 +51,11 @@ namespace SEE.Game.SceneManipulation
 		public string Name;
 
 		/// <summary>
+		/// The node level.
+		/// </summary>
+		public int Level;
+
+		/// <summary>
 		/// Creates a new instance of a node element for restoration.
 		/// </summary>
 		/// <param name="parentID">ID of the parent node.</param>
@@ -74,17 +64,18 @@ namespace SEE.Game.SceneManipulation
 		/// <param name="scale">Scale of the node.</param>
 		/// <param name="nodeType">Type of the node.</param>
 		/// <param name="sourceName">Name of the node.</param>
+		/// <param name="level">Level of the node.</param>
 		public RestoreNodeElement(string parentID, string nodeID,
 			Vector3 pos, Vector3 scale,
-			string nodeType, string sourceName)
+			string nodeType, string sourceName, int level)
 		{
-			Type = ElementType.Node;
 			ParentID = parentID;
 			ID = nodeID;
 			Position = pos;
 			Scale = scale;
 			NodeType = nodeType;
 			Name = sourceName;
+			Level = level;
 		}
 	}
 
@@ -93,7 +84,7 @@ namespace SEE.Game.SceneManipulation
 	/// Serializable representation of an edge.
 	/// </summary>
     [Serializable]
-    public class RestoreEdgeElement : RestoreGraphElementHelper
+    public class RestoreEdgeElement : RestoreGraphElement
 	{
 		/// <summary>
 		/// ID of the source node.
@@ -120,7 +111,6 @@ namespace SEE.Game.SceneManipulation
 		public RestoreEdgeElement(string id, string fromID, string toID, string edgeType)
 		{
 			ID = id;
-			Type = ElementType.Edge;
 			FromID = fromID;
 			ToID = toID;
 			EdgeType = edgeType;

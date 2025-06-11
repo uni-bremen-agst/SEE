@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
+using OpenCVForUnity.ImgprocModule;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.CityRendering;
@@ -362,7 +363,7 @@ namespace SEE.Game.SceneManipulation
         public static void Revive(ISet<GameObject> nodesOrEdges, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
             RestoreNodeTypes(nodesOrEdges
-                .Select(go => go.TryGetNode(out Node node)? node : null)
+                .Select(go => go.TryGetNode(out Node node) ? node : null)
                 .Where(node => node != null)
                 .ToList(),
                 nodeTypes);
@@ -534,10 +535,36 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="nodesOrEdges">The graph elements to be restored.</param>
         /// <param name="nodeTypes">The node types to be restored.</param>
-        public static void Restore(List<RestoreGraphElementHelper> nodesOrEdges,
+        public static void Restore(List<RestoreGraphElement> nodesOrEdges,
             Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
-            ShowNotification.Info("Restore", "Restore placeholder");
+            List<Node> createdNodes = new();
+            nodesOrEdges
+                .OfType<RestoreNodeElement>()
+                .OrderBy(node => node.Level)
+                .Cast<RestoreGraphElement>()
+                .Concat(nodesOrEdges.OfType<RestoreEdgeElement>())
+                .ForEach(ele =>
+            {
+                switch (ele)
+                {
+                    case RestoreNodeElement nodeEle:
+                        GameObject parent = GraphElementIDMap.Find(nodeEle.ParentID);
+                        Node node = GameNodeAdder.AddChild(parent, worldSpacePosition: nodeEle.Position,
+                                                   worldSpaceScale: nodeEle.Scale, nodeID: nodeEle.ID)
+                                                   .GetNode();
+                        GameNodeEditor.ChangeName(node, nodeEle.Name);
+                        GameNodeEditor.ChangeType(node, nodeEle.NodeType);
+                        createdNodes.Add(node);
+                        break;
+                    case RestoreEdgeElement edgeEle:
+                        GameObject from = GraphElementIDMap.Find(edgeEle.FromID);
+                        GameObject to = GraphElementIDMap.Find(edgeEle.ToID);
+                        GameEdgeAdder.Add(from, to, edgeEle.EdgeType);
+                        break;
+                }
+            });
+            RestoreNodeTypes(createdNodes, nodeTypes);
         }
     }
 }

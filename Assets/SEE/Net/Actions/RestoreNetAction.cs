@@ -1,7 +1,9 @@
-﻿using SEE.Game.City;
+﻿using Crosstales.RTVoice.Model;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Net.Actions
 {
@@ -16,7 +18,7 @@ namespace SEE.Net.Actions
         /// A serialization of the map of the graph elements
         /// and their corresponding layouts, if applicable.
         /// </summary>
-        public List<RestoreGraphElementHelper> NodesOrEdges;
+        public string NodesOrEdges;
 
         /// <summary>
         /// A serialization of the map of the node types to be restored.
@@ -29,10 +31,10 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="nodesOrEdges">The deleted graph elements and their corresponding layouts, if applicable.</param>
         /// <param name="nodeTypes">The deleted node types.</param>
-        public RestoreNetAction(List<RestoreGraphElementHelper> nodesOrEdges,
+        public RestoreNetAction(List<RestoreGraphElement> nodesOrEdges,
             Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
-            NodesOrEdges = nodesOrEdges;
+            NodesOrEdges = RestoreGraphElementListSerializer.Serialize(nodesOrEdges);
             NodeTypeList = nodeTypes != null && nodeTypes.Count > 0?
                 NodeTypesSerializer.Serialize(nodeTypes) : "";
         }
@@ -42,8 +44,10 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            Dictionary<string, VisualNodeAttributes> nodeTypes = NodeTypesSerializer.Unserialize(NodeTypeList);
-            GameElementDeleter.Restore(NodesOrEdges, nodeTypes);
+            Dictionary<string, VisualNodeAttributes> nodeTypes = !string.IsNullOrEmpty(NodeTypeList)?
+                NodeTypesSerializer.Unserialize(NodeTypeList) : new();
+            List<RestoreGraphElement> nodesOrEdges = RestoreGraphElementListSerializer.Unserialize(NodesOrEdges);
+            GameElementDeleter.Restore(nodesOrEdges, nodeTypes);
         }
     }
 }

@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions
         /// The value is only set when the <see cref="GraphElement"/> is a <see cref="Node"/>.
         /// </summary>
         //private Dictionary<GraphElement, LayoutGameNode> deletedElements;
-        private List<RestoreGraphElementHelper> deletedElements;
+        private List<RestoreGraphElement> deletedElements;
 
         /// <summary>
         /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow
@@ -201,7 +201,7 @@ namespace SEE.Controls.Actions
                     if (ele is Node node)
                     {
                         deletedElements.Add(new RestoreNodeElement(((SubgraphMemento)mem).Parents[node].ID,
-                            node.ID, go.transform.position, go.transform.localScale, node.Type, node.SourceName));
+                            node.ID, go.transform.position, go.transform.lossyScale, node.Type, node.SourceName, node.Level));
                     }
                     else if (ele is Edge edge)
                     {
