@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Dissonance;
+using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Notification;
@@ -671,6 +672,26 @@ namespace SEE.Net
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
 
+        private void OnCreateServerSnapshot()
+        {
+            IEnumerable<ICodeCityPersitance> cityPersitances = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersitance>();
+
+            IList<SeeCitySnapshot> snapshots = new List<SeeCitySnapshot>();
+
+            foreach (ICodeCityPersitance city in cityPersitances)
+            {
+                snapshots.Add(city.SaveData());
+            }
+
+            ServerSnapshot serverSnapshot = new ServerSnapshot
+            {
+                CitySnapshots = snapshots,
+            };
+
+            string snapshot = JsonConvert.SerializeObject(serverSnapshot);
+
+        }
+
         /// <summary>
         /// Starts the voice-chat system selected. Unregisters itself from
         /// <see cref="SceneManager.sceneLoaded"/>.
@@ -1198,9 +1219,9 @@ namespace SEE.Net
 
         }
 
-#endregion
+        #endregion
 
-#region Vivox
+        #region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -1334,6 +1355,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-#endregion
+        #endregion
     }
 }

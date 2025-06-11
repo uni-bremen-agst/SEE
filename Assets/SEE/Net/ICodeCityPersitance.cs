@@ -1,6 +1,12 @@
 
 namespace SEE.Net
 {
+    /// <summary>
+    /// Interface for persisting code city data.
+    ///
+    /// Specifies a contract for loading and saving code city data.
+    /// This will store the actual absoulte state of the code city with the position of nodes and edges.
+    /// </summary>
     public interface ICodeCityPersitance
     {
         /// <summary>
@@ -9,6 +15,10 @@ namespace SEE.Net
         /// <param name="snapshot"></param>
         void LoadData(SeeCitySnapshot snapshot);
 
+        /// <summary>
+        /// Saves the current code city data to a snapshot.
+        /// </summary>
+        /// <returns>The snapshot that should be saved</returns>
         SeeCitySnapshot SaveData();
     }
 }
