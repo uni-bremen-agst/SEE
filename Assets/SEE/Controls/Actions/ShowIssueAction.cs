@@ -37,6 +37,10 @@ namespace SEE.Controls.Actions
         /// </summary>
         private SyncWindowSpaceAction syncAction;
 
+        // public void ShowIssueAction()
+        //{
+
+        //}
         public override HashSet<string> GetChangedObjects()
         {
             // Changes to the window space are handled and synced by us separately, so we won't include them here.
@@ -60,28 +64,43 @@ namespace SEE.Controls.Actions
 
         public override void Start()
         {
-            Awake();
+         
 
 
             ShowNotification.Error("Show Notification Issue ShowIssueAction Start15.", "Notify", 10, true);
-            //ShowNotification.Error("Show Notification Issue ShowIssueWindow.", "Notify", 10, true);
-         
+            // Dummy host GameObject – alternativ nimm graphElementRef.gameObject
+            
+            GameObject go = new GameObject("IssueWindow");
+            IssueWindow issueWindow = go.AddComponent<IssueWindow>();
+            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
+            JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
+            jiraReceiver.getIssues(settings);
+            //issueWindow.issueList = jiraReceiver.issues;
+            ShowNotification.Error($"Show Notification Issue Rows: {jiraReceiver.issuesJ.Count()}.", "Notify", 10, true);
+            issueWindow.Title = "Issues"; // muss gesetzt sein, sonst StartDesktop() bricht ab
+                                          //issueWindow.CreateUIInstance(); // oder verlasse dich auf Start() im nächsten Frame
             syncAction = new SyncWindowSpaceAction();
-            spaceManager.OnActiveWindowChanged.AddListener(UpdateSpace);
-            spaceManager[WindowSpaceManager.LocalPlayer].OnWindowAdded.AddListener(w =>
-            {
-                if (w is IssueWindow codeWindow)
-                {
-                    codeWindow.Window.active = true;
-                  // codeWindow.ScrollEvent.AddListener(UpdateSpace);
-                }
-            });
-            return;
 
-            void UpdateSpace()
-            {
-                syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]);
-            }
+            //ShowNotification.Error("Show Notification Issue ShowIssueWindow.", "Notify", 10, true);
+            //IssueWindow issueWindow = new IssueWindow();
+            //  issueWindow.CreateUIInstance();
+            // spaceManager.OnActiveWindowChanged.AddListener();
+
+            // spaceManager.OnActiveWindowChanged.AddListener(UpdateSpace);
+            //spaceManager[WindowSpaceManager.LocalPlayer].OnWindowAdded.AddListener(w =>
+            //{
+            //    if (w is IssueWindow codeWindow)
+            //    {
+            //        codeWindow.Window.active = true;
+            //      // codeWindow.ScrollEvent.AddListener(UpdateSpace);
+            //    }
+            //});
+            //return;
+
+            //void UpdateSpace()
+            //{
+            //    syncAction.UpdateSpace(spaceManager[WindowSpaceManager.LocalPlayer]);
+            //}
         }
 
         /// <summary>

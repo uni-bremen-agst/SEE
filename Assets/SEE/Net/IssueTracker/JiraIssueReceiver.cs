@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
+using SEE.UI.Notification;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -17,6 +19,7 @@ using static IssueReceiverInterface;
 public class JiraIssueReceiver : IssueReceiverInterface
 {
     public List<RootIssue> issues;
+    public  JArray issuesJ;
     //Github / giblab Issue Classes
     #region "IssueClasses Jira" 
 
@@ -1200,6 +1203,7 @@ public class JiraIssueReceiver : IssueReceiverInterface
         // Es konnte kein Issue upgedatet werden!
         return false;
     }
+    public bool downloadDone = false;
     private async void restAPI(Settings settings)
     {
         int total = 50;
@@ -1251,35 +1255,63 @@ public class JiraIssueReceiver : IssueReceiverInterface
             UnityEngine.Debug.Log($"IssueConvert:{total}");
             // total = (int)dic["total"];
 
-            // // UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
-            // startAT = (int)dic["startAt"]+ (int)dic["maxResults"];// rootobject.startAt + rootobject.maxResults;
-            // //total = rootobject.total;
-            // //// -1 da die 0 mit zählt
-            // //startAT = rootobject.startAt + rootobject.maxResults;
-            // //// gibt den descriptions aller Issues in der Console aus.
-            // ///   
-            // Dictionary<string, string> issuesDictionary = JsonConvert.DeserializeObject<Dictionary<string, string>>((string)dic["issues"]);
+            // UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
+            startAT = Convert.ToInt32(dic["startAt"]) + Convert.ToInt32(dic["maxResults"]);// rootobject.startAt + rootobject.maxResults;
+                                                                                           //total = rootobject.total;
+                                                                                           //// -1 da die 0 mit zählt
+                                                                                           //startAT = rootobject.startAt + rootobject.maxResults;
 
-            // using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJiraDescipt.txt"),true))
-            // {
-            //     foreach(KeyValuePair<string,string> keypair in issuesDictionary)
-            //// foreach (Issue issue in rootobject.issues)
-            //     {
+            //// gibt den descriptions aller Issues in der Console aus.
+            ///   
+            //Dictionary<string, System.Object> issuesDictionary = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>( dic["issues"].ToString());
+            issuesJ = JArray.Parse(dic["issues"].ToString());
+            //foreach (JToken item in JArray.Parse(dic["issues"].ToString()))
+            //{
+               
+            //        issuesJ.Add(item);
+            //   Console.WriteLine($"Jap{issuesJ.Count()}: ");
+                
+            //}
+
+            //if (issuesJ != null)
+            //{
+            //    //   ShowNotification.Error("issuesJ Is not NUll", "Error", 5, true); }
+            //    //= issuesArray;
+            //    using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJiraDescipt.txt"), true))
+            //    {
+            //        foreach (JObject issue in issuesJ)
+            //        {
+            //            // foreach (Issue issue in rootobject.issues)
+
+            //            foreach (JProperty property in issue.Properties())
+            //            {
+            //                string keyV = property.Name;
+            //                // J//Token value = property.Value;
+            //                outputFile.WriteLine($"{keyV}: {property.Value}");
+            //                // Console.WriteLine($"{keyV}: {value}");
+            //                // oder UnityEngine.Debug.Log($"{key}: {value}");
+            //            }
+            //            //string key = issue["key"]?.ToString() ?? "Kein Key";
+            //            //    string description = issue["fields"]?["description"]?.ToString() ?? "Keine Beschreibung";
 
 
-            //         outputFile.Write($"{keypair.Key}:  {keypair.Value}/n");
-            //       //  UnityEngine.Debug.Log($"Description:  {issue.fields.issuetype.description}/n");
-            //     }
-            // }
+            //            //UnityEngine.Debug.Log($"{key}: {description}");
+            //            //  outputFile.Write($"{keypair.Key}:  {keypair.Value}/n");
+            //            //  UnityEngine.Debug.Log($"Description:  {issue.fields.issuetype.description}/n");
+            //        }
 
+            //    }
+            //}
         }
+        
     }
     public List<RootIssue> getIssues(Settings settings)
     {
+        issuesJ = new JArray();
         issues = null;
-
+        downloadDone = false;
         restAPI(settings);
-
+        
         return issues;
     }
 
