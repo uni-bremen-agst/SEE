@@ -182,6 +182,7 @@ namespace SEE.Controls.Actions
                     // consequences if the user were putting the grabbed node onto the node the user
                     // is currently aiming at.
                     grabbedObject.Reparent(newTarget, true);
+                    grabbedObject.NewParentID = newTarget.name;
                 }
             }
             else // end dragging
@@ -255,6 +256,12 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
+            /// The ID of the grabbed game object.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            private string grabbedObjID;
+
+            /// <summary>
             /// Whether an object has been grabbed.
             /// </summary>
             /// <returns><c>true</c> if an object has been grabbed</returns>
@@ -280,9 +287,21 @@ namespace SEE.Controls.Actions
             internal GameObject NewParent { private set; get; }
 
             /// <summary>
+            /// The new parent id of <see cref="grabbedObject"/> after it was grabbed.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            public string NewParentID;
+
+            /// <summary>
             /// The original parent of <see cref="grabbedObject"/> before it was grabbed.
             /// </summary>
             private Transform originalParent;
+
+            /// <summary>
+            /// The original parent id of <see cref="grabbedObject"/>.
+            /// Required for undoing after a redraw.
+            /// </summary>
+            private string originalParentID;
 
             /// <summary>
             /// The original position of <see cref="grabbedObject"/> when it was grabbed.
@@ -312,6 +331,7 @@ namespace SEE.Controls.Actions
                 if (gameObject != null)
                 {
                     GrabbedGameObject = gameObject;
+                    grabbedObjID = gameObject.name;
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer)
                     {
                         originalParent = XRSEEActions.OldParent;
@@ -320,6 +340,7 @@ namespace SEE.Controls.Actions
                     {
                         originalParent = gameObject.transform.parent;
                     }
+                    originalParentID = originalParent.name;
                     originalWorldPosition = gameObject.transform.position;
                     IsGrabbed = true;
                     if (gameObject.TryGetComponent(out InteractableObject interactableObject))
@@ -521,6 +542,14 @@ namespace SEE.Controls.Actions
             /// </remarks>
             internal void Undo()
             {
+                if (originalParent == null)
+                {
+                    originalParent = GraphElementIDMap.Find(originalParentID).transform;
+                }
+                if (GrabbedGameObject == null)
+                {
+                    GrabbedGameObject = GraphElementIDMap.Find(grabbedObjID);
+                }
                 UnReparent();
             }
 
@@ -549,6 +578,10 @@ namespace SEE.Controls.Actions
             /// </remarks>
             internal void Redo()
             {
+                if (NewParent == null)
+                {
+                    NewParent = GraphElementIDMap.Find(NewParentID);
+                }
                 MoveToNewPosition();
                 if (NewParent != originalParent)
                 {
