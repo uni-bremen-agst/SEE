@@ -95,38 +95,45 @@ namespace SEE.GraphProviders.Evolution
         /// <returns>The calculated graph series.</returns>
         private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
         {
-            DateTime startDate = SEEDate.ToDate(Date);
+            // This name will be used as the root node of the graph.
+            // Its type will be <see cref="DataModel.DG.VCS.RepositoryType"/>.
+            // It is the innermost directory of the git repository.
+            string repositoryName = Filenames.InnermostDirectoryName(GitRepository.RepositoryPath.Path);
 
-            string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
-            string repositoryName = pathSegments[^1];
-
-            List<Commit> commitList = GitRepository.CommitsAfter(startDate).Reverse().ToList();
-            changePercentage(0.1f);
-
-            Dictionary<Commit, Patch> commitChanges
-                = commitList.ToDictionary(commit => commit, commit => GitRepository.GetFileChanges(commit));
-            changePercentage(0.2f);
-
-            int counter = 0;
-
+            // The files in the git repository for which nodes should be created.
             HashSet<string> files = GitRepository.AllFiles();
 
+            // All commits after this Date will be considered.
+            List<Commit> commitsAfterDate = GitRepository.CommitsAfter(SEEDate.ToDate(Date)).Reverse().ToList();
+            changePercentage(0.1f);
+
+            // Note from the LibGit2Sharp.Patch documentation:
+            // Building a patch is an expensive operation. If you only need to know which files have been added,
+            /// deleted, modified, ..., then consider using a simpler <see cref="TreeChanges"/>.
+
+            // A mapping of all considered commits onto their patch.
+            Dictionary<Commit, Patch> commitChanges
+                = commitsAfterDate.ToDictionary(commit => commit, commit => GitRepository.GetPatchRelativeToParent(commit));
+            changePercentage(0.2f);
+
+            // Only those commits that are changing any of the relevant files in the git repository.
             IEnumerable<KeyValuePair<Commit, Patch>> commits
                 = commitChanges.Where(x => x.Value.Any(patch => files.Contains(patch.Path)));
 
+            int íteration = 0;
             int commitLength = commits.Count();
 
             foreach (KeyValuePair<Commit, Patch> currentCommit in commits)
             {
-                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
+                changePercentage?.Invoke(Mathf.Clamp((float)íteration / commitLength, 0.2f, 0.98f));
 
                 // All commits between the first commit in commitList and the current commit
                 List<Commit> commitsInBetween =
-                    commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
+                    commitsAfterDate.GetRange(0, commitsAfterDate.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
 
                 graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                                            commitChanges, files));
-                counter++;
+                íteration++;
             }
 
             return graph;
@@ -139,7 +146,8 @@ namespace SEE.GraphProviders.Evolution
         /// </summary>
         /// <param name="repoName">The name of the git repository.</param>
         /// <param name="currentCommit">The current commit to generate the graph.</param>
-        /// <param name="commitsInBetween">All commits in between these two points.</param>
+        /// <param name="commitsInBetween">All commits from the very first commit of the considered
+        /// part of the history until <paramref name="currentCommit"/></param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
         /// <param name="files">The set of files in the git repository to be considered.</param>
         /// <returns>The graph of the evolution step.</returns>
@@ -154,7 +162,7 @@ namespace SEE.GraphProviders.Evolution
             {
                 BasePath = GitRepository.RepositoryPath.Path
             };
-            GraphUtils.NewNode(graph, repoName + "-Evo", DataModel.DG.VCS.RepositoryType, repoName + "-Evo");
+            GraphUtils.NewNode(graph, repoName, DataModel.DG.VCS.RepositoryType, repoName);
 
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);
