@@ -13,7 +13,7 @@ namespace SEE.VCS
     /// <summary>
     /// Tests for <see cref="VCS.GitRepository"/>.
     /// </summary>
-    internal class TestVCSQueries
+    internal class TestGitRepository
     {
         /// <summary>
         /// The project folder of SEE.
