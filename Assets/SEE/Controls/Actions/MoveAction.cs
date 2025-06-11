@@ -197,7 +197,9 @@ namespace SEE.Controls.Actions
                 // Action is finished.
                 // Prevent instant re-grab if the action was started via context menu and is not completed
                 ExecuteViaContextMenu = ExecuteViaContextMenu && wasMoved;
-                CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                CurrentState = wasMoved ?
+                    IReversibleAction.Progress.Completed
+                    : IReversibleAction.Progress.NoEffect;
                 return wasMoved;
             }
             return false;
@@ -251,6 +253,67 @@ namespace SEE.Controls.Actions
                 get;
                 private set;
             }
+
+            /// <summary>
+            /// Whether an object has been grabbed.
+            /// </summary>
+            /// <returns><c>true</c> if an object has been grabbed</returns>
+            /// <remarks>The default value for <c>bool</c> is <c>false</c>, which is exactly
+            /// what we need</remarks>
+            internal bool IsGrabbed { private set; get; }
+
+            /// <summary>
+            /// The name of the grabbed object if any was grabbed; otherwise the empty string.
+            /// </summary>
+            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
+
+            /// <summary>
+            /// The position of the grabbed object in world space.
+            /// </summary>
+            /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
+            internal readonly Vector3 Position
+            {
+                get
+                {
+                    if (IsGrabbed && GrabbedGameObject != null)
+                    {
+                        return GrabbedGameObject.transform.position;
+                    }
+                    else
+                    {
+                        throw new InvalidOperationException("No object is being grabbed.");
+                    }
+                }
+            }
+
+            /// <summary>
+            /// The node reference associated with the grabbed object. May be null if no
+            /// node is associated with the grabbed object.
+            /// </summary>
+            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
+
+            /// <summary>
+            /// Memorizes the new parent of <see cref="grabbedObject"/> after it was moved.
+            /// Can be the original parent. Relevant for <see cref="Redo"/>.
+            /// </summary>
+            internal GameObject NewParent { private set; get; }
+
+            /// <summary>
+            /// The original parent of <see cref="grabbedObject"/> before it was grabbed.
+            /// </summary>
+            private Transform originalParent;
+
+            /// <summary>
+            /// The original position of <see cref="grabbedObject"/> when it was grabbed.
+            /// Required to return it to its original position when the action is undone.
+            /// </summary>
+            private Vector3 originalWorldPosition;
+
+            /// <summary>
+            /// The current position of <see cref="GameObject"/> in world space. More precisely, the
+            /// position that was last set via <see cref="MoveTo(Vector3)"/>.
+            /// </summary>
+            private Vector3 currentPositionOfGrabbedObject;
 
             /// <summary>
             /// Whether the currently grabbed node is contained in a <see cref="SEEReflexionCity"/>.
@@ -359,67 +422,6 @@ namespace SEE.Controls.Actions
             }
 
             /// <summary>
-            /// Memorizes the new parent of <see cref="grabbedObject"/> after it was moved.
-            /// Can be the original parent. Relevant for <see cref="Redo"/>.
-            /// </summary>
-            internal GameObject NewParent { private set; get; }
-
-            /// <summary>
-            /// The original parent of <see cref="grabbedObject"/> before it was grabbed.
-            /// </summary>
-            private Transform originalParent;
-
-            /// <summary>
-            /// Whether an object has been grabbed.
-            /// </summary>
-            /// <returns><c>true</c> if an object has been grabbed</returns>
-            /// <remarks>The default value for <c>bool</c> is <c>false</c>, which is exactly
-            /// what we need</remarks>
-            internal bool IsGrabbed { private set; get; }
-
-            /// <summary>
-            /// The name of the grabbed object if any was grabbed; otherwise the empty string.
-            /// </summary>
-            internal readonly string Name => GrabbedGameObject != null ? GrabbedGameObject.name : string.Empty;
-
-            /// <summary>
-            /// The position of the grabbed object in world space.
-            /// </summary>
-            /// <exception cref="InvalidOperationException">in case no object is currently grabbed</exception>
-            internal readonly Vector3 Position
-            {
-                get
-                {
-                    if (IsGrabbed && GrabbedGameObject != null)
-                    {
-                        return GrabbedGameObject.transform.position;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("No object is being grabbed.");
-                    }
-                }
-            }
-
-            /// <summary>
-            /// The node reference associated with the grabbed object. May be null if no
-            /// node is associated with the grabbed object.
-            /// </summary>
-            public readonly NodeRef Node => GrabbedGameObject.TryGetNodeRef(out NodeRef result) ? result : null;
-
-            /// <summary>
-            /// The original position of <see cref="grabbedObject"/> when it was grabbed.
-            /// Required to return it to its original position when the action is undone.
-            /// </summary>
-            private Vector3 originalWorldPosition;
-
-            /// <summary>
-            /// The current position of <see cref="GameObject"/> in world space. More precisely, the
-            /// position that was last set via <see cref="MoveTo(Vector3)"/>.
-            /// </summary>
-            private Vector3 currentPositionOfGrabbedObject;
-
-            /// <summary>
             /// Returns the grabbed object to its original position when it was grabbed.
             /// This method will be called for Undo.
             /// </summary>
@@ -468,7 +470,8 @@ namespace SEE.Controls.Actions
                 {
                     return;
                 }
-                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(), targetPosition, targetGameObject);
+                currentPositionOfGrabbedObject = GameNodeMover.GetCoordinatesOn(GrabbedGameObject.WorldSpaceSize(),
+                    targetPosition, targetGameObject);
                 MoveTo(GrabbedGameObject, currentPositionOfGrabbedObject, 0);
             }
 
@@ -677,7 +680,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Reflexion Mapping", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Reflexion Mapping",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 
@@ -698,7 +702,8 @@ namespace SEE.Controls.Actions
                 }
                 catch (ArchitectureAnalysisException e)
                 {
-                    ShowNotification.Error("Re-parenting", $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
+                    ShowNotification.Error("Re-parenting",
+                        $"Parenting {child.name} onto {parent.name} failed: {e.Message}");
                 }
             }
 
