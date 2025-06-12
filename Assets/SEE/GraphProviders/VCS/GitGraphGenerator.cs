@@ -160,6 +160,8 @@ namespace SEE.GraphProviders.VCS
             string repositoryPath = repository.RepositoryPath.Path;
             string rootDirectory = Filenames.InnermostDirectoryName(repositoryPath);
 
+            GraphUtils.NewNode(graph, rootDirectory, DataModel.DG.VCS.RepositoryType, rootDirectory);
+
             if (string.IsNullOrWhiteSpace(repositoryPath))
             {
                 graph.BasePath = repositoryPath;
@@ -207,6 +209,8 @@ namespace SEE.GraphProviders.VCS
              IList<Commit> commitsInBetween,
              IDictionary<Commit, Patch> commitChanges)
         {
+            GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
+
             FileToMetrics fileToMetrics = InitialFileToMetrics(files);
 
             foreach (Commit commitInBetween in commitsInBetween)
@@ -319,6 +323,8 @@ namespace SEE.GraphProviders.VCS
              AuthorMapping authorAliasMap,
              Action<float> changePercentage)
         {
+            GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
+
             IList<Commit> commitList = repository.CommitsAfter(startDate);
 
             HashSet<string> files = repository.AllFiles();

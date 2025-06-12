@@ -162,7 +162,6 @@ namespace SEE.GraphProviders.Evolution
             {
                 BasePath = GitRepository.RepositoryPath.Path
             };
-            GraphUtils.NewNode(graph, repoName, DataModel.DG.VCS.RepositoryType, repoName);
 
             graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
             graph.StringAttributes.Add("CommitId", currentCommit.Sha);

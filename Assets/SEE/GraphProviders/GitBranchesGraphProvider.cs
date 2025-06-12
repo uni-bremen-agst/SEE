@@ -145,8 +145,6 @@ namespace SEE.GraphProviders
 
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
 
-            GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
-
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
