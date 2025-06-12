@@ -65,7 +65,7 @@ namespace SEE.GraphProviders.Evolution
             CancellationToken token = default)
         {
             CheckAttributes();
-            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage), cancellationToken: token);
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, token), cancellationToken: token);
         }
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.GraphProviders.Evolution
         /// <param name="graph">The input graph series.</param>
         /// <param name="changePercentage">Keeps track of the current progess.</param>
         /// <returns>The calculated graph series.</returns>
-        private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
+        private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage, CancellationToken token)
         {
             // This name will be used as the root node of the graph.
             // Its type will be <see cref="DataModel.DG.VCS.RepositoryType"/>.
@@ -101,11 +101,16 @@ namespace SEE.GraphProviders.Evolution
             string repositoryName = Filenames.InnermostDirectoryName(GitRepository.RepositoryPath.Path);
 
             // The files in the git repository for which nodes should be created.
-            HashSet<string> files = GitRepository.AllFiles();
+            HashSet<string> files = GitRepository.AllFiles(token);
 
             // All commits after this Date will be considered.
             List<Commit> commitsAfterDate = GitRepository.CommitsAfter(SEEDate.ToDate(Date)).Reverse().ToList();
             changePercentage(0.1f);
+
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
 
             // Note from the LibGit2Sharp.Patch documentation:
             // Building a patch is an expensive operation. If you only need to know which files have been added,
@@ -125,6 +130,10 @@ namespace SEE.GraphProviders.Evolution
 
             foreach (KeyValuePair<Commit, Patch> currentCommit in commits)
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
                 changePercentage?.Invoke(Mathf.Clamp((float)íteration / commitLength, 0.2f, 0.98f));
 
                 // All commits between the first commit in commitList and the current commit

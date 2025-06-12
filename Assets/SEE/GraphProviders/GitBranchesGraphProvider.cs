@@ -104,7 +104,7 @@ namespace SEE.GraphProviders
 
             CheckAttributes(branchCity);
 
-            Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity),
+            Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
 
             // Only add the poller when in play mode.
@@ -127,7 +127,7 @@ namespace SEE.GraphProviders
         /// <param name="changePercentage">The current status of the process.</param>
         /// <param name="branchCity">The <see cref="BranchCity"/> from which the provider was called.</param>
         /// <returns>The generated output graph.</returns>
-        private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity)
+        private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity, CancellationToken token)
         {
             // Note: repositoryPath is platform dependent.
             string repositoryPath = GitRepository.RepositoryPath.Path;
@@ -148,10 +148,12 @@ namespace SEE.GraphProviders
             // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
-            GitGraphGenerator.AddNodesAfterDate(graph, SimplifyGraph, GitRepository, repositoryName, startDate, branchCity.CombineAuthors, branchCity.AuthorAliasMap, changePercentage);
+            GitGraphGenerator.AddNodesAfterDate
+                (graph, SimplifyGraph, GitRepository, repositoryName, startDate,
+                branchCity.CombineAuthors, branchCity.AuthorAliasMap,
+                changePercentage, token);
             changePercentage(1f);
 
-            graph.FinalizeNodeHierarchy();
             return graph;
         }
 

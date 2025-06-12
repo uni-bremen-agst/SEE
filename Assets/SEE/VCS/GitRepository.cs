@@ -10,6 +10,7 @@ using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.VCS
@@ -348,16 +349,14 @@ namespace SEE.VCS
         /// of <see cref="Filter.Matcher"/> and does not violate any exclusive criterion in
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
-        /// <param name="repository">the repository from which to retrieve the paths</param>
-        /// <param name="filter">the filter to be used to retrieve the files</param>
         /// <returns>all distinct file paths</returns>
-        public HashSet<string> AllFiles()
+        public HashSet<string> AllFiles(CancellationToken token = default)
         {
             OpenRepository();
             HashSet<string> result = new();
             foreach (Branch branch in RelevantBranches())
             {
-                AllFiles(branch.Tip.Tree, result);
+                AllFiles(branch.Tip.Tree, result, token);
             }
             return result;
         }
@@ -383,14 +382,14 @@ namespace SEE.VCS
         /// <param name="filter">the filter to be used to retrieve the files</param>
         /// <returns>all distinct file paths</returns>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="tree"/> is null</exception>
-        internal HashSet<string> AllFiles(LibGit2Sharp.Tree tree)
+        internal HashSet<string> AllFiles(LibGit2Sharp.Tree tree, CancellationToken token = default)
         {
             if (tree == null)
             {
                 throw new ArgumentNullException(nameof(tree));
             }
             HashSet<string> result = new();
-            AllFiles(tree, result);
+            AllFiles(tree, result, token);
             return result;
         }
 
@@ -403,14 +402,14 @@ namespace SEE.VCS
         /// <returns>A collection of file paths representing all files in the specified commit.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="commitID"/> is null, empty,
         /// or consists only of whitespace.</exception>
-        internal HashSet<string> AllFiles(string commitID)
+        internal HashSet<string> AllFiles(string commitID, CancellationToken token = default)
         {
             if (string.IsNullOrWhiteSpace(commitID))
             {
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
             OpenRepository();
-            return AllFiles(repository.Lookup<Commit>(commitID).Tree);
+            return AllFiles(repository.Lookup<Commit>(commitID).Tree, token);
         }
 
         /// <summary>
@@ -424,11 +423,15 @@ namespace SEE.VCS
         /// <paramref name="filter"/> is different from null and at least one of the paths in
         /// <see cref="Filter.RepositoryPaths"/> does not exist in the <paramref name="tree"/>
         /// or does not denote a directory.</exception>
-        private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths)
+        private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
-                CollectFiles(tree, VCSFilter.Matcher, paths);
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
+                CollectFiles(tree, VCSFilter.Matcher, paths, token);
             }
             else
             {
@@ -436,7 +439,11 @@ namespace SEE.VCS
                 {
                     if (!string.IsNullOrWhiteSpace(repositoryPath))
                     {
-                        CollectFiles(Find(tree, repositoryPath), VCSFilter.Matcher, paths);
+                        if (token.IsCancellationRequested)
+                        {
+                            throw new OperationCanceledException(token);
+                        }
+                        CollectFiles(Find(tree, repositoryPath), VCSFilter.Matcher, paths, token);
                     }
                 }
             }
@@ -482,7 +489,7 @@ namespace SEE.VCS
         /// <param name="matcher">the inclusion/exclusion path globbings</param>
         /// <param name="paths">the set of paths to which the paths are to be added</param>
         /// <returns>the set of distinct paths.</returns>
-        private static void CollectFiles(LibGit2Sharp.Tree tree, Matcher matcher, HashSet<string> paths)
+        private static void CollectFiles(LibGit2Sharp.Tree tree, Matcher matcher, HashSet<string> paths, CancellationToken token)
         {
             foreach (TreeEntry entry in tree)
             {
@@ -496,7 +503,7 @@ namespace SEE.VCS
                 else if (entry.TargetType == TreeEntryTargetType.Tree)
                 {
                     LibGit2Sharp.Tree subtree = (LibGit2Sharp.Tree)entry.Target;
-                    CollectFiles(subtree, matcher, paths);
+                    CollectFiles(subtree, matcher, paths, token);
                 }
             }
         }

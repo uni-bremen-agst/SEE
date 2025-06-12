@@ -159,8 +159,8 @@ namespace SEE.GraphProviders.VCS
              GitRepository repository,
              string commitID,
              string baselineCommitID,
-             Action<float> changePercentage,
-             CancellationToken token)
+             Action<float> changePercentage = null,
+             CancellationToken token = default)
         {
             string repositoryPath = repository.RepositoryPath.Path;
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
@@ -173,12 +173,19 @@ namespace SEE.GraphProviders.VCS
             graph.CommitID(commitID);
             graph.RepositoryPath(repositoryPath);
 
+            changePercentage?.Invoke(0.1f);
+
             // Get all files using "git ls-tree -r <CommitID> --name-only".
-            HashSet<string> files = repository.AllFiles(commitID);
+            HashSet<string> files = repository.AllFiles(commitID, token);
+            changePercentage?.Invoke(0.6f);
             FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
 
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
             UpdateMetrics(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
-
+            changePercentage?.Invoke(0.9f);
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
 
             changePercentage?.Invoke(1f);
@@ -244,16 +251,21 @@ namespace SEE.GraphProviders.VCS
              DateTime startDate,
              bool consultAliasMap,
              AuthorMapping authorAliasMap,
-             Action<float> changePercentage)
+             Action<float> changePercentage,
+             CancellationToken token)
         {
             IList<Commit> commitList = repository.CommitsAfter(startDate);
-            HashSet<string> files = repository.AllFiles();
+            HashSet<string> files = repository.AllFiles(token);
             FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
 
             int counter = 0;
             int commitLength = commitList.Count();
             foreach (Commit commit in commitList)
             {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
                 UpdateMetrics(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
                 changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
                 counter++;
