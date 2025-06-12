@@ -487,10 +487,12 @@ namespace SEE.GO
         /// </para><para>
         /// <list type="bullet">
         /// <item>
-        /// If a <see cref="Renderer"/> is attached, the <see cref="Renderer.bounds"/> will be used.
+        /// If a <see cref="Collider"/> is attached, the <see cref="Collider.bounds"/> will be used.
         /// </item><item>
         /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
-        /// performance penalty.
+        /// performance penalty (see <see cref="GeometryUtils.CalculateLineBounds"/>).
+        /// </item><item>
+        /// If a <see cref="Renderer"/> is attached, the <see cref="Renderer.bounds"/> will be used.
         /// </item><item>
         /// Else, <see cref="Transform.lossyScale"/> and <see cref="Transform.position"/> are provided and a warning
         /// is logged.
@@ -507,6 +509,14 @@ namespace SEE.GO
         /// <returns><c>true</c> if the size was successfully retrieved, <c>false</c> if the fallback was used.</returns>
         public static bool WorldSpaceSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
+            // Rely on collider bounds if available.
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                size = collider.bounds.size;
+                position = collider.bounds.center;
+                return true;
+            }
+
             // For objects with a LineRenderer, we can use its positions to determine its bounds.
             // Otherwise Unity will return overly large bounds.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
@@ -564,10 +574,13 @@ namespace SEE.GO
         /// </para><para>
         /// <list type="bullet">
         /// <item>
-        /// If a <see cref="MeshFilter"/> is attached, the <see cref="MeshFilter.sharedMesh.bounds"/> will be used.
+        /// If a <see cref="Collider"/> is attached, the <see cref="Collider.bounds"/> will be used and converted into
+        /// local space.
         /// </item><item>
         /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
-        /// performance penalty.
+        /// performance penalty (see <see cref="GeometryUtils.CalculateLineBounds"/>).
+        /// </item><item>
+        /// If a <see cref="MeshFilter"/> is attached, the <see cref="MeshFilter.sharedMesh.bounds"/> will be used.
         /// </item><item>
         /// Else, <see cref="Transform.localScale"/> and <see cref="Transform.localPosition"/> are provided and a
         /// warning is logged.
@@ -584,6 +597,14 @@ namespace SEE.GO
         /// <returns><c>true</c> if the <paramref name="gameObject"/> has a size, <c>false</c> if the fallback was used.</returns>
         public static bool LocalSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
+            // Rely on collider bounds if available.
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                size = getLocalColliderSize(collider);
+                position = collider.transform.InverseTransformPoint(collider.bounds.center) + gameObject.transform.localPosition;
+                return true;
+            }
+
             // For objects with a LineRenderer, we can use its positions to determine its bounds.
             // Otherwise Unity will return overly large bounds.
             if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
@@ -600,7 +621,6 @@ namespace SEE.GO
             if (gameObject.TryGetComponent(out MeshFilter meshFilter) && (sharedMesh = meshFilter.sharedMesh) != null)
             {
                 size = Vector3.Scale(sharedMesh.bounds.size, gameObject.transform.localScale);
-                // position = Vector3.Scale(sharedMesh.bounds.center, gameObject.transform.localPosition);
                 position = sharedMesh.bounds.center + gameObject.transform.localPosition;
                 return true;
             }
@@ -611,6 +631,69 @@ namespace SEE.GO
             size = gameObject.transform.localScale;
             position = gameObject.transform.localPosition;
             return false;
+
+            Vector3 getLocalColliderSize(Collider collider)
+            {
+                Vector3 localScale = collider.transform.localScale;
+
+                if (collider is BoxCollider box)
+                {
+                    return Vector3.Scale(box.size, localScale);
+                }
+                else if (collider is SphereCollider sphere)
+                {
+                    float diameter = sphere.radius * 2f;
+                    // Sphere scales uniformly in all axes
+                    return new Vector3(diameter, diameter, diameter) * Mathf.Max(localScale.x, Mathf.Max(localScale.y, localScale.z));
+                }
+                else if (collider is CapsuleCollider capsule)
+                {
+                    float diameter = capsule.radius * 2f;
+                    Vector3 size = Vector3.zero;
+                    switch (capsule.direction)
+                    {
+                        case 0: // X axis
+                            size = new Vector3(capsule.height, diameter, diameter);
+                            break;
+                        case 1: // Y axis
+                            size = new Vector3(diameter, capsule.height, diameter);
+                            break;
+                        case 2: // Z axis
+                            size = new Vector3(diameter, diameter, capsule.height);
+                            break;
+                        default:
+                            // This should never happen
+                            throw new NotImplementedException();
+                    }
+                    size.x *= localScale.x;
+                    size.y *= localScale.y;
+                    size.z *= localScale.z;
+                    return size;
+                }
+                else if (collider is MeshCollider meshCollider)
+                {
+                    Mesh mesh = meshCollider.sharedMesh;
+                    if (mesh != null)
+                    {
+                        return Vector3.Scale(mesh.bounds.size, localScale);
+                    }
+                    else
+                    {
+                        return Vector3.zero;
+                    }
+                }
+                else
+                {
+                    // Fallback: bounds.size is in world space, convert to local by dividing by scale
+                    Debug.LogWarning($"GameObject has unknown collider type, using localScale as fallback: {gameObject.name}");
+                    Bounds worldBounds = collider.bounds;
+                    Vector3 worldSize = worldBounds.size;
+                    return new Vector3(
+                        localScale.x != 0 ? worldSize.x / localScale.x : 0,
+                        localScale.y != 0 ? worldSize.y / localScale.y : 0,
+                        localScale.z != 0 ? worldSize.z / localScale.z : 0);
+                }
+            }
         }
 
         /// <summary>
@@ -1193,7 +1276,7 @@ namespace SEE.GO
         /// <summary>
         /// Checks if <paramref name="gameObject"/> overlaps with any other active direct child node of its parent.
         /// <para>
-        /// Overlap is checked based on the <c>Collider</c> components. Objects with no <c>Collider</c>
+        /// Overlap is checked based on the <see cref="Collider"/> components. Objects with no <see cref="Collider"/>
         /// component and inactive nodes are ignored.
         /// </para>
         /// </summary>
@@ -1201,10 +1284,10 @@ namespace SEE.GO
         /// The <paramref name="gameObject"/> must be a node, i.e., coantain a <c>NodeRef</c> component.
         /// </remarks>
         /// <param name="gameObject">The game object whose operator to retrieve.</param>
-        /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <c>Collider</c> component,
+        /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <see cref="Collider"/> component,
         /// or does not overlap with its siblings.</returns>
         /// <exception cref="InvalidOperationException">
-        /// Thrown when the object the method is called on is not a node, i.e., has no <c>NodeRef</c>
+        /// Thrown when the object the method is called on is not a node, i.e., has no <see cref="NodeRef"/>
         /// component.
         /// </exception>
         public static bool OverlapsWithSiblings(this GameObject gameObject)
@@ -1219,7 +1302,8 @@ namespace SEE.GO
             }
             foreach (Transform sibling in gameObject.transform.parent)
             {
-                if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf() || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
+                if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf()
+                    || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
                 {
                     continue;
                 }
