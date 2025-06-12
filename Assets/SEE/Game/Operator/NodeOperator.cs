@@ -273,8 +273,8 @@ namespace SEE.Game.Operator
 
             void updatePortalLayers()
             {
-                InteractableObject[] children = transform.GetComponentsInChildren<InteractableObject>();
-                foreach (InteractableObject child in children)
+                InteractableObjectBase[] children = transform.GetComponentsInChildren<InteractableObjectBase>();
+                foreach (InteractableObjectBase child in children)
                 {
                     child.UpdateLayer();
                 }

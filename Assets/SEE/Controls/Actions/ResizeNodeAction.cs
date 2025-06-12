@@ -477,9 +477,6 @@ namespace SEE.Controls.Actions
                 {
                     GameObject handle = GameObject.CreatePrimitive(PrimitiveType.Plane);
                     handle.transform.localScale = handleScale;
-                    // Prevent SelectAction from unselecting the resize object when interacting
-                    // with the handle outside the resize object bounds.
-                    handle.layer = Layers.InteractableGraphElements;
 
                     Material material;
                     if (direction == Vector3.up)
@@ -515,7 +512,13 @@ namespace SEE.Controls.Actions
 
                     handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                     handle.transform.SetParent(transform);
+
+                    // Contain interaction within the portal.
                     Portal.InheritPortal(from: transform.gameObject, to: handle);
+                    InteractableAuxiliaryObject io = handle.AddOrGetComponent<InteractableAuxiliaryObject>();
+                    io.UpdateLayer();
+                    io.PartiallyInteractable = true;
+
                     return handle;
                 }
             }
@@ -576,12 +579,16 @@ namespace SEE.Controls.Actions
             /// </summary>
             void StartResizing()
             {
-                if (!Raycasting.RaycastAnything(out RaycastHit hit))
+                if (!Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit hit, out InteractableAuxiliaryObject io, false)
+                        || !io.IsInteractable(hit.point))
+                // if (!Raycasting.RaycastAnything(out RaycastHit hit))
                 {
                     return;
                 }
-                Vector3? resizeDirection = handles.TryGetValue(hit.collider.gameObject, out Vector3 value) ? value : null;
-                if (resizeDirection == null)
+                // GameObject hitObject = hit.collider.gameObject;
+                GameObject hitObject = io.gameObject;
+                Vector3? resizeDirection = handles.TryGetValue(hitObject, out Vector3 value) ? value : null;
+                if (resizeDirection == null) // || !hitObject.TryGetComponent(out InteractableBaseObject ibo) || !ibo.IsInteractable(hit.point))
                 {
                     return;
                 }

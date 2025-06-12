@@ -33,10 +33,19 @@ namespace SEE.Controls
     }
 
     /// <summary>
-    /// Super class of the behaviours of game objects the player interacts with.
+    /// User-interactable graph elements.
     /// </summary>
-    public sealed class InteractableObject : MonoBehaviour
+    public sealed class InteractableObject : InteractableObjectBase
     {
+        /// <inheritdoc />
+        public override int InteractableLayer => Layers.InteractableGraphObjects;
+
+        /// <inheritdoc />
+        public override int NonInteractableLayer => Layers.NonInteractableGraphObjects;
+
+        /// <inheritdoc />
+        public override Color? HitColor => null;
+
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
 
@@ -219,67 +228,14 @@ namespace SEE.Controls
         /// <para>
         /// If the object is grabbed, it is not interactable.
         /// </para><para>
-        /// If the object has a portal:
-        /// <list type="bullet">
-        /// <item>
-        /// If a hit point is given, it is checked against the portal bounds.
-        /// </item><item>
-        /// Else, the object boundaries are checked against the portal bounds.
-        /// </item></list>
-        /// If either given point or the object's bounds are outside the portal bounds, the object is not interactable.
+        /// See <see cref="InteractableAuxiliaryObject.IsInteractable(Vector3?)"/> for inherited base functionality.
         /// </para>
         /// </summary>
         /// <param name="point">The hit point on the object.</param>
-        public bool IsInteractable(Vector3? point = null)
+        new public bool IsInteractable(Vector3? point = null)
         {
             if (IsGrabbed) return false;
-            if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
-            {
-                Bounds2D portalBounds = Bounds2D.FromPortal(leftFront, rightBack);
-
-                // Check interaction point
-                if (point != null && !portalBounds.Contains(point.Value))
-                {
-                    return false;
-                }
-                // Check if the object is (partially) within the portal bounds.
-                else
-                {
-                    Bounds2D bounds = new Bounds2D(gameObject);
-                    if (!portalBounds.Contains(bounds))
-                    {
-                        return false;
-                    }
-                }
-            }
-            // Potential further checks go here
-            return true;
-        }
-
-        /// <summary>
-        /// Updates the layer of the <see cref="GameObject"/> to match the current interactable state.
-        /// <para>
-        /// Switches between layser <see cref="Layers.InteractableGraphElements"/> and
-        /// <see cref="Layers.NonInteractableGraphElements"/> based on the result of
-        /// <see cref="IsInteractable"/>.
-        /// </para>
-        /// </summary>
-        public void UpdateLayer()
-        {
-            if (IsInteractable())
-            {
-                if (gameObject.layer == Layers.NonInteractableGraphElements)
-                {
-                    gameObject.layer = Layers.InteractableGraphElements;
-                }
-            }
-            else
-            {
-                if (gameObject.layer == Layers.InteractableGraphElements)
-                {
-                    gameObject.layer = Layers.NonInteractableGraphElements;
-                }
-            }
+            return base.IsInteractable(point);
         }
 
         /// <summary>

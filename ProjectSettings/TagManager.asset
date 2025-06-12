@@ -54,10 +54,10 @@ TagManager:
   - Post Processing
   - BoxCollider
   - 
-  - InteractableGraphElements
-  - NonInteractableGraphElements
-  - 
-  - 
+  - InteractableGraphObjects
+  - NonInteractableGraphObjects
+  - InteractableAuxiliaryObjects
+  - NonInteractableAuxiliaryObjects
   - 
   - 
   - 

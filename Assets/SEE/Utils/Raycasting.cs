@@ -82,18 +82,8 @@ namespace SEE.Utils
                 float maxDistance = InteractionRadius)
         {
             RaycastHit actualHit;
-            bool hasHit = false;
-            if (requireInteractable)
-            {
-                hasHit = Physics.Raycast(UserPointsTo(), out actualHit, maxDistance, Layers.InteractableGraphElementsLayerMask);
-            }
-            else
-            {
-                hasHit = Physics.Raycast(UserPointsTo(), out actualHit, maxDistance);
-
-            }
-
-            if (!IsMouseOverGUI() && hasHit)
+            int layerMask = requireInteractable ? Layers.InteractableGraphObjectsLayerMask : Layers.GraphObjectsLayerMask;
+            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out actualHit, maxDistance, layerMask))
             {
                 raycastHit = actualHit;
                 if (raycastHit.transform.TryGetComponent(out NodeRef nodeRef))
@@ -169,7 +159,7 @@ namespace SEE.Utils
             int numberOfHits;
             if (requireInteractable)
             {
-                numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits, maxDistance, Layers.InteractableGraphElementsLayerMask);
+                numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits, maxDistance, Layers.InteractableGraphObjectsLayerMask);
             }
             else
             {
@@ -230,9 +220,9 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
         /// <param name="io">The hit object or <c>null</c>.</param>
-        /// <param name="requireInteractable">If <c>true</c>, only raycasts against <see cref="InteractableObject"/>s
-        /// on the interactable layer <see cref="Layers.InteractableGraphElements"/>. Passing <c>false</c> usually
-        /// excludes objects outside their portal.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableGraphObjectsLayerMask"/>,
+        /// else <see cref="Layers.GraphObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
         /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
         /// <returns>The corresponding enum value for the hit.</returns>
         public static HitGraphElement RaycastInteractableObject(
@@ -241,42 +231,113 @@ namespace SEE.Utils
                 bool requireInteractable = true,
                 float maxDistance = InteractionRadius)
         {
-            HitGraphElement result = HitGraphElement.None;
+            int layer = requireInteractable ? Layers.InteractableGraphObjectsLayerMask : Layers.GraphObjectsLayerMask;
+            if (RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase obj, layer, maxDistance)
+                    && obj is InteractableObject)
+            {
+                raycastHit = hit;
+                io = (InteractableObject)obj;
+                HitGraphElement result = io.GraphElemRef.Elem switch
+                {
+                    null => HitGraphElement.None,
+                    Node => HitGraphElement.Node,
+                    Edge => HitGraphElement.Edge,
+                    _ => throw new System.ArgumentOutOfRangeException()
+                };
+                return result;
+            }
+            raycastHit = hit;
+            io = null;
+            return HitGraphElement.None;
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableAuxiliaryObject"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableAuxiliaryObjectsLayerMask"/>,
+        /// else <see cref="Layers.AuxiliaryObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableAuxiliaryObject(
+                out RaycastHit raycastHit,
+                out InteractableAuxiliaryObject io,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
+        {
+            int layer = requireInteractable ? Layers.InteractableAuxiliaryObjectsLayerMask : Layers.AuxiliaryObjectsLayerMask;
+            if (RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase obj, layer, maxDistance)
+                    && obj is InteractableAuxiliaryObject)
+            {
+                raycastHit = hit;
+                io = (InteractableAuxiliaryObject)obj;
+                return true;
+            }
+            raycastHit = hit;
+            io = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableObjectBase"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableObjectsLayerMask"/>,
+        /// else <see cref="Layers.NonInteractableObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableObjectBase(
+                out RaycastHit raycastHit,
+                out InteractableObjectBase io,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
+        {
+            int layerMask = requireInteractable ? Layers.InteractableObjectsLayerMask : Layers.AnyInteractableObjectsLayerMask;
+            return RaycastInteractableObjectBase(out raycastHit, out io, layerMask, maxDistance);
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableObjectBase"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="layerMask">
+        /// The layer mask to raycast against, defaults to <see cref="Layers.InteractableObjectsLayerMask"/>.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableObjectBase(
+                out RaycastHit raycastHit,
+                out InteractableObjectBase io,
+                int? layerMask,
+                float maxDistance = InteractionRadius)
+        {
+            layerMask ??= Layers.InteractableObjectsLayerMask;
+
             raycastHit = new RaycastHit();
             io = null;
 
             if (IsMouseOverGUI())
             {
-                return result;
+                return false;
             }
 
-            RaycastHit hit;
-            bool hasHit = false;
-            if (requireInteractable)
-            {
-                hasHit = Physics.Raycast(UserPointsTo(), out hit, maxDistance, Layers.InteractableGraphElementsLayerMask);
-            }
-            else
-            {
-                hasHit = Physics.Raycast(UserPointsTo(), out hit, maxDistance);
-            }
-
-            if (hasHit)
+            if (Physics.Raycast(UserPointsTo(), out RaycastHit hit, maxDistance, layerMask.Value))
             {
                 raycastHit = hit;
-                if (hit.transform.TryGetComponent(out InteractableObject obj))
+                if (hit.transform.TryGetComponent(out InteractableObjectBase obj))
                 {
                     io = obj;
-                    result = io.GraphElemRef.Elem switch
-                    {
-                        null => HitGraphElement.None,
-                        Node => HitGraphElement.Node,
-                        Edge => HitGraphElement.Edge,
-                        _ => throw new System.ArgumentOutOfRangeException()
-                    };
+                    return true;
                 }
             }
-            return result;
+            return false;
         }
 
         /// <summary>

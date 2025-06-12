@@ -68,7 +68,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void Awake()
         {
-            laserMaterial = Materials.New(Materials.ShaderType.PortalFree, MissColor);
+            laserMaterial = Materials.New(Materials.ShaderType.PortalFree, Color.white);
             GameObject laserBeam = new()
             {
                 name = $"Laser {Guid.NewGuid()}"
@@ -107,12 +107,12 @@ namespace SEE.Game.Avatars
         {
             Vector3 result;
             Color color;
-            if (Raycasting.RaycastAnything(out RaycastHit raycastHit, Raycasting.InteractionRadius) && (
-                (raycastHit.collider.gameObject.TryGetComponent(out InteractableObject o) && o.IsInteractable(raycastHit.point)) ||
-                raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
+            if (Raycasting.RaycastInteractableObjectBase(out RaycastHit raycastHit, out InteractableObjectBase io, false)
+                && (io.IsInteractable(raycastHit.point)
+                    || raycastHit.collider.gameObject.CompareTag(Tags.Drawable)))
             {
                 result = LastHit = raycastHit.point;
-                color = HitColor;
+                color = io.HitColor != null ? io.HitColor.Value : HitColor;
             }
             else
             {
@@ -120,7 +120,7 @@ namespace SEE.Game.Avatars
                 result = ray.origin + ray.direction * Raycasting.InteractionRadius;
                 color = MissColor;
             }
-            laserMaterial.color = color;
+            laserLine.startColor = laserLine.endColor = color;
             Draw(result);
             return result;
         }

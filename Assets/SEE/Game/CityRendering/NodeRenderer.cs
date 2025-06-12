@@ -33,7 +33,7 @@ namespace SEE.Game.CityRendering
         {
             gameNode.name = node.ID;
             gameNode.tag = Tags.Node;
-            gameNode.layer = Layers.InteractableGraphElements;
+            gameNode.layer = Layers.InteractableGraphObjects;
             gameNode.AddComponent<NodeRef>().Value = node;
         }
 
