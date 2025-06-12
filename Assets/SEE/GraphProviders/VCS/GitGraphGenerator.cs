@@ -219,6 +219,50 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
+        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// for the relevant files in the given <paramref name="repository"/> present after the given
+        /// <paramref name="startDate"/> to the <paramref name="graph"/>.
+        ///
+        /// Calculates and adds <see cref="GitFileMetrics"/> for all added files, too.
+        /// </summary>
+        /// <param name="graph">Where to add the file metrics.</param>
+        /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
+        /// will be collapsed into the inner most directory node</param>
+        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repositoryName">The name of the repository.</param>
+        /// <param name="startDate">The date after which commits in the history should be considered.
+        /// Older commits will be ignored.</param>
+        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
+        /// is false</param>
+        /// <param name="changePercentage">To report the progress.</param>
+        internal static void AddNodesAfterDate
+            (Graph graph,
+             bool simplifyGraph,
+             GitRepository repository,
+             string repositoryName,
+             DateTime startDate,
+             bool consultAliasMap,
+             AuthorMapping authorAliasMap,
+             Action<float> changePercentage)
+        {
+            IList<Commit> commitList = repository.CommitsAfter(startDate);
+            HashSet<string> files = repository.AllFiles();
+            FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
+
+            int counter = 0;
+            int commitLength = commitList.Count();
+            foreach (Commit commit in commitList)
+            {
+                UpdateMetrics(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
+                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
+                counter++;
+            }
+            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            changePercentage?.Invoke(1f);
+        }
+
+        /// <summary>
         /// Updates the metrics of <paramref name="fileToMetrics"/> according to the <paramref name="commit"/>
         /// for all files changed by <paramref name="patch"/>.
         /// </summary>
@@ -288,50 +332,6 @@ namespace SEE.GraphProviders.VCS
                     fileToMetrics[filePath].AuthorsChurn[comitter] += churn;
                 }
             }
-        }
-
-        /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
-        /// for the relevant files in the given <paramref name="repository"/> present after the given
-        /// <paramref name="startDate"/> to the <paramref name="graph"/>.
-        ///
-        /// Calculates and adds <see cref="GitFileMetrics"/> for all added files, too.
-        /// </summary>
-        /// <param name="graph">Where to add the file metrics.</param>
-        /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
-        /// will be collapsed into the inner most directory node</param>
-        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
-        /// <param name="repositoryName">The name of the repository.</param>
-        /// <param name="startDate">The date after which commits in the history should be considered.
-        /// Older commits will be ignored.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false</param>
-        /// <param name="changePercentage">To report the progress.</param>
-        internal static void AddNodesAfterDate
-            (Graph graph,
-             bool simplifyGraph,
-             GitRepository repository,
-             string repositoryName,
-             DateTime startDate,
-             bool consultAliasMap,
-             AuthorMapping authorAliasMap,
-             Action<float> changePercentage)
-        {
-            IList<Commit> commitList = repository.CommitsAfter(startDate);
-            HashSet<string> files = repository.AllFiles();
-            FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
-
-            int counter = 0;
-            int commitLength = commitList.Count();
-            foreach (Commit commit in commitList)
-            {
-                UpdateMetrics(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
-                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
-                counter++;
-            }
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
-            changePercentage?.Invoke(1f);
         }
 
         /// <summary>
