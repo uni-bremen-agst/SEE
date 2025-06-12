@@ -230,7 +230,7 @@ namespace SEE.Controls.Actions
             memento.NewPosition = newPosition;
 
             // Apply new position and scale to update edges and propagate changes to other players
-            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false);
+            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false, updateLayers: false);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
@@ -581,14 +581,12 @@ namespace SEE.Controls.Actions
             {
                 if (!Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit hit, out InteractableAuxiliaryObject io, false)
                         || !io.IsInteractable(hit.point))
-                // if (!Raycasting.RaycastAnything(out RaycastHit hit))
                 {
                     return;
                 }
-                // GameObject hitObject = hit.collider.gameObject;
                 GameObject hitObject = io.gameObject;
                 Vector3? resizeDirection = handles.TryGetValue(hitObject, out Vector3 value) ? value : null;
-                if (resizeDirection == null) // || !hitObject.TryGetComponent(out InteractableBaseObject ibo) || !ibo.IsInteractable(hit.point))
+                if (resizeDirection == null)
                 {
                     return;
                 }

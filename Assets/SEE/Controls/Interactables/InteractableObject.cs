@@ -13,7 +13,7 @@ using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
 using SEE.Game.Operator;
-using SEE.Game.SceneManipulation;
+using SEE.Game.Avatars;
 
 namespace SEE.Controls
 {
@@ -44,7 +44,22 @@ namespace SEE.Controls
         public override int NonInteractableLayer => Layers.NonInteractableGraphObjects;
 
         /// <inheritdoc />
-        public override Color? HitColor => null;
+        public override Color? HitColor => _hitColor;
+
+        /// <summary>
+        /// Backing field for the <see cref="HitColor"/> property.
+        /// </summary>
+        private Color _hitColor = LaserPointer.HitColor;
+
+        /// <summary>
+        /// The color of the laser pointer when it is hovering over a node.
+        /// </summary>
+        private static Color nodeHitColor = Color.green;
+
+        /// <summary>
+        /// The color of the laser pointer when it is hovering over an edge.
+        /// </summary>
+        private static Color edgeHitColor = Color.blue;
 
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -168,6 +183,8 @@ namespace SEE.Controls
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
+
+            _hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
         }
 
         private void OnDestroy()

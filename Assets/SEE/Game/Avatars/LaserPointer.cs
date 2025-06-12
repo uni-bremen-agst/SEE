@@ -22,13 +22,13 @@ namespace SEE.Game.Avatars
         /// Color of the laser beam when it hits anything.
         /// </summary>
         [Tooltip("Color of the laser beam when it hits anything.")]
-        public Color HitColor = Color.green;
+        public static Color HitColor = Color.green;
 
         /// <summary>
         /// Color of the laser beam when it does not hit anything.
         /// </summary>
         [Tooltip("Color of the laser beam when it does not hit anything.")]
-        public Color MissColor = Color.red;
+        public static Color MissColor = Color.red;
 
         /// <summary>
         /// The last point where the laser beam hit something.

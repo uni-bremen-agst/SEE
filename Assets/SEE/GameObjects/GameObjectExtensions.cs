@@ -10,6 +10,7 @@ using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 using Sirenix.Utilities;
 using SEE.DataModel.Drawable;
+using SEE.Controls;
 
 namespace SEE.GO
 {
@@ -1248,6 +1249,32 @@ namespace SEE.GO
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Update the interaction layer of the game object, and optionally its children.
+        /// </summary>
+        /// <param name="gameObject">The affected game object.</param>
+        /// <param name="recurse">Should children be updated as well?</param>
+        public static void UpdateInteractableLayers(this GameObject gameObject, bool recurse = true)
+        {
+            if (gameObject.TryGetComponent(out InteractableObjectBase io))
+            {
+                io.UpdateLayer();
+            }
+            else
+            {
+                Debug.LogWarning($"GameObject {gameObject.name} is not an interactable object!");
+            }
+
+            if (recurse)
+            {
+                InteractableObjectBase[] children = gameObject.transform.GetComponentsInChildren<InteractableObjectBase>();
+                foreach (InteractableObjectBase child in children)
+                {
+                    child.UpdateLayer();
+                }
+            }
         }
     }
 }
