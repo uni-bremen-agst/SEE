@@ -321,6 +321,9 @@ namespace SEE.Game.SceneManipulation
         private static void SetInactive(GameObject gameObject)
         {
             gameObject.SetActive(false);
+            // Restore the previous alpha value.
+            // Required to avoid a bug where the object becomes invisible.
+            GameObjectFader.Fade(gameObject, 0, 1.0f);
         }
 
         /// <summary>
