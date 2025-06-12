@@ -32,8 +32,6 @@ namespace SEE.Game.City
         /// If this is true, the authors of the commits with similar identities will be combined.
         /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
         /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
-        /// <seealso cref="AutoMapAuthors"/>
-        /// <seealso cref="AuthorAliasMap"/>
         /// </summary>
         [Tooltip("If true, the authors of the commits with similar identities will be combined."),
          TabGroup(VCSFoldoutGroup),
@@ -57,6 +55,25 @@ namespace SEE.Game.City
         public AuthorMapping AuthorAliasMap = new();
 
         /// <summary>
+        /// Resets everything that is specific to a given graph. Here in addition to
+        /// the overridden method, the <see cref="GitPoller"/> component will be
+        /// removed.
+        /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Remove the poller.
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroyer.Destroy(poller);
+            }
+        }
+
+        /// <summary>
         /// Validates <see cref="Date"/>.
         /// </summary>
         /// <param name="result">where the error results are to be added (if any)</param>
@@ -67,6 +84,27 @@ namespace SEE.Game.City
             {
                 result.AddError("Invalid date!");
             }
+        }
+
+        /// <summary>
+        /// Returns or adds a <see cref="GitPoller"/> component to the game object this
+        /// <paramref name="city"/> is attached to.
+        /// </summary>
+        /// <param name="pollingInterval">VCS polling interval in seconds.</param>
+        /// <param name="markerTime">Time in seconds for how long the markers should be shown.</param>
+        /// <returns>The <see cref="GitPoller"/> component</returns>
+        public GitPoller GetOrAddGitPollerComponent(int pollingInterval, int markerTime)
+        {
+            if (TryGetComponent(out GitPoller poller))
+            {
+                return poller;
+            }
+
+            GitPoller newPoller = gameObject.AddComponent<GitPoller>();
+            newPoller.CodeCity = this;
+            newPoller.PollingInterval = pollingInterval;
+            newPoller.MarkerTime = markerTime;
+            return newPoller;
         }
 
         #region Config I/O
@@ -82,7 +120,7 @@ namespace SEE.Game.City
         private const string combineAuthorsLabel = "CombineAuthors";
 
         /// <summary>
-        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
+        /// Label of attribute <see cref="AuthorAliasMap"/> in the configuration file.
         /// </summary>
         private const string authorAliasMapLabel = "AuthorAliasMap";
 
