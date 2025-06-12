@@ -138,10 +138,15 @@ namespace SEE.GraphProviders.VCS
 
         /// <summary>
         /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
-        /// for the relevant files in the given <paramref name="repository"/> present at the given
-        /// <paramref name="commitID"/> to the <paramref name="graph"/>.
+        /// to the <paramref name="graph"/> for the relevant files in the given <paramref name="repository"/>
+        /// present at the given <paramref name="commitID"/>. Metrics are added, too. The <see cref="GitFileMetrics"/>
+        /// are calulated relative to <paramref name="baselineCommitID"/>.
         ///
         /// </summary>
+        /// <param name="graph">Where to add the nodes.</param>
+        /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
+        /// will be collapsed into the inner most directory node</param>
+        /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics</param>
@@ -193,7 +198,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
         /// will be collapsed into the inner most directory node</param>
-        /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
+        /// <param name="repository">The repository from which the nodes and metrics are derived.</param>
         /// <param name="repositoryName">The name of the repository.</param>
         /// <param name="files">The files for which to calculate the metrics.</param>
         /// <param name="commitsInBetween">The metrics will be gathered for only the commits in this list.</param>
