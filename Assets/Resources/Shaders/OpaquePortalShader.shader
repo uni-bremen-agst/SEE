@@ -6,7 +6,7 @@
         _Smoothness("Smoothness", Range(0, 1)) = 0.5
         _Metallic("Metallic", Range(0, 1)) = 0.0
         _Cutoff("Cutoff", Range(0, 1)) = 0.5
-        _Portal("Portal", vector) = (-10, -10, 10, 10)
+        _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
         _EmissionStrength("Emission Strength", Range(0, 5)) = 0.0
     }
     SubShader

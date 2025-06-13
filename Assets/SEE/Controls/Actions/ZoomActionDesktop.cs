@@ -35,25 +35,23 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            InteractableObject obj = InteractableObject.HoveredObjectWithWorldFlag;
-
             // If we don't hover over any part of a city, we can't initiate any zooming related action
-            if (obj)
+            if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject io, false) != HitGraphElement.None)
             {
-                Transform rootTransform = SceneQueries.GetCityRootTransformUpwards(obj.transform);
+                Transform rootTransform = SceneQueries.GetCityRootTransformUpwards(io.transform);
                 if (rootTransform == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update received null rootTransform for hovered {obj.name}.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update received null rootTransform for hovered {io.name}.\n");
                     return;
                 }
                 else if (rootTransform.parent == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {obj.name} has no parent.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update: rootTransform for hovered {io.name} has no parent.\n");
                     return;
                 }
                 if (!rootTransform.parent.TryGetComponent(out GO.Plane clippingPlane) || clippingPlane == null)
                 {
-                    Debug.LogError($"ZoomActionDesktop.Update: parent for hovered {obj.name} has no {typeof(GO.Plane)}.\n");
+                    Debug.LogError($"ZoomActionDesktop.Update: parent for hovered {io.name} has no {typeof(GO.Plane)}.\n");
                     return;
                 }
 

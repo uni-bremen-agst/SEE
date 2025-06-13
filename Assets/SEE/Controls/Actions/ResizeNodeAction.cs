@@ -230,7 +230,7 @@ namespace SEE.Controls.Actions
             memento.NewPosition = newPosition;
 
             // Apply new position and scale to update edges and propagate changes to other players
-            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false);
+            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false, updateLayers: false);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
@@ -512,7 +512,13 @@ namespace SEE.Controls.Actions
 
                     handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                     handle.transform.SetParent(transform);
+
+                    // Contain interaction within the portal.
                     Portal.InheritPortal(from: transform.gameObject, to: handle);
+                    InteractableAuxiliaryObject io = handle.AddOrGetComponent<InteractableAuxiliaryObject>();
+                    io.UpdateLayer();
+                    io.PartiallyInteractable = true;
+
                     return handle;
                 }
             }
@@ -573,11 +579,13 @@ namespace SEE.Controls.Actions
             /// </summary>
             void StartResizing()
             {
-                if (!Raycasting.RaycastAnything(out RaycastHit hit))
+                if (!Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit hit, out InteractableAuxiliaryObject io, false)
+                        || !io.IsInteractable(hit.point))
                 {
                     return;
                 }
-                Vector3? resizeDirection = handles.TryGetValue(hit.collider.gameObject, out Vector3 value) ? value : null;
+                GameObject hitObject = io.gameObject;
+                Vector3? resizeDirection = handles.TryGetValue(hitObject, out Vector3 value) ? value : null;
                 if (resizeDirection == null)
                 {
                     return;
@@ -591,25 +599,22 @@ namespace SEE.Controls.Actions
             /// </summary>
             void UpdateSize()
             {
-                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out _, nodeRef);
-                if (!targetObjectHit.HasValue && !currentResizeStep.Up)
-                {
-                    return;
-                }
-
                 // Calculate new scale and position
-                // TODO (#806): Make cursorMovement compatible with VR controls
                 Vector3 cursorMovement;
                 Vector3 newCursorPosition;
 
                 if (currentResizeStep.Up)
                 {
                     Vector3 normalToCamera = upDownHandleTransform.up;
-                    newCursorPosition = GetMouseOnPlane(normalToCamera, Vector3.Scale(normalToCamera, currentResizeStep.InitialHitPoint));
+                    Plane plane = new(normalToCamera, Vector3.Scale(normalToCamera, currentResizeStep.InitialHitPoint));
+                    Raycasting.RaycastPlane(plane, out Vector3 hit);
+                    newCursorPosition = hit;
                 }
                 else
                 {
-                    newCursorPosition = GetMouseOnPlane(Vector3.up, new(0, currentResizeStep.InitialHitPoint.y, 0));
+                    Plane plane = new(Vector3.up, new Vector3(0, currentResizeStep.InitialHitPoint.y, 0));
+                    Raycasting.RaycastPlane(plane, out Vector3 hit);
+                    newCursorPosition = hit;
                 }
                 cursorMovement = Vector3.Scale(currentResizeStep.Direction, currentResizeStep.InitialHitPoint - newCursorPosition);
 
@@ -673,9 +678,9 @@ namespace SEE.Controls.Actions
                     {
                         Vector3 siblingSize = sibling.gameObject.LocalSize();
                         Vector3 siblingPos = sibling.localPosition;
-                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Left = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
                         otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x;
-                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Back = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
                         otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
@@ -740,9 +745,9 @@ namespace SEE.Controls.Actions
                         // Child position and scale on common parent
                         Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                         Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
-                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Left = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
                         otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x;
-                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Back = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
                         otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
@@ -806,11 +811,11 @@ namespace SEE.Controls.Actions
                 foreach (Transform child in children)
                 {
                     // Adapt children's position based on changed position and size
-                        bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
-                        child.localPosition = new(
-                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x : 0f),
-                                child.localPosition.y + posDiff.y, // we always resize height in positive direction
-                                child.localPosition.z + (shift2D ? 0.5f * posDiff.z : 0f));
+                    bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
+                    child.localPosition = new(
+                            child.localPosition.x + (shift2D ? 0.5f * posDiff.x : 0f),
+                            child.localPosition.y + posDiff.y, // we always resize height in positive direction
+                            child.localPosition.z + (shift2D ? 0.5f * posDiff.z : 0f));
 
                     // Fix base handle position
                     if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
@@ -823,30 +828,6 @@ namespace SEE.Controls.Actions
 
                     child.SetParent(transform);
                 }
-            }
-
-            /// <summary>
-            /// Projects the mouse cursor position onto plane defined by given normal and point.
-            /// </summary>
-            /// <param name="planeNormal">The direction in which the normal of the plane faces, e.g., <c>Vector3.up</c>.</param>
-            /// <param name="planePoint">The distance of the plane from the coordinate origin, e.g., <c>new Vector3(0, 5, 0)</c> for a height of <c>5</c>.</param>
-            /// <param name="maxDistance">Cutoff distance.</param>
-            /// <returns>Projected mouse position on the plane.</returns>
-            Vector3 GetMouseOnPlane(Vector3 planeNormal, Vector3 planePoint, float maxDistance = 1000f)
-            {
-                Plane plane = new Plane(planeNormal, planePoint);
-                Ray ray = MainCamera.Camera.ScreenPointToRay(Input.mousePosition);
-
-                // Calculate intersection
-                if(plane.Raycast(ray, out float distance))
-                {
-                    // Clamp to max distance if needed
-                    distance = Mathf.Min(distance, maxDistance);
-                    return ray.GetPoint(distance);
-                }
-
-                // Fallback: Project to plane's surface at max distance
-                return ray.GetPoint(maxDistance);
             }
 
             /// <summary>
@@ -935,7 +916,7 @@ namespace SEE.Controls.Actions
                 /// <summary>
                 /// Initializes the struct.
                 /// </summary>
-                public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Transform transform)
+                public ResizeStepData(Vector3 initialHitPoint, Vector3 direction, Transform transform)
                 {
                     InitialHitPoint = initialHitPoint;
                     Direction = direction;
@@ -955,11 +936,11 @@ namespace SEE.Controls.Actions
                     );
                     MinLocalSize = Vector3.Scale(SpatialMetrics.MinNodeSize, LocalScaleFactor);
                     LocalPadding = SpatialMetrics.Padding.x * LocalScaleFactor;
-                    Left    = Direction.x < 0;
-                    Right   = Direction.x > 0;
-                    Back    = Direction.z < 0;
+                    Left = Direction.x < 0;
+                    Right = Direction.x > 0;
+                    Back = Direction.z < 0;
                     Forward = Direction.z > 0;
-                    Up      = Direction.y > 0;
+                    Up = Direction.y > 0;
                     InvScreenHeight = 1f / Screen.height;
                     IsSet = true;
                 }

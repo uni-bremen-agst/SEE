@@ -5,17 +5,20 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         // Color
         _Color("(Start) Color", color) = (1,0,0,1)
         _EndColor("End Color", color) = (0,0,1,1)
-        _ColorGradientEnabled("Enable Color Gradient?", Range(0, 1)) = 0 // 0 = false, 1 = true
+        [Toggle] _ColorGradientEnabled("Enable Color Gradient?", Range(0, 1)) = 0 // 0 = false, 1 = true
 
         // Data Flow
-        _EdgeFlowEnabled("Enable Data Flow Visualization?", Range(0, 1)) = 0 // 0 = false, 1 = true
+        [Toggle] _EdgeFlowEnabled("Enable Data Flow Visualization?", Range(0, 1)) = 0 // 0 = false, 1 = true
         _AnimationFactor("Animation Speed Factor", Range(0, 3)) = 0.4
         _AnimationPause("Pause Between Animations", Range(0, 3)) = 0.4
         _EffectWidth("Effect Width", Range(0, 1.0)) = 0.03
         _GrowthAmount("Growth Amount", Range(0, 0.04)) = 0.005
 
-        // Clipping
-        _Portal("Portal", vector) = (-10, -10, 10, 10)
+        // Portal
+        _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
+        _PortalFade ("Portal Edge Fade (World Units)", Float) = 0.01
+
+        [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2 // 0: Off, 1: Front, 2: Back
     }
     SubShader
     {
@@ -24,13 +27,12 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
             "RenderType" = "Transparent"
             "IgnoreProjector" = "True"
             "ForceNoShadowCasting" = "True"
-            "PreviewType" = "Plane"
         }
 
         // Alpha blending mode for transparency
         Blend SrcAlpha OneMinusSrcAlpha
         // Makes the inside visible at clipping planes
-        Cull Off
+        Cull [_Cull]
         // Unity's lighting will not be applied
         Lighting Off
 
@@ -49,8 +51,6 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         struct v2f
         {
             float4 vertex : SV_POSITION;
-            float3 worldPos : TEXCOORD0;
-            float1 doDiscard : TEXCOORD1;
             float4 color : TEXCOORD2;
         };
 
@@ -67,8 +67,9 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         float _EffectWidth;
         float _GrowthAmount;
 
-        // Clipping
+        // Portal
         float4 _Portal;
+        float _PortalFade;
 
         v2f SharedVertexManipulation(appdata v)
         {
@@ -97,24 +98,18 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
             }
 
             o.vertex = UnityObjectToClipPos(v.vertex);
-            o.worldPos = mul(unity_ObjectToWorld, v.vertex);
 
-            // Note: The following is not strictly vertex related but we do this in the shared function
-            // to prevent clutter and code duplication.
-
-            // Flag coordinates as discardable outside portal
+            // Portal: Calculate overhang in each direction
             // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-            if (o.worldPos.x < _Portal.x || o.worldPos.z < _Portal.y ||
-                o.worldPos.x > _Portal.z || o.worldPos.z > _Portal.w)
-            {
-                o.doDiscard = 1;
-            }
-            else
-            {
-                o.doDiscard = 0;
-            }
+            float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
+            float overhangLeft   = max(_Portal.x - worldPos.x, 0.0);
+            float overhangBottom = max(_Portal.y - worldPos.z, 0.0);
+            float overhangRight  = max(worldPos.x - _Portal.z, 0.0);
+            float overhangTop    = max(worldPos.z - _Portal.w, 0.0);
+            float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
 
-            o.color = _ColorGradientEnabled > 0.5 ? lerp(_Color, _EndColor, v.uv.y) : _Color;;
+            // Color gradient and portal fade
+            o.color = (_ColorGradientEnabled > 0.5 ? lerp(_Color, _EndColor, v.uv.y) : _Color) * fade;
 
             return o;
         }
@@ -141,8 +136,8 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-               // Discard fragment if transparent or flagged earlier
-               if (i.doDiscard || i.color.a < 1.0)
+               // Discard fragment if not completely opaque
+               if (i.color.a < 1.0)
                 {
                     discard;
                 }
@@ -174,8 +169,8 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-                // Discard fragment if transparent or flagged earlier
-                if (i.doDiscard || i.color.a <= 0)
+                // Discard fragment if completely transparent or opaque
+                if (i.color.a <= 0 || i.color.a >= 1)
                 {
                     discard;
                 }

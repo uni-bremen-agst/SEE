@@ -8,6 +8,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using SEE.XR;
+using SEE.Game;
 
 namespace SEE.Utils
 {
@@ -26,6 +27,12 @@ namespace SEE.Utils
     /// </summary>
     public static class Raycasting
     {
+        /// <summary>
+        /// Maximal interaction distance.
+        /// </summary>
+        [Tooltip("Maximal interaction distance (World Units).")]
+        public const float InteractionRadius = 3.0f;
+
         /// <summary>
         /// Number of raycast hits we can store in the buffer for <see cref="RaycastLowestNode"/>.
         /// </summary>
@@ -58,6 +65,9 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="raycastHit">The hit object.</param>
         /// <param name="nodeRef">The hit graph element if <code>None</code> is not returned.</param>
+        /// <param name="requireInteractable">If <c>true</c>, only raycasts against <see cref="InteractableObject"/>s
+        /// on the interactable layer. Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
         /// <returns>if no GUI element is hit, but a GameObject with either
         /// an attached <see cref="NodeRef"/> or <see cref="EdgeRef"/> is hit, then
         /// <see cref="HitGraphElement.Node"/> or <see cref="HitGraphElement.Edge"/>,
@@ -65,17 +75,23 @@ namespace SEE.Utils
         /// hit game object has neither a <see cref="NodeRef"/> nor an <see cref="EdgeRef"/>
         /// attached, <see cref="HitGraphElement.None"/> is returned.
         /// </returns>
-        public static HitGraphElement RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef elementRef)
+        public static HitGraphElement RaycastGraphElement(
+                out RaycastHit raycastHit,
+                out GraphElementRef elementRef,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
         {
-            if (((SceneSettings.InputType == PlayerInputType.DesktopPlayer && !IsMouseOverGUI()) || SceneSettings.InputType == PlayerInputType.VRPlayer) && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
+            RaycastHit actualHit;
+            int layerMask = requireInteractable ? Layers.InteractableGraphObjectsLayerMask : Layers.GraphObjectsLayerMask;
+            if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out actualHit, maxDistance, layerMask))
             {
-                raycastHit = hit;
-                if (hit.transform.TryGetComponent(out NodeRef nodeRef))
+                raycastHit = actualHit;
+                if (raycastHit.transform.TryGetComponent(out NodeRef nodeRef))
                 {
                     elementRef = nodeRef;
                     return HitGraphElement.Node;
                 }
-                else if (hit.transform.TryGetComponent(out EdgeRef edgeRef))
+                else if (raycastHit.transform.TryGetComponent(out EdgeRef edgeRef))
                 {
                     elementRef = edgeRef;
                     return HitGraphElement.Edge;
@@ -100,21 +116,13 @@ namespace SEE.Utils
         /// <paramref name="raycastHit"/> will be set, if true is returned.
         /// </summary>
         /// <param name="raycastHit">hit object if true is returned, undefined otherwise</param>
-        /// <param name="maxDistance">how far the ray cast may reach; anything farther away
-        /// cannot be hit</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
         /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
-        public static bool RaycastAnything(out RaycastHit raycastHit, float maxDistance = float.PositiveInfinity)
+        public static bool RaycastAnything(out RaycastHit raycastHit, float maxDistance = InteractionRadius)
         {
             raycastHit = new RaycastHit();
             Physics.queriesHitBackfaces = true;
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
-            {
-                return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
-            }
-            else
-            {
-                return Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
-            }
+            return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
         }
 
         /// <summary>
@@ -133,14 +141,29 @@ namespace SEE.Utils
         /// <param name="raycastHit">hit object of lowest node if true is returned, null otherwise</param>
         /// <param name="hitNode">lowest node if true is returned, null otherwise</param>
         /// <param name="referenceNode">if given, all nodes which are not in the same graph as
-        /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.
-        /// </param>
+        /// <paramref name="referenceNode"/> as well as itself will not be considered when sorting raycast results.</param>
+        /// <param name="requireInteractable">If <c>true</c>, only raycasts against <see cref="InteractableObject"/>s
+        /// on the interactable layer. Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
         /// <returns>true if the mouse was over at least one node fulfilling the criteria; only then
         /// <paramref name="hitNode"/> and <paramref name="raycastHit"/> are defined</returns>
-        public static bool RaycastLowestNode(out RaycastHit? raycastHit, out Node hitNode, NodeRef referenceNode = null)
+        public static bool RaycastLowestNode(
+                out RaycastHit? raycastHit,
+                out Node hitNode,
+                NodeRef referenceNode = null,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
         {
             RaycastHit[] hits = new RaycastHit[raycastBufferSize];
-            int numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits);
+            int numberOfHits;
+            if (requireInteractable)
+            {
+                numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits, maxDistance, Layers.InteractableGraphObjectsLayerMask);
+            }
+            else
+            {
+                numberOfHits = Physics.RaycastNonAlloc(UserPointsTo(), hits, maxDistance);
+            }
             if (numberOfHits == raycastBufferSize)
             {
                 Debug.LogWarning("We possibly got more hits than buffer space is available.\n");
@@ -195,15 +218,25 @@ namespace SEE.Utils
         /// or <c>null</c>, if no such hit exists.
         /// </summary>
         /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
-        /// <param name="obj">The hit object or <c>null</c>.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableGraphObjectsLayerMask"/>,
+        /// else <see cref="Layers.GraphObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
         /// <returns>The corresponding enum value for the hit.</returns>
-        public static HitGraphElement RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject obj)
+        public static HitGraphElement RaycastInteractableObject(
+                out RaycastHit raycastHit,
+                out InteractableObject io,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
         {
-            HitGraphElement result = HitGraphElement.None;
-
-            static HitGraphElement DetermineHit(InteractableObject element)
+            int layer = requireInteractable ? Layers.InteractableGraphObjectsLayerMask : Layers.GraphObjectsLayerMask;
+            if (RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase obj, layer, maxDistance)
+                    && obj is InteractableObject)
             {
-                HitGraphElement result = element.GraphElemRef.Elem switch
+                raycastHit = hit;
+                io = (InteractableObject)obj;
+                HitGraphElement result = io.GraphElemRef.Elem switch
                 {
                     null => HitGraphElement.None,
                     Node => HitGraphElement.Node,
@@ -212,45 +245,116 @@ namespace SEE.Utils
                 };
                 return result;
             }
+            raycastHit = hit;
+            io = null;
+            return HitGraphElement.None;
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableAuxiliaryObject"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableAuxiliaryObjectsLayerMask"/>,
+        /// else <see cref="Layers.AuxiliaryObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableAuxiliaryObject(
+                out RaycastHit raycastHit,
+                out InteractableAuxiliaryObject io,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
+        {
+            int layer = requireInteractable ? Layers.InteractableAuxiliaryObjectsLayerMask : Layers.AuxiliaryObjectsLayerMask;
+            if (RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase obj, layer, maxDistance)
+                    && obj is InteractableAuxiliaryObject)
+            {
+                raycastHit = hit;
+                io = (InteractableAuxiliaryObject)obj;
+                return true;
+            }
+            raycastHit = hit;
+            io = null;
+            return false;
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableObjectBase"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="requireInteractable">If <c>true</c>, raycasts using <see cref="Layers.InteractableObjectsLayerMask"/>,
+        /// else <see cref="Layers.NonInteractableObjectsLayerMask"/>.
+        /// Passing <c>false</c> usually excludes objects outside their portal.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableObjectBase(
+                out RaycastHit raycastHit,
+                out InteractableObjectBase io,
+                bool requireInteractable = true,
+                float maxDistance = InteractionRadius)
+        {
+            int layerMask = requireInteractable ? Layers.InteractableObjectsLayerMask : Layers.AnyInteractableObjectsLayerMask;
+            return RaycastInteractableObjectBase(out raycastHit, out io, layerMask, maxDistance);
+        }
+
+        /// <summary>
+        /// Raycasts against <see cref="InteractableObjectBase"/>s and outputs either the closest hit
+        /// or <c>null</c>, if no such hit exists.
+        /// </summary>
+        /// <param name="raycastHit">The raycast hit for the hit interactable object or the default value.</param>
+        /// <param name="io">The hit object or <c>null</c>.</param>
+        /// <param name="layerMask">
+        /// The layer mask to raycast against, defaults to <see cref="Layers.InteractableObjectsLayerMask"/>.</param>
+        /// <param name="maxDistance">The maximum distance to raycast, defaults to <see cref="InteractionRadius"/>.</param>
+        /// <returns>True, if a hit exists, false otherwise.</returns>
+        public static bool RaycastInteractableObjectBase(
+                out RaycastHit raycastHit,
+                out InteractableObjectBase io,
+                int? layerMask,
+                float maxDistance = InteractionRadius)
+        {
+            layerMask ??= Layers.InteractableObjectsLayerMask;
 
             raycastHit = new RaycastHit();
-            obj = null;
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            io = null;
+
+            if (IsMouseOverGUI())
             {
-                if (XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray))
+                return false;
+            }
+
+            if (Physics.Raycast(UserPointsTo(), out RaycastHit hit, maxDistance, layerMask.Value))
+            {
+                raycastHit = hit;
+                if (hit.transform.TryGetComponent(out InteractableObjectBase obj))
                 {
-                    raycastHit = ray;
-                    if (ray.transform.TryGetComponent(out InteractableObject io))
-                    {
-                        result = DetermineHit(io);
-                        obj = io;
-                    }
+                    io = obj;
+                    return true;
                 }
             }
-            else
-            {
-                if (!IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out RaycastHit hit))
-                {
-                    raycastHit = hit;
-                    if (hit.transform.TryGetComponent(out InteractableObject io))
-                    {
-                        result = DetermineHit(io);
-                        obj = io;
-                    }
-                }
-            }
-            return result;
+            return false;
         }
 
         /// <summary>
         /// Whether the mouse currently hovers over a GUI element.
-        ///
+        /// <para>
         /// Note: If no <see cref="EventSystem"/> exists in the scene, internal calls will fail
         /// and <c>false</c> will be returned.
+        /// </para><para>
+        /// Note: If <see cref="SceneSettings.InputType"/> is not <see cref="PlayerInputType.DesktopPlayer"/>, this method will always return <c>false</c>.
+        /// </para>
         /// </summary>
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
+            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
+            {
+                return false;
+            }
             InputSystemUIInputModule inputModule = EventSystem.current.currentInputModule as InputSystemUIInputModule;
             if (inputModule == null)
             {
@@ -273,7 +377,11 @@ namespace SEE.Utils
         /// <param name="hit">Whether the clipping plane was hit.</param>
         /// <param name="hitInsideClippingArea">Whether the clipping plane was hit inside of its clipping area.</param>
         /// <param name="hitPointOnPlane">The hit position on the plane or <see cref="Vector3.zero"/>, if the plane was not hit.</param>
-        public static void RaycastClippingPlane(GO.Plane clippingPlane, out bool hit, out bool hitInsideClippingArea, out Vector3 hitPointOnPlane)
+        public static void RaycastClippingPlane(
+                GO.Plane clippingPlane,
+                out bool hit,
+                out bool hitInsideClippingArea,
+                out Vector3 hitPointOnPlane)
         {
             Ray ray = UserPointsTo();
             UnityEngine.Plane raycastPlane = new(Vector3.up, clippingPlane.transform.position);
@@ -322,7 +430,6 @@ namespace SEE.Utils
         /// <returns>ray from the user's mouse</returns>
         public static Ray UserPointsTo()
         {
-            // FIXME: We need to an interaction for VR, too.
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)

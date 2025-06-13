@@ -53,6 +53,7 @@ namespace SEE.GO
             GameObject gameEdge = new()
             {
                 tag = Tags.Edge,
+                layer = Layers.InteractableGraphObjects,
                 isStatic = false,
                 name = layoutGraphEdge.ItsEdge.ID
             };
