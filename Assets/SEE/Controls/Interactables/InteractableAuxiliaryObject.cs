@@ -5,7 +5,7 @@ using UnityEngine;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Super class of the behaviours of game objects the player interacts with.
+    /// Interactable auxiliary objects like resize handles, etc.
     /// </summary>
     public sealed class InteractableAuxiliaryObject : InteractableObjectBase
     {
