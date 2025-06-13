@@ -71,6 +71,12 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask LoadDataAsync()
         {
+            if (initialReflexionCity)
+            {
+                LoadInitial(gameObject.name);
+                return;
+            }
+
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
@@ -298,21 +304,6 @@ namespace SEE.Game.City
             }
         }
 
-        /// <summary>
-        /// Extends the existing reset functionality so that,
-        /// in the case of an initial ReflexionCity, the empty initial
-        /// ReflexionCity is loaded again.
-        /// </summary>
-        public override void Reset()
-        {
-            base.Reset();
-            if (initialReflexionCity)
-            {
-                LoadInitial(gameObject.name);
-                DrawGraph();
-            }
-        }
-
         #region SEEReflexionCity creation during in play mode
         /// <summary>
         /// Loads the initial reflexion city.
@@ -349,7 +340,10 @@ namespace SEE.Game.City
         /// </summary>
         private void SetupInitialReflexionCity()
         {
-            DataProvider.Add(new ReflexionGraphProvider());
+            if (!DataProvider.Pipeline.Any(provider => provider is ReflexionGraphProvider))
+            {
+                DataProvider.Add(new ReflexionGraphProvider());
+            }
             NodeLayoutSettings.Kind = NodeLayoutKind.Reflexion;
             NodeLayoutSettings.ArchitectureLayoutProportion = 0.6f;
         }

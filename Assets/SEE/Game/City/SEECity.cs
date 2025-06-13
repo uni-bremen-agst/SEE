@@ -530,6 +530,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
+        /// And enables the <see cref="CitySelectionManager"/> to add a new <see cref="AbstractSEECity"/>.
         /// </summary>
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
@@ -543,6 +544,10 @@ namespace SEE.Game.City
             if (TryGetComponent(out GitPoller poller))
             {
                 Destroyer.Destroy(poller);
+            }
+            if (TryGetComponent(out CitySelectionManager csm))
+            {
+                csm.enabled = true;
             }
         }
 
