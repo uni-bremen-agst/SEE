@@ -84,7 +84,6 @@ namespace SEE.Controls.Actions
 
         private void Update()
         {
-            // TODO: Update layer for all elements after shuffle is finished to make elements outside their portal non-interactable (cmp. NodeOperator.ResizeTo)
             bool synchronize = false;
 
             if (SEEInput.Cancel()) // cancel shuffling

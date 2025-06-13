@@ -120,7 +120,6 @@ namespace SEE.Utils
         /// <returns>true if the mouse is not over any GUI element and if anything was hit</returns>
         public static bool RaycastAnything(out RaycastHit raycastHit, float maxDistance = InteractionRadius)
         {
-            // TODO check where users should pass `maxDistance = float.PositiveInfinity`
             raycastHit = new RaycastHit();
             Physics.queriesHitBackfaces = true;
             return !IsMouseOverGUI() && Physics.Raycast(UserPointsTo(), out raycastHit, maxDistance);
