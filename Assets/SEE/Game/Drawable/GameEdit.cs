@@ -350,8 +350,8 @@ namespace SEE.Game.Drawable
             if (node.CompareTag(Tags.MindMapNode))
             {
                 GameMindMap.ChangeNodeKind(node, conf.NodeKind, conf.BorderConf);
-                ChangeLine(GameFinder.FindChildWithTag(node, Tags.Line), conf.BorderConf);
-                ChangeText(GameFinder.FindChildWithTag(node, Tags.DText), conf.TextConf);
+                ChangeLine(node.FindDescendantWithTag(Tags.Line), conf.BorderConf);
+                ChangeText(node.FindDescendantWithTag(Tags.DText), conf.TextConf);
                 GameObject attachedObjects = GameFinder.GetAttachedObjectsObject(
                         GameFinder.GetDrawableSurface(node));
                 GameObject parent = GameFinder.FindChild(attachedObjects, conf.ParentNode);
@@ -359,8 +359,8 @@ namespace SEE.Game.Drawable
 
                 GameMindMap.ChangeBoxSize(node);
 
-                GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<MeshCollider>().enabled = false;
-                GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.Line).GetComponent<MeshCollider>().enabled = false;
+                node.FindDescendantWithTag(Tags.DText).GetComponent<MeshCollider>().enabled = false;
                 if (conf.BranchLineToParent != "")
                 {
                     GameObject branch = GameFinder.FindChild(attachedObjects, conf.BranchLineToParent);

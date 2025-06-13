@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable;
+using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Drawable
@@ -33,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameStickyNoteManager.Move(GameFinder.GetHighestParent(Surface), Position, Rotation);
+            GameStickyNoteManager.Move(Surface.GetRootParent(), Position, Rotation);
         }
     }
 }

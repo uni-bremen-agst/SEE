@@ -1,17 +1,24 @@
-using System;
 using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.UI.RuntimeConfigMenu;
+using SEE.Game.CityRendering;
+using SEE.Game.Operator;
+using SEE.Game.Table;
 using SEE.GO;
+using SEE.GraphProviders;
+using SEE.Layout;
+using SEE.Layout.NodeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
-using Sirenix.OdinInspector;
-using UnityEngine;
-using SEE.Game.CityRendering;
-using MoreLinq;
-using SEE.GraphProviders;
-using SEE.Utils.Paths;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using TMPro;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -64,6 +71,12 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask LoadDataAsync()
         {
+            if (initialReflexionCity)
+            {
+                LoadInitial(gameObject.name);
+                return;
+            }
+
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
@@ -98,6 +111,199 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Re-draws the graph without deleting the underlying loaded graph.
+        /// Only the game objects generated for the nodes and edges are deleted first
+        /// and then they are re-created.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphDrawn)), RuntimeEnableIf(nameof(IsGraphDrawn))]
+        public override void ReDrawGraph()
+        {
+            const string Prefix = "Text";
+            if (LoadedGraph == null)
+            {
+                Debug.LogError("No graph loaded.\n");
+            }
+            else
+            {
+                ReDrawGraphAsync().Forget();
+
+            }
+            return;
+            async UniTask ReDrawGraphAsync()
+            {
+                // Gather the previous node layouts.
+                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
+                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
+                // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
+                Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
+                Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+
+                // Restore the original implementation graph.
+                (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
+                if (mapped.EdgeCount > 0)
+                {
+                    await RestoreImplementation(impl);
+                    mapped.Edges().ForEach(edge =>
+                        ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
+                }
+
+                // Delete the previous city and draw the new one.
+                DeleteGraphGameObjects();
+                await UniTask.DelayFrame(2);
+                DrawGraph();
+                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
+                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
+                // Restores the previous architecture layout.
+                RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
+                // Restores the previous mapping.
+                RestoreMapping(layoutGraphNodes, mapped);
+                visualization.InitializeEdges();
+                graphRenderer = null;
+            }
+
+            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
+            {
+                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
+                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
+                foreach (GameObject gameObject in gameObjects)
+                {
+                    Node node = gameObject.GetComponent<NodeRef>().Value;
+                    // Skip the root node. For implementation nodes, we only need the position.
+                    if (node.IsRoot())
+                    {
+                        continue;
+                    }
+                    LayoutGraphNode layoutNode = new(node)
+                    {
+                        CenterPosition = gameObject.transform.position,
+                        AbsoluteScale = gameObject.transform.localScale,
+                    };
+                    result.Add(layoutNode);
+
+                    // Skip non-architecture nodes. Their text restoration is handled by the layout itself.
+                    if (node.IsInArchitecture())
+                    {
+                        // Case for decorative texts that start with the prefix "Text".
+                        if (gameObject.FindChildWithPrefix(Prefix) != null)
+                        {
+                            RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix).transform;
+                            textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
+                        }
+                        // Case for label texts that start with the prefix "Label".
+                        else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
+                        {
+                            textValues.Add(node.ID,
+                                (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
+                        }
+                    }
+                }
+                LayoutNodes.SetLevels(result);
+                return (result, textValues);
+            }
+
+            async UniTask RestoreImplementation(Graph copyCurrentImpl)
+            {
+                // Create a copy of the original implementation graph to restore the current one to its original state.
+                GameObject tempGO = new($"COPY OF {gameObject.name}");
+                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
+                tempCity.LoadInitial(tempGO.name);
+                Graph implCopy = await tempCity.GetReflexionGraphProvider()
+                    .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
+                Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
+                implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
+
+                // Restore to the original parents.
+                foreach (Node copyNode in copyCurrentImpl.Nodes())
+                {
+                    if (copyNode == null
+                        || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
+                    {
+                        continue;
+                    }
+
+                    Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
+                    Node copyOriginalParent = copyOriginalNode?.Parent;
+                    Node copyCurrentParent = copyNode.Parent;
+                    bool shouldReparent = copyOriginalParent != null
+                        && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
+
+                    if (shouldReparent)
+                    {
+                        Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
+                        VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
+
+                    }
+                }
+                Destroyer.Destroy(tempGO);
+            }
+
+            void RestoreArchitectureLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
+                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues,
+                                        Vector3 pArchPos, Vector3 pArchLossyScale)
+            {
+                layoutGraphNodes.ForEach(nodeLayout =>
+                {
+                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
+                    if (node != null && !node.IsArchitectureOrImplementationRoot() && node.GetNode().IsInArchitecture())
+                    {
+                        node.NodeOperator().ScaleTo(DetermineScale(nodeLayout, pArchLossyScale), 0);
+                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
+                        node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
+                        {
+                            if (decorationValues.ContainsKey(nodeLayout.ID))
+                            {
+                                RectTransform tmpRect = (RectTransform)tmp.transform;
+                                tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
+                                if (tmp.name.StartsWith(Prefix))
+                                {
+                                    tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
+                                    tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
+                                }
+                            }
+                        });
+                    }
+                });
+            }
+
+            Vector3 DetermineScale(LayoutGraphNode nodeLayout, Vector3 prevLossyScale)
+            {
+                Vector3 currentLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
+
+                Vector3 scaleFactor = new(
+                    currentLossyScale.x / prevLossyScale.x,
+                    currentLossyScale.y / prevLossyScale.y,
+                    currentLossyScale.z / prevLossyScale.z);
+
+                return new(
+                    nodeLayout.AbsoluteScale.x / scaleFactor.x,
+                    nodeLayout.AbsoluteScale.y,
+                    nodeLayout.AbsoluteScale.z / scaleFactor.z);
+            }
+
+            void RestoreMapping(ICollection<LayoutGraphNode> layoutGraphNodes,
+                                Graph previousMapping)
+            {
+                previousMapping.Edges().ForEach(edge =>
+                {
+                    Node source = ReflexionGraph.GetNode(edge.Source.ID);
+                    Node target = ReflexionGraph.GetNode(edge.Target.ID);
+                    GameObject sourceGO = source.GameObject();
+                    if (sourceGO != null)
+                    {
+                        LayoutGraphNode sourceLayout = layoutGraphNodes.First(layout =>
+                            layout.ID.Equals(source.ID));
+                        sourceGO.NodeOperator().MoveTo(sourceLayout.CenterPosition, 0);
+                        ReflexionMapper.SetParent(sourceGO, target.GameObject());
+                    }
+                });
+            }
+        }
+
         #region SEEReflexionCity creation during in play mode
         /// <summary>
         /// Loads the initial reflexion city.
@@ -107,7 +313,7 @@ namespace SEE.Game.City
         {
             initialReflexionCity = true;
             AddInitialSubrootTypes();
-            AddUnkownNodeType();
+            CheckAndAddUnknownNodeType();
             if (LoadedGraph != null)
             {
                 Reset();
@@ -134,24 +340,12 @@ namespace SEE.Game.City
         /// </summary>
         private void SetupInitialReflexionCity()
         {
-            DataProvider.Add(new ReflexionGraphProvider());
+            if (!DataProvider.Pipeline.Any(provider => provider is ReflexionGraphProvider))
+            {
+                DataProvider.Add(new ReflexionGraphProvider());
+            }
             NodeLayoutSettings.Kind = NodeLayoutKind.Reflexion;
             NodeLayoutSettings.ArchitectureLayoutProportion = 0.6f;
-        }
-
-        /// <summary>
-        /// Adds the <see cref="Graph.UnknownType"/> to the <see cref="AbstractSEECity.NodeTypes"/>
-        /// with a magenta color.
-        /// </summary>
-        private void AddUnkownNodeType()
-        {
-            if (!NodeTypes.TryGetValue(Graph.UnknownType, out VisualNodeAttributes _))
-            {
-                VisualNodeAttributes visualNodeAttributes = new();
-                visualNodeAttributes.ColorProperty.TypeColor = Color.magenta;
-                visualNodeAttributes.ShowNames = true;
-                NodeTypes[Graph.UnknownType] = visualNodeAttributes;
-            }
         }
 
         /// <summary>
@@ -227,7 +421,7 @@ namespace SEE.Game.City
             /// Attention: At this point, the root node must come from the graph's nodes list <see cref="Graph.nodes"/>.
             /// If the <see cref="ReflexionGraph.ImplementationRoot"/> or <see cref="ReflexionGraph.ArchitectureRoot"/> is used,
             /// loading doesn't work because, the children are not added to <see cref="Graph.nodes"/>.
-            Node root = ReflexionGraph.GetNode(projectFolder == null? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
+            Node root = ReflexionGraph.GetNode(projectFolder == null ? ReflexionGraph.ArchitectureRoot.ID : ReflexionGraph.ImplementationRoot.ID);
 
             // Draws the graph.
             await renderer.DrawGraphAsync(graph, root.GameObject(), doNotAddUniqueRoot: true);

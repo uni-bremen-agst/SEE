@@ -303,6 +303,7 @@ namespace SEE.Game.City
 
             if (edge != null)
             {
+                await UniTask.WaitForEndOfFrame();
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);

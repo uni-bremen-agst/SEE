@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -241,11 +242,11 @@ namespace SEE.Game.Drawable
             {
                 MMNodeValueHolder valueHolder = node.GetComponent<MMNodeValueHolder>();
                 bool ellipse = valueHolder.NodeKind != NodeKind.Subtheme;
-                GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
+                GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
                 /// Gets the new border positions.
                 Vector3[] positions = GetBorderPositions(ellipse, Vector3.zero, nodeText);
                 /// Re-draws the border.
-                Drawing(GameFinder.FindChildWithTag(node, Tags.Line), positions);
+                Drawing(node.FindDescendantWithTag(Tags.Line), positions);
                 /// Renew the size of the BoxCollider.
                 ChangeBoxSize(node);
                 /// Re-draws the branch lines, because changes to the border might necessitate adjustments.
@@ -287,7 +288,7 @@ namespace SEE.Game.Drawable
             if (node.CompareTag(Tags.MindMapNode))
             {
                 BoxCollider box = node.GetComponent<BoxCollider>();
-                GameObject border = GameFinder.FindChildWithTag(node, Tags.Line);
+                GameObject border = node.FindDescendantWithTag(Tags.Line);
                 box.size = GetBoxSize(border);
             }
         }
@@ -374,7 +375,7 @@ namespace SEE.Game.Drawable
             positions[0] = startPoint;
             positions[1] = endPoint;
             /// Convert the positions to local space.
-            GameFinder.GetHighestParent(child).transform.InverseTransformPoints(positions);
+            child.GetRootParent().transform.InverseTransformPoints(positions);
 
             GameObject surface = GameFinder.GetDrawableSurface(child);
             /// If no name was chosen, use <see cref="ValueHolder.MindMapBranchLine"/> - ParentID - NodeID.
@@ -410,7 +411,7 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <param name="holder"></param>
         /// <param name="parent"></param>
@@ -421,7 +422,7 @@ namespace SEE.Game.Drawable
 
             if (holder.Layer != oldLayer && holder.GetChildren().Count > 0)
             {
-                foreach(GameObject child in holder.GetChildren().Keys) 
+                foreach(GameObject child in holder.GetChildren().Keys)
                 {
                     MMNodeValueHolder childHolder = child.GetComponent<MMNodeValueHolder>();
                     MindMapLayer(childHolder, holder);
@@ -597,8 +598,8 @@ namespace SEE.Game.Drawable
         public static NodeKind ChangeNodeKind(GameObject node, NodeKind newNodeKind, LineConf borderConf = null)
         {
             MMNodeValueHolder nodeValueHolder = node.GetComponent<MMNodeValueHolder>();
-            GameObject nodeText = GameFinder.FindChildWithTag(node, Tags.DText);
-            GameObject nodeBorder = GameFinder.FindChildWithTag(node, Tags.Line);
+            GameObject nodeText = node.FindDescendantWithTag(Tags.DText);
+            GameObject nodeBorder = node.FindDescendantWithTag(Tags.Line);
 
             if (nodeValueHolder.NodeKind != newNodeKind
                 && CheckValidNodeKindChange(node, newNodeKind, nodeValueHolder.NodeKind))
@@ -711,8 +712,8 @@ namespace SEE.Game.Drawable
         /// <param name="node">The node whose text and border collider should be disabled.</param>
         public static void DisableTextAndBorderCollider(GameObject node)
         {
-            GameFinder.FindChildWithTag(node, Tags.Line).GetComponent<Collider>().enabled = false;
-            GameFinder.FindChildWithTag(node, Tags.DText).GetComponent<Collider>().enabled = false;
+            node.FindDescendantWithTag(Tags.Line).GetComponent<Collider>().enabled = false;
+            node.FindDescendantWithTag(Tags.DText).GetComponent<Collider>().enabled = false;
         }
 
         /// <summary>
@@ -753,7 +754,7 @@ namespace SEE.Game.Drawable
         private static bool ChangeIsPossible(GameObject selectedNode)
         {
             GameObject attacheds = GameFinder.GetAttachedObjectsObject(selectedNode);
-            foreach (GameObject node in GameFinder.FindAllChildrenWithTag(attacheds, Tags.MindMapNode))
+            foreach (GameObject node in attacheds.FindAllDescendantsWithTag(Tags.MindMapNode))
             {
                 if (node.GetComponent<MMNodeValueHolder>().NodeKind == NodeKind.Theme
                     && ParentChangeIsValid(selectedNode, node))
@@ -811,8 +812,8 @@ namespace SEE.Game.Drawable
                 Setup(surface, name, GetPrefix(nodeKind), textConf.Text,
                     surface.transform.TransformPoint(position), associatedPage, out GameObject node);
                 /// Destroyes the text and border, because the originals will be restored below.
-                Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.Line));
-                Destroyer.Destroy(GameFinder.FindChildWithTag(node, Tags.DText));
+                Destroyer.Destroy(node.FindDescendantWithTag(Tags.Line));
+                Destroyer.Destroy(node.FindDescendantWithTag(Tags.DText));
                 createdNode = node;
             }
 

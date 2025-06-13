@@ -1,19 +1,18 @@
 ﻿using Michsky.UI.ModernUIPack;
 using SEE.Game;
 using SEE.Game.Drawable;
+using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions.Drawable;
-using SEE.UI.Drawable;
+using SEE.UI;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using SEE.Utils.History;
-using SEE.Game.Drawable.ActionHelpers;
-using SEE.UI;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -462,7 +461,7 @@ namespace SEE.Controls.Actions.Drawable
         private void MoveWithWorldPosition(Vector3 newPosition)
         {
             /// Moves the clone of the selected node to the destination (new position).
-            Vector3 newLocalPosition = GameFinder.GetHighestParent(newSurface).transform.
+            Vector3 newLocalPosition = newSurface.GetRootParent().transform.
                 InverseTransformPoint(newPosition);
             newLocalPosition = new Vector3(newLocalPosition.x, newLocalPosition.y,
                 selectedObj.transform.localPosition.z);

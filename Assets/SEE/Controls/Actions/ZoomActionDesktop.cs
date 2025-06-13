@@ -3,6 +3,9 @@ using SEE.GO;
 using SEE.Utils;
 using static SEE.GO.GameObjectExtensions;
 using UnityEngine;
+using SEE.Game.Operator;
+using SEE.Net.Actions;
+using TMPro;
 
 namespace SEE.Controls.Actions
 {
@@ -114,6 +117,24 @@ namespace SEE.Controls.Actions
                     UpdateZoomState(rootTransform, zoomState);
                 }
             }
+        }
+
+        /// <summary>
+        /// Triggers a zoom reset caused by an other action.
+        /// </summary>
+        public bool TriggerImmediateReset(Transform rootTransform)
+        {
+            ZoomState zoomState = GetZoomStateCopy(rootTransform);
+            float steps = zoomState.CurrentTargetZoomSteps;
+            if (steps > 0)
+            {
+                zoomState.CurrentTargetZoomSteps = 0;
+                zoomState.ZoomCommands.Clear();
+                NodeOperator nodeOperator = rootTransform.gameObject.NodeOperator();
+                nodeOperator.ResizeTo(zoomState.OriginalLocalScale, zoomState.OriginalPosition, 0, true, false);
+                new ResizeNodeNetAction(rootTransform.name, zoomState.OriginalLocalScale, zoomState.OriginalPosition, true, false, 0).Execute();
+            }
+            return steps > 0;
         }
     }
 }

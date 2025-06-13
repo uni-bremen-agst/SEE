@@ -5,6 +5,7 @@ using SEE.Utils.Paths;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Game.City
 {
@@ -17,7 +18,7 @@ namespace SEE.Game.City
         [Tooltip("Whether a holistic metric board shall be loaded on startup.")]
         public bool LoadBoardOnStartup;
 
-        [SerializeField, Tooltip("Path to the board that shall be loaded."), ShowIf(nameof(LoadBoardOnStartup))]
+        [SerializeField, Tooltip("Path to the board that shall be loaded."), ShowIf(nameof(LoadBoardOnStartup)), RuntimeShowIf(nameof(LoadBoardOnStartup))]
         public DataPath BoardPath = new();
 
         /// <summary>

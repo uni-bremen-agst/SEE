@@ -237,7 +237,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="animationDuration">the duration of alpha change in seconds</param>
         /// <param name="alpha">the color's alpha value (transparency) the <paramref name="gameObject"/>
         /// should have after <paramref name="animationDuration"/> seconds</param>
-        private static void Fade(GameObject gameObject, float animationDuration, float alpha)
+        public static void Fade(GameObject gameObject, float animationDuration, float alpha)
         {
             if (gameObject.TryGetComponentOrLog(out Renderer renderer))
             {

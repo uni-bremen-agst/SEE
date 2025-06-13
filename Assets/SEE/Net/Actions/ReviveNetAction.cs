@@ -47,7 +47,8 @@ namespace SEE.Net.Actions
         public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
-            NodeTypeList = NodeTypesSerializer.Serialize(nodeTypes);
+            NodeTypeList = nodeTypes != null && nodeTypes.Count > 0?
+                NodeTypesSerializer.Serialize(nodeTypes) : "";
         }
 
         /// <summary>
@@ -57,7 +58,8 @@ namespace SEE.Net.Actions
         {
             ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
             ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-            Dictionary<string, VisualNodeAttributes> nodeTypes = NodeTypesSerializer.Unserialize(NodeTypeList);
+            Dictionary<string, VisualNodeAttributes> nodeTypes = !string.IsNullOrEmpty(NodeTypeList)?
+                NodeTypesSerializer.Unserialize(NodeTypeList) : new();
             GameElementDeleter.Revive(gameObjects, nodeTypes);
         }
     }
