@@ -1083,6 +1083,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -1210,6 +1213,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -1341,6 +1347,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -1468,6 +1477,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -1695,6 +1707,163 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: AuthorAliasMap
+      Entry: 7
+      Data: 37|SEE.GraphProviders.VCS.AuthorMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 38|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 39|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Rainer Koschke
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 40|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 7
+      Data: 41|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: axivionsee
+    - Name: Email
+      Entry: 1
+      Data: rainer.koschke@qt.io
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 42|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Tim Kuhlmann
+    - Name: Email
+      Entry: 1
+      Data: tim.kuhlmann@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: tinxx
+    - Name: Email
+      Entry: 1
+      Data: 13608545+tinxx@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 46|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: "Hannes Ku\xDF"
+    - Name: Email
+      Entry: 1
+      Data: hkuss@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 47|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 48|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Hannes Lennart Kuss
+    - Name: Email
+      Entry: 1
+      Data: 102760046+hlkuss@users.noreply.github.com
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
@@ -1781,7 +1950,8 @@ MonoBehaviour:
     Root: 1
     RelativePath: /
     AbsolutePath: 
-  Date: 31/12/2024
+  Date: 2025/01/01
+  CombineAuthors: 1
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2936,6 +3106,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3063,6 +3236,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -3194,6 +3370,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3321,6 +3500,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -3452,6 +3634,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3579,6 +3764,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -3710,6 +3898,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -3837,6 +4028,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -3968,6 +4162,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -4095,6 +4292,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -5078,6 +5278,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5205,6 +5408,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -5336,6 +5542,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5465,6 +5674,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5592,6 +5804,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -5726,6 +5941,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -5853,6 +6071,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -5984,6 +6205,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6111,6 +6335,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -6242,6 +6469,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6369,6 +6599,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -6503,6 +6736,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6635,6 +6871,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -6762,6 +7001,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -6893,6 +7135,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -7022,6 +7267,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -7149,6 +7397,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -9531,6 +9782,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -9551,7 +9805,7 @@ MonoBehaviour:
       Data: true
     - Name: Shape
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: MetricToLength
       Entry: 7
       Data: 12|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
@@ -9611,7 +9865,7 @@ MonoBehaviour:
       Data: 0.001
     - Name: MaximalBlockLength
       Entry: 4
-      Data: 1
+      Data: 0.1
     - Name: AntennaSettings
       Entry: 7
       Data: 14|SEE.Game.City.AntennaAttributes, SEE
@@ -9658,6 +9912,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -9716,10 +9973,10 @@ MonoBehaviour:
       Data: 0.4339623
     - Name: 
       Entry: 4
-      Data: 0.419633329
+      Data: 0.4196333
     - Name: 
       Entry: 4
-      Data: 0.419633329
+      Data: 0.4196333
     - Name: 
       Entry: 4
       Data: 1
@@ -9785,8 +10042,11 @@ MonoBehaviour:
       Data: 1
     - Name: ShowNames
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -9839,10 +10099,10 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 4
-      Data: 0.921568632
+      Data: 0.9215686
     - Name: 
       Entry: 4
-      Data: 0.0156862754
+      Data: 0.01568628
     - Name: 
       Entry: 4
       Data: 1
@@ -9881,7 +10141,61 @@ MonoBehaviour:
       Data: 4
     - Name: 
       Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: Metric.Clone_Rate
+    - Name: $v
+      Entry: 7
+      Data: SEE.Game.ColorRange, SEE
+    - Name: Lower
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Upper
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 4
       Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: NumberOfColors
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -9952,7 +10266,7 @@ MonoBehaviour:
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
-    Kind: 4
+    Kind: 1
     IncrementalTreeMap:
       LocalMovesDepth: 3
       LocalMovesBranchingLimit: 4
@@ -9976,7 +10290,7 @@ MonoBehaviour:
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
-    EdgeWidth: 0.01
+    EdgeWidth: 0.005
     EdgesAboveBlocks: 1
     Tension: 0.85
   EdgeSelectionSettings:
@@ -10049,7 +10363,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2e5d4facdf0010e4898868f60a952c2b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  HeightOffset: 0.0010616779
+  HeightOffset: 0.0015009642
 --- !u!65 &407024188
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -11379,6 +11693,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11511,6 +11828,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11638,6 +11958,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -11769,6 +12092,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -11896,6 +12222,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -12027,6 +12356,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12154,6 +12486,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -12288,6 +12623,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12415,6 +12753,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -12546,6 +12887,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12673,6 +13017,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -12804,6 +13151,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -12931,6 +13281,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -13065,6 +13418,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -13197,6 +13553,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -13324,6 +13683,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -13455,6 +13817,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -13584,6 +13949,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -13711,6 +14079,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -19072,6 +19443,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -19199,6 +19573,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -19330,6 +19707,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -19457,6 +19837,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -19588,6 +19971,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -19715,6 +20101,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -19846,6 +20235,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -19973,6 +20365,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -20104,6 +20499,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -20231,6 +20629,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -21261,7 +21662,7 @@ MonoBehaviour:
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
-  SceneMigrationSynchronization: 1
+  SceneMigrationSynchronization: 0
   SpawnWithObservers: 1
   DontDestroyWithOwner: 0
   AutoObjectParentSync: 1
@@ -28083,6 +28484,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -28210,6 +28614,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -28341,6 +28748,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -28468,6 +28878,9 @@ MonoBehaviour:
       Entry: 5
       Data: true
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -28599,6 +29012,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -28726,6 +29142,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -28857,6 +29276,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -28984,6 +29406,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -29115,6 +29540,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -29242,6 +29670,9 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
       Entry: 5
       Data: false
     - Name: 
@@ -29373,6 +29804,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -29502,6 +29936,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: true
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -29631,6 +30068,9 @@ MonoBehaviour:
     - Name: AllowManualResize
       Entry: 5
       Data: true
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
     - Name: 
       Entry: 8
       Data: 

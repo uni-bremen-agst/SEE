@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MoreLinq;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
@@ -126,7 +127,7 @@ namespace SEE.Tools.ReflexionAnalysis
                 EdgeEvent edgeEvent => events.Incorporate(edgeEvent, e => e.Edge == edgeEvent.Edge),
                 HierarchyEvent hierarchyChangeEvent =>
                     events.Incorporate(hierarchyChangeEvent, e => e.Child == hierarchyChangeEvent.Child
-                                                                  && e.Parent == hierarchyChangeEvent.Parent),
+                                           && e.Parent == hierarchyChangeEvent.Parent),
                 NodeEvent nodeChangeEvent => events.Incorporate(nodeChangeEvent, e => e.Node == nodeChangeEvent.Node),
                 VersionChangeEvent versionChangeEvent => events.IncorporateVersionEvent(versionChangeEvent),
                 AttributeEvent<string> attributeEvent => events.IncorporateAttributeEvent(attributeEvent),
@@ -140,7 +141,7 @@ namespace SEE.Tools.ReflexionAnalysis
         {
             // We will simply retain the most recent version change event.
             // Keeping the others doesn't make much sense, as we've "compacted" previous events already.
-            return events.Where(x => !(x is VersionChangeEvent)).Append(versionChangeEvent).ToList();
+            return events.Where(x => x is not VersionChangeEvent).Append(versionChangeEvent).ToList();
         }
 
         private static IList<ChangeEvent> IncorporateAttributeEvent<T>(this IList<ChangeEvent> events, AttributeEvent<T> attributeEvent)
@@ -148,8 +149,8 @@ namespace SEE.Tools.ReflexionAnalysis
             // If there were any previous attribute events for this same attribute and same attributable,
             // we remove them and simply retain the most recent event.
             return events.Where(x => !(x is AttributeEvent<T> a
-                                       && a.AttributeName == attributeEvent.AttributeName
-                                       && a.Attributable == attributeEvent.Attributable)).Append(attributeEvent).ToList();
+                                    && a.AttributeName == attributeEvent.AttributeName
+                                    && a.Attributable == attributeEvent.Attributable)).Append(attributeEvent).ToList();
         }
 
         /// <summary>
@@ -167,7 +168,7 @@ namespace SEE.Tools.ReflexionAnalysis
             // We only care about the most recent NewState of an edge.
             // However, we also care about the first OldState of an edge, so we find it first.
             State? oldState = events.OfType<EdgeChange>().FirstOrDefault(x => x.Edge == edgeChange.Edge)?.OldState;
-            EdgeChange newEvent = new EdgeChange(edgeChange.VersionId, edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
+            EdgeChange newEvent = new(edgeChange.VersionId, edgeChange.Edge, oldState ?? edgeChange.OldState, edgeChange.NewState);
             // Now we just have to filter out previous EdgeChange events and add the new one.
             return events.Where(x => !(x is EdgeChange e && e.Edge == edgeChange.Edge)).Append(newEvent).ToList();
         }
@@ -178,7 +179,7 @@ namespace SEE.Tools.ReflexionAnalysis
         private static IList<ChangeEvent> Incorporate(this IList<ChangeEvent> events, GraphElementTypeEvent typeEvent)
         {
             string oldType = events.OfType<GraphElementTypeEvent>().FirstOrDefault(x => x.Element == typeEvent.Element)?.OldType;
-            GraphElementTypeEvent newEvent = new GraphElementTypeEvent(typeEvent.VersionId, oldType ?? typeEvent.OldType, typeEvent.NewType, typeEvent.Element);
+            GraphElementTypeEvent newEvent = new(typeEvent.VersionId, oldType ?? typeEvent.OldType, typeEvent.NewType, typeEvent.Element);
             return events.Where(x => !(x is GraphElementTypeEvent e && e.Element == typeEvent.Element)).Append(newEvent).ToList();
         }
 
@@ -208,14 +209,13 @@ namespace SEE.Tools.ReflexionAnalysis
                 // Since the same thing (edge/child/...) can't be removed or added twice, it must be the inverse
                 // operation of newEvent. This means we can simply remove that one and ignore the newEvent.
                 events.Remove(redundant);
-                return events;
             }
             else
             {
                 // Otherwise, the new event must be non-redundant.
                 events.Add(newEvent);
-                return events;
             }
+            return events;
         }
 
         /// <summary>
@@ -273,22 +273,16 @@ namespace SEE.Tools.ReflexionAnalysis
                 return false;
             }
 
-            switch (subgraph)
+            return subgraph switch
             {
-                case Implementation:
-                case Architecture:
-                    return element.HasToggle(subgraph.GetLabel());
-                case Mapping:
-                    // Either a "Maps_To" edge or a node connected to such an edge
-                    return (element is Edge edge && edge.HasSupertypeOf(ReflexionGraph.MapsToType))
-                           || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping));
-                case FullReflexion:
-                    return element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping();
-                case None:
-                    return !element.IsInReflexion();
-                default:
-                    throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.");
-            }
+                Implementation or Architecture => element.HasToggle(subgraph.GetLabel()),
+                // Either a "Maps_To" edge or a node connected to such an edge
+                Mapping => (element is Edge edge && edge.HasSupertypeOf(ReflexionGraph.MapsToType))
+                    || (element is Node node && node.Incomings.Concat(node.Outgoings).Any(IsInMapping)),
+                FullReflexion => element.IsInImplementation() || element.IsInArchitecture() || element.IsInMapping(),
+                None => !element.IsInReflexion(),
+                _ => throw new ArgumentOutOfRangeException(nameof(subgraph), subgraph, "Unknown subgraph type.")
+            };
         }
 
         /// <summary>
@@ -358,15 +352,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <param name="graph">The graph whose nodes and edges shall be marked</param>
         /// <param name="subgraph">The subgraph the nodes and edges will be marked with</param>
         /// <param name="markRootNode">Whether to mark the root node of the <paramref name="graph"/>, too</param>
-        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraphs subgraph, bool markRootNode = true)
-        {
-            IEnumerable<GraphElement> graphElements = graph.Nodes()
-                                                           .Where(node => markRootNode || node.HasToggle(Graph.RootToggle))
-                                                           .Concat<GraphElement>(graph.Edges());
-            foreach (GraphElement graphElement in graphElements)
-            {
-                graphElement.SetIn(subgraph);
-            }
-        }
+        public static void MarkGraphNodesIn(this Graph graph, ReflexionSubgraphs subgraph, bool markRootNode = true) =>
+            graph.Nodes()
+                 .Where(node => markRootNode || node.HasToggle(Graph.RootToggle))
+                 .Concat<GraphElement>(graph.Edges())
+                 .ForEach(x => x.SetIn(subgraph));
     }
 }
