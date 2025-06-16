@@ -40,7 +40,7 @@ namespace SEE.Controls
 
         [Tooltip("Custom endpoint for telemetry export (used in remote mode).")]
         [ShowInInspector]
-        public static string CustomTelemetryServerURL = "http://localhost:4317";
+        public static string CustomTelemetryServerURL = "http://localhost:4318/v1/traces";
 
 
         /// <summary>

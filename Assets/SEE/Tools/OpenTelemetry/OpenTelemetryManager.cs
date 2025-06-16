@@ -1,20 +1,20 @@
 ﻿using System;
+using System.Diagnostics;
 using System.IO;
 using OpenTelemetry;
+using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
 using SEE.Controls;
 using UnityEngine;
-using OpenTelemetry.Exporter;
-
-
+using Debug = UnityEngine.Debug;
 
 namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
     /// Handles the setup, management, and shutdown of OpenTelemetry tracing for Unity applications.
     /// </summary>
-    public class OpenTelemetryManager : IDisposable
+    public class OpenTelemetryManager 
     {
         /// <summary>
         /// The OpenTelemetry tracer provider instance.
@@ -74,16 +74,15 @@ namespace SEE.Tools.OpenTelemetry
         /// <summary>
         /// Initializes the OpenTelemetry system with a remote OTLP exporter using HTTP/Protobuf.
         /// Internally uses a <see cref="BatchActivityExportProcessor"/> with default settings.
-        /// 
+        ///
         /// Export behavior:
         /// - Traces are buffered in memory.
         /// - Up to 512 spans are exported in a batch every 5 seconds.
-        /// - All remaining spans are exported immediately upon shutdown or disposal.
-        /// - The internal export queue has a maximum capacity of 2048 spans. If full, it triggers an export automatically.
+        /// - All remaining spans are exported on shutdown or disposal.
+        /// - The export queue can hold up to 2048 spans before forced flush.
         /// </summary>
         /// <param name="serverUrl">
-        /// The URL of the remote telemetry endpoint
-        /// Must not be null or empty. The endpoint must support OTLP/HTTP protocol.
+        /// The OTLP endpoint that accepts HTTP/Protobuf (e.g. http://localhost:4318).
         /// </param>
         private void InitializeRemoteExporter(string serverUrl)
         {
@@ -91,24 +90,24 @@ namespace SEE.Tools.OpenTelemetry
             {
                 tracerProvider = Sdk.CreateTracerProviderBuilder()
                     .AddSource("SEE.Tracing")
-                    .SetResourceBuilder(ResourceBuilder.CreateDefault().AddService("SEEOpenTelemetryClient"))
-                    .AddOtlpExporter(otlpOptions =>
+                    .SetResourceBuilder(ResourceBuilder.CreateDefault()
+                        .AddService("SEEOpenTelemetryTracking"))
+                    .AddOtlpExporter(options =>
                     {
-                        otlpOptions.Endpoint = new Uri(serverUrl);
-                        otlpOptions.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        options.Endpoint = new Uri(serverUrl);
+                        options.Protocol = OtlpExportProtocol.HttpProtobuf;
+                        // Do not add custom headers – OTLP/HTTP expects standard requests
                     })
-                    .Build(); 
+                    .Build();
 
-                Debug.Log($"OpenTelemetry (remote) initialized with HTTP/Protobuf and batching. Sending to: {serverUrl}");
+                Debug.Log($"OpenTelemetry initialized for HTTP/Protobuf export to {serverUrl} (batching every ~5s).");
             }
-            catch (Exception exception)
+            catch (Exception ex)
             {
-                Debug.LogError($"Remote OpenTelemetry initialization failed: {exception.Message}");
+                Debug.LogError($"Failed to initialize remote OpenTelemetry exporter: {ex.Message}");
             }
         }
 
-
-        
         /// <summary>
         /// Initializes the OpenTelemetry system with a local file-based trace exporter.
         /// </summary>
@@ -136,8 +135,13 @@ namespace SEE.Tools.OpenTelemetry
         /// Properly shuts down the OpenTelemetry tracer provider and its associated exporter.
         /// Logs a warning if not previously initialized.
         /// </summary>
-        public void Shutdown()
+        public void Shutdown(TracingHelper helper,bool host)
         {
+            if (host)
+            {
+                TracingHelperService.Instance?.TrackSessionEnd();
+            }
+            
             if (tracerProvider == null)
             {
                 Debug.LogWarning("OpenTelemetry is not initialized.");
@@ -151,14 +155,6 @@ namespace SEE.Tools.OpenTelemetry
             traceFileExporter = null;
 
             Debug.Log("OpenTelemetry shutdown complete.");
-        }
-
-        /// <summary>
-        /// Disposes the manager and cleans up the provider and exporter.
-        /// </summary>
-        public void Dispose()
-        {
-            Shutdown();
         }
     }
 }

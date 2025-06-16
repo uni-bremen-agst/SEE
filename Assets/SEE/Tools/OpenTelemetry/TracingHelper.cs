@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Net.Http;
 using SEE.Controls.Actions;
 using SEE.Utils.History;
 using UnityEngine;
@@ -16,11 +17,14 @@ namespace SEE.Tools.OpenTelemetry
     {
         private readonly ActivitySource activitySource;
         private readonly string playerName;
+
         private readonly HashSet<Type> excludedActionTypes = new HashSet<Type>
         {
             typeof(MoveAction)
         };
-        private readonly Dictionary<string, DateTimeOffset> boostKeyStartTimes = new Dictionary<string, DateTimeOffset>();
+
+        private readonly Dictionary<string, DateTimeOffset> boostKeyStartTimes =
+            new Dictionary<string, DateTimeOffset>();
 
         public TracingHelper(string sourceName = "SEE.Tracing", string playerName = "UnknownPlayer")
         {
@@ -197,7 +201,7 @@ namespace SEE.Tools.OpenTelemetry
                 activity.Stop();
             }
         }
-        
+
         /// <summary>
         /// Tracks a camera yaw rotation event when the mouse is released.
         /// </summary>
@@ -217,7 +221,7 @@ namespace SEE.Tools.OpenTelemetry
                 activity.SetTag("rotation.delta", rotationDelta.ToString("F2"));
             }
         }
-        
+
         /// <summary>
         /// Tracks how long the player hovered over a specific object.
         /// </summary>
@@ -305,6 +309,22 @@ namespace SEE.Tools.OpenTelemetry
                     boostKeyStartTimes.Remove(playerName);
                 }
             }
+        }
+        /// <summary>
+        /// Sends a final trace span indicating that the session has ended.
+        /// This allows external tools to detect when a session is complete.
+        /// </summary>
+        public void TrackSessionEnd()
+        {
+            using Activity activity = activitySource.StartActivity("SessionEnd");
+            if (activity != null)
+            {
+                activity.SetTag("event.type", "session.end");
+                activity.SetTag("player.name", playerName);
+                activity.SetTag("message", "Trace Export Session Ended. Tracer shut down cleanly.");
+            }
+
+            Debug.Log("SessionEnd span sent.");
         }
     }
 }

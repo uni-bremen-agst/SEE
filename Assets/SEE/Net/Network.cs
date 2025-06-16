@@ -879,10 +879,13 @@ namespace SEE.Net
         private void OnClientDisconnectCallback(ulong owner)
         {
             callbackToMenu?.Invoke(false,
-                                   $"The server {ServerAddress} has refused the connection due to the following reason: "
-                                     + NetworkManager.Singleton.DisconnectReason);
+                $"The server {ServerAddress} has refused the connection due to the following reason: "
+                + NetworkManager.Singleton.DisconnectReason);
             callbackToMenu = null;
-            TracingHelperService.Shutdown();
+            if (!HostServer)
+            {
+                TracingHelperService.Shutdown(false);
+            }
         }
 
         /// <summary>
@@ -988,12 +991,12 @@ namespace SEE.Net
         public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
 
         /// <summary>
-        /// Shuts down the voice-chat system.
+        /// Shuts down the voice-chat system and opentelemetry.
         /// </summary>
         private void OnApplicationQuit()
         {
             
-            TracingHelperService.Shutdown();
+            TracingHelperService.Shutdown(true);
             
             switch (VoiceChat)
             {

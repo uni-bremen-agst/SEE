@@ -1,4 +1,7 @@
-﻿namespace SEE.Tools.OpenTelemetry
+﻿using System.Net.Http;
+using UnityEngine;
+
+namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
     /// Provides a centralized service for tracing user and system actions.
@@ -28,16 +31,16 @@
             manager.Initialize();
             Instance = new TracingHelper("SEE.Tracing", playerName);
         }
-
+        
         /// <summary>
         /// Shuts down the tracing service and exporter cleanly.
         /// Should be called before application exit.
         /// </summary>
-        public static void Shutdown()
+        public static void Shutdown(bool host)
         {
             if (manager != null)
             {
-                manager.Shutdown();
+                manager.Shutdown(Instance,host);
                 manager = null;
             }
 
