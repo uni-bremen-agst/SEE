@@ -2,12 +2,9 @@ using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.Game.Operator;
-using SEE.Game.Table;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
@@ -48,6 +45,16 @@ namespace SEE.Game.City
         private bool initialReflexionCity = false;
 
         /// <summary>
+        /// Indicates whether the initial Reflexion city should be loaded.
+        /// </summary>
+        private bool IsInitialReflexionCity => initialReflexionCity;
+
+        /// <summary>
+        /// Indicates whether the Reflexion city should be loaded from a file.
+        /// </summary>
+        private bool IsLoadedReflexionCity => !initialReflexionCity;
+
+        /// <summary>
         /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
         /// Regular loading of a city from files is not used for the initial reflexion city.
         /// </summary>
@@ -57,6 +64,16 @@ namespace SEE.Game.City
             {
                 base.Start();
             }
+        }
+
+        /// <summary>
+        /// Executes <see cref="AbstractSEECity.LoadConfiguration"/>
+        /// and sets <see cref="initialReflexionCity"/> to false.
+        /// </summary>
+        public override void LoadConfiguration()
+        {
+            base.LoadConfiguration();
+            SwitchLoaded();
         }
 
         /// <summary>
@@ -109,6 +126,29 @@ namespace SEE.Game.City
             {
                 scheduler.OnInitialEdgesDone += visualization.InitializeEdges;
             }
+        }
+
+        /// <summary>
+        /// Ensures that the initial Reflexion city is loaded.
+        /// </summary>
+        [RuntimeButton(DataButtonsGroup, "Switch to initial Reflexion city")]
+        [RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
+        [RuntimeHideIf(nameof(IsInitialReflexionCity))]
+        public void SwitchInitial()
+        {
+            initialReflexionCity = true;
+        }
+
+        /// <summary>
+        /// Ensures that the Reflexion city is loaded from a file.
+        /// </summary>
+        [Button("Switch to loaded Reflexion city", ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Switch to loaded Reflexion city")]
+        [EnableIf(nameof(IsInitialReflexionCity)), RuntimeEnableIf(nameof(IsInitialReflexionCity))]
+        [HideIf(nameof(IsLoadedReflexionCity)), RuntimeHideIf(nameof(IsLoadedReflexionCity))]
+        public void SwitchLoaded()
+        {
+            initialReflexionCity = false;
         }
 
         /// <summary>

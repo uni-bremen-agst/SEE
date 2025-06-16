@@ -339,7 +339,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
-        public void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
         }
