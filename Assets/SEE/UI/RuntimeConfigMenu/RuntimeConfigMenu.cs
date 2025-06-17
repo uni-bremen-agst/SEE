@@ -214,11 +214,14 @@ namespace SEE.UI.RuntimeConfigMenu
             }
         }
 
-        public async UniTask RebuildTabAsync(int index)
+        /// <summary>
+        /// Rebuilds the tab at the specified <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">The index of the tab to rebuild.</param>
+        public void RebuildTab(int index)
         {
             cityMenus[currentCity].ToggleMenu();
             Destroyer.Destroy(cityMenus[index]);
-            await UniTask.Yield();
             AddCity(index);
             cityMenus[currentCity].ToggleMenu();
         }

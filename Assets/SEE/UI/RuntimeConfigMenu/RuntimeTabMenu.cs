@@ -422,7 +422,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (result is UniTask<bool> task)
                 {
                     doRebuild = await task;
-                    Debug.Log($"Rebuild {doRebuild}");
                 }
                 OnUpdateMenuValues?.Invoke();
                 UpdateCityMethodNetAction netAction = new()
@@ -436,7 +435,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                     {
-                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                        runtimeConfigMenu.RebuildTab(CityIndex);
                     }
                     else
                     {
