@@ -372,7 +372,8 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
-            if (methodInfo.Name.Equals("LoadConfiguration") || methodInfo.Name.Equals("LoadDataAsync"))
+            if (methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
+                ||methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
             {
                 buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
             }
