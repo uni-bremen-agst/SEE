@@ -419,7 +419,7 @@ namespace SEE.UI.RuntimeConfigMenu
             async UniTask ExecuteLoadAsync()
             {
                 object result = methodInfo.Invoke(city, null);
-                bool doRebuild = false;
+                bool doRebuild = true;
                 if (result is UniTask<bool> task)
                 {
                     doRebuild = await task;
