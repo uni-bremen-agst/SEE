@@ -5,6 +5,7 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.Net.Actions.RuntimeConfig;
+using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -218,12 +219,16 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Rebuilds the tab at the specified <paramref name="index"/>.
         /// </summary>
         /// <param name="index">The index of the tab to rebuild.</param>
-        public void RebuildTab(int index)
+        public async UniTask RebuildTabAsync(int index)
         {
             cityMenus[currentCity].ToggleMenu();
+            string active = cityMenus[currentCity].ActiveEntry.Title;
             Destroyer.Destroy(cityMenus[index]);
             AddCity(index);
+            await UniTask.Yield();
             cityMenus[currentCity].ToggleMenu();
+            cityMenus[currentCity].SelectEntry(cityMenus[currentCity]
+                .Entries.FirstOrDefault(entry => entry.Title.Equals(active)));
         }
     }
 }

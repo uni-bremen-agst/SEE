@@ -435,7 +435,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                     {
-                        runtimeConfigMenu.RebuildTab(CityIndex);
+                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
                     }
                     else
                     {
