@@ -55,6 +55,17 @@ namespace SEE.Game.City
         private bool IsLoadedReflexionCity => !initialReflexionCity;
 
         /// <summary>
+        /// Indicator of whether
+        /// </summary>
+        private bool initialCityStateLoaded = false;
+
+        /// <summary>
+        /// Checks whether the city is in its initial configuration state.
+        /// </summary>
+        /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
+        private bool IsInitialState() => initialCityStateLoaded;
+
+        /// <summary>
         /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
         /// Regular loading of a city from files is not used for the initial reflexion city.
         /// </summary>
@@ -74,6 +85,7 @@ namespace SEE.Game.City
         {
             base.LoadConfiguration();
             SwitchLoaded();
+            initialCityStateLoaded = false;
         }
 
         /// <summary>
@@ -90,8 +102,13 @@ namespace SEE.Game.City
         {
             if (initialReflexionCity)
             {
+                ResetToInitial();
                 LoadInitial(gameObject.name);
                 return;
+            }
+            else if (IsInitialState())
+            {
+                LoadConfiguration();
             }
 
             // Makes the necessary changes for the initial types of a reflexion city.
@@ -114,6 +131,30 @@ namespace SEE.Game.City
             }
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+        }
+
+        /// <summary>
+        /// Resets all configuration values to their initial default state.
+        /// </summary>
+        private void ResetToInitial()
+        {
+            LODCulling = 0.001f;
+            HierarchicalEdges = HierarchicalEdgeTypes();
+            HiddenEdges = new();
+            NodeTypes = new();
+            IgnoreSelfLoopsInLifting = false;
+            MaximalAntennaSegmentHeight = 0.5f;
+            AntennaWidth = 0.1f;
+            BaseAnimationDuration = 1.0f;
+            MetricToColor = new();
+            ZScoreScale = false;
+            ScaleOnlyLeafMetrics = true;
+            ErosionSettings = new();
+            BoardSettings = new();
+            NodeLayoutSettings = new();
+            EdgeLayoutSettings = new();
+            EdgeSelectionSettings = new();
+            MarkerAttributes = new();
         }
 
         protected override void InitializeAfterDrawn()
@@ -352,6 +393,7 @@ namespace SEE.Game.City
         public void LoadInitial(string cityName)
         {
             initialReflexionCity = true;
+            initialCityStateLoaded = true;
             AddInitialSubrootTypes();
             CheckAndAddUnknownNodeType();
             if (LoadedGraph != null)
