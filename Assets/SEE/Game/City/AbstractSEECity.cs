@@ -693,7 +693,7 @@ namespace SEE.Game.City
         /// Adds the initial root node type to the <see cref="NodeTypes"/>.
         /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
         /// </summary>
-        private void AddRootNodeType()
+        protected void AddRootNodeType()
         {
             if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
             {

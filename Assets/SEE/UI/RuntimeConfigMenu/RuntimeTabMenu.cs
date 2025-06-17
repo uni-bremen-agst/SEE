@@ -372,22 +372,29 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
-            buttonManager.clickEvent.AddListener(() =>
+            if (methodInfo.Name.Equals("LoadConfiguration") || methodInfo.Name.Equals("LoadDataAsync"))
             {
-                // calls the method and updates the menu
-                methodInfo.Invoke(city, null);
-                OnUpdateMenuValues?.Invoke();
-            });
-            buttonManager.clickEvent.AddListener(() =>
+                buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
+            }
+            else
             {
-                UpdateCityMethodNetAction netAction = new()
+                buttonManager.clickEvent.AddListener(() =>
                 {
-                    CityIndex = CityIndex,
-                    MethodName = methodInfo.Name
-                };
-                netAction.Execute();
-            });
-            buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
+                    // calls the method and updates the menu
+                    methodInfo.Invoke(city, null);
+                    OnUpdateMenuValues?.Invoke();
+                });
+                buttonManager.clickEvent.AddListener(() =>
+                {
+                    UpdateCityMethodNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        MethodName = methodInfo.Name
+                    };
+                    netAction.Execute();
+                });
+                buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
+            }
 
             // add network listener
             SyncMethod += methodName =>
@@ -407,6 +414,31 @@ namespace SEE.UI.RuntimeConfigMenu
                 SetInteractableRecursive(button, interactable);
             }
             controlConditions.Add((methodInfo, button, city));
+
+            async UniTask ExecuteLoadAsync()
+            {
+                object result = methodInfo.Invoke(city, null);
+                if (result is UniTask task)
+                {
+                    await task;
+                }
+                OnUpdateMenuValues?.Invoke();
+                UpdateCityMethodNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    MethodName = methodInfo.Name
+                };
+                netAction.Execute();
+                CheckControlConditionsWithDelay();
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                }
+                else
+                {
+                    throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+                }
+            }
         }
 
         /// <summary>
@@ -949,7 +981,7 @@ namespace SEE.UI.RuntimeConfigMenu
         private void SetInteractableRecursive(GameObject root, bool interactable)
         {
             SetInteractableAsync(root, interactable).Forget();
-            foreach(Transform child in root.transform)
+            foreach (Transform child in root.transform)
             {
                 SetInteractableRecursive(child.gameObject, interactable);
             }
@@ -984,6 +1016,10 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // Waits enough frames to ensure that the changes will occur.
             await UniTask.DelayFrame(delay);
+            if (this == null)
+            {
+                return;
+            }
             foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
                 go.SetActive(ValidateVisibilityAttributes(m, obj));

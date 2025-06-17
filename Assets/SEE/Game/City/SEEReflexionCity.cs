@@ -142,6 +142,7 @@ namespace SEE.Game.City
             HierarchicalEdges = HierarchicalEdgeTypes();
             HiddenEdges = new();
             NodeTypes = new();
+            AddRootNodeType();
             IgnoreSelfLoopsInLifting = false;
             MaximalAntennaSegmentHeight = 0.5f;
             AntennaWidth = 0.1f;

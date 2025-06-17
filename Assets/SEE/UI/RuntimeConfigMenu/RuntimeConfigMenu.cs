@@ -213,5 +213,14 @@ namespace SEE.UI.RuntimeConfigMenu
                 return false;
             }
         }
+
+        public async UniTask RebuildTabAsync(int index)
+        {
+            cityMenus[currentCity].ToggleMenu();
+            Destroyer.Destroy(cityMenus[index]);
+            await UniTask.Yield();
+            AddCity(index);
+            cityMenus[currentCity].ToggleMenu();
+        }
     }
 }

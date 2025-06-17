@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using SEE.Utils.Config;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -149,7 +149,6 @@ namespace SEE.Game.City
                     // VisualNodeAttributes
                     VisualNodeAttributes visualNodeAttributes = new();
                     visualNodeAttributes.Restore(dict, visualNodeAttributesLabel);
-
                     map[name] = visualNodeAttributes;
                     result = true;
                 }
