@@ -95,20 +95,24 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
+        /// <returns>Whether the menus needs adjustment.</returns>
         [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override async UniTask LoadDataAsync()
+        public override async UniTask<bool> LoadDataAsync()
         {
+            bool needMenuAdjustments = false;
             if (initialReflexionCity)
             {
+                needMenuAdjustments = !IsInitialState();
                 ResetToInitial();
                 LoadInitial(gameObject.name);
-                return;
+                return needMenuAdjustments;
             }
             else if (IsInitialState())
             {
                 LoadConfiguration();
+                needMenuAdjustments = true;
             }
 
             // Makes the necessary changes for the initial types of a reflexion city.
@@ -131,6 +135,7 @@ namespace SEE.Game.City
             }
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+            return needMenuAdjustments;
         }
 
         /// <summary>

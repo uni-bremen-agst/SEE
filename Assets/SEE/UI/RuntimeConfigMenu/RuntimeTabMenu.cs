@@ -418,9 +418,11 @@ namespace SEE.UI.RuntimeConfigMenu
             async UniTask ExecuteLoadAsync()
             {
                 object result = methodInfo.Invoke(city, null);
-                if (result is UniTask task)
+                bool doRebuild = false;
+                if (result is UniTask<bool> task)
                 {
-                    await task;
+                    doRebuild = await task;
+                    Debug.Log($"Rebuild {doRebuild}");
                 }
                 OnUpdateMenuValues?.Invoke();
                 UpdateCityMethodNetAction netAction = new()
@@ -430,13 +432,16 @@ namespace SEE.UI.RuntimeConfigMenu
                 };
                 netAction.Execute();
                 CheckControlConditionsWithDelay();
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                if (doRebuild)
                 {
-                    runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
-                }
-                else
-                {
-                    throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                    }
+                    else
+                    {
+                        throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+                    }
                 }
             }
         }
