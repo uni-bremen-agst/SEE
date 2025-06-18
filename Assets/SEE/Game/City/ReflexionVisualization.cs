@@ -297,7 +297,7 @@ namespace SEE.Game.City
                 // This should be the case by the end of this frame.
                 // TODO: In the future, the GraphRenderer should be an observer to the Graph,
                 //       so that these cases are handled properly.
-                await UniTask.WaitForEndOfFrame();
+                await UniTask.DelayFrame(2);
                 edge = edgeChange.Edge.GameObject();
             }
 
