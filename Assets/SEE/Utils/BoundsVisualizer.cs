@@ -4,9 +4,9 @@ using UnityEngine;
 namespace SEE.Utils
 {
     /// <summary>
-    /// Draw and update a visual bounding box for debugging.
+    /// Draws and updates a visual bounding box for debugging.
     /// <para>
-    /// Enable Gizmos in the Unity Editor to see the bounding box.
+    /// Enables Gizmos in the Unity Editor to see the bounding box.
     /// </para>
     /// </summary>
     [ExecuteAlways]
@@ -17,8 +17,15 @@ namespace SEE.Utils
         /// </summary>
         public Color BoundsColor = Color.green;
 
+        /// <summary>
+        /// The type of the bounding box.
+        /// </summary>
         public BoundsType Type = BoundsType.SEE;
 
+        /// <summary>
+        /// Draws the gizmo for the bounding box.
+        /// </summary>
+        /// <remarks>Called by Unity.</remarks>
         void OnDrawGizmos()
         {
             Vector3? center, size;
