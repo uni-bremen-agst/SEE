@@ -44,12 +44,12 @@ namespace SEE.Controls
         public override int NonInteractableLayer => Layers.NonInteractableGraphObjects;
 
         /// <inheritdoc />
-        public override Color? HitColor => _hitColor;
+        public override Color? HitColor => hitColor;
 
         /// <summary>
         /// Backing field for the <see cref="HitColor"/> property.
         /// </summary>
-        private Color _hitColor = LaserPointer.HitColor;
+        private Color hitColor = LaserPointer.HitColor;
 
         /// <summary>
         /// The color of the laser pointer when it is hovering over a node.
@@ -184,7 +184,7 @@ namespace SEE.Controls
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
 
-            _hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
+            hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
         }
 
         private void OnDestroy()

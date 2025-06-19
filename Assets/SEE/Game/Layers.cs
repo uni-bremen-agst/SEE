@@ -41,7 +41,7 @@ namespace SEE.Game
         /// <summary>
         /// Backing field for the <see cref="Default"/> property.
         /// </summary>
-        private static int? _default;
+        private static int? defaultLayer;
 
         /// <summary>
         /// Cached property index for the <see cref="DefaultLayerName"/> layer.
@@ -50,21 +50,21 @@ namespace SEE.Game
         {
             get
             {
-                _default ??= LayerMask.NameToLayer(DefaultLayerName);
+                defaultLayer ??= LayerMask.NameToLayer(DefaultLayerName);
 
-                if (_default < 0)
+                if (defaultLayer < 0)
                 {
                     Debug.LogError($"Layer does not exist: {DefaultLayerName}");
                 }
 
-                return _default.Value;
+                return defaultLayer.Value;
             }
         }
 
         /// <summary>
         /// Backing field for the <see cref="InteractableAuxiliaryObjects"/> property.
         /// </summary>
-        private static int? _interactableAuxiliaryObjects;
+        private static int? interactableAuxiliaryObjects;
 
         /// <summary>
         /// Cached property index for the <see cref="InteractableAuxiliaryObjectsLayerName"/> layer.
@@ -73,21 +73,21 @@ namespace SEE.Game
         {
             get
             {
-                _interactableAuxiliaryObjects ??= LayerMask.NameToLayer(InteractableAuxiliaryObjectsLayerName);
+                interactableAuxiliaryObjects ??= LayerMask.NameToLayer(InteractableAuxiliaryObjectsLayerName);
 
-                if (_interactableAuxiliaryObjects < 0)
+                if (interactableAuxiliaryObjects < 0)
                 {
                     Debug.LogError($"Layer does not exist: {InteractableAuxiliaryObjectsLayerName}");
                 }
 
-                return _interactableAuxiliaryObjects.Value;
+                return interactableAuxiliaryObjects.Value;
             }
         }
 
         /// <summary>
         /// Backing field for the <see cref="NonInteractableAuxiliaryObjects"/> property.
         /// </summary>
-        private static int? _nonInteractableAuxiliaryObjects;
+        private static int? nonInteractableAuxiliaryObjects;
 
         /// <summary>
         /// Cached property index for the <see cref="NonInteractableAuxiliaryObjectsLayerName"/> layer.
@@ -96,21 +96,21 @@ namespace SEE.Game
         {
             get
             {
-                _nonInteractableAuxiliaryObjects ??= LayerMask.NameToLayer(NonInteractableAuxiliaryObjectsLayerName);
+                nonInteractableAuxiliaryObjects ??= LayerMask.NameToLayer(NonInteractableAuxiliaryObjectsLayerName);
 
-                if (_nonInteractableAuxiliaryObjects < 0)
+                if (nonInteractableAuxiliaryObjects < 0)
                 {
                     Debug.LogError($"Layer does not exist: {NonInteractableAuxiliaryObjectsLayerName}");
                 }
 
-                return _nonInteractableAuxiliaryObjects.Value;
+                return nonInteractableAuxiliaryObjects.Value;
             }
         }
 
         /// <summary>
         /// Backing field for the <see cref="InteractableGraphObjects"/> property.
         /// </summary>
-        private static int? _interactableGraphObjects;
+        private static int? interactableGraphObjects;
 
         /// <summary>
         /// Cached property index for the <see cref="InteractableGraphObjectsLayerName"/> layer.
@@ -119,21 +119,21 @@ namespace SEE.Game
         {
             get
             {
-                _interactableGraphObjects ??= LayerMask.NameToLayer(InteractableGraphObjectsLayerName);
+                interactableGraphObjects ??= LayerMask.NameToLayer(InteractableGraphObjectsLayerName);
 
-                if (_interactableGraphObjects < 0)
+                if (interactableGraphObjects < 0)
                 {
                     Debug.LogError($"Layer does not exist: {InteractableGraphObjectsLayerName}");
                 }
 
-                return _interactableGraphObjects.Value;
+                return interactableGraphObjects.Value;
             }
         }
 
         /// <summary>
         /// Backing field for the <see cref="NonInteractableGraphObjects"/> property.
         /// </summary>
-        private static int? _nonInteractableGraphObjects;
+        private static int? nonInteractableGraphObjects;
 
         /// <summary>
         /// Cached property index for the <see cref="NonInteractableGraphObjectsLayerName"/> layer.
@@ -142,14 +142,14 @@ namespace SEE.Game
         {
             get
             {
-                _nonInteractableGraphObjects ??= LayerMask.NameToLayer(NonInteractableGraphObjectsLayerName);
+                nonInteractableGraphObjects ??= LayerMask.NameToLayer(NonInteractableGraphObjectsLayerName);
 
-                if (_nonInteractableGraphObjects < 0)
+                if (nonInteractableGraphObjects < 0)
                 {
                     Debug.LogError($"Layer does not exist: {NonInteractableGraphObjectsLayerName}");
                 }
 
-                return _nonInteractableGraphObjects.Value;
+                return nonInteractableGraphObjects.Value;
             }
         }
 
@@ -160,7 +160,7 @@ namespace SEE.Game
         /// <summary>
         /// Backing field for <see cref="InteractableObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _interactableObjectsLayerMask = null;
+        private static LayerMask? interactableObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableAuxiliaryObjects"/> and <see cref="InteractableGraphObjects"/> layers.
@@ -169,15 +169,15 @@ namespace SEE.Game
         {
             get
             {
-                _interactableObjectsLayerMask ??= (1 << InteractableAuxiliaryObjects) | (1 << InteractableGraphObjects);
-                return _interactableObjectsLayerMask.Value;
+                interactableObjectsLayerMask ??= (1 << InteractableAuxiliaryObjects) | (1 << InteractableGraphObjects);
+                return interactableObjectsLayerMask.Value;
             }
         }
 
         /// <summary>
         /// Backing field for <see cref="AnyInteractableObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _anyInteractableObjectsLayerMask = null;
+        private static LayerMask? anyInteractableObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableAuxiliaryObjects"/>, <see cref="NonInteractableAuxiliaryObjects"/>,
@@ -187,19 +187,19 @@ namespace SEE.Game
         {
             get
             {
-                _anyInteractableObjectsLayerMask ??=
+                anyInteractableObjectsLayerMask ??=
                         (1 << InteractableAuxiliaryObjects)
                         | (1 << NonInteractableAuxiliaryObjects)
                         | (1 << InteractableGraphObjects)
                         | (1 << NonInteractableGraphObjects);
-                return _anyInteractableObjectsLayerMask.Value;
+                return anyInteractableObjectsLayerMask.Value;
             }
         }
 
         /// <summary>
         /// Backing field for <see cref="AuxiliaryObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _auxiliaryObjectsLayerMask = null;
+        private static LayerMask? auxiliaryObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableAuxiliaryObjects"/> and <see cref="NonInteractableAuxiliaryObjects"/> layers.
@@ -208,15 +208,15 @@ namespace SEE.Game
         {
             get
             {
-                _auxiliaryObjectsLayerMask ??= (1 << InteractableAuxiliaryObjects) | (1 << NonInteractableAuxiliaryObjects);
-                return _auxiliaryObjectsLayerMask.Value;
+                auxiliaryObjectsLayerMask ??= (1 << InteractableAuxiliaryObjects) | (1 << NonInteractableAuxiliaryObjects);
+                return auxiliaryObjectsLayerMask.Value;
             }
         }
 
         /// <summary>
         /// Backing field for <see cref="InteractableAuxiliaryObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _nonInteractableAuxiliaryObjectsLayerMask = null;
+        private static LayerMask? nonInteractableAuxiliaryObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableAuxiliaryObjects"/> layer.
@@ -225,15 +225,15 @@ namespace SEE.Game
         {
             get
             {
-                _nonInteractableAuxiliaryObjectsLayerMask ??= 1 << InteractableAuxiliaryObjects;
-                return _nonInteractableAuxiliaryObjectsLayerMask.Value;
+                nonInteractableAuxiliaryObjectsLayerMask ??= 1 << InteractableAuxiliaryObjects;
+                return nonInteractableAuxiliaryObjectsLayerMask.Value;
             }
         }
 
         /// <summary>
         /// Backing field for <see cref="GraphObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _graphObjectsLayerMask = null;
+        private static LayerMask? graphObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableGraphObjects"/> and <see cref="NonInteractableGraphObjects"/> layers.
@@ -242,15 +242,15 @@ namespace SEE.Game
         {
             get
             {
-                _graphObjectsLayerMask ??= (1 << InteractableGraphObjects) | (1 << NonInteractableGraphObjects);
-                return _graphObjectsLayerMask.Value;
+                graphObjectsLayerMask ??= (1 << InteractableGraphObjects) | (1 << NonInteractableGraphObjects);
+                return graphObjectsLayerMask.Value;
             }
         }
 
         /// <summary>
         /// Backing field for <see cref="InteractableGraphObjectsLayerMask"/>.
         /// </summary>
-        private static LayerMask? _interactableGraphObjectsLayerMask = null;
+        private static LayerMask? interactableGraphObjectsLayerMask = null;
 
         /// <summary>
         /// Cached layer mask for the <see cref="InteractableGraphObjects"/> layer.
@@ -259,8 +259,8 @@ namespace SEE.Game
         {
             get
             {
-                _interactableGraphObjectsLayerMask ??= 1 << InteractableGraphObjects;
-                return _interactableGraphObjectsLayerMask.Value;
+                interactableGraphObjectsLayerMask ??= 1 << InteractableGraphObjects;
+                return interactableGraphObjectsLayerMask.Value;
             }
         }
 
