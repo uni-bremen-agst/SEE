@@ -1336,7 +1336,7 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Update the interaction layer of the game object, and optionally its children.
+        /// Updates the interaction layer of the game object, and optionally its children.
         /// </summary>
         /// <param name="gameObject">The affected game object.</param>
         /// <param name="recurse">Should children be updated as well?</param>
