@@ -4,12 +4,10 @@ using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.Game.CityRendering;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
-using SEE.Tools.ReflexionAnalysis;
-using SEE.UI.Notification;
-using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
@@ -97,6 +95,11 @@ namespace SEE.Controls.Actions
         private List<GameObject> hitGraphElements = new();
 
         /// <summary>
+        /// The graph element ids of <see cref="hitGraphElements"/>.
+        /// </summary>
+        private List<string> hitGraphElementIDs = new();
+
+        /// <summary>
         /// Contains all implicitly deleted nodes and edges as a consequence of the deletion
         /// of one particular selected game object (in <see cref="Update"/>).
         ///
@@ -113,6 +116,12 @@ namespace SEE.Controls.Actions
         /// is, in the destructor.
         /// </summary>
         private ISet<GameObject> deletedGameObjects;
+
+        /// <summary>
+        /// The elements from <see cref="deletedGameObjects"/>.
+        /// The value is only set when the <see cref="GraphElement"/> is a <see cref="Node"/>.
+        /// </summary>
+        private List<RestoreGraphElement> deletedElements;
 
         /// <summary>
         /// The <see cref="VisualNodeAttributes"/> for the node types that are deleted, to allow
@@ -133,12 +142,14 @@ namespace SEE.Controls.Actions
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(raycastHit.collider.gameObject);
+                hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
                 return Delete(); // the selected objects are deleted and this action is done now
             }
             else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
+                hitGraphElementIDs.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject.name);
                 XRSEEActions.Selected = false;
                 return Delete(); // the selected objects are deleted and this action is done now
             }
@@ -160,6 +171,7 @@ namespace SEE.Controls.Actions
         private bool Delete()
         {
             deletedGameObjects = new HashSet<GameObject>();
+            deletedElements = new();
             InteractableObject.UnselectAll(true);
             foreach (GameObject go in hitGraphElements)
             {
@@ -168,19 +180,52 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
+
                 new DeleteNetAction(go.name).Execute();
-                (_, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                (GraphElementsMemento mem,
+                    ISet<GameObject> deleted,
+                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+
                 if (deleted == null)
                 {
                     continue;
                 }
+
                 deletedGameObjects.UnionWith(deleted);
+                deleted.ForEach(go =>
+                {
+                    SEECity city = go.ContainingCity<SEECity>();
+
+                    GraphElement ele = GetGraphElement(go);
+                    if (ele is Node node)
+                    {
+                        deletedElements.Add(new RestoreNodeElement(((SubgraphMemento)mem).Parents[node].ID,
+                            node.ID, go.transform.position, go.transform.lossyScale, node.Type, node.SourceName, node.Level));
+                    }
+                    else if (ele is Edge edge)
+                    {
+                        deletedElements.Add(new RestoreEdgeElement(edge.ID, edge.Source.ID, edge.Target.ID, edge.Type));
+                    }
+                });
                 deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
             return true;
+
+            static GraphElement GetGraphElement(GameObject go)
+            {
+                if (go.TryGetNode(out Node node))
+                {
+                    return node;
+                }
+                else if (go.TryGetEdge(out Edge edge))
+                {
+                    return edge;
+                }
+                return null;
+            }
         }
 
         /// <summary>
@@ -204,24 +249,45 @@ namespace SEE.Controls.Actions
         {
             ExecuteViaContextMenu = true;
             hitGraphElements = toDelete.ToList();
+            hitGraphElementIDs = toDelete.Select(x => x.name).ToList();
         }
 
         /// <summary>
-        /// Undoes this DeleteAction.
+        /// Undoes this <see cref="DeleteAction">.
         /// </summary>
         public override void Undo()
         {
             base.Undo();
-            GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
-            new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes).Execute();
+            /// First, try to find the corresponding <see cref="GameObject"/>s if the references in the set are <c>null</c>.
+            if (deletedGameObjects.All(go => go == null))
+            {
+                deletedGameObjects.Clear();
+                deletedGameObjects.UnionWith(deletedElements.Select(ele => GraphElementIDMap.Find(ele.ID)));
+            }
+            /// Revive the objects.
+            if (deletedGameObjects.All(go => go != null))
+            {
+                GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
+                new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes).Execute();
+            }
+            else
+            /// Occurs if the corresponding <see cref="GameObject"/>s cannot be found. This typically happens after a redraw.
+            {
+                GameElementDeleter.Restore(deletedElements, deletedNodeTypes);
+                new RestoreNetAction(deletedElements, deletedNodeTypes).Execute();
+            }
         }
 
         /// <summary>
-        /// Redoes this DeleteAction.
+        /// Redoes this <see cref="DeleteAction">.
         /// </summary>
         public override void Redo()
         {
             base.Redo();
+            if (hitGraphElements.All(go => go == null))
+            {
+                hitGraphElements = hitGraphElementIDs.Select(go => GraphElementIDMap.Find(go)).ToList();
+            }
             foreach (GameObject go in hitGraphElements)
             {
                 if (go.IsRoot())
@@ -241,13 +307,13 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            if (deletedGameObjects == null)
+            if (deletedElements == null)
             {
                 return new HashSet<string>();
             }
             else
             {
-                return new HashSet<string>(deletedGameObjects.Select(x => x.name));
+                return new HashSet<string>(deletedElements.Select(ele => ele.ID));
             }
         }
     }

@@ -133,7 +133,7 @@ namespace SEE.UI.Drawable
             drawFreehand.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawFreehand);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject drawShape = GameFinder.FindChild(barInstance, "DrawShape");
@@ -141,7 +141,7 @@ namespace SEE.UI.Drawable
             drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawShapes);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject writeText = GameFinder.FindChild(barInstance, "WriteText");
@@ -149,7 +149,7 @@ namespace SEE.UI.Drawable
             writeText.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.WriteText);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject addImage = GameFinder.FindChild(barInstance, "AddImage");
@@ -157,7 +157,7 @@ namespace SEE.UI.Drawable
             addImage.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.AddImage);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject mindMap = GameFinder.FindChild(barInstance, "MindMap");
@@ -165,7 +165,7 @@ namespace SEE.UI.Drawable
             mindMap.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MindMap);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject colorPicker = GameFinder.FindChild(barInstance, "ColorPicker");
@@ -173,7 +173,7 @@ namespace SEE.UI.Drawable
             colorPicker.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.ColorPicker);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject edit = GameFinder.FindChild(barInstance, "Edit");
@@ -181,7 +181,7 @@ namespace SEE.UI.Drawable
             edit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Edit);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject moveRotator = GameFinder.FindChild(barInstance, "MoveRotator");
@@ -189,7 +189,7 @@ namespace SEE.UI.Drawable
             moveRotator.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MoveRotator);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject scale = GameFinder.FindChild(barInstance, "Scale");
@@ -197,7 +197,7 @@ namespace SEE.UI.Drawable
             scale.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Scale);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject layerChanger = GameFinder.FindChild(barInstance, "LayerChanger");
@@ -205,7 +205,7 @@ namespace SEE.UI.Drawable
             layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject cutCopyPaste = GameFinder.FindChild(barInstance, "CutCopyPaste");
@@ -213,7 +213,7 @@ namespace SEE.UI.Drawable
             cutCopyPaste.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.CutCopyPaste);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject movePoint = GameFinder.FindChild(barInstance, "MovePoint");
@@ -221,7 +221,7 @@ namespace SEE.UI.Drawable
             movePoint.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MovePoint);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject lineSplit = GameFinder.FindChild(barInstance, "LineSplit");
@@ -229,7 +229,7 @@ namespace SEE.UI.Drawable
             lineSplit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineSplit);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject save = GameFinder.FindChild(barInstance, "Save");
@@ -237,7 +237,7 @@ namespace SEE.UI.Drawable
             save.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Save);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject load = GameFinder.FindChild(barInstance, "Load");
@@ -245,7 +245,7 @@ namespace SEE.UI.Drawable
             load.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Load);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject linePointErase = GameFinder.FindChild(barInstance, "LinePointErase");
@@ -253,7 +253,7 @@ namespace SEE.UI.Drawable
             linePointErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LinePointErase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject lineConnectionErase = GameFinder.FindChild(barInstance, "LineConnectionErase");
@@ -261,7 +261,7 @@ namespace SEE.UI.Drawable
             lineConnectionErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineConnectionErase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject erase = GameFinder.FindChild(barInstance, "Erase");
@@ -269,7 +269,7 @@ namespace SEE.UI.Drawable
             erase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Erase);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject cleaner = GameFinder.FindChild(barInstance, "Clear");
@@ -277,7 +277,7 @@ namespace SEE.UI.Drawable
             cleaner.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Clear);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject stickyNote = GameFinder.FindChild(barInstance, "StickyNote");
@@ -285,7 +285,7 @@ namespace SEE.UI.Drawable
             stickyNote.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.StickyNote);
-                menu.UpdateActiveEntry(ActionStateTypes.Drawable.Name);
+                menu.UpdateActiveEntry();
             });
 
             GameObject manager = GameFinder.FindChild(barInstance, "Manager");

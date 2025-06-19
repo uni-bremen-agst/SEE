@@ -1,4 +1,5 @@
-﻿using SEE.GameObjects;
+﻿using SEE.Controls.Actions;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.GO.Menu;
 using SEE.UI.RuntimeConfigMenu;
@@ -109,6 +110,30 @@ namespace SEE.Game
             if (citiesHolder == null)
             {
                 Debug.LogError($"Couldn't find component '{nameof(CitiesHolder)}' "
+                               + $"on local player named '{Instance.name}'.\n");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="ZoomActionDesktop"/> attached to the local player <see cref="Instance"/>
+        /// or any of its descendants (including inactive ones).
+        /// </summary>
+        /// <param name="zoomActionDesktop">the resulting <see cref="ZoomActionDesktop"/>; null if none could be found</param>
+        /// <returns>true if a <see cref="ZoomActionDesktop"/> could be found.</returns>
+        internal static bool TryGetZoomActionDesktop(out ZoomActionDesktop zoomActionDesktop)
+        {
+            if (Instance == null)
+            {
+                Debug.LogError($"Local player is null'.\n");
+                zoomActionDesktop = null;
+                return false;
+            }
+            zoomActionDesktop = Instance.GetComponentInChildren<ZoomActionDesktop>();
+            if (zoomActionDesktop == null)
+            {
+                Debug.LogError($"Couldn't find component '{nameof(ZoomActionDesktop)}' "
                                + $"on local player named '{Instance.name}'.\n");
                 return false;
             }

@@ -93,13 +93,14 @@ namespace SEE.Game.City
         /// Generates the graph randomly according <see cref="LeafConstraint"/>,
         /// <see cref="InnerNodeConstraint"/>, and <see cref="LeafAttributes"/>.
         /// </summary>
+        /// <returns>True if the menus need to be adjusted; otherwise, false.</returns>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override UniTask LoadDataAsync()
+        public override UniTask<bool> LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
-            return UniTask.CompletedTask;
+            return UniTask.FromResult(false);
         }
 
         //----------------------------------------------------------------------------

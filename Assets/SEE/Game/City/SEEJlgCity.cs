@@ -54,13 +54,15 @@ namespace SEE.Game.City
         /// Loads all city data as in <see cref="SEECity.LoadDataAsync"/> plus the
         /// JLG tracing data.
         /// </summary>
+        /// <returns>True if the menus need to be adjusted; otherwise, false.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override async UniTask LoadDataAsync()
+        public override async UniTask<bool> LoadDataAsync()
         {
             await base.LoadDataAsync();
             LoadJLG();
+            return false;
         }
 
         /// <summary>

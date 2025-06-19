@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -78,31 +79,10 @@ namespace SEE.Game.Drawable
         /// <returns>The searched child, if found. Otherwise, null</returns>
         public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
         {
-            Transform[] allChildren;
-            if (parent.CompareTag(Tags.Drawable))
-            {
-                GameObject attachedObjects = FindChildWithTag(GetHighestParent(parent), Tags.AttachedObjects);
-                if (attachedObjects != null)
-                {
-                    allChildren = attachedObjects.GetComponentsInChildren<Transform>(includeInactive);
-                }
-                else
-                {
-                    allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-                }
-            }
-            else
-            {
-                allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-            }
-            foreach (Transform child in allChildren)
-            {
-                if (child.gameObject.name.Equals(childName))
-                {
-                    return child.gameObject;
-                }
-            }
-            return null;
+            GameObject attachedObjects = parent.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
+            return attachedObjects != null?
+                attachedObjects.FindDescendant(childName, includeInactive)
+                : parent.FindDescendant(childName, includeInactive);
         }
 
         /// <summary>
@@ -112,7 +92,7 @@ namespace SEE.Game.Drawable
         /// <returns>The drawable object.</returns>
         public static GameObject GetDrawableSurface(GameObject obj)
         {
-            return FindChildWithTag(GetHighestParent(obj), Tags.Drawable);
+            return obj.GetRootParent().FindDescendantWithTag(Tags.Drawable);
         }
 
         /// <summary>
@@ -122,7 +102,7 @@ namespace SEE.Game.Drawable
         /// <returns>true, if the child has a drawable. Otherwise false</returns>
         public static bool HasDrawableSurface(GameObject child)
         {
-            if (HasParentWithTag(child, Tags.AttachedObjects))
+            if (child.HasParentWithTag(Tags.AttachedObjects))
             {
                 return GetDrawableSurface(child) != null;
             }
@@ -156,73 +136,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Searches for a child with a specific tag.
-        /// </summary>
-        /// <param name="parent">The parent of the children.</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>the first found child with the searched tag.</returns>
-        public static GameObject FindChildWithTag(GameObject parent, string tag, bool includeInactive = true)
-        {
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-            foreach (Transform childTransform in allChildren)
-            {
-                if (childTransform.gameObject.CompareTag(tag))
-                {
-                    return childTransform.gameObject;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// Searches for all children with the given tag.
-        /// </summary>
-        /// <param name="parent">The parent of the children</param>
-        /// <param name="tag">The tag to be searched</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>All children with the searched tag.</returns>
-        public static IList<GameObject> FindAllChildrenWithTag(GameObject parent, string tag, bool includeInactive = true)
-        {
-            List<GameObject> gameObjects = new();
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-            foreach (Transform childTransform in allChildren)
-            {
-                if (childTransform.gameObject.CompareTag(tag))
-                {
-                    gameObjects.Add(childTransform.gameObject);
-                }
-            }
-            return gameObjects;
-        }
-
-        /// <summary>
-        /// Searches for all children with the given tag (<paramref name="childTag"/>) except the parent
-        /// has a specific tag (<paramref name="parentTag"/>).
-        /// Will be used for mind map nodes.
-        /// </summary>
-        /// <param name="parent">The parent of the children</param>
-        /// <param name="childTag">The tag to be searched</param>
-        /// <param name="parentTag">The execpt tag</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>All children with the searched tag, except those whose parent has the specific tag.</returns>
-        public static List<GameObject> FindAllChildrenWithTagExceptParentHasTag(GameObject parent,
-            string childTag, string parentTag, bool includeInactive = true)
-        {
-            List<GameObject> gameObjects = new();
-            Transform[] allChildren = parent.GetComponentsInChildren<Transform>(includeInactive);
-            foreach (Transform childTransform in allChildren)
-            {
-                if (childTransform.gameObject.CompareTag(childTag)
-                    && !childTransform.parent.gameObject.CompareTag(parentTag))
-                {
-                    gameObjects.Add(childTransform.gameObject);
-                }
-            }
-            return gameObjects;
-        }
-
-        /// <summary>
         /// Query to check if a game object have children.
         /// Greater than 1 because the transform of the parent is included.
         /// </summary>
@@ -235,17 +148,6 @@ namespace SEE.Game.Drawable
         }
 
         /// <summary>
-        /// Query whether the parent has a child with the searched tag.
-        /// </summary>
-        /// <param name="parent">The parent</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <returns>true, if a child with the searched tag exists.</returns>
-        public static bool HasChildWithTag(GameObject parent, string tag)
-        {
-            return FindChildWithTag(parent, tag) != null;
-        }
-
-        /// <summary>
         /// Query whether the child has a parent.
         /// </summary>
         /// <param name="child">The child.</param>
@@ -253,26 +155,6 @@ namespace SEE.Game.Drawable
         public static bool HasParent(GameObject child)
         {
             return child.transform.parent != null;
-        }
-
-        /// <summary>
-        /// Query wheter the child has a parent with the given tag.
-        /// </summary>
-        /// <param name="child">The child.</param>
-        /// <param name="tag">The tag to be searched.</param>
-        /// <returns>true, if a parent with the given tag exists.</returns>
-        public static bool HasParentWithTag(GameObject child, string tag)
-        {
-            Transform transform = child.transform;
-            while (transform.parent != null)
-            {
-                if (transform.parent.gameObject.CompareTag(tag))
-                {
-                    return true;
-                }
-                transform = transform.parent;
-            }
-            return false;
         }
 
         /// <summary>
@@ -326,8 +208,8 @@ namespace SEE.Game.Drawable
         /// <returns>The unique ID.</returns>
         public static string GetUniqueID(GameObject surface)
         {
-            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface))?
-                GetDrawableSurfaceParentName(surface): surface.name;
+            return !string.IsNullOrEmpty(GetDrawableSurfaceParentName(surface)) ?
+                GetDrawableSurfaceParentName(surface) : surface.name;
         }
 
         /// <summary>
@@ -355,7 +237,7 @@ namespace SEE.Game.Drawable
         /// <returns>True if an object with a <see cref="Tags.Whiteboard"/> exists in the object tree.</returns>
         public static bool IsWhiteboard(GameObject obj)
         {
-            return FindChildWithTag(GetHighestParent(obj), Tags.Whiteboard) != null;
+            return obj.GetRootParent().FindDescendantWithTag(Tags.Whiteboard) != null;
         }
 
         /// <summary>
@@ -365,25 +247,7 @@ namespace SEE.Game.Drawable
         /// <returns>True if an object with a <see cref="Tags.StickyNote"/> exists in the object tree.</returns>
         public static bool IsStickyNote(GameObject obj)
         {
-            return FindChildWithTag(GetHighestParent(obj), Tags.StickyNote) != null;
-        }
-
-        /// <summary>
-        /// Gets the highest parent of the given child.
-        /// Usually the drawable holder.
-        /// </summary>
-        /// <param name="child">The child.</param>
-        /// <returns>The highest parent</returns>
-        public static GameObject GetHighestParent(GameObject child)
-        {
-            if (child.transform.parent != null)
-            {
-                return GetHighestParent(child.transform.parent.gameObject);
-            }
-            else
-            {
-                return child;
-            }
+            return obj.GetRootParent().FindDescendantWithTag(Tags.StickyNote) != null;
         }
 
         /// <summary>
@@ -394,7 +258,7 @@ namespace SEE.Game.Drawable
         /// <returns>the object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {
-            return FindChildWithTag(GetHighestParent(obj), Tags.AttachedObjects);
+            return obj.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
         }
 
         /// <summary>

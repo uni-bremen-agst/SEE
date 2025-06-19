@@ -174,7 +174,6 @@ namespace SEE.Controls.Actions.Drawable
                         webImageDialog.Open();
                         break;
                 }
-                CurrentState = IReversibleAction.Progress.InProgress;
             }
         }
 

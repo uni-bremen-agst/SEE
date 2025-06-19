@@ -3,15 +3,16 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
-using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -183,10 +184,10 @@ namespace SEE.Controls.Actions.Drawable
                 if (MindMapParentSelectionMenu.GetChosenParent() != null)
                 {
                     Vector3[] positions = new Vector3[2];
-                    positions[0] = GameFinder.GetHighestParent(node).transform.
+                    positions[0] = node.GetRootParent().transform.
                         InverseTransformPoint(NearestPoints.GetNearestPoint(node,
                             MindMapParentSelectionMenu.GetChosenParent().transform.position));
-                    positions[1] = GameFinder.GetHighestParent(node).transform.
+                    positions[1] = node.GetRootParent().transform.
                         InverseTransformPoint(NearestPoints.GetNearestPoint(
                             MindMapParentSelectionMenu.GetChosenParent(),
                             node.transform.position));
@@ -333,9 +334,9 @@ namespace SEE.Controls.Actions.Drawable
                 && node != null)
             {
                 Vector3[] positions = new Vector3[2];
-                positions[0] = GameFinder.GetHighestParent(node).transform
+                positions[0] = node.GetRootParent().transform
                     .InverseTransformPoint(NearestPoints.GetNearestPoint(node, raycastHit.point));
-                positions[1] = GameFinder.GetHighestParent(node).transform
+                positions[1] = node.GetRootParent().transform
                     .InverseTransformPoint(raycastHit.point);
                 branchLineRenderer.positionCount = 2;
                 branchLineRenderer.SetPositions(positions);
@@ -420,8 +421,8 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects,
-                Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null
+                && attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode).Count > 0)
             {
                 return true;
             }

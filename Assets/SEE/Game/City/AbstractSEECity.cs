@@ -180,7 +180,7 @@ namespace SEE.Game.City
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
         [PropertyOrder(999)]
-        [ShowIf(nameof(ShowProgressBar))]
+        [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
         public float ProgressBar;
@@ -339,7 +339,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
-        public void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
         }
@@ -693,7 +693,7 @@ namespace SEE.Game.City
         /// Adds the initial root node type to the <see cref="NodeTypes"/>.
         /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
         /// </summary>
-        private void AddRootNodeType()
+        protected void AddRootNodeType()
         {
             if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
             {

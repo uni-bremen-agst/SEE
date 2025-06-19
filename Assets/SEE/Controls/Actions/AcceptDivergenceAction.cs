@@ -8,11 +8,11 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.History;
+using SEE.XR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using SEE.XR;
 
 namespace SEE.Controls.Actions
 {

@@ -1,4 +1,5 @@
 ﻿using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Drawable;
 using SEE.Utils;
@@ -34,7 +35,7 @@ namespace SEE.Game.Drawable
             obj.transform.localEulerAngles = Vector3.zero;
 
             /// Transforms the hit point to local space.
-            Vector3 convertedHitPoint = GameFinder.GetHighestParent(obj).transform.InverseTransformPoint(hitPoint);
+            Vector3 convertedHitPoint = obj.GetRootParent().transform.InverseTransformPoint(hitPoint);
 
             /// Ensure that the converted hit point preserves the distance to the drawable.
             convertedHitPoint -= obj.GetComponent<OrderInLayerValueHolder>().OrderInLayer

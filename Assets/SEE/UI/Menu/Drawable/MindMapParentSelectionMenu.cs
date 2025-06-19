@@ -3,8 +3,9 @@ using SEE.Game;
 using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
+using SEE.UI.Notification;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -65,7 +66,7 @@ namespace SEE.UI.Menu.Drawable
                 .GetComponent<HorizontalSelector>();
 
             /// Gets all Mind Map Nodes of the given attached object - object.
-            IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+            IList<GameObject> allNodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode);
 
             /// Gather all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
             /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>.
@@ -145,7 +146,7 @@ namespace SEE.UI.Menu.Drawable
                     .GetComponent<HorizontalSelector>();
 
                 /// Gets all Mind Map Nodes of the given attached object - object.
-                IList<GameObject> allNodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode, false);
+                IList<GameObject> allNodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode, false);
 
                 /// Collect all Mind Map Nodes with the <see cref="GameMindMap.NodeKind"/>:
                 /// <see cref="GameMindMap.NodeKind.Theme"/> or <see cref="GameMindMap.NodeKind.Subtheme"/>

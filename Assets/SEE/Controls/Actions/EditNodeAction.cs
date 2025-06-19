@@ -1,14 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.UI.PropertyDialog;
+﻿using SEE.DataModel.DG;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using UnityEngine;
 using SEE.Utils.History;
-using SEE.Game.SceneManipulation;
-using SEE.UI.Notification;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
