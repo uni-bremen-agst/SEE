@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SEE.Utils
 {
+    /// <summary>
+    /// Utility for calculating line bounds given a <see cref="LineRenderer"/>.
+    /// </summary>
     public class GeometryUtils
     {
         /// <summary>
