@@ -101,7 +101,6 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="position">The position of the object.</param>
         /// <param name="size">The size of the object.</param>
-        /// <returns>The new <see cref="Bounds2D"/>.</returns>
         public Bounds2D(Vector2 position, Vector2 size)
         {
             Left = position.x - size.x / 2f;
@@ -118,7 +117,6 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="position">The position of the 3D object.</param>
         /// <param name="size">The size of the 3D object.</param>
-        /// <returns>The new <see cref="Bounds2D"/>.</returns>
         public Bounds2D(Vector3 position, Vector3 size) : this(position.XZ(), size.XZ()) { }
 
         /// <summary>
@@ -166,7 +164,7 @@ namespace SEE.Game.SceneManipulation
         /// </exception>
         public float this[Vector3 dir]
         {
-            get
+            readonly get
             {
                 if (dir == Vector3.left)
                 {
@@ -219,7 +217,7 @@ namespace SEE.Game.SceneManipulation
         /// </exception>
         public float this[Direction2D dir]
         {
-            get
+            readonly get
             {
                 return dir switch
                 {
@@ -264,47 +262,48 @@ namespace SEE.Game.SceneManipulation
         /// <summary>
         /// Returns a printable string with the struct's values.
         /// <summary>
+        /// <returns>this <see cref="Bounds2D"/> in readable form</returns>
         public readonly override string ToString()
         {
             return $"{nameof(Bounds2D)}(Left: {Left}, Right: {Right}, Back: {Back}, Front: {Front})";
         }
 
         /// <summary>
-        /// Checks if the <paramref name="other"/> bounds are contained in this bounds.
+        /// Checks if the <paramref name="other"/> bounds is contained in this <see cref="Bounds2D"/>.
         /// </summary>
         /// <param name="other">The bounds of another object.</param>
-        /// <returns></returns>
-        public bool Contains(Bounds2D other)
+        /// <returns>true if <paramref name="other"/> is contained in this <see cref="Bounds2D"/></returns>
+        public readonly bool Contains(Bounds2D other)
         {
             return other.Left >= Left && other.Right <= Right && other.Back >= Back && other.Front <= Front;
         }
 
         /// <summary>
-        /// Checks if the <paramref name="point"/> is contained in this bounds.
+        /// Checks if the <paramref name="point"/> is contained in this <see cref="Bounds2D"/>.
         /// </summary>
         /// <param name="point">The point to check against.</param>
-        /// <returns></returns>
-        public bool Contains(Vector2 point)
+        /// <returns>true if <paramref name="point"/> is contained in this <see cref="Bounds2D"/></returns>
+        public readonly bool Contains(Vector2 point)
         {
             return point.x >= Left && point.x <= Right && point.y >= Back && point.y <= Front;
         }
 
         /// <summary>
-        /// Checks if the 2D equivalent of <paramref name="point"/> is contained in this bounds.
+        /// Checks if the 2D equivalent of <paramref name="point"/> is contained in this <see cref="Bounds2D"/>.
         /// <para>
         /// Takes the x and z coordinates of the point and converts them to 2D coordinates.
         /// </para>
         /// </summary>
         /// <param name="point">The point to check against.</param>
-        /// <returns></returns>
-        public bool Contains(Vector3 point) { return Contains(point.XZ()); }
+        /// <returns>true if 2D equivalent of <paramref name="point"/> is contained in this <see cref="Bounds2D"/></returns>
+        public readonly bool Contains(Vector3 point) { return Contains(point.XZ()); }
 
         /// <summary>
-        /// Checks if there is an overlap between two bounds.
+        /// Checks if there is an overlap between this <see cref="Bounds2D"/> and <paramref name="other"/>.
         /// </summary>
         /// <param name="other">The bounds of another object.</param>
         /// <returns><c>true</c> iff the bounds overlap.</returns>
-        public bool HasOverlap(Bounds2D other)
+        public readonly bool HasOverlap(Bounds2D other)
         {
             return Front >= other.Back && Back <= other.Front && Left <= other.Right && Right >= other.Left;
         }
@@ -316,7 +315,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="point">The position from which to cast.</param>
         /// <param name="direction">The direction in which to cast.</param>
         /// <returns><c>true</c> if the ray intersects with the bounds, else <c>false</c>.></returns>
-        public bool LineIntersect(Vector2 point, Direction2D direction)
+        public readonly bool LineIntersect(Vector2 point, Direction2D direction)
         {
             if ((direction == Direction2D.Left || direction == Direction2D.Right) &&
                     point.y >= Back && point.y <= Front)
