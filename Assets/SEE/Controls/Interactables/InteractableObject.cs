@@ -308,14 +308,6 @@ namespace SEE.Controls
 
                     if (IsHoverFlagSet(HoverFlag.World))
                     {
-                        // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
-                        //   investigation.
-                        //if (HoveredObjectWithWorldFlag != null)
-                        //{
-                        //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
-                        //}
-                        // Note (TK): Is this still the case now that `isInitiator` is checked first?
-
                         HoveredObjectWithWorldFlag = this;
                     }
                 }
