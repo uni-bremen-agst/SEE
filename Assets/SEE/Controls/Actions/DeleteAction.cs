@@ -121,7 +121,6 @@ namespace SEE.Controls.Actions
         /// The elements from <see cref="deletedGameObjects"/>.
         /// The value is only set when the <see cref="GraphElement"/> is a <see cref="Node"/>.
         /// </summary>
-        //private Dictionary<GraphElement, LayoutGameNode> deletedElements;
         private List<RestoreGraphElement> deletedElements;
 
         /// <summary>
@@ -215,7 +214,7 @@ namespace SEE.Controls.Actions
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
             return true;
 
-            GraphElement GetGraphElement(GameObject go)
+            static GraphElement GetGraphElement(GameObject go)
             {
                 if (go.TryGetNode(out Node node))
                 {
@@ -254,7 +253,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Undoes this DeleteAction.
+        /// Undoes this <see cref="DeleteAction">.
         /// </summary>
         public override void Undo()
         {
@@ -280,7 +279,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Redoes this DeleteAction.
+        /// Redoes this <see cref="DeleteAction">.
         /// </summary>
         public override void Redo()
         {
