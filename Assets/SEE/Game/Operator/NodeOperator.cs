@@ -136,11 +136,11 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = positionX.AnimateTo(newXPosition, duration);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -170,11 +170,11 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = positionY.AnimateTo(newYPosition, duration);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -204,11 +204,11 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = positionZ.AnimateTo(newZPosition, duration);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -243,11 +243,11 @@ namespace SEE.Game.Operator
                 positionY.AnimateTo(newPosition.y, duration),
                 positionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -299,7 +299,7 @@ namespace SEE.Game.Operator
                         children.Add(child);
                     }
                 }
-                reparent(tempParent);
+                Reparent(tempParent);
             }
 
             IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
@@ -311,15 +311,15 @@ namespace SEE.Game.Operator
                     scale.AnimateTo(newLocalScale, duration)
                   },
                  a => a);
-            animation.OnComplete(() => onEnd(originalParent));
-            animation.OnKill(() => onEnd(originalParent));
+            animation.OnComplete(() => OnEnd(originalParent));
+            animation.OnKill(() => OnEnd(originalParent));
             return animation;
 
-            void onEnd(Transform originalParent)
+            void OnEnd(Transform originalParent)
             {
                 if (reparentChildren)
                 {
-                    reparent(originalParent);
+                    Reparent(originalParent);
                 }
                 if (updateLayers)
                 {
@@ -327,7 +327,7 @@ namespace SEE.Game.Operator
                 }
             }
 
-            void reparent(Transform newParent)
+            void Reparent(Transform newParent)
             {
                 foreach (Transform child in children)
                 {
@@ -352,11 +352,11 @@ namespace SEE.Game.Operator
             bool updateLayers = true)
         {
             IOperationCallback<Action> animation = rotation.AnimateTo(newRotation, ToDuration(factor));
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -384,11 +384,11 @@ namespace SEE.Game.Operator
         {
             Quaternion rotation = Quaternion.AngleAxis(angle, axis);
             IOperationCallback<Action> animation = RotateTo(rotation, factor);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
@@ -419,11 +419,11 @@ namespace SEE.Game.Operator
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
             IOperationCallback<Action> animation = scale.AnimateTo(newLocalScale, duration);
-            animation.OnComplete(() => onEnd());
-            animation.OnKill(() => onEnd());
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
             return animation;
 
-            void onEnd()
+            void OnEnd()
             {
                 if (updateLayers)
                 {
