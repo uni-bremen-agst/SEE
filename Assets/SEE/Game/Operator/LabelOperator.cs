@@ -101,7 +101,7 @@ namespace SEE.Game.Operator
                 }
                 else
                 {
-                    Debug.LogError("Could not retrieve portal for node label.", gameObject);
+                    Debug.LogError("Could not retrieve portal for node label.\n", gameObject);
                 }
 
                 // Make it invisible, initially.
