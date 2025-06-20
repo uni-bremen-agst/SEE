@@ -44,7 +44,7 @@ namespace SEE.GO
         /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
-        private const string opaqueMetallicMaterialName = "Materials/SEEMaterial";
+        private const string opaqueMetallicMaterialName = "Materials/OpaqueMetallicPortalMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).

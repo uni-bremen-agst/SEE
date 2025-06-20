@@ -10,7 +10,7 @@ Shader "Custom/PortalSpriteShader"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
-        _Portal("Portal", vector) = (-10, -10, 10, 10)
+        _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
     }
 
@@ -89,7 +89,7 @@ Shader "Custom/PortalSpriteShader"
 
             fixed4 frag(const v2f IN) : SV_Target
             {
-                // Discard coordinates if transparent or outside portal
+                // Discard coordinates if outside portal
                 // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
                 if (IN.worldPos.x < _Portal.x || IN.worldPos.z < _Portal.y ||
                     IN.worldPos.x > _Portal.z || IN.worldPos.z > _Portal.w)

@@ -91,6 +91,7 @@ namespace SEE.Game.CityRendering
                     GameObject gameEdge = new()
                     {
                         tag = Tags.Edge,
+                        layer = Layers.InteractableGraphObjects,
                         isStatic = false,
                         name = authorName + ":" + nodeOfAuthor.Key.ID
                     };
