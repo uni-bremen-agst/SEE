@@ -16,7 +16,6 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using SEE.XR;
 
-
 namespace SEE.Controls.Actions
 {
     /// <summary>
@@ -44,7 +43,7 @@ namespace SEE.Controls.Actions
         /// This is true if the user is dragging an object.
         /// We use this in VR to activate/deactivate this action.
         /// </summary>
-        bool activeAction;
+        private bool activeAction;
 
         /// <summary>
         /// Returns a new instance of <see cref="MoveAction"/>.
