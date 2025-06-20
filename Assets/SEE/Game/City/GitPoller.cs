@@ -2,17 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using LibGit2Sharp;
 using SEE.DataModel.DG;
-using SEE.Game;
-using SEE.Game.City;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
-using Sirenix.OdinInspector;
+using SEE.VCS;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.Game.City
 {
     /// <summary>
     /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
@@ -21,21 +18,16 @@ namespace SEE.GameObjects
     /// When a new commit was detected on any branch, a refresh of the CodeCity is initiated.
     /// Newly added or changed nodes will be marked after the refresh.
     ///
-    /// This component will be added automatically by <see cref="AllGitBranchesSingleGraphProvider"/>
-    /// if <see cref="AllGitBranchesSingleGraphProvider.AutoFetch"/> is set to true.
+    /// This component will be added automatically by <see cref="GitBranchesGraphProvider"/>
+    /// if <see cref="GitBranchesGraphProvider.AutoFetch"/> is set to true.
     /// </summary>
     public class GitPoller : MonoBehaviour
     {
         /// <summary>
-        /// The code city where the <see cref="AllGitBranchesSingleGraphProvider"/> graph provider
+        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
         /// was executed and which should be updated when a new commit is detected.
         /// </summary>
-        public SEECity CodeCity;
-
-        /// <summary>
-        /// The full paths to the repositories that should be watched for updates.
-        /// </summary>
-        [ShowInInspector] public HashSet<string> WatchedRepositories = new();
+        public BranchCity CodeCity;
 
         /// <summary>
         /// The interval in seconds in which git should be polled.
@@ -52,7 +44,7 @@ namespace SEE.GameObjects
         /// Maps the repository (path) to a list of all hashes of the branches from
         /// the repository.
         /// </summary>
-        private Dictionary<string, List<string>> RepositoriesTipHashes = new();
+        private IList<string> TipHashes = new List<string>();
 
         /// <summary>
         /// MarkerFactory for generating node markers.
@@ -60,50 +52,31 @@ namespace SEE.GameObjects
         private MarkerFactory markerFactory;
 
         /// <summary>
-        /// Specifies that the poller should not run currently.
+        /// Specifies that the poller should currently not run.
         /// This is set to true when git fetch is in progress.
         /// </summary>
-        private bool doNotPool = false;
+        private bool doNotPoll = false;
+
+        /// <summary>
+        /// The <see cref="GitRepository"/> to poll.
+        /// </summary>
+        public GitRepository Repository { set; private get; }
 
         /// <summary>
         /// Runs git fetch on all remotes for all branches.
         /// </summary>
         private void RunGitFetch()
         {
-            foreach (string repoPath in WatchedRepositories)
-            {
-                using Repository repo = new(repoPath);
-                // Fetch all remote branches
-                foreach (Remote remote in repo.Network.Remotes)
-                {
-                    IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
-                    try
-                    {
-                        Commands.Fetch(repo, remote.Name, refSpecs, null, "");
-                    }
-                    catch (LibGit2SharpException e)
-                    {
-                        Debug.LogError($"Error while running git fetch for repository path {repoPath} and remote name {remote.Name}: {e.Message}.\n");
-                    }
-                }
-            }
+            Repository.FetchRemotes();
         }
 
         /// <summary>
-        /// Gets the hashes of all tip commits from all branches in all watched repositories.
+        /// Gets the hashes of all tip commits from all branches in <see cref="Repository"/>.
         /// </summary>
-        /// <returns>A mapping from a repository path to a list of the hashes of all tip
-        /// commits.</returns>
-        private Dictionary<string, List<string>> GetTipHashes()
+        /// <returns>All tip commits.</returns>
+        private IList<string> GetTipHashes()
         {
-            Dictionary<string, List<string>> result = new();
-            foreach (string repoPath in WatchedRepositories)
-            {
-                using Repository repo = new Repository(repoPath);
-                result.Add(repoPath, repo.Branches.Select(x => x.Tip.Sha).ToList());
-            }
-
-            return result;
+            return Repository.GetTipHashes();
         }
 
         /// <summary>
@@ -111,7 +84,7 @@ namespace SEE.GameObjects
         /// </summary>
         private void Start()
         {
-            if (WatchedRepositories.Count == 0)
+            if (Repository == null)
             {
                 Debug.Log("No watched repositories.\n");
                 return;
@@ -124,7 +97,7 @@ namespace SEE.GameObjects
 
             async UniTaskVoid InitialPoll()
             {
-                RepositoriesTipHashes = await UniTask.RunOnThreadPool(GetTipHashes);
+                TipHashes = await UniTask.RunOnThreadPool(GetTipHashes);
                 InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
             }
         }
@@ -145,25 +118,25 @@ namespace SEE.GameObjects
         /// <summary>
         /// Is called in every <see cref="PollingInterval"/> seconds.
         ///
-        /// This method will fetch the newest commits and if new commits exist the
+        /// This method will fetch the newest commits and, if new commits exist, the
         /// code city is refreshed.
         /// </summary>
         private async UniTaskVoid PollReposAsync()
         {
-            if (!doNotPool)
+            if (!doNotPoll)
             {
-                doNotPool = true;
-                Dictionary<string, List<string>> newHashes = await UniTask.RunOnThreadPool(() =>
+                doNotPoll = true;
+                IList<string> newHashes = await UniTask.RunOnThreadPool(() =>
                 {
                     RunGitFetch();
                     return GetTipHashes();
                 });
 
-                if (!newHashes.All(x => RepositoriesTipHashes[x.Key].SequenceEqual(x.Value)))
+                if (!newHashes.SequenceEqual(TipHashes))
                 {
                     ShowNewCommitsMessage();
 
-                    RepositoriesTipHashes = newHashes;
+                    TipHashes = newHashes;
                     // Backup old graph
                     Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
                     await CodeCity.LoadDataAsync();
@@ -182,7 +155,7 @@ namespace SEE.GameObjects
                         GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
                         nodeEqualityComparer,
                         out ISet<Node> addedNodes,
-                        out _,
+                        out ISet<Node> removedNodes,
                         out ISet<Node> changedNodes,
                         out _);
 
@@ -196,10 +169,27 @@ namespace SEE.GameObjects
                         markerFactory.MarkBorn(GraphElementIDMap.Find(addedNode.ID, true));
                     }
 
+                    ShowRemovedNodes(removedNodes);
+
+                    // Removed nodes are not marked, because they are not in the graph anymore.
+                    // But we may want animate their removal.
+
                     Invoke(nameof(RemoveMarker), MarkerTime);
                 }
 
-                doNotPool = false;
+                doNotPoll = false;
+            }
+        }
+
+        /// <summary>
+        /// Notifies the user about removed files in the repository.
+        /// </summary>
+        /// <param name="removedNodes">The list of removed nodes.</param>
+        private void ShowRemovedNodes(ISet<Node> removedNodes)
+        {
+            foreach (Node removedNode in removedNodes)
+            {
+                ShowNotification.Info("File removed", $"File {removedNode.ID} was removed from the repository {Repository.RepositoryPath.Path}.");
             }
         }
 

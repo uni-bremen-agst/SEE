@@ -15,23 +15,38 @@ namespace SEE.Utils
     /// </summary>
     public class Performance
     {
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="action">The name of the action whose performance is to be measured.</param>
+        /// <param name="sw">The <see cref="Stopwatch"/> to be used for the measurement.</param>
         private Performance(string action, Stopwatch sw)
         {
             this.action = action;
             stopWatch = sw;
         }
 
+        /// <summary>
+        /// The <see cref="Stopwatch"/> to be used for the measurement.
+        /// </summary>
         private readonly Stopwatch stopWatch;
 
+        /// <summary>
+        /// The name of the action whose performance is to be measured.
+        /// </summary>
         private readonly string action;
 
+        /// <summary>
+        /// The elapsed time in milliseconds between the calls of <see cref="Begin(string)"/>
+        /// and <see cref="End(bool)"/>.
+        /// </summary>
         private double totalTimeInMilliSeconds;
 
         /// <summary>
         /// Returns a new performance time stamp and emits given action.
         /// </summary>
         /// <param name="action">name of action started to be printed</param>
-        /// <returns></returns>
+        /// <returns>Instance to be used to measure the performance.</returns>
         public static Performance Begin(string action)
         {
             Stopwatch sw = new();
@@ -68,8 +83,8 @@ namespace SEE.Utils
         }
 
         /// <summary>
-        /// Returns the elapsed time in milliseconds between the calls of Begin(string)
-        /// and End(bool).
+        /// Returns the elapsed time in milliseconds between the calls of <see cref="Begin(string)"/>
+        /// and <see cref="End(bool)"/>.
         /// </summary>
         /// <returns>elapsed time in milliseconds</returns>
         public double GetTimeInMilliSeconds()

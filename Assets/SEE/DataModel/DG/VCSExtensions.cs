@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel.DG
+﻿using System;
+
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Provides convenience extension properties for the VCS related attributes.
@@ -57,8 +59,10 @@
         /// </summary>
         /// <param name="graph">graph whose repository path is to be set</param>
         /// <param name="value">value to be set</param>
+        [Obsolete("Will be removed soon.")]
         public static void RepositoryPath(this Graph graph, string value)
         {
+            // FIXME: Removed this method.
             graph.SetString(RepositoryPathAttribute, value);
         }
 
@@ -66,8 +70,10 @@
         /// Returns the repository path of the <paramref name="graphElement"/>.
         /// </summary>
         /// <param name="graphElement">graph element whose repository path is requested</param>
+        [Obsolete("Will be removed soon.")]
         public static bool TryGetRepositoryPath(this GraphElement graphElement, out string repositoryPath)
         {
+            // FIXME: Removed this method.
             return graphElement.ItsGraph.TryGetString(RepositoryPathAttribute, out repositoryPath);
         }
     }

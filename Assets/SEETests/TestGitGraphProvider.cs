@@ -1,23 +1,24 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.Evolution;
+using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.VCS;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
-
 using static SEE.DataModel.DG.VCS;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
+    /// Tests of <see cref="GitBranchesGraphProvider"/> and
     /// <see cref="GitEvolutionGraphProvider"/>"/>.
     /// </summary>
     public class TestGitGraphProvider
@@ -90,9 +91,17 @@ namespace SEE.GraphProviders
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             city.VCSPath = new DataPath(gitDirPath);
-            AllGitBranchesSingleGraphProvider provider = new()
+            using GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                       repositoryPaths: null,
+                                                                       branches: null));
+            GitBranchesGraphProvider provider = new()
             {
-                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                GitRepository = gitRepository,
+                SimplifyGraph = true,
+                AutoFetch = true,
+                PollingInterval = 60,
+                MarkerTime = 3,
             };
             city.Date = date;
 
@@ -116,14 +125,15 @@ namespace SEE.GraphProviders
         /// <returns>The generated Graph</returns>
         private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
+
+            using GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                       repositoryPaths: null,
+                                                                       branches: null));
             GitEvolutionGraphProvider provider = new()
             {
                 Date = date,
-                GitRepository = new GitRepository()
-                {
-                    RepositoryPath = new DataPath(gitDirPath),
-                    PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
-                }
+                GitRepository = gitRepository
             };
 
             static void ReportProgress(float x)

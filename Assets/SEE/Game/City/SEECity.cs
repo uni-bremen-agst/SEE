@@ -4,7 +4,6 @@ using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
-using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
@@ -614,11 +613,6 @@ namespace SEE.Game.City
         {
             base.Reset();
             ResetGraphData();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
         }
 
         /// <summary>
