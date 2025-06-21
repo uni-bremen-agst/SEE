@@ -1,4 +1,6 @@
-﻿using SEE.GO;
+﻿using SEE.Controls;
+using SEE.GO;
+using SEE.Tools.OpenTelemetry;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -63,35 +65,79 @@ namespace SEE.Game.Avatars
             Laser.On = true;
             if (HandBone == null)
             {
-                HandBone = gameObject.transform.Find("CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand")?.transform;
+                HandBone = gameObject.transform
+                    .Find(
+                        "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand")
+                    ?.transform;
             }
+
             if (HandBone == null)
             {
-                Debug.LogError($"Hand bone not assigned in component {nameof(VRAvatarAimingSystem)} in game object {gameObject.FullName()}.\n");
+                Debug.LogError(
+                    $"Hand bone not assigned in component {nameof(VRAvatarAimingSystem)} in game object {gameObject.FullName()}.\n");
             }
         }
+
+        private GameObject lastLaserTarget;
+        private float laserTargetStartTime;
 
         /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
         /// towards this direction. The position of <see cref="Target"/> is set to
         /// the end of the laser beam.
-        /// Also distinguishes between local controlled player and remote player.
-        /// If it's the remote player, draw method is directly called.
+        /// Also distinguishes between locally controlled and remote players.
+        /// If it's the remote player, <see cref="Laser.Draw(Vector3)"/> is called directly.
+        ///
+        /// In addition, for local players, this method tracks how long the laser pointer is
+        /// directed at <see cref="InteractableObject"/>s. If the pointing duration exceeds a
+        /// configurable threshold, the object is traced using OpenTelemetry for behavioral analysis.
         /// </summary>
         private void Update()
         {
             if (IsLocallyControlled)
             {
-                // Draw a line from the AimTransform of the avatar into the direction
-                // where the Handbone is pointing to.
                 if (HandBone != null)
                 {
-                    // The direction of the HandBone needs to be adjusted.
-                    // The direction is not just in forward direction
-                    // of the axis from palm to fingers.
                     Vector3 direction = HandBone.rotation * Vector3.up;
                     // Move the aim target to the tip of the laser beam.
                     Target.position = Laser.PointTowards(direction);
+
+                    // --- Laser Hover Tracking ---
+                    if (Physics.Raycast(HandBone.position, direction, out RaycastHit hitInfo))
+                    {
+                        GameObject currentHit = hitInfo.collider.gameObject;
+
+                        // Only track interactable objects
+                        if (currentHit.GetComponent<InteractableObject>() != null)
+                        {
+                            if (currentHit != lastLaserTarget)
+                            {
+                                if (lastLaserTarget != null)
+                                {
+                                    float duration = Time.time - laserTargetStartTime;
+                                    TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+                                }
+
+                                lastLaserTarget = currentHit;
+                                laserTargetStartTime = Time.time;
+                            }
+                        }
+                        else if (lastLaserTarget != null)
+                        {
+                            // Laser moved away from previous valid object
+                            float duration = Time.time - laserTargetStartTime;
+                            TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+
+                            lastLaserTarget = null;
+                        }
+                    }
+                    else if (lastLaserTarget != null)
+                    {
+                        float duration = Time.time - laserTargetStartTime;
+                        TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+
+                        lastLaserTarget = null;
+                    }
                 }
             }
             else
