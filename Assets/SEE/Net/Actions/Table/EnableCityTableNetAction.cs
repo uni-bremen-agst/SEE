@@ -11,7 +11,7 @@ namespace SEE.Net.Actions.Table
         /// The constructor.
         /// </summary>
         /// <param name="tableID">The table id.</param>
-		public EnableCityTableNetAction(string tableID) : base(tableID) { }
+        public EnableCityTableNetAction(string tableID) : base(tableID) { }
 
         /// <summary>
         /// Enables and redraws the city of the table on the client.

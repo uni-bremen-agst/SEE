@@ -6,7 +6,7 @@ namespace SEE.Net.Actions.Table
     /// <summary>
     /// Moves a table including the portal on all clients.
     /// </summary>
-    public class MoveIncPortalTableNetAction : TableNetAction
+    public class MoveTableAndPortalNetAction : TableNetAction
     {
         /// <summary>
         /// The position to which the table should be moved.
@@ -18,7 +18,7 @@ namespace SEE.Net.Actions.Table
         /// </summary>
         /// <param name="tableID">The table id.</param>
         /// <param name="position">The position to which the table should be moved</param>
-        public MoveIncPortalTableNetAction(string tableID, Vector3 position) : base(tableID)
+        public MoveTableAndPortalNetAction(string tableID, Vector3 position) : base(tableID)
         {
             Position = position;
         }

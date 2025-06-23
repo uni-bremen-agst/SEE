@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions.Table
                 {
                     case ProgressState.Move:
                         GameTableManager.MoveIncPortal(modifiedTable, memento.Old.Position);
-                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
+                        new MoveTableAndPortalNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
@@ -545,7 +545,7 @@ namespace SEE.Controls.Actions.Table
                 {
                     case ProgressState.Move:
                         GameTableManager.MoveIncPortal(modifiedTable, memento.Old.Position);
-                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.Old.Position).Execute();
+                        new MoveTableAndPortalNetAction(modifiedTable.name, memento.Old.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.Old.Scale);
@@ -573,7 +573,7 @@ namespace SEE.Controls.Actions.Table
                 {
                     case ProgressState.Move:
                         GameTableManager.MoveIncPortal(modifiedTable, memento.New.Position);
-                        new MoveIncPortalTableNetAction(modifiedTable.name, memento.New.Position).Execute();
+                        new MoveTableAndPortalNetAction(modifiedTable.name, memento.New.Position).Execute();
                         break;
                     case ProgressState.Scale:
                         GameTableManager.Scale(modifiedTable, memento.New.Scale);
