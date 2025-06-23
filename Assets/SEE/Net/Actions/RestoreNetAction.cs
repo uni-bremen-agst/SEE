@@ -1,16 +1,14 @@
-﻿using Crosstales.RTVoice.Model;
-using SEE.Game.City;
+﻿using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace SEE.Net.Actions
 {
     /// <summary>
     /// This class propagates an undo of <see cref="DeleteAction"/> to all clients
     /// in the network, that is, it restores game objects representing a node
-    /// or edge previously were deleted.
+    /// or edge previously deleted.
     /// </summary>
     public class RestoreNetAction : AbstractNetAction
     {
@@ -31,11 +29,12 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="nodesOrEdges">The deleted graph elements and their corresponding layouts, if applicable.</param>
         /// <param name="nodeTypes">The deleted node types.</param>
-        public RestoreNetAction(List<RestoreGraphElement> nodesOrEdges,
-            Dictionary<string, VisualNodeAttributes> nodeTypes)
+        public RestoreNetAction
+            (List<RestoreGraphElement> nodesOrEdges,
+             Dictionary<string, VisualNodeAttributes> nodeTypes)
         {
             NodesOrEdges = RestoreGraphElementListSerializer.Serialize(nodesOrEdges);
-            NodeTypeList = nodeTypes != null && nodeTypes.Count > 0?
+            NodeTypeList = nodeTypes != null && nodeTypes.Count > 0 ?
                 NodeTypesSerializer.Serialize(nodeTypes) : "";
         }
 
