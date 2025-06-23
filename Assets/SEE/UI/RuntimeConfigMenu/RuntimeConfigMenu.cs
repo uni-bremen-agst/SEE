@@ -5,7 +5,6 @@ using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.Net.Actions.RuntimeConfig;
-using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -49,9 +48,9 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool blockOpening;
 
         /// <summary>
-        /// Indicator of whether the menu was build before.
+        /// Indicator of whether the menu was built before.
         /// </summary>
-        private bool wasBuildBefore = false;
+        private bool wasBuiltBefore = false;
 
         /// <summary>
         /// Instantiates the tab menu for each city.
@@ -73,12 +72,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void BuildTabMenus()
         {
-            if (wasBuildBefore)
+            if (wasBuiltBefore)
             {
                 ShowNotification.Info("Rebuilding Runtime Config Menu",
                     "The runtime config menu is being rebuilt. This may take a moment. Please wait.");
             }
-            wasBuildBefore = true;
+            wasBuiltBefore = true;
 
             if (cityMenus != null)
             {
