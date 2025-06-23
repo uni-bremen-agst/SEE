@@ -1,11 +1,9 @@
-﻿using Cysharp.Threading.Tasks;
-using SEE.Game.Table;
-using UnityEngine;
+﻿using SEE.Game.Table;
 
 namespace SEE.Net.Actions.Table
 {
     /// <summary>
-    /// Destroyes a table on all clients.
+    /// Destroys a table on all clients.
     /// </summary>
     public class DestroyTableNetAction : TableNetAction
     {
@@ -16,7 +14,7 @@ namespace SEE.Net.Actions.Table
         public DestroyTableNetAction(string tableID) : base(tableID) {}
 
         /// <summary>
-        /// Destroyes the table on each client.
+        /// Destroys the table on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
