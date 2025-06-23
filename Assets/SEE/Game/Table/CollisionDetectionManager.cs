@@ -7,14 +7,14 @@ namespace SEE.Game.Table
     /// This class manages collision detection for a universal table.
     /// </summary>
 	public class CollisionDetectionManager : MonoBehaviour
-	{
+    {
         /// <summary>
         /// Indicates whether the trigger option was enabled.
         /// </summary>
 		private bool changedTrigger = false;
 
         /// <summary>
-        /// Indicates whether an <see cref="Rigidbody"/> was added.
+        /// Indicates whether a <see cref="Rigidbody"/> was added.
         /// </summary>
         private bool addRigidbody = false;
 
@@ -52,11 +52,11 @@ namespace SEE.Game.Table
             {
                 collider.isTrigger = false;
             }
-			if (gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb)
-				&& addRigidbody)
-			{
-				Destroyer.Destroy(rb);
-			}
+            if (gameObject.TryGetComponent<Rigidbody>(out Rigidbody rb)
+                && addRigidbody)
+            {
+                Destroyer.Destroy(rb);
+            }
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace SEE.Game.Table
         /// <param name="other">The colliding object.</param>
         private void OnTriggerEnter(Collider other)
         {
-			isColliding = true;
+            isColliding = true;
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace SEE.Game.Table
         /// <param name="other">The colliding object.</param>
         private void OnTriggerStay(Collider other)
         {
-			isColliding = true;
+            isColliding = true;
         }
 
         /// <summary>
@@ -83,16 +83,16 @@ namespace SEE.Game.Table
         /// <param name="other">The colliding object.</param>
         private void OnTriggerExit(Collider other)
         {
-			isColliding = false;
+            isColliding = false;
         }
 
         /// <summary>
         /// Indicates whether the object is colliding with another object.
         /// </summary>
-        /// <returns>if the object is colliding with another object.</returns>
+        /// <returns>True if the object is colliding with another object.</returns>
 		public bool IsInCollision()
-		{
-			return isColliding;
-		}
+        {
+            return isColliding;
+        }
     }
 }
