@@ -26,7 +26,7 @@ namespace SEE.UI.Menu.Table
         /// <summary>
         /// Whether this class has a finished scale progress in store that hasn't been fetched yet.
         /// </summary>
-        private bool isFinish;
+        private bool isFinished;
 
         /// <summary>
         /// Whether this class has a canceled progress in store that hasn't been fetched yet.
@@ -99,7 +99,7 @@ namespace SEE.UI.Menu.Table
             ButtonManagerBasic finish = menuInstance.FindDescendant("Finish").GetComponent<ButtonManagerBasic>();
             finish.clickEvent.AddListener(() =>
             {
-                isFinish = true;
+                isFinished = true;
             });
             ButtonManagerBasic cancel = menuInstance.FindDescendant("Cancel").GetComponent<ButtonManagerBasic>();
             cancel.clickEvent.AddListener(() =>
@@ -109,21 +109,21 @@ namespace SEE.UI.Menu.Table
         }
 
         /// <summary>
-        /// Checks if the progress is finished.
+        /// Checks whether the progress is finished.
         /// </summary>
-        /// <returns><see cref="isFinish"/></returns>
+        /// <returns><see cref="isFinished"/></returns>
         public bool TryGetFinish()
         {
-            if (isFinish)
+            if (isFinished)
             {
-                isFinish = false;
+                isFinished = false;
                 return true;
             }
             return false;
         }
 
         /// <summary>
-        /// Checks if the progress was canceled.
+        /// Checks whether the progress was canceled.
         /// Otherwise it will be false.
         /// </summary>
         /// <returns><see cref="wasCanceled"/></returns>
