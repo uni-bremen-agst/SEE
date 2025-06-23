@@ -11,7 +11,7 @@ namespace SEE.Net.Actions.Table
     public abstract class TableNetAction : AbstractNetAction
     {
         /// <summary>
-        /// The unique name of the table to interact.
+        /// The unique name of the table to be manipulated.
         /// </summary>
         public string TableID;
 
@@ -23,16 +23,16 @@ namespace SEE.Net.Actions.Table
 
         /// <summary>
         /// The constructor of this action. It sets the <see cref="TableID"/> to identify the table
-        /// to be interacted with.
+        /// to be manipulated.
         /// </summary>
-        /// <param name="tableID">The unique name of the table to interact.</param>
+        /// <param name="tableID">The unique name of the table to be manipulated.</param>
         public TableNetAction(string tableID) : base()
         {
             TableID = tableID;
         }
 
         /// <summary>
-        /// Returns the table object with the id <see cref="TableID"/>
+        /// Returns the table object with the id <see cref="TableID"/>.
         /// </summary>
         /// <returns>the found table object (never null)</returns>
         /// <exception cref="Exception">thrown if a table object cannot be found</exception>

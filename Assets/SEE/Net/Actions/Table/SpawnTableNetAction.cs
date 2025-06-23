@@ -1,11 +1,10 @@
-﻿using SEE.Controls.Actions.Table;
-using SEE.Game.Table;
+﻿using SEE.Game.Table;
 using UnityEngine;
 
 namespace SEE.Net.Actions.Table
 {
     /// <summary>
-    /// This class is repsonsible for spawn <see cref="SpawnTableAction"/> an table on all clients.
+    /// This class is repsonsible for spawning a table on all clients.
     /// </summary>
     public class SpawnTableNetAction : AbstractNetAction
     {
@@ -15,7 +14,7 @@ namespace SEE.Net.Actions.Table
         public string Name;
 
         /// <summary>
-        /// The position of the table.
+        /// The position of the table in worldspace.
         /// </summary>
         public Vector3 Position;
 
