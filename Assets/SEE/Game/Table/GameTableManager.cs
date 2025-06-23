@@ -36,7 +36,7 @@ namespace SEE.Game.Table
         /// Also, it deactivates the <see cref="CitySelectionManager"/> component
         /// because it would be triggered when the table is placed while the user
         /// is clicking the left mouse button.
-        /// Additionally, collision detection will be actived to ensure that the
+        /// Additionally, collision detection will be activated to ensure that the
         /// table does not overlap with another object.
         /// </summary>
         /// <param name="name">The name for the table. If null, a randomized name will be used.</param>
