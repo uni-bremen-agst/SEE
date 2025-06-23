@@ -201,9 +201,8 @@ namespace SEE.Net
                     if (action is AddCityNetAction || action is SpawnTableNetAction)
                     {
                         blockedForSynchronization = true;
-                        ExecuteActionUnsafeWithResponseClientRpc(serializedAction,
-                            action is AddCityNetAction,
-                            RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                        ExecuteCityOrTableCreationUnsafeWithResponseClientRpc
+                            (serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
                         await UniTask.WaitUntil(() => !blockedForSynchronization);
                     }
                     else
@@ -245,7 +244,7 @@ namespace SEE.Net
 
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received an ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return true;
             }
 
@@ -253,14 +252,20 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Performs a unsafe action on the client side and then sends a response to the server.
+        /// Performs an unsafe creation of either a code city or table
+        /// on the client side and then sends a response to the server.
+        /// If <paramref name="cityCreation"/> is true, a city is assumed
+        /// to be created; otherwise, a table is assumed to be created.
+        ///
+        /// Precondition: The action must be an <see cref="AddCityNetAction"/>
+        /// or a <see cref="SpawnTableNetAction"/>.
         /// </summary>
         /// <param name="serializedAction">The serialized action to be broadcasted.</param>
-        /// <param name="cityCreation">If true, the execution will wait until the city was created;
-        /// otherwise it will wait until the table is created</param>
         /// <param name="rpcParams">The additional RPC parameters</param>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        private void ExecuteActionUnsafeWithResponseClientRpc(string serializedAction, bool cityCreation = false, RpcParams rpcParams = default)
+        private void ExecuteCityOrTableCreationUnsafeWithResponseClientRpc
+            (string serializedAction,
+            RpcParams rpcParams = default)
         {
             if (ShouldSkipUnsafeRpcExecution(rpcParams))
             {
@@ -269,14 +274,20 @@ namespace SEE.Net
 
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
 
-            if (cityCreation)
+            if (action is AddCityNetAction)
             {
                 ExecuteAndWaitForCityCreation().Forget();
             }
-            else
+            else if (action is SpawnTableNetAction)
             {
                 ExecuteAndWaitForTableCreation().Forget();
             }
+            else
+            {
+                throw new System.Exception($"The action must be an {nameof(AddCityNetAction)} or a {nameof(SpawnTableNetAction)}.");
+            }
+
+            return;
 
             async UniTask ExecuteAndWaitForCityCreation()
             {
