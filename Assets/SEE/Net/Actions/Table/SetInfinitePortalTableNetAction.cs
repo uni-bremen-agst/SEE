@@ -1,5 +1,4 @@
 ﻿using SEE.Game;
-using SEE.Game.Drawable;
 using SEE.GO;
 
 namespace SEE.Net.Actions.Table
@@ -13,7 +12,7 @@ namespace SEE.Net.Actions.Table
         /// The constructor.
         /// </summary>
         /// <param name="tableID">The table id.</param>
-		public SetInfinitePortalTableNetAction(string tableID) : base(tableID) { }
+        public SetInfinitePortalTableNetAction(string tableID) : base(tableID) { }
 
         /// <summary>
         /// Sets an infinite portal for the table on the client.
