@@ -4,7 +4,8 @@ using SEE.GameObjects;
 namespace SEE.Net.Actions.Table
 {
     /// <summary>
-    /// Disables the <see cref="CitySelectionManager"/> on the corresponding table for all clients.
+    /// Disables the <see cref="CitySelectionManager"/> on the corresponding table
+    /// for all clients.
     /// </summary>
     public class DisableCSMTableNetAction : TableNetAction
     {
