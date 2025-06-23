@@ -637,7 +637,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (condition.StartsWith("@"))
             {
                 throw new Exception($"Conditions of this form ({condition}) " +
-                    $"are not supported in the RuntimeConfigMenu.");
+                    "are not supported in the RuntimeConfigMenu.");
             }
 
             FieldInfo field = FindMemberRecursive(type, condition,
@@ -703,9 +703,15 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="attributes">attributes</param>
         /// <param name="memberInfo">field or property info from <see cref="CreateSetting"/></param>
         /// <param name="obj">object which contains the field or property from <see cref="CreateSetting"/></param>
-        private void CreateSetting(Func<object> getter, string settingName, GameObject parent, bool removable,
-            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null,
-            MemberInfo memberInfo = null, object obj = null)
+        private void CreateSetting
+            (Func<object> getter,
+            string settingName,
+            GameObject parent,
+            bool removable,
+            UnityAction<object> setter = null,
+            IEnumerable<Attribute> attributes = null,
+            MemberInfo memberInfo = null,
+            object obj = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
             Attribute[] attributeArray = attributes?.ToArray() ?? Array.Empty<Attribute>();
