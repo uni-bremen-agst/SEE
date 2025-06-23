@@ -4,23 +4,20 @@ using UnityEngine;
 namespace SEE.Net.Actions.Table
 {
     /// <summary>
-    /// Moves a table including the portal on all clients.
+    /// Moves a table including its portal on all clients.
     /// </summary>
-    public class MoveTableAndPortalNetAction : TableNetAction
+    /// <remarks>If you do not want to move the portal, use
+    /// <see cref="MoveTableOnlyNetAction"/>.</remarks>
+    public class MoveTableAndPortalNetAction : MoveTableNetAction
     {
-        /// <summary>
-        /// The position to which the table should be moved.
-        /// </summary>
-        public Vector3 Position;
-
         /// <summary>
         /// The constructor.
         /// </summary>
         /// <param name="tableID">The table id.</param>
         /// <param name="position">The position to which the table should be moved</param>
-        public MoveTableAndPortalNetAction(string tableID, Vector3 position) : base(tableID)
+        public MoveTableAndPortalNetAction(string tableID, Vector3 position)
+            : base(tableID, position)
         {
-            Position = position;
         }
 
         /// <summary>
