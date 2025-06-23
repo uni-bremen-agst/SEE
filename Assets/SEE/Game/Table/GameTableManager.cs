@@ -36,7 +36,7 @@ namespace SEE.Game.Table
         /// Also, it deactivates the <see cref="CitySelectionManager"/> component
         /// because it would be triggered when the table is placed while the user
         /// is clicking the left mouse button.
-        /// Additionally, collision detection will be actived to ensure that the
+        /// Additionally, collision detection will be activated to ensure that the
         /// table does not overlap with another object.
         /// </summary>
         /// <param name="name">The name for the table. If null, a randomized name will be used.</param>
@@ -176,7 +176,7 @@ namespace SEE.Game.Table
         /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
         /// at the specified <paramref name="position"/>,
-        /// and with the provided <paramref name="eulerAngles"/>.
+        /// and with the provided <paramref name="scale"/>.
         /// </summary>
         /// <param name="name">The table name.</param>
         /// <param name="position">The position of the table.</param>
@@ -192,7 +192,7 @@ namespace SEE.Game.Table
         }
 
         /// <summary>
-        /// Destroyes the given <paramref name="table"/>.
+        /// Destroys the given <paramref name="table"/>.
         /// Also removes the table from <see cref="CitiesHolder.Cities"/>.
         /// </summary>
         /// <param name="table">The table to destroy.</param>
