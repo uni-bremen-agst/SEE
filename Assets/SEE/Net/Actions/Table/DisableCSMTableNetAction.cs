@@ -13,7 +13,7 @@ namespace SEE.Net.Actions.Table
         /// The constructor.
         /// </summary>
         /// <param name="tableID">The table id.</param>
-		public DisableCSMTableNetAction(string tableID) : base(tableID) { }
+        public DisableCSMTableNetAction(string tableID) : base(tableID) { }
 
         /// <summary>
         /// Disables the <see cref="CitySelectionManager"/> of the table on the client.
