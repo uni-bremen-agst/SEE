@@ -516,7 +516,7 @@ namespace SEE.Game.SceneManipulation
                 });
             }
 
-            GameObject TryGetFirstParentGameObject(Node node)
+            static GameObject TryGetFirstParentGameObject(Node node)
             {
                 if (node.Parent != null && node.Parent.GameObject() == null)
                 {
