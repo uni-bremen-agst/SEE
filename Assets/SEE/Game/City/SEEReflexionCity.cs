@@ -55,7 +55,7 @@ namespace SEE.Game.City
         private bool IsLoadedReflexionCity => !initialReflexionCity;
 
         /// <summary>
-        /// Indicator of whether
+        /// Whether the initial city state has been loaded.
         /// </summary>
         private bool initialCityStateLoaded = false;
 

@@ -1,9 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using MoreLinq;
-using OpenCVForUnity.ImgprocModule;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.Tools.ReflexionAnalysis;
@@ -143,7 +141,6 @@ namespace SEE.Game.SceneManipulation
                 throw new ArgumentException($"Game object {deletedObject.name} must be a node or edge.");
             }
         }
-
 
         /// <summary>
         /// Identifies the node types belonging to this subgraph and removes them from the graph.
@@ -496,7 +493,7 @@ namespace SEE.Game.SceneManipulation
         /// Restores the deleted node types.
         /// </summary>
         /// <param name="nodes">The nodes to be restored.</param>
-        /// <param name="nodeTypes">The node types properties.</param>
+        /// <param name="nodeTypes">The node types' properties.</param>
         private static void RestoreNodeTypes(List<Node> nodes, Dictionary<string, VisualNodeAttributes> nodeTypes = null)
         {
             if (nodeTypes != null && nodeTypes.Count > 0)

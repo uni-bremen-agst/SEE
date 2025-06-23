@@ -75,7 +75,7 @@ namespace SEE.Controls.Actions.Table
         private Memento memento;
 
         /// <summary>
-        /// This struct can store all the information needed to revert or repeat a <see cref="ModifyTableAction"/>
+        /// Memento to store all the information needed to revert or repeat a <see cref="ModifyTableAction"/>
         /// </summary>
         private struct Memento
         {
@@ -105,7 +105,7 @@ namespace SEE.Controls.Actions.Table
             private bool newDataWasSet;
 
             /// <summary>
-            /// The relevant transform data (position, euler angles and scale).
+            /// The relevant transform data (position, euler angles, and scale).
             /// </summary>
             public struct TransformData
             {
@@ -135,7 +135,6 @@ namespace SEE.Controls.Actions.Table
             /// The constructor.
             /// </summary>
             /// <param name="table">The modified table.</param>
-            /// <param name="operation">The operation that was executed.</param>
             public Memento(GameObject table)
             {
                 Name = table.name;
@@ -221,9 +220,9 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Executes the user's input to modifying the table.
+        /// Executes the user's input to modify the table.
         /// </summary>
-        /// <returns>True if the action is completed successfully. Otherwise, false.</returns>
+        /// <returns>True if the action is completed successfully; otherwise false.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -283,7 +282,8 @@ namespace SEE.Controls.Actions.Table
         }
 
         /// <summary>
-        /// Changes the progress state to the operation selection and opens the depending menu.
+        /// Changes the progress state to the operation selection and opens the
+        /// depending <see cref="menu"/>.
         /// </summary>
         private void OpenOperationSelection()
         {
@@ -309,7 +309,7 @@ namespace SEE.Controls.Actions.Table
 
         /// <summary>
         /// Prepares the selected operation by performing necessary setup steps.
-        /// It applicable, it reset a zoom and activates an infinity portal for movement.
+        /// If applicable, it resets a zoom and activates an infinity portal for movement.
         /// </summary>
         private void PrepareSelectedOperation()
         {
@@ -323,8 +323,6 @@ namespace SEE.Controls.Actions.Table
                     if (zoomActionDesktop.TriggerImmediateReset(rootTransform))
                     {
                         currentProgressState = ProgressState.Wait;
-                        //ShowNotification.Info("Zoom reset",
-                        //    "The currently chosen zoom will be reset, and may take a little bit.");
                         WaitForReset(rootTransform).Forget();
                     }
                 }
@@ -441,8 +439,8 @@ namespace SEE.Controls.Actions.Table
         {
             if (modifiedTable.GetComponent<CollisionDetectionManager>().IsInCollision())
             {
-                ShowNotification.Warn("Table can't be placed",
-                    "The table can't be placed because it is colliding with another object.");
+                ShowNotification.Warn("Table cannot be placed",
+                    "The table cannot be placed because it is colliding with another object.");
             }
             else
             {
@@ -478,10 +476,7 @@ namespace SEE.Controls.Actions.Table
         /// </summary>
         private void InitScaleMenu()
         {
-            if (scaleMenu == null)
-            {
-                scaleMenu = new ScaleTableMenu(modifiedTable);
-            }
+            scaleMenu ??= new ScaleTableMenu(modifiedTable);
         }
 
         /// <summary>
@@ -518,7 +513,7 @@ namespace SEE.Controls.Actions.Table
             }
             else
             {
-                string deleteMessage = "Do you really want to delete this table?\nThe city cannot be rebuild using undo.";
+                string deleteMessage = "Do you really want to delete this table?\nThe city cannot be rebuilt using undo.";
                 if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(deleteMessage)))
                 {
                     Delete();
@@ -631,6 +626,5 @@ namespace SEE.Controls.Actions.Table
         {
             return new() { memento.Name };
         }
-
     }
 }

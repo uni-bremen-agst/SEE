@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions.Table
 
         /// <summary>
         /// Indicator whether the action waited for synchronization after the <see cref="Start"/> method.
-        /// Without waiting, the table to be moved might not be found on the other players sides.
+        /// Without waiting, the table to be moved might not be found by the other connected players.
         /// </summary>
         private bool waitedForSynchronization = false;
 
@@ -114,8 +114,8 @@ namespace SEE.Controls.Actions.Table
                         if (spawnedTable.TryGetComponent<CollisionDetectionManager>(out CollisionDetectionManager cdManager)
                             && cdManager.IsInCollision())
                         {
-                            ShowNotification.Warn("Table can't be placed",
-                                "The table can't be placed because it is colliding with another object.");
+                            ShowNotification.Warn("Table cannot be placed",
+                                "The table cannot be placed because it is colliding with another object.");
                             return false;
                         }
                         finish = true;

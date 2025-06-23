@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SEE.Game.Table
 {
     /// <summary>
-    /// This class manages the tables modification.
+    /// This class manages table modifications.
     /// </summary>
     public static class GameTableManager
     {
@@ -74,7 +74,7 @@ namespace SEE.Game.Table
 
         /// <summary>
         /// Moves the specified <paramref name="table"/> to the specified <paramref name="position"/>,
-        /// including the associated portal, if the city is drawn.
+        /// including the associated portal if the city is drawn.
         /// </summary>
         /// <param name="table">The table to move.</param>
         /// <param name="position">The position where the table should be placed.</param>
@@ -176,7 +176,7 @@ namespace SEE.Game.Table
         /// <summary>
         /// Respawns a table with the given <paramref name="name"/>,
         /// at the specified <paramref name="position"/>,
-        /// and with the provided <paramref name="eulerAngles"/>.
+        /// and with the provided <paramref name="scale"/>.
         /// </summary>
         /// <param name="name">The table name.</param>
         /// <param name="position">The position of the table.</param>
@@ -192,7 +192,7 @@ namespace SEE.Game.Table
         }
 
         /// <summary>
-        /// Destroyes the given <paramref name="table"/>.
+        /// Destroys the given <paramref name="table"/>.
         /// Also removes the table from <see cref="CitiesHolder.Cities"/>.
         /// </summary>
         /// <param name="table">The table to destroy.</param>
@@ -211,7 +211,7 @@ namespace SEE.Game.Table
 
         /// <summary>
         /// Enables and adds a <see cref="HighlightEffect"/> on the given <paramref name="table"/>
-        /// if it doesn't already exist, then configures and activates the highlight effect.
+        /// if it does not already exist, then configures and activates the highlight effect.
         /// </summary>
         /// <param name="table">The table to which the <see cref="HighlightEffect"/> should be added.</param>
         private static void ActivateHighlight(GameObject table)

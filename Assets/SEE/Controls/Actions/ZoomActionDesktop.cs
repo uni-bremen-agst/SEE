@@ -5,7 +5,6 @@ using static SEE.GO.GameObjectExtensions;
 using UnityEngine;
 using SEE.Game.Operator;
 using SEE.Net.Actions;
-using TMPro;
 
 namespace SEE.Controls.Actions
 {
@@ -120,19 +119,20 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Triggers a zoom reset caused by an other action.
+        /// Triggers an immediate zoom reset caused by another action.
         /// </summary>
-        public bool TriggerImmediateReset(Transform rootTransform)
+        /// <param name="transform">The transform to be reset.</param>
+        public  bool TriggerImmediateReset(Transform transform)
         {
-            ZoomState zoomState = GetZoomStateCopy(rootTransform);
+            ZoomState zoomState = GetZoomStateCopy(transform);
             float steps = zoomState.CurrentTargetZoomSteps;
             if (steps > 0)
             {
                 zoomState.CurrentTargetZoomSteps = 0;
                 zoomState.ZoomCommands.Clear();
-                NodeOperator nodeOperator = rootTransform.gameObject.NodeOperator();
+                NodeOperator nodeOperator = transform.gameObject.NodeOperator();
                 nodeOperator.ResizeTo(zoomState.OriginalLocalScale, zoomState.OriginalPosition, 0, true, false);
-                new ResizeNodeNetAction(rootTransform.name, zoomState.OriginalLocalScale, zoomState.OriginalPosition, true, false, 0).Execute();
+                new ResizeNodeNetAction(transform.name, zoomState.OriginalLocalScale, zoomState.OriginalPosition, true, false, 0).Execute();
             }
             return steps > 0;
         }
