@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System;
+﻿using System;
 using UnityEngine;
 using SEE.DataModel.DG;
 using SEE.Utils;
-using SEE.GO;
 
 namespace SEE.Game.SceneManipulation
 {
@@ -11,7 +9,7 @@ namespace SEE.Game.SceneManipulation
     /// Provides utility methods to compute and evaluate <see cref="Bounds"/>
     /// of <see cref="GameObject"/>s, particulary for checking spatial relationships in the XZ-plane.
     /// </summary>
-	public static class BoundsChecker
+    public static class BoundsChecker
     {
         /// <summary>
         /// Calculates a bounding volume that encapsulates all <see cref="Renderer"/> components
@@ -64,10 +62,12 @@ namespace SEE.Game.SceneManipulation
             foreach (Vector3 corner in corners)
             {
                 if (!IsInsideXZ(corner, parentBounds))
+                {
                     return false;
+                }
             }
-
             return true;
+
             static bool IsInsideXZ(Vector3 point, Bounds bounds)
             {
                 return point.x >= bounds.min.x && point.x <= bounds.max.x &&
