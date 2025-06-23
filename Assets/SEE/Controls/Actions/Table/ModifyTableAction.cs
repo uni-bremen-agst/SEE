@@ -457,7 +457,7 @@ namespace SEE.Controls.Actions.Table
             if (Raycasting.RaycastAnything(out RaycastHit raycast))
             {
                 GameTableManager.Move(modifiedTable, raycast.point);
-                new MoveTableNetAction(modifiedTable.name, raycast.point).Execute();
+                new MoveTableOnlyNetAction(modifiedTable.name, raycast.point).Execute();
                 CheckCollisionWithLeftMouseButton();
             }
         }

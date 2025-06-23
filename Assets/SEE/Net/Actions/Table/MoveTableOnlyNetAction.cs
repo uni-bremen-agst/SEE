@@ -6,7 +6,7 @@ namespace SEE.Net.Actions.Table
     /// <summary>
     /// Moves a table on all clients.
     /// </summary>
-    public class MoveTableNetAction : TableNetAction
+    public class MoveTableOnlyNetAction : TableNetAction
     {
         /// <summary>
         /// The position to which the table should be moved.
@@ -18,7 +18,7 @@ namespace SEE.Net.Actions.Table
         /// </summary>
         /// <param name="tableID">The table id.</param>
         /// <param name="position">The position to which the table should be moved</param>
-        public MoveTableNetAction(string tableID, Vector3 position) : base(tableID)
+        public MoveTableOnlyNetAction(string tableID, Vector3 position) : base(tableID)
         {
             Position = position;
         }

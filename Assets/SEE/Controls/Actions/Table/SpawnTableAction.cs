@@ -108,7 +108,7 @@ namespace SEE.Controls.Actions.Table
                 if (waitedForSynchronization && !finish && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
                     GameTableManager.Move(spawnedTable, raycastHit.point);
-                    new MoveTableNetAction(spawnedTable.name, spawnedTable.transform.position).Execute();
+                    new MoveTableOnlyNetAction(spawnedTable.name, spawnedTable.transform.position).Execute();
                     if (SEEInput.LeftMouseDown())
                     {
                         if (spawnedTable.TryGetComponent<CollisionDetectionManager>(out CollisionDetectionManager cdManager)
