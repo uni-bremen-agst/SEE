@@ -283,7 +283,7 @@ namespace SEE.GO.Menu
             foreach (NestedMenuEntry<MenuEntry> nested in playerMenu.modeMenu.Entries
                 .OfType<NestedMenuEntry<MenuEntry>>())
             {
-                entry ??= SearchRecursive(nested, actionName, playerMenu);
+                entry ??= SearchRecursively(nested, actionName, playerMenu);
                 if (entry != null)
                 {
                     return entry;
@@ -292,7 +292,7 @@ namespace SEE.GO.Menu
 
             return null;
 
-            static MenuEntry SearchRecursive(NestedMenuEntry<MenuEntry> group, string actionName, PlayerMenu playerMenu)
+            static MenuEntry SearchRecursively(NestedMenuEntry<MenuEntry> group, string actionName, PlayerMenu playerMenu)
             {
                 MenuEntry entry = null;
                 foreach (MenuEntry e in group.InnerEntries)
@@ -300,7 +300,7 @@ namespace SEE.GO.Menu
                     if (e is NestedMenuEntry<MenuEntry> nested)
                     {
                         playerMenu.modeMenu.SelectEntry(group);
-                        entry = SearchRecursive(nested, actionName, playerMenu);
+                        entry = SearchRecursively(nested, actionName, playerMenu);
                     }
                     else
                     {
