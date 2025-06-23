@@ -1,5 +1,4 @@
-﻿using MoreLinq;
-using SEE.Game.City;
+﻿using SEE.Game.City;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -24,7 +23,7 @@ namespace SEE.GameObjects
         public CitiesHolder() => Cities = new();
 
         /// <summary>
-        /// Finds the city game object corresponding to the associated <paramref name="tableID"/>.
+        /// Finds the city game object corresponding for the associated <paramref name="tableID"/>.
         /// </summary>
         /// <param name="tableID">The table ID</param>
         /// <returns>The corresponding city game object if found; otherwise, null.</returns>
