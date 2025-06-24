@@ -231,8 +231,8 @@ namespace SEE.Controls.Actions
                         targetPosition = rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, nodeOperator.TargetScale);
                     }
 
-                    nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false);
-                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, AnimationFactor).Execute();
+                    nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false, true);
+                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true, AnimationFactor).Execute();
                 }
             }
         }

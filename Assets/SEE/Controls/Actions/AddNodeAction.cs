@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -12,8 +14,6 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
-using SEE.Game.City;
-using SEE.Game;
 
 namespace SEE.Controls.Actions
 {
@@ -78,9 +78,10 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer
-                        && Input.GetMouseButtonDown(0)
-                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
+                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
+                        && ger.gameObject.TryGetComponent(out InteractableObject io)
+                        && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }

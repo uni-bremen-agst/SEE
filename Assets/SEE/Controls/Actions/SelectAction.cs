@@ -39,9 +39,12 @@ namespace SEE.Controls.Actions
             else if (SEEInput.Select() || XRSEEActions.SelectedFlag)
             {
                 InteractableObject obj = null;
-                if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
+                if (Raycasting.RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase o)
+                        && o is InteractableObject
+                        && ((InteractableObject)o).GraphElemRef.Elem != null
+                        && o.IsInteractable(o.PartiallyInteractable ? hit.point : null))
                 {
-                    obj = o;
+                    obj = ((InteractableObject)o);
                 }
                 if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.SelectedFlag))
                 {

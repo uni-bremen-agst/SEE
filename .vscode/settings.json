@@ -56,5 +56,17 @@
     "dotnet.defaultSolution": "SEE.sln",
     "files.insertFinalNewline": true,
     "files.trimFinalNewlines": true,
-    "files.trimTrailingWhitespace": true
+    "files.trimTrailingWhitespace": true,
+    "[csharp]": {
+        "editor.defaultFormatter": "ms-dotnettools.csharp",
+        "editor.formatOnPaste": false
+    },
+    "[plaintext]": {
+        "files.trimTrailingWhitespace": false
+    },
+    "files.associations": {
+        "*.asset": "plaintext",
+        "*.prefab": "plaintext",
+        "*.unity": "plaintext"
+    }
 }
