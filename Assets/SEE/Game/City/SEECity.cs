@@ -8,6 +8,7 @@ using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Net;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -29,7 +30,7 @@ namespace SEE.Game.City
     /// Manages settings of the graph data showing a single version of a software
     /// system needed at runtime.
     /// </summary>
-    public class SEECity : AbstractSEECity
+    public class SEECity : AbstractSEECity, ICodeCityPersitance
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
@@ -123,6 +124,8 @@ namespace SEE.Game.City
         /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
         protected bool IsPipelineRunning;
+
+        private GraphRenderResult renderResult;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -436,7 +439,7 @@ namespace SEE.Game.City
                         updateProgress(x);
                     }
 
-                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
+                    renderResult = await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
@@ -674,6 +677,35 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+        }
+
+        public void LoadFromSnapshot(SeeCitySnapshot snapshot)
+        {
+            throw new NotImplementedException();
+        }
+
+        SeeCitySnapshot ICodeCityPersitance.CreateSnapshot()
+        {
+            if (renderResult == null)
+            {
+                return null;
+            }
+            return new SeeCitySnapshot
+            {
+                Nodes = renderResult.Nodes.Select(node => new SnapshotNode()
+                {
+                    NodeId = node.ID,
+                    CenterPosition = node.CenterPosition,
+                    AbsoluteScale = node.AbsoluteScale,
+                    Rotation = node.Rotation
+                }).ToList(),
+                Edges = renderResult.Edges.Select(edge => new SnapshotEdge(edge.Source.ID, edge.Target.ID))
+            };
+        }
+
+        public CityTypes GetCityType()
+        {
+            return CityTypes.CodeCity;
         }
 
         #endregion

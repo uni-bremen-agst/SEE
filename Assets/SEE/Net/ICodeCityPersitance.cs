@@ -1,4 +1,6 @@
 
+using SEE.Game.City;
+
 namespace SEE.Net
 {
     /// <summary>
@@ -13,12 +15,14 @@ namespace SEE.Net
         /// Loads the code city data from <paramref name="snapshot"/>
         /// </summary>
         /// <param name="snapshot"></param>
-        void LoadData(SeeCitySnapshot snapshot);
+        void LoadFromSnapshot(SeeCitySnapshot snapshot);
 
         /// <summary>
         /// Saves the current code city data to a snapshot.
         /// </summary>
         /// <returns>The snapshot that should be saved</returns>
-        SeeCitySnapshot SaveData();
+        SeeCitySnapshot CreateSnapshot();
+
+        CityTypes GetCityType();
     }
 }
