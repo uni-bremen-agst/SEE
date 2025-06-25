@@ -23,29 +23,29 @@ Properties {
 	_UnderlayDilate		("Border Dilate", Range(-1,1)) = 0
 	_UnderlaySoftness 	("Border Softness", Range(0,1)) = 0
 
-	_WeightNormal		("Weight Normal", float) = 0
-	_WeightBold			("Weight Bold", float) = .5
+	_WeightNormal		("Weight Normal", Float) = 0
+	_WeightBold			("Weight Bold", Float) = .5
 
-	_ShaderFlags		("Flags", float) = 0
-	_ScaleRatioA		("Scale RatioA", float) = 1
-	_ScaleRatioB		("Scale RatioB", float) = 1
-	_ScaleRatioC		("Scale RatioC", float) = 1
+	_ShaderFlags		("Flags", Float) = 0
+	_ScaleRatioA		("Scale RatioA", Float) = 1
+	_ScaleRatioB		("Scale RatioB", Float) = 1
+	_ScaleRatioC		("Scale RatioC", Float) = 1
 
 	_MainTex			("Font Atlas", 2D) = "white" {}
-	_TextureWidth		("Texture Width", float) = 512
-	_TextureHeight		("Texture Height", float) = 512
-	_GradientScale		("Gradient Scale", float) = 5
-	_ScaleX				("Scale X", float) = 1
-	_ScaleY				("Scale Y", float) = 1
+	_TextureWidth		("Texture Width", Float) = 512
+	_TextureHeight		("Texture Height", Float) = 512
+	_GradientScale		("Gradient Scale", Float) = 5
+	_ScaleX				("Scale X", Float) = 1
+	_ScaleY				("Scale Y", Float) = 1
 	_PerspectiveFilter	("Perspective Correction", Range(0, 1)) = 0.875
 	_Sharpness			("Sharpness", Range(-1,1)) = 0
 
-	_VertexOffsetX		("Vertex OffsetX", float) = 0
-	_VertexOffsetY		("Vertex OffsetY", float) = 0
+	_VertexOffsetX		("Vertex OffsetX", Float) = 0
+	_VertexOffsetY		("Vertex OffsetY", Float) = 0
 
 	_ClipRect			("Clip Rect", vector) = (-32767, -32767, 32767, 32767)
-	_MaskSoftnessX		("Mask SoftnessX", float) = 0
-	_MaskSoftnessY		("Mask SoftnessY", float) = 0
+	_MaskSoftnessX		("Mask SoftnessX", Float) = 0
+	_MaskSoftnessY		("Mask SoftnessY", Float) = 0
 
 	_StencilComp		("Stencil Comparison", Float) = 8
 	_Stencil			("Stencil ID", Float) = 0
@@ -57,7 +57,8 @@ Properties {
 
 	_Cutoff				("Cutoff", Range(0, 1)) = 0.5
 
-	_Portal			("Portal", vector) = (-10, -10, 10, 10)
+	_Portal		("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
+	_PortalFade	("Portal Edge Fade (World Units)", Float) = 0.01
 }
 
 SubShader {
@@ -104,7 +105,8 @@ SubShader {
 		#include "UnityUI.cginc"
 		#include "TMPro_Properties.cginc"
 
-		uniform float4 _Portal;
+		float4 _Portal;
+		float _PortalFade;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -230,10 +232,16 @@ SubShader {
 		// PIXEL SHADER
 		fixed4 PixShader(pixel_t input) : SV_Target
 		{
-			// Discard coordinates if outside portal
+			// Portal: Calculate overhang in each direction
 			// Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-			if (input.worldPos.x < _Portal.x || input.worldPos.z < _Portal.y ||
-				input.worldPos.x > _Portal.z || input.worldPos.z > _Portal.w)
+			float overhangLeft   = max(_Portal.x - input.worldPos.x, 0.0);
+			float overhangBottom = max(_Portal.y - input.worldPos.z, 0.0);
+			float overhangRight  = max(input.worldPos.x - _Portal.z, 0.0);
+			float overhangTop    = max(input.worldPos.z - _Portal.w, 0.0);
+
+			// Discard coordinates if outside portal
+			if (overhangLeft > _PortalFade || overhangRight > _PortalFade ||
+				overhangBottom > _PortalFade || overhangTop > _PortalFade)
 			{
 				discard;
 			}
@@ -272,6 +280,11 @@ SubShader {
 			#if UNITY_UI_ALPHACLIP
 			clip(c.a - 0.001);
 			#endif
+
+			// Portal fade effect
+			float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
+			c.a *= fade;
+			c.rgb *= fade;
 
 			return c;
 		}
