@@ -10,6 +10,7 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
+using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
@@ -285,13 +286,13 @@ namespace SEE.Game.CityRendering
         /// <param name="token">cancellation token with which to cancel the operation</param>
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
-        public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
+        public async UniTask<GraphRenderResult> DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
                                             CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
             if (graph.NodeCount == 0)
             {
                 Debug.LogWarning("The graph has no nodes.\n");
-                return;
+                return new GraphRenderResult();
             }
 
             // all nodes of the graph
@@ -309,7 +310,7 @@ namespace SEE.Game.CityRendering
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
             /// The layout to be applied. If <see cref="doNotAddUniqueRoot"/> is true, use <see cref="NodeLayoutKind.Treemap"/> as the layout.
-            NodeLayout nodeLayout = !doNotAddUniqueRoot? GetLayout() : GetLayout(NodeLayoutKind.Treemap);
+            NodeLayout nodeLayout = !doNotAddUniqueRoot ? GetLayout() : GetLayout(NodeLayoutKind.Treemap);
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
@@ -328,9 +329,11 @@ namespace SEE.Game.CityRendering
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
+
+            ICollection<GameObject> edgeLayouts = new List<GameObject>();
             try
             {
-                await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+                edgeLayouts = await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
             }
             catch (OperationCanceledException)
             {
@@ -368,7 +371,11 @@ namespace SEE.Game.CityRendering
             }
 
             updateProgress?.Invoke(1.0f);
-            return;
+            return new GraphRenderResult
+            {
+                Nodes = layoutNodes,
+                Edges = LayoutEdges(edgeLayouts).Values
+            };
 
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
@@ -478,7 +485,7 @@ namespace SEE.Game.CityRendering
             }
             if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
             {
-               throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+                throw new Exception("Reflexion layout cannot be used as an implementation layout.");
             }
             return GetLayout(nodeLayoutSettings.Implementation);
         }
