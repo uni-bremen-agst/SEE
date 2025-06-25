@@ -251,7 +251,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // A member can be a field, property, method, event, or other things.
             city.GetType().GetMembers()
                 .Where(IsCityAttribute)
-                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested)
+                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested).ThenBy(SortGroupOrder)
                 .ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
@@ -286,6 +286,11 @@ namespace SEE.UI.RuntimeConfigMenu
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
+
+            int SortGroupOrder(MemberInfo memberInfo) =>
+                memberInfo.GetCustomAttributes()
+                    .OfType<RuntimeGroupOrderAttribute>().FirstOrDefault()?.Order
+                    ?? int.MaxValue;
 
             // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)

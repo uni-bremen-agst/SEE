@@ -70,6 +70,7 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(ConfigurationPathOrder)]
         public DataPath ConfigurationPath = new();
 
         /// <summary>
@@ -84,6 +85,7 @@ namespace SEE.Game.City
         /// is needed to show the source code of nodes and edges.
         /// </summary>
         [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DataPath SourceCodeDirectory
@@ -111,6 +113,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(SolutionPathOrder)]
         public DataPath SolutionPath = new();
 
         /// <summary>
@@ -790,6 +793,25 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        /// <summary>
+        /// The order of the configuration path.
+        /// </summary>
+        protected const int ConfigurationPathOrder = 0;
+
+        /// <summary>
+        /// The order of the solution path.
+        /// </summary>
+        protected const int SolutionPathOrder = ConfigurationPathOrder + 1;
+
+        /// <summary>
+        /// The order of the data provider.
+        /// </summary>
+        protected const int DataProviderOrder = SolutionPathOrder + 1;
+
+        /// <summary>
+        /// The order of the source code directory.
+        /// </summary>
+        protected const int SourceCodeDirectoryOrder = DataProviderOrder + 1;
         #endregion
     }
 }
