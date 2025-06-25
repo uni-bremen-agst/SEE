@@ -81,6 +81,9 @@ namespace SEE.Game.City
         /// Executes <see cref="AbstractSEECity.LoadConfiguration"/>
         /// and sets <see cref="initialReflexionCity"/> to false.
         /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
+        [PropertyOrder(ConfigurationButtonsGroupLoad)]
         public override void LoadConfiguration()
         {
             base.LoadConfiguration();

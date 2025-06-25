@@ -753,7 +753,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
         /// </summary>
-        protected const float ResetButtonsGroupOrderReset = 1;
+        protected const float ResetButtonsGroupOrderReset = 2;
 
         /// <summary>
         /// The name of the group for the Inspector buttons managing the configuration file.
@@ -763,7 +763,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
-        protected const float ConfigurationButtonsGroupLoad = 1;
+        protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
