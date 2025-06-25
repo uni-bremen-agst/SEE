@@ -44,6 +44,13 @@ public class SnapshotManager : MonoBehaviour
             snapshots.Add(snapshot);
         }
 
+        if (snapshots.Count == 0)
+        {
+            Debug.LogWarning("No cities found, skip saving snapshot.");
+            // Don't send snapshot to backend of no cities exist.
+            return;
+        }
+
         ServerSnapshot serverSnapshot = new ServerSnapshot
         {
             CitySnapshots = snapshots,
@@ -64,13 +71,6 @@ public class SnapshotManager : MonoBehaviour
 
         string fileName = Path.Combine(SnapshotPath, $"server_snapshot-{Guid.NewGuid()}.json.xz");
         Directory.CreateDirectory(SnapshotPath);
-        byte[] jsonBytes = Encoding.UTF8.GetBytes(snapshotJson);
-
-        // using (FileStream fileStream = new FileStream(fileName, FileMode.Create))
-        // using (GZipStream compressionStream = new GZipStream(fileStream, System.IO.Compression.CompressionLevel.Optimal))
-        // {
-        //     await compressionStream.WriteAsync(jsonBytes, 0, jsonBytes.Length);
-        // }
 
         Compressor.Save(fileName,
          new MemoryStream(Encoding.UTF8.GetBytes(snapshotJson)));

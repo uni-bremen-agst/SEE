@@ -672,26 +672,6 @@ namespace SEE.Net
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
         }
 
-        private void OnCreateServerSnapshot()
-        {
-            IEnumerable<ICodeCityPersitance> cityPersitances = FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersitance>();
-
-            IList<SeeCitySnapshot> snapshots = new List<SeeCitySnapshot>();
-
-            foreach (ICodeCityPersitance city in cityPersitances)
-            {
-                snapshots.Add(city.SaveData());
-            }
-
-            ServerSnapshot serverSnapshot = new ServerSnapshot
-            {
-                CitySnapshots = snapshots,
-            };
-
-            string snapshot = JsonConvert.SerializeObject(serverSnapshot);
-
-        }
-
         /// <summary>
         /// Starts the voice-chat system selected. Unregisters itself from
         /// <see cref="SceneManager.sceneLoaded"/>.
