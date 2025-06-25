@@ -4596,16 +4596,16 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
-  JLGPath:
-    Root: 3
-    RelativePath: /JLGExample/CodeFacts.jlg
-    AbsolutePath: 
   BreakpointClass: classname
   BreakpointLine: 0
   DistanceAboveCity: 0.3
   DistanceBehindCity: 0.3
   LineWidth: 0.01
   ShowOnlyCalls: 0
+  JLGPath:
+    Root: 3
+    RelativePath: /JLGExample/CodeFacts.jlg
+    AbsolutePath: 
 --- !u!114 &264006614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21623,6 +21623,7 @@ GameObject:
   - component: {fileID: 1334775386}
   - component: {fileID: 1334775385}
   - component: {fileID: 1334775388}
+  - component: {fileID: 1334775389}
   m_Layer: 0
   m_Name: Server
   m_TagString: Untagged
@@ -21753,6 +21754,18 @@ MonoBehaviour:
       type: 3}
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
+--- !u!114 &1334775389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d559df8621b541ce6a60fd6a8a3cec2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1339535448
 PrefabInstance:
   m_ObjectHideFlags: 0

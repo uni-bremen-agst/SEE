@@ -79,11 +79,17 @@ public class SnapshotManager : MonoBehaviour
         {
             string url = Network.ClientRestAPI + "server/snapshots?serverId=" + Network.ServerId;
 
-            using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
-            {
-                request.uploadHandler = new UploadHandlerFile(fileName);
+            List<IMultipartFormSection> formSections = new List<IMultipartFormSection>();
 
-                await request.SendWebRequest();
+            // Create a MultipartForm section with the snapshot file.
+            var bytes = File.ReadAllBytes(fileName);
+            MultipartFormFileSection fileFormSection = new MultipartFormFileSection("file", bytes, fileName, "application/octet-stream");
+            formSections.Add(fileFormSection);
+
+            byte[] boundary = UnityWebRequest.GenerateBoundary();
+            using (UnityWebRequest request = UnityWebRequest.Post(url, formSections, boundary))
+            {
+                await request.SendWebRequest().ToUniTask();
 
                 if (request.result != UnityWebRequest.Result.Success)
                 {
@@ -97,9 +103,8 @@ public class SnapshotManager : MonoBehaviour
                     {
                         File.Delete(fileName);
                     }
-                    catch (System.Exception)
+                    catch (Exception)
                     {
-
                         Debug.LogError($"Failed to delete local snapshot after upload: {request.error}");
                     }
                 }

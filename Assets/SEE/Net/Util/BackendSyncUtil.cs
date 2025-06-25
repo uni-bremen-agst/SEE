@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.Game.Drawable;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using Unity.Netcode;
 using UnityEditor.PackageManager;
@@ -38,6 +40,11 @@ namespace SEE.Net.Util
         /// This is a dedicated directory where only files are stored that are downloaded from the backend.
         /// </summary>
         private const string serverContentDirectory = "Multiplayer/";
+
+        /// <summary>
+        /// Path to the directory where snapshots are stored before they are sent to the server.
+        /// </summary>
+        private static readonly string SnapshotPath = Path.Combine(Path.GetTempPath(), "see_snapshots");
 
         /// <summary>
         /// The data structure for logging into the backend.
@@ -367,7 +374,7 @@ namespace SEE.Net.Util
         /// A <see cref="UniTask{bool}"/> indicating whether the login was successful.
         /// Returns <c>true</c> if the login is successful; otherwise, <c>false</c>.
         /// </returns>
-        private static async UniTask<bool> LogInAsync()
+        public static async UniTask<bool> LogInAsync()
         {
             string url = Network.ClientRestAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword);
