@@ -144,8 +144,12 @@ namespace SEE.GO
         /// <summary>
         /// Sets the vertices of the <paramref name="line"/> to <paramref name="from"/>
         /// and <paramref name="to"/>.
+        /// <para>
         /// Precondition: <paramref name="line"/> must be a single line consisting of
         /// two points. We do not want to change a true polyline by a single line.
+        /// </para><para>
+        /// Silently ignores lines with more than two vertices.
+        /// </para>
         /// </summary>
         /// <param name="line">line to be redrawn</param>
         /// <param name="from">the start of the line in world space</param>

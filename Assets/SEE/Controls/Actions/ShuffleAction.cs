@@ -102,13 +102,11 @@ namespace SEE.Controls.Actions
             {
                 if (!shuffling)
                 {
-                    // Retrieve cityRootNode.
-                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
                     // Let's see whether we have hit a code-city element.
-                    if (hoveredObject)
+                    if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef, false) != HitGraphElement.None)
                     {
                         // cityRootNode is the node containing the hoveredObject
-                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject.transform);
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(elementRef.gameObject.transform);
                         Assert.IsNotNull(cityRootNode);
                         // Remember the original position of the city-root node so that it can be reset
                         // to its original position.

@@ -78,7 +78,9 @@ namespace SEE.Controls.Actions
             {
                 case ProgressState.NoNodeSelected:
                     if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
-                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
+                        && ger.gameObject.TryGetComponent(out InteractableObject io)
+                        && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
