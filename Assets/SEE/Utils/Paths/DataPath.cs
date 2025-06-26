@@ -288,7 +288,7 @@ namespace SEE.Utils.Paths
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            path = NormalizePath(path);
+            path = Filenames.ToInternalRepresentation(path);
             if (Root == RootKind.Url)
             {
                 // The constructor will check whether path is a valid URI
@@ -349,11 +349,6 @@ namespace SEE.Utils.Paths
             {
                 Root = RootKind.Absolute;
                 AbsolutePath = path;
-            }
-
-            static string NormalizePath(string path)
-            {
-                return path.Replace('\\', '/');
             }
         }
 
