@@ -288,10 +288,6 @@ namespace SEE.Utils.Paths
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            if (Root != RootKind.Url)
-            {
-                path = Filenames.ToInternalRepresentation(path);
-            }
             if (Root == RootKind.Url)
             {
                 // The constructor will check whether path is a valid URI
@@ -323,35 +319,39 @@ namespace SEE.Utils.Paths
                 // to our server.
 
             }
-            else if (path.Contains(Application.streamingAssetsPath))
+            else // path refers to a file-system path.
             {
-                Root = RootKind.StreamingAssets;
-                RelativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
-            }
-            else if (path.Contains(Application.dataPath))
-            {
-                Root = RootKind.AssetsFolder;
-                RelativePath = path.Replace(Application.dataPath, string.Empty);
-            }
-            else if (path.Contains(Application.persistentDataPath))
-            {
-                Root = RootKind.PersistentData;
-                RelativePath = path.Replace(Application.persistentDataPath, string.Empty);
-            }
-            else if (path.Contains(Application.temporaryCachePath))
-            {
-                Root = RootKind.TemporaryCache;
-                RelativePath = path.Replace(Application.temporaryCachePath, string.Empty);
-            }
-            else if (path.Contains(ProjectFolder()))
-            {
-                Root = RootKind.ProjectFolder;
-                RelativePath = path.Replace(ProjectFolder(), string.Empty);
-            }
-            else
-            {
-                Root = RootKind.Absolute;
-                AbsolutePath = path;
+                path = Filenames.ToInternalRepresentation(path);
+                if (path.Contains(Application.streamingAssetsPath))
+                {
+                    Root = RootKind.StreamingAssets;
+                    RelativePath = path.Replace(Application.streamingAssetsPath, string.Empty);
+                }
+                else if (path.Contains(Application.dataPath))
+                {
+                    Root = RootKind.AssetsFolder;
+                    RelativePath = path.Replace(Application.dataPath, string.Empty);
+                }
+                else if (path.Contains(Application.persistentDataPath))
+                {
+                    Root = RootKind.PersistentData;
+                    RelativePath = path.Replace(Application.persistentDataPath, string.Empty);
+                }
+                else if (path.Contains(Application.temporaryCachePath))
+                {
+                    Root = RootKind.TemporaryCache;
+                    RelativePath = path.Replace(Application.temporaryCachePath, string.Empty);
+                }
+                else if (path.Contains(ProjectFolder()))
+                {
+                    Root = RootKind.ProjectFolder;
+                    RelativePath = path.Replace(ProjectFolder(), string.Empty);
+                }
+                else
+                {
+                    Root = RootKind.Absolute;
+                    AbsolutePath = path;
+                }
             }
         }
 
