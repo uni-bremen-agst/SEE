@@ -36,6 +36,11 @@ namespace SEE.UI.Menu
         private readonly Stack<MenuLevel> levels = new();
 
         /// <summary>
+        /// The current menu level.
+        /// </summary>
+        public int CurrentLevel => levels.Count();
+
+        /// <summary>
         /// Path to the NestedMenu prefab.
         /// </summary>
         protected override string MenuPrefab => "Prefabs/UI/NestedMenu";

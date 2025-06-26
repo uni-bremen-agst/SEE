@@ -101,7 +101,7 @@ namespace SEE.Game.Drawable
                 surf.CurrentPage = page;
             }
 
-            SurfacePageController surfacePageController = GameFinder.GetHighestParent(obj).GetComponentInChildren<SurfacePageController>();
+            SurfacePageController surfacePageController = obj.GetRootParent().GetComponentInChildren<SurfacePageController>();
             if (surfacePageController != null)
             {
                 surfacePageController.UpdatePage();
@@ -222,7 +222,7 @@ namespace SEE.Game.Drawable
         /// the correct object will not be hidden, causing errors.</remarks>
         public static void ChangeVisibility(GameObject obj, bool visibility)
         {
-            GameFinder.GetHighestParent(obj).SetActive(visibility);
+            obj.GetRootParent().SetActive(visibility);
             if (GameFinder.GetDrawableSurface(obj).TryGetDrawableSurface(out DrawableSurface surface))
             {
                 surface.Visibility = visibility;

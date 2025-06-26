@@ -24,6 +24,7 @@ namespace SEE.Utils
         public const char CircleExclamationMark = '\uF06A';
         public const char CircleMinus = '\uF056';
         public const char CircleQuestionMark = '\uF059';
+        public const char City = '\uF64F';
         public const char Crosshairs = '\uF05B';
         public const char Code = '\uF121';
         public const char Compare = '\uE13A';
@@ -55,6 +56,7 @@ namespace SEE.Utils
         public const char Load = '\uF56F';
         public const char MagnifyingGlass = '\uF002';
         public const char MinusCheckbox = '\uF146';
+        public const char Modify = '\uF0AD';
         public const char Move = '\uF0B2';
         public const char MoveAPoint = '\uF4D7';
         public const char Node = '\uF1B2';

@@ -49,6 +49,7 @@ namespace SEE.Game.City
               KeyLabel = "Author", ValueLabel = "Aliases"),
          Tooltip("Author alias mapping."),
          ShowIf("CombineAuthors"),
+         RuntimeShowIf("CombineAuthors"),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup),
          HideReferenceObjectPicker]

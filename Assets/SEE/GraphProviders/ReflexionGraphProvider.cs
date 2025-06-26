@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
@@ -8,9 +9,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
-using SEE.GameObjects;
 
 namespace SEE.GraphProviders
 {

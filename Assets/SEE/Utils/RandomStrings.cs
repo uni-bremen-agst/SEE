@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace SEE.Game.Drawable
+namespace SEE.Utils
 {
     /// <summary>
     /// Provides random strings.
