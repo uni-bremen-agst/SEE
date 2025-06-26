@@ -82,7 +82,7 @@ namespace SEE.Utils.Paths
         /// <param name="path">the path</param>
         public DataPath(string path)
         {
-           Path = path;
+            Path = path;
         }
 
         /// <summary>
@@ -288,7 +288,10 @@ namespace SEE.Utils.Paths
             {
                 throw new ArgumentNullException(nameof(path));
             }
-            path = Filenames.ToInternalRepresentation(path);
+            if (Root != RootKind.Url)
+            {
+                path = Filenames.ToInternalRepresentation(path);
+            }
             if (Root == RootKind.Url)
             {
                 // The constructor will check whether path is a valid URI
