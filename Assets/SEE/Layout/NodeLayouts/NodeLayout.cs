@@ -52,6 +52,9 @@ namespace SEE.Layout.NodeLayouts
             Box box = Bounding3DBox(layout.Values);
             MoveTo(layout.Values, centerPosition, box);
             float scaleFactor = Mathf.Min(rectangle.x / box.Width, rectangle.y / box.Depth);
+            /// This case is required when a <see cref="ReflexionLayout"/>
+            /// is used and only a single Subroot should be displayed.
+            scaleFactor = float.IsNaN(scaleFactor) ? 0f : scaleFactor;
             // Note: Scaling may not be needed for some layouts because they already scale the nodes
             // so that they fit into rectangle (e.g., tree map).
             // The box is now at centerPosition.

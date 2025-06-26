@@ -7,7 +7,6 @@ using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
-using SEE.Layout;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -19,7 +18,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -42,7 +40,7 @@ namespace SEE.Game.City
         [OdinSerialize, ShowInInspector,
          Tooltip("A graph provider yielding the data to be visualized as a code city."),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
-         HideReferenceObjectPicker]
+         HideReferenceObjectPicker, RuntimeGroupOrder(DataProviderOrder)]
         public SingleGraphPipelineProvider DataProvider = new();
 
         /// <summary>
@@ -326,10 +324,12 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
+        /// <returns>True if the menus need to be adjusted; otherwise, false.
+        /// Required for <see cref="SEEReflexionCity"/>.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual async UniTask LoadDataAsync()
+        public virtual async UniTask<bool> LoadDataAsync()
         {
             if (DataProvider != null)
             {
@@ -369,6 +369,7 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
+            return false;
         }
 
         /// <summary>
@@ -377,7 +378,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
-        [EnableIf(nameof(IsGraphLoaded))]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
             string outputFile = Application.streamingAssetsPath + "/output.gxl";
@@ -400,7 +401,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphLoaded))]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
             if (IsPipelineRunning)
@@ -460,92 +461,19 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
-        /// Only the game objects generated for the nodes and edges are deleted first
-        /// and then they are re-created.
+        /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphDrawn))]
-        public void ReDrawGraph()
+        public virtual void ReDrawGraph()
         {
-            const string Prefix = "Text";
             if (LoadedGraph == null)
             {
                 Debug.LogError("No graph loaded.\n");
             }
             else
             {
-                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
-                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
                 DeleteGraphGameObjects();
                 DrawGraph();
-                RestoreLayout(layoutGraphNodes, decorationValues).Forget();
-                graphRenderer = null;
-            }
-            return;
-
-            async UniTask RestoreLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
-                                        Dictionary<string, (Vector3 pos, Vector2 rect, Vector3 scale)> decorationValues)
-            {
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn());
-                layoutGraphNodes.ForEach(nodeLayout =>
-                {
-                    GameObject node = GraphElementIDMap.Find(nodeLayout.ID);
-                    if (node != null)
-                    {
-                        node.NodeOperator().ScaleTo(nodeLayout.AbsoluteScale, 0);
-                        node.NodeOperator().MoveTo(nodeLayout.CenterPosition, 0);
-                        node.GetComponentsInChildren<TextMeshPro>().ForEach(tmp =>
-                        {
-                            if (decorationValues.ContainsKey(nodeLayout.ID))
-                            {
-                                RectTransform tmpRect = (RectTransform)tmp.transform;
-                                tmpRect.localScale = decorationValues[nodeLayout.ID].scale;
-                                if (tmp.name.StartsWith(Prefix))
-                                {
-                                    tmpRect.sizeDelta = decorationValues[nodeLayout.ID].rect;
-                                    tmpRect.localPosition = decorationValues[nodeLayout.ID].pos;
-                                }
-                            }
-                        });
-                    }
-                });
-            }
-
-            (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
-            {
-                IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-                Dictionary<string, (Vector3, Vector2, Vector3)> textValues = new();
-                foreach (GameObject gameObject in gameObjects)
-                {
-                    Node node = gameObject.GetComponent<NodeRef>().Value;
-                    // skip root nodes. Their restoration is handled by the layout itself.
-                    if (node.IsRoot() || node.IsArchitectureOrImplementationRoot())
-                    {
-                        continue;
-                    }
-                    LayoutGraphNode layoutNode = new(node)
-                    {
-                        CenterPosition = gameObject.transform.position,
-                        AbsoluteScale = gameObject.transform.localScale
-                    };
-                    result.Add(layoutNode);
-                    // Case for decorative texts that start with the prefix "Text".
-                    if (gameObject.FindChildWithPrefix(Prefix) != null)
-                    {
-                        RectTransform text = (RectTransform)gameObject.FindChildWithPrefix(Prefix);
-                        textValues.Add(node.ID, (text.localPosition, text.rect.size, text.localScale));
-                    }
-                    // Case for label texts that start with the prefix "Label".
-                    else if (gameObject.GetComponentInChildren<TextMeshPro>() != null)
-                    {
-                        textValues.Add(node.ID, (Vector3.zero, Vector2.zero, gameObject.GetComponentInChildren<TextMeshPro>().transform.localScale));
-                    }
-                }
-                LayoutNodes.SetLevels(result);
-                return (result, textValues);
             }
         }
 
@@ -554,7 +482,7 @@ namespace SEE.Game.City
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        private GraphRenderer graphRenderer;
+        protected GraphRenderer graphRenderer;
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
@@ -605,6 +533,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
+        /// And enables the <see cref="CitySelectionManager"/> to add a new <see cref="AbstractSEECity"/>.
         /// </summary>
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
@@ -618,6 +547,10 @@ namespace SEE.Game.City
             if (TryGetComponent(out GitPoller poller))
             {
                 Destroyer.Destroy(poller);
+            }
+            if (TryGetComponent(out CitySelectionManager csm))
+            {
+                csm.enabled = true;
             }
         }
 
@@ -653,6 +586,21 @@ namespace SEE.Game.City
             else
             {
                 DumpNodeMetrics(new List<Graph>() { loadedGraph });
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="Graph.UnknownType"/> is present in <see cref="AbstractSEECity.NodeTypes"/>
+        /// and adds it with a magenta color if missing.
+        /// </summary>
+        public void CheckAndAddUnknownNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.UnknownType, out VisualNodeAttributes _))
+            {
+                VisualNodeAttributes visualNodeAttributes = new();
+                visualNodeAttributes.ColorProperty.TypeColor = Color.magenta;
+                visualNodeAttributes.ShowNames = true;
+                NodeTypes[Graph.UnknownType] = visualNodeAttributes;
             }
         }
 

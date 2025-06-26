@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 
@@ -132,7 +133,7 @@ namespace SEE.Game.Drawable
         /// <returns>Nothing, it waits until the sticky note has been converted.</returns>
         private static async UniTask ChangeVisibilityAfterLoadDrawablesAsync(GameObject stickyNote, DrawableConfig config)
         {
-            while (!GameFinder.GetHighestParent(stickyNote).name.Contains(ValueHolder.DrawableHolderPrefix))
+            while (!stickyNote.GetRootParent().name.Contains(ValueHolder.DrawableHolderPrefix))
             {
                 await UniTask.Yield();
             }
@@ -256,7 +257,7 @@ namespace SEE.Game.Drawable
         /// <param name="pos">The new position.</param>
         public static void SetPosition(GameObject obj, Vector3 pos)
         {
-            Transform transform = GameFinder.GetHighestParent(obj).transform;
+            Transform transform = obj.GetRootParent().transform;
             transform.position = pos;
         }
 
@@ -281,12 +282,12 @@ namespace SEE.Game.Drawable
             /// Checks if the order in layer should increase or decrease.
             if (newLayer - oldLayer > 0)
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer,
+                GameLayerChanger.ChangeOrderInLayer(stickyNote.GetRootParent(), newLayer,
                     GameLayerChanger.LayerChangerStates.Increase, false, true);
             }
             else
             {
-                GameLayerChanger.ChangeOrderInLayer(GameFinder.GetHighestParent(stickyNote), newLayer,
+                GameLayerChanger.ChangeOrderInLayer(stickyNote.GetRootParent(), newLayer,
                     GameLayerChanger.LayerChangerStates.Decrease, false, true);
             }
         }
@@ -298,7 +299,7 @@ namespace SEE.Game.Drawable
         /// <param name="config">The configuration which holds the values for the changing.</param>
         public static void Change(GameObject stickyNote, DrawableConfig config)
         {
-            GameObject root = GameFinder.GetHighestParent(stickyNote);
+            GameObject root = stickyNote.GetRootParent();
             GameObject surface = GameFinder.GetDrawableSurface(stickyNote);
             GameObject surfaceParent = surface.transform.parent.gameObject;
 
