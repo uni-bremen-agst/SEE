@@ -36,7 +36,7 @@ namespace SEE.GraphProviders
         /// between <see cref="BaselineCommitID"/> and <see cref="CommitID"/>.
         /// If <see cref="BaselineCommitID"/> is null or empty, no VCS metrics are gathered.
         /// </summary>
-        [ShowInInspector, Tooltip("VCS metrics will be gathered relative to this commit id. If undefined, no VCS metrics will be gathered"),
+        [ShowInInspector, Tooltip("VCS metrics will be gathered relative to this commit id. If undefined, no VCS metrics will be gathered."),
             HideReferenceObjectPicker]
         public string BaselineCommitID = string.Empty;
 
