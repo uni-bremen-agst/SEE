@@ -128,6 +128,11 @@ namespace SEE.VCS
         /// </summary>
         private const string branchesLabel = "Branches";
 
+        /// <summary>
+        /// Saves the attributes of this <see cref="Filter"/> using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes.</param>
+        /// <param name="label">The label under which this <see cref="Filter"/> is to be saved.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -143,6 +148,11 @@ namespace SEE.VCS
             writer.EndGroup();
         }
 
+        /// <summary>
+        /// Restores the attributes of this <see cref="Filter"/> from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The attributes to restore from.</param>
+        /// <param name="label">The label under which to look up the values in <paramref name="attributes"/>.</param>
         public void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

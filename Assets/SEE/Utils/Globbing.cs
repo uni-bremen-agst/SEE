@@ -28,9 +28,10 @@ namespace SEE.Utils
         private const string isIncludeLabel = "IsInclude";
 
         /// <summary>
-        /// Saves the attributes of this <see cref="Globbing"/> to <paramref name="writer"/>.
+        /// Saves the attributes of this <see cref="Globbing"/> using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes.</param>
+        /// <param name="label">The label under which this <see cref="Globbing"/> is to be saved.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginList(label);
@@ -48,6 +49,7 @@ namespace SEE.Utils
         /// Restores the attributes of this <see cref="Globbing"/> from <paramref name="attributes"/>.
         /// </summary>
         /// <param name="attributes">The attributes to restore from.</param>
+        /// <param name="label">The label under which to look up the values in <paramref name="attributes"/>.</param>
         /// <returns>True if <paramref name="attributes"/> contained a <see cref="Globbing"/>
         /// for the given <paramref name="label"/>.</returns>
         public bool Restore(Dictionary<string, object> attributes, string label)

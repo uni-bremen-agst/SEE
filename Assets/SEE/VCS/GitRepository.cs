@@ -349,6 +349,7 @@ namespace SEE.VCS
         /// of <see cref="Filter.Matcher"/> and does not violate any exclusive criterion in
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>all distinct file paths</returns>
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
