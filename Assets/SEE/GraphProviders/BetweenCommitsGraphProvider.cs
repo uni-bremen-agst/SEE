@@ -40,6 +40,9 @@ namespace SEE.GraphProviders
             HideReferenceObjectPicker]
         public string BaselineCommitID = string.Empty;
 
+        /// <summary>
+        /// <inheritdoc cref="GraphProvider.GetKind"/>.
+        /// </summary>
         public override SingleGraphProviderKind GetKind()
         {
             return SingleGraphProviderKind.VCS;
@@ -97,8 +100,6 @@ namespace SEE.GraphProviders
                 throw new ArgumentException("The given city is null.\n");
             }
         }
-
-
 
         /// <summary>
         /// Creates and adds a new node to <paramref name="graph"/> and returns it.
@@ -202,6 +203,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private const string baselineCommitIDLabel = "BaselineCommitID";
 
+        /// <summary>
+        /// <inheritdoc cref="GraphProvider.SaveAttributes(ConfigWriter)"/>.
+        /// </summary>
         protected override void SaveAttributes(ConfigWriter writer)
         {
             base.SaveAttributes(writer);
@@ -209,6 +213,9 @@ namespace SEE.GraphProviders
             writer.Save(BaselineCommitID, baselineCommitIDLabel);
         }
 
+        /// <summary>
+        /// <inheritdoc cref="GraphProvider.RestoreAttributes(Dictionary{string, object})"/>.
+        /// </summary>
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             base.RestoreAttributes(attributes);
