@@ -89,7 +89,6 @@ namespace SEE.Scanner
             int totalNunberOfOperators = 0;
             int totalNumberOfOperands = 0;
 
-
             foreach (AntlrToken token in tokens)
             {
                 // Line of code counting.
