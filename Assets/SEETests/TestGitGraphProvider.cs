@@ -163,25 +163,25 @@ namespace SEE.GraphProviders
 
                 Assert.AreEqual(
                     1,
-                    series[0].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[0].GetNode("firstFile.cs").IntAttributes[CommitFrequency]
                 );
 
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[1].GetNode("AnotherFile.cs").IntAttributes[CommitFrequency]
                 );
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[1].GetNode("firstFile.cs").IntAttributes[CommitFrequency]
                 );
 
                 Assert.AreEqual(
                     2,
-                    series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[2].GetNode("AnotherFile.cs").IntAttributes[CommitFrequency]
                 );
                 Assert.AreEqual(
                     1,
-                    series[2].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[2].GetNode("firstFile.cs").IntAttributes[CommitFrequency]
                 );
             });
         }
