@@ -178,14 +178,14 @@ namespace SEE.GraphProviders
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == "File");
+            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.VCS.FileType);
             AssertTokenMetricsExist(fileNode);
         }
 
         private static void AssertTokenMetricsExist(Node node)
         {
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "LOC", out int _));
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "McCabe_Complexity", out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.LOC, out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.McCabe, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperators, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperands, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.TotalOperators, out int _));
