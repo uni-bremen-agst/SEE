@@ -67,8 +67,32 @@
         /// Prefix for all metrics.
         /// </summary>
         public const string Prefix = "Metric.";
-    }
 
+        /// <summary>
+        /// Prefix for line metrics.
+        /// </summary>
+        public const string Lines = Prefix + "Lines.";
+
+        /// <summary>
+        /// Name of lines of code (LOC) metric.
+        /// </summary>
+        public const string LOC = Lines + "LOC";
+
+        /// <summary>
+        /// Number of comments in the source code.
+        /// </summary>
+        public const string Comments = Lines + "Comments";
+
+        /// <summary>
+        /// Number of tokens in the source code.
+        /// </summary>
+        public const string NumberOfTokens = Prefix + "Number_of_Tokens";
+
+        /// <summary>
+        /// Name of McCabe complexity metric.
+        /// </summary>
+        public const string McCabe = Prefix + "McCabe_Complexity";
+    }
 
     /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.

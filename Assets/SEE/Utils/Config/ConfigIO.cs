@@ -223,8 +223,7 @@ namespace SEE.Utils.Config
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                if (values == null)
+                if (dictionary is not Dictionary<string, object> values)
                 {
                     throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, float>. Actual type: {dictionary.GetType()}");
                 }
@@ -265,15 +264,15 @@ namespace SEE.Utils.Config
         /// </summary>
         /// <param name="attributes">where to look up the <paramref name="label"/></param>
         /// <param name="label">the label to look up</param>
-        /// <param name="value">the value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// <param name="value">the restored value of the looked up <paramref name="label"/> if the <paramref name="label"/>
         /// exists</param>
         /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <exception cref="InvalidCastException">in case the looked up value is not the expected type List of string</exception>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref Vector3 value)
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
-                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
-                if (values == null)
+                if (dictionary is not Dictionary<string, object> values)
                 {
                     throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: Dictionary<string, float>. Actual type: {dictionary.GetType()}");
                 }
@@ -297,12 +296,23 @@ namespace SEE.Utils.Config
             }
         }
 
+        /// <summary>
+        /// Restores <paramref name="value"/> from <paramref name="attributes"/> using the given <paramref name="label"/>.
+        ///
+        /// If a value can be restored, <paramref name="value"/> will be set to the restored value, that is,
+        /// its previous is overridden completely, and true is returned.
+        /// </summary>
+        /// <param name="attributes">where to look up the <paramref name="label"/></param>
+        /// <param name="label">the label to look up</param>
+        /// <param name="value">the restored value of the looked up <paramref name="label"/> if the <paramref name="label"/>
+        /// exists.</param>
+        /// <returns>true if the <paramref name="label"/> was found</returns>
+        /// <exception cref="InvalidCastException">in case the looked up value is not the expected type List of string</exception>
         internal static bool Restore(Dictionary<string, object> attributes, string label, ref HashSet<string> value)
         {
             if (attributes.TryGetValue(label, out object storedValue))
             {
-                List<object> values = storedValue as List<object>;
-                if (values == null)
+                if (storedValue is not List<object> values)
                 {
                     throw new InvalidCastException($"Types are not assignment compatible for attribute {label}. Expected type: List<string>. Actual type: {storedValue.GetType()}");
                 }

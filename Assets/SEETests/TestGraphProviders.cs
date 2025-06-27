@@ -1,7 +1,9 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -176,14 +178,14 @@ namespace SEE.GraphProviders
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == "File");
+            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.VCS.FileType);
             AssertTokenMetricsExist(fileNode);
         }
 
         private static void AssertTokenMetricsExist(Node node)
         {
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "LOC", out int _));
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "McCabe_Complexity", out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.LOC, out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.McCabe, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperators, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperands, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.TotalOperators, out int _));
@@ -232,17 +234,18 @@ namespace SEE.GraphProviders
         /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
-            Dictionary<string, bool> pathGlobbing = new()
+            Globbing pathGlobbing = new()
                 {
                     { "Assets/SEE/GraphProviders/**/*.cs", true }
                 };
 
-            VCSGraphProvider provider = new()
+            BetweenCommitsGraphProvider provider = new()
             {
-                RepositoryPath = new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                GitRepository = new GitRepository
+                                     (new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                                      new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
                 CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
-                PathGlobbing = pathGlobbing
             };
 
             return await provider.ProvideAsync(new Graph(""), NewCity());
@@ -254,9 +257,7 @@ namespace SEE.GraphProviders
         /// <returns></returns>
         private static SEECity NewCity()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-            return city;
+            return new GameObject().AddComponent<SEECity>();
         }
     }
 }
