@@ -35,6 +35,15 @@
       "dependencies": {},
       "hash": "fe31ad0904abee296b5ea72c6073157accba59e8"
     },
+    "com.github.homuler.mediapipe": {
+      "version": "file:com.github.homuler.mediapipe",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {
+        "com.unity.ugui": "1.0.0",
+        "com.unity.test-framework": "1.0.0"
+      }
+    },
     "com.openai.unity": {
       "version": "8.6.3",
       "depth": 0,
