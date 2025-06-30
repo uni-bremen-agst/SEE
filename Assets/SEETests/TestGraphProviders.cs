@@ -1,5 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Utils;
 using SEE.Utils.Paths;
@@ -207,7 +208,7 @@ namespace SEE.GraphProviders
             Graph graph = await GetVCSGraphAsync();
             Assert.IsNotNull(graph);
             Assert.IsTrue(graph.NodeCount > 0);
-
+            Save(graph);
             Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
 
             {
@@ -215,7 +216,7 @@ namespace SEE.GraphProviders
                 Assert.AreEqual(157, value);
             }
             {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesDeleted, out int value));
+                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesRemoved, out int value));
                 Assert.AreEqual(193, value);
             }
             {
@@ -226,6 +227,13 @@ namespace SEE.GraphProviders
                 Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
                 Assert.AreEqual(12, value);
             }
+        }
+
+        private void Save(Graph graph)
+        {
+            string filename = Path.GetTempFileName();
+            GraphWriter.Save(filename, graph, "Part_Of");
+            Debug.Log($"Graph saved to {filename}.\n");
         }
 
         /// <summary>
@@ -243,7 +251,7 @@ namespace SEE.GraphProviders
             {
                 GitRepository = new GitRepository
                                      (new DataPath(Path.GetDirectoryName(Application.dataPath)),
-                                      new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
+                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
                 CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
             };

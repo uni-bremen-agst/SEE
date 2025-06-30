@@ -33,7 +33,7 @@ namespace SEE.GraphProviders.VCS
             FileToMetrics fileToMetrics = new();
             foreach (string file in repositoryFiles)
             {
-                fileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<FileAuthor>(), 0));
+                fileToMetrics.Add(file, new GitFileMetrics(0, new HashSet<FileAuthor>(), 0, 0));
             }
             return fileToMetrics;
         }
@@ -228,9 +228,8 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
         /// for the relevant files in the given <paramref name="repository"/> present after the given
-        /// <paramref name="startDate"/> to the <paramref name="graph"/>.
-        ///
-        /// Calculates and adds <see cref="GitFileMetrics"/> for all added files, too.
+        /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
+        /// <see cref="GitFileMetrics"/> are calculated, too.
         /// </summary>
         /// <param name="graph">Where to add the file metrics.</param>
         /// <param name="simplifyGraph">If true, single chains of directory nodes in the node hierarchy
@@ -319,7 +318,8 @@ namespace SEE.GraphProviders.VCS
                     fileToMetrics.Add(filePath,
                         new GitFileMetrics(1,
                             new HashSet<FileAuthor> { comitter },
-                            churn));
+                            changedFile.LinesAdded,
+                            changedFile.LinesDeleted));
 
                     fileToMetrics[filePath].AuthorsChurn.Add(comitter, churn);
                 }
@@ -327,7 +327,8 @@ namespace SEE.GraphProviders.VCS
                 {
                     GitFileMetrics changedFileMetrics = fileToMetrics[filePath];
                     changedFileMetrics.NumberOfCommits += 1;
-                    changedFileMetrics.Churn += churn;
+                    changedFileMetrics.LinesAdded += changedFile.LinesAdded;
+                    changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
                     changedFileMetrics.Authors.Add(comitter);
                     changedFileMetrics.AuthorsChurn.GetOrAdd(comitter, () => 0);
                     changedFileMetrics.AuthorsChurn[comitter] += churn;
@@ -499,10 +500,10 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repository"> The repository from which the nodes and metrics are derived.</param>
         private static void AddNodesAndMetrics
             (FileToMetrics fileToMetrics,
-            Graph graph,
-            bool simplifyGraph,
-            string repositoryName,
-            GitRepository repository)
+             Graph graph,
+             bool simplifyGraph,
+             string repositoryName,
+             GitRepository repository)
         {
             CalculateTruckFactor(fileToMetrics);
 
@@ -513,6 +514,8 @@ namespace SEE.GraphProviders.VCS
                 Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, graph);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
                 n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
+                n.SetInt(DataModel.DG.VCS.LinesAdded, file.Value.LinesAdded);
+                n.SetInt(DataModel.DG.VCS.LinesRemoved, file.Value.LinesRemoved);
                 n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);
                 n.SetInt(DataModel.DG.VCS.TruckNumber, file.Value.TruckFactor);
                 if (file.Value.Authors.Any())

@@ -291,9 +291,9 @@
         /// </summary>
         public const string LinesAdded = Prefix + "Lines_Added";
         /// <summary>
-        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// The number of lines of code removed from a file that was changed between two commits.
         /// </summary>
-        public const string LinesDeleted = Prefix + "Lines_Deleted";
+        public const string LinesRemoved = Prefix + "Lines_Removed";
         /// <summary>
         /// The churn of a file, that is, the number of lines added and deleted.
         /// </summary>
