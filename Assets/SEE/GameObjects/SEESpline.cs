@@ -486,8 +486,8 @@ namespace SEE.GO
         /// <item><description>
         /// If available, the collider is either enabled or disabled.
         /// </description></item><item><description>
-        /// If no collider is available and a <see cref="MeshFilter"/> is available, a <see cref="MeshCollider"/>
-        /// will be created using the available shared mesh.
+        /// If <see cref="IsSelectable"/> is <c>true</c> and no collider is available and a <see cref="MeshFilter"/> is available,
+        /// a <see cref="MeshCollider"/> will be created using the available shared mesh.
         /// </description></item>
         /// </list>
         /// </summary>
