@@ -327,7 +327,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Initializes the horizontal selector for switching cities.
         /// </summary>
-        private void SetupCitySwitcher()
+        public void SetupCitySwitcher()
         {
             // init the list
             citySwitcher.itemList.Clear();

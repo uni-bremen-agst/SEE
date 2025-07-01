@@ -9,6 +9,7 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -79,10 +80,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             wasBuiltBefore = true;
 
-            if (cityMenus != null)
-            {
-                cityMenus.ForEach(c => Destroyer.Destroy(c));
-            }
+            cityMenus?.ForEach(c => Destroyer.Destroy(c));
             cityMenus = new RuntimeTabMenu[GetCities().Length];
             for (int i = 0; i < GetCities().Length; i++)
             {
@@ -90,6 +88,47 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             currentMenuCities = GetCities();
             needsRebuild = false;
+        }
+
+        /// <summary>
+        /// Rebuild the menu based on the current list of available cities.
+        /// Only tabs for new cities will be created; existing ones are preserved ans reused.
+        /// After reconstruction, the city switcher in each tab is updated.
+        /// </summary>
+        public void RebuildMenu()
+        {
+            Debug.Log($"RebuildMenus");
+            RuntimeTabMenu[] oldMenus = cityMenus;
+            Debug.Log($"Old size {oldMenus.Length}");
+            cityMenus = new RuntimeTabMenu[GetCities().Length];
+            Debug.Log($"New size {cityMenus.Length}");
+            AbstractSEECity[] cities = GetCities();
+            cities.ForEach(city => Debug.Log($"In new list {city.name}"));
+            for (int i = 0; i < cities.Length; i++)
+            {
+                if (!currentMenuCities.Any(city => city.Equals(cities[i])))
+                {
+                    Debug.Log($"{cities[i]} is a new city. Add tab menu");
+                    AddCity(i);
+                    UpdateCitySwitcher(i).Forget();
+                }
+                else
+                {
+                    Debug.Log($"Contains city");
+                    AbstractSEECity matchingCity = currentMenuCities.First(city => city.Equals(cities[i]));
+                    Debug.Log($"Matching City {matchingCity.name}");
+                    Debug.Log($"Of index {Array.IndexOf(cities, matchingCity)}");
+                    Debug.Log($"New index {i}");
+                    cityMenus[i] = oldMenus[Array.IndexOf(cities, matchingCity)];
+                }
+            }
+            currentMenuCities = GetCities();
+
+            async UniTask UpdateCitySwitcher(int skipID)
+            {
+                await UniTask.WaitUntil(() => GetMenuForCity(skipID) != null);
+                cityMenus.ForEach(menu => menu.SetupCitySwitcher());
+            }
         }
 
         /// <summary>
@@ -116,17 +155,19 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (blockOpening)
                 {
-                    ShowNotification.Warn("Menu opening is blocked.", "A deletion process is in progress, and therefore the menu cannot be opened.");
+                    ShowNotification.Warn("Menu opening is blocked.",
+                        "A deletion process is in progress, and therefore the menu cannot be opened.");
                     return;
                 }
                 if (cityMenus.Length <= currentCity)
                 {
                     currentCity = cityMenus.Length - 1;
                 }
-                if (!currentMenuCities.SequenceEqual(GetCities()) || needsRebuild)
+                if (!currentMenuCities.SequenceEqual(GetCities())
+                    || needsRebuild)
                 {
                     new RebuildNetAction().Execute();
-                    BuildTabMenus();
+                    RebuildMenu();//BuildTabMenus();
                 }
                 cityMenus[currentCity].ToggleMenu();
             }
@@ -205,7 +246,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (needsRebuild)
             {
                 needsRebuild = false;
-                BuildTabMenus();
+                RebuildMenu();//BuildTabMenus();
                 return true;
             }
             else
