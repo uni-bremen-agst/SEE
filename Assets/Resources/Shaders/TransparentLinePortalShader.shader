@@ -13,7 +13,7 @@
 
         // Portal
         _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
-        _PortalFade ("Portal Edge Fade Width (World Units)", Float) = 0.01
+        _PortalFadeWidth ("Portal Edge Fade Width (World Units)", Float) = 0.01
     }
 
     SubShader
