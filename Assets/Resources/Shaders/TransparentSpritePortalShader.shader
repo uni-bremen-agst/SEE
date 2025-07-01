@@ -12,7 +12,7 @@ Shader "Unlit/TransparentSpritePortalShader"
     {
         _MainTex ("Texture", 2D) = "white" {}
         _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
-        _PortalFade ("Portal Edge Fade (World Units)", Float) = 0.01
+        _PortalFadeWidth ("Portal Edge Fade Width (World Units)", Float) = 0.01
     }
     SubShader
     {
@@ -55,7 +55,7 @@ Shader "Unlit/TransparentSpritePortalShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _Portal;
-            float _PortalFade;
+            float _PortalFadeWidth;
 
             v2f vert (appdata v)
             {
@@ -85,15 +85,15 @@ Shader "Unlit/TransparentSpritePortalShader"
                 float overhangTop    = max(i.worldPos.z - _Portal.w, 0.0);
 
                 // Discard coordinates if outside portal
-                if (overhangLeft > _PortalFade || overhangRight > _PortalFade ||
-                    overhangBottom > _PortalFade || overhangTop > _PortalFade)
+                if (overhangLeft > _PortalFadeWidth || overhangRight > _PortalFadeWidth ||
+                    overhangBottom > _PortalFadeWidth || overhangTop > _PortalFadeWidth)
                 {
                     discard;
                 }
 
                 // Fade effect
-                float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
-                color.a *= fade;
+                float portalFade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom + overhangTop) / _PortalFadeWidth);
+                color.a *= portalFade;
 
                 return color;
             }
