@@ -280,9 +280,8 @@ SubShader {
 			#endif
 
 			// Portal fade effect
-			float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
-			c.a *= fade;
-			c.rgb *= fade;
+			float portalFade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom + overhangTop) / _PortalFade);
+			c *= portalFade;
 
 			return c;
 		}

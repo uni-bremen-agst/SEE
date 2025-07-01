@@ -2,11 +2,18 @@
 {
     Properties
     {
+        // Texture
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
+
+        // Clip Ends
+        _VisibleStart ("Start of Visible Segment", Range(0, 1)) = 0.0
+        _VisibleEnd ("End of Visible Segment", Range(0, 1)) = 1.0
+
+        // Portal
         _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
-        _PortalFade ("Portal Edge Fade (World Units)", Float) = 0.01
+        _PortalFade ("Portal Edge Fade Width (World Units)", Float) = 0.01
     }
 
     SubShader
@@ -41,16 +48,16 @@
             {
                 float4 vertex   : POSITION;
                 float4 color    : COLOR;
-                float2 texcoord : TEXCOORD0;
+                float2 uv : TEXCOORD0;
                 UNITY_VERTEX_INPUT_INSTANCE_ID
             };
 
             struct v2f
             {
                 float4 vertex    : SV_POSITION;
-                float3 worldPos  : TEXCOORD1;
                 fixed4 color     : COLOR;
-                float2 texcoord  : TEXCOORD0;
+                float2 uv  : TEXCOORD0;
+                float3 worldPos  : TEXCOORD1;
                 UNITY_VERTEX_OUTPUT_STEREO
             };
 
@@ -63,7 +70,7 @@
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(OUT);
                 OUT.vertex = UnityObjectToClipPos(IN.vertex);
                 OUT.worldPos = mul(unity_ObjectToWorld, IN.vertex);
-                OUT.texcoord = IN.texcoord;
+                OUT.uv = IN.uv;
                 OUT.color = IN.color * _Color;
                 #ifdef PIXELSNAP_ON
                 OUT.vertex = UnityPixelSnap (OUT.vertex);
@@ -72,10 +79,17 @@
                 return OUT;
             }
 
+            // Texture
             sampler2D _MainTex;
             sampler2D _AlphaTex;
+
+            // Clip Ends
+            float _VisibleStart;
+            float _VisibleEnd;
+
+            // Portal
             float4 _Portal;
-            float _PortalFade;
+            float _PortalFadeWidth;
 
             fixed4 SampleSpriteTexture (float2 uv)
             {
@@ -91,10 +105,16 @@
 
             fixed4 frag(v2f IN) : SV_Target
             {
-                fixed4 color = SampleSpriteTexture(IN.texcoord) * IN.color;
+                fixed4 color = SampleSpriteTexture(IN.uv) * IN.color;
 
                 // Discard coordinates if completely transparent
                 if (color.a <= 0)
+                {
+                    discard;
+                }
+
+                // Clip Ends
+                if (IN.uv.y < _VisibleStart || IN.uv.y > _VisibleEnd || _VisibleStart == _VisibleEnd)
                 {
                     discard;
                 }
@@ -107,14 +127,14 @@
                 float overhangTop    = max(IN.worldPos.z - _Portal.w, 0.0);
 
                 // Discard coordinates if outside portal
-                if (overhangLeft > _PortalFade || overhangRight > _PortalFade ||
-                    overhangBottom > _PortalFade || overhangTop > _PortalFade)
+                if (overhangLeft > _PortalFadeWidth || overhangRight > _PortalFadeWidth ||
+                    overhangBottom > _PortalFadeWidth || overhangTop > _PortalFadeWidth)
                 {
                     discard;
                 }
 
                 // Fade effect
-                float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
+                float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFadeWidth);
                 color.a *= fade;
                 color.rgb *= color.a;
 
