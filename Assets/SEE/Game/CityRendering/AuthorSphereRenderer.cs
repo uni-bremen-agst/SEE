@@ -120,13 +120,27 @@ namespace SEE.Game.CityRendering
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
                     gameEdge.AddComponent<InteractableObject>();
+                    GraphElementRef graphElemRef = gameEdge.AddComponent<GraphElementRef>();
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
+
                     authorRef.AuthorSpheres.Add(sphere);
                     authorRef.Edges.Add((gameEdge, churn));
 
                     authorSphere.Edges.Add((gameEdge, churn));
+
+                    if (Settings is BranchCity branchCity && !branchCity.ShowEdgesPermantly)
+                    {
+                        gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                        if (authorRef.AuthorSpheres.Count > 1)
+                        {
+                            foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                            {
+                                edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -201,7 +215,7 @@ namespace SEE.Game.CityRendering
                     author.Author = authors[counter];
 
                     gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowHovering>();
+                    //gameObject.AddComponent<ShowHovering>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;

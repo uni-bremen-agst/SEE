@@ -1905,7 +1905,7 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 2
+    AnimationKind: 1
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
@@ -1950,8 +1950,9 @@ MonoBehaviour:
     Root: 1
     RelativePath: /
     AbsolutePath: 
-  Date: 2025/01/01
+  Date: 2025/05/25
   CombineAuthors: 1
+  ShowEdgesPermantly: 0
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4596,16 +4597,16 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
-  JLGPath:
-    Root: 3
-    RelativePath: /JLGExample/CodeFacts.jlg
-    AbsolutePath: 
   BreakpointClass: classname
   BreakpointLine: 0
   DistanceAboveCity: 0.3
   DistanceBehindCity: 0.3
   LineWidth: 0.01
   ShowOnlyCalls: 0
+  JLGPath:
+    Root: 3
+    RelativePath: /JLGExample/CodeFacts.jlg
+    AbsolutePath: 
 --- !u!114 &264006614
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.CompilerServices;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -255,7 +257,7 @@ namespace SEE.Controls.Actions
                     // Queue successors, if there are any.
                     connected.Select(getSuccessorNode)
                              .Where(x => x != null)
-                             .Select(x => (x, distance+1))
+                             .Select(x => (x, distance + 1))
                              .ForEach(nodeQueue.Enqueue);
                 }
                 return results.OrderBy(x => x.Key).Select(x => x.Value);
@@ -286,6 +288,7 @@ namespace SEE.Controls.Actions
             if (gameObject.TryGetNode(out Node node))
             {
                 codeCity ??= City();
+                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();
@@ -296,14 +299,40 @@ namespace SEE.Controls.Actions
                                                        followSource: layout.AnimateTransitiveSourceEdges,
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
                                                        fromSelection);
-                ToggleEdges(edges, edgeToggleToken.Token).Forget();
+                ToggleEdges(edges, edgeToggleToken.Token, animationKind).Forget();
+
+                if (codeCity is BranchCity)
+                {
+                    ToggleBranchCityEdges(animationKind, edgeToggleToken.Token).Forget();
+                }
             }
             return;
 
-            async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token)
+            async UniTaskVoid ToggleBranchCityEdges(EdgeAnimationKind animationKind, CancellationToken token)
             {
-                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+                if (gameObject.TryGetComponent(out AuthorRef authorRef))
+                {
+                    if (authorRef.Edges.Count > 1)
+                    {
+                        return;
+                    }
+                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                    {
+                        edge.EdgeOperator()?.ShowOrHide(show, animationKind);
+                    }
+                    if (show)
+                    {
+                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
+                    }
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
+            }
 
+            async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token, EdgeAnimationKind animationKind)
+            {
                 foreach (IList<Edge> edgeLevel in edges)
                 {
                     foreach (Edge edge in edgeLevel)

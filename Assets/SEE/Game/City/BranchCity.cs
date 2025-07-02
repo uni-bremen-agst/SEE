@@ -40,6 +40,12 @@ namespace SEE.Game.City
          RuntimeTab(VCSFoldoutGroup)]
         public bool CombineAuthors;
 
+
+        [Tooltip("If true, the edges connected the authors spheres and nodes will be shown permantly"),
+         TabGroup(VCSFoldoutGroup),
+         RuntimeTab(VCSFoldoutGroup)]
+        public bool ShowEdgesPermantly;
+
         /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
         /// This is used to manually group commit authors with similar identities together.
