@@ -9,7 +9,6 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -63,7 +62,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
             async UniTask WaitForLocalPlayerInstantiation()
             {
-                await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
+                await UniTask.WaitUntil(() => LocalPlayer.Instance != null)
+                    .ContinueWith(() => UniTask.Yield());
                 BuildTabMenus();
             }
         }
@@ -97,37 +97,44 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void RebuildMenu()
         {
-            Debug.Log($"RebuildMenus");
             RuntimeTabMenu[] oldMenus = cityMenus;
-            Debug.Log($"Old size {oldMenus.Length}");
             cityMenus = new RuntimeTabMenu[GetCities().Length];
+            AbstractSEECity[] newCities = GetCities();
+
+            Debug.Log($"RebuildMenus");
+            Debug.Log($"Old size {oldMenus.Length}");
             Debug.Log($"New size {cityMenus.Length}");
-            AbstractSEECity[] cities = GetCities();
-            cities.ForEach(city => Debug.Log($"In new list {city.name}"));
-            for (int i = 0; i < cities.Length; i++)
+
+            for (int i = 0; i < newCities.Length; i++)
             {
-                if (!currentMenuCities.Any(city => city.Equals(cities[i])))
+                int oldIndex = Array.FindIndex(currentMenuCities, city => city.Equals(newCities[i]));
+
+                if (oldIndex >= 0)
                 {
-                    Debug.Log($"{cities[i]} is a new city. Add tab menu");
-                    AddCity(i);
-                    UpdateCitySwitcher(i).Forget();
+                    cityMenus[i] = oldMenus[oldIndex];
                 }
                 else
                 {
-                    Debug.Log($"Contains city");
-                    AbstractSEECity matchingCity = currentMenuCities.First(city => city.Equals(cities[i]));
-                    Debug.Log($"Matching City {matchingCity.name}");
-                    Debug.Log($"Of index {Array.IndexOf(cities, matchingCity)}");
-                    Debug.Log($"New index {i}");
-                    cityMenus[i] = oldMenus[Array.IndexOf(cities, matchingCity)];
+                    AddCity(i);
                 }
             }
-            currentMenuCities = GetCities();
 
-            async UniTask UpdateCitySwitcher(int skipID)
+            foreach (AbstractSEECity oldCity in currentMenuCities)
             {
-                await UniTask.WaitUntil(() => GetMenuForCity(skipID) != null);
-                cityMenus.ForEach(menu => menu.SetupCitySwitcher());
+                if (!newCities.Any(city => city.Equals(oldCity)))
+                {
+                    int oldIndex = Array.IndexOf(currentMenuCities, oldCity);
+                    Destroyer.Destroy(oldMenus[oldIndex]);
+                }
+            }
+
+            currentMenuCities = newCities;
+            UpdateCitySwitcher().Forget();
+
+            static async UniTask UpdateCitySwitcher()
+            {
+                await UniTask.WaitUntil(() => cityMenus.All(menu => menu != null));
+                cityMenus.ForEach(menu => menu.UpdateCitySwitcher());
             }
         }
 
@@ -166,6 +173,9 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (!currentMenuCities.SequenceEqual(GetCities())
                     || needsRebuild)
                 {
+                    Debug.Log($"currentMenuCities.SequenceEqual(GetCieites()): {currentMenuCities.SequenceEqual(GetCities())}");
+                    currentMenuCities.ForEach(c => Debug.Log($"{(c != null ? c.name : null)} is in currentMenuCities"));
+                    GetCities().ForEach(c => Debug.Log($"{c.name} is in GetCities()"));
                     new RebuildNetAction().Execute();
                     RebuildMenu();//BuildTabMenus();
                 }

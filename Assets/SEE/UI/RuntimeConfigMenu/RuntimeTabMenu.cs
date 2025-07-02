@@ -327,7 +327,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Initializes the horizontal selector for switching cities.
         /// </summary>
-        public void SetupCitySwitcher()
+        private void SetupCitySwitcher()
         {
             // init the list
             citySwitcher.itemList.Clear();
@@ -341,6 +341,21 @@ namespace SEE.UI.RuntimeConfigMenu
                 citySwitcher.index = CityIndex;
                 citySwitcher.UpdateUI();
             });
+        }
+
+        public void UpdateCitySwitcher()
+        {
+            citySwitcher.itemList.Clear();
+            citySwitcher.defaultIndex = CityIndex;
+            RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
+            citySwitcher.selectorEvent.RemoveAllListeners();
+            citySwitcher.selectorEvent.AddListener(index =>
+            {
+                OnSwitchCity?.Invoke(index);
+                citySwitcher.index = CityIndex;
+                citySwitcher.UpdateUI();
+            });
+            citySwitcher.UpdateUI();
         }
 
         /// <summary>
