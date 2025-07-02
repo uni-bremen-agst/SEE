@@ -76,7 +76,7 @@ namespace SEE.VCS
          Tooltip("Filter to identify the relevant files in the repository."),
          RuntimeTab(graphProviderFoldoutGroup),
          HideReferenceObjectPicker]
-        public SEE.VCS.Filter VCSFilter = new();
+        public Filter VCSFilter = new();
 
         /// <summary>
         /// Constructor setting default values for the fields.
@@ -91,7 +91,7 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryPath">path to the repository</param>
         /// <param name="filter">the filter to be used to retrieve the relevant files from the repository</param>
-        public GitRepository(DataPath repositoryPath, SEE.VCS.Filter filter)
+        public GitRepository(DataPath repositoryPath, Filter filter)
         {
             RepositoryPath = repositoryPath ??
                 throw new ArgumentNullException(nameof(repositoryPath), "Repository path must not be null.");
@@ -137,6 +137,52 @@ namespace SEE.VCS
                         ($"Error while running git fetch for repository path {RepositoryPath.Path} and remote name {remote.Name}: {e.Message}.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the list of commits between the two given commits in reverse chronological order.
+        /// More precisely, it returns all commits that are backward reachable from
+        /// <paramref name="newCommitId"/> (including <paramref name="newCommitId"/> itself),
+        /// but not backward reachable from <paramref name="oldCommitId"/>. A commit is
+        /// backard reachable from another commit if it is an ancestor of that commit in
+        /// the commit history. Note that, by definition, every commit is backward reachable from itself.
+        /// Thus, the results will include <paramref name="newCommitId"/> but not <paramref name="oldCommitId"/>.
+        ///
+        /// This method is equivalent to the command line query:
+        ///    git rev-list <newCommitId> ^<oldCommitId>
+        /// </summary>
+        /// <param name="oldCommitId">SHA hash of the earlier commit serving as the baseline</param>
+        /// <param name="newCommitId">SHA hash of the from which to search backward for relevant commits</param>
+        /// <returns>The list of commits from <paramref name="oldCommitId"/> to <paramref name="newCommitId"/>.</returns>
+        /// <exception cref="ArgumentException">thrown if <paramref name="oldCommitId"/> or
+        /// <paramref name="newCommitId"/> is null or empty or if they do not identify
+        /// any commit in the repository.</exception>
+        public IEnumerable<Commit> CommitsBetween(string oldCommitId, string newCommitId)
+        {
+            OpenRepository();
+            if (string.IsNullOrWhiteSpace(oldCommitId) || string.IsNullOrWhiteSpace(newCommitId))
+            {
+                throw new ArgumentException("Both commit IDs must be non-empty strings.");
+            }
+
+            Commit oldCommit = repository.Lookup<Commit>(oldCommitId);
+            Commit newCommit = repository.Lookup<Commit>(newCommitId);
+            if (oldCommit == null)
+            {
+                throw new ArgumentException($"Commit with SHA '{oldCommitId}' not found in the repository.", nameof(oldCommitId));
+            }
+            if (newCommit == null)
+            {
+                throw new ArgumentException($"Commit with SHA '{newCommitId}' not found in the repository.", nameof(newCommitId));
+            }
+            // The 'Walk' method with the 'Exclude' filter is the most efficient way to do this.
+            // It walks the history starting from 'newCommit' and excludes any commits reachable from 'oldCommit'.
+            return repository.Commits.QueryBy(new CommitFilter
+            {
+                SortBy = CommitSortStrategies.Time, // reverse chronological order
+                IncludeReachableFrom = newCommit,
+                ExcludeReachableFrom = oldCommit
+            });
         }
 
         /// <summary>

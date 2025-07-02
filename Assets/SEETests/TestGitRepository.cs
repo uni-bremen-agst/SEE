@@ -54,10 +54,40 @@ namespace SEE.VCS
         /// <param name="values">the values to be printed</param>
         private static void Print<T>(IEnumerable<T> values)
         {
-            foreach (T commit in values)
+            foreach (T value in values)
             {
-                Debug.Log(commit.ToString() + "\n");
+                Debug.Log(value.ToString() + "\n");
             }
+        }
+
+        [Test]
+        // Same commit as both old and new commit.
+        [TestCase("8e66aa028412984ce92c192d43feb106311c676c", "8e66aa028412984ce92c192d43feb106311c676c", 0)]
+        // Old commit is an immedidate predecessor of new commit.
+        [TestCase("bbc9ba9246fa005be073ae2ae9b750b7f4450c97", "8e66aa028412984ce92c192d43feb106311c676c", 1)]
+        // Old commit is an immedidate successor of new commit.
+        [TestCase("8e66aa028412984ce92c192d43feb106311c676c", "bbc9ba9246fa005be073ae2ae9b750b7f4450c97", 0)]
+        // Old and new commit are on the same branch. New commit is a transitive successor of old commit.
+        [TestCase("50b00fbecf51b76cbc15cb04293ea644ac6af100", "8e66aa028412984ce92c192d43feb106311c676c", 4)]
+        // New commit is on a branch different from the master branch.
+        // Its immediate predecessor ff243537f267195bf52fd99c6cf183aa4a58cb11 is on the same branch and is
+        // a merge commit merging the master branch into the branch of new commit.
+        // The branch of new commit has not yet been merged into the master branch.
+        // That is, we should obtain all commits on the branch of new commit from the
+        // point in time where this branch diverged from the master branch.
+        // The following query identifes the number of all commits on the branch of new commit after
+        // it was created (diverged from the master branch):
+        //    git rev-list origin..536a570161b5101013917bfc85c74a30c5963905|wc -l
+        [TestCase("c75f364ef9f99d7688098405e07b866f3ea6539b", "536a570161b5101013917bfc85c74a30c5963905", 109)]
+        public void TestCommitsBetween(string oldCommit, string newCommit, int expectedCount)
+        {
+            GitRepository repo = GetRepository(null); // all branches
+            Performance p = Performance.Begin(nameof(GitRepository.CommitsBetween));
+            IEnumerable<Commit> commits = repo.CommitsBetween(oldCommit, newCommit);
+            p.End(true);
+            Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
+            Print(commits);
+            Assert.AreEqual(expectedCount, commits.Count(), $"Expected {expectedCount} commits between {oldCommit} and {newCommit}, but found {commits.Count()}.");
         }
 
         /// <summary>
