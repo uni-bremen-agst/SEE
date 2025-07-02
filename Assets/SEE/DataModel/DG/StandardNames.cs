@@ -303,9 +303,9 @@
         /// </summary>
         public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
         /// <summary>
-        /// The number of times a file was changed between two commits.
+        /// The number of commits for a given file that was changed between two commits.
         /// </summary>
-        public const string CommitFrequency = Prefix + "Commit_Frequency";
+        public const string NumberOfCommits = Prefix + "Number_Of_Commits";
         /// <summary>
         /// The truck factor of a file (core-devs metric).
         /// </summary>

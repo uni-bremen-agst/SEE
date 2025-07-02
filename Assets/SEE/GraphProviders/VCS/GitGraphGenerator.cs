@@ -184,7 +184,7 @@ namespace SEE.GraphProviders.VCS
             {
                 throw new OperationCanceledException(token);
             }
-            UpdateMetrics(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
+            UpdateMetricsForPatch(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
             changePercentage?.Invoke(0.9f);
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
 
@@ -219,7 +219,7 @@ namespace SEE.GraphProviders.VCS
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                UpdateMetrics(fileToMetrics, commitInBetween, commitChanges[commitInBetween], false, null);
+                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], false, null);
             }
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
@@ -265,7 +265,7 @@ namespace SEE.GraphProviders.VCS
                 {
                     throw new OperationCanceledException(token);
                 }
-                UpdateMetrics(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
+                UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
                 changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
                 counter++;
             }
@@ -278,13 +278,14 @@ namespace SEE.GraphProviders.VCS
         /// for all files changed by <paramref name="patch"/>.
         /// </summary>
         /// <param name="fileToMetrics">metrics will be calculated for the files therein and added to this map</param>
-        /// <param name="commit">The commit that should be processed</param>
+        /// <param name="commit">The commit that should be processed. Only its <see cref="Commit.Author"/>
+        /// will be used.</param>
         /// <param name="patch">The changes the commit has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
-        private static void UpdateMetrics
+        private static void UpdateMetricsForPatch
             (FileToMetrics fileToMetrics,
             Commit commit,
             Patch patch,
@@ -388,7 +389,7 @@ namespace SEE.GraphProviders.VCS
         /// If <paramref name="commit"/> is null, nothing happens.
         ///
         /// Otherwise, the metrics will be calculated between <paramref name="commit"/> and
-        /// its first parents. If a commit has no parent, <paramref name="commit"/> is the
+        /// its first parent. If a commit has no parent, <paramref name="commit"/> is the
         /// very first commit in the version history, which is perfectly okay.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map</param>
@@ -397,23 +398,23 @@ namespace SEE.GraphProviders.VCS
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
-        private static void UpdateMetrics
+        private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
-            GitRepository gitRepository,
-            Commit commit,
-            bool consultAliasMap,
-            AuthorMapping authorAliasMap)
+             GitRepository gitRepository,
+             Commit commit,
+             bool consultAliasMap,
+             AuthorMapping authorAliasMap)
         {
             if (commit == null)
             {
                 return;
             }
 
-            Patch changedFilesPath = commit.Parents.Any()
+            Patch patch = commit.Parents.Any()
                 ? gitRepository.Diff(commit, commit.Parents.First())
                 : gitRepository.Diff(null, commit);
 
-            UpdateMetrics(fileToMetrics, commit, changedFilesPath, consultAliasMap, authorAliasMap);
+            UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, authorAliasMap);
         }
 
         /// <summary>
@@ -513,7 +514,7 @@ namespace SEE.GraphProviders.VCS
             {
                 Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, graph);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
-                n.SetInt(DataModel.DG.VCS.CommitFrequency, file.Value.NumberOfCommits);
+                n.SetInt(DataModel.DG.VCS.NumberOfCommits, file.Value.NumberOfCommits);
                 n.SetInt(DataModel.DG.VCS.LinesAdded, file.Value.LinesAdded);
                 n.SetInt(DataModel.DG.VCS.LinesRemoved, file.Value.LinesRemoved);
                 n.SetInt(DataModel.DG.VCS.Churn, file.Value.Churn);

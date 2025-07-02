@@ -203,30 +203,25 @@ namespace SEE.GraphProviders
 
         [Test]
         [Category("SkipOnCI")]  // We do a checkout with fetch-depth 1 in CI, so we cannot get all VCS metrics.
-        public async Task TestVCSMetricsAsync()
+        // should be equivalent to:
+        // git diff --shortstat a5fe5e6a2692f41aeb8448d5114000e6f82e605e 0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs
+        [TestCase(DataModel.DG.VCS.LinesAdded, 157)]
+        [TestCase(DataModel.DG.VCS.LinesRemoved, 193)]
+        // Should be equivalent to:
+        // git log a5fe5e6a2692f41aeb8448d5114000e6f82e605e 0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|grep ^Author|sort -u|wc -l
+        [TestCase(DataModel.DG.VCS.NumberOfDevelopers, 4)]
+        // Should be equivalent to:
+        // git rev-list  a5fe5e6a2692f41aeb8448d5114000e6f82e605e..0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|wc -l
+        [TestCase(DataModel.DG.VCS.NumberOfCommits, 12)]
+        public async Task TestVCSMetricsAsync(string metric, int expected)
         {
             Graph graph = await GetVCSGraphAsync();
             Assert.IsNotNull(graph);
             Assert.IsTrue(graph.NodeCount > 0);
             Save(graph);
             Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
-
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesAdded, out int value));
-                Assert.AreEqual(157, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesRemoved, out int value));
-                Assert.AreEqual(193, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.NumberOfDevelopers, out int value));
-                Assert.AreEqual(4, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
-                Assert.AreEqual(12, value);
-            }
+            Assert.IsTrue(node.TryGetInt(metric, out int value));
+            Assert.AreEqual(expected, value);
         }
 
         private void Save(Graph graph)
@@ -237,21 +232,27 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders.
+        /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders in
+        /// any of the branches of our SEE repository between two specific commits.
         /// </summary>
         /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
         private static async Task<Graph> GetVCSGraphAsync()
         {
             Globbing pathGlobbing = new()
                 {
-                    { "Assets/SEE/GraphProviders/**/*.cs", true }
+                    { "**/*.cs", true }
                 };
+
+            IEnumerable<string> repositoryPaths = new[]
+            {
+                "Assets/SEE/GraphProviders",
+            };
 
             BetweenCommitsGraphProvider provider = new()
             {
                 GitRepository = new GitRepository
                                      (new DataPath(Path.GetDirectoryName(Application.dataPath)),
-                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
+                                      new Filter(globbing: pathGlobbing, repositoryPaths: repositoryPaths, branches: null)),
                 BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
                 CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
             };
