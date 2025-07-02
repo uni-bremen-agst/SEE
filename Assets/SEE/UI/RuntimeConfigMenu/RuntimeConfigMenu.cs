@@ -102,9 +102,6 @@ namespace SEE.UI.RuntimeConfigMenu
             AbstractSEECity[] newCities = GetCities();
 
             Debug.Log($"RebuildMenus");
-            Debug.Log($"Old size {oldMenus.Length}");
-            Debug.Log($"New size {cityMenus.Length}");
-
             for (int i = 0; i < newCities.Length; i++)
             {
                 int oldIndex = Array.FindIndex(currentMenuCities, city => city.Equals(newCities[i]));
@@ -112,6 +109,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (oldIndex >= 0)
                 {
                     cityMenus[i] = oldMenus[oldIndex];
+                    oldMenus[oldIndex].CityIndex = i;
                 }
                 else
                 {
