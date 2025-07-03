@@ -101,7 +101,6 @@ namespace SEE.UI.RuntimeConfigMenu
             cityMenus = new RuntimeTabMenu[GetCities().Length];
             AbstractSEECity[] newCities = GetCities();
 
-            Debug.Log($"RebuildMenus");
             for (int i = 0; i < newCities.Length; i++)
             {
                 int oldIndex = Array.FindIndex(currentMenuCities, city => city.Equals(newCities[i]));
@@ -175,7 +174,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     currentMenuCities.ForEach(c => Debug.Log($"{(c != null ? c.name : null)} is in currentMenuCities"));
                     GetCities().ForEach(c => Debug.Log($"{c.name} is in GetCities()"));
                     new RebuildNetAction().Execute();
-                    RebuildMenu();//BuildTabMenus();
+                    RebuildMenu();
                 }
                 cityMenus[currentCity].ToggleMenu();
             }
@@ -254,7 +253,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (needsRebuild)
             {
                 needsRebuild = false;
-                RebuildMenu();//BuildTabMenus();
+                RebuildMenu();
                 return true;
             }
             else

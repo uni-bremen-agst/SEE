@@ -16,7 +16,7 @@ namespace SEE.Net.Actions.RuntimeConfig
         {
             if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
             {
-                runtimeConfigMenu.BuildTabMenus();
+                runtimeConfigMenu.RebuildMenu();
             }
             else
             {
