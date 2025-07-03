@@ -140,7 +140,9 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the list of commits between the two given commits in reverse chronological order.
+        /// Returns the list of non-merge commits between the two given commits in reverse chronological order.
+        /// A non-merge commit is a commit having more than one parent.
+        ///
         /// More precisely, it returns all commits that are backward reachable from
         /// <paramref name="newCommitId"/> (including <paramref name="newCommitId"/> itself),
         /// but not backward reachable from <paramref name="oldCommitId"/>. A commit is
@@ -182,7 +184,7 @@ namespace SEE.VCS
                 SortBy = CommitSortStrategies.Time, // reverse chronological order
                 IncludeReachableFrom = newCommit,
                 ExcludeReachableFrom = oldCommit
-            });
+            }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent
         }
 
         /// <summary>
