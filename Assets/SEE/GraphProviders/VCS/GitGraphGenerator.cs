@@ -173,18 +173,46 @@ namespace SEE.GraphProviders.VCS
             graph.CommitID(commitID);
             graph.RepositoryPath(repositoryPath);
 
-            changePercentage?.Invoke(0.1f);
+            float percentage = 0.05f;
+            changePercentage?.Invoke(percentage);
 
             // Get all files using "git ls-tree -r <CommitID> --name-only".
             HashSet<string> files = repository.AllFiles(commitID, token);
-            changePercentage?.Invoke(0.6f);
+            percentage = 0.2f;
+            changePercentage?.Invoke(percentage);
+
             FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
 
             if (token.IsCancellationRequested)
             {
                 throw new OperationCanceledException(token);
             }
-            UpdateMetricsForPatch(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
+            IEnumerable<Commit> commitList = repository.CommitsBetween(baselineCommitID, commitID);
+            percentage = 0.3f;
+            changePercentage?.Invoke(percentage);
+
+            int commitCount = commitList.Count();
+            int currentCommitIndex = 0;
+            Commit previousCommit = null;
+
+            foreach (Commit commit in commitList)
+            {
+                if (token.IsCancellationRequested)
+                {
+                    throw new OperationCanceledException(token);
+                }
+                // baselineCommitID is not part of the commitList. We compare the first commit
+                // of the commitlist with the baselineCommitID.
+                if (currentCommitIndex == 0)
+                {
+                    previousCommit = repository.GetCommit(baselineCommitID);
+                }
+                UpdateMetricsForPatch(fileToMetrics, commit, repository.Diff(previousCommit, commit), false, null);
+                previousCommit = commit;
+                currentCommitIndex++;
+            }
+
+            //UpdateMetricsForPatch(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
             changePercentage?.Invoke(0.9f);
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
 
@@ -310,6 +338,8 @@ namespace SEE.GraphProviders.VCS
                 {
                     continue;
                 }
+
+                Debug.Log($"Processing file {filePath} for {commit.Id}.\n");
 
                 int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
 
