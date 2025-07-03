@@ -109,7 +109,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (oldIndex >= 0)
                 {
                     cityMenus[i] = oldMenus[oldIndex];
-                    oldMenus[oldIndex].CityIndex = i;
+                    cityMenus[i].CityIndex = i;
                 }
                 else
                 {
