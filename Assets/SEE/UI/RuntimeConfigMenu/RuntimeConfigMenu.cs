@@ -53,6 +53,12 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool wasBuiltBefore = false;
 
         /// <summary>
+        /// Returns the current selected <see cref="RuntimeTabMenu"/>.
+        /// </summary>
+        /// <returns></returns>
+        public RuntimeTabMenu GetCurrentTab() => cityMenus[currentCity];
+
+        /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
         private void Start()
@@ -95,7 +101,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Only tabs for new cities will be created; existing ones are preserved ans reused.
         /// After reconstruction, the city switcher in each tab is updated.
         /// </summary>
-        public void RebuildMenu()
+        public async UniTask RebuildMenuAsync()
         {
             RuntimeTabMenu[] oldMenus = cityMenus;
             cityMenus = new RuntimeTabMenu[GetCities().Length];
@@ -126,13 +132,8 @@ namespace SEE.UI.RuntimeConfigMenu
             }
 
             currentMenuCities = newCities;
-            UpdateCitySwitcher().Forget();
-
-            static async UniTask UpdateCitySwitcher()
-            {
-                await UniTask.WaitUntil(() => cityMenus.All(menu => menu != null));
-                cityMenus.ForEach(menu => menu.UpdateCitySwitcher());
-            }
+            await UniTask.WaitUntil(() => cityMenus.All(menu => menu != null));
+            cityMenus.ForEach(menu => menu.UpdateCitySwitcher());
         }
 
         /// <summary>
@@ -174,7 +175,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     currentMenuCities.ForEach(c => Debug.Log($"{(c != null ? c.name : null)} is in currentMenuCities"));
                     GetCities().ForEach(c => Debug.Log($"{c.name} is in GetCities()"));
                     new RebuildNetAction().Execute();
-                    RebuildMenu();
+                    RebuildMenuAsync().Forget();
                 }
                 cityMenus[currentCity].ToggleMenu();
             }
@@ -253,7 +254,7 @@ namespace SEE.UI.RuntimeConfigMenu
             if (needsRebuild)
             {
                 needsRebuild = false;
-                RebuildMenu();
+                RebuildMenuAsync().Forget();
                 return true;
             }
             else
