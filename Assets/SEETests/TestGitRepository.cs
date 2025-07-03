@@ -85,8 +85,8 @@ namespace SEE.VCS
             Performance p = Performance.Begin(nameof(GitRepository.CommitsBetween));
             IEnumerable<Commit> commits = repo.CommitsBetween(oldCommit, newCommit);
             p.End(true);
-            Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
-            Print(commits);
+            //Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
+            //Print(commits);
             Assert.AreEqual(expectedCount, commits.Count(), $"Expected {expectedCount} commits between {oldCommit} and {newCommit}, but found {commits.Count()}.");
         }
 
