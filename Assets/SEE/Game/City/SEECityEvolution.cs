@@ -173,6 +173,11 @@ namespace SEE.Game.City
                         reportProgress(x);
                     }
 
+                    if (DataProvider.Pipeline.Count == 0)
+                    {
+                        Debug.LogWarning("No graph provider in pipeline.\n");
+                        return;
+                    }
                     LoadedGraphSeries = await DataProvider.ProvideAsync(new List<Graph>(), this, ReportProgress,
                                                                         cancellationTokenSource.Token);
 
@@ -182,7 +187,7 @@ namespace SEE.Game.City
                         return;
                     }
 
-                    ShowNotification.Info("SEECity Evolution", $"{LoadedGraphSeries.Count} Graphs loaded");
+                    ShowNotification.Info("SEECity Evolution", $"{LoadedGraphSeries.Count} graphs loaded");
 
                     firstGraph = LoadedGraphSeries.FirstOrDefault();
                     if (firstGraph != null)
@@ -317,9 +322,7 @@ namespace SEE.Game.City
                     // there may now be multiple roots again.
                     relevantGraph.AddSingleRoot(out Node _, name: "ROOT", type: Graph.UnknownType);
                 }
-
                 graphs[i] = relevantGraph;
-                SetupCompoundSpringEmbedder(graphs[i]);
             }
         }
 

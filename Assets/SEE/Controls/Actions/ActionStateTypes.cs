@@ -1,7 +1,8 @@
-﻿using SEE.Utils;
-using UnityEngine;
+﻿using UnityEngine;
+using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
+using SEE.Controls.Actions.Table;
 
 namespace SEE.Controls.Actions
 {
@@ -70,11 +71,6 @@ namespace SEE.Controls.Actions
                   Color.red.Darker(), Icons.Move,
                   MoveAction.CreateReversibleAction);
 
-            Rotate =
-              new("Rotate", "Rotate the selected node and its children within a graph",
-                  Color.blue.Darker(), Icons.Rotate,
-                  RotateAction.CreateReversibleAction);
-
             Hide =
               new("Hide", "Hides nodes or edges",
                   Color.yellow.Darker(), Icons.EyeSlash,
@@ -95,10 +91,10 @@ namespace SEE.Controls.Actions
                   Color.green.Darker(), Icons.PenToSquare,
                   EditNodeAction.CreateReversibleAction);
 
-            ScaleNode =
-              new("Scale Node", "Scale a node",
-                  Color.green.Darker(), Icons.Scale,
-                  ScaleNodeAction.CreateReversibleAction);
+            ResizeNode =
+              new("Resize Node", "Change the size of a node",
+                  Color.green.Darker(), Icons.Resize,
+                  ResizeNodeAction.CreateReversibleAction);
 
             Delete =
               new("Delete", "Delete a node or an edge",
@@ -109,11 +105,6 @@ namespace SEE.Controls.Actions
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
                   ShowCodeAction.CreateReversibleAction);
-
-            Draw =
-              new("Draw", "Draw freely in world space",
-                  Color.magenta.Darker(), Icons.Pencil,
-                  DrawAction.CreateReversibleAction);
 
             AcceptDivergence =
               new("Accept Divergence", "Accept a diverging edge into the architecture",
@@ -297,21 +288,33 @@ namespace SEE.Controls.Actions
                     Color.yellow.Darker(), Icons.Load,
                     LoadAction.CreateReversibleAction,
                     parent: Drawable);
+            // Table actions.
+            Table =
+                new("Table", "Please select the table mode you want to activate.",
+                    new Color(1f, 0.5f, 0f), Icons.City);
+            SpawnTable =
+                new("Spawn Table", "Spawnes a new universal table.",
+                    Color.green, Icons.City,
+                    SpawnTableAction.CreateReversibleAction,
+                    parent: Table);
+            ModifyTable =
+                new("Modify Table", "Modifies a table.",
+                    Color.yellow, Icons.Modify,
+                    ModifyTableAction.CreateReversibleAction,
+                    parent: Table);
         }
 
-        // IMPORTANT NOTE: The order of the following field declarations must be exaclty the same
+        // IMPORTANT NOTE: The order of the following field declarations must be exactly the same
         // as the order of their assignments in the static constructor above.
 
         public static readonly ActionStateType Move;
-        public static readonly ActionStateType Rotate;
         public static readonly ActionStateType Hide;
         public static readonly ActionStateType NewEdge;
         public static readonly ActionStateType NewNode;
         public static readonly ActionStateType EditNode;
-        public static readonly ActionStateType ScaleNode;
+        public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType Delete;
         public static readonly ActionStateType ShowCode;
-        public static readonly ActionStateType Draw;
         public static readonly ActionStateType AcceptDivergence;
 
         public static readonly ActionStateTypeGroup MetricBoard;
@@ -345,6 +348,10 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType Clear;
         public static readonly ActionStateType Save;
         public static readonly ActionStateType Load;
+
+        public static readonly ActionStateTypeGroup Table;
+        public static readonly ActionStateType SpawnTable;
+        public static readonly ActionStateType ModifyTable;
 
         #endregion
 

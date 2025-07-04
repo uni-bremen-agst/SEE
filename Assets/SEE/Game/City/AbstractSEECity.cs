@@ -4,7 +4,6 @@ using System.Linq;
 using Sirenix.Serialization;
 using SEE.DataModel.DG;
 using SEE.GO;
-using SEE.Layout.NodeLayouts.Cose;
 using SEE.Utils;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -25,11 +24,13 @@ namespace SEE.Game.City
     /// to its visualization.
     /// </summary>
     [Serializable]
+    [ExecuteInEditMode]
     public abstract partial class AbstractSEECity : SerializedMonoBehaviour
     {
         protected virtual void Awake()
         {
             LabelLineMaterial = new Material(LineMaterial(Color.white));
+            AddRootNodeType();
         }
 
         protected virtual void Start()
@@ -69,6 +70,7 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(ConfigurationPathOrder)]
         public DataPath ConfigurationPath = new();
 
         /// <summary>
@@ -83,6 +85,7 @@ namespace SEE.Game.City
         /// is needed to show the source code of nodes and edges.
         /// </summary>
         [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DataPath SourceCodeDirectory
@@ -110,6 +113,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(SolutionPathOrder)]
         public DataPath SolutionPath = new();
 
         /// <summary>
@@ -179,7 +183,7 @@ namespace SEE.Game.City
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
         [PropertyOrder(999)]
-        [ShowIf(nameof(ShowProgressBar))]
+        [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
         public float ProgressBar;
@@ -263,13 +267,6 @@ namespace SEE.Game.City
         public EdgeSelectionAttributes EdgeSelectionSettings = new();
 
         /// <summary>
-        /// The cose graph settings.
-        /// </summary>
-        [HideInInspector]
-        [Obsolete]
-        public CoseGraphAttributes CoseGraphSettings = new(); // FIXME put into CitySettings.cs
-
-        /// <summary>
         /// The metrics for the visualization of erosions.
         /// </summary>
         [Tooltip("Settings for the visualization of software erosions."), TabGroup(ErosionFoldoutGroup), RuntimeTab(ErosionFoldoutGroup)]
@@ -318,7 +315,7 @@ namespace SEE.Game.City
         /// that is, a game object where a <see cref="AbstractSEECity"/> component is attached to.</remarks>
         protected static void UpdateGraphElementIDMap(GameObject root)
         {
-            if (root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge))
+            if ((root.CompareTag(Tags.Node) || root.CompareTag(Tags.Edge)) && !GraphElementIDMap.Has(root.name))
             {
                 GraphElementIDMap.Add(root);
             }
@@ -345,7 +342,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
-        public void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
         }
@@ -696,47 +693,18 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Saves all data needed for the listing of the dirs in gui in cosegraphSettings
+        /// Adds the initial root node type to the <see cref="NodeTypes"/>.
+        /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
         /// </summary>
-        /// <param name="graph"></param>
-        [Obsolete]
-        public void SetupCompoundSpringEmbedder(Graph graph)
+        protected void AddRootNodeType()
         {
-            if (NodeLayoutSettings.Kind == NodeLayoutKind.CompoundSpringEmbedder)
+            if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
             {
-                Dictionary<string, bool> dirs = CoseGraphSettings.ListInnerNodeToggle;
-                // the new directories
-                Dictionary<string, bool> dirsLocal = new();
-
-                Dictionary<string, NodeLayoutKind> dirsLayout = new();
-                Dictionary<string, NodeShapes> dirsShape = new();
-
-                foreach (Node node in graph.Nodes())
-                {
-                    if (!node.IsLeaf())
-                    {
-                        dirsShape.Add(node.ID, NodeTypes[node.Type].Shape);
-                        dirsLocal.Add(node.ID, false);
-                        dirsLayout.Add(node.ID, NodeLayoutSettings.Kind);
-                    }
-                }
-
-                // if the key isn't in the old dictionaries
-                //dirsLocal = dirsLocal.Where(i => !dirs.ContainsKey(i.Key)).ToDictionary(i => i.Key, i => i.Value);
-
-                bool diff1 = dirs.Keys.Except(dirsLocal.Keys).Any();
-                bool diff2 = dirsLocal.Keys.Except(dirs.Keys).Any();
-
-                if (dirs.Count != dirsLocal.Count || diff1 || diff2)
-                {
-                    CoseGraphSettings.InnerNodeShape = dirsShape;
-                    CoseGraphSettings.InnerNodeLayout = dirsLayout;
-                    CoseGraphSettings.ListInnerNodeToggle = dirsLocal;
-                }
-
-                CoseGraphSettings.LoadedForNodeTypes = NodeTypes.Where(type => type.Value.IsRelevant)
-                                                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value.IsRelevant);
+                NodeTypes[Graph.RootType] = new VisualNodeAttributes();
             }
+            VisualNodeAttributes root = NodeTypes[Graph.RootType];
+            root.ShowNames = false;
+            root.ColorProperty.TypeColor = new Color(0f, 0.3412f, 0.7216f);
         }
 
         #region Odin Inspector Attributes
@@ -788,7 +756,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
         /// </summary>
-        protected const float ResetButtonsGroupOrderReset = 1;
+        protected const float ResetButtonsGroupOrderReset = 2;
 
         /// <summary>
         /// The name of the group for the Inspector buttons managing the configuration file.
@@ -798,7 +766,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
-        protected const float ConfigurationButtonsGroupLoad = 1;
+        protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
@@ -825,6 +793,25 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        /// <summary>
+        /// The order of the configuration path.
+        /// </summary>
+        protected const int ConfigurationPathOrder = 0;
+
+        /// <summary>
+        /// The order of the solution path.
+        /// </summary>
+        protected const int SolutionPathOrder = ConfigurationPathOrder + 1;
+
+        /// <summary>
+        /// The order of the data provider.
+        /// </summary>
+        protected const int DataProviderOrder = SolutionPathOrder + 1;
+
+        /// <summary>
+        /// The order of the source code directory.
+        /// </summary>
+        protected const int SourceCodeDirectoryOrder = DataProviderOrder + 1;
         #endregion
     }
 }

@@ -44,8 +44,9 @@ namespace SEE.UI.FilePicker
         protected virtual string LabelPath => "Label";
 
         /// <summary>
-        ///     The menu.
+        /// The menu.
         /// </summary>
+        [ManagedUI(integral: true)]
         protected GameObject Menu { get; private set; }
 
         /// <summary>
@@ -68,34 +69,8 @@ namespace SEE.UI.FilePicker
         /// </summary>
         protected TextMeshProUGUI LabelText { get; private set; }
 
-
         /// <summary>
-        ///     Destroys the component if the <see cref="Menu" /> is destroyed.
-        /// </summary>
-        protected override void Update()
-        {
-            if (Menu == null)
-            {
-                Destroyer.Destroy(this);
-                return;
-            }
-
-            base.Update();
-        }
-
-        /// <summary>
-        ///     Destroys the menu when this component is destroyed.
-        /// </summary>
-        private void OnDestroy()
-        {
-            if (Menu != null)
-            {
-                Destroyer.Destroy(Menu);
-            }
-        }
-
-        /// <summary>
-        ///     Initializes the menu.
+        /// Initializes the menu.
         /// </summary>
         protected override void StartDesktop()
         {

@@ -6,6 +6,7 @@ using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GO;
 using UnityEngine;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -160,9 +161,19 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                if (settings.Show && pointer.Value.On)
+                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                 {
-                    nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
+                    if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
+                    {
+                        nodeOperator.FadeLabel(settings.LabelAlpha, pointer.Value.LastHit, settings.AnimationFactor);
+                    }
+                }
+                else
+                {
+                    if (settings.Show && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit) && nodeOperator.LabelIsNotEmpty())
+                    {
+                        nodeOperator.FadeLabel(settings.LabelAlpha, raycasthit.point, settings.AnimationFactor);
+                    }
                 }
             }
         }
@@ -211,7 +222,15 @@ namespace SEE.Controls.Actions
         {
             if ((isHovered || isSelected) && nodeOperator != null && nodeOperator.Node != null)
             {
-                nodeOperator.UpdateLabelLayout(pointer.Value.LastHit);
+                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                {
+                    XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit);
+                    nodeOperator.UpdateLabelLayout(raycasthit.point);
+                }
+                else
+                {
+                    nodeOperator.UpdateLabelLayout(pointer.Value.LastHit);
+                }
             }
         }
     }

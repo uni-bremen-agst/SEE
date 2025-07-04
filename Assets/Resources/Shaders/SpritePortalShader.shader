@@ -1,8 +1,8 @@
-﻿// Original Unity sprite shader, modified to work with Portals.
-// Short summary of notifications:
+﻿// Original Unity sprite shader, modified to work with portal.
+// Short summary of modifications:
 // 1. Made function parameters const.
-// 2. Added _PortalMin and _PortalMax similarly to e.g. OpaquePortalShader.
-// 3. Modify fragment function to only display a certain pixel 
+// 2. Added _Portal property similarly to e.g. OpaquePortalShader.
+// 3. Modify fragment function to discard pixels outside the portal
 
 Shader "Custom/PortalSpriteShader"
 {
@@ -10,8 +10,7 @@ Shader "Custom/PortalSpriteShader"
     {
         [PerRendererData] _MainTex ("Sprite Texture", 2D) = "white" {}
         _Color ("Tint", Color) = (1,1,1,1)
-        _PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-        _PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+        _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
         [MaterialToggle] PixelSnap ("Pixel snap", Float) = 0
     }
 
@@ -51,11 +50,12 @@ Shader "Custom/PortalSpriteShader"
                 float4 vertex : SV_POSITION;
                 fixed4 color : COLOR;
                 float2 texcoord : TEXCOORD0;
+                float3 worldPos : TEXCOORD1;
+
             };
 
             fixed4 _Color;
-            float2 _PortalMin;
-            float2 _PortalMax;
+            float4 _Portal;
 
             v2f vert(const appdata_t IN)
             {
@@ -64,18 +64,9 @@ Shader "Custom/PortalSpriteShader"
                 OUT.color = IN.color * _Color;
                 OUT.texcoord = IN.texcoord;
                 #ifdef PIXELSNAP_ON
-				OUT.vertex = UnityPixelSnap (OUT.vertex);
+                OUT.vertex = UnityPixelSnap (OUT.vertex);
                 #endif
-
-                // Modification starts here
-                const float3 world_position = mul(unity_ObjectToWorld, IN.vertex);
-                // Don't render vertex if it's outside of the portal
-                if (world_position.x < _PortalMin.x || world_position.z < _PortalMin.y ||
-                    world_position.x > _PortalMax.x || world_position.z > _PortalMax.y)
-                {
-                    OUT.color.a = 0.0f;
-                }
-                // Modification ends here
+                OUT.worldPos = mul(unity_ObjectToWorld, IN.vertex);
 
                 return OUT;
             }
@@ -89,8 +80,8 @@ Shader "Custom/PortalSpriteShader"
                 fixed4 color = tex2D(_MainTex, uv);
 
                 #if UNITY_TEXTURE_ALPHASPLIT_ALLOWED
-				if (_AlphaSplitEnabled)
-					color.a = tex2D (_AlphaTex, uv).r;
+                if (_AlphaSplitEnabled)
+                    color.a = tex2D (_AlphaTex, uv).r;
                 #endif //UNITY_TEXTURE_ALPHASPLIT_ALLOWED
 
                 return color;
@@ -98,6 +89,14 @@ Shader "Custom/PortalSpriteShader"
 
             fixed4 frag(const v2f IN) : SV_Target
             {
+                // Discard coordinates if outside portal
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                if (IN.worldPos.x < _Portal.x || IN.worldPos.z < _Portal.y ||
+                    IN.worldPos.x > _Portal.z || IN.worldPos.z > _Portal.w)
+                {
+                    discard;
+                }
+
                 float4 c = SampleSpriteTexture(IN.texcoord) * IN.color;
                 // Following segment taken from https://forum.unity.com/threads/sprite-tint-shader.520248/#post-3412451
                 fixed a = c.a;

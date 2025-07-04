@@ -267,7 +267,7 @@ namespace SEE.Controls.Actions
                         : forNode.Edges.Where(e => RelevantEdge(e, forNode));
                 }
 
-                bool RelevantEdge(Edge edge, Node forNode) => getPredecessorNode(edge) == forNode;
+                bool RelevantEdge(Edge edge, Node forNode) => getPredecessorNode(edge) == null || getPredecessorNode(edge) == forNode;
             }
 
             IEnumerable<Edge> MergeEdgeLevel(IEnumerable<Edge> first, IEnumerable<Edge> second)

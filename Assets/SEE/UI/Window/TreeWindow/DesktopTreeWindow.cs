@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using Michsky.UI.ModernUIPack;
@@ -12,6 +9,10 @@ using SEE.GO;
 using SEE.UI.Notification;
 using SEE.UI.PopupMenu;
 using SEE.Utils;
+using SEE.XR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -392,6 +393,35 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
+                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    {
+                        pointerHelper.EnterEvent.AddListener(_ =>
+                        {
+                            XRSEEActions.OnTreeViewToggle = true;
+                            XRSEEActions.TreeViewEntry = item;
+                        });
+                        pointerHelper.ExitEvent.AddListener(_ => XRSEEActions.OnTreeViewToggle = false);
+                        pointerHelper.ThumbstickEvent.AddListener(e =>
+                        {
+                            if (XRSEEActions.TooltipToggle)
+                            {
+                                if (representedGraphElement == null)
+                                {
+                                    // There are no applicable actions for this item.
+                                    return;
+                                }
+
+                                // We want all applicable actions for the element, except ones where the element
+                                // is shown in the TreeWindow, since we are already in the TreeWindow.
+                                IEnumerable<PopupMenuEntry> actions = CreateContextMenuActions(contextMenu, e.position, representedGraphElement, representedGameObject);
+                                XRSEEActions.TooltipToggle = false;
+                                XRSEEActions.OnSelectToggle = true;
+                                XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit ray);
+                                contextMenu.ShowWith(actions, ray.point);
+                            }
+                        });
+                    }
+
                     // Right click opens the context menu, left/middle click expands/collapses the item.
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
@@ -405,15 +435,7 @@ namespace SEE.UI.Window.TreeWindow
 
                             // We want all applicable actions for the element, except ones where the element
                             // is shown in the TreeWindow, since we are already in the TreeWindow.
-                            IEnumerable<PopupMenuAction> actions = ContextMenuAction
-                                                                   .GetApplicableOptions(representedGraphElement,
-                                                                                         representedGameObject)
-                                                                   .Where(x => !x.Name.Contains("TreeWindow"));
-                            actions = actions.Append(new PopupMenuAction("Hide in TreeWindow", () =>
-                            {
-                                searcher.Filter.ExcludeElements.Add(representedGraphElement);
-                                Rebuild();
-                            }, Icons.Hide));
+                            IEnumerable<PopupMenuEntry> actions = CreateContextMenuActions(contextMenu, e.position, representedGraphElement, representedGameObject);
                             contextMenu.ShowWith(actions, e.position);
                         }
                         else
@@ -428,6 +450,23 @@ namespace SEE.UI.Window.TreeWindow
                             }
                         }
                     });
+                }
+
+                IEnumerable<PopupMenuEntry> CreateContextMenuActions(TreeWindowContextMenu contextMenu, Vector2 position, GraphElement representedGraphElement, GameObject representedGameObject)
+                {
+                    List<PopupMenuAction> appends = new()
+                    {
+                        new("Hide in TreeWindow", () =>
+                        {
+                            searcher.Filter.ExcludeElements.Add(representedGraphElement);
+                            Rebuild();
+                        }, Icons.Hide)
+                    };
+
+                    IEnumerable<PopupMenuEntry> actions = ContextMenuAction
+                        .GetOptionsForTreeView(contextMenu.ContextMenu, position, representedGraphElement, representedGameObject, appends);
+
+                    return actions.Concat(appends);
                 }
             }
         }
@@ -700,7 +739,10 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            items.position = items.position.WithXYZ(y: 0);
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            {
+                items.position = items.position.WithXYZ(y: 0);
+            }
         }
 
         /// <summary>
@@ -848,13 +890,27 @@ namespace SEE.UI.Window.TreeWindow
             searchField.onValueChanged.AddListener(SearchFor);
 
             filterButton = root.Find("Search/Filter").gameObject.MustGetComponent<ButtonManagerBasic>();
+            filterButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             sortButton = root.Find("Search/Sort").gameObject.MustGetComponent<ButtonManagerBasic>();
+            sortButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             groupButton = root.Find("Search/Group").gameObject.MustGetComponent<ButtonManagerBasic>();
+            groupButton.clickEvent.AddListener(() => {
+                XRSEEActions.OnSelectToggle = true;
+            });
             PopupMenu.PopupMenu popupMenu = gameObject.AddComponent<PopupMenu.PopupMenu>();
             contextMenu = new TreeWindowContextMenu(popupMenu, searcher, grouper, Rebuild,
                                                     filterButton, sortButton, groupButton);
 
             Rebuild();
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
         }
 
         /// <summary>

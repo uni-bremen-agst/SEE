@@ -45,6 +45,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// A list of all nominal active windows. May be empty.
         /// </summary>
+        [ManagedUI(toggleEnabled: true, destroy: false)]
         private readonly List<BaseWindow> windows = new();
 
         /// <summary>
@@ -55,6 +56,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// The game object on the UI canvas. This object will contain all UI windows.
         /// </summary>
+        [ManagedUI(toggleEnabled: true, destroy: false)]
         private GameObject space;
 
         /// <summary>
@@ -97,40 +99,6 @@ namespace SEE.UI.Window
                 throw new ArgumentNullException(nameof(window));
             }
             return windows.Remove(window);
-        }
-
-        /// <summary>
-        /// When disabling this component, the associated windows will also be disabled.
-        /// </summary>
-        public void OnDisable()
-        {
-            // When disabled, all windows need to be disabled and hidden.
-            foreach (BaseWindow window in windows.FindAll(x => x != null))
-            {
-                window.enabled = false;
-            }
-
-            if (space != null)
-            {
-                space.SetActive(false);
-            }
-        }
-
-        /// <summary>
-        /// When enabling this component, the associated windows will also be enabled.
-        /// </summary>
-        public void OnEnable()
-        {
-            // Re-enabling the space will cause its windows to show back up.
-            foreach (BaseWindow window in windows)
-            {
-                window.enabled = true;
-            }
-
-            if (space)
-            {
-                space.SetActive(true);
-            }
         }
 
         /// <summary>

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Controls;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphSearch;
@@ -74,9 +75,10 @@ namespace SEE.UI.Window.TreeWindow
             base.Start();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
             subscription.Dispose();
+            base.OnDestroy();
         }
 
         /// <summary>
@@ -185,8 +187,18 @@ namespace SEE.UI.Window.TreeWindow
                 case EdgeEvent:
                 case GraphElementTypeEvent:
                 case HierarchyEvent:
-                case NodeEvent:
                     Rebuild();
+                    break;
+                case NodeEvent nodeEvent:
+                    if (nodeEvent.Node.IsRoot() && nodeEvent.Change == ChangeType.Removal)
+                    {
+                        WindowSpace winSpace = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+                        winSpace.CloseWindow(this);
+                    }
+                    else
+                    {
+                        Rebuild();
+                    }
                     break;
             }
         }

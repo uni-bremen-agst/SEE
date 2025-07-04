@@ -47,12 +47,16 @@ namespace SEE.UI.HelpSystem
         public bool IsPlaying { get; set; }
 
         /// <summary>
-        /// Path to the HelpSystemEntry prefab.
+        /// Path to the HelpSystemEntry prefab. It contains the video player,
+        /// the text area for the help text, and the buttons for controlling the video
+        /// as well as the button to close the dialog and the button to go back to the
+        /// parent in the help menu.
         /// </summary>
         private const string helpSystemEntryPrefab = "Prefabs/UI/HelpSystemEntry";
 
         /// <summary>
-        /// Path to the HelpSystemEntrySpace prefab.
+        /// Path to the HelpSystemEntrySpace prefab. It is a panel in which
+        /// the HelpSystemEntry is placed.
         /// </summary>
         private const string helpSystemEntrySpacePrefab = "Prefabs/UI/HelpSystemEntrySpace";
 
@@ -96,13 +100,17 @@ namespace SEE.UI.HelpSystem
         private ButtonManagerBasicIcon backwardButton;
 
         /// <summary>
-        /// The helpSystemEntry-GameObject.
+        /// The helpSystemEntry GameObject.
+        /// It will be instantiated from the prefab <see cref="helpSystemEntryPrefab"/>.
+        /// It will be a child of <see cref="helpSystemSpace"/>.
         /// </summary>
         private GameObject helpSystemEntry;
 
         /// <summary>
         /// The helpSystemEntrySpace-GameObject which contains the helpSystemEntry.
         /// It is nessecary because of the dynamic panel for scaling the entry.
+        /// It will be instantiated from the prefab <see cref="helpSystemEntrySpacePrefab"/>.
+        /// It will be a child of <see cref="PlatformDependentComponent.Canvas"/>.
         /// </summary>
         private GameObject helpSystemSpace;
 
@@ -139,7 +147,30 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         protected override void StartDesktop()
         {
+            /// Note: <see cref="GetTextField()"/> called below accesses <see cref="helpSystemEntry"/>
+            /// that is why we need to instantiate it first.
+            SetUpHelpSystemEntryAndSpace();
+            helpSystemSpace.SetActive(false);
+            helpSystemEntry.SetActive(false);
             instructionsDisplay = GetTextField();
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
+        /// <summary>
+        /// Instantiates the help system entry and the space if necessary, that is,
+        /// if <see cref="helpSystemEntry"/> is null.
+        /// </summary>
+        private void SetUpHelpSystemEntryAndSpace()
+        {
+            if (helpSystemSpace == null)
+            {
+                helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
+                helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            }
         }
 
         /// <summary>
@@ -183,7 +214,7 @@ namespace SEE.UI.HelpSystem
 
                     if (currentHelpEntry.Index <= currentEntries.Count)
                     {
-                        if (Mathf.Round((float)videoPlayer.time) == currentHelpEntry.CumulatedTime && !isAdded)
+                        if (Mathf.Approximately(Mathf.Round((float)videoPlayer.time), currentHelpEntry.CumulatedTime) && !isAdded)
                         {
                             if (currentHelpEntry?.Index - 1 == HelpSystemBuilder.CurrentEntries.Count)
                             {
@@ -202,6 +233,11 @@ namespace SEE.UI.HelpSystem
                     }
                 }
             }
+        }
+
+        protected override void UpdateVR()
+        {
+            UpdateDesktop();
         }
 
         /// <summary>
@@ -243,8 +279,11 @@ namespace SEE.UI.HelpSystem
         /// </summary>
         public void ShowEntry()
         {
-            helpSystemSpace = PrefabInstantiator.InstantiatePrefab(helpSystemEntrySpacePrefab, Canvas.transform, false);
-            helpSystemEntry = PrefabInstantiator.InstantiatePrefab(helpSystemEntryPrefab, helpSystemSpace.transform, false);
+            /// If the dialog was closed, <see cref="helpSystemSpace"/> and <see cref="helpSystemEntry"/>
+            /// are null and need to be instantiated again.
+            SetUpHelpSystemEntryAndSpace();
+            helpSystemSpace.SetActive(true);
+            helpSystemEntry.SetActive(true);
             helpSystemSpace.transform.localScale = new Vector3(1.7f, 1.7f);
             RectTransform dynamicPanel = helpSystemSpace.transform.GetChild(2).GetComponent<RectTransform>();
             dynamicPanel.sizeDelta = new Vector2(550, 425);
@@ -382,17 +421,40 @@ namespace SEE.UI.HelpSystem
         }
 
         /// <summary>
+        /// The icon for playing the video.
+        /// </summary>
+        private Sprite playIcon;
+
+        /// <summary>
+        /// The icon for pausing the video.
+        /// </summary>
+        private Sprite pauseIcon;
+
+        /// <summary>
+        /// Initializes the sprites to avoid loading them multiple times.
+        /// </summary>
+        private void InitializeIcons()
+        {
+            playIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+            pauseIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+        }
+
+        /// <summary>
         /// Toggles the "IsPlaying" state. If the entry is running, it will be paused; if it is paused,
         /// it will be played on.
         /// </summary>
         public void TogglePlaying()
         {
+            if (playIcon == null || pauseIcon == null)
+            {
+                InitializeIcons();
+            }
+
             helpSystemEntry.transform.Find("Content/Lower Video/Buttons/Pause")
                            .gameObject.TryGetComponentOrLog(out pauseButton);
             if (!IsPlaying)
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/Pause_Simple_Icons_UI");
+                pauseButton.buttonIcon = pauseIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Play();
                 Speaker.Instance.PauseOrUnPause();
@@ -400,8 +462,7 @@ namespace SEE.UI.HelpSystem
             }
             else
             {
-                // FIXME: Should this resource really be loaded each time playing is toggled?
-                pauseButton.buttonIcon = Resources.Load<Sprite>("Materials/40+ Simple Icons - Free/RewindOneFrameForward_Simple_Icons_UI");
+                pauseButton.buttonIcon = playIcon;
                 pauseButton.UpdateUI();
                 videoPlayer.Pause();
                 Speaker.Instance.Pause();

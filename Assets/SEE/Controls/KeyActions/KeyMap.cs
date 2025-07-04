@@ -134,8 +134,8 @@ namespace SEE.Controls.KeyActions
         {
             if (TryGetKeyAction(keyCode, out KeyAction action))
             {
-                throw new($"Cannot register key {keyCode} for {descriptor.Name}."
-               + $" Key {keyCode} is already bound to {action}.\n");
+                throw new KeyBindingsExistsException($"Cannot register key {keyCode} for {descriptor.Name}."
+                                                     + $" Key {keyCode} is already bound to {action}.\n");
             }
             else
             {
@@ -351,5 +351,13 @@ namespace SEE.Controls.KeyActions
             }
         }
         #endregion
+
+        /// <summary>
+        /// An exception indicating that the attempted rebind would result in a duplicate key binding.
+        /// </summary>
+        public class KeyBindingsExistsException : Exception
+        {
+            public KeyBindingsExistsException(string message) : base(message) { }
+        };
     }
 }

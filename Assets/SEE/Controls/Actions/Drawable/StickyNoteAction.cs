@@ -1,8 +1,8 @@
 ﻿using HighlightPlus;
 using SEE.Game;
 using SEE.Game.Drawable;
-using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
 using SEE.UI.Notification;
@@ -10,7 +10,6 @@ using SEE.Utils;
 using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
-using MouseButton = SEE.Game.Drawable.ActionHelpers.MouseButton;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -134,7 +133,7 @@ namespace SEE.Controls.Actions.Drawable
             if (selectedAction == Operation.Move && stickyNote != null)
             {
                 foreach (Collider collider in
-                    GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                    stickyNote.GetRootParent().GetComponentsInChildren<Collider>())
                 {
                     collider.enabled = true;
                 }
@@ -150,8 +149,8 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         break;
                     case Operation.Move:
-                        GameObject stickyHolder = GameFinder.GetHighestParent(
-                        GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, memento.OriginalConfig.ParentID));
+                        GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
+                            memento.OriginalConfig.ParentID).GetRootParent();
                         GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
                             memento.OriginalConfig.Rotation);
                         GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
@@ -225,7 +224,7 @@ namespace SEE.Controls.Actions.Drawable
                     && stickyNote != null)
                 {
                     foreach (Collider collider in
-                        GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                        stickyNote.GetRootParent().GetComponentsInChildren<Collider>())
                     {
                         collider.enabled = true;
                     }
@@ -241,8 +240,8 @@ namespace SEE.Controls.Actions.Drawable
                             }
                             break;
                         case Operation.Move:
-                            GameObject stickyHolder = GameFinder.GetHighestParent(
-                            GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, memento.OriginalConfig.ParentID));
+                            GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
+                                memento.OriginalConfig.ParentID).GetRootParent();
                             GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
                                 memento.OriginalConfig.Rotation);
                             GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
@@ -304,7 +303,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         private void SpawnOnPosition()
         {
-            if (Queries.LeftMouseDown() && !inProgress
+            if (SEEInput.LeftMouseDown() && !inProgress
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit))
             {
                 inProgress = true;
@@ -323,7 +322,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// Block for selecting the rotation and the right position.
                     StickyNoteMenu.Instance.Destroy();
                     StickyNoteRotationMenu.Enable(stickyNote, raycastHit.collider.gameObject);
-                    StickyNoteMoveMenu.Enable(GameFinder.GetHighestParent(stickyNote), true);
+                    StickyNoteMoveMenu.Enable(stickyNote.GetRootParent(), true);
                 }
             }
         }
@@ -393,7 +392,7 @@ namespace SEE.Controls.Actions.Drawable
                 memento.ChangedConfig.Rotation = stickyNoteHolder.transform.eulerAngles;
                 stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = true;
                 foreach (Collider collider in
-                    GameFinder.GetHighestParent(stickyNote).GetComponentsInChildren<Collider>())
+                    stickyNote.GetRootParent().GetComponentsInChildren<Collider>())
                 {
                     collider.enabled = true;
                 }
@@ -413,7 +412,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <returns>true, if a sticky not was selected, Otherwise false</returns>
         private bool MoveSelection()
         {
-            if (Queries.LeftMouseDown()
+            if (SEEInput.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit) && !inProgress
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
@@ -433,7 +432,7 @@ namespace SEE.Controls.Actions.Drawable
                     surface.GetComponent<Collider>().enabled = false;
                     stickyNote = surface.transform.parent.gameObject;
                     stickyNote.transform.Find("Back").GetComponent<Collider>().enabled = false;
-                    stickyNoteHolder = GameFinder.GetHighestParent(surface);
+                    stickyNoteHolder = surface.GetRootParent();
                     foreach(Collider collider in stickyNoteHolder.GetComponentsInChildren<Collider>())
                     {
                         collider.enabled = false;
@@ -504,7 +503,7 @@ namespace SEE.Controls.Actions.Drawable
                     newPos, eulerAngles).Execute();
 
                 /// Opens the move and rotation menu for fine-tuning.
-                if (Queries.MouseHold(MouseButton.Left))
+                if (SEEInput.MouseHold(MouseButton.Left))
                 {
                     GameFinder.GetDrawableSurface(stickyNoteHolder).GetComponent<Collider>().enabled = true;
                     StickyNoteRotationMenu.Enable(stickyNoteHolder);
@@ -527,7 +526,7 @@ namespace SEE.Controls.Actions.Drawable
                 || SEEInput.MoveObjectForward() || SEEInput.MoveObjectBackward())
             {
                 ValueHolder.MoveDirection direction = GetDirection();
-                GameObject holder = GameFinder.GetHighestParent(stickyNote);
+                GameObject holder = stickyNote.GetRootParent();
                 Vector3 newPos = GameStickyNoteManager.MoveByMenu(holder, direction, StickyNoteMoveMenu.GetSpeed());
                 if (!spawnMode)
                 {
@@ -597,7 +596,7 @@ namespace SEE.Controls.Actions.Drawable
             if (finish)
             {
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;
-                memento.ChangedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+                memento.ChangedConfig.Rotation = stickyNote.GetRootParent().transform.eulerAngles;
                 CurrentState = IReversibleAction.Progress.Completed;
                 return true;
             }
@@ -623,7 +622,7 @@ namespace SEE.Controls.Actions.Drawable
         /// False, if the update method should return false.</returns>
         private EditReturnState EditSelection()
         {
-            if (Queries.LeftMouseDown()
+            if (SEEInput.LeftMouseDown()
                 && Raycasting.RaycastAnything(out RaycastHit raycastHit)
                 && (raycastHit.collider.gameObject.CompareTag(Tags.Drawable)
                     || GameFinder.HasDrawableSurface(raycastHit.collider.gameObject)
@@ -658,7 +657,7 @@ namespace SEE.Controls.Actions.Drawable
                 ScaleMenu.Instance.Destroy();
                 stickyNote.Destroy<HighlightEffect>();
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;
-                memento.ChangedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+                memento.ChangedConfig.Rotation = stickyNote.GetRootParent().transform.eulerAngles;
 
                 /// If there are changed in the configuration finish this operation.
                 if (!CheckEquals(memento.OriginalConfig, memento.ChangedConfig))
@@ -725,7 +724,7 @@ namespace SEE.Controls.Actions.Drawable
             else /// Will be executed if the newly selected sticky note is the same as the previous one.
             {
                 memento.ChangedConfig.Scale = stickyNote.transform.localScale;
-                memento.ChangedConfig.Rotation = GameFinder.GetHighestParent(stickyNote).transform.eulerAngles;
+                memento.ChangedConfig.Rotation = stickyNote.GetRootParent().transform.eulerAngles;
 
                 if (!CheckEquals(memento.OriginalConfig, memento.ChangedConfig))
                 {
@@ -756,7 +755,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else if (stickyNote != null && StickyNoteRotationMenu.IsYActive())
             {
-                stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
+                stickyNoteHolder = stickyNote.GetRootParent();
                 RotateByWheel(stickyNoteHolder, true);
             }
 
@@ -791,24 +790,24 @@ namespace SEE.Controls.Actions.Drawable
             bool interaction = false;
             value = 0;
 
-            if (Queries.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && !Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate? ValueHolder.Rotate : ValueHolder.ScaleUp;
                 interaction = true;
             }
-            if (Queries.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollUp() && Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? ValueHolder.RotateFast : ValueHolder.ScaleUpFast;
                 interaction = true;
             }
 
-            if (Queries.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && !Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.Rotate : ValueHolder.ScaleDown;
                 interaction = true;
 
             }
-            if (Queries.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
+            if (SEEInput.ScrollDown() && Input.GetKey(KeyCode.LeftControl))
             {
                 value = state == WheelInteractionType.Rotate ? -ValueHolder.RotateFast : ValueHolder.ScaleDownFast;
                 interaction = true;
@@ -825,7 +824,7 @@ namespace SEE.Controls.Actions.Drawable
             string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
             if (WheelInteraction(WheelInteractionType.Rotate, out float degree))
             {
-                stickyNoteHolder = GameFinder.GetHighestParent(stickyNote);
+                stickyNoteHolder = stickyNote.GetRootParent();
                 float newDegree = stickyNoteHolder.transform.localEulerAngles.y + degree;
                 GameStickyNoteManager.SetRotateY(stickyNoteHolder, newDegree);
                 StickyNoteRotationMenu.AssignValueToYSlider(newDegree);
@@ -870,7 +869,7 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     memento = new(DrawableConfigManager.GetDrawableConfig(surface), selectedAction);
                     new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
-                    Destroyer.Destroy(GameFinder.GetHighestParent(surface));
+                    Destroyer.Destroy(surface.GetRootParent());
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;
                 }
@@ -920,11 +919,11 @@ namespace SEE.Controls.Actions.Drawable
                     GameObject toDeleteSurface = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
                         memento.OriginalConfig.ParentID);
                     new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
-                    Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));
+                    Destroyer.Destroy(toDeleteSurface.GetRootParent());
                     break;
                 case Operation.Move:
-                    GameObject stickyHolder = GameFinder.GetHighestParent(
-                        GameFinder.FindDrawableSurface(memento.OriginalConfig.ID, memento.OriginalConfig.ParentID));
+                    GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.OriginalConfig.ID,
+                        memento.OriginalConfig.ParentID).GetRootParent();
                     GameStickyNoteManager.Move(stickyHolder, memento.OriginalConfig.Position,
                         memento.OriginalConfig.Rotation);
                     GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
@@ -963,8 +962,8 @@ namespace SEE.Controls.Actions.Drawable
                     new StickyNoteSpawnNetAction(memento.OriginalConfig).Execute();
                     break;
                 case Operation.Move:
-                    GameObject stickyHolder = GameFinder.GetHighestParent(
-                        GameFinder.FindDrawableSurface(memento.ChangedConfig.ID, memento.ChangedConfig.ParentID));
+                    GameObject stickyHolder = GameFinder.FindDrawableSurface(memento.ChangedConfig.ID,
+                        memento.ChangedConfig.ParentID).GetRootParent();
                     GameStickyNoteManager.Move(stickyHolder, memento.ChangedConfig.Position,
                         memento.ChangedConfig.Rotation);
                     GameObject surface = GameFinder.GetDrawableSurface(stickyHolder);
@@ -985,7 +984,7 @@ namespace SEE.Controls.Actions.Drawable
                     /// Save the current state of the Sticky Note; another user may have made changes.
                     memento.OriginalConfig = DrawableConfigManager.GetDrawableConfig(toDeleteSurface);
                     new StickyNoteDeleterNetAction(DrawableConfigManager.GetDrawableConfig(toDeleteSurface)).Execute();
-                    Destroyer.Destroy(GameFinder.GetHighestParent(toDeleteSurface));
+                    Destroyer.Destroy(toDeleteSurface.GetRootParent());
                     break;
             }
         }

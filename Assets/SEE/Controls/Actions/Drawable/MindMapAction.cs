@@ -3,15 +3,16 @@ using SEE.Game.Drawable;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
-using SEE.UI.Notification;
+using SEE.GO;
 using SEE.Net.Actions.Drawable;
 using SEE.UI.Menu.Drawable;
+using SEE.UI.Notification;
 using SEE.UI.PropertyDialog.Drawable;
 using SEE.Utils;
+using SEE.Utils.History;
 using System.Collections.Generic;
 using UnityEngine;
 using static SEE.UI.Menu.Drawable.MindMapMenu;
-using SEE.Utils.History;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -155,7 +156,7 @@ namespace SEE.Controls.Actions.Drawable
                 switch (chosenOperation)
                 {
                     case Operation.None:
-                        if (Queries.LeftMouseDown())
+                        if (SEEInput.LeftMouseDown())
                         {
                             ShowNotification.Info("Select an operation",
                                 "First you need to select an operation from the menu.");
@@ -183,10 +184,10 @@ namespace SEE.Controls.Actions.Drawable
                 if (MindMapParentSelectionMenu.GetChosenParent() != null)
                 {
                     Vector3[] positions = new Vector3[2];
-                    positions[0] = GameFinder.GetHighestParent(node).transform.
+                    positions[0] = node.GetRootParent().transform.
                         InverseTransformPoint(NearestPoints.GetNearestPoint(node,
                             MindMapParentSelectionMenu.GetChosenParent().transform.position));
-                    positions[1] = GameFinder.GetHighestParent(node).transform.
+                    positions[1] = node.GetRootParent().transform.
                         InverseTransformPoint(NearestPoints.GetNearestPoint(
                             MindMapParentSelectionMenu.GetChosenParent(),
                             node.transform.position));
@@ -328,14 +329,14 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the branch line preview.
             /// It draws the line from the origin of the node to the position of the mouse cursor.
-            if (!Queries.MouseHold(MouseButton.Left)
+            if (!SEEInput.MouseHold(MouseButton.Left)
                 && Selector.SelectQueryHasOrIsSurfaceWithoutMouse(out RaycastHit raycastHit)
                 && node != null)
             {
                 Vector3[] positions = new Vector3[2];
-                positions[0] = GameFinder.GetHighestParent(node).transform
+                positions[0] = node.GetRootParent().transform
                     .InverseTransformPoint(NearestPoints.GetNearestPoint(node, raycastHit.point));
-                positions[1] = GameFinder.GetHighestParent(node).transform
+                positions[1] = node.GetRootParent().transform
                     .InverseTransformPoint(raycastHit.point);
                 branchLineRenderer.positionCount = 2;
                 branchLineRenderer.SetPositions(positions);
@@ -343,7 +344,7 @@ namespace SEE.Controls.Actions.Drawable
 
             /// This block is for the selection of a parent node.
             /// It will executed if the left mouse button will be clicked.
-            if (Queries.LeftMouseDown() && node != null)
+            if (SEEInput.LeftMouseDown() && node != null)
             {
                 /// A node can only be chosen as a parent node if it is a Theme or Subtheme Node.
                 /// Additionally, the node must not choose itself.
@@ -420,8 +421,8 @@ namespace SEE.Controls.Actions.Drawable
                 return true;
             }
 
-            if (attachedObjects != null && GameFinder.FindAllChildrenWithTag(attachedObjects,
-                Tags.MindMapNode).Count > 0)
+            if (attachedObjects != null
+                && attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode).Count > 0)
             {
                 return true;
             }

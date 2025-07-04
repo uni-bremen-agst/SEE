@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
 using MoreLinq;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
@@ -123,13 +124,29 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveXTo(float newXPosition, float factor = 1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveXTo(
+            float newXPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool updateLayers = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return positionX.AnimateTo(newXPosition, duration);
+            IOperationCallback<Action> animation = positionX.AnimateTo(newXPosition, duration);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>
@@ -141,13 +158,29 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveYTo(float newYPosition, float factor = 1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveYTo(
+            float newYPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool updateLayers = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return positionY.AnimateTo(newYPosition, duration);
+            IOperationCallback<Action> animation = positionY.AnimateTo(newYPosition, duration);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>
@@ -159,13 +192,29 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveZTo(float newZPosition, float factor = 1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveZTo(
+            float newZPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool updateLayers = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return positionZ.AnimateTo(newZPosition, duration);
+            IOperationCallback<Action> animation = positionZ.AnimateTo(newZPosition, duration);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>
@@ -177,18 +226,114 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> MoveTo(Vector3 newPosition, float factor = 1, bool updateEdges = true)
+        public IOperationCallback<Action> MoveTo(
+            Vector3 newPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool updateLayers = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return new AndCombinedOperationCallback<Action>(new[]
+            IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>(new[]
             {
                 positionX.AnimateTo(newPosition.x, duration),
                 positionY.AnimateTo(newPosition.y, duration),
                 positionZ.AnimateTo(newPosition.z, duration)
             }, a => a);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Moves and scales the node at the same time.
+        /// <para>
+        /// If <paramref name="reparentChildren"/> is <c>true></c> (default), children are not scaled and moved along.
+        /// For this purpose they are reparented to their grandparent during the animation and back to the original
+        /// parent after the animation has completed.
+        /// </para>
+        /// </summary>
+        /// <param name="newLocalScale">the desired new local scale</param>
+        /// <param name="newPosition">the desired new target position in world space</param>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <param name="reparentChildren">if <c>true</c>, the children are not moved and scaled along with their parent</param>
+        /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
+        /// <returns>An operation callback for the requested animation</returns>
+        public IOperationCallback<Action> ResizeTo(
+            Vector3 newLocalScale,
+            Vector3 newPosition,
+            float factor = 1,
+            bool updateEdges = true,
+            bool reparentChildren = true,
+            bool updateLayers = true)
+        {
+            float duration = ToDuration(factor);
+            updateLayoutDuration = duration;
+            this.updateEdges = updateEdges;
+
+            List<Transform> children = null;
+            Transform originalParent = transform;
+            Transform tempParent = transform.parent;
+            if (reparentChildren)
+            {
+                children = new(transform.childCount);
+                foreach (Transform child in transform)
+                {
+                    if (child.gameObject.IsNodeAndActiveSelf())
+                    {
+                        children.Add(child);
+                    }
+                }
+                Reparent(tempParent);
+            }
+
+            IOperationCallback<Action> animation = new AndCombinedOperationCallback<Action>
+                (new[]
+                  {
+                    positionX.AnimateTo(newPosition.x, duration),
+                    positionY.AnimateTo(newPosition.y, duration),
+                    positionZ.AnimateTo(newPosition.z, duration),
+                    scale.AnimateTo(newLocalScale, duration)
+                  },
+                 a => a);
+            animation.OnComplete(() => OnEnd(originalParent));
+            animation.OnKill(() => OnEnd(originalParent));
+            return animation;
+
+            void OnEnd(Transform originalParent)
+            {
+                if (reparentChildren)
+                {
+                    Reparent(originalParent);
+                }
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
+
+            void Reparent(Transform newParent)
+            {
+                foreach (Transform child in children)
+                {
+                    child.SetParent(newParent);
+                }
+            }
         }
 
         /// <summary>
@@ -199,10 +344,25 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Quaternion newRotation, float factor = 1)
+        public IOperationCallback<Action> RotateTo(
+            Quaternion newRotation,
+            float factor = 1,
+            bool updateLayers = true)
         {
-            return rotation.AnimateTo(newRotation, ToDuration(factor));
+            IOperationCallback<Action> animation = rotation.AnimateTo(newRotation, ToDuration(factor));
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>
@@ -211,14 +371,30 @@ namespace SEE.Game.Operator
         /// <param name="axis">the axis to rotate around</param>
         /// <param name="angle">the angle to rotate by</param>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> RotateTo(Vector3 axis, float angle, float factor = 1)
+        public IOperationCallback<Action> RotateTo(
+            Vector3 axis,
+            float angle,
+            float factor = 1,
+            bool updateLayers = true)
         {
             Quaternion rotation = Quaternion.AngleAxis(angle, axis);
-            return RotateTo(rotation, factor);
+            IOperationCallback<Action> animation = RotateTo(rotation, factor);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>
@@ -231,13 +407,29 @@ namespace SEE.Game.Operator
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
         /// <param name="updateEdges">if true, the connecting edges will be moved along with the node</param>
+        /// <param name="updateLayers">If <c>true</c>, layers will be updated via <see cref="InteractableObject.UpdateLayer"/>.</param>
         /// <returns>An operation callback for the requested animation</returns>
-        public IOperationCallback<Action> ScaleTo(Vector3 newLocalScale, float factor = 1, bool updateEdges = true)
+        public IOperationCallback<Action> ScaleTo(
+            Vector3 newLocalScale,
+            float factor = 1,
+            bool updateEdges = true,
+            bool updateLayers = true)
         {
             float duration = ToDuration(factor);
             updateLayoutDuration = duration;
             this.updateEdges = updateEdges;
-            return scale.AnimateTo(newLocalScale, duration);
+            IOperationCallback<Action> animation = scale.AnimateTo(newLocalScale, duration);
+            animation.OnComplete(() => OnEnd());
+            animation.OnKill(() => OnEnd());
+            return animation;
+
+            void OnEnd()
+            {
+                if (updateLayers)
+                {
+                    transform.gameObject.UpdateInteractableLayers();
+                }
+            }
         }
 
         /// <summary>

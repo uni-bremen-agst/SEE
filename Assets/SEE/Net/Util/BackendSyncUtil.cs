@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Cysharp.Threading.Tasks;
+using Newtonsoft.Json;
+using SEE.Game.City;
+using SEE.Utils.Paths;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using Cysharp.Threading.Tasks;
-using Newtonsoft.Json;
-using SEE.Game.City;
-using SEE.Game.Drawable;
-using SEE.Utils.Paths;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -87,7 +86,7 @@ namespace SEE.Net.Util
             [JsonProperty(PropertyName = "size")]
             public long Size;
             [JsonProperty(PropertyName = "creationTime")]
-            public long CreationTime;
+            public DateTime CreationTime;
 
             public static FileData FromJson(string json)
             {

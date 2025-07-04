@@ -32,6 +32,12 @@ namespace SEE.Utils
         public readonly UnityEvent<PointerEventData> ClickEvent = new();
 
         /// <summary>
+        /// This event will be triggered whenever the user clicks the GameObject
+        /// this component is attached to with the thumbstickbutton in VR.
+        /// </summary>
+        public readonly UnityEvent<PointerEventData> ThumbstickEvent = new();
+
+        /// <summary>
         /// Invokes the <see cref="ExitEvent"/>.
         /// </summary>
         /// <param name="eventData">Data about the pointer.</param>

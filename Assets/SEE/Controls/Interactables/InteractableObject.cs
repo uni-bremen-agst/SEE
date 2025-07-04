@@ -11,6 +11,9 @@ using Valve.VR.InteractionSystem;
 #endif
 using SEE.Net.Actions;
 using SEE.Audio;
+using SEE.Game;
+using SEE.Game.Operator;
+using SEE.Game.Avatars;
 
 namespace SEE.Controls
 {
@@ -30,10 +33,34 @@ namespace SEE.Controls
     }
 
     /// <summary>
-    /// Super class of the behaviours of game objects the player interacts with.
+    /// User-interactable graph elements.
     /// </summary>
-    public sealed class InteractableObject : MonoBehaviour
+    public sealed class InteractableObject : InteractableObjectBase
     {
+        /// <inheritdoc />
+        public override int InteractableLayer => Layers.InteractableGraphObjects;
+
+        /// <inheritdoc />
+        public override int NonInteractableLayer => Layers.NonInteractableGraphObjects;
+
+        /// <inheritdoc />
+        public override Color? HitColor => hitColor;
+
+        /// <summary>
+        /// Backing field for the <see cref="HitColor"/> property.
+        /// </summary>
+        private Color hitColor = LaserPointer.HitColor;
+
+        /// <summary>
+        /// The color of the laser pointer when it is hovering over a node.
+        /// </summary>
+        private static Color nodeHitColor = Color.green;
+
+        /// <summary>
+        /// The color of the laser pointer when it is hovering over an edge.
+        /// </summary>
+        private static Color edgeHitColor = Color.blue;
+
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
 
@@ -61,9 +88,13 @@ namespace SEE.Controls
         public static readonly HashSet<InteractableObject> HoveredObjects = new();
 
         /// <summary>
-        /// The object, that is currently hovered by this player. There is always only ever
-        /// one object hovered by this player with the flag <see cref="HoverFlag.World"/>
-        /// set.
+        /// The object, that is currently hovered by this player.
+        /// <para>
+        /// There is always at most one object hovered by this player with the flag
+        /// <see cref="HoverFlag.World"/> set.
+        /// </para><para>
+        /// The object is tested against <see cref="IsInteractable"/> before being set.
+        /// </para>
         /// </summary>
         public static InteractableObject HoveredObjectWithWorldFlag { get; private set; }
 
@@ -76,6 +107,11 @@ namespace SEE.Controls
         /// The grabbed objects.
         /// </summary>
         public static readonly HashSet<InteractableObject> GrabbedObjects = new();
+
+        /// <summary>
+        /// If multiple objects should be selectable at the same time.
+        /// </summary>
+        public static bool MultiSelectionAllowed = true;
 
         /// <summary>
         /// The selected objects per graph.
@@ -147,6 +183,8 @@ namespace SEE.Controls
             gameObject.TryGetComponentOrLog(out interactable);
 #endif
             GraphElemRef = GetComponent<GraphElementRef>();
+
+            hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
         }
 
         private void OnDestroy()
@@ -203,6 +241,21 @@ namespace SEE.Controls
         #region Interaction
 
         /// <summary>
+        /// Whether the object is currently interactable (at the given hit point).
+        /// <para>
+        /// If the object is grabbed, it is not interactable.
+        /// </para><para>
+        /// See <see cref="InteractableAuxiliaryObject.IsInteractable(Vector3?)"/> for inherited base functionality.
+        /// </para>
+        /// </summary>
+        /// <param name="point">The hit point on the object.</param>
+        new public bool IsInteractable(Vector3? point = null)
+        {
+            if (IsGrabbed) return false;
+            return base.IsInteractable(point);
+        }
+
+        /// <summary>
         /// Sets <see cref="HoverFlags"/> to given <paramref name="hoverFlags"/>. Then if
         /// the object is being hovered over (<see cref="IsHovered"/>), the <see cref="HoverIn"/>
         /// and <see cref="AnyHoverIn"/> events are triggered with this <see cref="InteractableObject"/>
@@ -252,19 +305,14 @@ namespace SEE.Controls
                     LocalHoverIn?.Invoke(this);
                     LocalAnyHoverIn?.Invoke(this);
                     AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.HoverSound, this.gameObject);
+
+                    if (IsHoverFlagSet(HoverFlag.World))
+                    {
+                        HoveredObjectWithWorldFlag = this;
+                    }
                 }
 
                 HoveredObjects.Add(this);
-                if (IsHoverFlagSet(HoverFlag.World))
-                {
-                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
-                    //   investigation.
-                    //if (HoveredObjectWithWorldFlag != null)
-                    //{
-                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
-                    //}
-                    HoveredObjectWithWorldFlag = this;
-                }
             }
             else
             {
@@ -354,6 +402,11 @@ namespace SEE.Controls
         {
             Assert.IsTrue(IsSelected != select);
 
+            if (select && !MultiSelectionAllowed && SelectedObjects.Count > 0)
+            {
+                return;
+            }
+
             IsSelected = select;
 
             if (select)
@@ -371,7 +424,12 @@ namespace SEE.Controls
                 graphToSelectedIOs[graph].Add(this);
 
                 // Start blinking indefinitely.
-                gameObject.Operator().Blink(-1);
+                GraphElementOperator op = gameObject.Operator();
+                op.Blink(-1);
+                if (op is EdgeOperator eop)
+                {
+                    eop.AnimateDataFlow(true);
+                }
 
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
@@ -393,7 +451,12 @@ namespace SEE.Controls
                 graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
                 // Stop blinking.
-                gameObject.Operator().Blink(0);
+                GraphElementOperator op = gameObject.Operator();
+                op.Blink(0);
+                if (op is EdgeOperator eop)
+                {
+                    eop.AnimateDataFlow(false);
+                }
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
@@ -818,7 +881,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI())
+            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI() && IsInteractable())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -837,13 +900,14 @@ namespace SEE.Controls
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
-                if (isFlagSet && isMouseOverGUI)
+                bool isInteractable = IsInteractable();
+                if (isFlagSet && (isMouseOverGUI || !isInteractable))
                 {
                     // If the Hoverflag.World flag is set, but we are currently hovering over the GUI,
                     // we need to reset the Hoverflag.World flag to false.
                     SetHoverFlag(HoverFlag.World, false, true);
                 }
-                else if (!isFlagSet && !isMouseOverGUI)
+                else if (!isFlagSet && !isMouseOverGUI && isInteractable)
                 {
                     // If the Hoverflag.World flag is not set and no longer hovering over the GUI,
                     // we need to set the Hoverflag.World flag to true again.

@@ -5,8 +5,7 @@
 		_Color("Color", Color) = (1, 1, 1, 1)
 		_Smoothness("Smoothness", Range(0, 1)) = 0.5
 		_Metallic("Metallic", Range(0, 1)) = 0.0
-		_PortalMin("Portal Left Front Corner", vector) = (-10, -10, 0, 0)
-		_PortalMax("Portal Right Back Corner", vector) = (10, 10, 0, 0)
+		_Portal("Portal", vector) = (-10, -10, 10, 10)
 		_EmissionStrength("Emission Strength", Range(0, 5)) = 0.0
 	}
 
@@ -27,20 +26,20 @@
 		fixed4 _Color;
 		half _Smoothness;
 		half _Metallic;
-		float2 _PortalMin;
-		float2 _PortalMax;
+		float4 _Portal;
 		float _EmissionStrength;
 
 		void main(Input IN, inout SurfaceOutputStandard o)
 		{
-			fixed4 c = _Color;
-			if (IN.worldPos.x < _PortalMin.x || IN.worldPos.z < _PortalMin.y ||
-				IN.worldPos.x > _PortalMax.x || IN.worldPos.z > _PortalMax.y
-			)
+			// Discard coordinates if transparent or outside portal
+			// Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+			if (IN.worldPos.x < _Portal.x || IN.worldPos.z < _Portal.y ||
+				IN.worldPos.x > _Portal.z || IN.worldPos.z > _Portal.w)
 			{
-				c.a = 0.0f;
+				discard;
 			}
 
+			fixed4 c = _Color;
 			o.Albedo = c.rgb;
 			o.Emission = 0.5 * c.rgb;
 			o.Metallic = _Metallic;

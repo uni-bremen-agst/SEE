@@ -25,6 +25,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The menu game object.
         /// </summary>
+        [ManagedUI(integral: true)]
         protected GameObject Menu { get; private set; }
 
         /// <summary>
@@ -76,21 +77,6 @@ namespace SEE.UI.Menu
             OnShowMenuChanged += UpdateKeywordListener;
             OnCloseMenuCommandChanged += UpdateKeywordListener;
             MenuManager.confirmButton.onClick.AddListener(() => ShowMenu = false);
-        }
-
-        /// <summary>
-        /// Updates the component for the current platform.
-        /// Destroys this component if the corresponding menu has been destroyed or was not properly initialized.
-        /// </summary>
-        protected override void Update()
-        {
-            // destroys the component without a menu
-            if (Menu == null)
-            {
-                Destroyer.Destroy(this);
-                return;
-            }
-            base.Update();
         }
 
         /// <summary>

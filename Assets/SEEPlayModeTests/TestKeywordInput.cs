@@ -10,13 +10,13 @@ using System.Linq;
 namespace SEE.Controls
 {
     /// <summary>
-    /// Test cases for <see cref="KeywordInput"/>. 
-    /// 
+    /// Test cases for <see cref="KeywordInput"/>.
+    ///
     /// Note: This test is not automated. It expects that a human tester uses
     /// a microphone to talk. The recognized input is shown on the console
     /// for inspection and will also be compared to the expected result.
     /// </summary>
-    [Category("NonDeterministic")]
+    [Category("SkipOnCI")]
     internal class TestKeywordInput
     {
         /// <summary>
@@ -35,7 +35,7 @@ namespace SEE.Controls
         {
             LogAssert.ignoreFailingMessages = true;
 
-            KeywordInput input = new KeywordInput(keywords);
+            KeywordInput input = new(keywords);
             input.Register(OnPhraseRecognized);
             input.Start();
 
@@ -53,7 +53,7 @@ namespace SEE.Controls
         private void OnPhraseRecognized(PhraseRecognizedEventArgs args)
         {
             // General information on what was recognized.
-            StringBuilder builder = new StringBuilder();
+            StringBuilder builder = new();
             builder.AppendFormat("{0} ({1}){2}", args.text, args.confidence, Environment.NewLine);
             builder.AppendFormat("\tTimestamp: {0}{1}", args.phraseStartTime, Environment.NewLine);
             builder.AppendFormat("\tDuration: {0} seconds{1}", args.phraseDuration.TotalSeconds, Environment.NewLine);

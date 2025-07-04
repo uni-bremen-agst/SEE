@@ -1,112 +1,94 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Layout
 {
-    public interface IGameNode
-    {
-        /// <summary>
-        /// A unique ID for a node.
-        /// </summary>
-        string ID { get; }
-
-        /// <summary>
-        /// The local scale of a node (i.e., scale relative to its parent).
-        /// </summary>
-        Vector3 LocalScale { get; set; }
-
-        /// <summary>
-        /// The absolute scale of a node in world co-ordinates.
-        ///
-        /// Note: This value may be meaningful only if the node is not skewed.
-        /// </summary>
-        Vector3 AbsoluteScale { get; }
-
-        /// <summary>
-        /// Scales the node by the given <paramref name="factor"/>.
-        /// </summary>
-        /// <param name="factor">factory by which to scale the node</param>
-        void ScaleBy(float factor);
-
-        /// <summary>
-        /// Center position of a node in world space.
-        /// </summary>
-        Vector3 CenterPosition { get; set; }
-
-        /// <summary>
-        /// Rotation around the y axis in degrees.
-        /// </summary>
-        float Rotation { get; set; }
-
-        /// <summary>
-        /// X-Z center position of the roof of the node in world space.
-        /// </summary>
-        Vector3 Roof { get; }
-
-        /// <summary>
-        /// X-Z center position of the ground of the node in world space.
-        /// </summary>
-        Vector3 Ground { get; }
-    }
-
-    public interface IGraphNode<T>
-    {
-        /// <summary>
-        /// The set of immediate successors of this node.
-        /// </summary>
-        ICollection<T> Successors { get; }
-    }
-
-    public interface ISublayoutNode<T>
-    {
-        /// <summary>
-        /// the relative position from a sublayoutNode to its sublayoutRoot node
-        /// </summary>
-        Vector3 RelativePosition { get; set; }
-
-        /// <summary>
-        /// true if node is a sublayouNode
-        /// </summary>
-        bool IsSublayoutNode { get; set; }
-
-        /// <summary>
-        /// true if node is a root node of a sublayout
-        /// </summary>
-        bool IsSublayoutRoot { get; set; }
-
-        /// <summary>
-        /// if the node is a sublayout root, this is the sublayout
-        /// </summary>
-        Sublayout Sublayout { get; set; }
-
-        /// <summary>
-        /// the sublayout root node
-        /// </summary>
-        T SublayoutRoot { get; set; }
-
-        void SetOrigin();
-
-        void SetRelative(T node);
-    }
-
     /// <summary>
-    ///  Defines the methods for all nodes to be laid out.
+    /// Defines the methods for all nodes to be laid out.
     /// </summary>
-    public interface ILayoutNode : IGameNode, IGraphNode<ILayoutNode>, IHierarchyNode<ILayoutNode>, ISublayoutNode<ILayoutNode>
-    {
-    }
-
-    public static class ILayoutNodeHierarchy
+    public abstract class ILayoutNode : IGameNode, IHierarchyNode<ILayoutNode>
     {
         /// <summary>
-        /// Returns all nodes in <paramref name="layoutNodes"/> that do not have a parent.
+        /// See <see cref="IGameNode.ID"/>.
         /// </summary>
-        /// <param name="layoutNodes">nodes to be queried</param>
-        /// <returns>all root nodes in <paramref name="layoutNodes"/></returns>
-        public static ICollection<ILayoutNode> Roots(ICollection<ILayoutNode> layoutNodes)
+        public abstract string ID { get; }
+
+        /// <summary>
+        /// See <see cref="IGameNode.AbsoluteScale"/>.
+        /// </summary>
+        public abstract Vector3 AbsoluteScale { get; set; }
+        /// <summary>
+        /// See <see cref="IGameNode.CenterPosition"/>.
+        /// </summary>
+        public abstract Vector3 CenterPosition { get; set; }
+        /// <summary>
+        /// See <see cref="IGameNode.Rotation"/>.
+        /// </summary>
+        public abstract float Rotation { get; set; }
+        /// <summary>
+        /// See <see cref="IGameNode.Roof"/>.
+        /// </summary>
+        public abstract Vector3 Roof { get; }
+        /// <summary>
+        /// See <see cref="IGameNode.Ground"/>.
+        /// </summary>
+        public abstract Vector3 Ground { get; }
+        /// <summary>
+        /// See <see cref="IGameNode.HasType"/>.
+        /// </summary>
+        public abstract bool HasType(string typeName);
+        /// <summary>
+        /// See <see cref="IGameNode.ScaleXZBy"/>.
+        /// </summary>
+        public abstract void ScaleXZBy(float factor);
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.Parent"/>.
+        /// </summary>
+        public ILayoutNode Parent { get; protected set; }
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.Parent"/>.
+        /// </summary>
+        public int Level { get; set; } = 0;
+
+        /// <summary>
+        /// List of children of this node.
+        /// </summary>
+        private readonly List<ILayoutNode> children = new();
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.IsLeaf"/>.
+        /// </summary>
+        public bool IsLeaf => children.Count == 0;
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.Children"/>.
+        /// </summary>
+        public ICollection<ILayoutNode> Children()
         {
-            return layoutNodes.Where(node => node.Parent == null).ToList();
+            return children;
+        }
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.AddChild(T)"/>.
+        /// </summary>
+        public void AddChild(ILayoutNode child)
+        {
+            children.Add(child);
+            child.Parent = this;
+        }
+
+        /// <summary>
+        /// See <see cref="IHierarchyNode.RemoveChild(T)"/>.
+        /// </summary>
+        public void RemoveChild(ILayoutNode child)
+        {
+            if (!children.Remove(child))
+            {
+                throw new System.Exception("Child not found.");
+            }
+            child.Parent = null;
         }
     }
 }

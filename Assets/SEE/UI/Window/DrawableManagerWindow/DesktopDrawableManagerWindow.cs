@@ -86,7 +86,6 @@ namespace SEE.UI.Window.DrawableManagerWindow
         {
             Title = "Drawable Surface Manager";
             base.StartDesktop();
-            DisableWindowDraggerButtons();
             Transform root = PrefabInstantiator.InstantiatePrefab(dmWindowPrefab, Window.transform.Find("Content"), false).transform;
             items = (RectTransform)root.Find("Content/Items");
             scrollRect = root.gameObject.MustGetComponent<ScrollRect>();
@@ -243,7 +242,10 @@ namespace SEE.UI.Window.DrawableManagerWindow
                             CollapseItem(item);
                             foreach (GameObject child in childrenItems)
                             {
-                                RemoveItem(child);
+                                if (child != null)
+                                {
+                                    RemoveItem(child);
+                                }
                             }
                         }
                         else
@@ -380,7 +382,7 @@ namespace SEE.UI.Window.DrawableManagerWindow
             visibilityMesh.color = GetVisibilityColor(config.Visibility);
             visibilityBtn.clickEvent.AddListener(() =>
             {
-                bool visibility = !GameFinder.GetHighestParent(surface).activeInHierarchy;
+                bool visibility = !surface.GetRootParent().activeInHierarchy;
                 GameDrawableManager.ChangeVisibility(surface, visibility);
                 new DrawableChangeVisibilityNetAction(DrawableConfigManager.GetDrawableConfig(surface)).Execute();
                 visibilityMesh.text = GetVisibilityText(visibility);
@@ -435,8 +437,8 @@ namespace SEE.UI.Window.DrawableManagerWindow
                 {
                     pointerHelper.ClickEvent.AddListener(e =>
                     {
-                        GameHighlighter.EnableGlowOverlay(GameFinder.GetHighestParent(surface));
-                        Destroy(GameFinder.GetHighestParent(surface).GetComponent<HighlightEffect>(), 3.0f);
+                        GameHighlighter.EnableGlowOverlay(surface.GetRootParent());
+                        Destroy(surface.GetRootParent().GetComponent<HighlightEffect>(), 3.0f);
                     });
                 }
             }

@@ -1,5 +1,4 @@
 ﻿using SEE.Controls;
-using SEE.UI.PropertyDialog.HolisticMetrics;
 using UnityEngine;
 
 namespace SEE.UI.PropertyDialog.Drawable
@@ -7,7 +6,7 @@ namespace SEE.UI.PropertyDialog.Drawable
     /// <summary>
     /// This class manages the dialog for adding and downloading an image from the web.
     /// </summary>
-    internal class WebImageDialog : HolisticMetricsDialog
+    internal class WebImageDialog : BasePropertyDialog
     {
         /// <summary>
         /// The URL contained in the dialog.
@@ -81,11 +80,11 @@ namespace SEE.UI.PropertyDialog.Drawable
         /// <summary>
         /// Fetches the input the player gave us.
         /// </summary>
-        /// <param name="url">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <param name="url">If <see cref="BasePropertyDialog.gotInput"/>, this will be the
         /// URL the user provided. Otherwise it is empty.</param>
-        /// <param name="filename">If <see cref="HolisticMetricsDialog.gotInput"/>, this will be the
+        /// <param name="filename">If <see cref="BasePropertyDialog.gotInput"/>, this will be the
         /// filename the user provided. Otherwise it is empty.</param>
-        /// <returns><see cref="HolisticMetricsDialog.gotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.gotInput"/></returns>
         internal bool TryGetUserInput(out string url, out string filename)
         {
             if (GotInput)

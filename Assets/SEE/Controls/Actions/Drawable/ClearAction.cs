@@ -1,5 +1,4 @@
-﻿using SEE.Game;
-using SEE.Game.Drawable;
+﻿using SEE.Game.Drawable;
 using SEE.Game.Drawable.Configurations;
 using SEE.UI.Notification;
 using SEE.Net.Actions.Drawable;
@@ -91,7 +90,7 @@ namespace SEE.Controls.Actions.Drawable
         {
             if (!Raycasting.IsMouseOverGUI())
             {
-                if (Queries.LeftMouseDown() 
+                if (SEEInput.LeftMouseDown()
                     && Raycasting.RaycastAnything(out RaycastHit raycastHit))
                 {
                     GameObject hitObject = raycastHit.collider.gameObject;
@@ -125,7 +124,7 @@ namespace SEE.Controls.Actions.Drawable
                 memento = new Memento(surface, menu.CurrentType, menu.ShouldDeletePage);
                 if (!menu.ShouldDeletePage)
                 {
-                    ClearCurrent(surface, holder.CurrentPage); 
+                    ClearCurrent(surface, holder.CurrentPage);
                 }
                 else
                 {
@@ -159,7 +158,6 @@ namespace SEE.Controls.Actions.Drawable
         /// <param name="page">The page to be deleted.</param>
         private void DeleteCurrent(GameObject surface, int page)
         {
-            
             GameDrawableManager.RemovePage(surface, page);
             new SurfaceRemovePageNetAction(DrawableConfigManager.GetDrawableConfig(surface), page).Execute();
         }
@@ -214,7 +212,7 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// Clears the drawable with deleting all pages. 
+        /// Clears the drawable with deleting all pages.
         /// </summary>
         /// <param name="surface">The drawable to be cleared.</param>
         private void DeleteAll(GameObject surface)

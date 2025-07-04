@@ -1,8 +1,8 @@
-﻿using System;
+﻿using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using System;
 using System.Collections;
 using System.Collections.Generic;
-using SEE.Utils.Config;
-using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -47,6 +47,21 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Removes the given <paramref name="nodeType"/> from the map if the map contains it.
+        /// </summary>
+        /// <param name="nodeType">The node type to be removed.</param>
+        /// <returns>True if the node type could be removed, otherwise false.</returns>
+        public bool Remove(string nodeType)
+        {
+            if (map.ContainsKey(nodeType))
+            {
+                map.Remove(nodeType);
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// The number of elements in the map.
         /// </summary>
         public int Count => map.Count;
@@ -86,6 +101,8 @@ namespace SEE.Game.City
         {
             return this.GetEnumerator();
         }
+
+        #region Config I/O
 
         /// <summary>
         /// Saves this <see cref="NodeTypeVisualsMap"/> as a list of groups (node-type name, <see cref="NodeTypeVisualsMap"/>)
@@ -130,9 +147,8 @@ namespace SEE.Game.City
                         continue;
                     }
                     // VisualNodeAttributes
-                    VisualNodeAttributes visualNodeAttributes = new VisualNodeAttributes();
+                    VisualNodeAttributes visualNodeAttributes = new();
                     visualNodeAttributes.Restore(dict, visualNodeAttributesLabel);
-
                     map[name] = visualNodeAttributes;
                     result = true;
                 }
@@ -153,5 +169,7 @@ namespace SEE.Game.City
         /// The label of the <see cref="VisualNodeAttributes"/> in the configuration file.
         /// </summary>
         private const string visualNodeAttributesLabel = "visualNodeAttributes";
+
+        #endregion Config I/O
     }
 }

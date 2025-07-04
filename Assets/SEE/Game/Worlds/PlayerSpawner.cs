@@ -3,7 +3,6 @@ using SEE.Game.Avatars;
 using SEE.GO;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
 using UnityEngine;
@@ -69,6 +68,11 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
+        /// The dissonance communication. Its game object holds the remote players as its children.
+        /// </summary>
+        private DissonanceComms dissonanceComms = null;
+
+        /// <summary>
         /// The information needed to spawn player avatars.
         /// </summary>
         /// <remarks>This field must not be readonly. It will be changed by Odin during serialization.</remarks>
@@ -79,20 +83,26 @@ namespace SEE.Game.Worlds
         /// The name of the player prefabs used for spawning. These prefabs must be located in the
         /// <see cref="SpawnInfo.playerPrefabFolder"/>.
         /// </summary>
+        /// <remarks>Order by male and female and then by name.</remarks>
         public static List<string> Prefabs = new()
         {
-           "Male1",
-           "Male2",
-           "Male3",
-           "Female1",
-           "Female2",
-           "Female3",
+            // Males
+           "Caleb",
+           "Carlos",
+           "Dwayne",
+           "Eddy",
+           "John",
+           "Karl",
+           "Kevin",
+           "Tao",
+           "Yvo",
+           // Females
+           "Hanna",
+           "Luise",
+           "Paula",
+           "Shi",
+           "Susan",
         };
-
-        /// <summary>
-        /// The dissonance communication. Its game object holds the remote players as its children.
-        /// </summary>
-        private DissonanceComms dissonanceComms = null;
 
         /// <summary>
         /// Initializes the player spawns if they are not already set by the user in the Unity inspector.
@@ -101,6 +111,7 @@ namespace SEE.Game.Worlds
         {
             if (playerSpawns == null || playerSpawns.Count == 0)
             {
+                // TODO (#832): This should be computed.
                 playerSpawns = new()
                 {
                     new SpawnInfo(Prefabs[0], new Vector3(0.4f, 0f, -5.8f), 270),
@@ -109,16 +120,24 @@ namespace SEE.Game.Worlds
                     new SpawnInfo(Prefabs[3], new Vector3(-3.5f, 0f, -5.8f), 90),
                     new SpawnInfo(Prefabs[4], new Vector3(-3.5f, 0f, -6.8f), 90),
                     new SpawnInfo(Prefabs[5], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[6], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[7], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[8], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[9], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[10], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[11], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[12], new Vector3(-3.5f, 0f, -7.8f), 90),
+                    new SpawnInfo(Prefabs[13], new Vector3(-3.5f, 0f, -7.8f), 90),
                 };
             }
         }
 
         /// <summary>
-        /// Starts the co-routine <see cref="SpawnPlayerCoroutine"/>.
+        /// Runs <see cref="SpawnPlayer"/>.
         /// </summary>
         private void OnEnable()
         {
-            StartCoroutine(SpawnPlayerCoroutine());
+            SpawnPlayer();
         }
 
         /// <summary>
@@ -134,24 +153,19 @@ namespace SEE.Game.Worlds
         }
 
         /// <summary>
-        /// This co-routine sets <see cref="dissonanceComms"/>, registers <see cref="ClientConnects(ulong)"/>
+        /// This method sets <see cref="dissonanceComms"/>, registers <see cref="ClientConnects(ulong)"/>
         /// on the <see cref="NetworkManager.Singleton.OnClientConnectedCallback"/> and spawns
         /// the first local client.
         /// </summary>
-        /// <returns>enumerator as to how to continue this co-routine</returns>
-        private IEnumerator SpawnPlayerCoroutine()
+        private void SpawnPlayer()
         {
-            Net.Network networkConfig = FindObjectOfType<Net.Network>()
+            Net.Network networkConfig = FindFirstObjectByType<Net.Network>()
                 ?? throw new Exception("Network configuration not found.\n");
 
             // Wait until Dissonance is created.
-            while (ReferenceEquals(dissonanceComms, null))
+            if (ReferenceEquals(dissonanceComms, null))
             {
-                dissonanceComms = FindObjectOfType<DissonanceComms>();
-                if (ReferenceEquals(dissonanceComms, null))
-                {
-                    yield return null;
-                }
+                dissonanceComms = FindFirstObjectByType<DissonanceComms>();
                 // We need to set the local player name in DissonanceComms
                 // before Dissonance is started. That is why we cannot afford
                 // to wait until the next frame.
@@ -168,7 +182,7 @@ namespace SEE.Game.Worlds
                 // nor host. A pure client is to request spawning a player
                 // via the following call back.
                 networkManager.OnClientConnectedCallback += OnClientIsConnected;
-                yield break;
+                return;
             }
 
             // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -223,7 +237,7 @@ namespace SEE.Game.Worlds
 
         /// <summary>
         /// Requests to spawn a player on the server. Is used as callback registered
-        /// at <see cref="SpawnPlayerCoroutine"/>. The player name and avatar index
+        /// at <see cref="SpawnPlayer"/>. The player name and avatar index
         /// are retrieved from the local configuration on the client side.
         /// </summary>
         /// <param name="clientId">the network ID of the connecting client</param>

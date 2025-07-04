@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using SEE.DataModel.DG;
-using SEE.UI.PropertyDialog;
+﻿using SEE.DataModel.DG;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
-using UnityEngine;
 using SEE.Utils.History;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -126,9 +127,22 @@ namespace SEE.Controls.Actions
                     break;
 
                 default:
-                    throw new NotImplementedException("Unhandled case.");
+                    throw new NotImplementedException($"Unhandled case {nameof(progress)}.");
             }
             return result;
+        }
+
+        /// <summary>
+        /// Used to execute the <see cref="EditNodeAction"/> from the context menu.
+        /// Opens the edit dialog for the <paramref name="node"/>
+        /// and ensures that the <see cref="Update"/> method performs the execution via context menu.
+        /// </summary>
+        /// <param name="node">The node to be edit.</param>
+        public void ContextMenuExecution(Node node)
+        {
+            progress = ProgressState.WaitingForInput;
+            memento = new Memento(node);
+            OpenDialog();
         }
 
         /// <summary>
@@ -147,8 +161,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            memento.Node.SourceName = memento.OriginalName;
-            memento.Node.Type = memento.OriginalType;
+            GameNodeEditor.ChangeName(memento.Node, memento.OriginalName);
+            GameNodeEditor.ChangeType(memento.Node, memento.OriginalType);
             NotifyClients(memento.Node);
         }
 
@@ -158,8 +172,8 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            memento.Node.SourceName = memento.NewName;
-            memento.Node.Type = memento.NewType;
+            GameNodeEditor.ChangeName(memento.Node, memento.NewName);
+            GameNodeEditor.ChangeType(memento.Node, memento.NewType);
             NotifyClients(memento.Node);
         }
 
@@ -203,7 +217,7 @@ namespace SEE.Controls.Actions
         private void OpenDialog()
         {
             // This dialog will set the source name and type of memento.node.
-            NodePropertyDialog dialog = new NodePropertyDialog(memento.Node);
+            NodePropertyDialog dialog = new(memento.Node);
             dialog.OnConfirm.AddListener(OKButtonPressed);
             dialog.OnCancel.AddListener(CancelButtonPressed);
             dialog.Open();

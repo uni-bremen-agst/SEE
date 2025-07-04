@@ -7,13 +7,14 @@ using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GraphProviders;
 using SEE.GraphProviders.Evolution;
 using SEE.Utils.Paths;
 using UnityEngine;
 using UnityEngine.TestTools;
 
-namespace SEETests
+using static SEE.DataModel.DG.VCS;
+
+namespace SEE.GraphProviders
 {
     /// <summary>
     /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
@@ -21,6 +22,11 @@ namespace SEETests
     /// </summary>
     public class TestGitGraphProvider
     {
+        /// <summary>
+        /// The default value for the start date of relevant commits.
+        /// </summary>
+        private const string defaultDate = "2024/01/01";
+
         /// <summary>
         /// Path to the git directory.
         /// </summary>
@@ -34,14 +40,22 @@ namespace SEETests
         /// <summary>
         /// Signature of one developer.
         /// </summary>
-        private readonly Signature testSig = new("John Doe", "doe@example.com",
-            new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+        private readonly Signature developerA =
+            new(
+                "John Doe",
+                "doe@example.com",
+                new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero)
+            );
 
         /// <summary>
         /// Signature of another developer.
         /// </summary>
-        private readonly Signature testSig2 = new("Jan Muller", "muller@example.com",
-            new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero));
+        private readonly Signature developerB =
+            new(
+                "Jan Muller",
+                "muller@example.com",
+                new DateTimeOffset(2024, 04, 01, 1, 1, 1, TimeSpan.Zero)
+            );
 
         /// <summary>
         /// Creates a new file in the path <paramref name="path"/> and fills or appends the file with
@@ -62,7 +76,7 @@ namespace SEETests
             File.AppendAllText(Path.Combine(gitDirPath, path), text);
             repo.Index.Add(path);
             repo.Index.Write();
-            testSig.When.AddHours(1);
+            developerA.When.AddHours(1);
             repo.Commit("One Commit", author, author);
         }
 
@@ -71,15 +85,14 @@ namespace SEETests
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<Graph> ProvidingGraphAsync(string date = "01/01/2024")
+        private async UniTask<Graph> ProvidingGraphAsync(string date = defaultDate)
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
             city.VCSPath = new DataPath(gitDirPath);
-            AllGitBranchesSingleGraphProvider provider = new();
-            provider.PathGlobbing = new Dictionary<string, bool>()
+            AllGitBranchesSingleGraphProvider provider = new()
             {
-                { "**/*.cs", true }
+                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
             };
             city.Date = date;
 
@@ -88,7 +101,11 @@ namespace SEETests
                 // Do nothing here
             }
 
-            Graph g = await provider.ProvideAsync(new Graph(""), city, changePercentage: ReportProgress);
+            Graph g = await provider.ProvideAsync(
+                new Graph(""),
+                city,
+                changePercentage: ReportProgress
+            );
             return g;
         }
 
@@ -97,17 +114,16 @@ namespace SEETests
         /// </summary>
         /// <param name="date">An optional date limit for the graph provider</param>
         /// <returns>The generated Graph</returns>
-        private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = "01/01/2024")
+        private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
-            GameObject go = new();
-            SEECityEvolution city = go.AddComponent<SEECityEvolution>();
-
-            GitEvolutionGraphProvider provider = new();
-            provider.Date = date;
-            provider.GitRepository = new GitRepository()
+            GitEvolutionGraphProvider provider = new()
             {
-                RepositoryPath = new DataPath(gitDirPath),
-                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                Date = date,
+                GitRepository = new GitRepository()
+                {
+                    RepositoryPath = new DataPath(gitDirPath),
+                    PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                }
             };
 
             static void ReportProgress(float x)
@@ -115,7 +131,11 @@ namespace SEETests
                 // Do nothing here
             }
 
-            List<Graph> g = await provider.ProvideAsync(new List<Graph>(), city, changePercentage: ReportProgress);
+            List<Graph> g = await provider.ProvideAsync(
+                new List<Graph>(),
+                null, // This is not used in the evolution provider.
+                changePercentage: ReportProgress
+            );
             return g;
         }
 
@@ -124,20 +144,35 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerB);
 
                 IList<Graph> series = await ProvidingGraphSeriesAsync();
                 Assert.AreEqual(3, series.Count);
 
-                Assert.AreEqual(1, series[0].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(
+                    1,
+                    series[0].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                );
 
-                Assert.AreEqual(1, series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, series[1].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(
+                    1,
+                    series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                );
+                Assert.AreEqual(
+                    1,
+                    series[1].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                );
 
-                Assert.AreEqual(2, series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, series[2].GetNode("firstFile.cs-Evo").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(
+                    2,
+                    series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                );
+                Assert.AreEqual(
+                    1,
+                    series[2].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                );
             });
         }
 
@@ -146,23 +181,25 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig);
-                WriteFile("AnotherFile.cs", "This is a test", testSig2);
-                WriteFile(Path.Combine("dir1", "dir2", "actualFile.cs"), "This is a test", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerA);
+                WriteFile("AnotherFile.cs", "This is a test", developerB);
+                WriteFile(
+                    Path.Combine("dir1", "dir2", "actualFile.cs"),
+                    "This is a test",
+                    developerB
+                );
 
                 Graph g = await ProvidingGraphAsync();
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n1 = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n1.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n1.IntAttributes[VCS.NumberOfDevelopers]);
-
+                Assert.AreEqual(1, n1.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n1.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("AnotherFile.cs"));
                 Node n2 = g.GetNode("AnotherFile.cs");
-                Assert.AreEqual(2, n2.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(2, n2.IntAttributes[VCS.NumberOfDevelopers]);
-
+                Assert.AreEqual(2, n2.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n2.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("dir1/dir2/actualFile.cs"));
             });
@@ -173,17 +210,17 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
-                Graph g = await ProvidingGraphAsync(date: "01/12/2024");
+                Graph g = await ProvidingGraphAsync(date: "2024/12/01");
                 // This file should be too old by now
-                Assert.AreEqual(0,g.GetNode("firstFile.cs").IntAttributes[VCS.NumberOfDevelopers]);
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[VCS.CommitFrequency]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfDevelopers]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[CommitFrequency]);
                 Graph g2 = await ProvidingGraphAsync();
                 Assert.NotNull(g2.GetNode("firstFile.cs"));
                 Node n = g2.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -192,16 +229,16 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is a test from Jan", testSig2);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is a test from Jan", developerB);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(2, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -210,18 +247,25 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
                 repo.CreateBranch("newBranch");
-                WriteFile("firstFile.cs", "This is a test on newBranch", testSig);
-                Commands.Checkout(repo, repo.Branches["master"]);
+                WriteFile("firstFile.cs", "This is a test on newBranch", developerA);
+                Branch branch = repo.Branches["main"] ?? repo.Branches["master"];
+                if (branch == null)
+                {
+                    throw new Exception(
+                        $"main/master branch not found! (branches: {string.Join(", ", repo.Branches)})"
+                    );
+                }
+                Commands.Checkout(repo, branch);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -230,17 +274,17 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is another test", testSig);
-                WriteFile("otherfile.notcs", "This is another test in another file", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is another test", developerA);
+                WriteFile("otherfile.notcs", "This is another test in another file", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
 
                 Assert.IsNull(g.GetNode("otherfile.notcs"));
             });
@@ -251,16 +295,16 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
-                WriteFile("firstFile.cs", "This is another test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
+                WriteFile("firstFile.cs", "This is another test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -268,13 +312,12 @@ namespace SEETests
         public IEnumerator TestGitProviderFileDoesNotExist()
         {
             return UniTask.ToCoroutine(async () =>
-                {
-                    WriteFile("firstFile.cs", "This is a test", testSig);
+            {
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
-                    Graph g = await ProvidingGraphAsync();
-                    Assert.IsNull(g.GetNode("file/does/not/exists"));
-                }
-            );
+                Graph g = await ProvidingGraphAsync();
+                Assert.IsNull(g.GetNode("file/does/not/exists"));
+            });
         }
 
         [UnityTest]
@@ -282,15 +325,15 @@ namespace SEETests
         {
             return UniTask.ToCoroutine(async () =>
             {
-                WriteFile("firstFile.cs", "This is a test", testSig);
+                WriteFile("firstFile.cs", "This is a test", developerA);
 
                 Graph g = await ProvidingGraphAsync();
                 // Check data of firstFile.cs
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[VCS.CommitFrequency]);
-                Assert.AreEqual(1, n.IntAttributes[VCS.NumberOfDevelopers]);
+                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
 
@@ -309,7 +352,7 @@ namespace SEETests
             repo?.Dispose();
             if (Directory.Exists(gitDirPath))
             {
-                SEE.Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
+                Utils.Filenames.DeleteReadOnlyDirectory(gitDirPath);
             }
         }
     }

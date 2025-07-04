@@ -102,13 +102,11 @@ namespace SEE.Controls.Actions
             {
                 if (!shuffling)
                 {
-                    // Retrieve cityRootNode.
-                    InteractableObject hoveredObject = InteractableObject.HoveredObjectWithWorldFlag;
                     // Let's see whether we have hit a code-city element.
-                    if (hoveredObject)
+                    if (Raycasting.RaycastGraphElement(out RaycastHit _, out GraphElementRef elementRef, false) != HitGraphElement.None)
                     {
                         // cityRootNode is the node containing the hoveredObject
-                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(hoveredObject.transform);
+                        cityRootNode = SceneQueries.GetCityRootTransformUpwards(elementRef.gameObject.transform);
                         Assert.IsNotNull(cityRootNode);
                         // Remember the original position of the city-root node so that it can be reset
                         // to its original position.
@@ -116,7 +114,7 @@ namespace SEE.Controls.Actions
                         // The node operator that is going to be used to move the city-root node
                         nodeOperator = cityRootNode.gameObject.NodeOperator();
 
-                        // Where exactly have we hit the plane containing cideRootNode (if at all)?
+                        // Where exactly have we hit the plane containing cityRootNode (if at all)?
                         if (Raycasting.RaycastPlane(new UnityEngine.Plane(Vector3.up, cityRootNode.position), out Vector3 cityPlaneHitPoint))
                         {
                             gizmo.gameObject.SetActive(true);

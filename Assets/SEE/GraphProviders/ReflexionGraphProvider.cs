@@ -1,4 +1,5 @@
-﻿using SEE.DataModel.DG;
+﻿using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.City;
 using SEE.Tools.ReflexionAnalysis;
@@ -8,7 +9,6 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Threading;
-using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -55,7 +55,7 @@ namespace SEE.GraphProviders
         {
             if (city == null)
             {
-                throw new ArgumentException("The given city is null.\n");
+                throw new ArgumentNullException(nameof(city));
             }
             Graph architectureGraph = await LoadGraphAsync(Architecture, city, token);
             changePercentage?.Invoke(0.33f);
@@ -75,7 +75,6 @@ namespace SEE.GraphProviders
                 mappingGraph = await LoadGraphAsync(Mapping, city, token);
                 changePercentage?.Invoke(1.0f);
             }
-
             return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
@@ -88,13 +87,39 @@ namespace SEE.GraphProviders
         /// <param name="token">token with which the loading can be cancelled</param>
         /// <returns>loaded graph</returns>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="path"/> is null</exception>
-        private async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
+        internal async UniTask<Graph> LoadGraphAsync(DataPath path, AbstractSEECity city, CancellationToken token = default)
         {
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
             return await GraphReader.LoadAsync(path, city.HierarchicalEdges, city.SourceCodeDirectory.Path);
+        }
+
+        /// <summary>
+        /// Provides the initial reflexion city.
+        /// </summary>
+        /// <param name="cityName">the name for the city.</param>
+        /// <param name="city">the reflexion city.</param>
+        /// <param name="changePercentage">callback to report progress from 0 to 1</param>
+        /// <param name="token">cancellation token</param>
+        /// <returns>the created <see cref="ReflexionGraph"/></returns>
+        /// <exception cref="ArgumentNullException">thrown, if the city is null.</exception>
+        public Graph ProvideInitial(string cityName, AbstractSEECity city,
+                                    Action<float> changePercentage = null, CancellationToken token = default)
+        {
+            if (city == null)
+            {
+                throw new ArgumentNullException(nameof(city));
+            }
+            CityName = cityName;
+            Graph architectureGraph = new("", $"Architecture {cityName}");
+            changePercentage?.Invoke(0.33f);
+            Graph implementationGraph = new("", $"Implementation {cityName}");
+            changePercentage?.Invoke(0.66f);
+            Graph mappingGraph = new("", $"Mapping {cityName}");
+            changePercentage?.Invoke(1.0f);
+            return new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph, CityName);
         }
 
         #region Configuration file input/output

@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -11,6 +10,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
@@ -35,7 +35,7 @@ namespace SEE.GraphProviders.Evolution
         /// The date limit until commits should be analyzed.
         /// </summary>
         [InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analyzed (DD-MM-YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
+         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
         public string Date = "";
 
         /// <summary>
@@ -71,10 +71,9 @@ namespace SEE.GraphProviders.Evolution
         /// <exception cref="ArgumentException">If one attribute is not set correctly.</exception>
         private void CheckAttributes()
         {
-            if (Date == "" || !DateTime.TryParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture,
-                    DateTimeStyles.None, out _))
+            if (!SEEDate.IsValid(Date))
             {
-                throw new ArgumentException("Date is not set or can't be parsed");
+                throw new ArgumentException($"Date {Date} is not a valid date ({SEEDate.DateFormat}).");
             }
 
             if (GitRepository.RepositoryPath.Path == "" || !Directory.Exists(GitRepository.RepositoryPath.Path) ||
@@ -93,7 +92,7 @@ namespace SEE.GraphProviders.Evolution
         /// <returns>The calculated graph series.</returns>
         private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
         {
-            DateTime timeLimit = DateTime.ParseExact(Date, "dd/MM/yyyy", CultureInfo.InvariantCulture);
+            DateTime timeLimit = SEEDate.ToDate(Date);
 
             Matcher matcher = new();
 

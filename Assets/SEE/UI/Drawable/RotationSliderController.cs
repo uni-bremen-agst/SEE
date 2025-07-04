@@ -1,7 +1,7 @@
 ﻿using Michsky.UI.ModernUIPack;
-using RTG;
 using SEE.UI.Notification;
 using System.Globalization;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -90,14 +90,14 @@ namespace SEE.UI.Drawable
         {
             text = text.Replace(",", ".");
             /// Try to parse the text into a float.
-            if (text.LastChar() != '.' && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
+            if (text.Last() != '.' && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out float value))
             {
                 manager.mainSlider.value = value;
                 SliderChanged(value);
             }
             else
             {
-                if (text.LastChar() != '.')
+                if (text.Last() != '.')
                 {
                     ShowNotification.Warn("Wrong format!", "The given text is no degree format.");
                 }

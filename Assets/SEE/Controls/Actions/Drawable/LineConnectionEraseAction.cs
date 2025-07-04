@@ -54,7 +54,7 @@ namespace SEE.Controls.Actions.Drawable
                     }
                 }
                 /// This block completes the action.
-                if (Queries.MouseUp(MouseButton.Left) && isActive)
+                if (SEEInput.MouseUp(MouseButton.Left) && isActive)
                 {
                     CurrentState = IReversibleAction.Progress.Completed;
                     return true;

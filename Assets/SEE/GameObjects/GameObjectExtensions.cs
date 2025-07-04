@@ -1,15 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.Utils;
-using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using SEE.Utils;
 using Sirenix.Utilities;
-using SEE.DataModel.Drawable;
 
 namespace SEE.GO
 {
@@ -51,13 +52,30 @@ namespace SEE.GO
         /// (checked by predicate <see cref="IsNode(GameObject)"/>.
         ///
         /// This predicate can be queried for game objects representing a code city,
-        /// that is, game objects that have a <see cref="AbstractSEECity"/> attached to
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
         /// them.
         /// </summary>
         /// <returns>true if a code city was drawn</returns>
         public static bool IsCodeCityDrawn(this GameObject gameObject)
         {
             return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode());
+        }
+
+        /// <summary>
+        /// Returns true if a code city was drawn for this <paramref name="gameObject"/> and is active.
+        /// A code city is assumed to be drawn in there is at least one immediate child
+        /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>.
+        ///
+        /// This predicate can be queried for game objects representing a code city,
+        /// that is, game objects that have an <see cref="AbstractSEECity"/> attached to
+        /// them.
+        /// </summary>
+        /// <returns>true if a code city was drawn and is active.</returns>
+        public static bool IsCodeCityDrawnAndActive(this GameObject gameObject)
+        {
+            return gameObject.transform.Cast<Transform>().Any(child => child.gameObject.IsNode()
+                    && child.gameObject.activeInHierarchy);
         }
 
         /// <summary>
@@ -121,6 +139,20 @@ namespace SEE.GO
         public static bool IsRoot(this GameObject gameNode)
         {
             return gameNode.GetComponent<NodeRef>()?.Value?.IsRoot() ?? false;
+        }
+
+        /// <summary>
+        /// True if <paramref name="gameNode"/> represents the implementation or architecture root of
+        /// the graph.
+        ///
+        /// Precondition: <paramref name="gameNode"/> has a <see cref="NodeRef"/> component
+        /// attached to it that is a valid graph node reference.
+        /// </summary>
+        /// <param name="gameNode">game object representing a Node to be queried whether it is an implementation or architecture root</param>
+        /// <returns>true if <paramref name="gameNode"/> represents an implementation or architecture root in the graph</returns>
+        public static bool IsArchitectureOrImplementationRoot(this GameObject gameNode)
+        {
+            return gameNode.GetComponent<NodeRef>()?.Value?.IsArchitectureOrImplementationRoot() ?? false;
         }
 
         /// <summary>
@@ -345,7 +377,7 @@ namespace SEE.GO
         /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
         public static float GetRoof(this GameObject gameObject)
         {
-            return gameObject.transform.position.y + gameObject.WorldSpaceScale().y / 2.0f;
+            return gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
         }
 
         /// <summary>
@@ -355,8 +387,19 @@ namespace SEE.GO
         /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
-            Vector3 result = gameObject.transform.position;
-            result.y += gameObject.WorldSpaceScale().y / 2.0f;
+            Vector3 result;
+            if (gameObject.TryGetComponent(out SEESpline spline))
+            {
+                // Splines aren't actually positioned at their game object's position,
+                // but their position can be determined by their middle control point.
+                result = spline.GetMiddleControlPoint();
+                result.y += spline.Radius;
+            }
+            else
+            {
+                result = gameObject.transform.position;
+                result.y += gameObject.WorldSpaceSize().y / 2.0f;
+            }
             return result;
         }
 
@@ -368,7 +411,7 @@ namespace SEE.GO
         public static Vector3 GetGroundCenter(this GameObject gameObject)
         {
             Vector3 result = gameObject.transform.position;
-            result.y -= gameObject.WorldSpaceScale().y / 2.0f;
+            result.y -= gameObject.WorldSpaceSize().y / 2.0f;
             return result;
         }
 
@@ -434,24 +477,276 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
+        /// <para>
+        /// This value reflects the actual world-space bounds of the axis-aligned cuboid that contains the rendered
+        /// object.
+        /// Please note that the <see cref="Transform.lossyScale"/> is only the scale factor and not the actual size of
+        /// a rendered object.
+        /// Similarly, <see cref="Transform.position"/> is not necessarily the center point of the rendered object.
+        /// </para><para>
+        /// <list type="bullet">
+        /// <item>
+        /// If a <see cref="Collider"/> is attached, the <see cref="Collider.bounds"/> will be used.
+        /// </item><item>
+        /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
+        /// performance penalty (see <see cref="GeometryUtils.CalculateLineBounds"/>).
+        /// </item><item>
+        /// If a <see cref="Renderer"/> is attached, the <see cref="Renderer.bounds"/> will be used.
+        /// </item><item>
+        /// Else, <see cref="Transform.lossyScale"/> and <see cref="Transform.position"/> are provided and a warning
+        /// is logged.
+        /// It means that either the object is not rendered at all or this method needs to be extended.
+        /// </item>
+        /// </list>
+        /// </para><para>
+        /// Local-space counterpart: <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/>
+        /// </para>
         /// </summary>
-        /// <param name="gameObject">object whose size is requested</param>
-        /// <returns>size of given <paramref name="gameObject"/></returns>
-        public static Vector3 WorldSpaceScale(this GameObject gameObject)
+        /// <param name="gameObject">object whose scale is requested</param>
+        /// <param name="position">out parameter for the world-space position of the object</param>
+        /// <param name="size">out parameter for the world-space size of the object</param>
+        /// <returns><c>true</c> if the size was successfully retrieved, <c>false</c> if the fallback was used.</returns>
+        public static bool WorldSpaceSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
         {
-            // For some objects, such as capsules, lossyScale gives wrong results.
+            // Rely on collider bounds if available.
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                size = collider.bounds.size;
+                position = collider.bounds.center;
+                return true;
+            }
+
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                Bounds lineBounds = GeometryUtils.CalculateLineBounds(lineRenderer, true);
+                size = lineBounds.size;
+                position = lineBounds.center;
+                return true;
+            }
+
+            // For some objects, such as capsules or custom meshes, lossyScale gives wrong results.
             // The more reliable option to determine the size is using the
             // object's renderer if it has one.
             if (gameObject.TryGetComponent(out Renderer renderer))
             {
-                return renderer.bounds.size;
+                size = renderer.bounds.size;
+                position = renderer.bounds.center;
+                return true;
             }
-            else
+
+            // No renderer, so we use lossyScale as a fallback.
+            // Note: This should not happen. If the object has no renderer, it has no size at all.
+            Debug.LogWarning($"GameObject has no Renderer component, using lossyScale as fallback: {gameObject.name}");
+            size = gameObject.transform.lossyScale;
+            position = gameObject.transform.position;
+            return false;
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// <para>
+        /// This is a shorthand method for <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
+        /// See there for additional documentation.
+        /// </para><para>
+        /// Use <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> directly if you need both position and size.
+        /// </para><para>
+        /// Local-space counterpart: <see cref="LocalSize(GameObject)"/>
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">object whose size is requested</param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 WorldSpaceSize(this GameObject gameObject)
+        {
+            WorldSpaceSize(gameObject, out Vector3 size, out Vector3 _);
+            return size;
+        }
+
+        /// <summary>
+        /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in local space,
+        /// i.e., in relation to its parent.
+        /// <para>
+        /// This value should often be used instead of the <see cref="Transform.localScale"/> because the scale only
+        /// reflects the size for objects with a standardized size like cube primitives. Similarly, the
+        /// <see cref="Transform.localPosition"/> can be significantly off the object's center.
+        /// </para><para>
+        /// <list type="bullet">
+        /// <item>
+        /// If a <see cref="Collider"/> is attached, the <see cref="Collider.bounds"/> will be used and converted into
+        /// local space.
+        /// </item><item>
+        /// If a <see cref="LineRenderer"/> is attached, the bounds will be calculated based on its positions with a
+        /// performance penalty (see <see cref="GeometryUtils.CalculateLineBounds"/>).
+        /// </item><item>
+        /// If a <see cref="MeshFilter"/> is attached, the <see cref="MeshFilter.sharedMesh.bounds"/> will be used.
+        /// </item><item>
+        /// Else, <see cref="Transform.localScale"/> and <see cref="Transform.localPosition"/> are provided and a
+        /// warning is logged.
+        /// It means that either the object is not rendered at all or this method needs to be extended.
+        /// </item>
+        /// </list>
+        /// </para><para>
+        /// World-space counterpart: <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/>
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">object whose scale is requested</param>
+        /// <param name="size">out parameter for the local size of the object</param>
+        /// <param name="position">out parameter for the local position of the object</param>
+        /// <returns><c>true</c> if the <paramref name="gameObject"/> has a size, <c>false</c> if the fallback was used.</returns>
+        public static bool LocalSize(this GameObject gameObject, out Vector3 size, out Vector3 position)
+        {
+            // Rely on collider bounds if available.
+            if (gameObject.TryGetComponent(out Collider collider))
             {
-                // No renderer, so we use lossyScale as a fallback.
-                return gameObject.transform.lossyScale;
+                size = getLocalColliderSize(collider);
+                position = collider.transform.InverseTransformPoint(collider.bounds.center) + gameObject.transform.localPosition;
+                return true;
             }
+
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                Bounds lineBounds = GeometryUtils.CalculateLineBounds(lineRenderer, false);
+                size = lineBounds.size;
+                position = lineBounds.center;
+                return true;
+            }
+
+            // For some objects, such as capsules or custom meshes, localScale gives wrong results.
+            // The more reliable option to determine the size is using the object's mesh if it has one.
+            Mesh sharedMesh;
+            if (gameObject.TryGetComponent(out MeshFilter meshFilter) && (sharedMesh = meshFilter.sharedMesh) != null)
+            {
+                size = Vector3.Scale(sharedMesh.bounds.size, gameObject.transform.localScale);
+                position = sharedMesh.bounds.center + gameObject.transform.localPosition;
+                return true;
+            }
+
+            // No mesh, so we use localScale as a fallback.
+            // Note: This should not happen. If the object has no mesh, it has no size at all.
+            Debug.LogWarning($"GameObject has no mesh or LineRenderer, using localScale as fallback: {gameObject.name}");
+            size = gameObject.transform.localScale;
+            position = gameObject.transform.localPosition;
+            return false;
+
+            Vector3 getLocalColliderSize(Collider collider)
+            {
+                Vector3 localScale = collider.transform.localScale;
+
+                if (collider is BoxCollider box)
+                {
+                    return Vector3.Scale(box.size, localScale);
+                }
+                else if (collider is SphereCollider sphere)
+                {
+                    float diameter = sphere.radius * 2f;
+                    // Sphere scales uniformly in all axes
+                    return new Vector3(diameter, diameter, diameter) * Mathf.Max(localScale.x, Mathf.Max(localScale.y, localScale.z));
+                }
+                else if (collider is CapsuleCollider capsule)
+                {
+                    float diameter = capsule.radius * 2f;
+                    Vector3 size = Vector3.zero;
+                    switch (capsule.direction)
+                    {
+                        case 0: // X axis
+                            size = new Vector3(capsule.height, diameter, diameter);
+                            break;
+                        case 1: // Y axis
+                            size = new Vector3(diameter, capsule.height, diameter);
+                            break;
+                        case 2: // Z axis
+                            size = new Vector3(diameter, diameter, capsule.height);
+                            break;
+                        default:
+                            // This should never happen
+                            throw new NotImplementedException();
+                    }
+                    size.x *= localScale.x;
+                    size.y *= localScale.y;
+                    size.z *= localScale.z;
+                    return size;
+                }
+                else if (collider is MeshCollider meshCollider)
+                {
+                    Mesh mesh = meshCollider.sharedMesh;
+                    if (mesh != null)
+                    {
+                        return Vector3.Scale(mesh.bounds.size, localScale);
+                    }
+                    else
+                    {
+                        return Vector3.zero;
+                    }
+                }
+                else
+                {
+                    // Fallback: bounds.size is in world space, convert to local by dividing by scale
+                    Debug.LogWarning($"GameObject has unknown collider type, using localScale as fallback: {gameObject.name}");
+                    Bounds worldBounds = collider.bounds;
+                    Vector3 worldSize = worldBounds.size;
+                    return new Vector3(
+                        localScale.x != 0 ? worldSize.x / localScale.x : 0,
+                        localScale.y != 0 ? worldSize.y / localScale.y : 0,
+                        localScale.z != 0 ? worldSize.z / localScale.z : 0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Returns the size of the given <paramref name="gameObject"/> in local space,
+        /// i.e., in relation to its parent.
+        /// <para>
+        /// This is a shorthand method for <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
+        /// See there for additional documentation.
+        /// </para><para>
+        /// Use <see cref="LocalSize(GameObject, out Vector3, out Vector3)"/> directly if you need both position and size.
+        /// </para><para>
+        /// World-space counterpart: <see cref="WorldSpaceSize(GameObject)"/>
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">object whose size is requested</param>
+        /// <returns>size of given <paramref name="gameObject"/></returns>
+        public static Vector3 LocalSize(this GameObject gameObject)
+        {
+            LocalSize(gameObject, out Vector3 size, out Vector3 _);
+            return size;
+        }
+
+        /// <summary>
+        /// Returns the bounds of the given <paramref name="gameObject"/> in its own
+        /// local coordinate system.
+        /// <para>
+        /// Note: A primitive cube has a size of (1,1,1), and a coordinate center (pivot)
+        /// of (0,0,0).
+        /// However, that does not apply for all primitives or models in general.
+        /// </para>
+        /// </summary>
+        /// <param name="gameObject">The game object.</param>
+        /// <returns>Local-space bounds of <paramref name="gameObject"/>.</returns>
+        public static Bounds LocalBounds(this GameObject gameObject)
+        {
+            // For objects with a LineRenderer, we can use its positions to determine its bounds.
+            // Otherwise Unity will return overly large bounds.
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                return GeometryUtils.CalculateLineBounds(lineRenderer, false);
+            }
+            if (gameObject.TryGetComponent(out MeshFilter meshFilter))
+            {
+                return meshFilter.sharedMesh.bounds;
+            }
+            if (gameObject.TryGetComponent(out Renderer renderer))
+            {
+                return new(
+                        gameObject.transform.InverseTransformPoint(renderer.bounds.center),
+                        gameObject.transform.InverseTransformVector(renderer.bounds.size));
+            }
+            // This fallback works for uniform primitives like cubes, but not for non-uniforms like cylinders.
+            return new(Vector3.zero, Vector3.one);
         }
 
         /// <summary>
@@ -541,7 +836,7 @@ namespace SEE.GO
         /// we wish to return</param>
         /// <typeparam name="T">The component to get / add</typeparam>
         /// <returns>The existing or newly created component</returns>
-        public static T AddOrGetComponent<T>(this GameObject gameObject) where T: Component
+        public static T AddOrGetComponent<T>(this GameObject gameObject) where T : Component
         {
             return gameObject.TryGetComponent(out T component) ? component : gameObject.AddComponent<T>();
         }
@@ -588,8 +883,29 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns true if <paramref name="gameObject"/> has a <see cref="NodeRef"/>
-        /// component attached to it.
+        /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeSelf"/>
+        /// is true and it is tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        public static bool IsNodeAndActiveSelf(this GameObject gameObject)
+        {
+            return gameObject.activeSelf && gameObject.CompareTag(Tags.Node);
+        }
+
+        /// <summary>
+        /// Returns true if <paramref name="gameObject"/>'s <see cref="GameObject.activeInHierarchy"/>
+        /// is true and it is tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <param name="gameObject">the game object to check</param>
+        /// <returns>true if <paramref name="gameObject"/> is an active node</returns>
+        public static bool IsNodeAndActiveInHierarchy(this GameObject gameObject)
+        {
+            return gameObject.CompareTag(Tags.Node) && gameObject.activeInHierarchy;
+        }
+
+        /// <summary>
+        /// Retrieves the node reference component, if possible.
         /// </summary>
         /// <param name="gameObject">the game object whose NodeRef is checked</param>
         /// <param name="nodeRef">the attached NodeRef; defined only if this method
@@ -953,6 +1269,212 @@ namespace SEE.GO
                 {
                     throw new InvalidOperationException($"Cannot get {nameof(GraphElementOperator)} for game object "
                                                         + $"{gameObject.name} because it is neither a node nor an edge.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if <paramref name="gameObject"/> overlaps with any other active direct child node of its parent.
+        /// <para>
+        /// Overlap is checked based on the <see cref="Collider"/> components. Objects with no <see cref="Collider"/>
+        /// component and inactive nodes are ignored.
+        /// </para>
+        /// </summary>
+        /// <remarks>
+        /// The <paramref name="gameObject"/> must be a node, i.e., coantain a <c>NodeRef</c> component.
+        /// </remarks>
+        /// <param name="gameObject">The game object whose operator to retrieve.</param>
+        /// <returns><c>false</c> if <paramref name="gameObject"/> does not have a <see cref="Collider"/> component,
+        /// or does not overlap with its siblings.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// Thrown when the object the method is called on is not a node, i.e., has no <see cref="NodeRef"/>
+        /// component.
+        /// </exception>
+        public static bool OverlapsWithSiblings(this GameObject gameObject)
+        {
+            if (!gameObject.HasNodeRef())
+            {
+                throw new InvalidOperationException("GameObject must be a node!");
+            }
+            if (!gameObject.TryGetComponent(out Collider collider))
+            {
+                return false;
+            }
+            foreach (Transform sibling in gameObject.transform.parent)
+            {
+                if (sibling.gameObject == gameObject || !sibling.gameObject.IsNodeAndActiveSelf()
+                    || !sibling.gameObject.TryGetComponent(out Collider siblingCollider))
+                {
+                    continue;
+                }
+
+                if (collider.bounds.Intersects(siblingCollider.bounds))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Searches for the first child that starts with the <paramref name="prefix"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
+        /// <param name="prefix">The prefix to search for.</param>
+        /// <returns>the found child or null.</returns>
+        public static GameObject FindChildWithPrefix(this GameObject gameObject, string prefix)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.name.StartsWith(prefix))
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="descendantName">The name of the descendant to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search wil include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The frist matching descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>,
+        /// or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendant(this GameObject gameObject, string descendantName, bool includeInactive = true)
+        {
+            return gameObject
+                    .GetComponentsInChildren<Transform>(includeInactive)
+                    .FirstOrDefault(t => t.gameObject.name == descendantName)?
+                    .gameObject;
+        }
+
+        /// <summary>
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="tag"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search will include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The first matching descendant <see cref="GameObject"/> with the specified tag, or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendantWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .FirstOrDefault(t => t.gameObject.CompareTag(tag))?
+                .gameObject;
+        }
+
+        /// <summary>
+        /// QDetermines whether the <paramref name="gameObject"/> has any descendant
+        /// with the specified <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a descendant with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasDescendantWithTag(this GameObject gameObject, string tag)
+        {
+            return gameObject.FindDescendantWithTag(tag) != null;
+        }
+
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s of the given <paramref name="gameObject"/>
+        /// that have the specified tag.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to start the search from.</param>
+        /// <param name="tag">The tag that matching descendants must have.</param>
+        /// <param name="includeInactive">Whether to include inactive <see cref="GameObject"/>s in the search.</param>
+        /// <returns>A list of all descendant <see cref="GameObject"/>s with the specified tag.</returns>
+        public static IList<GameObject> FindAllDescendantsWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .Where(t => t.CompareTag(tag))
+                .Select(t => t.gameObject)
+                .ToList();
+        }
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s with the specified <paramref name="descendantTag"/>,
+        /// exluding those whose immediate parent has the specified <paramref name="immediateParentTag"/>.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
+        /// <param name="descendantTag">The tag that matching descendants must have.</param>
+        /// <param name="immediateParentTag">If the immediate parent has this tag, the child will be excluded from the result.</param>
+        /// <param name="includeInactive">Whether inactive <see cref="GameObject"/>s should be included in the search.</param>
+        /// <returns>A list of matching descendant <see cref="GameObject"/>s, excluding those whose parent has the specified tag.</returns>
+        public static List<GameObject> FindAllDescendantsWithTagExcludingSpecificParentTag(this GameObject gameObject,
+            string descendantTag, string immediateParentTag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .Where(t => t.CompareTag(descendantTag) &&
+                            t.parent != null &&
+                            !t.parent.CompareTag(immediateParentTag))
+                .Select(t => t.gameObject)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="gameObject"/> has any ancestor
+        /// with the given <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> whose parent hierarhcy will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a parent or ancestor with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasParentWithTag(this GameObject gameObject, string tag)
+        {
+            Transform transform = gameObject.transform;
+            while (transform.parent != null)
+            {
+                if (transform.parent.gameObject.CompareTag(tag))
+                {
+                    return true;
+                }
+                transform = transform.parent;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Traverses up the hierachy from the given <paramref name="gameObject"/>
+        /// and returns the highest parent.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> in the hierarchy.</param>
+        /// <returns>The root <see cref="GameObject"/> at the top of the hierarchy.
+        /// If the given object has no parent, it is returned itself.</returns>
+        public static GameObject GetRootParent(this GameObject gameObject)
+        {
+            Transform parent = gameObject.transform.parent;
+            return parent != null ? GetRootParent(parent.gameObject) : gameObject;
+        }
+
+        /// <summary>
+        /// Updates the interaction layer of the game object, and optionally its children.
+        /// </summary>
+        /// <param name="gameObject">The affected game object.</param>
+        /// <param name="recurse">Should children be updated as well?</param>
+        public static void UpdateInteractableLayers(this GameObject gameObject, bool recurse = true)
+        {
+            if (gameObject.TryGetComponent(out InteractableObjectBase io))
+            {
+                io.UpdateLayer();
+            }
+            else
+            {
+                Debug.LogWarning($"GameObject {gameObject.name} is not an interactable object!");
+            }
+
+            if (recurse)
+            {
+                InteractableObjectBase[] children = gameObject.transform.GetComponentsInChildren<InteractableObjectBase>();
+                foreach (InteractableObjectBase child in children)
+                {
+                    child.UpdateLayer();
                 }
             }
         }

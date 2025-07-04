@@ -19,12 +19,14 @@ namespace SEE.GO
         /// </summary>
         public enum ShaderType
         {
-            Opaque = 0,          // fully drawn with no transparency
-            TransparentLine = 1, // for lines with transparency
-            OpaqueMetallic = 2,  // for opaque meshes with a more realistic metallic effect
-            PortalFree = 3,       // not limited by a portal (seen everywhere)
-            DrawableLine = 4,       // for drawable lines
-            DrawableDashedLine = 5, // for drawable dashed lines
+            Opaque             = 0, // fully drawn with no transparency
+            TransparentLine    = 1, // for lines with transparency (LineRenderer)
+            TransparentEdge    = 2, // for edge meshes with transparency (MeshRenderer)
+            OpaqueMetallic     = 3, // for opaque meshes with a more realistic metallic effect
+            PortalFree         = 4, // not limited by a portal (seen everywhere)
+            DrawableLine       = 5, // for drawable lines
+            DrawableDashedLine = 6, // for drawable dashed lines
+            Sprite             = 7, // for sprites (planes with textures with transparency) visible within portal
         }
 
         /// <summary>
@@ -32,13 +34,17 @@ namespace SEE.GO
         /// </summary>
         private const string opaqueMaterialName = "Materials/OpaquePortalMaterial";
         /// <summary>
-        /// Name of the material for transparent lines (located in folder Resources).
+        /// Name of the material for transparent lines using LineRenderer (located in folder Resources).
         /// </summary>
         private const string transparentLineMaterialName = "Materials/TransparentLinePortalMaterial";
         /// <summary>
+        /// Name of the material for transparent 3D edges (located in folder Resources).
+        /// </summary>
+        private const string transparentEdgeMaterialName = "Materials/TransparentEdgePortalMaterial";
+        /// <summary>
         /// Name of the material for opaque, metallic meshes (located in folder Resources).
         /// </summary>
-        private const string opaqueMetallicMaterialName = "Materials/SEEMaterial";
+        private const string opaqueMetallicMaterialName = "Materials/OpaqueMetallicPortalMaterial";
         /// <summary>
         /// Name of the material for materials seen everywhere, i.e., not only within a portal
         /// (located in folder Resources).
@@ -54,11 +60,15 @@ namespace SEE.GO
         /// (located in folder Resources).
         /// </summary>
         private const string drawableDashedLineMaterialName = "Materials/DrawableDashedLineMaterial";
+        /// <summary>
+        /// Name of the material for sprites with transparency within a portal (located in Resources folder).
+        /// </summary>
+        private const string spriteMaterialName = "Materials/TransparentSpritePortalMaterial";
 
         /// <summary>
         /// The id of the shader property for the texture.
         /// </summary>
-        private static readonly int texturePropertyID = Shader.PropertyToID("_Texture");
+        private static readonly int texturePropertyID = Shader.PropertyToID("_MainTex");
 
         /// <summary>
         /// The type of the shaders of this material instance.
@@ -258,17 +268,23 @@ namespace SEE.GO
                 case ShaderType.TransparentLine:
                     name = transparentLineMaterialName;
                     break;
+                case ShaderType.TransparentEdge:
+                    name = transparentEdgeMaterialName;
+                    break;
                 case ShaderType.OpaqueMetallic:
                     name = opaqueMetallicMaterialName;
                     break;
                 case ShaderType.PortalFree:
                     name = portalFreeMaterialName;
                     break;
-                case ShaderType.DrawableLine: 
+                case ShaderType.DrawableLine:
                     name = drawableLineMaterialName;
                     break;
                 case ShaderType.DrawableDashedLine:
                     name = drawableDashedLineMaterialName;
+                    break;
+                case ShaderType.Sprite:
+                    name = spriteMaterialName;
                     break;
                 default:
                     Assertions.InvalidCodePath();

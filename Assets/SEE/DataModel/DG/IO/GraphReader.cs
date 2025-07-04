@@ -47,13 +47,16 @@ namespace SEE.DataModel.DG.IO
         /// <param name="path">path of the GXL data</param>
         /// <param name="hierarchicalEdgeTypes">edge types forming the node hierarchy</param>
         /// <param name="basePath">the base path of the graph</param>
+        /// <param name="changePercentage">to report progress</param>
         /// <param name="token">token with which the loading can be cancelled</param>
         /// <param name="logger">logger to log the output</param>
         /// <returns>loaded graph</returns>
-        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,                                                       CancellationToken token = default, Utils.ILogger logger = null)
+        public static async UniTask<Graph> LoadAsync(DataPath path, HashSet<string> hierarchicalEdgeTypes, string basePath,
+                                                     Action<float> changePercentage = null, CancellationToken token = default,
+                                                     Utils.ILogger logger = null)
         {
             GraphReader graphReader = new(hierarchicalEdgeTypes, basePath, logger: logger);
-            await graphReader.LoadAsync(await path.LoadAsync(), path.Path, token);
+            await graphReader.LoadAsync(await path.LoadAsync(), path.Path, changePercentage, token);
             return graphReader.GetGraph();
         }
 
@@ -75,10 +78,13 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="gxl">Stream containing GXL data that shall be processed</param>
         /// <param name="name">Name of the GXL data stream. Only used for display purposes in log messages</param>
+        /// <param name="changePercentage">to report progress</param>
         /// <param name="token">token with which the loading can be cancelled</param>
-        public override async UniTask LoadAsync(Stream gxl, string name = "[unknown]", CancellationToken token = default)
+        public override async UniTask LoadAsync(Stream gxl, string name = "[unknown]",
+                                                Action<float> changePercentage = null,
+                                                CancellationToken token = default)
         {
-            await base.LoadAsync(gxl, name, token);
+            await base.LoadAsync(gxl, name, changePercentage, token);
             graph.BasePath = basePath;
             if (!string.IsNullOrWhiteSpace(rootName))
             {
@@ -92,7 +98,7 @@ namespace SEE.DataModel.DG.IO
                     Debug.LogWarning($"Graph stored in {Name} has multiple roots. Adding an artificial single root {rootName}.\n");
                     Node singleRoot = new()
                     {
-                        Type = Graph.UnknownType,
+                        Type = Graph.RootType,
                         ID = rootName,
                         SourceName = ""
                     };

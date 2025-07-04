@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using JetBrains.Annotations;
-using SEE.DataModel;
+using MoreLinq;
 using SEE.DataModel.DG;
 using UnityEngine.Assertions;
 using static SEE.Tools.ReflexionAnalysis.ReflexionSubgraphs;
@@ -696,6 +696,44 @@ namespace SEE.Tools.ReflexionAnalysis
             child.Reparent(null);
         }
 
+        /// <summary>
+        /// Adds the <paramref name="subgraph"/> to the reflexion graph depending on <paramref name="addToImplementation"/>.
+        /// If <paramref name="addToImplementation"/> is true, the subgraph is added to the implementation graph.
+        /// Otherwise, it is added to the architecture graph.
+        /// </summary>
+        /// <param name="subgraph">The subgraph that is to be integrated into the reflexion graph.</param>
+        /// <param name="root">The root node of the respective graph in which the <paramref name="subgraph"/> is to be integrated.</param>
+        /// <param name="addToImplementation">True if the <paramref name="subgraph"/> should be added to the implementation graph.
+        /// False if it should be added to the architecture graph.</param>
+        public void AddSubgraphInContext(Graph subgraph, Node root, bool addToImplementation)
+        {
+            subgraph.Nodes().ForEach(node =>
+            {
+                node.ItsGraph = null;
+                if (addToImplementation)
+                {
+                    AddToImplementation(node);
+                }
+                else
+                {
+                    AddToArchitecture(node);
+                }
+            });
+            subgraph.GetRoots().ForEach(subRoot => root.AddChild(subRoot));
+            subgraph.Edges().ForEach((edge) =>
+            {
+                edge.ItsGraph = null;
+                if (addToImplementation)
+                {
+                    AddToImplementation(edge);
+                }
+                else
+                {
+                    AddToArchitecture(edge);
+                }
+            });
+        }
+
         #region Helper
 
         /// <summary>
@@ -973,7 +1011,7 @@ namespace SEE.Tools.ReflexionAnalysis
             toSubtree ??= new HashSet<Node>(to.PostOrderDescendants());
 
             // TODO: Once a true type hierarchy exists, this needs to be updated
-            Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => IsSpecified(edge) && edge.HasSupertypeOf(type) && targets.Contains(edge.Target);
+            Func<Edge, bool> IsRedundantIn(ICollection<Node> targets) => edge => edge.HasSupertypeOf(type) && targets.Contains(edge.Target) && IsSpecified(edge);
 
             Edge redundantSuper = fromSupertree.SelectMany(x => x.Outgoings).FirstOrDefault(IsRedundantIn(toSupertree));
             AssertOrThrow(redundantSuper == null,

@@ -29,6 +29,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             internal readonly Vector2 ZoomCenter;
             /// <summary>
+            /// Should the position be reset to original position?
+            /// </summary>
+            internal readonly bool ResetPosition;
+            /// <summary>
             /// The amount of time in seconds that it should take to reach <see cref="TargetZoomSteps"/>.
             /// </summary>
             private readonly float duration;
@@ -37,12 +41,13 @@ namespace SEE.Controls.Actions
             /// </summary>
             private readonly float startTime;
 
-            internal ZoomCommand(Vector2 zoomCenter, float targetZoomSteps, float duration)
+            internal ZoomCommand(Vector2 zoomCenter, float targetZoomSteps, float duration, bool resetPosition = false)
             {
                 TargetZoomSteps = targetZoomSteps;
                 ZoomCenter = zoomCenter;
                 this.duration = duration;
                 startTime = Time.realtimeSinceStartup;
+                ResetPosition = resetPosition;
             }
 
             /// <summary>
@@ -82,16 +87,20 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// The maximal number of zooming steps.
             /// </summary>
-            internal const uint ZoomMaxSteps = 32;
+            internal const uint ZoomMaxSteps = 10;
             /// <summary>
             /// Handles the speed in which we zoom into the city.
             /// </summary>
             internal const float ZoomFactor = 0.5f;
 
             /// <summary>
-            /// Original scale of city for reset.
+            /// Original local scale of city for reset.
             /// </summary>
-            internal Vector3 OriginalScale;
+            internal Vector3 OriginalLocalScale;
+            /// <summary>
+            /// Original world-space position of city for reset.
+            /// </summary>
+            internal Vector3 OriginalPosition;
 
             /// <summary>
             /// The list of active zoom commands, that is, those that are still to be executed.
@@ -109,6 +118,11 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Pushes a zoom command for execution. Zoom commands are automatically removed
             /// once they are finished.
+            /// <para>
+            /// The position will automatically be reset if <see cref="CurrentTargetZoomSteps"/> +
+            /// <paramref name="zoomSteps"/> equals <c>0</c>, i.e., the zoom factor reaches <c>1</c>.
+            /// Otherwise, <paramref name="zoomCenter"/> is used for calculating the new position.
+            /// </para>
             /// </summary>
             /// <param name="zoomCenter">The position to be zoomed towards.</param>
             /// <param name="zoomSteps">The desired amount of zoom steps.</param>
@@ -119,29 +133,44 @@ namespace SEE.Controls.Actions
                 if (zoomSteps != 0.0f)
                 {
                     float newZoomStepsInProgress = CurrentTargetZoomSteps + zoomSteps;
-                    ZoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration));
+                    ZoomCommands.Add(new ZoomCommand(zoomCenter, zoomSteps, duration, Mathf.Approximately(CurrentTargetZoomSteps + zoomSteps, 0)));
                     CurrentTargetZoomSteps = newZoomStepsInProgress;
                 }
+            }
+
+            /// <summary>
+            /// Pushes a zoom command for execution that will reset the code city to its
+            /// original un-zoomed state. Zoom commands are automatically removed
+            /// once they are finished.
+            /// <para>
+            /// <see cref="CurrentTargetZoomSteps"/> will be reset to 0.
+            /// </para>
+            /// </summary>
+            /// <param name="duration">The desired duration of the zooming.</param>
+            internal void PushResetCommand(float duration)
+            {
+                CurrentTargetZoomSteps = 0;
+                ZoomCommands.Add(new ZoomCommand(Vector2.zero, CurrentTargetZoomSteps, duration, true));
             }
         }
 
         /// <summary>
         /// The zoom states for every root transform of a city. Once the first zoom is initiated,
         /// the zoom state will be inserted here.
-        ///
+        /// <para>
         /// The key of this mapping is the root game node (tagged by <see cref="Tags.Node"/>)
         /// of the game-object hierarchy. It is the game object that will be zoomed;
         /// all its descendants are scaled along with it.
-        ///
+        /// </para>
         /// Because we may have multiple code cities in the scene, there is not only one such
         /// root node.
         /// </summary>
-        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new Dictionary<Transform, ZoomState>();
+        private readonly Dictionary<Transform, ZoomState> rootTransformToZoomStates = new();
 
         /// <summary>
         /// The node operator for every root transform of a city.
         /// </summary>
-        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new Dictionary<Transform, NodeOperator>();
+        private readonly Dictionary<Transform, NodeOperator> rootTransformToOperator = new();
 
         /// <summary>
         /// Factor to apply to the animation.
@@ -173,12 +202,14 @@ namespace SEE.Controls.Actions
                     // If there is any zoom command, execute it.
                     float zoomSteps = zoomState.CurrentTargetZoomSteps;
                     int positionCount = 0;
-                    Vector2 positionSum = Vector3.zero;
+                    Vector2 positionSum = Vector2.zero;
 
+                    bool resetPosition = false;
                     for (int i = 0; i < zoomState.ZoomCommands.Count; i++)
                     {
                         positionCount++;
                         positionSum += zoomState.ZoomCommands[i].ZoomCenter;
+                        resetPosition = zoomState.ZoomCommands[i].ResetPosition;
                         if (zoomState.ZoomCommands[i].IsFinished())
                         {
                             zoomState.ZoomCommands.RemoveAt(i--);
@@ -188,25 +219,20 @@ namespace SEE.Controls.Actions
                             zoomSteps -= zoomState.ZoomCommands[i].TargetZoomSteps - zoomState.ZoomCommands[i].CurrentDeltaScale();
                         }
                     }
-                    Vector3 averagePosition = new Vector3(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
 
                     zoomState.CurrentZoomFactor = ConvertZoomStepsToZoomFactor(zoomSteps);
-                    Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
-                    Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
-
-                    nodeOperator.ScaleTo(zoomState.CurrentZoomFactor * zoomState.OriginalScale, AnimationFactor);
-                    nodeOperator.MoveTo(rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, nodeOperator.TargetScale), AnimationFactor);
-
-                    new ZoomNetAction(rootTransform.name, nodeOperator.TargetPosition, nodeOperator.TargetScale).Execute();
-                }
-                else
-                {
-                    float lastZoomFactor = zoomState.CurrentZoomFactor;
-                    zoomState.CurrentZoomFactor = ConvertZoomStepsToZoomFactor(zoomState.CurrentTargetZoomSteps);
-                    if (!Mathf.Approximately(lastZoomFactor, zoomState.CurrentZoomFactor))
+                    Vector3 targetScale = zoomState.CurrentZoomFactor * zoomState.OriginalLocalScale;
+                    Vector3 targetPosition = zoomState.OriginalPosition;
+                    if (!resetPosition)
                     {
-                        nodeOperator.ScaleTo(zoomState.CurrentZoomFactor * zoomState.OriginalScale, AnimationFactor);
+                        Vector3 averagePosition = new(positionSum.x / positionCount, rootTransform.position.y, positionSum.y / positionCount);
+                        Vector3 cityCenterToHitPoint = averagePosition - rootTransform.position;
+                        Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
+                        targetPosition = rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, nodeOperator.TargetScale);
                     }
+
+                    nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false, true);
+                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true, AnimationFactor).Execute();
                 }
             }
         }
@@ -224,7 +250,8 @@ namespace SEE.Controls.Actions
             {
                 result = new ZoomState
                 {
-                    OriginalScale = transform.localScale,
+                    OriginalLocalScale = transform.localScale,
+                    OriginalPosition = transform.position,
                     ZoomCommands = new List<ZoomCommand>((int)ZoomState.ZoomMaxSteps),
                     CurrentTargetZoomSteps = 0,
                     CurrentZoomFactor = 1.0f

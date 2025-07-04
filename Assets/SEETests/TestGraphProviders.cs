@@ -35,41 +35,50 @@ namespace SEE.GraphProviders
         [Test]
         public async Task TestCSVJaCoCoGXLGraphProviderAsync()
         {
-            SingleGraphPipelineProvider graphPipeline = new();
+            DataModel.DG.GraphIndex.FileRanges.ReportMissingSourceRange = false;
 
+            try
             {
-                SingleGraphProvider provider = new GXLSingleGraphProvider()
-                { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
-                graphPipeline.Add(provider);
+                SingleGraphPipelineProvider graphPipeline = new();
+
+                {
+                    SingleGraphProvider provider = new GXLSingleGraphProvider()
+                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    graphPipeline.Add(provider);
+                }
+                {
+                    SingleGraphProvider provider = new JaCoCoGraphProvider()
+                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                    graphPipeline.Add(provider);
+                }
+
+                {
+                    SingleGraphProvider provider = new CSVGraphProvider()
+                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                    graphPipeline.Add(provider);
+                }
+
+                Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
+                Assert.IsNotNull(loaded);
+                Assert.IsTrue(loaded.NodeCount > 0);
+                Assert.IsTrue(loaded.EdgeCount > 0);
+
+                Assert.IsTrue(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node));
+
+                // Metric from JaCoCo report.
+                {
+                    Assert.IsTrue(node.TryGetInt(JaCoCo.BranchCovered, out int value));
+                    Assert.AreEqual(5, value);
+                }
+                // Metric from CSV import.
+                {
+                    Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
+                    Assert.AreEqual(3, value);
+                }
             }
+            finally
             {
-                SingleGraphProvider provider = new JaCoCoGraphProvider()
-                { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
-                graphPipeline.Add(provider);
-            }
-
-            {
-                SingleGraphProvider provider = new CSVGraphProvider()
-                { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
-                graphPipeline.Add(provider);
-            }
-
-            Graph loaded = await graphPipeline.ProvideAsync(new Graph(""), NewCity());
-            Assert.IsNotNull(loaded);
-            Assert.IsTrue(loaded.NodeCount > 0);
-            Assert.IsTrue(loaded.EdgeCount > 0);
-
-            Assert.IsTrue(loaded.TryGetNode("counter.CountToAThousand.countWithFibbonaci(I;)", out Node node));
-
-            // Metric from JaCoCo report.
-            {
-                Assert.IsTrue(node.TryGetInt(JaCoCo.BranchCovered, out int value));
-                Assert.AreEqual(5, value);
-            }
-            // Metric from CSV import.
-            {
-                Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "Developers", out int value));
-                Assert.AreEqual(3, value);
+                DataModel.DG.GraphIndex.FileRanges.ReportMissingSourceRange = true;
             }
         }
 
@@ -190,6 +199,7 @@ namespace SEE.GraphProviders
         }
 
         [Test]
+        [Category("SkipOnCI")]  // We do a checkout with fetch-depth 1 in CI, so we cannot get all VCS metrics.
         public async Task TestVCSMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();

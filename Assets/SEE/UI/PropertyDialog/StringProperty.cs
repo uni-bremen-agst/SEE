@@ -1,8 +1,10 @@
-﻿using System;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -38,6 +40,11 @@ namespace SEE.UI.PropertyDialog
         private GameObject parentOfInputField;
 
         /// <summary>
+        /// Indicator of whether the validation error message should be displayed.
+        /// </summary>
+        private bool showValidationFailedMessage = false;
+
+        /// <summary>
         /// Sets <see cref="inputField"/> as an instantiation of prefab <see cref="stringInputFieldPrefab"/>.
         /// Sets the label and value of the field.
         /// </summary>
@@ -54,9 +61,9 @@ namespace SEE.UI.PropertyDialog
             textField = GetInputField(inputField);
             textField.text = savedValue;
             SetupTooltip(inputField);
+            SetupDisableValidationMessageOnValueChange(inputField, textField);
 
             #region Local Methods
-
             void SetupTooltip(GameObject field)
             {
                 if (field.TryGetComponentOrLog(out PointerHelper pointerHelper))
@@ -104,7 +111,25 @@ namespace SEE.UI.PropertyDialog
                 }
             }
 
+            void SetupDisableValidationMessageOnValueChange(GameObject inputField, TMP_InputField textField)
+            {
+                textField.onValueChanged.AddListener(value =>
+                {
+                    if (showValidationFailedMessage)
+                    {
+                        inputField.FindDescendant("Validation Area").SetActive(false);
+                        ChangeColorOfValidation(Color.white);
+                        showValidationFailedMessage = false;
+                    }
+                });
+            }
+
             #endregion
+        }
+
+        protected override void StartVR()
+        {
+            StartDesktop();
         }
 
         /// <summary>
@@ -148,6 +173,48 @@ namespace SEE.UI.PropertyDialog
                     textField.text = value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Displays the text field for the validation failed message with the given <paramref name="errorMessage"/>.
+        /// </summary>
+        /// <param name="errorMessage">The error message which should be displayed.</param>
+        public void ChangeToValidationFailed(string errorMessage)
+        {
+            GameObject validationArea = inputField.FindDescendant("Validation Area");
+            validationArea.SetActive(true);
+            validationArea.GetComponentInChildren<TextMeshProUGUI>().text = errorMessage;
+            showValidationFailedMessage = true;
+            ChangeColorOfValidation(Color.red);
+        }
+
+        /// <summary>
+        /// Changes the colors of the objects based on the validation status.
+        /// Adjusts the caret, the input field text, the font color of the entered text,
+        /// the placeholder and the background images (background and filled).
+        /// </summary>
+        /// <param name="color">The color of the validation status.</param>
+        private void ChangeColorOfValidation(Color color)
+        {
+            textField.caretColor = color;
+            // Change the color of the TMP_Inputfield.
+            textField.colors = new ColorBlock
+            {
+                normalColor = color,
+                highlightedColor = color,
+                pressedColor = color,
+                disabledColor = color,
+                colorMultiplier = 1f,
+                fadeDuration = 0.1f
+            };
+            // Change the color of the input text and of the placeholder text.
+            TextMeshProUGUI textTMP = inputField.FindDescendant("Text Area").GetComponentInChildren<TextMeshProUGUI>();
+            textTMP.faceColor = color;
+            inputField.FindDescendant("Placeholder").GetComponent<TextMeshProUGUI>().color = color;
+
+            // Change the color of the input field background (the underlaying line).
+            UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();
+            managerInputField.UIManagerAsset.inputFieldColor = color;
         }
     }
 }

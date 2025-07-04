@@ -3,6 +3,8 @@ using SEE.IDE;
 using SEE.Utils;
 using UnityEngine;
 using SEE.Audio;
+using SEE.GO;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -34,23 +36,28 @@ namespace SEE.Controls.Actions
                 InteractableObject.UnselectAll(true);
                 AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound);
             }
-            else if (SEEInput.Select())
+            else if (SEEInput.Select() || XRSEEActions.SelectedFlag)
             {
                 InteractableObject obj = null;
-                if (Raycasting.RaycastInteractableObject(out _, out InteractableObject o) != HitGraphElement.None)
+                if (Raycasting.RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase o)
+                        && o is InteractableObject
+                        && ((InteractableObject)o).GraphElemRef.Elem != null
+                        && o.IsInteractable(o.PartiallyInteractable ? hit.point : null))
                 {
-                    obj = o;
+                    obj = ((InteractableObject)o);
                 }
-                if (Input.GetKey(KeyCode.LeftControl))
+                if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.SelectedFlag))
                 {
                     if (obj != null)
                     {
                         obj.SetSelect(!obj.IsSelected, true);
+                        XRSEEActions.SelectedFlag = false;
                     }
                 }
                 else
                 {
                     InteractableObject.ReplaceSelection(obj, true);
+                    XRSEEActions.SelectedFlag = false;
                 }
             }
             else if (IDEIntegration.Instance != null && IDEIntegration.Instance.PendingSelectionsAction())

@@ -130,6 +130,7 @@ namespace SEE.Game.SceneManipulation
             if (city != null)
             {
                 Node node = NewGraphNode(nodeID);
+                city.CheckAndAddUnknownNodeType();
                 AddNodeToGraph(parent.GetNode(), node);
                 GameObject result = city.Renderer.DrawNode(node);
                 result.transform.position = parent.transform.position;

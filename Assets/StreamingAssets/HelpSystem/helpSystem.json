@@ -1,0 +1,1208 @@
+{
+    "HelpSystem": {
+        "MenuEntry": {
+            "name": "Help System",
+            "description": "Find your specific use case",
+            "icon": "Materials/Notification/info",
+            "MenuEntries": [
+                {
+                    "type": "MenuEntry",
+                    "name": "Navigation",
+                    "description": "Use cases related to the navigation in SEE",
+                    "color": "green",
+                    "MenuEntries": [
+                        {
+                            "type": "MenuEntry",
+                            "name": "Player navigation",
+                            "description": "How to navigate in SEE",
+                            "color": "green",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Simple navigation",
+                                    "description": "",
+                                    "color": "green",
+                                    "video": "HelpSystem/Videos/Navigation/navigation.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Key W or S to move forwards or backwards.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "You can move to the right or left with Key A or D.",
+                                            "startPosition": 5
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "To change your view direction keep the right mouse button pressed while moving your mouse.",
+                                            "startPosition": 11
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "With Key E and Q you can go up and down.",
+                                            "startPosition": 20
+                                        }
+                                    ]
+                                }
+                            ]
+                        },
+                        {
+                            "type": "MenuEntry",
+                            "name": "City navigation",
+                            "description": "How to navigate a code city",
+                            "color": "green",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Zoom into Code Cities",
+                                    "description": "How to zoom into a code city",
+                                    "color": "green",
+                                    "video": "HelpSystem/Videos/Navigation/zoomIntoCodeCity.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Hover with the mouse over the city you want to zoom into.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Now, you can scroll the mouse wheel up and down for zooming in and out.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "The zooming is focussed on the mouse pointer.",
+                                            "startPosition": 10
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Architecture",
+                    "description": "Use cases related to the architecture",
+                    "color": "magenta",
+                    "MenuEntries": [
+                        {
+                            "type": "MenuEntry",
+                            "name": "Player Menu",
+                            "description": "Player Menu use cases",
+                            "color": "magenta",
+                            "MenuEntries": [
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Move node",
+                                    "description": "How to move a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/MoveNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Initially the move mode is selected. If not press Space and left click on Move.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Press and hold the left mouse button to drag a node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Release mouse button to place the node on its new position.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "You can undo by pressing Control and Z.",
+                                            "startPosition": 20
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Rotate node",
+                                    "description": "How to rotate a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/RotateNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry Rotate Node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the node. A yellow ring appears.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click and hold the ring. Move your mouse and release when you reach the right rotation.",
+                                            "startPosition": 15
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Hide Node",
+                                    "description": "How to hide node(s)",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/WorkInProgress.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Work in Progress.",
+                                            "startPosition": 0
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Add Edge",
+                                    "description": "How to add a new edge",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/AddEdge.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry new edge.",
+                                            "startPosition": 5
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on a node to select the start node.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click on a node to select the target node.",
+                                            "startPosition": 14
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can now see the edge as a spline with a color gradient.",
+                                            "startPosition": 18
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Press key U to reset the selected start node.",
+                                            "startPosition": 22
+                                        }
+                                    ]
+                                },
+
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Add Node",
+                                    "description": "How to add a new node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/NewNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry New Node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Search for the place you want to insert the node.",
+                                            "startPosition": 10
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click to place it.",
+                                            "startPosition": 14
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Open player menu again to choose Edit Node. ",
+                                            "startPosition": 18
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Left click on your new node and add attributes to it.",
+                                            "startPosition": 22
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Edit Node",
+                                    "description": "How to edit an existing node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/EditNodev2.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry edit node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the node you want to edit.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "You can see all editable metrics inside of this new window.",
+                                            "startPosition": 16
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Insert new values, if so desired.",
+                                            "startPosition": 20
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Finish the editing process by pushing the Okay button.",
+                                            "startPosition": 24
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Scale Node",
+                                    "description": "How to scale a node",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/ScaleNode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on the entry scale node.",
+                                            "startPosition": 6
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on a node. Axis will appear.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Drag the axis in which direction you want to scale the node.",
+                                            "startPosition": 17
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "Release mouse to confirm..",
+                                            "startPosition": 21
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Delete Node or Edge",
+                                    "description": "How to delete node or edge",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/Delete.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "Press Space for opening the player menu.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "Left click on entry Delete",
+                                            "startPosition": 7
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "To delete an edge just left click it.",
+                                            "startPosition": 12
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "After blinking it will disappear.",
+                                            "startPosition": 17
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can also remove a node with its edges, just click it.",
+                                            "startPosition": 21
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "After blinking it will also disappear.",
+                                            "startPosition": 26
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "You can undo with Control and Z.",
+                                            "startPosition": 34
+                                        }
+                                    ]
+                                },
+                                {
+                                    "type": "HelpSystemEntry",
+                                    "name": "Show Code",
+                                    "description": "How to show code of a node.",
+                                    "color": "magenta",
+                                    "video": "HelpSystem/Videos/Architecture/ShowCode.mp4",
+                                    "HelpEntries": [
+                                        {
+                                            "index": 1,
+                                            "text": "This Code city represents the SEE project.",
+                                            "startPosition": 0
+                                        },
+                                        {
+                                            "index": 2,
+                                            "text": "To see code, open the player menu with space.",
+                                            "startPosition": 4
+                                        },
+                                        {
+                                            "index": 3,
+                                            "text": "Left click on the entry Show Code.",
+                                            "startPosition": 8
+                                        },
+                                        {
+                                            "index": 4,
+                                            "text": "Left click to select a node. A code window opens.",
+                                            "startPosition": 13
+                                        },
+                                        {
+                                            "index": 5,
+                                            "text": "You can also use the context menu. Right click on a node.",
+                                            "startPosition": 28
+                                        },
+                                        {
+                                            "index": 6,
+                                            "text": "Now choose Show Code again.",
+                                            "startPosition": 33
+                                        },
+                                        {
+                                            "index": 7,
+                                            "text": "By dragging the code window corner you can adjust the size.",
+                                            "startPosition": 38
+                                        }
+                                    ]
+                                }
+
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Search for a node",
+                            "description": "How to search for a node by source-name",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/workInProgress.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Work in Progress.",
+                                    "startPosition": 0
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Evolution",
+                    "description": "Use cases related to software-evolution",
+                    "color": "red",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Navigation bar",
+                            "description": "How to navigate between versions of evolution",
+                            "color": "red",
+                            "video": "HelpSystem/Videos/Evolution/evolution.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "You can start the evolution with the play button at the navigation bar.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "You can see the current version of all versions on the lower right side.",
+                                    "startPosition": 18
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "If you want to pause the evolution, press the pause button, which appears after pushing the play button.",
+                                    "startPosition": 28
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "The other play button is for backward playing and works as same as the normal play button.",
+                                    "startPosition": 37
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Pushing multiple times on the double play buttons determines the play speed.",
+                                    "startPosition": 53
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "New classes falling from the top.",
+                                    "startPosition": 60
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "Deleted classes disappears to the top.",
+                                    "startPosition": 65
+                                },
+                                {
+                                    "index": 8,
+                                    "text": "Red nodes with edges are clones in this City.",
+                                    "startPosition": 79
+                                },
+                                {
+                                    "index": 8,
+                                    "text": "You also can skip by moving the dragger of the navigation bar by left click on it.",
+                                    "startPosition": 90
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Drawable",
+                    "description": "Use cases related to drawable-system",
+                    "color": "magenta",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Draw freely on the whiteboard",
+                            "description": "How to drawly free on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/FreeDraw.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press Space for opening the player menu.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Left click on the entry drawable.",
+                                    "startPosition": 5
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Now choose Draw Freehand.",
+                                    "startPosition": 14
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "You can also open the drawable bar by clicking the up arrow in the middle of the screen.",
+                                    "startPosition": 18
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Left click on the first icon, its the brush.",
+                                    "startPosition": 24
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "On the right you can adjust thickness, line kind and color.",
+                                    "startPosition": 30
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "To draw just click and hold the left mouse button",
+                                    "startPosition": 49
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Draw shape on the whiteboard",
+                            "description": "How to draw a shape on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/DrawShape.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the second left icon.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "To simply draw a straight line, just click where you want to start.",
+                                    "startPosition": 8
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Then move your mouse and click for a second point.",
+                                    "startPosition": 14
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "You can go on or click finshed on the right side.",
+                                    "startPosition": 20
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "You can also choose a different shape by clicking the left and right arrows.",
+                                    "startPosition": 26
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "For a rectangle adjust the values for a and b.",
+                                    "startPosition": 33
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "To place the shape click on the desired places on the whiteboard",
+                                    "startPosition": 40
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Add text to the whiteboard",
+                            "description": "How to add text to the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/WriteText.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the third left icon with a big A.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "On the right you can adjust your desired text formatting.",
+                                    "startPosition": 6
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Left click on the whiteboard to select a place for your text.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Insert your text in the up comming Input field.",
+                                    "startPosition": 17
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Add image to the whiteboard",
+                            "description": "How to add a image on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/AddAnImage.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the fourth left icon with a image.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Left click on the whiteboard where you want to add an image.",
+                                    "startPosition": 6
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "The place of your image can be local on your machine or in the web.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "If you press local, you can search your image in a file browser.",
+                                    "startPosition": 17
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Allowed image formats are png, jpg and jpeg.",
+                                    "startPosition": 23
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "Press save and your image is placed.",
+                                    "startPosition": 29
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Create a mindmap on the whiteboard",
+                            "description": "How to create a mindmap on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/MindMap.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the fifth left icon.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Start with left click on central theme",
+                                    "startPosition": 8
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Then left click on the whiteboard where you want to place the theme.",
+                                    "startPosition": 16
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Put your text in the up comming input field.",
+                                    "startPosition": 22
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Now place a Subtheme as you did before with the central theme.",
+                                    "startPosition": 31
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "You need to select the parent after it.",
+                                    "startPosition": 48
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "Placing a leaf works the same.",
+                                    "startPosition": 61
+                                },
+                                {
+                                    "index": 8,
+                                    "text": "You can also add another sub theme to an existing one.",
+                                    "startPosition": 82
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Create a sticky note",
+                            "description": "How to create a sticky note",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/StickyNotes.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click the icon that looks just like a sticky note.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Start with a left click on spawn.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Then select a place on the whiteboard where you want to place the sticky note.",
+                                    "startPosition": 17
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "With move you can place it even on other places.",
+                                    "startPosition": 23
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "You can choose Laying so it looks like its laying on the table.",
+                                    "startPosition": 28
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "Clicking on next, brings you to the rotation option.",
+                                    "startPosition": 36
+                                },
+                                {
+                                    "index": 7,
+                                    "text": "Use the slider or the shown values to rotate.",
+                                    "startPosition": 43
+                                },
+                                {
+                                    "index": 8,
+                                    "text": "To edit it click edit followed by selecting the sticky note.",
+                                    "startPosition": 49
+                                },
+                                {
+                                    "index": 9,
+                                    "text": "With the color picker you can change the color.",
+                                    "startPosition": 56
+                                },
+                                {
+                                    "index": 10,
+                                    "text": "With scale you can adjust the size.",
+                                    "startPosition": 64
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Use the color picker of the whiteboard",
+                            "description": "How to use the color picker of the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/ColorPicker.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the pipette.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Left click on the place where you want to get the color of.",
+                                    "startPosition": 9
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "The color is now collected and you can go on with drawing with the brush.",
+                                    "startPosition": 17
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Move or rotate objects on the whiteboard",
+                            "description": "How to move or rotate objects on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/MoveRotate.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the crossed arrows.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Click on the object you want to move or rotate.",
+                                    "startPosition": 10
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Click move and then use the arrows to move the object.",
+                                    "startPosition": 20
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Toggeling Move by mouse sticks your object to your mouse.",
+                                    "startPosition": 29
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Left click where you want to place it.",
+                                    "startPosition": 36
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "To rotate just click this instead and use the slider.",
+                                    "startPosition": 49
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Scale objects on the whiteboard",
+                            "description": "How to scale objects on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/Scale.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click the diagonal arrows.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Left click on the object you want to scale.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "You can now change the values for x and y.",
+                                    "startPosition": 20
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Change sorting layer of objects on the whiteboard",
+                            "description": "How to change the sorting layer of objects on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/SortingLayer.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the icon with 3 layers.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "With a left click you can increase the layer order. With a right click you can decrease the layer order.",
+                                    "startPosition": 9
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "There a minimum and maximum layer order which will be shown if you want to go further.",
+                                    "startPosition": 19
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Cut, copy and paste objects on the whiteboard",
+                            "description": "How to cut, copy and paste objects on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/CutCopyPaste.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click the icon with the two pages and the scissors.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Click on the object you want to cut or copy.",
+                                    "startPosition": 8
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "To cut, click cut on the right. Choose a new place afterwards by clicking on the whiteboard.",
+                                    "startPosition": 15
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Copy works the same.",
+                                    "startPosition": 28
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Move a point on the whiteboard",
+                            "description": "How to move a point on the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/MovePoint.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click the icon with the hand.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Click on a point on the whiteboard, it will stick to your mouse.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Click again to place the point to its new position.",
+                                    "startPosition": 17
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Save content of whiteboard",
+                            "description": "How to save content of the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/Save.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the save icon.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Click on the whiteboard you want to save.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Click save and choose your save position in the file browser.",
+                                    "startPosition": 18
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Click save again to save in the selected folder.",
+                                    "startPosition": 29
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Clear content of whiteboard",
+                            "description": "How to clear content of the whiteboard",
+                            "color": "magenta",
+                            "video": "HelpSystem/Videos/Drawable/ClearPage.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Use the drawable bar and click on the eraser icon.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Choose between current page and all pages.",
+                                    "startPosition": 11
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Then toggle to Delete Page and click on the whiteboard.",
+                                    "startPosition": 18
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Debugging",
+                    "description": "Use cases related to software-debugging",
+                    "color": "blue"
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Quality",
+                    "description": "Use cases related to the software-quality",
+                    "color": "cyan",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Show Metrics",
+                            "description": "How to show metrics of a node",
+                            "color": "cyan",
+                            "video": "HelpSystem/Videos/Quality/ShowMetric.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Hover over a node in the code city.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Right click on the node and then click show metric.",
+                                    "startPosition": 6
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "You can now see all metrics this node has and even search for them.",
+                                    "startPosition": 12
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Code Cities",
+                    "description": "Use cases related to Code",
+                    "color": "red",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Add a code city by config file",
+                            "description": "How to add a code city by config file",
+                            "color": "red",
+                            "video": "HelpSystem/Videos/Config/CodeCityConfig.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press K to open the config menue.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Add a config file to ConfigurationPath",
+                                    "startPosition": 10
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Click Load configuration.",
+                                    "startPosition": 23
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "Click load data and then draw data.",
+                                    "startPosition": 29
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "Your Code city will appear.",
+                                    "startPosition": 35
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Collaboration",
+                    "description": "Use cases related to Collaboration/Multiplayer",
+                    "color": "green",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Connect as Client",
+                            "description": "How to connect as a client",
+                            "color": "green",
+                            "video": "HelpSystem/Videos/Coop/ClientConnect.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "In the main menue select the settings.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "Add the provided IP address and server port",
+                                    "startPosition": 14
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Sometimes you also get a password for log in.",
+                                    "startPosition": 34
+                                },
+                                {
+                                    "index": 4,
+                                    "text": "You can also change your name which is displayed to others.",
+                                    "startPosition": 46
+                                },
+                                {
+                                    "index": 5,
+                                    "text": "At the bottom you can choose the chat version",
+                                    "startPosition": 53
+                                },
+                                {
+                                    "index": 6,
+                                    "text": "Now you only need to press OK and select Client to connect.",
+                                    "startPosition": 59
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Text chat",
+                            "description": "How to chat with others",
+                            "color": "green",
+                            "video": "HelpSystem/Videos/Coop/TextChat.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press F2 to open the text chat.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "You can now write a message and send it with Enter.",
+                                    "startPosition": 5
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Other people in the room will get your message displayed next to your name.",
+                                    "startPosition": 12
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "type": "MenuEntry",
+                    "name": "Miscellaneous",
+                    "description": "Use cases related to Miscellaneous",
+                    "color": "cyan",
+                    "MenuEntries": [
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Use Mirror",
+                            "description": "How to connect use the mirror",
+                            "color": "cyan",
+                            "video": "HelpSystem/Videos/Miscellaneous/Mirror.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press F8 to toggle the Mirror.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "The mirror will be shown or paused.",
+                                    "startPosition": 5
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "You can use it to check your character and name.",
+                                    "startPosition": 12
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Use Browser",
+                            "description": "How to use the browser",
+                            "color": "cyan",
+                            "video": "HelpSystem/Videos/Miscellaneous/Browser.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "Press F4 to open the browser.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "By default you see the website of SEE.",
+                                    "startPosition": 5
+                                },
+                                {
+                                    "index": 3,
+                                    "text": "Use the bottom input field to type in the url.",
+                                    "startPosition": 14
+                                }
+                            ]
+                        },
+                        {
+                            "type": "HelpSystemEntry",
+                            "name": "Use VR headset",
+                            "description": "How to use a VR headset",
+                            "color": "cyan",
+                            "video": "HelpSystem/Videos/Miscellaneous/VR.mp4",
+                            "HelpEntries": [
+                                {
+                                    "index": 1,
+                                    "text": "In the main menue press Toggle Desktop/VR.",
+                                    "startPosition": 0
+                                },
+                                {
+                                    "index": 2,
+                                    "text": "The selected mdoe will be displayed in the right upper corner.",
+                                    "startPosition": 7
+                                }
+                            ]
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+}

@@ -10,6 +10,7 @@ using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game.SceneManipulation;
+using SEE.XR;
 
 namespace SEE.Controls.Actions
 {
@@ -74,6 +75,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             public string EdgeType;
             /// <summary>
+            /// The created edge ID.
+            /// </summary>
+            public string EdgeID;
+            /// <summary>
             /// Constructor.
             /// </summary>
             /// <param name="from">the source of the edge</param>
@@ -86,6 +91,7 @@ namespace SEE.Controls.Actions
                 this.To = to;
                 this.ToID = to.name;
                 this.EdgeType = edgeType;
+                this.EdgeID = null;
             }
         }
 
@@ -133,22 +139,44 @@ namespace SEE.Controls.Actions
         public override bool Update()
         {
             bool result = false;
-
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            // FIXME: We need an interaction for VR, too.
-            if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (from == null)
+                if (XRSEEActions.Selected
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
                 {
-                    // No source selected yet; this interaction is meant to set the source.
-                    from = HoveredObject;
+                    if (from == null)
+                    {
+                        from = InteractableObject.HoveredObjectWithWorldFlag.gameObject;
+                        XRSEEActions.Selected = false;
+                    }
+                    else if (to == null)
+                    {
+                        to = InteractableObject.HoveredObjectWithWorldFlag.gameObject;
+                        XRSEEActions.Selected = false;
+                    }
                 }
-                else if (to == null)
+            }
+            else
+            {
+                if (HoveredObject != null
+                    && Input.GetMouseButtonDown(0)
+                    && !Raycasting.IsMouseOverGUI()
+                    && HoveredObject.HasNodeRef())
                 {
-                    // Source is already set; this interaction is meant to set the target.
-                    to = HoveredObject;
+                    if (from == null)
+                    {
+                        // No source selected yet; this interaction is meant to set the source.
+                        from = HoveredObject;
+                    }
+                    else if (to == null)
+                    {
+                        // Source is already set; this interaction is meant to set the target.
+                        to = HoveredObject;
+                    }
                 }
             }
             // Note: from == to may be possible.
@@ -158,12 +186,13 @@ namespace SEE.Controls.Actions
                 // FIXME: In the future, we need to query the edge type from the user.
                 memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
+                memento.EdgeID = createdEdge.name;
 
                 // action is completed (successfully or not; it does not matter)
                 from = null;
                 to = null;
                 result = createdEdge != null;
-                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound);
+                AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewEdgeSound, createdEdge, true);
                 CurrentState = result ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
             }
             // Forget from and to upon user request.
@@ -176,11 +205,26 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Used to execute the <see cref="AddEdgeAction"/> from the context menu.
+        /// It ensures that the <see cref="Update"/> method performs the execution via context menu.
+        /// </summary>
+        /// <param name="source">Is the source node of the edge.</param>
+        public void ContextMenuExecution(GameObject source)
+        {
+            from = source;
+            ShowNotification.Info("Select target", "Next, select a target node for the line.");
+        }
+
+        /// <summary>
         /// Undoes this AddEdgeAction
         /// </summary>
         public override void Undo()
         {
             base.Undo();
+            if (createdEdge == null)
+            {
+                createdEdge = GraphElementIDMap.Find(memento.EdgeID);
+            }
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
             Destroyer.Destroy(createdEdge);
@@ -256,9 +300,9 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.From.name,
-                memento.To.name,
-                createdEdge.name
+                memento.FromID,
+                memento.ToID,
+                memento.EdgeID
             };
         }
     }

@@ -3,6 +3,7 @@ using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.Net.Dashboard.Model.Issues;
 using SEE.Net.Dashboard.Model.Metric;
+using SEE.Utils;
 using UnityEngine;
 using UnityEngine.TestTools;
 
@@ -11,7 +12,7 @@ namespace SEE.Net.Dashboard
     /// <summary>
     /// Class which tests the dashboard retrieval, i.e. everything in the <see cref="SEE.Net.Dashboard"/> namespace.
     /// </summary>
-    [Category("NonDeterministic")]
+    [Category("SkipOnCI")]
     public class TestDashboard
     {
         /**
@@ -20,11 +21,31 @@ namespace SEE.Net.Dashboard
          * properties has to be created, because the currently existing SEE project is too dynamic to reliably test.
          */
 
+        /// <summary>
+        /// The maximal amount of time to wait for a response from the dashboard.
+        /// </summary>
+        private const float timeout = 2f;
+
+        /// <summary>
+        /// The game object holding a <see cref="DashboardRetriever"/> component,
+        /// which is used to retrieve data from the dashboard. This object will
+        /// be created and destroyed for each test.
+        /// </summary>
+        private GameObject retrieverObject;
+
         [SetUp]
         public void SetUp()
         {
-            GameObject retrieverObject = new("Retriever");
-            retrieverObject.AddComponent<DashboardRetriever>();
+            retrieverObject = new("Retriever");
+            DashboardRetriever retriever = retrieverObject.AddComponent<DashboardRetriever>();
+            // Set timeout to 2 seconds to speed up tests.
+            retriever.TimeoutSeconds = timeout;
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Destroyer.Destroy(retrieverObject);
         }
 
         [UnityTest]

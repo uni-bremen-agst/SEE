@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="256"
+   height="256"
+   viewBox="0 0 256 256.00001"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="ResizeArrows.svg"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="2.7699989"
+     inkscape:cx="905.05451"
+     inkscape:cy="115.88452"
+     inkscape:window-width="2560"
+     inkscape:window-height="1371"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1">
+    <inkscape:page
+       x="0"
+       y="0"
+       width="256"
+       height="256"
+       id="page1"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="ResizeArrowUpDown.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192" />
+    <inkscape:page
+       x="266"
+       y="0"
+       width="256"
+       height="256"
+       id="page2"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="ResizeArrowBottomRight.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192" />
+    <inkscape:page
+       x="532"
+       y="0"
+       width="256"
+       height="256"
+       id="page6"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="ResizeArrowRight.png"
+       inkscape:export-xdpi="192"
+       inkscape:export-ydpi="192" />
+    <inkscape:page
+       x="798"
+       y="0"
+       width="256"
+       height="256"
+       id="page3"
+       margin="0"
+       bleed="0"
+       inkscape:export-filename="ResizeArrowUpDown.png"
+       inkscape:export-xdpi="768"
+       inkscape:export-ydpi="768" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <path
+     id="ResizeArrowUpDown"
+     style="fill:#ff00ff;fill-opacity:1;stroke:#000000;stroke-width:7.31427;stroke-dasharray:none"
+     d="M 128.00164,5.367 44.973955,94.531234 h 51.70226 v 66.937556 h -51.70226 l 83.027685,89.16464 83.02462,-89.16464 H 159.32707 V 94.531234 h 51.69919 z"
+     sodipodi:nodetypes="ccccccccccc" />
+  <path
+     id="ResizeArrowBottomRight"
+     style="fill:#00d6d6;fill-opacity:1;stroke:#000000;stroke-width:7.31427;stroke-dasharray:none"
+     d="M 467.20514,201.20514 462.86595,79.44707 426.30693,116.00609 315.92582,5.6249701 271.62497,49.925822 382.00609,160.30693 345.44924,196.86378 Z"
+     sodipodi:nodetypes="cccccccc" />
+  <path
+     id="ResizeArrowRight"
+     style="fill:#00d6d6;fill-opacity:1;stroke:#000000;stroke-width:7.31427;stroke-dasharray:none"
+     d="m 781.63384,125.09513 -89.16423,-83.027704 10e-6,51.70227 -156.10248,-1.1e-5 1e-5,62.650875 156.10247,-1e-5 -10e-6,51.6992 z"
+     sodipodi:nodetypes="cccccccc" />
+  <g
+     id="None">
+    <path
+       style="fill:#ffffff;stroke:#000000;stroke-width:10;stroke-dasharray:none"
+       d="M 803,251 V 5 h 246 v 246 z"
+       id="path6"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:#ff00ff;stroke:#000000;stroke-width:10;stroke-dasharray:none"
+       d="m 803,5 246,246"
+       id="path7"
+       sodipodi:nodetypes="cc" />
+    <path
+       style="fill:#ff00ff;stroke:#000000;stroke-width:10;stroke-dasharray:none"
+       d="M 803,251 1049,5"
+       id="path8"
+       sodipodi:nodetypes="cc" />
+  </g>
+</svg>

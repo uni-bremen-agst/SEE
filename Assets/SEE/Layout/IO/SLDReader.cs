@@ -73,7 +73,7 @@ namespace SEE.Layout.IO
 
                         node.CenterPosition = position;
                         node.Rotation = eulerAngles.y;
-                        node.LocalScale = scale;
+                        node.AbsoluteScale = scale;
                     }
                     else
                     {

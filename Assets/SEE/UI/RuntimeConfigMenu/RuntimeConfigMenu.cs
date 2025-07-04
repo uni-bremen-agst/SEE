@@ -1,7 +1,14 @@
-using System.Linq;
+using Cysharp.Threading.Tasks;
+using MoreLinq;
 using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
+using SEE.GameObjects;
+using SEE.Net.Actions.RuntimeConfig;
+using SEE.UI.Notification;
+using SEE.Utils;
+using System;
+using System.Linq;
 using UnityEngine;
 
 namespace SEE.UI.RuntimeConfigMenu
@@ -25,20 +32,77 @@ namespace SEE.UI.RuntimeConfigMenu
         private int currentCity;
 
         /// <summary>
+        /// The list of cities on which the current RuntimeConfigMenu is based.
+        /// </summary>
+        private AbstractSEECity[] currentMenuCities;
+
+        /// <summary>
+        /// Whether the menu needs a rebuild.
+        /// </summary>
+        private bool needsRebuild;
+
+        /// <summary>
+        /// Indicator of whether opening the menu should be blocked.
+        /// This is only the case during the deletion process.
+        /// </summary>
+        private bool blockOpening;
+
+        /// <summary>
+        /// Indicator of whether the menu was built before.
+        /// </summary>
+        private bool wasBuiltBefore = false;
+
+        /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
         private void Start()
         {
-            int cityCount = GameObject.FindGameObjectsWithTag(Tags.CodeCity).Length;
-            cityMenus = new RuntimeTabMenu[cityCount];
-            for (int i = 0; i < cityCount; i++)
+            WaitForLocalPlayerInstantiation().Forget();
+            return;
+
+            async UniTask WaitForLocalPlayerInstantiation()
             {
-                cityMenus[i] = gameObject.AddComponent<RuntimeTabMenu>();
-                cityMenus[i].Title = "City Configuration";
-                cityMenus[i].HideAfterSelection = false;
-                cityMenus[i].CityIndex = i;
-                cityMenus[i].OnSwitchCity += SwitchCity;
+                await UniTask.WaitUntil(() => LocalPlayer.Instance != null);
+                BuildTabMenus();
             }
+        }
+
+        /// <summary>
+        /// Builds the menu.
+        /// </summary>
+        public void BuildTabMenus()
+        {
+            if (wasBuiltBefore)
+            {
+                ShowNotification.Info("Rebuilding Runtime Config Menu",
+                    "The runtime config menu is being rebuilt. This may take a moment. Please wait.");
+            }
+            wasBuiltBefore = true;
+
+            if (cityMenus != null)
+            {
+                cityMenus.ForEach(c => Destroyer.Destroy(c));
+            }
+            cityMenus = new RuntimeTabMenu[GetCities().Length];
+            for (int i = 0; i < GetCities().Length; i++)
+            {
+                AddCity(i);
+            }
+            currentMenuCities = GetCities();
+            needsRebuild = false;
+        }
+
+        /// <summary>
+        /// Adds a <see cref="RuntimeTabMenu"/> for the city with the given <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">The city index.</param>
+        private void AddCity(int index)
+        {
+            cityMenus[index] = gameObject.AddComponent<RuntimeTabMenu>();
+            cityMenus[index].Title = "City Configuration";
+            cityMenus[index].HideAfterSelection = false;
+            cityMenus[index].CityIndex = index;
+            cityMenus[index].OnSwitchCity += SwitchCity;
         }
 
         /// <summary>
@@ -50,6 +114,20 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             if (SEEInput.ToggleConfigMenu())
             {
+                if (blockOpening)
+                {
+                    ShowNotification.Warn("Menu opening is blocked.", "A deletion process is in progress, and therefore the menu cannot be opened.");
+                    return;
+                }
+                if (cityMenus.Length <= currentCity)
+                {
+                    currentCity = cityMenus.Length - 1;
+                }
+                if (!currentMenuCities.SequenceEqual(GetCities()) || needsRebuild)
+                {
+                    new RebuildNetAction().Execute();
+                    BuildTabMenus();
+                }
                 cityMenus[currentCity].ToggleMenu();
             }
         }
@@ -74,11 +152,21 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Sorted by the game object name.
         /// </summary>
-        /// <returns>table list</returns>
+        /// <returns>the sorted cities or null if this menu does not have a
+        /// <see cref="CitiesHolder"/> attached to it</returns>
         public static AbstractSEECity[] GetCities()
         {
-            return GameObject.FindGameObjectsWithTag(Tags.CodeCity).Select(go => go.GetComponent<AbstractSEECity>())
-                             .OrderBy(go => go.name).ToArray();
+            if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
+            {
+                return citiesHolder.Cities
+                    .Select(pair => pair.Value.GetComponent<AbstractSEECity>())
+                    .Where(component => component != null)
+                    .OrderBy(go => go.name).ToArray();
+            }
+            else
+            {
+                return null;
+            }
         }
 
         /// <summary>
@@ -89,6 +177,57 @@ namespace SEE.UI.RuntimeConfigMenu
         public static RuntimeTabMenu GetMenuForCity(int i)
         {
             return cityMenus[i];
+        }
+
+        /// <summary>
+        /// Sets the notification that a rebuild is required.
+        /// </summary>
+        public void PerformRebuildOnNextOpening()
+        {
+            blockOpening = false;
+            needsRebuild = true;
+        }
+
+        /// <summary>
+        /// Sets the notification that the opening of the menu is blocked.
+        /// </summary>
+        public void BlockOpening()
+        {
+            blockOpening = true;
+        }
+
+        /// <summary>
+        /// Performs the rebuild if necessary.
+        /// </summary>
+        /// <returns>True if a rebuild was performed, otherwise false.</returns>
+        public bool PerformRebuildIfRequired()
+        {
+            if (needsRebuild)
+            {
+                needsRebuild = false;
+                BuildTabMenus();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Rebuilds the tab at the specified <paramref name="index"/>.
+        /// </summary>
+        /// <param name="index">The index of the tab to rebuild.</param>
+        public async UniTask RebuildTabAsync(int index)
+        {
+            cityMenus[currentCity].ToggleMenu();
+            string active = cityMenus[currentCity].ActiveEntry.Title;
+            Destroyer.Destroy(cityMenus[index]);
+            AddCity(index);
+            await UniTask.Yield();
+            cityMenus[currentCity].ToggleMenu();
+            cityMenus[currentCity].SelectEntry(cityMenus[currentCity]
+                .Entries.FirstOrDefault(entry => entry.Title.Equals(active)));
         }
     }
 }

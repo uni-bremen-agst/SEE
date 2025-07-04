@@ -6,7 +6,7 @@ using UnityEngine;
 namespace SEE.Net.Actions.Drawable
 {
     /// <summary>
-    /// Superclass for all drawable new actions. Provides the drawable surface object
+    /// Superclass for all drawable net actions. Provides the drawable surface object
     /// and an implelentation of <see cref="ExecuteOnServer"/> that does nothing.
     /// </summary>
     public abstract class DrawableNetAction : AbstractNetAction

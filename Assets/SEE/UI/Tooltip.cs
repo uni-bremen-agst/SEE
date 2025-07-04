@@ -110,6 +110,7 @@ namespace SEE.UI
         /// <summary>
         /// The GameObject which contains the Tooltip UI element.
         /// </summary>
+        [ManagedUI(toggleEnabled: true)]
         private GameObject tooltipGameObject;
 
         /// <summary>
@@ -311,6 +312,11 @@ namespace SEE.UI
             }
         }
 
+        protected override void StartVR()
+        {
+            StartDesktop();
+        }
+
         protected override void UpdateDesktop()
         {
             if (text == null)
@@ -340,26 +346,14 @@ namespace SEE.UI
             }
         }
 
-        private void OnDestroy()
+        protected override void UpdateVR()
         {
-            Destroyer.Destroy(tooltipGameObject);
+            UpdateDesktop();
         }
 
-        private void OnDisable()
+        protected override void OnDisable()
         {
             fadeIn?.Kill();
-            if (tooltipGameObject != null)
-            {
-                tooltipGameObject.SetActive(false);
-            }
-        }
-
-        private void OnEnable()
-        {
-            if (tooltipGameObject != null)
-            {
-                tooltipGameObject.SetActive(true);
-            }
         }
     }
 }

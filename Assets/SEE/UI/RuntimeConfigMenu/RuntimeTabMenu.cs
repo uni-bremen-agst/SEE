@@ -1,8 +1,4 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
+using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -10,21 +6,27 @@ using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.UI.Menu;
+using SEE.Game.SceneManipulation;
 using SEE.GO;
-using SEE.Layout.NodeLayouts.Cose;
+using SEE.GraphProviders;
 using SEE.Net.Actions.RuntimeConfig;
+using SEE.UI.Menu;
+using SEE.UI.Notification;
+using SEE.UI.PropertyDialog;
 using SEE.Utils;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using SimpleFileBrowser;
+using Sirenix.OdinInspector;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using SEE.Utils.Config;
-using SEE.Utils.Paths;
-using SEE.GraphProviders;
-using Sirenix.OdinInspector;
-
 
 namespace SEE.UI.RuntimeConfigMenu
 {
@@ -148,6 +150,27 @@ namespace SEE.UI.RuntimeConfigMenu
         public Action<string> SyncRemoveListElement;
 
         /// <summary>
+        /// Triggers when a dict entry was added by a different player.
+        /// </summary>
+        public Action<string, string, string> SyncAddDictEntry;
+
+        /// <summary>
+        /// Triggers when a dict entry was removed by a different player.
+        /// </summary>
+        public Action<string, string> SyncRemoveDictEntry;
+
+        /// <summary>
+        /// Triggers when a dict entry should be removed.
+        /// </summary>
+        public Action<string, string> RemoveDictEntryAction;
+
+        /// <summary>
+        /// This list contains all the data needed to determine the visibility
+        /// and interactability of a member info or its associated GameObject.
+        /// </summary>
+        private readonly List<(MemberInfo, GameObject, object)> controlConditions = new();
+
+        /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
@@ -228,7 +251,7 @@ namespace SEE.UI.RuntimeConfigMenu
             // A member can be a field, property, method, event, or other things.
             city.GetType().GetMembers()
                 .Where(IsCityAttribute)
-                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested)
+                .OrderBy(HasTabAttribute).ThenBy(GetTabName).ThenBy(SortIsNotNested).ThenBy(SortGroupOrder)
                 .ForEach(memberInfo => CreateSetting(memberInfo, null, city));
             SelectEntry(Entries.First());
 
@@ -263,6 +286,11 @@ namespace SEE.UI.RuntimeConfigMenu
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
+
+            int SortGroupOrder(MemberInfo memberInfo) =>
+                memberInfo.GetCustomAttributes()
+                    .OfType<RuntimeGroupOrderAttribute>().FirstOrDefault()?.Order
+                    ?? int.MaxValue;
 
             // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
@@ -324,6 +352,10 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <see cref="RuntimeButtonAttribute"/>
         private void CreateButton(MethodInfo methodInfo)
         {
+            AssertConditionalAttributePairsValid(methodInfo);
+            bool visibility = ValidateVisibilityAttributes(methodInfo, city);
+            bool interactable = ValidateInteractableAttributes(methodInfo, city);
+
             RuntimeButtonAttribute buttonAttribute =
                 methodInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault();
             // only methods with the button attribute
@@ -345,21 +377,30 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
-            buttonManager.clickEvent.AddListener(() =>
+            if (methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
+                ||methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
             {
-                // calls the method and updates the menu
-                methodInfo.Invoke(city, null);
-                OnUpdateMenuValues?.Invoke();
-            });
-            buttonManager.clickEvent.AddListener(() =>
+                buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
+            }
+            else
             {
-                UpdateCityMethodNetAction netAction = new()
+                buttonManager.clickEvent.AddListener(() =>
                 {
-                    CityIndex = CityIndex,
-                    MethodName = methodInfo.Name
-                };
-                netAction.Execute();
-            });
+                    // calls the method and updates the menu
+                    methodInfo.Invoke(city, null);
+                    OnUpdateMenuValues?.Invoke();
+                });
+                buttonManager.clickEvent.AddListener(() =>
+                {
+                    UpdateCityMethodNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        MethodName = methodInfo.Name
+                    };
+                    netAction.Execute();
+                });
+                buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
+            }
 
             // add network listener
             SyncMethod += methodName =>
@@ -369,8 +410,45 @@ namespace SEE.UI.RuntimeConfigMenu
                     // calls the method and updates the menu
                     methodInfo.Invoke(city, null);
                     OnUpdateMenuValues?.Invoke();
+                    CheckControlConditionsWithDelay();
                 }
             };
+
+            button.SetActive(visibility);
+            if (HasInteractableAttribute(methodInfo))
+            {
+                SetInteractableRecursive(button, interactable);
+            }
+            controlConditions.Add((methodInfo, button, city));
+
+            async UniTask ExecuteLoadAsync()
+            {
+                object result = methodInfo.Invoke(city, null);
+                bool doRebuild = true;
+                if (result is UniTask<bool> task)
+                {
+                    doRebuild = await task;
+                }
+                OnUpdateMenuValues?.Invoke();
+                UpdateCityMethodNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    MethodName = methodInfo.Name
+                };
+                netAction.Execute();
+                CheckControlConditionsWithDelay();
+                if (doRebuild)
+                {
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                    }
+                    else
+                    {
+                        throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -417,6 +495,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
 
+            AssertConditionalAttributePairsValid(memberInfo);
+
             switch (memberInfo)
             {
                 case FieldInfo fieldInfo:
@@ -430,8 +510,11 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => fieldInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => fieldInfo.SetValue(obj, changedValue),
-                        memberInfo.GetCustomAttributes()
+                        memberInfo.GetCustomAttributes(),
+                        fieldInfo,
+                        obj
                     );
                     break;
                 case PropertyInfo propertyInfo:
@@ -451,10 +534,163 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => propertyInfo.GetValue(obj),
                         memberInfo.Name,
                         parent,
+                        false,
                         changedValue => propertyInfo.SetValue(obj, changedValue),
-                        memberInfo.GetCustomAttributes()
+                        memberInfo.GetCustomAttributes(),
+                        propertyInfo,
+                        obj
                     );
                     break;
+            }
+        }
+
+        /// <summary>
+        /// Validates the given <paramref name="memberInfo"/> decorated with a conditional
+        /// design-time attribute (e.g., <see cref="ShowIfAttribute"/> also has the corresponding
+        /// runtime attribute (e.g., <see cref="RuntimeShowIfAttribute"/>.
+        /// </summary>
+        /// <param name="memberInfo">The object to validate.</param>
+        /// <exception cref="Exception">Thrown if a conditional design-time attribute is present on the member
+        /// but the corresponding runtime attribute is missing.</exception>
+        private void AssertConditionalAttributePairsValid(MemberInfo memberInfo)
+        {
+            if (memberInfo == null)
+            {
+                return;
+            }
+            (Type, Type)[] attributePairs = new (Type designTime, Type runtime)[]
+            {
+                (typeof(ShowIfAttribute), typeof(RuntimeShowIfAttribute)),
+                (typeof(HideIfAttribute), typeof(RuntimeHideIfAttribute)),
+                (typeof(EnableIfAttribute), typeof(RuntimeEnableIfAttribute)),
+                (typeof(DisableIfAttribute), typeof(RuntimeDisableIfAttribute)),
+            };
+
+            foreach ((Type designAttr, Type runtimeAttr) in attributePairs)
+            {
+                if (memberInfo.GetCustomAttribute(designAttr, inherit: false) != null
+                    && memberInfo.GetCustomAttribute(runtimeAttr, inherit: false) == null)
+                {
+                    throw new InvalidOperationException($"{memberInfo.Name} of {memberInfo.DeclaringType} " +
+                        $"has {designAttr.Name} but no corresponding {runtimeAttr.Name}.");
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the specified <see cref="MemberInfo"/>
+        /// has a <see cref="RuntimeShowIfAttribute"/> or a <see cref="RuntimeHideIfAttribute"/>
+        /// and evaluates its condition.
+        /// </summary>
+        /// <param name="memberInfo">The member to check.</param>
+        /// <param name="obj">The instance that contains the member.</param>
+        /// <returns><c>true</c> if the member should be shown. Otherwise, <c>false</c>.</returns>
+        private bool ValidateVisibilityAttributes(MemberInfo memberInfo, object obj)
+        {
+            if (memberInfo.GetCustomAttribute<RuntimeShowIfAttribute>() is { } showIf
+                && !EvaluateCondition(showIf.Condition, showIf.Value, obj))
+            {
+                return false;
+            }
+
+            if (memberInfo.GetCustomAttribute<RuntimeHideIfAttribute>() is { } hideIf
+                && EvaluateCondition(hideIf.Condition, hideIf.Value, obj))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks whether the specified <see cref="MemberInfo"/>
+        /// has a <see cref="RuntimeEnableIfAttribute"/> or a <see cref="RuntimeDisableIfAttribute"/>
+        /// and evaluates its condition.
+        /// </summary>
+        /// <param name="memberInfo">The member to check.</param>
+        /// <param name="obj">The instance that contains the member.</param>
+        /// <returns><c>true</c> if the member should be interacable. Otherwise, <c>false</c>.</returns>
+        private bool ValidateInteractableAttributes(MemberInfo memberInfo, object obj)
+        {
+            if (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() is { } enableIf
+                && !EvaluateCondition(enableIf.Condition, enableIf.Value, obj))
+            {
+                return false;
+            }
+
+            if (memberInfo.GetCustomAttribute<RuntimeDisableIfAttribute>() is { } disableIf
+                && EvaluateCondition(disableIf.Condition, disableIf.Value, obj))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Evaluates the specified <paramref name="condition"/> by searching for the
+        /// corresponding <see cref="FieldInfo"/>, <see cref="PropertyInfo"/> or <see cref="MethodInfo"/>
+        /// in the given <paramref name="obj"/>, and then evaluates it accordingly.
+        /// </summary>
+        /// <param name="condition">The condition to be checked.</param>
+        /// <param name="expectedValue">The expected value to compare against. Can be <c>null</c>.</param>
+        /// <param name="obj">The object on whcih to evaluate the condition.</param>
+        /// <returns><c>true</c> if the condition is met. Otherwise, <c>false</c>.</returns>
+        /// <exception cref="Exception">Thrown if the <paramref name="condition"/> is in an unsupported or incorrect format.</exception>
+        private bool EvaluateCondition(string condition, object expectedValue, object obj)
+        {
+            Type type = obj.GetType();
+            if (condition.StartsWith("@"))
+            {
+                throw new Exception($"Conditions of this form ({condition}) " +
+                    "are not supported in the RuntimeConfigMenu.");
+            }
+
+            FieldInfo field = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetField(n, flags));
+            if (field != null)
+            {
+                return Compare(field.GetValue(obj), expectedValue);
+            }
+
+            PropertyInfo prop = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetProperty(n, flags));
+            if (prop != null)
+            {
+                return Compare(prop.GetValue(obj), expectedValue);
+            }
+
+            MethodInfo m = FindMemberRecursive(type, condition,
+                (t, n, flags) => t.GetMethod(n, flags));
+            if (m != null && m.ReturnType == typeof(bool))
+            {
+                return (bool)m.Invoke(obj, null);
+            }
+
+            return true;
+
+            bool Compare(object actual, object expected)
+            {
+                if (actual is bool b)
+                {
+                    return b;
+                }
+                return expected == null || Equals(actual, expected);
+            }
+
+            T FindMemberRecursive<T>(Type type, string name, Func<Type, string, BindingFlags, T> resolver)
+                where T : MemberInfo
+            {
+                while (type != null)
+                {
+                    T member = resolver(type, name,
+                        BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+                    if (member != null)
+                    {
+                        return member;
+                    }
+                    type = type.BaseType;
+                }
+                return null;
             }
         }
 
@@ -467,10 +703,20 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="settingName">setting name; in case of a list element, this would be index of the list
         /// element; otherwise this would be the name of the field</param>
         /// <param name="parent">parent game object</param>
+        /// <param name="removable">Enables the remove button to remove this object. Needed for nested settings</param>
         /// <param name="setter">setter of the setting value</param>
         /// <param name="attributes">attributes</param>
-        private void CreateSetting(Func<object> getter, string settingName, GameObject parent,
-            UnityAction<object> setter = null, IEnumerable<Attribute> attributes = null)
+        /// <param name="memberInfo">field or property info from <see cref="CreateSetting"/></param>
+        /// <param name="obj">object which contains the field or property from <see cref="CreateSetting"/></param>
+        private void CreateSetting
+            (Func<object> getter,
+            string settingName,
+            GameObject parent,
+            bool removable,
+            UnityAction<object> setter = null,
+            IEnumerable<Attribute> attributes = null,
+            MemberInfo memberInfo = null,
+            object obj = null)
         {
             // stores the attributes in an array so it can be accessed multiple times
             Attribute[] attributeArray = attributes?.ToArray() ?? Array.Empty<Attribute>();
@@ -492,17 +738,19 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-
+            bool visibility = memberInfo == null && obj == null || ValidateVisibilityAttributes(memberInfo, obj);
+            bool interactable = memberInfo == null && obj == null || ValidateInteractableAttributes(memberInfo, obj);
+            GameObject createdObj = null;
             switch (value)
             {
                 case bool:
-                    CreateSwitch(settingName,
+                    createdObj = CreateSwitch(settingName,
                         changedValue => setter!(changedValue),
                         () => (bool)getter(),
                         parent);
                     break;
                 case int:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!((int)changedValue),
                         () => (int)getter(),
@@ -510,7 +758,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case uint:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!((uint)changedValue),
                         () => (uint)getter(),
@@ -518,7 +766,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case float:
-                    CreateSlider(settingName,
+                    createdObj = CreateSlider(settingName,
                         attributeArray.OfType<RangeAttribute>().ElementAtOrDefault(0),
                         changedValue => setter!(changedValue),
                         () => (float)getter(),
@@ -526,24 +774,26 @@ namespace SEE.UI.RuntimeConfigMenu
                         parent);
                     break;
                 case string:
-                    CreateStringField(settingName,
+                    createdObj = CreateStringField(settingName,
                         changedValue => setter!(changedValue),
                         () => (string)getter(),
                         parent);
                     break;
                 case Color:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateColorPicker(settingName,
                         parent,
                         changedValue => setter!(changedValue),
                         () => (Color)getter());
                     break;
                 case DataPath dataPath:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateFilePicker(settingName, dataPath, parent);
                     break;
                 case Enum:
-                    CreateDropDown(settingName,
+                    createdObj = CreateDropDown(settingName,
                         // changedValue is the enum value as an integer; here we will
                         // convert it back to the enum. We pass on the value to the
                         // setter of the caller because only the caller has the context to
@@ -564,16 +814,22 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => mapInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        mapInfo,
+                        obj);
                     break;
                 case AntennaAttributes:
                     FieldInfo antennaInfo = value.GetType().GetField(nameof(AntennaAttributes.AntennaSections))!;
                     CreateSetting(() => antennaInfo.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        antennaInfo,
+                        obj);
                     break;
 
                 case SingleGraphPipelineProvider:
@@ -581,8 +837,11 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        pipeline,
+                        obj);
                     break;
 
                 case MultiGraphPipelineProvider:
@@ -591,8 +850,11 @@ namespace SEE.UI.RuntimeConfigMenu
                     CreateSetting(() => pipeline2.GetValue(value),
                         settingName,
                         parent,
+                        removable,
                         null,
-                        attributeArray);
+                        attributeArray,
+                        pipeline2,
+                        obj);
                     break;
                 // types that shouldn't be in the configuration menu
                 case Graph:
@@ -603,27 +865,31 @@ namespace SEE.UI.RuntimeConfigMenu
                     // not supported
                     break;
                 case IDictionary dict:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable, true);
+                    createdObj = parent.transform.parent.gameObject;
+                    CreateDictEntryManagement(parent, dict);
                     UpdateDictChildren(parent, dict);
                     OnUpdateMenuValues += () => UpdateDictChildren(parent, dict);
                     break;
                 case IList<string> list:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(list, parent, () => string.Empty);
                     break;
                 case List<SingleGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(providerList, parent, () => new SingleGraphPipelineProvider());
                     break;
                 case List<MultiGraphProvider> providerList:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateList(providerList, parent, () => new MultiGraphPipelineProvider());
                     break;
 
                 // confirmed types where the nested fields should be edited
                 case ColorRange:
                 case ColorProperty:
-                case CoseGraphAttributes:
                 case VisualNodeAttributes:
                 case NodeLayoutAttributes:
                 case EdgeLayoutAttributes:
@@ -634,7 +900,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 case VisualAttributes:
                 case ConfigIO.IPersistentConfigItem:
                 case LabelAttributes:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 case CSVGraphProvider:
@@ -642,13 +909,140 @@ namespace SEE.UI.RuntimeConfigMenu
                 case GXLSingleGraphProvider:
                 case JaCoCoGraphProvider:
                 case ReflexionGraphProvider:
-                    parent = CreateNestedSetting(settingName, parent);
+                    parent = CreateNestedSetting(settingName, parent, removable);
+                    createdObj = parent.transform.parent.gameObject;
                     CreateTypeField(parent, value as SingleGraphProvider);
                     value.GetType().GetMembers().ForEach(nestedInfo => CreateSetting(nestedInfo, parent, value));
                     break;
                 default:
                     Debug.LogWarning($"Missing: {settingName}, {value.GetType().FullName}.\n");
                     break;
+            }
+            createdObj?.SetActive(visibility);
+            if (createdObj != null && HasInteractableAttribute(memberInfo))
+            {
+                SetInteractableRecursive(createdObj, interactable);
+            }
+            if (memberInfo != null && obj != null && createdObj != null)
+            {
+                controlConditions.Add((memberInfo, createdObj, obj));
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <paramref name="memberInfo"/> has a <see cref="RuntimeEnableIfAttribute"/>
+        /// or a <see cref="RuntimeDisableIfAttribute"/>.
+        /// </summary>
+        /// <param name="memberInfo">The member info to be checked.</param>
+        /// <returns><c>true</c> if a corresponding attribute was found. Otherwise, <c>false</c>.</c></returns>
+        private bool HasInteractableAttribute(MemberInfo memberInfo)
+        {
+            return memberInfo != null && (memberInfo.GetCustomAttribute<RuntimeEnableIfAttribute>() != null
+                || memberInfo.GetCustomAttribute<RuntimeDisableIfAttribute>() != null);
+        }
+
+        /// <summary>
+        /// Sets the interactability (<paramref name="interactable"/>) of all applicable
+        /// components on the given <paramref name="obj"/>.
+        /// Waits one frame to ensure all components are initialized.
+        /// </summary>
+        /// <param name="obj">The game object whose components should be updated.</param>
+        /// <param name="interactable">The desired interactable state.</param>
+        private async UniTask SetInteractableAsync(GameObject obj, bool interactable)
+        {
+            await UniTask.Yield();
+            const string interact = "interactable";
+            foreach (Component comp in obj.GetComponents<Component>())
+            {
+                if (comp == null)
+                {
+                    continue;
+                }
+                Type type = comp.GetType();
+
+                // Check property
+                PropertyInfo prop = type.GetProperty(interact, BindingFlags.Public | BindingFlags.Instance);
+                if (prop != null && prop.CanWrite && prop.PropertyType == typeof(bool))
+                {
+                    prop.SetValue(comp, interactable);
+                    continue;
+                }
+
+                // Check field
+                FieldInfo field = type.GetField(interact, BindingFlags.Public | BindingFlags.Instance);
+                if (field != null && field.FieldType == typeof(bool))
+                {
+                    field.SetValue(comp, interactable);
+                }
+
+                // Handle disable colors gradients.
+                HandleColor(comp);
+            }
+
+            void HandleColor(Component comp)
+            {
+                if (comp is UIGradient uig)
+                {
+                    uig.enabled = interactable;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Recursively sets the interactability of the specified <paramref name="root"/>
+        /// and all of its child game objects.
+        /// </summary>
+        /// <param name="root">The root game object whose hierarchy will be updated.</param>
+        /// <param name="interactable">The desired interactable state to apply.</param>
+        private void SetInteractableRecursive(GameObject root, bool interactable)
+        {
+            SetInteractableAsync(root, interactable).Forget();
+            foreach (Transform child in root.transform)
+            {
+                SetInteractableRecursive(child.gameObject, interactable);
+            }
+        }
+
+        /// <summary>
+        /// Calls <see cref="CheckControlConditionsAsync(int)"/> without waiting.
+        /// </summary>
+        private void CheckControlConditions()
+        {
+            CheckControlConditionsAsync(0).Forget();
+        }
+
+        /// <summary>
+        /// Similar to <see cref="CheckControlConditions"/>, but waits ten frames before executing.
+        /// </summary>
+        private void CheckControlConditionsWithDelay()
+        {
+            CheckControlConditionsAsync(10).Forget();
+        }
+
+        /// <summary>
+        /// Asynchronously iterates over all control conditions after an optional frame delay,
+        /// then updates the active state and interactability of associated <see cref="GameObject"/> instances.
+        /// </summary>
+        /// <param name="delay">
+        /// Number of frames to wait before evaluating the control conditions.
+        /// Use this to ensure that all relevant states and components are initialized before applying changes.
+        /// </param>
+        /// <returns>A <see cref="UniTask"/> representing the asynchronous operation.</returns>
+        private async UniTask CheckControlConditionsAsync(int delay)
+        {
+            // Waits enough frames to ensure that the changes will occur.
+            await UniTask.DelayFrame(delay);
+            if (this == null)
+            {
+                return;
+            }
+            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
+            {
+                go.SetActive(ValidateVisibilityAttributes(m, obj));
+                if (HasInteractableAttribute(m))
+                {
+                    SetInteractableRecursive(go, ValidateInteractableAttributes(m, obj));
+                }
             }
         }
 
@@ -659,14 +1053,195 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="settingName">setting name</param>
         /// <param name="parent">container</param>
+        /// <param name="expandable">Enables the add button to add new items.</param>
+        /// <param name="removable">Enables the remove button to remove this entry from its dictionary.</param>
         /// <returns>container for child settings</returns>
-        private static GameObject CreateNestedSetting(string settingName, GameObject parent)
+        private GameObject CreateNestedSetting(string settingName, GameObject parent,
+            bool removable, bool expandable = false)
         {
             GameObject container =
                 PrefabInstantiator.InstantiatePrefab(settingsObjectPrefab, parent.transform, false);
             container.name = settingName;
             container.GetComponentInChildren<TextMeshProUGUI>().text = settingName;
+            if (expandable)
+            {
+                EnableAddButton();
+            }
+            if (removable && CanRemoveKey())
+            {
+                InitRemoveButton();
+            }
             return container.transform.Find("Content").gameObject;
+
+            void EnableAddButton()
+            {
+                Transform addBtnTransform = container.transform.Find("Buttons/AddBtn");
+                addBtnTransform.gameObject.SetActive(true);
+            }
+
+            bool CanRemoveKey()
+            {
+                return !Graph.RootTypes.Contains(settingName);
+            }
+
+            void InitRemoveButton()
+            {
+                Transform removeBtnTransform = container.transform.Find("Buttons/RemoveBtn");
+                removeBtnTransform.gameObject.SetActive(true);
+                ButtonManagerBasicIcon removeBtn = removeBtnTransform.GetComponent<ButtonManagerBasicIcon>();
+                removeBtn.clickEvent.AddListener(() =>
+                {
+                    RemoveDictEntryAction.Invoke(parent.FullName(), settingName);
+                });
+            }
+        }
+
+        /// <summary>
+        /// Adds functionality for managing dictionary entries.
+        /// This includes adding new entries as well as removing existing ones.
+        /// </summary>
+        /// <param name="parent">container</param>
+        /// <param name="dict">the dictionary</param>
+        private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
+        {
+            ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
+            addBtn.clickEvent.AddListener(() =>
+            {
+                Type keyType = GetType(true);
+                if (keyType != typeof(string))
+                {
+                    string message = keyType != null ?
+                        $"currently {keyType} is not supported as a key value." :
+                        "the key type could not be determined since the dictionary is empty.";
+                    ShowNotification.Error("Entry cannot be added.", $"The entry cannot be added because {message}");
+                    return;
+                }
+                Type valueType = GetType(false);
+                if (valueType != null)
+                {
+                    AddEntry(valueType).Forget();
+                }
+                else
+                {
+                    ShowNotification.Error("Entry cannot be added.", "The entry cannot be added because the " +
+                        "value type could not be determined since the dictionary is empty.");
+                }
+            });
+
+            /// The action to be executed when an entry should be removed from a dictionary.
+            /// Additionally, it is checked whether it is a <see cref="VisualNodeAttributes"/>.
+            /// If this is the case, it is verified whether it can be removed at all.
+            RemoveDictEntryAction += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    if (dict[key].GetType() == typeof(VisualNodeAttributes))
+                    {
+                        ValidateAndRemoveNodeType((VisualNodeAttributes)dict[key], key);
+                    }
+                    else
+                    {
+                        RemoveDictEntry(key);
+                    }
+                }
+            };
+
+            // listeners for net actions; broadcasts the addition of a new dict
+            // entry to all clients
+            SyncAddDictEntry += (widgetPath, key, valueTypeName) =>
+            {
+                if (widgetPath == parent.FullName())
+                {
+                    Type valueType = Type.GetType(valueTypeName);
+                    dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                }
+            };
+
+            // broadcasts the removal of a new dict entry to all cients
+            SyncRemoveDictEntry += (widgetPath, key) =>
+            {
+                if (widgetPath == parent.FullName()
+                    && dict.Contains(key))
+                {
+                    dict.Remove(key);
+                    UpdateDictChildren(parent, dict);
+                }
+            };
+            return;
+
+            void RemoveDictEntry(string key)
+            {
+                dict.Remove(key);
+                UpdateDictChildren(parent, dict);
+                RemoveDictEntryNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    WidgetPath = parent.FullName(),
+                    Key = key
+                };
+                netAction.Execute();
+            }
+
+            void ValidateAndRemoveNodeType(VisualNodeAttributes nodeType, string key)
+            {
+                if (city.LoadedGraph == null)
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because the graph is not loaded.");
+                    return;
+                }
+                if (city.LoadedGraph.Nodes().Any(node => node.Type == key))
+                {
+                    ShowNotification.Warn("Node type cannot be deleted.", $"The node type {key} " +
+                        "cannot be deleted because it is used in the graph. Only unused node types can be deleted.");
+                }
+                else
+                {
+                    RemoveDictEntry(key);
+                }
+            }
+
+            /// Returns the desired type from a dictionary, depending on searchKeyType.
+            /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
+            /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
+            /// the second case is used, where the base type is examined.
+            /// If the types cannot be determined here either, it tries to extract the types directly from the first entry.
+            /// However, this only works if the dictionary is not empty.
+            /// If none of the cases can determine the desired type, null is returned.
+            Type GetType(bool searchKeyType)
+            {
+                Type dictType = dict.GetType();
+                int i = searchKeyType ? 0 : 1;
+                ICollection collection = searchKeyType ? dict.Keys : dict.Values;
+                return dictType.GetGenericArguments().Length == 2 ?
+                    dictType.GetGenericArguments()[i] : dictType.BaseType.GetGenericArguments().Length == 2 ?
+                        dictType.BaseType.GetGenericArguments()[i] : collection.Count > 0 ?
+                            collection.Cast<object>().FirstOrDefault()?.GetType() : null;
+            }
+
+            async UniTask AddEntry(Type valueType)
+            {
+                RuntimeMenuAddDictEntryProperty addEntryProperty = new(dict);
+                addEntryProperty.Open();
+                string key = null;
+                await UniTask.WaitUntil(() => addEntryProperty.TryGetKey(out key) || addEntryProperty.WasCanceled());
+                if (key != null)
+                {
+                    dict.Add(key, Activator.CreateInstance(valueType));
+                    UpdateDictChildren(parent, dict);
+                    AddDictEntryNetAction netAction = new()
+                    {
+                        CityIndex = CityIndex,
+                        WidgetPath = parent.FullName(),
+                        Key = key,
+                        ValueType = valueType.FullName
+                    };
+                    netAction.Execute();
+                    ImmediateRedraw();
+                }
+            }
         }
 
         /// <summary>
@@ -680,7 +1255,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
+        private GameObject CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
             Func<float> getter, bool useRoundValue, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -706,23 +1281,13 @@ namespace SEE.UI.RuntimeConfigMenu
             slider.minValue = range.min;
             slider.maxValue = range.max;
             slider.value = getter();
-
-            // add listeners
-            RuntimeSliderManager endEditManager = slider.gameObject.AddComponent<RuntimeSliderManager>();
-
-            endEditManager.OnEndEdit += () => setter(slider.value);
-            endEditManager.OnEndEdit += () =>
+            if (settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)))
             {
-                UpdateCityAttributeNetAction<float> action = new()
-                {
-                    CityIndex = CityIndex,
-                    WidgetPath = getWidgetName(),
-                    Value = slider.value
-                };
-                action.Execute();
-            };
+                sliderManager.mainSlider.onValueChanged.AddListener((f) => RoundAfterFrame().Forget());
+            }
 
-            endEditManager.OnEndEdit += CheckImmediateRedraw;
+            // add and init listeners
+            InitSlider(slider.gameObject.AddComponent<RuntimeSliderManager>());
 
             OnUpdateMenuValues += () =>
             {
@@ -737,6 +1302,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     setter((float)value);
                     slider.value = (float)value;
                     sliderManager.UpdateUI();
+                    TwoDecimalPlaces(settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)));
+                    CheckControlConditions();
                 }
             };
 
@@ -762,6 +1329,124 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
             }
+            return sliderGameObject;
+
+            async UniTask RoundAfterFrame()
+            {
+                await UniTask.Yield();
+                TwoDecimalPlaces(true);
+            }
+
+            void TwoDecimalPlaces(bool condition)
+            {
+                if (!condition)
+                {
+                    return;
+                }
+                if (sliderManager.valueText != null)
+                {
+                    sliderManager.valueText.text = slider.value.ToString("F2");
+                }
+                if (sliderManager.popupValueText != null)
+                {
+                    sliderManager.popupValueText.text = slider.value.ToString("F2");
+                }
+            }
+
+            void InitSlider(RuntimeSliderManager endEditManager)
+            {
+                if (!settingName.Equals(nameof(NodeLayoutAttributes.ArchitectureLayoutProportion)))
+                {
+                    endEditManager.OnEndEdit += () => setter(slider.value);
+                    endEditManager.OnEndEdit += () =>
+                    {
+                        UpdateCityAttributeNetAction<float> action = new()
+                        {
+                            CityIndex = CityIndex,
+                            WidgetPath = getWidgetName(),
+                            Value = slider.value
+                        };
+                        action.Execute();
+                    };
+
+                    endEditManager.OnEndEdit += CheckImmediateRedraw;
+                    endEditManager.OnEndEdit += CheckControlConditions;
+                }
+                else
+                {
+                    endEditManager.OnEndEdit += () =>
+                    {
+                        if (!ValidateChildrenFitAfterProportionChange())
+                        {
+                            return;
+                        }
+                        setter(slider.value);
+                        UpdateCityAttributeNetAction<float> action = new()
+                        {
+                            CityIndex = CityIndex,
+                            WidgetPath = getWidgetName(),
+                            Value = slider.value
+                        };
+                        action.Execute();
+                        CheckImmediateRedraw();
+                        CheckControlConditions();
+                    };
+                }
+            }
+
+            bool ValidateChildrenFitAfterProportionChange()
+            {
+                SEEReflexionCity rc = (SEEReflexionCity)city;
+                if (!city.gameObject.IsCodeCityDrawnAndActive())
+                {
+                    return false;
+                }
+
+                GameObject archRoot = rc.ReflexionGraph.ArchitectureRoot.GameObject();
+                if (archRoot.transform.localScale.z <= slider.value
+                    || archRoot.GetNode().Children().Count() == 0)
+                {
+                    return true;
+                }
+                if (archRoot.GetNode().Children().Count() > 0)
+                {
+                    if (slider.value > 0)
+                    {
+                        archRoot.GetNode().Children().ForEach(child =>
+                            child.GameObject().transform.SetParent(null, true));
+                        Vector3 prevScale = archRoot.transform.localScale;
+                        Vector3 prevPos = archRoot.transform.position;
+
+                        // Calculates the new position and scale for the architecture node.
+                        Transform root = archRoot.ContainingCity().gameObject.transform;
+                        float depth = root.lossyScale.z;
+                        Vector3 referencePoint = new(root.position.x, archRoot.transform.position.y, root.position.z);
+                        referencePoint.z += depth / 2;
+                        float length = depth * slider.value;
+                        Vector3 position = referencePoint;
+                        position.z -= length / 2;
+                        archRoot.transform.localScale = new Vector3(1, archRoot.transform.localScale.y, slider.value);
+                        archRoot.transform.position = position;
+                        // Check whether every child fits within the new architecture's bounds.
+                        bool valid = BoundsChecker.ValidateChildrenInBounds(archRoot.GetNode(), () =>
+                        {
+                            archRoot.transform.localScale = prevScale;
+                            archRoot.transform.position = prevPos;
+                        });
+                        archRoot.GetNode().Children().ForEach(child =>
+                            child.GameObject().transform.SetParent(archRoot.transform));
+                        if (valid)
+                        {
+                            immediateRedraw = true;
+                            return true;
+                        }
+                    }
+                }
+                ShowNotification.Warn("Proportion change failed.",
+                                $"The specified value {slider.value} would cause the children to exceed the new boundaries.");
+                slider.value = archRoot.transform.localScale.z;
+                return false;
+            }
         }
 
         /// <summary>
@@ -773,7 +1458,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
+        private GameObject CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
@@ -806,6 +1491,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             switchManager.OnEvents.AddListener(CheckImmediateRedraw);
+            switchManager.OnEvents.AddListener(CheckControlConditions);
 
             switchManager.OffEvents.AddListener(() => setter(false));
             switchManager.OffEvents.AddListener(() =>
@@ -820,6 +1506,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             switchManager.OffEvents.AddListener(CheckImmediateRedraw);
+            switchManager.OffEvents.AddListener(CheckControlConditions);
 
             OnUpdateMenuValues += () =>
             {
@@ -834,6 +1521,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     setter((bool)value);
                     switchManager.isOn = (bool)value;
                     switchManager.UpdateUI();
+                    CheckControlConditions();
                 }
             };
 
@@ -860,6 +1548,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
+            return switchGameObject;
         }
 
         /// <summary>
@@ -871,7 +1560,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
+        private GameObject CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
             GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // init the widget
@@ -906,6 +1595,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             inputField.onEndEdit.AddListener(_ => CheckImmediateRedraw());
+            inputField.onEndEdit.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => inputField.text = getter();
 
@@ -915,6 +1605,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     setter(value as string);
                     inputField.text = value as string;
+                    CheckControlConditions();
                 }
             };
 
@@ -941,6 +1632,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
             }
+            return stringGameObject;
         }
 
         private void CreateTypeField(GameObject parent, MultiGraphProvider provider)
@@ -1028,7 +1720,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
         /// <param name="recursive">whether it is called recursively (small editor menu)</param>
         /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
-        private void CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
+        private GameObject CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
             Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
             // convert the value names to an array
@@ -1067,6 +1759,7 @@ namespace SEE.UI.RuntimeConfigMenu
             });
 
             dropdown.dropdownEvent.AddListener(_ => CheckImmediateRedraw());
+            dropdown.dropdownEvent.AddListener(_ => CheckControlConditions());
 
             OnUpdateMenuValues += () => dropdown.ChangeDropdownInfo(Array.IndexOf(valueArray, getter()));
 
@@ -1076,6 +1769,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     setter((int)value);
                     dropdown.ChangeDropdownInfo((int)value);
+                    CheckControlConditions();
                 }
             };
 
@@ -1103,6 +1797,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
             }
+            return dropDownGameObject;
         }
 
         /// <summary>
@@ -1391,6 +2086,11 @@ namespace SEE.UI.RuntimeConfigMenu
             // add listener to update list
             OnUpdateMenuValues += () =>
             {
+                // This case can occur if a dictionary entry has been removed.
+                if (parent == null || addButton == null || removeButton == null)
+                {
+                    return;
+                }
                 UpdateListChildren(list, parent);
                 addButton.transform.SetAsLastSibling();
                 removeButton.transform.SetAsLastSibling();
@@ -1428,6 +2128,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => list[iCopy],
                         i.ToString(),
                         parent,
+                        false,
                         changedValue => list[iCopy] = changedValue as T
                     );
                 }
@@ -1446,7 +2147,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (!dict.Contains(child.name))
                 {
-                    Destroyer.Destroy(child);
+                    Destroyer.Destroy(child.gameObject);
                 }
             }
 
@@ -1459,6 +2160,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         () => dict[key],
                         key.ToString(),
                         parent,
+                        true,
                         changedValue => dict[key] = changedValue
                     );
                 }
@@ -1491,8 +2193,16 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
 
-            TriggerImmediateRedraw();
+            ImmediateRedraw();
+        }
 
+        /// <summary>
+        /// Triggers the immediate redraw <see cref="TriggerImmediateRedraw"/> of the city
+        /// locally and on all connected clients (the latter via <see cref="UpdateCityMethodNetAction"/>).
+        /// </summary>
+        private void ImmediateRedraw()
+        {
+            TriggerImmediateRedraw();
             UpdateCityMethodNetAction netAction = new()
             {
                 CityIndex = CityIndex,
@@ -1511,15 +2221,7 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-
-            city.Invoke(nameof(SEECity.LoadDataAsync), 0);
-            StartCoroutine(DrawNextFrame());
-
-            IEnumerator DrawNextFrame()
-            {
-                yield return 0;
-                city.Invoke(nameof(SEECity.DrawGraph), 0);
-            }
+            city.Invoke(nameof(SEECity.ReDrawGraph), 0);
         }
 
         /// <summary>

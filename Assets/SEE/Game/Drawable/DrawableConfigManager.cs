@@ -1,5 +1,6 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
+using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -199,12 +200,12 @@ namespace SEE.Game.Drawable
                     order = transform.GetComponentInParent<OrderInLayerValueHolder>().OrderInLayer;
                 }
                 bool lighting = false;
-                if (GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>() != null)
+                if (surface.GetRootParent().transform.GetComponentInChildren<Light>() != null)
                 {
-                    lighting = GameFinder.GetHighestParent(surface).transform.GetComponentInChildren<Light>().enabled;
+                    lighting = surface.GetRootParent().transform.GetComponentInChildren<Light>().enabled;
                 }
 
-                bool visibility = GameFinder.GetHighestParent(surface).activeInHierarchy;
+                bool visibility = surface.GetRootParent().activeInHierarchy;
 
                 DrawableHolder holder = surface.GetComponent<DrawableHolder>();
 
@@ -231,7 +232,7 @@ namespace SEE.Game.Drawable
                 if (attachedObjects != null)
                 {
                     /// Creates configurations for all lines of the drawable, except the Mind Map Node borders.
-                    GameObject[] lines = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                    GameObject[] lines = attachedObjects.FindAllDescendantsWithTagExcludingSpecificParentTag(
                         Tags.Line, Tags.MindMapNode).ToArray();
                     foreach (GameObject line in lines)
                     {
@@ -240,7 +241,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all texts of the drawable, except the Mind Map Node texts.
-                    GameObject[] texts = GameFinder.FindAllChildrenWithTagExceptParentHasTag(attachedObjects,
+                    GameObject[] texts = attachedObjects.FindAllDescendantsWithTagExcludingSpecificParentTag(
                         Tags.DText, Tags.MindMapNode).ToArray();
                     foreach (GameObject text in texts)
                     {
@@ -249,8 +250,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all images of the drawable.
-                    GameObject[] images = GameFinder.FindAllChildrenWithTag(attachedObjects,
-                        Tags.Image).ToArray();
+                    GameObject[] images = attachedObjects.FindAllDescendantsWithTag(Tags.Image).ToArray();
                     foreach (GameObject image in images)
                     {
                         ImageConf imageConf = ImageConf.GetImageConf(image);
@@ -258,7 +258,7 @@ namespace SEE.Game.Drawable
                     }
 
                     /// Creates configurations for all Mind Map nodes of the drawable.
-                    IList<GameObject> nodes = GameFinder.FindAllChildrenWithTag(attachedObjects, Tags.MindMapNode);
+                    IList<GameObject> nodes = attachedObjects.FindAllDescendantsWithTag(Tags.MindMapNode);
                     nodes = nodes.OrderBy(o => o.GetComponent<MMNodeValueHolder>().Layer).ToList();
                     foreach (GameObject node in nodes)
                     {

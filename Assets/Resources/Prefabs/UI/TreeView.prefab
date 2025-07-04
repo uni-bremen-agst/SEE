@@ -197,6 +197,7 @@ GameObject:
   - component: {fileID: 8918530655449257547}
   - component: {fileID: 3444143981090016800}
   - component: {fileID: 4789464308854986259}
+  - component: {fileID: 1406969187520639013}
   m_Layer: 5
   m_Name: SearchField
   m_TagString: Untagged
@@ -407,6 +408,18 @@ MonoBehaviour:
   m_FlexibleWidth: 100
   m_FlexibleHeight: -1
   m_LayoutPriority: 3
+--- !u!114 &1406969187520639013
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 842951385601223108}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8200dca4f813a2949a733aadb413d2f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &894369973855324406
 GameObject:
   m_ObjectHideFlags: 0
@@ -2610,7 +2623,7 @@ MonoBehaviour:
   m_Elasticity: 0.1
   m_Inertia: 1
   m_DecelerationRate: 0.135
-  m_ScrollSensitivity: 20
+  m_ScrollSensitivity: 0.1
   m_Viewport: {fileID: 6104944427379572325}
   m_HorizontalScrollbar: {fileID: 7161509444652221816}
   m_VerticalScrollbar: {fileID: 8823517661645426696}
@@ -2777,7 +2790,7 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 8823517660152590211}
   m_HandleRect: {fileID: 8823517660152590212}
   m_Direction: 2
-  m_Value: 0
+  m_Value: 1
   m_Size: 1
   m_NumberOfSteps: 0
   m_OnValueChanged:
@@ -2955,7 +2968,7 @@ PrefabInstance:
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 797
+      value: 1233
       objectReference: {fileID: 0}
     - target: {fileID: 3766619498664164433, guid: 4e7329bce1107abf6a795e345a0b2270,
         type: 3}

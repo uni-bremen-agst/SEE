@@ -10,6 +10,8 @@ namespace SEE.Utils
     /// </summary>
     public static class Icons
     {
+        public const char ArrowLeft = '\uF060';
+        public const char ArrowRight = '\uF061';
         public const char ArrowRotateLeft = '\uF0E2';
         public const char Bars = '\uF0C9';
         public const char Broadcast = '\uF519';
@@ -22,6 +24,7 @@ namespace SEE.Utils
         public const char CircleExclamationMark = '\uF06A';
         public const char CircleMinus = '\uF056';
         public const char CircleQuestionMark = '\uF059';
+        public const char City = '\uF64F';
         public const char Crosshairs = '\uF05B';
         public const char Code = '\uF121';
         public const char Compare = '\uE13A';
@@ -53,6 +56,7 @@ namespace SEE.Utils
         public const char Load = '\uF56F';
         public const char MagnifyingGlass = '\uF002';
         public const char MinusCheckbox = '\uF146';
+        public const char Modify = '\uF0AD';
         public const char Move = '\uF0B2';
         public const char MoveAPoint = '\uF4D7';
         public const char Node = '\uF1B2';
@@ -61,7 +65,7 @@ namespace SEE.Utils
         public const char PenToSquare = '\uF044';
         public const char Pencil = '\uF303';
         public const char QuestionMark = '?';
-        public const char Rotate = '\uF2F1';
+        public const char Resize = '\uF065';
         public const char Save = '\uF0C7';
         public const char Scale = '\uF424';
         public const char Shapes = '\uF61F';
@@ -76,6 +80,7 @@ namespace SEE.Utils
         public const char Text = '\uF031';
         public const char Trash = '\uF1F8';
         public const char TreeView = '\uF802';
+        public const char Upload = '\uE09A';
         public const char VR = '\uF729';
         public const char Whiteboard = '\uF51B';
     }

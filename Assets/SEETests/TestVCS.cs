@@ -1,8 +1,6 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
 using SEE.Utils.Paths;
-using System;
-using UnityEngine;
 
 namespace SEE.VCS
 {

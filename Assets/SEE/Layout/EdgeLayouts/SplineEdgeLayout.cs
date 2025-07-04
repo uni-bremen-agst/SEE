@@ -22,13 +22,15 @@ namespace SEE.Layout.EdgeLayouts
         }
 
         /// <summary>
-        /// Adds way points to each edge in the given list of<paramref name= "edges" />
+        /// Adds way points to each edge in the given list of <paramref name="edges"/>
         /// along a spline from its source to each target.
+        /// <para>
         /// The <paramref name="edges"/> are assumed to be in between pairs of nodes in
-        /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"\>
+        /// the given set of <paramref name="nodes"/>. The given <paramref name="nodes"/>
         /// are used to determine the height at which to draw the edges so that they
         /// do not pass through any other node and, hence, should include every node that
         /// may be in between sources and targets of any edge in <paramref name="edges"/>.
+        /// </para>
         /// </summary>
         /// <param name="nodes">nodes whose edges are to be drawn or which are
         /// ancestors of any nodes whose edges are to be drawn</param>

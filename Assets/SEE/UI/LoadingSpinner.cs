@@ -177,7 +177,7 @@ namespace SEE.UI
             if (!AsyncUtils.IsRunningOnMainThread)
             {
                 // If the game is not running, we'll just use a simple log message.
-                Debug.Log($"Running: {processMessage}");
+                Debug.Log($"Running: {processMessage}\n");
             }
 
             if (indeterminateProcesses.Add(processMessage) && !ReferenceEquals(loadingSpinner, null))
@@ -324,11 +324,12 @@ namespace SEE.UI
         /// will be <c>null</c> afterwards.
         /// </summary>
         /// <remarks>Called by Unity.</remarks>
-        private void OnDisable()
+        protected override void OnDisable()
         {
             // AXIVION Routine C#-MethodShouldBeDeclaredStatic: This method is interpreted by Unity.
             Destroyer.Destroy(loadingSpinner);
             loadingSpinner = null;
+            base.OnDisable();
         }
 
         /// <summary>

@@ -1,6 +1,8 @@
 ﻿using SEE.Controls.KeyActions;
 using SEE.Utils;
 using UnityEngine;
+using SEE.GO;
+using SEE.XR;
 
 namespace SEE.Controls
 {
@@ -96,15 +98,6 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Opens/closes the search menu.
-        /// </summary>
-        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
-        internal static bool ToggleSearch()
-        {
-            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.ToggleSettings);
-        }
-
-        /// <summary>
         /// True if KeyboardShortcutsEnabled and the key for the given <paramref name="digit"/>
         /// was pressed. Used as shortcuts for the menu entries.
         ///
@@ -124,6 +117,12 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Undo()
         {
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.UndoToggle)
+            {
+                bool undo = XRSEEActions.UndoToggle;
+                XRSEEActions.UndoToggle = false;
+                return undo;
+            }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -145,6 +144,12 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Redo()
         {
+            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.RedoToggle)
+            {
+                bool redo = XRSEEActions.RedoToggle;
+                XRSEEActions.RedoToggle = false;
+                return redo;
+            }
 #if UNITY_EDITOR == false
             // Ctrl keys are not available when running the game in the editor
             if (Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl))
@@ -591,6 +596,87 @@ namespace SEE.Controls
 
         #endregion
 
+        //----------------------------------------------------
+        #region Mouse Interaction
+
+        /// <summary>
+        /// Registers the users left mouse button input.
+        /// </summary>
+        /// <returns>true if the user uses the left mouse button.</returns>
+        public static bool LeftMouseInteraction()
+        {
+            return Input.GetMouseButton(leftMouseButton);
+        }
+
+        /// <summary>
+        /// Registers the users left mouse down input.
+        /// </summary>
+        /// <remarks>
+        /// This is only <c>true</c> in the exact frame the mouse button is pressed down.
+        /// </remarks>
+        /// <returns>True if the user uses left mouse down.</returns>
+        public static bool LeftMouseDown()
+        {
+            return Input.GetMouseButtonDown(leftMouseButton);
+        }
+
+        /// <summary>
+        /// Registers the users right mouse button input.
+        /// </summary>
+        /// <returns>true if the user uses the left mouse button.</returns>
+        public static bool RightMouseInteraction()
+        {
+            return Input.GetMouseButton(rightMouseButton);
+        }
+
+        /// <summary>
+        /// Registers the uses mouse button up input (release the selected button).
+        /// </summary>
+        /// <param name="state">The mouse button which should be observed.</param>
+        /// <returns>true if the user releases the selected mouse button.</returns>
+        public static bool MouseUp(MouseButton state)
+        {
+            return Input.GetMouseButtonUp((int)state);
+        }
+
+        /// <summary>
+        /// Registers the uses mouse button input (button holded).
+        /// </summary>
+        /// <param name="state">The mouse button which should be observed.</param>
+        /// <returns>true if the user holds the selected mouse button.</returns>
+        public static bool MouseHold(MouseButton state)
+        {
+            return Input.GetMouseButton((int)state);
+        }
+
+        /// <summary>
+        /// Registers the uses mouse down button input (button down).
+        /// </summary>
+        /// <param name="state">The mouse down button which should be observed.</param>
+        /// <returns>true if the user press the selected mouse button.</returns>
+        public static bool MouseDown(MouseButton state)
+        {
+            return Input.GetMouseButtonDown((int)state);
+        }
+
+        /// <summary>
+        /// Registers the use of the mouse wheel for scrolling down.
+        /// </summary>
+        /// <returns>True if the user scrolls down.</returns>
+        public static bool ScrollDown()
+        {
+            return Input.mouseScrollDelta.y <= -0.1;
+        }
+
+        /// <summary>
+        /// Registers the use of the mouse wheel for scrolling up.
+        /// </summary>
+        /// <returns>True if the user scrolls up.</returns>
+        public static bool ScrollUp()
+        {
+            return Input.mouseScrollDelta.y >= 0.1;
+        }
+        #endregion
         //----------------------------------------------------
         #region Chat
         //----------------------------------------------------

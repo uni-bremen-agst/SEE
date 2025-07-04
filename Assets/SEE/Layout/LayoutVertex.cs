@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Layout
 {
@@ -16,8 +14,8 @@ namespace SEE.Layout
         /// <param name="index">the unique ID of the node (a number to be converted into a string)</param>
         public LayoutVertex(Vector3 initialSize, int index)
         {
-            scale = initialSize;
-            id = index.ToString();
+            AbsoluteScale = initialSize;
+            this.id = index.ToString();
         }
 
         /// <summary>
@@ -26,7 +24,7 @@ namespace SEE.Layout
         /// <param name="id">unique ID of the node</param>
         public LayoutVertex(string id)
         {
-            scale = Vector3.zero;
+            AbsoluteScale = Vector3.zero;
             this.id = id;
         }
 
@@ -36,146 +34,64 @@ namespace SEE.Layout
         private readonly string id;
 
         /// <summary>
-        /// Immediate ancestor of the node. May be null, if the node is a root.
+        /// <see cref="IGameNode.ID"/>.
         /// </summary>
-        public ILayoutNode Parent { get; private set; }
+        public override string ID => id;
+
+        #region IGameNode
 
         /// <summary>
-        /// The level of the node in the node hierarchy, that is, the number
-        /// of ancestors. A root has level 0.
+        /// Implementation of <see cref="ILayoutNode.HasType(string)"/>.
         /// </summary>
-        public int Level { get; set; } = 0;
-
-        /// <summary>
-        /// Immediate children of the node.
-        /// </summary>
-        private readonly List<ILayoutNode> children = new();
-
-        /// <summary>
-        /// Immediate children of the node.
-        /// </summary>
-        public ICollection<ILayoutNode> Children()
+        /// <param name="typeName">ignored</param>
+        /// <returns>always false</returns>
+        public override bool HasType(string typeName)
         {
-            return children;
+            return false;
         }
 
         /// <summary>
-        /// Adds given <paramref name="node"/> to the children of this node.
+        /// <see cref="IGameNode.AbsoluteScale"/>.
         /// </summary>
-        /// <param name="node">child node</param>
-        public void AddChild(LayoutVertex node)
-        {
-            children.Add(node);
-            node.Parent = this;
-        }
+        public override Vector3 AbsoluteScale { set; get; }
 
         /// <summary>
-        /// The local scale of the node, that is, the size of the node
-        /// relative to its parent. If size is Vector3.one, the node is
-        /// as large as its parent.
+        /// <see cref="IGameNode.ScaleXZBy(float)"/>.
         /// </summary>
-        private Vector3 scale;
-
-        /// <summary>
-        /// The local scale of the node, that is, the size of the node
-        /// relative to its parent. If size is Vector3.one, the node is
-        /// as large as its parent.
-        /// </summary>
-        public Vector3 LocalScale
+        public override void ScaleXZBy(float factor)
         {
-            get => scale;
-            set => scale = value;
-        }
-
-        /// <summary>
-        /// Increases the size of this node by the given factor.
-        /// </summary>
-        /// <param name="factor">factor by which to multiply this node's scale</param>
-        public void ScaleBy(float factor)
-        {
-            scale *= factor;
-        }
-
-        public void SetOrigin()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void SetRelative(ILayoutNode node)
-        {
-            throw new NotImplementedException();
+            Vector3 result = AbsoluteScale;
+            result.x *= factor;
+            result.z *= factor;
+            AbsoluteScale = result;
         }
 
         /// <summary>
         /// The center position of the node.
         /// </summary>
-        private Vector3 centerPosition;
-
-        /// <summary>
-        /// The center position of the node.
-        /// </summary>
-        public Vector3 CenterPosition
-        {
-            get => centerPosition;
-            set => centerPosition = value;
-        }
+        public override Vector3 CenterPosition { set; get; }
 
         /// <summary>
         /// The X-Z center position of the node's roof.
         /// </summary>
-        public Vector3 Roof
+        public override Vector3 Roof
         {
-            get => centerPosition + 0.5f * scale.y * Vector3.up;
+            get => CenterPosition + 0.5f * AbsoluteScale.y * Vector3.up;
         }
 
         /// <summary>
         /// The X-Z center position of the node's ground.
         /// </summary>
-        public Vector3 Ground
+        public override Vector3 Ground
         {
-            get => centerPosition - 0.5f * scale.y * Vector3.up;
+            get => CenterPosition - 0.5f * AbsoluteScale.y * Vector3.up;
         }
-
-        /// <summary>
-        /// True if this node is a leaf, that is, has no children.
-        /// </summary>
-        public bool IsLeaf => children.Count == 0;
-
-        /// <summary>
-        /// The unique ID of this node.
-        /// </summary>
-        public string ID { get => id; }
 
         /// <summary>
         /// The rotation of the node along the y axis in degrees.
         /// </summary>
-        private float rotation;
+        public override float Rotation { set; get; }
 
-        /// <summary>
-        /// The rotation of the node along the y axis in degrees.
-        /// </summary>
-        public float Rotation
-        {
-            get => rotation;
-            set => rotation = value;
-        }
-
-        /// <summary>
-        /// The set of successor nodes.
-        /// </summary>
-        public ICollection<ILayoutNode> Successors => new List<ILayoutNode>();
-
-        /// <summary>
-        /// The scale of the node in world space, i.e., in absolute Unity units
-        /// independent of its parent.
-        /// </summary>
-        public Vector3 AbsoluteScale => scale;
-
-        public Vector3 RelativePosition { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSublayoutNode { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public bool IsSublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public Sublayout Sublayout { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public ILayoutNode SublayoutRoot { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public GameObject GameObject => throw new NotImplementedException();
+        #endregion IGameNode
     }
 }

@@ -1,4 +1,5 @@
 ﻿using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
 using System.Collections.Generic;
@@ -7,22 +8,27 @@ using UnityEngine;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// This class propagates an undo of <see cref="DeleteAction"/> to all clients
+    /// This class revives nodes and/or edges previously deleted at all clients
     /// in the network, that is, it revives game objects representing a node
-    /// or edge previously marked as deleted.
+    /// or edge previously marked as deleted (but not actually deleted).
     ///
-    /// Precondition: The objects to be revived were in fact previously deleted.
+    /// Precondition: The objects to be revived were in fact previously
+    /// marked as deleted.
     /// </summary>
-    public class ReviveNetAction : AbstractNetAction
+    /// <remarks>If the objects to be revived were actually deleted, use
+    /// <see cref="RestoreNetAction"/> instead.</remarks>
+    public class ReviveNetAction : RegenerateNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
 
         /// <summary>
-        /// A serialization of the unique names of the gameObjects of a node or edge that
-        /// are to be revived.
+        /// A serialization of the unique names of the gameObjects representing either
+        /// a node or an edge that are to be revived.
+        /// The type is assumed to be a list of strings, where each string is a unique name
+        /// identifying a game object representing either a node or edge in the scene.
         /// </summary>
-        public string GameObjectIDList;
+        public string GraphElementIDs;
 
         /// <summary>
         /// Creates a new <see cref="ReviveNetAction"/>.
@@ -35,30 +41,23 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="gameObjectIDs">the list of unique names of the gameObjects representing
         /// a node or edge that have to be revived</param>
+        /// <param name="nodeTypes">the map of the node types to be restored.</param>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
         /// or any of its elements is null</exception>
-        public ReviveNetAction(List<string> gameObjectIDs)
+        public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
+            : base(nodeTypes)
         {
-            GameObjectIDList = StringListSerializer.Serialize(gameObjectIDs);
+            GraphElementIDs = StringListSerializer.Serialize(gameObjectIDs);
         }
 
         /// <summary>
-        /// Things to execute on the server (none for this class). Necessary because it is abstract
-        /// in the superclass.
-        /// </summary>
-        public override void ExecuteOnServer()
-        {
-            // Intentionally left blank.
-        }
-
-        /// <summary>
-        /// Revives the game object identified by <see cref="GameObjectIDList"/> on each client.
+        /// Revives the game object identified by <see cref="GraphElementIDs"/> on each client.
         /// </summary>
         public override void ExecuteOnClient()
         {
-            ISet<string> gameObjectIDs = new HashSet<string>(StringListSerializer.Unserialize(GameObjectIDList));
-            ISet<GameObject> gameObjects = SceneQueries.Find(gameObjectIDs);
-            GameElementDeleter.Revive(gameObjects);
+            GameElementDeleter.Revive(SceneQueries.Find
+                                          (new HashSet<string>(StringListSerializer.Unserialize(GraphElementIDs))),
+                                      ToMap());
         }
     }
 }

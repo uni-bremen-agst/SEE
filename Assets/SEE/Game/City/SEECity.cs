@@ -1,25 +1,25 @@
+using Cysharp.Threading.Tasks;
+using MoreLinq;
+using SEE.DataModel;
+using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
+using SEE.Game.CityRendering;
+using SEE.GameObjects;
+using SEE.GO;
+using SEE.GraphProviders;
+using SEE.UI;
+using SEE.UI.Notification;
+using SEE.UI.RuntimeConfigMenu;
+using SEE.Utils;
+using SEE.Utils.Config;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
-using Cysharp.Threading.Tasks;
-using MoreLinq;
-using SEE.DataModel.DG;
-using SEE.UI.RuntimeConfigMenu;
-using SEE.GO;
-using SEE.Utils;
-using Sirenix.OdinInspector;
 using UnityEngine;
 using UnityEngine.Assertions;
-using SEE.Game.CityRendering;
-using SEE.UI;
-using SEE.Utils.Config;
-using Sirenix.Serialization;
-using SEE.GraphProviders;
-using SEE.UI.Notification;
-using SEE.DataModel.DG.IO;
-using SEE.DataModel;
-using SEE.GameObjects;
 
 namespace SEE.Game.City
 {
@@ -40,7 +40,7 @@ namespace SEE.Game.City
         [OdinSerialize, ShowInInspector,
          Tooltip("A graph provider yielding the data to be visualized as a code city."),
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
-         HideReferenceObjectPicker]
+         HideReferenceObjectPicker, RuntimeGroupOrder(DataProviderOrder)]
         public SingleGraphPipelineProvider DataProvider = new();
 
         /// <summary>
@@ -120,7 +120,7 @@ namespace SEE.Game.City
         /// <summary>
         /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
-        private bool IsPipelineRunning;
+        protected bool IsPipelineRunning;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -145,7 +145,6 @@ namespace SEE.Game.City
                 else if (visualizedSubGraph == null)
                 {
                     visualizedSubGraph = RelevantGraph(LoadedGraph);
-                    SetupCompoundSpringEmbedder(visualizedSubGraph);
                 }
                 return visualizedSubGraph;
             }
@@ -325,10 +324,12 @@ namespace SEE.Game.City
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
+        /// <returns>True if the menus need to be adjusted; otherwise, false.
+        /// Required for <see cref="SEEReflexionCity"/>.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual async UniTask LoadDataAsync()
+        public virtual async UniTask<bool> LoadDataAsync()
         {
             if (DataProvider != null)
             {
@@ -337,21 +338,19 @@ namespace SEE.Game.City
                     using (LoadingSpinner.ShowDeterminate($"Loading city \"{gameObject.name}\"...",
                                                           out Action<float> reportProgress))
                     {
-                        ShowNotification.Info("SEECity", "Loading graph");
                         IsPipelineRunning = true;
+
+                        ReportProgress(0.01f);
+
+                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
+                                                                      cancellationTokenSource.Token);
+                        IsPipelineRunning = false;
 
                         void ReportProgress(float x)
                         {
                             ProgressBar = x;
                             reportProgress(x);
                         }
-
-                        ReportProgress(0.01f);
-
-                        LoadedGraph = await DataProvider.ProvideAsync(new Graph(""), this, ReportProgress,
-                            cancellationTokenSource.Token);
-                        IsPipelineRunning = false;
-                        ShowNotification.Info("SEECity", $"{DataProvider.Pipeline.Count()} Graph provider finished:");
                     }
                 }
                 catch (OperationCanceledException)
@@ -370,6 +369,7 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
+            return false;
         }
 
         /// <summary>
@@ -378,7 +378,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
-        [EnableIf(nameof(IsGraphLoaded))]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
             string outputFile = Application.streamingAssetsPath + "/output.gxl";
@@ -390,11 +390,81 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Returns whether the graph has been loaded.
+        /// </summary>
+        protected bool IsGraphLoaded => loadedGraph != null;
+
+        /// <summary>
+        /// Draws the graph.
+        /// Precondition: The graph and its metrics have been loaded.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Draw Data")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
+        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        public virtual void DrawGraph()
+        {
+            if (IsPipelineRunning)
+            {
+                ShowNotification.Error("Graph Drawing", "Graph provider pipeline is still running.");
+                return;
+            }
+            if (LoadedGraph != null)
+            {
+                DrawGraphAsync(VisualizedSubGraph).Forget();
+            }
+            else
+            {
+                ShowNotification.Error("Graph Drawing", "No graph loaded.");
+            }
+        }
+
+        /// <summary>
+        /// Draws <paramref name="graph"/>.
+        /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
+        /// </summary>
+        /// <param name="graph">graph to be drawn</param>
+        protected async UniTaskVoid DrawGraphAsync(Graph graph)
+        {
+            GraphRenderer renderer = new(this, graph);
+            try
+            {
+                using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
+                {
+                    void ReportProgress(float x)
+                    {
+                        ProgressBar = x;
+                        updateProgress(x);
+                    }
+
+                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
+                throw;
+            }
+
+            // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
+            // game starts. Otherwise, in playmode, we have to call it ourselves.
+            if (Application.isPlaying)
+            {
+                InitializeAfterDrawn();
+            }
+        }
+
+        /// <summary>
+        /// True if the graph has been drawn (and of course loaded).
+        /// </summary>
+        protected bool IsGraphDrawn => IsGraphLoaded && gameObject.IsCodeCityDrawn();
+
+        /// <summary>
         /// Re-draws the graph without deleting the underlying loaded graph.
         /// Only the game objects generated for the nodes are deleted first.
         /// Precondition: The graph and its metrics have been loaded.
         /// </summary>
-        public void ReDrawGraph()
+        public virtual void ReDrawGraph()
         {
             if (LoadedGraph == null)
             {
@@ -408,84 +478,11 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Returns whether the graph has been loaded.
-        /// </summary>
-        private bool IsGraphLoaded => loadedGraph != null;
-
-        /// <summary>
-        /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
-        /// </summary>
-        [Button(ButtonSizes.Small, Name = "Draw Data")]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
-        [EnableIf(nameof(IsGraphLoaded))]
-        public virtual void DrawGraph()
-        {
-            if (IsPipelineRunning)
-            {
-                ShowNotification.Error("SEECity", "Graph provider pipeline is still running");
-                return;
-            }
-
-            if (LoadedGraph == null)
-            {
-                Debug.LogError("No graph loaded.\n");
-            }
-            else
-            {
-                Graph theVisualizedSubGraph = VisualizedSubGraph;
-                if (ReferenceEquals(theVisualizedSubGraph, null))
-                {
-                    Debug.LogError("No graph loaded.\n");
-                }
-                else
-                {
-                    DrawAsync(theVisualizedSubGraph).Forget();
-                }
-            }
-
-            return;
-
-            async UniTaskVoid DrawAsync(Graph subGraph)
-            {
-                graphRenderer = new GraphRenderer(this, subGraph);
-                // We assume here that this SEECity instance was added to a game object as
-                // a component. The inherited attribute gameObject identifies this game object.
-                try
-                {
-                    using (LoadingSpinner.ShowDeterminate($"Drawing city \"{gameObject.name}\"", out Action<float> updateProgress))
-                    {
-                        void ReportProgress(float x)
-                        {
-                            ProgressBar = x;
-                            updateProgress(x);
-                        }
-
-                        await graphRenderer.DrawGraphAsync(subGraph, gameObject, ReportProgress, cancellationTokenSource.Token);
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    ShowNotification.Warn("Drawing cancelled", "Drawing was cancelled.\n", log: true);
-                    throw;
-                }
-
-                // If we're in editmode, InitializeAfterDrawn() will be called by Start() once the
-                // game starts. Otherwise, in playmode, we have to call it ourselves.
-                if (Application.isPlaying)
-                {
-                    InitializeAfterDrawn();
-                }
-            }
-        }
-
-        /// <summary>
         /// The graph renderer used to draw the city.
         ///
         /// Neither serialized nor saved to the config file.
         /// </summary>
-        private GraphRenderer graphRenderer;
+        protected GraphRenderer graphRenderer;
 
         /// <summary>
         /// Yields the graph renderer that draws this city.
@@ -517,21 +514,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Reads the a saved layout of the city from a file named <see cref="LayoutPath"/>.
-        /// The format of the written file depends upon the file extension. If the extension
-        /// is <see cref="Filenames.GVLExtension"/> it is expected to be in the GVL format; otherwise
-        /// the file is assumed to be in the SLD format.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
-        [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
-        public void LoadLayout()
-        {
-            ICollection<GameObject> gameNodes = AllNodeDescendants(gameObject);
-            graphRenderer.LoadLayout(gameNodes, gameObject.transform.position.y);
-        }
-
-        /// <summary>
         /// This method will cancel any running graph provider pipeline and delete the currently
         /// loaded graph.
         /// </summary>
@@ -551,6 +533,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Resets everything that is specific to a given graph. Here: the selected node types,
         /// the underlying and visualized graph, and all game objects visualizing information about it.
+        /// And enables the <see cref="CitySelectionManager"/> to add a new <see cref="AbstractSEECity"/>.
         /// </summary>
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
@@ -564,6 +547,10 @@ namespace SEE.Game.City
             if (TryGetComponent(out GitPoller poller))
             {
                 Destroyer.Destroy(poller);
+            }
+            if (TryGetComponent(out CitySelectionManager csm))
+            {
+                csm.enabled = true;
             }
         }
 
@@ -599,6 +586,21 @@ namespace SEE.Game.City
             else
             {
                 DumpNodeMetrics(new List<Graph>() { loadedGraph });
+            }
+        }
+
+        /// <summary>
+        /// Checks whether the <see cref="Graph.UnknownType"/> is present in <see cref="AbstractSEECity.NodeTypes"/>
+        /// and adds it with a magenta color if missing.
+        /// </summary>
+        public void CheckAndAddUnknownNodeType()
+        {
+            if (!NodeTypes.TryGetValue(Graph.UnknownType, out VisualNodeAttributes _))
+            {
+                VisualNodeAttributes visualNodeAttributes = new();
+                visualNodeAttributes.ColorProperty.TypeColor = Color.magenta;
+                visualNodeAttributes.ShowNames = true;
+                NodeTypes[Graph.UnknownType] = visualNodeAttributes;
             }
         }
 

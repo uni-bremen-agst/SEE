@@ -1,6 +1,4 @@
-﻿using SEE.DataModel.DG;
-using SEE.Layout.NodeLayouts.Cose;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -12,15 +10,9 @@ namespace SEE.Layout.NodeLayouts
     /// Published in: Proceeding INFOVIS '98 Proceedings of the 1998 IEEE Symposium on
     /// Information Visualization, Pages 19-25.
     /// </summary>
-    public class BalloonNodeLayout : HierarchicalNodeLayout
+    public class BalloonNodeLayout : NodeLayout
     {
-        /// <summary>
-        /// Constructor.
-        /// </summary>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        public BalloonNodeLayout(float groundLevel)
-            : base(groundLevel)
+        static BalloonNodeLayout()
         {
             Name = "Balloon";
         }
@@ -28,7 +20,7 @@ namespace SEE.Layout.NodeLayouts
         /// <summary>
         /// Information about a node necessary to draw it.
         /// </summary>
-        private struct NodeInfo
+        private readonly struct NodeInfo
         {
             public readonly float Radius;
             public readonly float OuterRadius;
@@ -36,23 +28,30 @@ namespace SEE.Layout.NodeLayouts
 
             public NodeInfo(float radius, float outerRadius, float referenceLengthChildren)
             {
-                this.Radius = radius;
-                this.OuterRadius = outerRadius;
-                this.ReferenceLengthChildren = referenceLengthChildren;
+                Radius = radius;
+                OuterRadius = outerRadius;
+                ReferenceLengthChildren = referenceLengthChildren;
             }
         }
 
         /// <summary>
         /// A mapping of nodes onto their circle data.
         /// </summary>
-        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new Dictionary<ILayoutNode, NodeInfo>();
+        private readonly Dictionary<ILayoutNode, NodeInfo> nodeInfos = new();
 
         /// <summary>
         /// The node layout we compute as a result.
         /// </summary>
         private Dictionary<ILayoutNode, NodeTransform> layoutResult;
 
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(IEnumerable<ILayoutNode> gameNodes)
+        /// <summary>
+        /// See <see cref="NodeLayout.Layout"/>.
+        /// </summary>
+        /// <exception cref="Exception">thrown if there is no root in <paramref name="gameNodes"/></exception>
+        protected override Dictionary<ILayoutNode, NodeTransform> Layout
+            (IEnumerable<ILayoutNode> gameNodes,
+             Vector3 centerPosition,
+             Vector2 rectangle)
         {
             // puts the outermost circles of the roots next to each other;
             // later we might use a circle-packing algorithm instead,
@@ -65,7 +64,7 @@ namespace SEE.Layout.NodeLayouts
             Roots = LayoutNodes.GetRoots(gameNodes);
             if (Roots.Count == 0)
             {
-                throw new System.Exception("Graph has no root nodes.");
+                throw new Exception("Graph has no root nodes.");
             }
 
             // the maximal radius over all root circles; required to create the plane underneath
@@ -170,7 +169,7 @@ namespace SEE.Layout.NodeLayouts
             if (node.IsLeaf)
             {
                 // Necessary size of the block independent of the parent
-                Vector3 size = node.LocalScale;
+                Vector3 size = node.AbsoluteScale;
 
                 // The outer radius of an inner-most node is determined by the ground
                 // rectangle of the block to be drawn for the node.
@@ -243,19 +242,16 @@ namespace SEE.Layout.NodeLayouts
             {
                 // leaf
                 // leaves will only be positioned; we maintain their original scale
-                layoutResult[node] = new NodeTransform(position, node.LocalScale);
+                layoutResult[node] = new NodeTransform(position.x, position.z, node.AbsoluteScale);
             }
             else
             {
                 // inner node
                 // inner nodes will be positioned and scaled, primarily in x and z axes;
-                // the inner nodes will be slightly lifted along the y axis according to their
-                // tree depth so that they can be stacked visually (level 0 is at the bottom)
-                position.y += LevelLift(node);
                 layoutResult[node]
-                    = new NodeTransform(position,
+                    = new NodeTransform(position.x, position.z,
                                         new Vector3(2 * nodeInfos[node].OuterRadius,
-                                                    node.LocalScale.y,
+                                                    node.AbsoluteScale.y,
                                                     2 * nodeInfos[node].OuterRadius));
 
                 // The center points of the children circles are located on the circle
@@ -298,7 +294,7 @@ namespace SEE.Layout.NodeLayouts
                         // point, P, are isosceles triangles, with |cp_p - P| = |cp_p - cp_c| = r_p
                         // and |cp_c - P| = r_c. The angle alpha of this isosceles triangle is
                         // 2 * arcsin(r_c / (2*r_p)).
-                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
+                        double alpha = 2 * Math.Asin(childOuterRadius / (2 * parentInnerRadius));
                         //Debug.Log(node.name + " 1) Alpha:         " + alpha + "\n");
 
                         // There are two identical isosceles triangles, one for each of the two
@@ -334,7 +330,7 @@ namespace SEE.Layout.NodeLayouts
 
                         // Asin (arcsin) returns an angle, θ, measured in radians, such that
                         // -π/2 ≤ θ ≤ π/2 -or- NaN if d < -1 or d > 1 or d equals NaN.
-                        double alpha = 2 * System.Math.Asin(childOuterRadius / (2 * parentInnerRadius));
+                        double alpha = 2 * Math.Asin(childOuterRadius / (2 * parentInnerRadius));
 
                         if (accummulatedAlpha > 0.0)
                         {
@@ -345,9 +341,9 @@ namespace SEE.Layout.NodeLayouts
                         }
                         // Convert polar coordinate back to cartesian coordinate.
                         Vector3 childCenter;
-                        childCenter.x = position.x + (float)(parentInnerRadius * System.Math.Cos(accummulatedAlpha));
-                        childCenter.y = GroundLevel;
-                        childCenter.z = position.z + (float)(parentInnerRadius * System.Math.Sin(accummulatedAlpha));
+                        childCenter.x = position.x + (float)(parentInnerRadius * Math.Cos(accummulatedAlpha));
+                        childCenter.y = position.y;
+                        childCenter.z = position.z + (float)(parentInnerRadius * Math.Sin(accummulatedAlpha));
 
                         DrawCircles(child, childCenter);
 
@@ -356,16 +352,6 @@ namespace SEE.Layout.NodeLayouts
                     }
                 }
             }
-        }
-
-        public override Dictionary<ILayoutNode, NodeTransform> Layout(ICollection<ILayoutNode> layoutNodes, ICollection<Edge> edges, ICollection<SublayoutLayoutNode> sublayouts)
-        {
-            throw new NotImplementedException();
-        }
-
-        public override bool UsesEdgesAndSublayoutNodes()
-        {
-            return false;
         }
     }
 }

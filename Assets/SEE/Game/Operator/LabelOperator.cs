@@ -1,6 +1,4 @@
-using System.Linq;
 using DG.Tweening;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using TMPro;
@@ -49,6 +47,15 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Returns true if the label is not empty.
+        /// </summary>
+        /// <returns>True if the label is not empty.</returns>
+        public bool LabelIsNotEmpty()
+        {
+            return !string.IsNullOrWhiteSpace(labelText?.text);
+        }
+
+        /// <summary>
         /// Creates and prepares the <see cref="nodeLabel"/> game object along with its components.
         /// If <see cref="nodeLabel"/> already exists, nothing will happen.
         /// </summary>
@@ -88,8 +95,14 @@ namespace SEE.Game.Operator
                 line.transform.SetParent(nodeLabel.transform);
 
                 // The nodeLabel and its child edge must inherit the portal of gameObject.
-                Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack);
-                Portal.SetPortal(nodeLabel, leftFront, rightBack);
+                if (Portal.GetPortal(gameObject, out Vector2 leftFront, out Vector2 rightBack))
+                {
+                    Portal.SetPortal(nodeLabel, leftFront, rightBack);
+                }
+                else
+                {
+                    Debug.LogError("Could not retrieve portal for node label.\n", gameObject);
+                }
 
                 // Make it invisible, initially.
                 if (nodeLabel.TryGetComponentOrLog(out labelText) && line.TryGetComponentOrLog(out labelLineRenderer))
