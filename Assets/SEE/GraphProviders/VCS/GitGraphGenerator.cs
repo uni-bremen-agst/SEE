@@ -187,13 +187,14 @@ namespace SEE.GraphProviders.VCS
             {
                 throw new OperationCanceledException(token);
             }
+            // Includes all commits between the baseline commit and the commitID
+            // including the commitID itself but excluding the baseline commit.
             IEnumerable<Commit> commitList = repository.CommitsBetween(baselineCommitID, commitID);
             percentage = 0.3f;
             changePercentage?.Invoke(percentage);
 
             int commitCount = commitList.Count();
             int currentCommitIndex = 0;
-            Commit previousCommit = null;
 
             foreach (Commit commit in commitList)
             {
@@ -201,19 +202,12 @@ namespace SEE.GraphProviders.VCS
                 {
                     throw new OperationCanceledException(token);
                 }
-                // baselineCommitID is not part of the commitList. We compare the first commit
-                // of the commitlist with the baselineCommitID.
-                if (currentCommitIndex == 0)
-                {
-                    previousCommit = repository.GetCommit(baselineCommitID);
-                }
-                UpdateMetricsForPatch(fileToMetrics, commit, repository.Diff(previousCommit, commit), false, null);
-                previousCommit = commit;
+                Debug.Log($"Processing commit {commit.Id}\n");
+                UpdateMetricsForCommit(fileToMetrics, repository, commit, false, null);
                 currentCommitIndex++;
+                changePercentage?.Invoke(Mathf.Clamp((float)currentCommitIndex / commitCount, percentage, 0.98f));
             }
 
-            //UpdateMetricsForPatch(fileToMetrics, repository.GetCommit(commitID), repository.Diff(baselineCommitID, commitID), false, null);
-            changePercentage?.Invoke(0.9f);
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
 
             changePercentage?.Invoke(1f);
@@ -308,7 +302,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="fileToMetrics">metrics will be calculated for the files therein and added to this map</param>
         /// <param name="commit">The commit that should be processed. Only its <see cref="Commit.Author"/>
         /// will be used.</param>
-        /// <param name="patch">The changes the commit has made. This will be most likely the
+        /// <param name="patch">The changes the <paramref name="commit"/> has made. This will be most likely the
         /// changes between this commit and its parent. Can be null.</param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
@@ -339,7 +333,10 @@ namespace SEE.GraphProviders.VCS
                     continue;
                 }
 
-                Debug.Log($"Processing file {filePath} for {commit.Id}.\n");
+                if (filePath == "Assets/SEE/GraphProviders/VCSGraphProvider.cs")
+                {
+                    Debug.Log($"Processing file {filePath} for {commit.Id}.\n");
+                }
 
                 int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
 
@@ -419,7 +416,7 @@ namespace SEE.GraphProviders.VCS
         /// If <paramref name="commit"/> is null, nothing happens.
         ///
         /// Otherwise, the metrics will be calculated between <paramref name="commit"/> and
-        /// its first parent. If a commit has no parent, <paramref name="commit"/> is the
+        /// all its parents. If a commit has no parent, <paramref name="commit"/> is the
         /// very first commit in the version history, which is perfectly okay.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map</param>
@@ -439,12 +436,17 @@ namespace SEE.GraphProviders.VCS
             {
                 return;
             }
-
-            Patch patch = commit.Parents.Any()
-                ? gitRepository.Diff(commit, commit.Parents.First())
-                : gitRepository.Diff(null, commit);
-
-            UpdateMetricsForPatch(fileToMetrics, commit, patch, consultAliasMap, authorAliasMap);
+            if (commit.Parents.Any())
+            {
+                foreach (Commit parent in commit.Parents)
+                {
+                    UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(parent, commit), consultAliasMap, authorAliasMap);
+                }
+            }
+            else
+            {
+                UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(null, commit), consultAliasMap, authorAliasMap);
+            }
         }
 
         /// <summary>
@@ -453,7 +455,6 @@ namespace SEE.GraphProviders.VCS
         /// <param name="repositoryFilePath">The file path from the node. This must be a relative path
         /// in the syntax of the repository regarding the directory separator</param>
         /// <param name="repository">The repository from which the file content is retrieved.</param>
-        /// <param name="commitID">The commitID where the files exist.</param>
         /// <param name="language">The language the given text is written in.</param>
         /// <returns>The token stream for the specified file and commit.</returns>
         private static ICollection<AntlrToken> RetrieveTokens
