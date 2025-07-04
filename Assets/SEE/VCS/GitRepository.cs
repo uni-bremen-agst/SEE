@@ -140,8 +140,18 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the list of non-merge commits between the two given commits in reverse chronological order.
+        /// Returns the list of non-merge commits between the two given commits in reverse
+        /// topological order, that is, a commit is returned before all its parents.
         /// A non-merge commit is a commit having more than one parent.
+        ///
+        /// For instance, in a commit history like this:
+        ///
+        ///     ---1----2----4----7
+        ///         \              \
+        ///          3----5----6----8---
+        ///
+        /// The result would be 1,2,4,7,3,5,6 or 1,3,5,6,2,4,7.
+        /// Commit 8 is not included because it is a merge commit (it has two parents, 6 and 7).
         ///
         /// More precisely, it returns all commits that are backward reachable from
         /// <paramref name="newCommitId"/> (including <paramref name="newCommitId"/> itself),
@@ -151,7 +161,7 @@ namespace SEE.VCS
         /// Thus, the results will include <paramref name="newCommitId"/> but not <paramref name="oldCommitId"/>.
         ///
         /// This method is equivalent to the command line query:
-        ///    git rev-list <newCommitId> ^<oldCommitId>
+        ///    git rev-list --topo-order --reverse --no-merges <newCommitId> ^<oldCommitId>
         /// </summary>
         /// <param name="oldCommitId">SHA hash of the earlier commit serving as the baseline</param>
         /// <param name="newCommitId">SHA hash of the from which to search backward for relevant commits</param>
@@ -181,7 +191,7 @@ namespace SEE.VCS
             // It walks the history starting from 'newCommit' and excludes any commits reachable from 'oldCommit'.
             return repository.Commits.QueryBy(new CommitFilter
             {
-                SortBy = CommitSortStrategies.Time, // reverse chronological order
+                SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Reverse,
                 IncludeReachableFrom = newCommit,
                 ExcludeReachableFrom = oldCommit
             }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent

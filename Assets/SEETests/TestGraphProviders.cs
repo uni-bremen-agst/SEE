@@ -212,7 +212,7 @@ namespace SEE.GraphProviders
         [TestCase(DataModel.DG.VCS.NumberOfDevelopers, 4)]
         // Should be equivalent to:
         // git log 0878f91f900dc90d89c594c521ac1d3b9edd7097 ^a5fe5e6a2692f41aeb8448d5114000e6f82e605e --name-status| grep VCSGraphProvider.cs | wc -l
-        // git rev-list  a5fe5e6a2692f41aeb8448d5114000e6f82e605e..0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|wc -l
+        // git rev-list --topo-order --reverse --no-merges a5fe5e6a2692f41aeb8448d5114000e6f82e605e..0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|wc -l
         [TestCase(DataModel.DG.VCS.NumberOfCommits, 11)]
         public async Task TestVCSMetricsAsync(string metric, int expected)
         {
