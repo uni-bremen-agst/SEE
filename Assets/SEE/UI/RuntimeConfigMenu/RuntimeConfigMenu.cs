@@ -68,8 +68,10 @@ namespace SEE.UI.RuntimeConfigMenu
 
             async UniTask WaitForLocalPlayerInstantiation()
             {
-                await UniTask.WaitUntil(() => LocalPlayer.Instance != null)
-                    .ContinueWith(() => UniTask.Yield());
+                await UniTask.WaitUntil(() => LocalPlayer.Instance != null
+                    && LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder)
+                    && citiesHolder.Cities.Count > 0)
+                    .ContinueWith(() => UniTask.DelayFrame(1));
                 BuildTabMenus();
             }
         }
@@ -171,9 +173,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (!currentMenuCities.SequenceEqual(GetCities())
                     || needsRebuild)
                 {
-                    Debug.Log($"currentMenuCities.SequenceEqual(GetCieites()): {currentMenuCities.SequenceEqual(GetCities())}");
-                    currentMenuCities.ForEach(c => Debug.Log($"{(c != null ? c.name : null)} is in currentMenuCities"));
-                    GetCities().ForEach(c => Debug.Log($"{c.name} is in GetCities()"));
                     new RebuildNetAction().Execute();
                     RebuildMenuAsync().Forget();
                 }
