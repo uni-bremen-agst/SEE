@@ -942,7 +942,8 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 SetInteractableRecursive(createdObj, interactable);
             }
-            if (memberInfo != null && obj != null && createdObj != null)
+            if (memberInfo != null && obj != null && createdObj != null
+                && memberInfo.GetCustomAttribute<RuntimeIfAttribute>() != null)
             {
                 controlConditions.Add((memberInfo, createdObj, obj));
             }
