@@ -1056,10 +1056,12 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
+            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions.ToList())
             {
                 if (go == null)
                 {
+                    Debug.Log($"{m.Name} of {m.DeclaringType.FullName} was null; skip.");
+                    controlConditions.Remove((m, go, obj));
                     continue;
                 }
                 go.SetActive(ValidateVisibilityAttributes(m, obj));
@@ -2241,7 +2243,8 @@ namespace SEE.UI.RuntimeConfigMenu
         private void TriggerImmediateRedraw()
         {
             // does nothing if no graph is loaded
-            if (city.LoadedGraph == null)
+            if (city.LoadedGraph == null
+                || city.gameObject.IsCodeCityDrawnAndActive())
             {
                 return;
             }
