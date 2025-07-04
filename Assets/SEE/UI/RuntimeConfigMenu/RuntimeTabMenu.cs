@@ -1057,6 +1057,10 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
             {
+                if (go == null)
+                {
+                    continue;
+                }
                 go.SetActive(ValidateVisibilityAttributes(m, obj));
                 if (HasInteractableAttribute(m))
                 {
