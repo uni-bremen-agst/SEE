@@ -1060,7 +1060,6 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (go == null)
                 {
-                    Debug.Log($"{m.Name} of {m.DeclaringType.FullName} was null; skip.");
                     controlConditions.Remove((m, go, obj));
                     continue;
                 }
@@ -2244,7 +2243,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // does nothing if no graph is loaded
             if (city.LoadedGraph == null
-                || city.gameObject.IsCodeCityDrawnAndActive())
+                || !city.gameObject.IsCodeCityDrawnAndActive())
             {
                 return;
             }
