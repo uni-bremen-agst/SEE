@@ -150,6 +150,9 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitID">The commit id at which the files must exist.</param>
         /// <param name="baselineCommitID">The commit id of the baseline against which to gather
         /// the VCS metrics</param>
+        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="authorAliasMap">Where to to look up an author alias. Can be null if <paramref name="consultAliasMap"/>
+        /// is false</param>
         /// <param name="changePercentage">Callback to report progress from 0 to 1.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>the input <paramref name="graph"/> with the added nodes</returns>
@@ -159,6 +162,8 @@ namespace SEE.GraphProviders.VCS
              GitRepository repository,
              string commitID,
              string baselineCommitID,
+             bool consultAliasMap,
+             AuthorMapping authorAliasMap,
              Action<float> changePercentage = null,
              CancellationToken token = default)
         {
@@ -202,8 +207,7 @@ namespace SEE.GraphProviders.VCS
                 {
                     throw new OperationCanceledException(token);
                 }
-                Debug.Log($"Processing commit {commit.Id}\n");
-                UpdateMetricsForCommit(fileToMetrics, repository, commit, false, null);
+                UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
                 currentCommitIndex++;
                 changePercentage?.Invoke(Mathf.Clamp((float)currentCommitIndex / commitCount, percentage, 0.98f));
             }
@@ -228,6 +232,9 @@ namespace SEE.GraphProviders.VCS
         /// <param name="commitChanges">The changes associated with each commit in <paramref name="commitsInBetween"/>;
         /// for each element in <paramref name="commitsInBetween"/> there must be a corresponding entry in
         /// <paramref name="commitChanges"/>.</param>
+        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
+        /// is false</param>
         internal static void AddNodesForCommits
             (Graph graph,
              bool simplifyGraph,
@@ -235,13 +242,15 @@ namespace SEE.GraphProviders.VCS
              string repositoryName,
              HashSet<string> files,
              IList<Commit> commitsInBetween,
-             IDictionary<Commit, Patch> commitChanges)
+             IDictionary<Commit, Patch> commitChanges,
+             bool consultAliasMap,
+             AuthorMapping authorAliasMap)
         {
             FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
-                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], false, null);
+                UpdateMetricsForPatch(fileToMetrics, commitInBetween, commitChanges[commitInBetween], consultAliasMap, authorAliasMap);
             }
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
@@ -321,8 +330,8 @@ namespace SEE.GraphProviders.VCS
 
             HashSet<string> files = new(fileToMetrics.Keys);
 
-            FileAuthor comitter = GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
-                                                         consultAliasMap, authorAliasMap);
+            FileAuthor committer = GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
+                                                          consultAliasMap, authorAliasMap);
 
             foreach (PatchEntryChanges changedFile in patch)
             {
@@ -333,11 +342,6 @@ namespace SEE.GraphProviders.VCS
                     continue;
                 }
 
-                if (filePath == "Assets/SEE/GraphProviders/VCSGraphProvider.cs")
-                {
-                    Debug.Log($"Processing file {filePath} for {commit.Id}.\n");
-                }
-
                 int churn = changedFile.LinesAdded + changedFile.LinesDeleted;
 
                 if (!fileToMetrics.ContainsKey(filePath))
@@ -345,11 +349,11 @@ namespace SEE.GraphProviders.VCS
                     // If the file has not been added to the metrics yet, add it.
                     fileToMetrics.Add(filePath,
                         new GitFileMetrics(1,
-                            new HashSet<FileAuthor> { comitter },
+                            new HashSet<FileAuthor> { committer },
                             changedFile.LinesAdded,
                             changedFile.LinesDeleted));
 
-                    fileToMetrics[filePath].AuthorsChurn.Add(comitter, churn);
+                    fileToMetrics[filePath].AuthorsChurn.Add(committer, churn);
                 }
                 else
                 {
@@ -357,9 +361,9 @@ namespace SEE.GraphProviders.VCS
                     changedFileMetrics.NumberOfCommits += 1;
                     changedFileMetrics.LinesAdded += changedFile.LinesAdded;
                     changedFileMetrics.LinesRemoved += changedFile.LinesDeleted;
-                    changedFileMetrics.Authors.Add(comitter);
-                    changedFileMetrics.AuthorsChurn.GetOrAdd(comitter, () => 0);
-                    changedFileMetrics.AuthorsChurn[comitter] += churn;
+                    changedFileMetrics.Authors.Add(committer);
+                    changedFileMetrics.AuthorsChurn.GetOrAdd(committer, () => 0);
+                    changedFileMetrics.AuthorsChurn[committer] += churn;
 
                     foreach (string otherFilePath in patch
                                  .Where(e => !e.Equals(changedFile))
@@ -370,7 +374,7 @@ namespace SEE.GraphProviders.VCS
                         changedFileMetrics.FilesChangesTogether[otherFilePath]++;
                     }
 
-                    fileToMetrics[filePath].AuthorsChurn[comitter] += churn;
+                    fileToMetrics[filePath].AuthorsChurn[committer] += churn;
                 }
             }
         }
@@ -543,7 +547,7 @@ namespace SEE.GraphProviders.VCS
 
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
-                Node n = GraphUtils.GetOrAddFileNode(file.Key, rootNode, graph);
+                Node n = GraphUtils.GetOrAddFileNode(graph, file.Key);
                 n.SetInt(DataModel.DG.VCS.NumberOfDevelopers, file.Value.Authors.Count);
                 n.SetInt(DataModel.DG.VCS.NumberOfCommits, file.Value.NumberOfCommits);
                 n.SetInt(DataModel.DG.VCS.LinesAdded, file.Value.LinesAdded);
