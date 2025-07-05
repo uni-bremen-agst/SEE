@@ -1,4 +1,6 @@
-﻿namespace SEE.DataModel.DG
+﻿using System;
+
+namespace SEE.DataModel.DG
 {
     /// <summary>
     /// Provides convenience extension properties for the VCS related attributes.
@@ -6,7 +8,7 @@
     public static class VCSExtensions
     {
         /// <summary>
-        /// The attribute name for the commitID..
+        /// The attribute name for the commitID.
         /// </summary>
         public const string CommitIDAttribute = "CommitID";
 
@@ -44,26 +46,17 @@
         public const string RepositoryPathAttribute = "RepositoryPath";
 
         /// <summary>
-        /// Returns the repository path of the <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">graph whose repository path is requested</param>
-        public static bool TryGetRepositoryPath(this Graph graph, out string repositoryPath)
-        {
-            return graph.TryGetString(RepositoryPathAttribute, out repositoryPath);
-        }
-
-        /// <summary>
-        /// Sets the repository path of the <paramref name="graph"/> to <paramref name="value"/>
+        /// Sets the repository path of the <paramref name="graph"/> to <paramref name="repositoryPath"/>
         /// </summary>
         /// <param name="graph">graph whose repository path is to be set</param>
-        /// <param name="value">value to be set</param>
-        public static void RepositoryPath(this Graph graph, string value)
+        /// <param name="repositoryPath">value to be set</param>
+        public static void RepositoryPath(this Graph graph, string repositoryPath)
         {
-            graph.SetString(RepositoryPathAttribute, value);
+            graph.SetString(RepositoryPathAttribute, repositoryPath);
         }
 
         /// <summary>
-        /// Returns the repository path of the <paramref name="graphElement"/>.
+        /// Returns the repository path of the graph <paramref name="graphElement"/> belongs to.
         /// </summary>
         /// <param name="graphElement">graph element whose repository path is requested</param>
         public static bool TryGetRepositoryPath(this GraphElement graphElement, out string repositoryPath)

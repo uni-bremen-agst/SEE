@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions
 
             CodeWindow codeWindow = GetOrCreateCodeWindow(graphElementRef, sourceFilename);
 
-            IVersionControl vcs = VersionControlFactory.GetVersionControl(city.VersionControlSystem, city.VCSPath.Path);
+            IVersionControl vcs = new GitVersionControl(city.VCSPath.Path);
             // The path of the file relative to the root of the repository where / is used as separator.
             string relativePath = graphElement.Path();
             Change change = vcs.GetFileChange(relativePath, city.OldRevision, city.NewRevision, out string oldRelativePath);
@@ -298,7 +298,7 @@ namespace SEE.Controls.Actions
                         ShowNotification.Error("No repository path", message, log: false);
                         throw new InvalidOperationException(message);
                     }
-                    IVersionControl vcs = VersionControlFactory.GetVersionControl(VCSKind.Git, repositoryPath);
+                    IVersionControl vcs = new GitVersionControl(repositoryPath);
                     string[] fileContent = vcs.Show(graphElement.ID, commitID).Split("\\n", StringSplitOptions.RemoveEmptyEntries);
                     codeWindow.EnterFromText(fileContent);
                 }

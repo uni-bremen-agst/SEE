@@ -67,8 +67,32 @@
         /// Prefix for all metrics.
         /// </summary>
         public const string Prefix = "Metric.";
-    }
 
+        /// <summary>
+        /// Prefix for line metrics.
+        /// </summary>
+        public const string Lines = Prefix + "Lines.";
+
+        /// <summary>
+        /// Name of lines of code (LOC) metric.
+        /// </summary>
+        public const string LOC = Lines + "LOC";
+
+        /// <summary>
+        /// Number of comments in the source code.
+        /// </summary>
+        public const string Comments = Lines + "Comments";
+
+        /// <summary>
+        /// Number of tokens in the source code.
+        /// </summary>
+        public const string NumberOfTokens = Prefix + "Number_of_Tokens";
+
+        /// <summary>
+        /// Name of McCabe complexity metric.
+        /// </summary>
+        public const string McCabe = Prefix + "McCabe_Complexity";
+    }
 
     /// <summary>
     /// Provides an extension <see cref="Name(NumericAttributeNames)"/> for <see cref="NumericAttributeNames"/>.
@@ -267,9 +291,9 @@
         /// </summary>
         public const string LinesAdded = Prefix + "Lines_Added";
         /// <summary>
-        /// The number of lines of code deleted for a file that was changed between two commits.
+        /// The number of lines of code removed from a file that was changed between two commits.
         /// </summary>
-        public const string LinesDeleted = Prefix + "Lines_Deleted";
+        public const string LinesRemoved = Prefix + "Lines_Removed";
         /// <summary>
         /// The churn of a file, that is, the number of lines added and deleted.
         /// </summary>
@@ -279,9 +303,9 @@
         /// </summary>
         public const string NumberOfDevelopers = Prefix + "Number_Of_Developers";
         /// <summary>
-        /// The number of times a file was changed between two commits.
+        /// The number of commits for a given file that was changed between two commits.
         /// </summary>
-        public const string CommitFrequency = Prefix + "Commit_Frequency";
+        public const string NumberOfCommits = Prefix + "Number_Of_Commits";
         /// <summary>
         /// The truck factor of a file (core-devs metric).
         /// </summary>
