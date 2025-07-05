@@ -55,11 +55,13 @@ namespace SEE.GraphProviders.VCS
         ///
         /// Directories will have the node type <see cref="DataModel.DG.VCS.DirectoryType"/>.
         /// </summary>
-        /// <param name="fullRelativePath">The full relative path of the file.
-        /// This will become the ID of the newly created node.</param>
+        /// <param name="fullRelativePath">The full relative path of the file (not a directory!).
+        /// This will become the ID of the newly created node. The separator in this
+        /// path is assumed to be <see cref="Path.AltDirectorySeparatorChar"/>.</param>
         /// <param name="parent">The parent under which the searched/created node is contained.</param>
         /// <param name="graph">The graph to add the nodes to.</param>
         /// <returns>The found or newly create file node</returns>
+        [Obsolete] // FIXME: Remove this method before merging..
         public static Node GetOrAddFileNode
             (string fullRelativePath,
              Node parent,
@@ -122,6 +124,32 @@ namespace SEE.GraphProviders.VCS
             parent.AddChild(addedDirectoryNode);
             return GetOrAddFileNode(fullRelativePath, String.Join(Path.AltDirectorySeparatorChar, pathSegments.Skip(1)),
                                     addedDirectoryNode, graph);
+        }
+
+        internal static Node GetOrAddFileNode(Graph graph, string path)
+        {
+            if (graph == null)
+            {
+                throw new ArgumentNullException(nameof(graph), "Graph cannot be null.");
+            }
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Path cannot be null or empty.", nameof(path));
+            }
+            if (graph.TryGetNode(path, out Node node))
+            {
+                return node;
+            }
+            else
+            {
+                string directory = Path.GetDirectoryName(path);
+                if (directory == null)
+                {
+                    throw new ArgumentException("Path must contain a directory.", nameof(path));
+                }
+                Node parentNode = graph.TryGetNode(directory, out Node parent) ? parent : GetOrAddFileNode(graph, directory);
+                return GetOrAddFileNode(path, path, parentNode, graph);
+            }
         }
     }
 }
