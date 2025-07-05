@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.FileSystemGlobbing;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using UnityEngine.UIElements;
 
 namespace SEE.Utils
 {
@@ -295,11 +295,82 @@ namespace SEE.Utils
             {
                 throw new ArgumentException("Directory path must neither be null nor empty.");
             }
-            string path = directoryPath[^1] == Path.DirectorySeparatorChar ?
-                directoryPath[..^1] : directoryPath;
+            // Remove trailing directory separator if it exists.
+            string path = TrimEndingDirectorySeparator(directoryPath, Path.DirectorySeparatorChar);
 
             return Path.GetFullPath(path).TrimEnd(Path.DirectorySeparatorChar)
                 .Split(Path.DirectorySeparatorChar).Last();
+        }
+
+        /// <summary>
+        /// Returns <paramref name="directoryPath"/> excluding the trailing <paramref name="separator"/>
+        /// character from the specified <paramref name="directoryPath"/>, if present.
+        ///
+        /// If the specified path does not end with the separator, <paramref name="directoryPath"/>
+        /// is returned unchanged. Likewise, if <paramref name="directoryPath"/> is null, empty
+        /// or only contains whitespace, it is returned unchanged.
+        /// </summary>
+        /// <param name="directoryPath">The directory path to process. Must not be null or empty.</param>
+        /// <param name="separator">The separator character to check for and remove, such as '/' or '\'.</param>
+        /// <returns>The directory path without a trailing separator. If the specified path does not end with the separator,  the
+        /// original path is returned unchanged.</returns>
+        /// <remarks>This method is similar to <see cref="Path.TrimEndingDirectorySeparator(string)"/>,
+        /// but allows to pass the <paramref name="separator"/></remarks>
+        public static string TrimEndingDirectorySeparator(string directoryPath, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(directoryPath))
+            {
+                return directoryPath;
+            }
+            return directoryPath[^1] == separator ? directoryPath[..^1] : directoryPath;
+        }
+
+        /// <summary>
+        /// Extracts the directory portion of a given <paramref name="path"/>, using the specified
+        /// <paramref name="separator"/> character. If <paramref name="path"/> is null, empty, or
+        /// consists only of whitespace, an empty string is returned.
+        /// </summary>
+        /// <remarks>This method handles edge cases such as paths that end with the separator character or
+        /// paths that consist only of the separator. If the last separator is the first character in the path, or if no
+        /// separator is found, the method returns an empty string.</remarks>
+        /// <param name="path">The full path from which to extract the directory name.</param>
+        /// <param name="separator">The character used to separate directory levels in the path.</param>
+        /// <returns>A string containing the directory portion of the path, excluding the trailing separator.</returns>
+        /// <example> We assume <paramref name="separator"/> is '/' in the following examples.
+        /// "Assets/SEE/GraphProviders/VCS/MyFile.cs" yields "Assets/SEE/GraphProviders/VCS";
+        /// "Super/Sub/" yields "Super";
+        /// "Super/Sub" yields "Super";
+        /// "MyFile.cs" yields "";
+        /// "MyDir/" yields "";
+        /// "MyDir" yields "";
+        /// "/" yields "".
+        /// </example>
+        /// <remarks>This method is similar to <see cref="Path.GetDirectoryName(string)"/>,
+        /// but allows to pass the <paramref name="separator"/> and handles a trailing
+        /// separator differently.</remarks>
+        public static string GetDirectoryName(string path, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+
+            int lastSeparatorIndex = path.LastIndexOf(separator);
+            if (lastSeparatorIndex == 0)
+            {
+                // If the last separator is the first character, return an empty string.
+                return string.Empty;
+            }
+            if (lastSeparatorIndex == path.Length - 1)
+            {
+                // If the last separator is the last character, we search for the next-to-last separator.
+                lastSeparatorIndex = path[..^1].LastIndexOf(separator);
+            }
+            if (lastSeparatorIndex < 0)
+            {
+                return string.Empty;
+            }
+            return path[..lastSeparatorIndex];
         }
     }
 }
