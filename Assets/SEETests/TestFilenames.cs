@@ -47,10 +47,28 @@ namespace SEE.Utils
         [TestCase("MyDir", "")]
         [TestCase("Super/Sub/", "Super")]
         [TestCase("Super/Sub", "Super")]
+        [TestCase("", "")]
+        [TestCase(null, "")]
         public void TestGetDirectoryName(string path, string expected)
         {
             string directory = Filenames.GetDirectoryName(path, '/');
             Assert.AreEqual(expected, directory);
+        }
+
+        [Test]
+        [TestCase("Assets/SEE/GraphProviders/VCS/MyFile.cs", "MyFile.cs")]
+        [TestCase("/", "")]
+        [TestCase("MyFile.cs", "MyFile.cs")]
+        [TestCase("MyDir/", "")]
+        [TestCase("MyFile", "MyFile")]
+        [TestCase("Super/Sub/", "")]
+        [TestCase("Super/Sub", "Sub")]
+        [TestCase("", "")]
+        [TestCase(null, "")]
+        public void TestGetFilename(string path, string expected)
+        {
+            string filename = Filenames.Basename(path, '/');
+            Assert.AreEqual(expected, filename);
         }
     }
 }

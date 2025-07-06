@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using UnityEngine.UIElements;
 
 namespace SEE.Utils
 {
@@ -371,6 +370,41 @@ namespace SEE.Utils
                 return string.Empty;
             }
             return path[..lastSeparatorIndex];
+        }
+
+        /// <summary>
+        /// Returns the basename portion of a given <paramref name="path"/>, using the specified
+        /// directory <paramref name="separator"/> character, that is, the string after the last
+        /// <paramref name="separator"/>.
+        /// If <paramref name="path"/> is null,
+        /// empty, or consists only of whitespace, an empty string is returned.
+        /// </summary>
+        /// <param name = "path" > The full path from which to extract the filename only.</param>
+        /// <param name="separator">The character used to separate directory levels in the path.</param>
+        /// <returns>A string containing the basename portion of the path.</returns>
+        /// <example>
+        /// Assets/SEE/GraphProviders/VCS/MyFile.cs yields MyFile.cs
+        /// / yields ""
+        /// MyFile.cs yields MyFile.cs
+        /// MyDir/ yields ""
+        /// MyFile yields MyFile
+        /// Super/Sub/ yields ""
+        /// Super/Sub yields Sub
+        /// "" yields ""
+        /// null  yields ""
+        /// </example>
+        public static string Basename(string path, char separator)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return string.Empty;
+            }
+            int lastSeparatorIndex = path.LastIndexOf(separator);
+            if (lastSeparatorIndex < 0)
+            {
+                return path; // No separator found, return the whole path.
+            }
+            return path[(lastSeparatorIndex + 1)..]; // Return everything after the last separator.
         }
     }
 }
