@@ -186,7 +186,7 @@ namespace SEE.GraphProviders.VCS
             percentage = 0.2f;
             changePercentage?.Invoke(percentage);
 
-            FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
+            FileToMetrics fileToMetrics = Prepare(graph, files);
 
             if (token.IsCancellationRequested)
             {
@@ -246,7 +246,7 @@ namespace SEE.GraphProviders.VCS
              bool consultAliasMap,
              AuthorMapping authorAliasMap)
         {
-            FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
+            FileToMetrics fileToMetrics = Prepare(graph, files);
 
             foreach (Commit commitInBetween in commitsInBetween)
             {
@@ -286,7 +286,7 @@ namespace SEE.GraphProviders.VCS
         {
             IList<Commit> commitList = repository.CommitsAfter(startDate);
             HashSet<string> files = repository.AllFiles(token);
-            FileToMetrics fileToMetrics = Prepare(graph, repositoryName, files);
+            FileToMetrics fileToMetrics = Prepare(graph, files);
 
             int counter = 0;
             int commitLength = commitList.Count();
@@ -385,13 +385,10 @@ namespace SEE.GraphProviders.VCS
         /// with <see cref="GitFileMetrics"/> initialized to zero.
         /// </summary>
         /// <param name="graph">Where to add the repository node.</param>
-        /// <param name="repositoryName">The name of the repository to be used as Id and
-        /// name of the node.</param>
         /// <param name="files">The set of files for which to return the initial <see cref="GitFileMetrics"/></param>
         /// <returns>Mapping of all filenames in <paramref name="files"/> onto zero <see cref="GitFileMetrics"/></returns>
-        private static FileToMetrics Prepare(Graph graph, string repositoryName, HashSet<string> files)
+        private static FileToMetrics Prepare(Graph graph, HashSet<string> files)
         {
-            GraphUtils.NewNode(graph, repositoryName, DataModel.DG.VCS.RepositoryType, repositoryName);
             return InitialFileToMetrics(files);
         }
 
@@ -543,8 +540,6 @@ namespace SEE.GraphProviders.VCS
         {
             CalculateTruckFactor(fileToMetrics);
 
-            Node rootNode = graph.GetNode(repositoryName);
-
             foreach (KeyValuePair<string, GitFileMetrics> file in fileToMetrics)
             {
                 Node n = GraphUtils.GetOrAddFileNode(graph, file.Key);
@@ -566,6 +561,7 @@ namespace SEE.GraphProviders.VCS
             }
 
             AddCodeMetrics(graph, repository);
+            graph.AddSingleRoot(out Node _, repositoryName, DataModel.DG.VCS.RepositoryType);
             Simplify(graph, simplifyGraph);
         }
 
