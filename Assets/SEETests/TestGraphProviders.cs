@@ -137,37 +137,47 @@ namespace SEE.GraphProviders
             string projectPath = repositoryPath[..repositoryPath.LastIndexOf("/")];
             string projectName = Path.GetFileName(projectPath);
 
-            List<string> expectedPaths = new List<string>()
+            List<string> expectedPaths = new()
             {
-                //projectName,
-                "SEE/Assets/SEE/GraphProviders",
-                "SEE/Assets/SEE/GraphProviders/CSVGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/DashboardGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/FileBasedGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/GXLGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/GraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/GraphProviderFactory.cs",
-                "SEE/Assets/SEE/GraphProviders/GraphProviderKind.cs",
-                "SEE/Assets/SEE/GraphProviders/JaCoCoGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/LSPGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/MergeDiffGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/PipelineGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/ReflexionGraphProvider.cs",
-                "SEE/Assets/SEE/GraphProviders/VCSGraphProvider.cs"
-            }.OrderByDescending(x => x).ToList();
+                projectName,
+                "Assets/SEE/GraphProviders",
+                "Assets/SEE/GraphProviders/CSVGraphProvider.cs",
+                "Assets/SEE/GraphProviders/DashboardGraphProvider.cs",
+                "Assets/SEE/GraphProviders/FileBasedGraphProvider.cs",
+                "Assets/SEE/GraphProviders/GXLGraphProvider.cs",
+                "Assets/SEE/GraphProviders/GraphProvider.cs",
+                "Assets/SEE/GraphProviders/GraphProviderFactory.cs",
+                "Assets/SEE/GraphProviders/GraphProviderKind.cs",
+                "Assets/SEE/GraphProviders/JaCoCoGraphProvider.cs",
+                "Assets/SEE/GraphProviders/LSPGraphProvider.cs",
+                "Assets/SEE/GraphProviders/MergeDiffGraphProvider.cs",
+                "Assets/SEE/GraphProviders/PipelineGraphProvider.cs",
+                "Assets/SEE/GraphProviders/ReflexionGraphProvider.cs",
+                "Assets/SEE/GraphProviders/VCSGraphProvider.cs"
+            };
+            expectedPaths.Sort();
 
             Graph graph = await GetVCSGraphAsync(false);
 
             // Node IDs are unique, so we can use a list.
             List<string> pathsFromGraph = new();
-            foreach (GraphElement elem in graph.Elements())
+            foreach (Node node in graph.Nodes())
             {
-                Debug.Log($"Node: {elem.ID} ({elem.Type})\n");
-                pathsFromGraph.Add(elem.ID);
+                pathsFromGraph.Add(node.ID);
             }
-            Assert.AreEqual(expectedPaths, pathsFromGraph.OrderByDescending(x => x).ToList());
-            Assert.AreEqual(expectedPaths.Count, pathsFromGraph.Count());
-            Assert.IsTrue(expectedPaths.SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+            pathsFromGraph.Sort();
+            //Print("expected", expectedPaths);
+            //Print("actual", pathsFromGraph);
+            Assert.AreEqual(expectedPaths, pathsFromGraph);
+
+            static void Print(string preamble, List<string> paths)
+            {
+                Debug.Log($"Paths {preamble}:\n");
+                foreach (string path in paths)
+                {
+                    Debug.Log($"'{path}'\n");
+                }
+            }
         }
 
         /// <summary>
