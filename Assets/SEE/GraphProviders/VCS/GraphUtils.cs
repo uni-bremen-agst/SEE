@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Linq;
 using SEE.DataModel.DG;
 using SEE.Utils;
 
@@ -83,6 +81,9 @@ namespace SEE.GraphProviders.VCS
                 return result;
             }
 
+            // Returns the parent directory node for given path. If none exists,
+            // the parent directory node will be created (including all its
+            // non-existing ancestors.
             Node GetOrAddDirectoryNode(string path)
             {
                 if (string.IsNullOrWhiteSpace(path))
