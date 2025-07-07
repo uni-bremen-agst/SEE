@@ -301,7 +301,7 @@ namespace SEE.VCS
 
             if (commit.Parents.Any())
             {
-                return repository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                return repository.Diff.Compare<Patch>(commit.Parents.First().Tree, commit.Tree);
             }
             return repository.Diff.Compare<Patch>(null, commit.Tree);
         }

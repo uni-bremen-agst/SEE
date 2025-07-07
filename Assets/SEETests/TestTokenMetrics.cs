@@ -125,7 +125,7 @@ namespace SEE.Scanner
         {
 
             // Test case for code with no operators to test Plain Text.
-            string code = "This arbitary file has no code.\nJust plain words."; // "." is its own operand.
+            string code = "This arbitrary file has no code.\nJust plain words."; // "." is its own operand.
 
             IList<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.Plain);
             TokenMetrics.HalsteadMetrics expected = new(DistinctOperators: 0,

@@ -64,9 +64,9 @@ namespace SEE.VCS
         [Test]
         // Same commit as both old and new commit.
         [TestCase("8e66aa028412984ce92c192d43feb106311c676c", "8e66aa028412984ce92c192d43feb106311c676c", 0)]
-        // Old commit is an immedidate predecessor of new commit.
+        // Old commit is an immediate predecessor of new commit.
         [TestCase("bbc9ba9246fa005be073ae2ae9b750b7f4450c97", "8e66aa028412984ce92c192d43feb106311c676c", 1)]
-        // Old commit is an immedidate successor of new commit.
+        // Old commit is an immediate successor of new commit.
         [TestCase("8e66aa028412984ce92c192d43feb106311c676c", "bbc9ba9246fa005be073ae2ae9b750b7f4450c97", 0)]
         // Old and new commit are on the same branch. New commit is a transitive successor of old commit.
         [TestCase("50b00fbecf51b76cbc15cb04293ea644ac6af100", "8e66aa028412984ce92c192d43feb106311c676c", 4)]
