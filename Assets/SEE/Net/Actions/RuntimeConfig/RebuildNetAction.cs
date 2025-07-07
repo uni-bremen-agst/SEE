@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.RuntimeConfig
 
             async UniTask Rebuild(bool wasOpen, RuntimeTabMenu currentTab)
             {
-                await runtimeConfigMenu.RebuildMenuAsync().ContinueWith(() => UniTask.DelayFrame(3));
+                await runtimeConfigMenu.RebuildMenuAsync().ContinueWith(() => UniTask.DelayFrame(1));
                 if (wasOpen)
                 {
                     if (currentTab != null)
