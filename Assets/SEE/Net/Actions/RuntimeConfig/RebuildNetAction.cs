@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using SEE.Game;
 using SEE.UI.RuntimeConfigMenu;
 using System;
+using System.Diagnostics;
 
 namespace SEE.Net.Actions.RuntimeConfig
 {
@@ -17,24 +18,32 @@ namespace SEE.Net.Actions.RuntimeConfig
         {
             if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
             {
-                bool isOpen = runtimeConfigMenu.GetCurrentTab().ShowMenu;
+                RuntimeTabMenu currentTab = runtimeConfigMenu.GetCurrentTab();
+                bool isOpen = currentTab.ShowMenu;
                 if (isOpen)
                 {
-                    runtimeConfigMenu.GetCurrentTab().ToggleMenu();
+                    currentTab.ToggleMenu();
                 }
-                Rebuild(isOpen).Forget();
+                Rebuild(isOpen, currentTab).Forget();
             }
             else
             {
                 throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
             }
 
-            async UniTask Rebuild(bool wasOpen)
+            async UniTask Rebuild(bool wasOpen, RuntimeTabMenu currentTab)
             {
-                await runtimeConfigMenu.RebuildMenuAsync();
+                await runtimeConfigMenu.RebuildMenuAsync().ContinueWith(() => UniTask.DelayFrame(3));
                 if (wasOpen)
                 {
-                    runtimeConfigMenu.GetCurrentTab().ToggleMenu();
+                    if (currentTab != null)
+                    {
+                        runtimeConfigMenu.SwitchCity(currentTab.CityIndex);
+                    }
+                    else
+                    {
+                        runtimeConfigMenu.GetCurrentTab().ToggleMenu();
+                    }
                 }
             }
         }

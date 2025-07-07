@@ -184,7 +184,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Changes the currently selected table/city.
         /// </summary>
         /// <param name="i">index</param>
-        private void SwitchCity(int i)
+        internal void SwitchCity(int i)
         {
             if (i == currentCity)
             {
