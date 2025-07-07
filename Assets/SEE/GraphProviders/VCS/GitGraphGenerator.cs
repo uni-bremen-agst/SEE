@@ -176,8 +176,8 @@ namespace SEE.GraphProviders.VCS
                 graph.BasePath = repositoryPath;
             }
             graph.Name = repositoryName;
-            graph.CommitID(commitID);
-            graph.RepositoryPath(repositoryPath);
+            graph.SetCommitID(commitID);
+            graph.SetRepositoryPath(repositoryPath);
 
             float percentage = 0.05f;
             changePercentage?.Invoke(percentage);
