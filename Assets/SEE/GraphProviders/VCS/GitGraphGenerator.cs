@@ -81,14 +81,14 @@ namespace SEE.GraphProviders.VCS
 
             float cumulativeRatio = 0;
 
-            // Sorting devs by their number of changed files
+            // Sorting devs by their number of changed files.
             List<FileAuthor> sortedDevs =
                 developersChurn
                     .OrderByDescending(x => x.Value)
                     .Select(x => x.Key)
                     .ToList();
 
-            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
+            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file.
             while (cumulativeRatio <= truckFactorCoreDevRatio)
             {
                 FileAuthor dev = sortedDevs.First();
@@ -130,7 +130,6 @@ namespace SEE.GraphProviders.VCS
                 {
                     return null;
                 }
-
                 return authorAliasMap
                     .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
                                                                && String.Equals(x.Name,  author.Name,  StringComparison.OrdinalIgnoreCase))).Key;
