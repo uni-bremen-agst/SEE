@@ -78,12 +78,12 @@ namespace SEE.GraphProviders.VCS
             else
             {
                 Node result = NewNode(graph, path, DataModel.DG.VCS.FileType, Filenames.Basename(path, separator));
-                Node parent = GetOrAddDirectoryNode(graph, Filenames.GetDirectoryName(path, separator));
+                Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
                 parent?.AddChild(result);
                 return result;
             }
 
-            static Node GetOrAddDirectoryNode(Graph graph, string path)
+            Node GetOrAddDirectoryNode(string path)
             {
                 if (string.IsNullOrWhiteSpace(path))
                 {
