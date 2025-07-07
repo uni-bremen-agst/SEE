@@ -48,11 +48,6 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool blockOpening;
 
         /// <summary>
-        /// Indicator of whether the menu was built before.
-        /// </summary>
-        private bool wasBuiltBefore = false;
-
-        /// <summary>
         /// Returns the current selected <see cref="RuntimeTabMenu"/>.
         /// </summary>
         /// <returns></returns>
@@ -81,13 +76,6 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         public void BuildTabMenus()
         {
-            if (wasBuiltBefore)
-            {
-                ShowNotification.Info("Rebuilding Runtime Config Menu",
-                    "The runtime config menu is being rebuilt. This may take a moment. Please wait.");
-            }
-            wasBuiltBefore = true;
-
             cityMenus?.ForEach(c => Destroyer.Destroy(c));
             cityMenus = new RuntimeTabMenu[GetCities().Length];
             for (int i = 0; i < GetCities().Length; i++)
