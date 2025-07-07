@@ -28,6 +28,8 @@ namespace SEE.GraphProviders.VCS
         /// for each and only the filenames contained in <paramref name="repositoryFiles"/>.
         /// </summary>
         /// <param name="repositoryFiles">A set of a files whose metrics should be calculated</param>
+        /// <returns>mapping containing empty <see cref="GitFileMetrics"/>
+        /// for each and only the filenames contained in <paramref name="repositoryFiles"/></returns>
         private static FileToMetrics InitialFileToMetrics(HashSet<string> repositoryFiles)
         {
             FileToMetrics fileToMetrics = new();
