@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
-using Cysharp.Threading.Tasks.CompilerServices;
 using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game;
@@ -336,7 +335,7 @@ namespace SEE.Controls.Actions
                 {
                     foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
                     {
-                        if (edge.TryGetComponent(out AuthorEdge authorEdge) && authorEdge.authorRef.Edges.Count == 1)
+                        if (edge.TryGetComponent(out AuthorEdge authorEdge) && authorEdge.targetNode.Edges.Count == 1)
                         {
                             edge.EdgeOperator()?.ShowOrHide(show, animationKind);
                         }
