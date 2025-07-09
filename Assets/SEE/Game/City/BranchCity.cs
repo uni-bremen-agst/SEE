@@ -29,33 +29,23 @@ namespace SEE.Game.City
         public string Date = SEEDate.Now();
 
         /// <summary>
-        /// If this is true, the authors of the commits with similar identities will be combined.
-        /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
-        /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
-        /// <seealso cref="AutoMapAuthors"/>
-        /// <seealso cref="AuthorAliasMap"/>
+        /// Resets everything that is specific to a given graph. Here in addition to
+        /// the overridden method, the <see cref="GitPoller"/> component will be
+        /// removed.
         /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined."),
-         TabGroup(VCSFoldoutGroup),
-         RuntimeTab(VCSFoldoutGroup)]
-        public bool CombineAuthors;
-
-        /// <summary>
-        /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
-        /// This is used to manually group commit authors with similar identities together.
-        /// The mapping enables aggregating commit data under a single normalized author identity.
-        /// </summary>
-        [NonSerialized, OdinSerialize,
-         DictionaryDrawerSettings(
-              DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
-              KeyLabel = "Author", ValueLabel = "Aliases"),
-         Tooltip("Author alias mapping."),
-         ShowIf("CombineAuthors"),
-         RuntimeShowIf("CombineAuthors"),
-         TabGroup(VCSFoldoutGroup),
-         RuntimeTab(VCSFoldoutGroup),
-         HideReferenceObjectPicker]
-        public AuthorMapping AuthorAliasMap = new();
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            // Remove the poller.
+            if (TryGetComponent(out GitPoller poller))
+            {
+                Destroyer.Destroy(poller);
+            }
+        }
 
         /// <summary>
         /// Validates <see cref="Date"/>.
@@ -70,6 +60,27 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Returns or adds a <see cref="GitPoller"/> component to the game object this
+        /// <paramref name="city"/> is attached to.
+        /// </summary>
+        /// <param name="pollingInterval">VCS polling interval in seconds.</param>
+        /// <param name="markerTime">Time in seconds for how long the markers should be shown.</param>
+        /// <returns>The <see cref="GitPoller"/> component</returns>
+        public GitPoller GetOrAddGitPollerComponent(int pollingInterval, int markerTime)
+        {
+            if (TryGetComponent(out GitPoller poller))
+            {
+                return poller;
+            }
+
+            GitPoller newPoller = gameObject.AddComponent<GitPoller>();
+            newPoller.CodeCity = this;
+            newPoller.PollingInterval = pollingInterval;
+            newPoller.MarkerTime = markerTime;
+            return newPoller;
+        }
+
         #region Config I/O
 
         /// <summary>
@@ -77,30 +88,16 @@ namespace SEE.Game.City
         /// </summary>
         private const string dateLabel = "Date";
 
-        /// <summary>
-        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
-        /// </summary>
-        private const string combineAuthorsLabel = "CombineAuthors";
-
-        /// <summary>
-        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
-        /// </summary>
-        private const string authorAliasMapLabel = "AuthorAliasMap";
-
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
-            writer.Save(CombineAuthors, combineAuthorsLabel);
-            AuthorAliasMap.Save(writer, authorAliasMapLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
-            ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
-            AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
         }
 
         #endregion

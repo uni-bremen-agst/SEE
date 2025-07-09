@@ -5,13 +5,13 @@ using System.Linq;
 using System.Threading;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
-using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.VCS;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using UnityEngine;
@@ -19,31 +19,58 @@ using UnityEngine;
 namespace SEE.GraphProviders.Evolution
 {
     /// <summary>
-    /// Provides an evolution for git repositories similar to <see cref="AllGitBranchesSingleGraphProvider"/>.
+    /// Provides an evolution for git repositories similar to <see cref="GitBranchesGraphProvider"/>.
     /// </summary>
     [Serializable]
     public class GitEvolutionGraphProvider : MultiGraphProvider
     {
         /// <summary>
+        /// All commits after the date specified in <see cref="Date"/> will be considered.
+        /// </summary>
+        [InspectorName("Start Date"),
+         Tooltip("All commits after the date specified will be considered (" + SEEDate.DateFormat + ")."),
+         RuntimeTab(GraphProviderFoldoutGroup)]
+        public string Date = "";
+
+        /// <summary>
         /// The git repository which should be analyzed.
         /// </summary>
         [OdinSerialize, ShowInInspector, SerializeReference, HideReferenceObjectPicker,
-         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"), RuntimeTab("Data")]
+         Tooltip("The Git repository from which to retrieve the data."),
+         ListDrawerSettings(DefaultExpandedState = true, ListElementLabelName = "Repository"),
+         RuntimeTab("Data")]
         public GitRepository GitRepository = new();
-
-        /// <summary>
-        /// The date limit until commits should be analyzed.
-        /// </summary>
-        [InspectorName("Date Limit"),
-         Tooltip("The date until commits should be analyzed (DD/MM/YYYY)"), RuntimeTab(GraphProviderFoldoutGroup)]
-        public string Date = "";
 
         /// <summary>
         /// Specifies if the resulting graph should be simplified.
         /// This means that directories which only contains other directories will be combined to safe space in the code city.
         /// </summary>
-        [Tooltip("If true, chains in the hierarchy will be simplified."), RuntimeTab(GraphProviderFoldoutGroup)]
+        [Tooltip("If true, chains in the hierarchy will be simplified."),
+         RuntimeTab(GraphProviderFoldoutGroup)]
         public bool SimplifyGraph;
+
+        /// <summary>
+        /// If this is true, the authors of the commits with similar identities will be combined.
+        /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
+        /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
+        /// </summary>
+        [Tooltip("If true, the authors of the commits with similar identities will be combined.")]
+        public bool CombineAuthors;
+
+        /// <summary>
+        /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
+        /// This is used to manually group commit authors with similar identities together.
+        /// The mapping enables aggregating commit data under a single normalized author identity.
+        /// </summary>
+        [NonSerialized, OdinSerialize,
+         DictionaryDrawerSettings(
+              DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
+              KeyLabel = "Author", ValueLabel = "Aliases"),
+         Tooltip("Author alias mapping."),
+         ShowIf("CombineAuthors"),
+         RuntimeShowIf("CombineAuthors"),
+         HideReferenceObjectPicker]
+        public AuthorMapping AuthorAliasMap = new();
 
         /// <summary>
         /// Provides the evolution graph of the git repository.
@@ -61,7 +88,7 @@ namespace SEE.GraphProviders.Evolution
             CancellationToken token = default)
         {
             CheckAttributes();
-            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage), cancellationToken: token);
+            return await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, token), cancellationToken: token);
         }
 
         /// <summary>
@@ -84,74 +111,61 @@ namespace SEE.GraphProviders.Evolution
         }
 
         /// <summary>
-        /// Calculates and returns the actual graph series.
-        ///
+        /// Calculates and returns the graph series, one graph for each commit in the git repository.
         /// </summary>
         /// <param name="graph">The input graph series.</param>
         /// <param name="changePercentage">Keeps track of the current progess.</param>
         /// <returns>The calculated graph series.</returns>
-        private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage)
+        private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage, CancellationToken token)
         {
-            DateTime timeLimit = SEEDate.ToDate(Date);
+            // This name will be used as the root node of the graph.
+            // Its type will be <see cref="DataModel.DG.VCS.RepositoryType"/>.
+            // It is the innermost directory of the git repository.
+            string repositoryName = Filenames.InnermostDirectoryName(GitRepository.RepositoryPath.Path);
 
-            Matcher matcher = new();
+            // The files in the git repository for which nodes should be created.
+            HashSet<string> files = GitRepository.AllFiles(token);
 
-            foreach (KeyValuePair<string, bool> pattern in GitRepository.PathGlobbing)
+            // All commits after this Date will be considered.
+            List<Commit> commitsAfterDate = GitRepository.CommitsAfter(SEEDate.ToDate(Date)).Reverse().ToList();
+            changePercentage(0.1f);
+
+            if (token.IsCancellationRequested)
             {
-                if (pattern.Value)
-                {
-                    matcher.AddInclude(pattern.Key);
-                }
-                else
-                {
-                    matcher.AddExclude(pattern.Key);
-                }
+                throw new OperationCanceledException(token);
             }
 
-            string[] pathSegments = GitRepository.RepositoryPath.Path.Split(Path.DirectorySeparatorChar);
-            string repositoryName = pathSegments[^1];
+            // Note from the LibGit2Sharp.Patch documentation:
+            // Building a patch is an expensive operation. If you only need to know which files have been added,
+            /// deleted, modified, ..., then consider using a simpler <see cref="TreeChanges"/>.
 
-            using (Repository repo = new(GitRepository.RepositoryPath.Path))
+            // A mapping of all considered commits onto their patch.
+            Dictionary<Commit, Patch> commitChanges
+                = commitsAfterDate.ToDictionary(commit => commit, commit => GitRepository.GetPatchRelativeToParent(commit));
+            changePercentage(0.2f);
+
+            // Only those commits that are changing any of the relevant files in the git repository.
+            IEnumerable<KeyValuePair<Commit, Patch>> commits
+                = commitChanges.Where(x => x.Value.Any(patch => files.Contains(patch.Path)));
+
+            int iteration = 0;
+            int commitLength = commits.Count();
+
+            foreach (KeyValuePair<Commit, Patch> currentCommit in commits)
             {
-                List<Commit> commitList = repo.Commits
-                    .QueryBy(new CommitFilter
-                    { IncludeReachableFrom = repo.Branches, SortBy = CommitSortStrategies.None })
-                    .Where(commit => DateTime.Compare(commit.Author.When.Date, timeLimit) > 0)
-                    .Where(commit => commit.Parents.Count() <= 1)
-                    .Reverse()
-                    .ToList();
-                changePercentage(0.1f);
-
-                Dictionary<Commit, Patch> commitChanges =
-                    commitList.ToDictionary(commit => commit, commit => GetFileChanges(commit, repo));
-                changePercentage(0.2f);
-
-                int counter = 0;
-                int commitLength = commitChanges.Where(x =>
-                    x.Value.Any(y =>
-                        matcher.Match(y.Path).HasMatches)).Count();
-
-                IList<string> files = repo.Branches
-                    .SelectMany(x => VCSGraphProvider.ListTree(x.Tip.Tree))
-                    .Distinct().ToList();
-
-                // iterate over all commits where at least one file with a file extension in includedFiles is present
-                foreach (KeyValuePair<Commit, Patch> currentCommit in
-                         commitChanges.Where(x =>
-                             x.Value.Any(y =>
-                                 matcher.Match(y.Path).HasMatches)))
+                if (token.IsCancellationRequested)
                 {
-                    changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0.2f, 0.98f));
-
-                    // All commits between the first commit in commitList and the current commit
-                    List<Commit> commitsInBetween =
-                        commitList.GetRange(0, commitList.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
-
-                    graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
-                        commitChanges,
-                        repo, files));
-                    counter++;
+                    throw new OperationCanceledException(token);
                 }
+                changePercentage?.Invoke(Mathf.Clamp((float)iteration / commitLength, 0.2f, 0.98f));
+
+                // All commits between the first commit in commitList and the current commit
+                List<Commit> commitsInBetween =
+                    commitsAfterDate.GetRange(0, commitsAfterDate.FindIndex(x => x.Sha == currentCommit.Key.Sha) + 1);
+
+                graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
+                                           commitChanges, files));
+                iteration++;
             }
 
             return graph;
@@ -164,51 +178,30 @@ namespace SEE.GraphProviders.Evolution
         /// </summary>
         /// <param name="repoName">The name of the git repository.</param>
         /// <param name="currentCommit">The current commit to generate the graph.</param>
-        /// <param name="commitsInBetween">All commits in between these two points.</param>
+        /// <param name="commitsInBetween">All commits from the very first commit of the considered
+        /// part of the history until <paramref name="currentCommit"/></param>
         /// <param name="commitChanges">All changes made by all commits within the evolution range.</param>
-        /// <param name="repo">The git repository in which the commit was made.</param>
-        /// <param name="files">A List of all files in the git repository.</param>
-        /// <returns>The graoh of the evolution step.</returns>
-        private Graph GetGraphOfCommit(string repoName, Commit currentCommit, List<Commit> commitsInBetween,
-            IDictionary<Commit, Patch> commitChanges, Repository repo, IList<string> files)
+        /// <param name="files">The set of files in the git repository to be considered.</param>
+        /// <returns>The graph of the evolution step.</returns>
+        private Graph GetGraphOfCommit
+            (string repoName,
+            Commit currentCommit,
+            List<Commit> commitsInBetween,
+            IDictionary<Commit, Patch> commitChanges,
+            HashSet<string> files)
         {
-            Graph g = new(GitRepository.RepositoryPath.Path)
+            Graph graph = new(GitRepository.RepositoryPath.Path)
             {
                 BasePath = GitRepository.RepositoryPath.Path
             };
-            GraphUtils.NewNode(g, repoName + "-Evo", DataModel.DG.VCS.RepositoryType, repoName + "-Evo");
 
-            g.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
-            g.StringAttributes.Add("CommitId", currentCommit.Sha);
+            graph.StringAttributes.Add("CommitTimestamp", currentCommit.Author.When.Date.ToString("dd/MM/yyy"));
+            graph.StringAttributes.Add("CommitId", currentCommit.Sha);
 
-            GitFileMetricProcessor metricProcessor = new(repo, GitRepository.PathGlobbing, files);
-
-            foreach (Commit commitInBetween in commitsInBetween)
-            {
-                metricProcessor.ProcessCommit(commitInBetween, commitChanges[commitInBetween]);
-            }
-
-            metricProcessor.CalculateTruckFactor();
-
-            GitFileMetricsGraphGenerator.FillGraphWithGitMetrics(metricProcessor, g, repoName, SimplifyGraph,
-                idSuffix: "-Evo");
-            return g;
-        }
-
-        /// <summary>
-        /// Returns all changed files in a commit.
-        /// </summary>
-        /// <param name="commit">The commit which files should be returned.</param>
-        /// <param name="repo">The git repository in which the commit was made.</param>
-        /// <returns>A list of all changed files (<see cref="PatchEntryChanges"/>).</returns>
-        private static Patch GetFileChanges(Commit commit, Repository repo)
-        {
-            if (commit.Parents.Any())
-            {
-                return repo.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
-            }
-
-            return repo.Diff.Compare<Patch>(null, commit.Tree);
+            GitGraphGenerator.AddNodesForCommits
+                (graph, SimplifyGraph, GitRepository, repoName, files, commitsInBetween, commitChanges,
+                CombineAuthors, AuthorAliasMap);
+            return graph;
         }
 
         /// <summary>
@@ -230,6 +223,21 @@ namespace SEE.GraphProviders.Evolution
         private const string gitRepositoryLabel = "Repository";
 
         /// <summary>
+        /// Label for serializing the <see cref="SimplifyGraph"/> field.
+        /// </summary>
+        private const string simplifyGraphLabel = "SimplifyGraph";
+
+        /// <summary>
+        /// Label of attribute <see cref="CombineAuthors"/> in the configuration file.
+        /// </summary>
+        private const string combineAuthorsLabel = "CombineAuthors";
+
+        /// <summary>
+        /// Label of attribute <see cref="AuthorAliasMap"/> in the configuration file.
+        /// </summary>
+        private const string authorAliasMapLabel = "AuthorAliasMap";
+
+        /// <summary>
         /// Saves the attributes of this provider to <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
@@ -237,6 +245,9 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Save(writer, gitRepositoryLabel);
             writer.Save(Date, dateLabel);
+            writer.Save(SimplifyGraph, simplifyGraphLabel);
+            writer.Save(CombineAuthors, combineAuthorsLabel);
+            AuthorAliasMap.Save(writer, authorAliasMapLabel);
         }
 
         /// <summary>
@@ -247,6 +258,9 @@ namespace SEE.GraphProviders.Evolution
         {
             GitRepository.Restore(attributes, gitRepositoryLabel);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
+            ConfigIO.Restore(attributes, simplifyGraphLabel, ref SimplifyGraph);
+            ConfigIO.Restore(attributes, combineAuthorsLabel, ref CombineAuthors);
+            AuthorAliasMap.Restore(attributes, authorAliasMapLabel);
         }
         #endregion Config IO
     }

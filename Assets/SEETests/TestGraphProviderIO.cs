@@ -1,10 +1,11 @@
 ﻿using NUnit.Framework;
+using SEE.GraphProviders.Evolution;
 using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
+using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
-using SEE.GraphProviders.Evolution;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -45,21 +46,28 @@ namespace SEE.GraphProviders
             }
         }
 
-        private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider saved, MultiGraphProvider loaded)
+        private static void AreEqualGXLEvolutionProviders(GXLEvolutionGraphProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            GXLEvolutionGraphProvider gxlLoaded = loaded as GXLEvolutionGraphProvider;
-            AreEqual(gxlLoaded.GXLDirectory, saved.GXLDirectory);
-            Assert.AreEqual(gxlLoaded.MaxRevisionsToLoad, saved.MaxRevisionsToLoad);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            GXLEvolutionGraphProvider gxlLoaded = actual as GXLEvolutionGraphProvider;
+            AreEqual(expected.GXLDirectory, gxlLoaded.GXLDirectory);
+            Assert.AreEqual(expected.MaxRevisionsToLoad, gxlLoaded.MaxRevisionsToLoad);
         }
 
-        private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider saved, MultiGraphProvider loaded)
+        private static void AreEqualGitEvolutionProviders(GitEvolutionGraphProvider expected, MultiGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            GitEvolutionGraphProvider gitLoaded = loaded as GitEvolutionGraphProvider;
-            Assert.AreEqual(gitLoaded.Date, saved.Date);
-            AreEqual(gitLoaded.GitRepository.RepositoryPath, saved.GitRepository.RepositoryPath);
-            Assert.AreEqual(gitLoaded.GitRepository.PathGlobbing, saved.GitRepository.PathGlobbing);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            GitEvolutionGraphProvider gitLoaded = actual as GitEvolutionGraphProvider;
+            Assert.AreEqual(expected.Date, gitLoaded.Date);
+            AreEqual(expected.GitRepository.RepositoryPath, gitLoaded.GitRepository.RepositoryPath);
+            AreEqualFilters(expected.GitRepository.VCSFilter, gitLoaded.GitRepository.VCSFilter);
+        }
+
+        private static void AreEqualFilters(SEE.VCS.Filter expected, SEE.VCS.Filter actual)
+        {
+            Assert.AreEqual(expected.Globbing, actual.Globbing);
+            Assert.AreEqual(expected.RepositoryPaths, actual.RepositoryPaths);
+            Assert.AreEqual(expected.Branches, actual.Branches);
         }
 
         /// <summary>
@@ -148,16 +156,16 @@ namespace SEE.GraphProviders
         {
             return new GitEvolutionGraphProvider()
             {
-                Date = "01/05/2024",
+                Date = "2024/01/05",
                 GitRepository = GetGitRepository()
             };
         }
 
-        private static void AreEqualGXLProviders(GXLSingleGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualGXLProviders(GXLSingleGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            GXLSingleGraphProvider gxlSingleLoaded = loaded as GXLSingleGraphProvider;
-            AreEqual(saved.Path, gxlSingleLoaded.Path);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            GXLSingleGraphProvider gxlSingleLoaded = actual as GXLSingleGraphProvider;
+            AreEqual(expected.Path, gxlSingleLoaded.Path);
         }
 
         #endregion
@@ -180,11 +188,11 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualCSVProviders(CSVGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualCSVProviders(CSVGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            CSVGraphProvider gxlLoaded = loaded as CSVGraphProvider;
-            AreEqual(saved.Path, gxlLoaded.Path);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            CSVGraphProvider gxlLoaded = actual as CSVGraphProvider;
+            AreEqual(expected.Path, gxlLoaded.Path);
         }
 
         #endregion
@@ -207,11 +215,11 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualJaCoCoGraphProviders(JaCoCoGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            JaCoCoGraphProvider loadedProvider = loaded as JaCoCoGraphProvider;
-            AreEqual(saved.Path, loadedProvider.Path);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            JaCoCoGraphProvider loadedProvider = actual as JaCoCoGraphProvider;
+            AreEqual(expected.Path, loadedProvider.Path);
         }
 
         #endregion
@@ -272,15 +280,15 @@ namespace SEE.GraphProviders
             AreEqualSinglePipelineProviders(saved, LoadSingleGraph());
         }
 
-        private static void AreEqualSinglePipelineProviders(SingleGraphPipelineProvider saved,
-            SingleGraphProvider loaded)
+        private static void AreEqualSinglePipelineProviders(SingleGraphPipelineProvider expected,
+                                                            SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            SingleGraphPipelineProvider graphPipelineLoaded = loaded as SingleGraphPipelineProvider;
-            Assert.AreEqual(saved.Pipeline.Count, graphPipelineLoaded.Pipeline.Count);
-            for (int i = 0; i < saved.Pipeline.Count; i++)
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            SingleGraphPipelineProvider graphPipelineLoaded = actual as SingleGraphPipelineProvider;
+            Assert.AreEqual(expected.Pipeline.Count, graphPipelineLoaded.Pipeline.Count);
+            for (int i = 0; i < expected.Pipeline.Count; i++)
             {
-                AreEqual(saved.Pipeline[i], graphPipelineLoaded.Pipeline[i]);
+                AreEqual(expected.Pipeline[i], graphPipelineLoaded.Pipeline[i]);
             }
         }
 
@@ -299,41 +307,43 @@ namespace SEE.GraphProviders
         [Test]
         public void TestAllBranchGitSingleProvider()
         {
-            AllGitBranchesSingleGraphProvider saved = GetAllBranchGitSingleProvider();
+            GitBranchesGraphProvider saved = GetAllBranchGitSingleProvider();
             Save(saved);
             AreEqualAllBranchGitSingleProvider(saved, LoadSingleGraph());
         }
 
-        private void AreEqualAllBranchGitSingleProvider(AllGitBranchesSingleGraphProvider saved,
-            SingleGraphProvider loaded)
+        private void AreEqualAllBranchGitSingleProvider(GitBranchesGraphProvider expected,
+                                                        SingleGraphProvider actual)
         {
-            Assert.AreEqual(saved.GetType(), loaded.GetType());
-            AllGitBranchesSingleGraphProvider gitBranchesLoaded = loaded as AllGitBranchesSingleGraphProvider;
-            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, saved.SimplifyGraph);
-            Assert.AreEqual(gitBranchesLoaded.AutoFetch, saved.AutoFetch);
+            Assert.AreEqual(expected.GetType(), actual.GetType());
+            GitBranchesGraphProvider gitBranchesLoaded = actual as GitBranchesGraphProvider;
+            Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, expected.SimplifyGraph);
+            Assert.AreEqual(gitBranchesLoaded.AutoFetch, expected.AutoFetch);
         }
 
-        private AllGitBranchesSingleGraphProvider GetAllBranchGitSingleProvider()
+        private GitBranchesGraphProvider GetAllBranchGitSingleProvider()
         {
-            return new AllGitBranchesSingleGraphProvider()
+            return new GitBranchesGraphProvider()
             {
-                PathGlobbing = new Dictionary<string, bool>()
-                {
-                    {".cs", true},
-                },
+                GitRepository = new GitRepository
+                                      (new DataPath("path/to/repo"),
+                                       new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                          repositoryPaths: new List<string>() { "path1", "path2" },
+                                                          branches: new List<string>() { "^branch1$", "master" })),
+                SimplifyGraph = true,
                 AutoFetch = true,
-                PollingInterval = 5,
-                MarkerTime = 10,
+                PollingInterval = 60,
+                MarkerTime = 3,
             };
         }
 
         private GitRepository GetGitRepository()
         {
-            return new GitRepository()
-            {
-                RepositoryPath = new DataPath("/path/to/repo"),
-                PathGlobbing = new Dictionary<string, bool>() { { ".cs", true }, { ".c", true }, { ".cbl", false } }
-            };
+            return new GitRepository
+                        (new DataPath("anotherpath/to/repoX"),
+                         new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cpp", true } },
+                                            repositoryPaths: new List<string>() { "path2", "path3" },
+                                            branches: new List<string>() { "^branch5$", "main" }));
         }
 
         #endregion
@@ -358,13 +368,13 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualReflexionGraphProviders(ReflexionGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualReflexionGraphProviders(ReflexionGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            ReflexionGraphProvider reflexionLoaded = loaded as ReflexionGraphProvider;
-            AreEqual(saved.Architecture, reflexionLoaded.Architecture);
-            AreEqual(saved.Implementation, reflexionLoaded.Implementation);
-            AreEqual(saved.Mapping, reflexionLoaded.Mapping);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            ReflexionGraphProvider reflexionLoaded = actual as ReflexionGraphProvider;
+            AreEqual(expected.Architecture, reflexionLoaded.Architecture);
+            AreEqual(expected.Implementation, reflexionLoaded.Implementation);
+            AreEqual(expected.Mapping, reflexionLoaded.Mapping);
         }
 
         #endregion
@@ -390,11 +400,11 @@ namespace SEE.GraphProviders
             };
         }
 
-        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider saved, SingleGraphProvider loaded)
+        private static void AreEqualDiffMergeGraphProviders(MergeDiffGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            MergeDiffGraphProvider loadedProvider = loaded as MergeDiffGraphProvider;
-            AreEqual(saved.OldGraph, loadedProvider.OldGraph);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            MergeDiffGraphProvider loadedProvider = actual as MergeDiffGraphProvider;
+            AreEqual(expected.OldGraph, loadedProvider.OldGraph);
         }
 
         #endregion
@@ -403,22 +413,29 @@ namespace SEE.GraphProviders
 
         public void TestVCSGraphProvider()
         {
-            VCSGraphProvider saved = GetVCSGraphProvider();
+            BetweenCommitsGraphProvider saved = GetVCSGraphProvider();
             Save(saved);
             AreEqualVCSGraphProviders(saved, LoadSingleGraph());
         }
 
-        private void AreEqualVCSGraphProviders(VCSGraphProvider saved, SingleGraphProvider loaded)
+        private void AreEqualVCSGraphProviders(BetweenCommitsGraphProvider expected, SingleGraphProvider actual)
         {
-            Assert.IsTrue(saved.GetType() == loaded.GetType());
-            VCSGraphProvider loadedProvider = loaded as VCSGraphProvider;
-            AreEqual(saved.RepositoryPath, loadedProvider.RepositoryPath);
-            Assert.AreEqual(saved.CommitID, loadedProvider.CommitID);
-            Assert.AreEqual(saved.BaselineCommitID, loadedProvider.BaselineCommitID);
-            AreEqual(saved.PathGlobbing, loadedProvider.PathGlobbing);
+            Assert.IsTrue(expected.GetType() == actual.GetType());
+            BetweenCommitsGraphProvider loadedProvider = actual as BetweenCommitsGraphProvider;
+            AreEqual(expected.GitRepository, loadedProvider.GitRepository);
+            Assert.AreEqual(expected.CommitID, loadedProvider.CommitID);
+            Assert.AreEqual(expected.BaselineCommitID, loadedProvider.BaselineCommitID);
         }
 
-        private void AreEqual(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
+        private static void AreEqual(GitRepository expected, GitRepository actual)
+        {
+            Assert.IsNotNull(expected);
+            Assert.IsNotNull(actual);
+            AreEqual(expected.RepositoryPath, actual.RepositoryPath);
+            AreEqualFilters(expected.VCSFilter, actual.VCSFilter);
+        }
+
+        private void AreEqualDictionaries(IDictionary<string, bool> expected, IDictionary<string, bool> actual)
         {
             Assert.AreEqual(expected.Count, actual.Count);
             foreach (var kv in expected)
@@ -428,22 +445,20 @@ namespace SEE.GraphProviders
             }
         }
 
-        private VCSGraphProvider GetVCSGraphProvider()
+        private BetweenCommitsGraphProvider GetVCSGraphProvider()
         {
-            Dictionary<string, bool> pathGlobbing = new()
+            Globbing pathGlobbing = new()
                 {
                     { "Assets/SEE/**/*.cs", true }
                 };
 
-            return new VCSGraphProvider()
+            return new BetweenCommitsGraphProvider()
             {
-                RepositoryPath = new DataPath()
-                {
-                    Path = Path.GetDirectoryName(Application.dataPath)
-                },
+                GitRepository = new GitRepository
+                    (new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                     new SEE.VCS.Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null)),
                 CommitID = "b10e1f49c144c0a22aa0d972c946f93a82ad3461",
                 BaselineCommitID = "5efa95913a6e894e5340f07fab26c9958b5c1096",
-                PathGlobbing = pathGlobbing
             };
         }
 
@@ -455,6 +470,18 @@ namespace SEE.GraphProviders
             SingleGraphProvider loaded = SingleGraphProvider.Restore(stream.Read(), providerLabel);
             Assert.IsNotNull(loaded);
             return loaded;
+        }
+
+        private void DumpSaved()
+        {
+            if (!File.Exists(filename))
+            {
+                Debug.LogError($"File {filename} does not exist after saving.");
+                return;
+            }
+            string content = File.ReadAllText(filename);
+            Debug.Log($"Saved content of {filename}:\n");
+            Debug.Log(content + "\n");
         }
 
         private void Save(SingleGraphProvider saved)
@@ -478,4 +505,3 @@ namespace SEE.GraphProviders
         }
     }
 }
-
