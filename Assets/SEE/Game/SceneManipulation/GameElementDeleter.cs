@@ -174,10 +174,10 @@ namespace SEE.Game.SceneManipulation
                 {
                     city.NodeTypes.Remove(type);
                 });
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
                 if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                 {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    runtimeConfigMenu.PerformTabRebuild(city);
                 }
             }
 
@@ -498,11 +498,7 @@ namespace SEE.Game.SceneManipulation
         {
             if (nodeTypes != null && nodeTypes.Count > 0)
             {
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
+                HashSet<SEEReflexionCity> affectedCities = new();
                 nodes.ForEach(node =>
                 {
                     GameObject obj = node.GameObject() != null ? node.GameObject() : TryGetFirstParentGameObject(node);
@@ -511,9 +507,18 @@ namespace SEE.Game.SceneManipulation
                         if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
                         {
                             city.NodeTypes[node.Type] = nodeTypes[node.Type];
+                            affectedCities.Add(city);
                         }
                     }
                 });
+                /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    foreach (SEEReflexionCity city in affectedCities)
+                    {
+                        runtimeConfigMenu.PerformTabRebuild(city);
+                    }
+                }
             }
 
             static GameObject TryGetFirstParentGameObject(Node node)

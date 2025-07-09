@@ -557,7 +557,7 @@ namespace SEE.Game.City
                 /// Notify <see cref="RuntimeConfigMenu"/> about changes.
                 if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                 {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    runtimeConfigMenu.PerformTabRebuild(this);
                 }
                 return (graph, (GraphRenderer)Renderer);
             }

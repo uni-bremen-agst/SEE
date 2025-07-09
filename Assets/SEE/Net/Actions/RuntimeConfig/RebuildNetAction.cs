@@ -21,7 +21,7 @@ namespace SEE.Net.Actions.RuntimeConfig
                 bool isOpen = currentTab.ShowMenu;
                 if (isOpen)
                 {
-                    currentTab.ToggleMenu();
+                    currentTab.ShowMenu = false;
                 }
                 Rebuild(isOpen, currentTab).Forget();
             }
@@ -38,6 +38,7 @@ namespace SEE.Net.Actions.RuntimeConfig
                     if (currentTab != null)
                     {
                         runtimeConfigMenu.SwitchCity(currentTab.CityIndex);
+                        currentTab.ShowMenu = true;
                     }
                     else
                     {
