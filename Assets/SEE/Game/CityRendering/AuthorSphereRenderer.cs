@@ -128,7 +128,7 @@ namespace SEE.Game.CityRendering
                     authorRef.Edges.Add((gameEdge, churn));
 
                     AuthorEdge authorEdge = gameEdge.AddComponent<AuthorEdge>();
-                    authorEdge.authorRef = authorRef;
+                    authorEdge.targetNode = authorRef;
                     authorEdge.authorSphere = authorSphere;
 
                     authorSphere.Edges.Add((gameEdge, churn));
@@ -229,7 +229,7 @@ namespace SEE.Game.CityRendering
                     graph.AddNode(authorNode);
                     gameObject.AddComponent<NodeRef>().Value = authorNode;
 
-                    InteractableObject iteractable = gameObject.AddComponent<InteractableObject>();
+                    gameObject.AddComponent<InteractableObject>();
                     gameObject.AddComponent<ShowEdges>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();

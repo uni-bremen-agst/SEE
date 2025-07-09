@@ -41,7 +41,7 @@ namespace SEE.Game.City
         public bool CombineAuthors;
 
 
-        [Tooltip("If true, the edges connected the authors spheres and nodes will be shown permantly"),
+        [Tooltip("If true, the edges connecting the authors spheres and nodes will be shown permantly"),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup)]
         public bool ShowEdgesPermantly;
