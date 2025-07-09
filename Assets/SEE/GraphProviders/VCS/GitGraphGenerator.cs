@@ -467,8 +467,8 @@ namespace SEE.GraphProviders.VCS
 
 
                         node.SetInt(Metrics.LOC, lineMetrics.LOC);
-                        node.SetInt(Metrics.LOC, lineMetrics.Comments);
-                        node.SetInt(Metrics.LOC, numberOfTokens);
+                        node.SetInt(Metrics.Comments, lineMetrics.Comments);
+                        node.SetInt(Metrics.NumberOfTokens, numberOfTokens);
 
                         node.SetInt(Metrics.McCabe, mccabeComplexity);
 
