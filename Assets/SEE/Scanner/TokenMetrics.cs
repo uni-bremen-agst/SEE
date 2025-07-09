@@ -86,7 +86,7 @@ namespace SEE.Scanner
             // Operands and operators for Halstead metrics.
             HashSet<string> distinctOperands = new();
             HashSet<string> distinctOperators = new();
-            int totalNunberOfOperators = 0;
+            int totalNumberOfOperators = 0;
             int totalNumberOfOperands = 0;
 
             foreach (AntlrToken token in tokens)
@@ -123,7 +123,7 @@ namespace SEE.Scanner
                     if (!IsWhiteSpace(token))
                     {
                         distinctOperators.Add(token.Text);
-                        totalNunberOfOperators++;
+                        totalNumberOfOperators++;
                     }
                 }
             }
@@ -132,7 +132,7 @@ namespace SEE.Scanner
 
             // Derivative Halstead metrics.
             int programVocabulary = distinctOperators.Count + distinctOperands.Count;
-            int programLength = totalNumberOfOperands + totalNunberOfOperators;
+            int programLength = totalNumberOfOperands + totalNumberOfOperators;
             float estimatedProgramLength = distinctOperators.Count == 0
                 ? 0 : distinctOperators.Count * Mathf.Log(distinctOperators.Count, 2)
                       + distinctOperands.Count * Mathf.Log(distinctOperands.Count, 2);
@@ -151,7 +151,7 @@ namespace SEE.Scanner
             halsteadMetrics = new HalsteadMetrics(
                 distinctOperators.Count,
                 distinctOperands.Count,
-                totalNunberOfOperators,
+                totalNumberOfOperators,
                 totalNumberOfOperands,
                 programVocabulary,
                 programLength,
