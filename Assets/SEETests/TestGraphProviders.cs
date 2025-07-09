@@ -166,18 +166,7 @@ namespace SEE.GraphProviders
                 pathsFromGraph.Add(node.ID);
             }
             pathsFromGraph.Sort();
-            //Print("expected", expectedPaths);
-            //Print("actual", pathsFromGraph);
             Assert.AreEqual(expectedPaths, pathsFromGraph);
-
-            static void Print(string preamble, List<string> paths)
-            {
-                Debug.Log($"Paths {preamble}:\n");
-                foreach (string path in paths)
-                {
-                    Debug.Log($"'{path}'\n");
-                }
-            }
         }
 
         /// <summary>

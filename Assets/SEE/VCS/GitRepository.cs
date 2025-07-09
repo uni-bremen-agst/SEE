@@ -1,6 +1,7 @@
 using LibGit2Sharp;
 using Microsoft.Extensions.FileSystemGlobbing;
 using SEE.Game.City;
+using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -300,7 +301,7 @@ namespace SEE.VCS
 
             if (commit.Parents.Any())
             {
-                return repository.Diff.Compare<Patch>(commit.Tree, commit.Parents.First().Tree);
+                return repository.Diff.Compare<Patch>(commit.Parents.First().Tree, commit.Tree);
             }
             return repository.Diff.Compare<Patch>(null, commit.Tree);
         }
@@ -566,6 +567,40 @@ namespace SEE.VCS
                 }
             }
         }
+
+        #region Author Aliasing
+        /// <summary>
+        /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
+        /// will be returned.
+        /// Otherwise: Returns the alias of the specified <paramref name="author"/> if it exists in the alias mapping;
+        /// or else returns the original <paramref name="author"/>.
+        ///
+        /// For two <see cref="FileAuthor"/>s to match, they must have same name and email address,
+        /// where the string comparison for both facets is case-insensitive.
+        /// </summary>
+        /// <param name="author">The author whose alias is to be retrieved.</param>
+        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
+        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
+        /// is false.</param>
+        /// <returns>A <see cref="FileAuthor"/> instance representing the alias of the author if found,
+        /// or the original author if no alias exists or if <paramref name="consultAliasMap"/> is false.</returns>
+        public static FileAuthor GetAuthorAliasIfExists(FileAuthor author, bool consultAliasMap, AuthorMapping authorAliasMap)
+        {
+            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
+            return ResolveAuthorAliasIfEnabled(author, consultAliasMap, authorAliasMap) ?? author;
+
+            static FileAuthor ResolveAuthorAliasIfEnabled(FileAuthor author, bool combineSimilarAuthors, AuthorMapping authorAliasMap)
+            {
+                if (!combineSimilarAuthors)
+                {
+                    return null;
+                }
+                return authorAliasMap
+                    .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
+                                                               && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
+            }
+        }
+        #endregion Author Aliasing
 
         #region Config I/O
 

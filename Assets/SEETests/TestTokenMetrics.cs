@@ -55,7 +55,7 @@ namespace SEE.Scanner
         /// Checks whether the provided code has the expected Halstead metrics.
         /// </summary>
         [Test]
-        public void TestCalculateHalsteadMetrics1()
+        public void TestCalculateHalsteadMetricsEmptyProgram()
         {
             // Test case for empty code, in case DistinctOperators, DistinctOperands and/or ProgramVocabulary values are zero.
             string emptyCode = "";
@@ -79,7 +79,7 @@ namespace SEE.Scanner
         }
 
         [Test]
-        public void TestCalculateHalsteadMetrics2()
+        public void TestCalculateHalsteadMetrics()
         {
             // Test case for standard code.
             string code = @"public class Program {
@@ -121,11 +121,11 @@ namespace SEE.Scanner
         }
 
         [Test]
-        public void TestCalculateHalsteadMetrics3()
+        public void TestCalculateHalsteadMetricsOnlyComments()
         {
 
             // Test case for code with no operators to test Plain Text.
-            string code = "This arbitary file has no code.\nJust plain words."; // "." is its own operand.
+            string code = "This arbitrary file has no code.\nJust plain words."; // "." is its own operand.
 
             IList<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.Plain);
             TokenMetrics.HalsteadMetrics expected = new(DistinctOperators: 0,

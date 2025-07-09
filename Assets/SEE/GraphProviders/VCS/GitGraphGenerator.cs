@@ -28,6 +28,8 @@ namespace SEE.GraphProviders.VCS
         /// for each and only the filenames contained in <paramref name="repositoryFiles"/>.
         /// </summary>
         /// <param name="repositoryFiles">A set of a files whose metrics should be calculated</param>
+        /// <returns>mapping containing empty <see cref="GitFileMetrics"/>
+        /// for each and only the filenames contained in <paramref name="repositoryFiles"/></returns>
         private static FileToMetrics InitialFileToMetrics(HashSet<string> repositoryFiles)
         {
             FileToMetrics fileToMetrics = new();
@@ -79,14 +81,14 @@ namespace SEE.GraphProviders.VCS
 
             float cumulativeRatio = 0;
 
-            // Sorting devs by their number of changed files
+            // Sorting devs by their number of changed files.
             List<FileAuthor> sortedDevs =
                 developersChurn
                     .OrderByDescending(x => x.Value)
                     .Select(x => x.Key)
                     .ToList();
 
-            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file
+            // Selecting the coreDevs which are responsible for at least 80% of the total churn of a file.
             while (cumulativeRatio <= truckFactorCoreDevRatio)
             {
                 FileAuthor dev = sortedDevs.First();
@@ -99,42 +101,6 @@ namespace SEE.GraphProviders.VCS
         }
 
         #endregion Truck Factor
-
-        #region Author Aliasing
-        /// <summary>
-        /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
-        /// will be returned.
-        /// Otherwise: Returns the alias of the specified <paramref name="author"/> if it exists in the alias mapping;
-        /// or else returns the original <paramref name="author"/>.
-        ///
-        /// For two <see cref="FileAuthor"/>s to match, they must have same name and email address,
-        /// where the string comparison for both facets is case-insensitive.
-        /// </summary>
-        /// <param name="author">The author whose alias is to be retrieved.</param>
-        /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
-        /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
-        /// is false.</param>
-        /// <returns>A <see cref="FileAuthor"/> instance representing the alias of the author if found,
-        /// or the original author if no alias exists or if <paramref name="consultAliasMap"/> is false.</returns>
-        private static FileAuthor GetAuthorAliasIfExists(FileAuthor author, bool consultAliasMap, AuthorMapping authorAliasMap)
-        {
-            // FIXME: Move this code to GitRepository.
-            // If the author is not in the alias map or combining of author aliases is disabled, use the original author
-            return ResolveAuthorAliasIfEnabled(author, consultAliasMap, authorAliasMap) ?? author;
-
-            static FileAuthor ResolveAuthorAliasIfEnabled(FileAuthor author, bool combineSimilarAuthors, AuthorMapping authorAliasMap)
-            {
-                if (!combineSimilarAuthors)
-                {
-                    return null;
-                }
-
-                return authorAliasMap
-                    .FirstOrDefault(alias => alias.Value.Any(x => String.Equals(x.Email, author.Email, StringComparison.OrdinalIgnoreCase)
-                                                               && String.Equals(x.Name,  author.Name,  StringComparison.OrdinalIgnoreCase))).Key;
-            }
-        }
-        #endregion Author Aliasing
 
         /// <summary>
         /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
@@ -175,8 +141,8 @@ namespace SEE.GraphProviders.VCS
                 graph.BasePath = repositoryPath;
             }
             graph.Name = repositoryName;
-            graph.CommitID(commitID);
-            graph.RepositoryPath(repositoryPath);
+            graph.SetCommitID(commitID);
+            graph.SetRepositoryPath(repositoryPath);
 
             float percentage = 0.05f;
             changePercentage?.Invoke(percentage);
@@ -330,8 +296,9 @@ namespace SEE.GraphProviders.VCS
 
             HashSet<string> files = new(fileToMetrics.Keys);
 
-            FileAuthor committer = GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
-                                                          consultAliasMap, authorAliasMap);
+            FileAuthor committer
+                = GitRepository.GetAuthorAliasIfExists(new FileAuthor(commit.Author.Name, commit.Author.Email),
+                                                       consultAliasMap, authorAliasMap);
 
             foreach (PatchEntryChanges changedFile in patch)
             {
