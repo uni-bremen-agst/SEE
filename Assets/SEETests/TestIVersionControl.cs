@@ -7,7 +7,7 @@ namespace SEE.VCS
     /// <summary>
     /// Tests for <see cref="IVersionControl"/>.
     /// </summary>
-    internal class TestVCS
+    internal class TestIVersionControl
     {
         /// <summary>
         /// The version control system under test.
@@ -26,7 +26,7 @@ namespace SEE.VCS
         [SetUp]
         public void SetUp()
         {
-            p = Performance.Begin(nameof(TestVCS));
+            p = Performance.Begin(nameof(TestIVersionControl));
             // We are using our own git repository of SEE as a guinea pig.
             vcs = new GitVersionControl(DataPath.ProjectFolder());
             Assert.IsNotNull(vcs);
