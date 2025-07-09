@@ -157,7 +157,7 @@ namespace SEE.GraphProviders.Evolution
                 {
                     throw new OperationCanceledException(token);
                 }
-                changePercentage?.Invoke(Mathf.Clamp((float)íteration / commitLength, 0.2f, 0.98f));
+                changePercentage?.Invoke(Mathf.Clamp((float)iteration / commitLength, 0.2f, 0.98f));
 
                 // All commits between the first commit in commitList and the current commit
                 List<Commit> commitsInBetween =
@@ -165,7 +165,7 @@ namespace SEE.GraphProviders.Evolution
 
                 graph.Add(GetGraphOfCommit(repositoryName, currentCommit.Key, commitsInBetween,
                                            commitChanges, files));
-                íteration++;
+                iteration++;
             }
 
             return graph;
