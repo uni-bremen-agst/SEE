@@ -22,9 +22,9 @@ namespace SEE.VCS
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="globbing">the inclusion/exclusion file globbings</param>
-        /// <param name="repositoryPaths">local paths starting at the root of the repository</param>
-        /// <param name="branches">the name of the branches</param>
+        /// <param name="globbing">The inclusion/exclusion file globbings.</param>
+        /// <param name="repositoryPaths">Local paths starting at the root of the repository.</param>
+        /// <param name="branches">The name of the branches.</param>
         public Filter(Globbing globbing = null, IEnumerable<string> repositoryPaths = null, IEnumerable<string> branches = null)
         {
             Globbing = globbing;
