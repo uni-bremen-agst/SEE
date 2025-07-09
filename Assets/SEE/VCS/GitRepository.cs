@@ -178,23 +178,13 @@ namespace SEE.VCS
                 throw new ArgumentException("Both commit IDs must be non-empty strings.");
             }
 
-            Commit oldCommit = repository.Lookup<Commit>(oldCommitId);
-            Commit newCommit = repository.Lookup<Commit>(newCommitId);
-            if (oldCommit == null)
-            {
-                throw new ArgumentException($"Commit with SHA '{oldCommitId}' not found in the repository.", nameof(oldCommitId));
-            }
-            if (newCommit == null)
-            {
-                throw new ArgumentException($"Commit with SHA '{newCommitId}' not found in the repository.", nameof(newCommitId));
-            }
             // The 'Walk' method with the 'Exclude' filter is the most efficient way to do this.
             // It walks the history starting from 'newCommit' and excludes any commits reachable from 'oldCommit'.
             return repository.Commits.QueryBy(new CommitFilter
             {
                 SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Reverse,
-                IncludeReachableFrom = newCommit,
-                ExcludeReachableFrom = oldCommit
+                IncludeReachableFrom = GetCheckedCommit(newCommitId),
+                ExcludeReachableFrom = GetCheckedCommit(oldCommitId)
             }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent
         }
 
@@ -219,14 +209,33 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the commit with the given <paramref name="commitId"/> from the repository.
+        /// Returns the commit with the given <paramref name="commitId"/> from the repository
+        /// or null if there is no such <paramref name="commitId"/>.
         /// </summary>
-        /// <param name="commitId">commit ID</param>
-        /// <returns>the commit corresponding to <paramref name="commitId"/></returns>
+        /// <param name="commitId">Commit ID</param>
+        /// <returns>The commit corresponding to <paramref name="commitId"/> or null.</returns>
+        /// <remarks>This method is similar to <see cref="GetCheckedCommit(string)"/>,
+        /// but returns null if the commit does not exist.</remarks>
         internal Commit GetCommit(string commitId)
         {
             OpenRepository();
             return repository.Lookup<Commit>(commitId);
+        }
+
+        /// <summary>
+        /// Returns the commit with the given <paramref name="commitId"/> from the repository.
+        /// If there is no such <paramref name="commitId"/>, an exception is thrown.
+        /// </summary>
+        /// <param name="commitId">Commit ID</param>
+        /// <returns>The commit corresponding to <paramref name="commitId"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if the repository does not have a commit
+        /// with the given <paramref name="CommitID"/>.</exception>
+        /// <remarks>This method is similar to <see cref="GetCommit(string)"/>,
+        /// but throws an exception if the commit does not exist.</remarks>
+        internal Commit GetCheckedCommit(string CommitID)
+        {
+            Commit commit = repository.Lookup<Commit>(CommitID);
+            return commit ?? throw new ArgumentException($"SHA1 {CommitID} does not exist in the repository {RepositoryPath.Path}.");
         }
 
         /// <summary>
@@ -276,13 +285,13 @@ namespace SEE.VCS
         /// Generates a patch representing the differences between two commits.
         /// Analogous to <see cref="Diff(Commit, Commit)"/>, but takes commit IDs as strings.
         /// </summary>
-        /// <param name="oldCommit">The identifier of the older commit to compare.</param>
-        /// <param name="newCommit">The identifier of the newer commit to compare.</param>
+        /// <param name="oldCommitID">The identifier of the older commit to compare.</param>
+        /// <param name="newCommitID">The identifier of the newer commit to compare.</param>
         /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
-        internal Patch Diff(string oldCommit, string newCommit)
+        internal Patch Diff(string oldCommitID, string newCommitID)
         {
             OpenRepository();
-            return Diff(repository.Lookup<Commit>(oldCommit), repository.Lookup<Commit>(newCommit));
+            return Diff(GetCheckedCommit(oldCommitID), GetCheckedCommit(newCommitID));
         }
 
         /// <summary>
@@ -469,7 +478,7 @@ namespace SEE.VCS
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
             OpenRepository();
-            return AllFiles(repository.Lookup<Commit>(commitID).Tree, token);
+            return AllFiles(GetCheckedCommit(commitID).Tree, token);
         }
 
         /// <summary>
