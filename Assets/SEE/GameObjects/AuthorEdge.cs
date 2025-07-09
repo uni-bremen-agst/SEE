@@ -2,10 +2,20 @@ using Sirenix.OdinInspector;
 
 namespace SEE.GameObjects
 {
+    /// <summary>
+    /// Attribute of an author edge connecting a author sphere to a node.
+    /// </summary>
     public class AuthorEdge : SerializedMonoBehaviour
     {
-        public AuthorRef authorRef;
 
+        /// <summary>
+        /// Reference to the target node this edge connects to.
+        /// </summary>
+        public AuthorRef targetNode;
+
+        /// <summary>
+        /// Reference to the <see cref="AuthorSphere"/> that this edge originates from.
+        /// </summary>
         public AuthorSphere authorSphere;
     }
 }
