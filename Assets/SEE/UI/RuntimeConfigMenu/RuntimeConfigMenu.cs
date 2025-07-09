@@ -41,21 +41,10 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool menuReady = false;
 
         /// <summary>
-        /// Whether the menu needs a rebuild.
-        /// </summary>
-        private bool needsRebuild;
-
-        /// <summary>
         /// Indicator of whether opening the menu should be blocked.
         /// This is only the case during the deletion process.
         /// </summary>
         private bool blockOpening;
-
-        /// <summary>
-        /// Returns the current selected <see cref="RuntimeTabMenu"/>.
-        /// </summary>
-        /// <returns></returns>
-        public RuntimeTabMenu GetCurrentTab() => cityMenus[currentCity];
 
         /// <summary>
         /// Instantiates the tab menu for each city.
@@ -87,7 +76,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 AddCity(i);
             }
             currentMenuCities = GetCities();
-            needsRebuild = false;
             menuReady = true;
         }
 
@@ -100,7 +88,7 @@ namespace SEE.UI.RuntimeConfigMenu
         {
             // Wait one frame to ensure all pending city deletions are complete to avoid redundant rebuilds.
             await UniTask.DelayFrame(1);
-            RuntimeTabMenu currentTab = GetCurrentTab();
+            RuntimeTabMenu currentTab = cityMenus[currentCity];
             bool isOpen = currentTab.ShowMenu;
             if (isOpen)
             {
@@ -149,7 +137,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
                 else
                 {
-                    GetCurrentTab().ToggleMenu();
+                    cityMenus[currentCity].ToggleMenu();
                 }
             }
         }
@@ -258,25 +246,6 @@ namespace SEE.UI.RuntimeConfigMenu
         public void BlockOpening()
         {
             blockOpening = true;
-        }
-
-        /// <summary>
-        /// Performs the rebuild if necessary.
-        /// </summary>
-        /// <returns>True if a rebuild was performed, otherwise false.</returns>
-        public bool PerformRebuildIfRequired()
-        {
-            if (needsRebuild)
-            {
-                Debug.Log($"PerformRebuildIfRequired executed");
-                needsRebuild = false;
-                RebuildMenuAsync().Forget();
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
 
         /// <summary>
