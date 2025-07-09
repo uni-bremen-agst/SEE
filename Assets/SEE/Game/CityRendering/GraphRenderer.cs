@@ -364,7 +364,7 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode);
+                DrawAuthorSpheres(nodeMap, rootGameNode, graph);
             }
 
             updateProgress?.Invoke(1.0f);

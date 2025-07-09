@@ -310,6 +310,7 @@ namespace SEE.Controls.Actions
 
             async UniTaskVoid ToggleBranchCityEdges(EdgeAnimationKind animationKind, CancellationToken token)
             {
+                // When the user hovers over a graph node
                 if (gameObject.TryGetComponent(out AuthorRef authorRef))
                 {
                     if (authorRef.Edges.Count > 1)
@@ -319,6 +320,26 @@ namespace SEE.Controls.Actions
                     foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
                     {
                         edge.EdgeOperator()?.ShowOrHide(show, animationKind);
+                    }
+                    if (show)
+                    {
+                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
+                    }
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
+                }
+
+                // When the user hovers over an AuthorSphere.
+                else if (gameObject.TryGetComponent(out AuthorSphere sphere))
+                {
+                    foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
+                    {
+                        if (edge.TryGetComponent(out AuthorEdge authorEdge) && authorEdge.authorRef.Edges.Count == 1)
+                        {
+                            edge.EdgeOperator()?.ShowOrHide(show, animationKind);
+                        }
                     }
                     if (show)
                     {
