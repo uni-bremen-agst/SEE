@@ -287,10 +287,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
 
-            int SortGroupOrder(MemberInfo memberInfo) =>
+            float SortGroupOrder(MemberInfo memberInfo) =>
                 memberInfo.GetCustomAttributes()
                     .OfType<RuntimeGroupOrderAttribute>().FirstOrDefault()?.Order
-                    ?? int.MaxValue;
+                    ?? float.MaxValue;
 
             // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
