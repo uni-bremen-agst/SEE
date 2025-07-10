@@ -182,7 +182,7 @@ namespace SEE.Game.City
         /// </summary>
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
-        [PropertyOrder(999)]
+        [PropertyOrder(999), RuntimeGroupOrder(999)]
         [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
@@ -330,7 +330,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Save Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupSave)]
+        [PropertyOrder(ConfigurationButtonsGroupSave), RuntimeGroupOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
@@ -341,7 +341,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupLoad)]
+        [PropertyOrder(ConfigurationButtonsGroupLoad), RuntimeGroupOrder(ConfigurationButtonsGroupLoad)]
         public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
@@ -384,7 +384,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
@@ -396,7 +396,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
         public void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
@@ -408,7 +408,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Dump Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         public void DumpGraphElementIDMap()
         {
             GraphElementIDMap.Dump();
@@ -420,7 +420,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Clear Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
         public void ClearGraphElementIDMap()
         {
             GraphElementIDMap.Clear();
@@ -618,7 +618,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "List Node Metrics")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         private void ListNodeMetrics()
         {
             DumpNodeMetrics();
@@ -724,9 +724,14 @@ namespace SEE.Game.City
         protected const string DataButtonsGroup = "DataButtonsGroup";
 
         /// <summary>
+        /// The order of the Switch buttons in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSwitch = 1;
+
+        /// <summary>
         /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
-        protected const float DataButtonsGroupOrderLoad = 1;
+        protected const float DataButtonsGroupOrderLoad = DataButtonsGroupOrderSwitch + 1;
 
         /// <summary>
         /// The order of the Draw button in the button group <see cref="DataButtonsGroup"/>.

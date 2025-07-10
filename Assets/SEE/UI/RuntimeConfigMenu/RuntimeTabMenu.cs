@@ -257,7 +257,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // creates the buttons for methods
             city.GetType().GetMethods().Where(IsCityAttribute)
-                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName)
+                .OrderBy(GetButtonGroup).ThenBy(SortGroupOrder).ThenBy(GetButtonName)
                 .ForEach(CreateButton);
             return;
 

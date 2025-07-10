@@ -83,7 +83,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupLoad)]
+        [PropertyOrder(ConfigurationButtonsGroupLoad), RuntimeGroupOrder(ConfigurationButtonsGroupLoad)]
         public override void LoadConfiguration()
         {
             base.LoadConfiguration();
@@ -101,7 +101,7 @@ namespace SEE.Game.City
         /// <returns>Whether the menus needs adjustment.</returns>
         [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask<bool> LoadDataAsync()
         {
             bool needMenuAdjustments = false;
@@ -180,8 +180,10 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Ensures that the initial Reflexion city is loaded.
+        /// Is used in the Odin and Runtime menu.
         /// </summary>
         [RuntimeButton(DataButtonsGroup, "Switch to initial Reflexion city")]
+        [PropertyOrder(DataButtonsGroupOrderSwitch), RuntimeGroupOrder(DataButtonsGroupOrderSwitch)]
         [RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
         [RuntimeHideIf(nameof(IsInitialReflexionCity))]
         public void SwitchInitial()
@@ -194,6 +196,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button("Switch to loaded Reflexion city", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Switch to loaded Reflexion city")]
+        [PropertyOrder(DataButtonsGroupOrderSwitch), RuntimeGroupOrder(DataButtonsGroupOrderSwitch)]
         [EnableIf(nameof(IsInitialReflexionCity)), RuntimeEnableIf(nameof(IsInitialReflexionCity))]
         [HideIf(nameof(IsLoadedReflexionCity)), RuntimeHideIf(nameof(IsLoadedReflexionCity))]
         public void SwitchLoaded()
@@ -209,7 +212,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphDrawn)), RuntimeEnableIf(nameof(IsGraphDrawn))]
         public override void ReDrawGraph()
         {

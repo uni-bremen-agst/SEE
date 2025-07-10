@@ -27,6 +27,7 @@ using SEE.Utils.Paths;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
+using SEE.UI.RuntimeConfigMenu;
 
 namespace SEE.Game.City
 {
@@ -57,7 +58,7 @@ namespace SEE.Game.City
         /// <returns>True if the menus need to be adjusted; otherwise, false.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
         public override async UniTask<bool> LoadDataAsync()
         {
             await base.LoadDataAsync();
