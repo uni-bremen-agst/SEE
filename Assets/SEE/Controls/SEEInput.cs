@@ -51,6 +51,18 @@ namespace SEE.Controls
         }
 
         /// <summary>
+        /// ShowIssues on the key bindings.
+        /// </summary>
+        /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
+        //public static bool SHowIssue()
+        //{
+        //    return;
+        //    //return KeyboardShortcutsEnabled
+        //    //    && KeyBindings.IsDown(KeyAction.Issues);
+        //}
+
+
+        /// <summary>
         /// Toggles voice control (i.e., for voice commands) on/off.
         /// </summary>
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>

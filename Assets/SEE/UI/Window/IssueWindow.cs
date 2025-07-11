@@ -33,8 +33,8 @@ namespace SEE.UI.Window
         private static string WindowPrefab => UIPrefabFolder + "Window";
         private static string ItemPrefabIssue => UIPrefabFolder + "IssueWindow";
         private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
-       // private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
-        
+        // private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
+
 
 
         public override void RebuildLayout()
@@ -75,7 +75,7 @@ namespace SEE.UI.Window
             }
 
             TMP_InputField searchField = issueWindow.transform.Find("Search/SearchField").gameObject.MustGetComponent<TMP_InputField>();
-           
+
             searchField.onSelect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = false);
             searchField.onDeselect.AddListener(_ => SEEInput.KeyboardShortcutsEnabled = true);
             searchField.text = "";
@@ -89,7 +89,7 @@ namespace SEE.UI.Window
 
             if (jiraReceiver.issuesJ != null)
             {
-              //  issueList = new List<RootIssue>(); // TODO: Load real data
+                //  issueList = new List<RootIssue>(); // TODO: Load real data
                 DisplayAttributes(jiraReceiver.issuesJ, issueWindow);
             }
             else
@@ -155,7 +155,7 @@ namespace SEE.UI.Window
 
 
 
-        private static void DisplayAttributes( JArray issues, GameObject issueWindowObject)
+        private static void DisplayAttributes(JArray issues, GameObject issueWindowObject)
         {
             Transform scrollViewContent = issueWindowObject.transform.Find("Content/Items");
             if (scrollViewContent == null)
@@ -166,29 +166,33 @@ namespace SEE.UI.Window
 
             //foreach (RootIssue issue in issues)
             //{
-            foreach (JObject issue in issues)
+            //foreach (JObject issue in issues)
+            //{
+            //    foreach (JProperty property in issue.Properties())
+            //    {
+            for (int i = 0; i < 15; i++)
             {
-                foreach (JProperty property in issue.Properties())
-                {
-                    string keyV = property.Name;
-                    // J//Token value = property.Value;
-                    // outputFile.WriteLine($"{keyV}: {property.Value}");
-                    // Console.WriteLine($"{keyV}: {value}");
-                    // oder UnityEngine.Debug.Log($"{key}: {value}");
+                //string keyV = property.Name;
+                // J//Token value = property.Value;
+                // outputFile.WriteLine($"{keyV}: {property.Value}");
+                // Console.WriteLine($"{keyV}: {value}");
+                // oder UnityEngine.Debug.Log($"{key}: {value}");
 
-                    GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-                    TextMeshProUGUI attributeText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
-                    TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
-                    if (attributeText != null && valueText != null)
-                    {
-                        attributeText.text = "test";//property.Name;
-                        valueText.text = "test2";  //property.Value.ToString();
-                    }
-                    //  text.va = "Test-Zeile";
-                    // Prefab erzeugen
-                    //GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+                GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+                TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (parameterText != null && valueText != null)
+                {
+                    parameterText.text = $"Parameter{i}";//property.Name;
+                    valueText.text = $"Value{i}";  //property.Value.ToString();
                 }
             }
+            //  text.va = "Test-Zeile";
+            // Prefab erzeugen
+            //GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+        
+    
+            //}
             // Text setzen
             //TextMeshProUGUI label = Attribute(issueRow);  // Annahme: erster Child ist der Text
             //  label.text = "sdsd"; //issue.title;

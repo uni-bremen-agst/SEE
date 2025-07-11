@@ -2,6 +2,7 @@
 using SEE.Utils;
 using SEE.Controls.Actions.HolisticMetrics;
 using SEE.Controls.Actions.Drawable;
+using SEE.Utils.History;
 
 namespace SEE.Controls.Actions
 {
@@ -100,6 +101,18 @@ namespace SEE.Controls.Actions
                   Color.yellow.Darker(), Icons.Trash,
                   DeleteAction.CreateReversibleAction);
 
+            //ShowIssue =
+            //new("Show Issue ??", "Display the Issues for this Project.",
+            //    Color.black, Icons.Code,
+            //    ShowIssueAction.CreateReversibleAction);
+            ShowIssue = new("Show Issues", "Display the Issues for this Project.",
+    Color.black, Icons.Code,
+    () =>
+    {
+        IReversibleAction action = ShowIssueAction.CreateReversibleAction();
+        action.Start();  //
+        return action;
+    });
             ShowCode =
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
@@ -299,6 +312,7 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType EditNode;
         public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType Delete;
+        public static readonly ActionStateType ShowIssue;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
 

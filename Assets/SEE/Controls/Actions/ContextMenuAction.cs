@@ -129,8 +129,7 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
-                        ShowNotification.Error("Show Notification Issue Contextmenu GetApplicableOptions.", "Notify", 2, true);
-                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
+                         IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
@@ -184,18 +183,17 @@ namespace SEE.Controls.Actions
         private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection(PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
         {
 
-            ShowNotification.Error("Show Notification Issue Contexmenu.", "Notify", 10, true);
-            List<PopupMenuEntry> entries = new()
+             List<PopupMenuEntry> entries = new()
             {
                 new PopupMenuHeading($"{selectedObjects.Count} elements selected!", int.MaxValue),
 
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
-                   new PopupMenuAction("Show Issues", () =>
-{
-    var action = ShowIssueAction.CreateReversibleAction();
-    action.Start(); // <-- dies ist entscheidend
-}, Icons.Info);
+//                   new PopupMenuAction("Show Issues", () =>
+//{
+//    var action = ShowIssueAction.CreateReversibleAction();
+//    action.Start(); // <-- dies ist entscheidend
+//}, Icons.Info);
                     List<PopupMenuEntry> submenuEntries = new()
                     {
                         new PopupMenuAction("Inspect", () =>
@@ -207,11 +205,10 @@ namespace SEE.Controls.Actions
                         new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
                         new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
                     };
-                          submenuEntries.Add(new PopupMenuAction("Show Issues55",    ShowIssue, Icons.Code));
+                          //submenuEntries.Add(new PopupMenuAction("Show Issues55",    ShowIssue, Icons.Code));
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
-                          ShowNotification.Error("Show Notification Issue Contextmenu Issues55.", "Notify", 2, true);
-                     
+                        
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                         if (selectedObjects.Any(o => o.gameObject.ContainingCity<VCSCity>() != null))
                         {
@@ -286,7 +283,6 @@ namespace SEE.Controls.Actions
             {
 
                 
-                ShowNotification.Error("Show Notification Issue ShowIssue ContextMenu.", "Notify", 10, true);
                 foreach (InteractableObject iO in selectedObjects)
                 {
 
@@ -299,8 +295,7 @@ namespace SEE.Controls.Actions
                     }
                     else
                     {
-                        Debug.Log(" IssueWindow erzeugt: " + window);
-                        ActivateWindow(window);
+                            ActivateWindow(window);
                     }
                     if (iO.gameObject != null)
                     {

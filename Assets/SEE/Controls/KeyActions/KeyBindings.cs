@@ -130,6 +130,9 @@ namespace SEE.Controls.KeyActions
             // user in the order of appearance here.
 
             // General
+           // Register(KeyAction.Issues, KeyCode.Z, "Issues",
+                //  KeyActionCategory.General, "Issues");
+
             Register(KeyAction.Help, KeyCode.H, "Help",
                      KeyActionCategory.General, "Provides help");
             Register(KeyAction.ToggleMenu, KeyCode.Space, "Toggle menu",

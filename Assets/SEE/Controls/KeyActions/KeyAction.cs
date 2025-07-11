@@ -6,6 +6,10 @@
     internal enum KeyAction
     {
         /// <summary>
+        /// Issues.
+        /// </summary>
+       /// Issues,
+        /// <summary>
         /// User asks for help.
         /// </summary>
         Help,
