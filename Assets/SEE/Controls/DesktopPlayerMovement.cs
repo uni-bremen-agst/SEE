@@ -28,8 +28,7 @@ namespace SEE.Controls
         /// has initiated the movement. We will start slower and then gradually increase
         /// the speed until <see cref="Speed"/> has been reached. This phase takes
         /// <see cref="timeToReachSpeed"/> seconds.</remarks>
-        [Tooltip("Speed of movements")]
-        public float Speed = 2f;
+        [Tooltip("Speed of movements")] public float Speed = 2f;
 
         /// <summary>
         /// The time (in seconds) past since the player has initiated a movement.
@@ -51,15 +50,18 @@ namespace SEE.Controls
             /// Rotation in Euler degrees around the y-axis (yaw).
             /// </summary>
             internal float Yaw;
+
             /// <summary>
             /// Rotation in Euler degrees around the x-axis (pitch).
             /// </summary>
             internal float Pitch;
+
             /// <summary>
             /// If true, the player moves freely in the world; otherwise, the player is
             /// rotating around the <see cref="FocusedObject"/> (the code city the player is conntected to).
             /// </summary>
             internal bool FreeMode;
+
             /// <summary>
             ///  The distance to the <see cref="FocusedObject"/> (the code city the player
             ///  is conntected to). This attribute is considered only if <see cref="FreeMode"/> is false.
@@ -118,6 +120,7 @@ namespace SEE.Controls
                 cameraState.Pitch = rotation.x;
                 cameraState.FreeMode = true;
             }
+
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
         }
 
@@ -148,10 +151,12 @@ namespace SEE.Controls
                 {
                     step += distance;
                 }
+
                 if (SEEInput.MoveBackward())
                 {
                     step -= distance;
                 }
+
                 if (step == 0)
                 {
                     // No movement has been initiated, so we reset the moving time.
@@ -161,10 +166,12 @@ namespace SEE.Controls
                 {
                     movingTime += Time.deltaTime;
                 }
+
                 cameraState.DistanceToFocusedObject -= step;
 
                 HandleRotation();
-                transform.SetPositionAndRotation(FocusedObject.CenterTop, Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
+                transform.SetPositionAndRotation(FocusedObject.CenterTop,
+                    Quaternion.Euler(cameraState.Pitch, cameraState.Yaw, 0.0f));
                 transform.position -= transform.forward * cameraState.DistanceToFocusedObject;
             }
             else // cameraState.freeMode == true
@@ -176,26 +183,32 @@ namespace SEE.Controls
                 {
                     step += transform.forward;
                 }
+
                 if (SEEInput.MoveBackward())
                 {
                     step -= transform.forward;
                 }
+
                 if (SEEInput.MoveRight())
                 {
                     step += transform.right;
                 }
+
                 if (SEEInput.MoveLeft())
                 {
                     step -= transform.right;
                 }
+
                 if (SEEInput.MoveUp())
                 {
                     step += Vector3.up;
                 }
+
                 if (SEEInput.MoveDown())
                 {
                     step += Vector3.down;
                 }
+
                 step.Normalize();
                 if (step == Vector3.zero)
                 {
@@ -206,6 +219,7 @@ namespace SEE.Controls
                 {
                     movingTime += Time.deltaTime;
                 }
+
                 step *= GetDistance();
                 // The following two lines may look strange, yet both are actually needed.
                 controller.Move(step); // this is the actual movement
@@ -224,11 +238,13 @@ namespace SEE.Controls
             {
                 // Movement should be started at minimalInitialSpeedFactor * Speed and then
                 // linearly increased to Speed.
-                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed, Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
+                float distance = Mathf.Lerp(minimalInitialSpeedFactor * Speed, Speed,
+                    Mathf.Min(movingTime / timeToReachSpeed, 1f)) * Time.deltaTime;
                 if (SEEInput.BoostCameraSpeed())
                 {
                     distance *= BoostFactor;
                 }
+
                 return distance;
             }
         }
@@ -262,6 +278,7 @@ namespace SEE.Controls
                 // locks the camera, so the player can look up and down, but can't fully rotate the camera.
                 cameraState.Pitch = Mathf.Clamp(cameraState.Pitch, -90, 90);
             }
+
             lastAxis.x = Input.mousePosition.x;
             lastAxis.y = Input.mousePosition.y;
         }

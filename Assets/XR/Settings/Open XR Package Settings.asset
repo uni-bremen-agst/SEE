@@ -482,7 +482,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   features:
   - {fileID: 3659132584355106210}
+<<<<<<< Updated upstream
   - {fileID: -8496670934490681423}
+=======
+  - {fileID: 7953223147710442691}
+>>>>>>> Stashed changes
   - {fileID: 8813224991119622085}
   - {fileID: 6352007622941683982}
   - {fileID: -3509102339466431376}

@@ -1,28 +1,28 @@
 ﻿namespace SEE.DataModel.DG
 {
+  /// <summary>
+  /// A memento of elements of a graph.
+  /// </summary>
+  public abstract class GraphElementsMemento
+  {
     /// <summary>
-    /// A memento of elements of a graph.
+    /// Constructor setting <see cref="ItsGraph"/> to given <paramref name="graph"/>.
     /// </summary>
-    public abstract class GraphElementsMemento
+    /// <param name="graph">graph from which the graph elements memorized stem</param>
+    protected GraphElementsMemento(Graph graph)
     {
-        /// <summary>
-        /// Constructor setting <see cref="ItsGraph"/> to given <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">graph from which the graph elements memorized stem</param>
-        protected GraphElementsMemento(Graph graph)
-        {
-            ItsGraph = graph;
-        }
-
-        /// <summary>
-        /// The graph from which the nodes and edges of this subgraph memento stem.
-        /// </summary>
-        public readonly Graph ItsGraph;
-
-        /// <summary>
-        /// Restores the graph, that is, re-adds the memorized elements
-        /// to <see cref="ItsGraph"/>.
-        /// </summary>
-        public abstract void Restore();
+      ItsGraph = graph;
     }
+
+    /// <summary>
+    /// The graph from which the nodes and edges of this subgraph memento stem.
+    /// </summary>
+    public readonly Graph ItsGraph;
+
+    /// <summary>
+    /// Restores the graph, that is, re-adds the memorized elements
+    /// to <see cref="ItsGraph"/>.
+    /// </summary>
+    public abstract void Restore();
+  }
 }
