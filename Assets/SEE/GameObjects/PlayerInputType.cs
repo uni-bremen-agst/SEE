@@ -11,4 +11,3 @@
         None = 3,               // no player at all
     }
 }
-

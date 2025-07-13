@@ -463,7 +463,6 @@ namespace SEE.Utils
             {
                 // First save a new city with all its default values.
                 CommitCity savedCity = NewVanillaSEECity<CommitCity>();
-                savedCity.VersionControlSystem = VCS.VCSKind.Git;
                 savedCity.VCSPath = new(vcsPath);
                 savedCity.Save(filename);
 
@@ -595,7 +594,6 @@ namespace SEE.Utils
         private static void DiffCityAttributesAreEqual(VCSCity expected, VCSCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
-            Assert.AreEqual(expected.VersionControlSystem, actual.VersionControlSystem);
             AreEqual(expected.VCSPath, actual.VCSPath);
         }
 
@@ -828,7 +826,6 @@ namespace SEE.Utils
         private static void WipeOutDiffCityAttributes(VCSCity city)
         {
             WipeOutSEECityAttributes(city);
-            city.VersionControlSystem = VCS.VCSKind.None;
             city.VCSPath.Path = "C:/MyAbsoluteDirectory/MyVCSDirectory";
         }
 

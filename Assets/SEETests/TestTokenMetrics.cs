@@ -45,37 +45,42 @@ namespace SEE.Scanner
         public void TestCalculateMcCabeComplexity(string code, int expected)
         {
             IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CSharp);
-            int complexity = TokenMetrics.CalculateMcCabeComplexity(tokens);
+            TokenMetrics.Gather(tokens, out _, out _, out int complexity, out _);
             Assert.AreEqual(expected, complexity);
         }
+
+        private const float tolerance = 0.001f; // Tolerance for float value comparisons.
 
         /// <summary>
         /// Checks whether the provided code has the expected Halstead metrics.
         /// </summary>
         [Test]
-        public void TestCalculateHalsteadMetrics()
+        public void TestCalculateHalsteadMetricsEmptyProgram()
         {
-            const float tolerance = 0.001f; // Tolerance for float value comparisons.
-
             // Test case for empty code, in case DistinctOperators, DistinctOperands and/or ProgramVocabulary values are zero.
             string emptyCode = "";
 
-            IList<AntlrToken> tokensEmptyCode = AntlrToken.FromString(emptyCode, AntlrLanguage.Plain);
-            TokenMetrics.HalsteadMetrics expectedEmptyCode = new(DistinctOperators: 0,
-                                                                 DistinctOperands: 0,
-                                                                 TotalOperators: 0,
-                                                                 TotalOperands: 0,
-                                                                 ProgramVocabulary: 0,
-                                                                 ProgramLength: 0,
-                                                                 EstimatedProgramLength: 0f,
-                                                                 Volume: 0f,
-                                                                 Difficulty: 0f,
-                                                                 Effort: 0f,
-                                                                 TimeRequiredToProgram: 0f,
-                                                                 NumberOfDeliveredBugs: 0f);
-            TokenMetrics.HalsteadMetrics metricsEmptyCode = TokenMetrics.CalculateHalsteadMetrics(tokensEmptyCode);
-            Assert.AreEqual(expectedEmptyCode, metricsEmptyCode);
+            IList<AntlrToken> tokens = AntlrToken.FromString(emptyCode, AntlrLanguage.Plain);
+            TokenMetrics.HalsteadMetrics expected = new(DistinctOperators: 0,
+                                                        DistinctOperands: 0,
+                                                        TotalOperators: 0,
+                                                        TotalOperands: 0,
+                                                        ProgramVocabulary: 0,
+                                                        ProgramLength: 0,
+                                                        EstimatedProgramLength: 0f,
+                                                        Volume: 0f,
+                                                        Difficulty: 0f,
+                                                        Effort: 0f,
+                                                        TimeRequiredToProgram: 0f,
+                                                        NumberOfDeliveredBugs: 0f);
 
+            TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
+            Assert.AreEqual(expected, halstead);
+        }
+
+        [Test]
+        public void TestCalculateHalsteadMetrics()
+        {
             // Test case for standard code.
             string code = @"public class Program {
 
@@ -99,51 +104,56 @@ namespace SEE.Scanner
                                                         Effort: 1029.73f,
                                                         TimeRequiredToProgram: 57.20724f,
                                                         NumberOfDeliveredBugs: 0.05547369f);
-            TokenMetrics.HalsteadMetrics metrics = TokenMetrics.CalculateHalsteadMetrics(tokens);
+            TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
 
-            Assert.AreEqual(expected.DistinctOperators, metrics.DistinctOperators);
-            Assert.AreEqual(expected.DistinctOperands, metrics.DistinctOperands);
-            Assert.AreEqual(expected.TotalOperators, metrics.TotalOperators);
-            Assert.AreEqual(expected.TotalOperands, metrics.TotalOperands);
-            Assert.AreEqual(expected.ProgramVocabulary, metrics.ProgramVocabulary);
-            Assert.AreEqual(expected.ProgramLength, metrics.ProgramLength);
-            Assert.AreEqual(expected.EstimatedProgramLength, metrics.EstimatedProgramLength, tolerance);
-            Assert.AreEqual(expected.Volume, metrics.Volume, tolerance);
-            Assert.AreEqual(expected.Difficulty, metrics.Difficulty, tolerance);
-            Assert.AreEqual(expected.Effort, metrics.Effort, tolerance);
-            Assert.AreEqual(expected.TimeRequiredToProgram, metrics.TimeRequiredToProgram, tolerance);
-            Assert.AreEqual(expected.NumberOfDeliveredBugs, metrics.NumberOfDeliveredBugs, tolerance);
+            Assert.AreEqual(expected.DistinctOperators, halstead.DistinctOperators);
+            Assert.AreEqual(expected.DistinctOperands, halstead.DistinctOperands);
+            Assert.AreEqual(expected.TotalOperators, halstead.TotalOperators);
+            Assert.AreEqual(expected.TotalOperands, halstead.TotalOperands);
+            Assert.AreEqual(expected.ProgramVocabulary, halstead.ProgramVocabulary);
+            Assert.AreEqual(expected.ProgramLength, halstead.ProgramLength);
+            Assert.AreEqual(expected.EstimatedProgramLength, halstead.EstimatedProgramLength, tolerance);
+            Assert.AreEqual(expected.Volume, halstead.Volume, tolerance);
+            Assert.AreEqual(expected.Difficulty, halstead.Difficulty, tolerance);
+            Assert.AreEqual(expected.Effort, halstead.Effort, tolerance);
+            Assert.AreEqual(expected.TimeRequiredToProgram, halstead.TimeRequiredToProgram, tolerance);
+            Assert.AreEqual(expected.NumberOfDeliveredBugs, halstead.NumberOfDeliveredBugs, tolerance);
+        }
+
+        [Test]
+        public void TestCalculateHalsteadMetricsOnlyComments()
+        {
 
             // Test case for code with no operators to test Plain Text.
-            string codeWithNoOperators = "This arbitary file has no code.\nJust plain words."; // "." is its own operand.
+            string code = "This arbitrary file has no code.\nJust plain words."; // "." is its own operand.
 
-            IList<AntlrToken> tokensNoOperators = AntlrToken.FromString(codeWithNoOperators, AntlrLanguage.Plain);
-            TokenMetrics.HalsteadMetrics expectedNoOperators = new(DistinctOperators: 0,
-                                                                   DistinctOperands: 10,
-                                                                   TotalOperators: 0,
-                                                                   TotalOperands: 11,
-                                                                   ProgramVocabulary: 10,
-                                                                   ProgramLength: 11,
-                                                                   EstimatedProgramLength: 0f,
-                                                                   Volume: 36.54121f,
-                                                                   Difficulty: 0f,
-                                                                   Effort: 0f,
-                                                                   TimeRequiredToProgram: 0f,
-                                                                   NumberOfDeliveredBugs: 0.0121804f);
-            TokenMetrics.HalsteadMetrics metricsNoOperators = TokenMetrics.CalculateHalsteadMetrics(tokensNoOperators);
+            IList<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.Plain);
+            TokenMetrics.HalsteadMetrics expected = new(DistinctOperators: 0,
+                                                        DistinctOperands: 10,
+                                                        TotalOperators: 0,
+                                                        TotalOperands: 11,
+                                                        ProgramVocabulary: 10,
+                                                        ProgramLength: 11,
+                                                        EstimatedProgramLength: 0f,
+                                                        Volume: 36.54121f,
+                                                        Difficulty: 0f,
+                                                        Effort: 0f,
+                                                        TimeRequiredToProgram: 0f,
+                                                        NumberOfDeliveredBugs: 0.0121804f);
+            TokenMetrics.Gather(tokens, out _, out _, out _, out TokenMetrics.HalsteadMetrics halstead);
 
-            Assert.AreEqual(expectedNoOperators.DistinctOperators, metricsNoOperators.DistinctOperators);
-            Assert.AreEqual(expectedNoOperators.DistinctOperands, metricsNoOperators.DistinctOperands);
-            Assert.AreEqual(expectedNoOperators.TotalOperators, metricsNoOperators.TotalOperators);
-            Assert.AreEqual(expectedNoOperators.TotalOperands, metricsNoOperators.TotalOperands);
-            Assert.AreEqual(expectedNoOperators.ProgramVocabulary, metricsNoOperators.ProgramVocabulary);
-            Assert.AreEqual(expectedNoOperators.ProgramLength, metricsNoOperators.ProgramLength);
-            Assert.AreEqual(expectedNoOperators.EstimatedProgramLength, metricsNoOperators.EstimatedProgramLength, tolerance);
-            Assert.AreEqual(expectedNoOperators.Volume, metricsNoOperators.Volume, tolerance);
-            Assert.AreEqual(expectedNoOperators.Difficulty, metricsNoOperators.Difficulty, tolerance);
-            Assert.AreEqual(expectedNoOperators.Effort, metricsNoOperators.Effort, tolerance);
-            Assert.AreEqual(expectedNoOperators.TimeRequiredToProgram, metricsNoOperators.TimeRequiredToProgram, tolerance);
-            Assert.AreEqual(expectedNoOperators.NumberOfDeliveredBugs, metricsNoOperators.NumberOfDeliveredBugs, tolerance);
+            Assert.AreEqual(expected.DistinctOperators, halstead.DistinctOperators);
+            Assert.AreEqual(expected.DistinctOperands, halstead.DistinctOperands);
+            Assert.AreEqual(expected.TotalOperators, halstead.TotalOperators);
+            Assert.AreEqual(expected.TotalOperands, halstead.TotalOperands);
+            Assert.AreEqual(expected.ProgramVocabulary, halstead.ProgramVocabulary);
+            Assert.AreEqual(expected.ProgramLength, halstead.ProgramLength);
+            Assert.AreEqual(expected.EstimatedProgramLength, halstead.EstimatedProgramLength, tolerance);
+            Assert.AreEqual(expected.Volume, halstead.Volume, tolerance);
+            Assert.AreEqual(expected.Difficulty, halstead.Difficulty, tolerance);
+            Assert.AreEqual(expected.Effort, halstead.Effort, tolerance);
+            Assert.AreEqual(expected.TimeRequiredToProgram, halstead.TimeRequiredToProgram, tolerance);
+            Assert.AreEqual(expected.NumberOfDeliveredBugs, halstead.NumberOfDeliveredBugs, tolerance);
         }
 
         /// <summary>
@@ -161,13 +171,38 @@ namespace SEE.Scanner
                             x = y; // An inline comment.
                         }
                     };
-                    ", 7)]
+                    ", 9)]
         [TestCase(" ", 0)]
         public void TestCalculateLinesOfCode(string code, int expected)
         {
             IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CPP);
-            int linesOfCode = TokenMetrics.CalculateLinesOfCode(tokens);
-            Assert.AreEqual(expected, linesOfCode);
+            TokenMetrics.Gather(tokens, out TokenMetrics.LineMetrics lineMetrics, out _, out _, out _);
+            Assert.AreEqual(expected, lineMetrics.LOC);
         }
+
+        /// <summary>
+        /// Checks whether the provided code has the expected number of comments.
+        /// </summary>
+        /// <param name="code">The provided code.</param>
+        /// <param name="expected">The expected lines of code.</param>
+        [Test]
+        [TestCase(@"class Program {
+                    public:
+                        int x;
+
+                        // A comment.
+                        void setX(int y) {
+                            x = y; // An inline comment.
+                        }
+                    };
+                    ", 2)]
+        [TestCase(" ", 0)]
+        public void TestCalculateLinesOfComments(string code, int expected)
+        {
+            IEnumerable<AntlrToken> tokens = AntlrToken.FromString(code, AntlrLanguage.CPP);
+            TokenMetrics.Gather(tokens, out TokenMetrics.LineMetrics lineMetrics, out _, out _, out _);
+            Assert.AreEqual(expected, lineMetrics.Comments);
+        }
+
     }
 }
