@@ -448,7 +448,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     doRebuild = await task;
                 }
-                OnUpdateMenuValues?.Invoke();
+                //OnUpdateMenuValues?.Invoke();
                 UpdateCityMethodNetAction netAction = new()
                 {
                     CityIndex = CityIndex,
@@ -458,14 +458,18 @@ namespace SEE.UI.RuntimeConfigMenu
                 CheckControlConditionsWithDelay();
                 if (doRebuild)
                 {
-                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                    {
-                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
-                    }
-                    else
-                    {
-                        throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
-                    }
+                    Debug.Log($"Do rebuild");
+                    await UniTask.DelayFrame(10);
+                    OnUpdateMenuValues?.Invoke();
+                    Debug.Log($"After Invoke");
+                    //if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    //{
+                    //    runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                    //}
+                    //else
+                    //{
+                    //    throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
+                    //}
                 }
             }
         }
@@ -2018,6 +2022,16 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     filePicker.SyncDropdown((int)newValue);
                 }
+            };
+
+            OnUpdateMenuValues += () =>
+            {
+                Debug.Log($"Update {settingName}");
+                Debug.Log($"Original datapath {dataPath}");
+                bool isAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
+                Debug.Log($"isAbsolute {isAbsolute}, absolute {dataPath.AbsolutePath}, relative {dataPath.RelativePath}");
+                filePicker.SyncPath(isAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath, isAbsolute);
+                filePicker.SyncDropdown((int)dataPath.Root);
             };
         }
 
