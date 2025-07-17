@@ -29496,10 +29496,10 @@ MonoBehaviour:
       Data: true
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -29649,7 +29649,7 @@ MonoBehaviour:
       Data: 17|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: true
+      Data: false
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30045,7 +30045,7 @@ MonoBehaviour:
       Data: 35|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30177,7 +30177,7 @@ MonoBehaviour:
       Data: 41|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30573,7 +30573,7 @@ MonoBehaviour:
       Data: 59|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
