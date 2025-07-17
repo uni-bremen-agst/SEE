@@ -27,11 +27,8 @@ namespace SEE.Scanner.Antlr
 
             string typeName = language.TypeName(symbolicName);
             TokenType type = AllTokens.SingleOrDefault(x => x.Name.Equals(typeName));
-            if (type == null)
-            {
-                throw new InvalidOperationException($"Unknown token type: {typeName}/{symbolicName}");
-            }
-            return type;
+            return type ?? throw new InvalidOperationException
+                                      ($"Unknown token type: type name='{typeName}', symbolic name='{symbolicName}' using lexer {language.Name}.");
         }
 
         #region Static TokenTypes
