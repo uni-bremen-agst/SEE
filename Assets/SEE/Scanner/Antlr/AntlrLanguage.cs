@@ -257,11 +257,11 @@ namespace SEE.Scanner.Antlr
         private const string cppFileName = "CPP14Lexer.g4";
 
         /// <summary>
-        /// Set of CPP file extensions.
+        /// Set of C and CPP file extensions.
         /// </summary>
         private static readonly HashSet<string> cppExtensions = new()
         {
-            "cpp", "cxx", "hpp"
+            "c", "h", "cpp", "cxx", "hpp"
         };
 
         /// <summary>
@@ -596,7 +596,6 @@ namespace SEE.Scanner.Antlr
 
             return target;
         }
-
 
         /// <summary>
         /// Creates a new lexer matching the <see cref="LexerFileName"/> of this language.
