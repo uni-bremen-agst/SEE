@@ -278,7 +278,7 @@ namespace SEE.Scanner.Antlr
             "Public", "Register", "Reinterpret_cast", "Return", "Short", "Signed",
             "Sizeof", "Static", "Static_assert", "Static_cast", "Struct",
             "Template", "This", "Thread_local", "Throw", "True_", "Typedef",
-            "Typeid_", "Typename_", "Union", "Unsigned", "Using", "Virtual", "Void",
+            "Typeid_", "Typename_", "Typeof", "Union", "Unsigned", "Using", "Virtual", "Void",
             "Volatile", "Wchar",
             "BooleanLiteral", "PointerLiteral", "UserDefinedLiteral",
             "MultiLineMacro", "Directive"
