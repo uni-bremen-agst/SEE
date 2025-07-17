@@ -12,6 +12,11 @@ namespace SEE.Scanner
         /// <summary>
         /// List of all token types.
         /// </summary>
+        /// <remarks>These are not the original tokens as defined by the underlying
+        /// programming language, but rather the kind of token categories relevant
+        /// to syntax highlighting; <seealso cref="SEE.Scanner.Antlr.AntlrTokenType"/>.
+        /// There are only few such tokens compared to the original tokens of the
+        /// programming language.</remarks>
         protected static readonly IList<TokenType> AllTokens = new List<TokenType>();
 
         /// <summary>

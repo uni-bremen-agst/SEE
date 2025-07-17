@@ -1660,163 +1660,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: AuthorAliasMap
-      Entry: 7
-      Data: 34|SEE.GraphProviders.VCS.AuthorMapping, SEE
-    - Name: comparer
-      Entry: 7
-      Data: 35|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
-        SEE]], mscorlib
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 12
-      Data: 3
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 36|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Rainer Koschke
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 37|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 2
-    - Name: 
-      Entry: 7
-      Data: 38|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: axivionsee
-    - Name: Email
-      Entry: 1
-      Data: rainer.koschke@qt.io
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 39|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 40|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Tim Kuhlmann
-    - Name: Email
-      Entry: 1
-      Data: tim.kuhlmann@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 41|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 42|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: tinxx
-    - Name: Email
-      Entry: 1
-      Data: 13608545+tinxx@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: "Hannes Ku\xDF"
-    - Name: Email
-      Entry: 1
-      Data: hkuss@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Hannes Lennart Kuss
-    - Name: Email
-      Entry: 1
-      Data: 102760046+hlkuss@users.noreply.github.com
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
   LODCulling: 0.001
   ConfigurationPath:
     Root: 3
@@ -1904,7 +1747,6 @@ MonoBehaviour:
     RelativePath: /
     AbsolutePath: 
   Date: 2025/01/01
-  CombineAuthors: 1
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -26261,7 +26103,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 3
+      Data: 4
     - Name: 
       Entry: 7
       Data: 
@@ -26659,6 +26501,138 @@ MonoBehaviour:
       Entry: 8
       Data: 
     - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: ROOT
+    - Name: $v
+      Entry: 7
+      Data: 23|SEE.Game.City.VisualNodeAttributes, SEE
+    - Name: IsRelevant
+      Entry: 5
+      Data: true
+    - Name: Shape
+      Entry: 3
+      Data: 0
+    - Name: MetricToLength
+      Entry: 7
+      Data: 24|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 3
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 1
+      Data: 0.001
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ColorProperty
+      Entry: 7
+      Data: 25|SEE.Game.City.ColorProperty, SEE
+    - Name: Property
+      Entry: 3
+      Data: 0
+    - Name: TypeColor
+      Entry: 7
+      Data: UnityEngine.Color, UnityEngine.CoreModule
+    - Name: 
+      Entry: 4
+      Data: 0
+    - Name: 
+      Entry: 4
+      Data: 0.3412
+    - Name: 
+      Entry: 4
+      Data: 0.7216
+    - Name: 
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: ByLevel
+      Entry: 5
+      Data: true
+    - Name: ColorMetric
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: MinimalBlockLength
+      Entry: 4
+      Data: 0.001
+    - Name: MaximalBlockLength
+      Entry: 4
+      Data: 1
+    - Name: AntennaSettings
+      Entry: 7
+      Data: 26|SEE.Game.City.AntennaAttributes, SEE
+    - Name: AntennaSections
+      Entry: 7
+      Data: 27|System.Collections.Generic.List`1[[System.String, mscorlib]], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: LabelSettings
+      Entry: 7
+      Data: 28|SEE.Game.LabelAttributes, SEE
+    - Name: Show
+      Entry: 5
+      Data: true
+    - Name: Distance
+      Entry: 4
+      Data: 0.2
+    - Name: FontSize
+      Entry: 4
+      Data: 0.4
+    - Name: AnimationFactor
+      Entry: 4
+      Data: 0.5
+    - Name: LabelAlpha
+      Entry: 4
+      Data: 1
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: OutlineWidth
+      Entry: 4
+      Data: 1
+    - Name: ShowNames
+      Entry: 5
+      Data: false
+    - Name: AllowManualResize
+      Entry: 5
+      Data: false
+    - Name: AllowManualHeightResize
+      Entry: 5
+      Data: false
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
       Entry: 13
       Data: 
     - Name: 
@@ -26669,7 +26643,7 @@ MonoBehaviour:
       Data: 
     - Name: MarkerAttributes
       Entry: 7
-      Data: 23|SEE.Game.City.MarkerAttributes, SEE
+      Data: 29|SEE.Game.City.MarkerAttributes, SEE
     - Name: MarkerHeight
       Entry: 4
       Data: 0.2
@@ -26735,10 +26709,10 @@ MonoBehaviour:
       Data: 
     - Name: MetricToColor
       Entry: 7
-      Data: 24|SEE.Game.City.ColorMap, SEE
+      Data: 30|SEE.Game.City.ColorMap, SEE
     - Name: map
       Entry: 7
-      Data: 25|SEE.Game.City.ColorRangeMapping, SEE
+      Data: 31|SEE.Game.City.ColorRangeMapping, SEE
     - Name: comparer
       Entry: 9
       Data: 4
@@ -26810,23 +26784,23 @@ MonoBehaviour:
       Data: 
     - Name: DataProvider
       Entry: 7
-      Data: 26|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
+      Data: 32|SEE.GraphProviders.SingleGraphPipelineProvider, SEE
     - Name: Pipeline
       Entry: 7
-      Data: 27|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
+      Data: 33|System.Collections.Generic.List`1[[SEE.GraphProviders.SingleGraphProvider,
         SEE]], mscorlib
     - Name: 
       Entry: 12
       Data: 1
     - Name: 
       Entry: 7
-      Data: 28|SEE.GraphProviders.BetweenCommitsGraphProvider, SEE
+      Data: 34|SEE.GraphProviders.BetweenCommitsGraphProvider, SEE
     - Name: GitRepository
       Entry: 7
-      Data: 29|SEE.VCS.GitRepository, SEE
+      Data: 35|SEE.VCS.GitRepository, SEE
     - Name: RepositoryPath
       Entry: 7
-      Data: 30|SEE.Utils.Paths.DataPath, SEE
+      Data: 36|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
       Data: 1
@@ -26841,10 +26815,10 @@ MonoBehaviour:
       Data: 
     - Name: VCSFilter
       Entry: 7
-      Data: 31|SEE.VCS.Filter, SEE
+      Data: 37|SEE.VCS.Filter, SEE
     - Name: Globbing
       Entry: 7
-      Data: 32|SEE.Utils.Globbing, SEE
+      Data: 38|SEE.Utils.Globbing, SEE
     - Name: comparer
       Entry: 9
       Data: 4
@@ -26871,7 +26845,7 @@ MonoBehaviour:
       Data: 
     - Name: RepositoryPaths
       Entry: 7
-      Data: 33|System.String[], mscorlib
+      Data: 39|System.String[], mscorlib
     - Name: 
       Entry: 12
       Data: 2
@@ -26889,7 +26863,7 @@ MonoBehaviour:
       Data: 
     - Name: Branches
       Entry: 7
-      Data: 34|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+      Data: 40|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
     - Name: 
       Entry: 12
       Data: 1
@@ -26911,6 +26885,12 @@ MonoBehaviour:
     - Name: SimplifyGraph
       Entry: 5
       Data: true
+    - Name: CombineAuthors
+      Entry: 5
+      Data: false
+    - Name: AuthorAliasMap
+      Entry: 6
+      Data: 
     - Name: CommitID
       Entry: 1
       Data: 6468e775f859eda7473736d9040cd760fefa5ebb
@@ -29516,10 +29496,10 @@ MonoBehaviour:
       Data: true
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: 
       Entry: 8
       Data: 
@@ -29669,7 +29649,7 @@ MonoBehaviour:
       Data: 17|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: true
+      Data: false
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30065,7 +30045,7 @@ MonoBehaviour:
       Data: 35|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30197,7 +30177,7 @@ MonoBehaviour:
       Data: 41|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
@@ -30593,7 +30573,7 @@ MonoBehaviour:
       Data: 59|SEE.Game.City.VisualNodeAttributes, SEE
     - Name: IsRelevant
       Entry: 5
-      Data: false
+      Data: true
     - Name: Shape
       Entry: 3
       Data: 0
