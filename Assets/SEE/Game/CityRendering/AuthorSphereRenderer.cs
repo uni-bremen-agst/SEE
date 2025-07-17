@@ -119,8 +119,8 @@ namespace SEE.Game.CityRendering
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
-                    gameEdge.AddComponent<InteractableObject>();
-                    GraphElementRef graphElemRef = gameEdge.AddComponent<GraphElementRef>();
+                    // gameEdge.AddComponent<InteractableObject>();
+                    // GraphElementRef graphElemRef = gameEdge.AddComponent<GraphElementRef>();
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
@@ -133,10 +133,11 @@ namespace SEE.Game.CityRendering
 
                     authorSphere.Edges.Add((gameEdge, churn));
 
-                    if (Settings is BranchCity branchCity && !branchCity.ShowEdgesPermantly)
+                    if (Settings is BranchCity branchCity && branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
                     {
                         gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                        if (authorRef.AuthorSpheres.Count > 1)
+
+                        if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                         {
                             foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
                             {
@@ -220,17 +221,11 @@ namespace SEE.Game.CityRendering
 
                     AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
                     author.Author = authors[counter];
-                    Node authorNode = new Node()
-                    {
-                        ID = gameObject.name,
-                        Type = "Author.Sphere"
-                    };
-                    rootNode.AddChild(authorNode);
-                    graph.AddNode(authorNode);
-                    gameObject.AddComponent<NodeRef>().Value = authorNode;
+
+                    gameObject.AddComponent<NodeRef>().Value = rootNode;
 
                     gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowEdges>();
+                    gameObject.AddComponent<ShowAuthorEdges>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;

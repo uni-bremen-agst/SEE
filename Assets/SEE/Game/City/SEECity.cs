@@ -277,6 +277,10 @@ namespace SEE.Game.City
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
+                if (child.TryGetComponent(out AuthorSphere _))
+                {
+                    continue;
+                }
                 if (child.TryGetComponent(out NodeRef nodeRef))
                 {
                     nodeRef.Value = graph.GetNode(child.name);

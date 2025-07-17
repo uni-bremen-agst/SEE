@@ -299,57 +299,8 @@ namespace SEE.Controls.Actions
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
                                                        fromSelection);
                 ToggleEdges(edges, edgeToggleToken.Token, animationKind).Forget();
-
-                if (codeCity is BranchCity)
-                {
-                    ToggleBranchCityEdges(animationKind, edgeToggleToken.Token).Forget();
-                }
             }
             return;
-
-            async UniTaskVoid ToggleBranchCityEdges(EdgeAnimationKind animationKind, CancellationToken token)
-            {
-                // When the user hovers over a graph node
-                if (gameObject.TryGetComponent(out AuthorRef authorRef))
-                {
-                    if (authorRef.Edges.Count > 1)
-                    {
-                        return;
-                    }
-                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
-                    {
-                        edge.EdgeOperator()?.ShowOrHide(show, animationKind);
-                    }
-                    if (show)
-                    {
-                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
-                    }
-                    if (token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
-
-                // When the user hovers over an AuthorSphere.
-                else if (gameObject.TryGetComponent(out AuthorSphere sphere))
-                {
-                    foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
-                    {
-                        if (edge.TryGetComponent(out AuthorEdge authorEdge) && authorEdge.targetNode.Edges.Count == 1)
-                        {
-                            edge.EdgeOperator()?.ShowOrHide(show, animationKind);
-                        }
-                    }
-                    if (show)
-                    {
-                        await UniTask.Delay(TransitiveDelay, cancellationToken: token);
-                    }
-                    if (token.IsCancellationRequested)
-                    {
-                        return;
-                    }
-                }
-            }
 
             async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token, EdgeAnimationKind animationKind)
             {

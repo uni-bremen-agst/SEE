@@ -41,10 +41,19 @@ namespace SEE.Game.City
         public bool CombineAuthors;
 
 
-        [Tooltip("If true, the edges connecting the authors spheres and nodes will be shown permantly"),
-         TabGroup(VCSFoldoutGroup),
-         RuntimeTab(VCSFoldoutGroup)]
-        public bool ShowEdgesPermantly;
+        [TabGroup(EdgeFoldoutGroup),
+         RuntimeTab(EdgeFoldoutGroup)]
+        public ShowAuthorEdgeStrategy ShowEdgesStrategy =
+                ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+
+
+        [ShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         RuntimeShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         Range(2, 20),
+         TabGroup(EdgeFoldoutGroup),
+         RuntimeTab(EdgeFoldoutGroup)]
+        public int AuthorThreshold = 2;
+
 
         /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
