@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace SEE.Game.Drawable.ActionHelpers
@@ -44,15 +43,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the square consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the square. It's the hit point on the drawable.</param>
-        /// <param name="a">The length for the edge</param>
+        /// <param name="length">The length for the edge</param>
         /// <returns>The positions for the square</returns>
-        public static Vector3[] Square(Vector3 point, float a)
+        public static Vector3[] Square(Vector3 point, float length)
         {
-            Vector3 A = new Vector3(point.x - a / 2, point.y - a / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(A.x + a, A.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(B.x, B.y + a, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(A.x, A.y + a, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - length / 2, point.y - length / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(a.x + length, a.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(b.x, b.y + length, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(a.x, a.y + length, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -61,16 +60,16 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the rectangle consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="a">Specifies the edge length of the a sides of the rectangle</param>
-        /// <param name="b">Specifies the edge length of the b sides of the rectangle</param>
+        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle</param>
+        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle</param>
         /// <returns>The positions for the rectangle</returns>
-        public static Vector3[] Rectangle(Vector3 point, float a, float b)
+        public static Vector3[] Rectangle(Vector3 point, float aLength, float bLength)
         {
-            Vector3 A = new Vector3(point.x - a / 2, point.y - b / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(A.x + a, A.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(B.x, B.y + b, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(A.x, A.y + b, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(b.x, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -79,16 +78,16 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the rhombus consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the rhombus. It's the hit point on the drawable.</param>
-        /// <param name="f">Specifies the edge length of the f sides of the rhombus</param>
-        /// <param name="e">Specifies the edge length of the e sides of the rhombus</param>
+        /// <param name="fLength">Specifies the edge length of the f sides of the rhombus</param>
+        /// <param name="eLength">Specifies the edge length of the e sides of the rhombus</param>
         /// <returns>The positions for the rhombus</returns>
-        public static Vector3[] Rhombus(Vector3 point, float f, float e)
+        public static Vector3[] Rhombus(Vector3 point, float fLength, float eLength)
         {
-            Vector3 A = new Vector3(point.x - e / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(point.x, point.y - f / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(point.x + e / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(point.x, point.y + f / 2, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(point.x, point.y - fLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(point.x + eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(point.x, point.y + fLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -97,17 +96,17 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the kite consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the kite. It's the hit point on the drawable.</param>
-        /// <param name="f1">Specifies the edge length of the f1 sides of the kite</param>
-        /// <param name="f2">Specifies the edge length of the f1 sides of the kite</param>
-        /// <param name="e">Specifies the edge length of the e sides of the kite</param>
+        /// <param name="f1Length">Specifies the edge length of the f1 sides of the kite</param>
+        /// <param name="f2Length">Specifies the edge length of the f1 sides of the kite</param>
+        /// <param name="eLength">Specifies the edge length of the e sides of the kite</param>
         /// <returns>The positions for the kite</returns>
-        public static Vector3[] Kite(Vector3 point, float f1, float f2, float e)
+        public static Vector3[] Kite(Vector3 point, float f1Length, float f2Length, float eLength)
         {
-            Vector3 A = new Vector3(point.x - e / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(point.x, point.y - f2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(point.x + e / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(point.x, point.y + f1, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(point.x, point.y - f2Length, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(point.x + eLength / 2, point.y, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(point.x, point.y + f1Length, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -116,15 +115,15 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the triangle consists of four points.
         /// </summary>
         /// <param name="point">The middle point of the triangle. It's the hit point on the drawable.</param>
-        /// <param name="c">Specifies the edge length of the c side of the triangle</param>
-        /// <param name="h">Specifies the height of the triangle</param>
+        /// <param name="cLength">Specifies the edge length of the c side of the triangle</param>
+        /// <param name="hLength">Specifies the height of the triangle</param>
         /// <returns>The positions for the triangle</returns>
-        public static Vector3[] Triangle(Vector3 point, float c, float h)
+        public static Vector3[] Triangle(Vector3 point, float cLength, float hLength)
         {
-            Vector3 A = new Vector3(point.x - c / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(point.x + c / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(point.x, point.y + h / 2, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, A };
+            Vector3 a = new Vector3(point.x - cLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(point.x + cLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(point.x, point.y + hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, a };
         }
 
         /// <summary>
@@ -161,19 +160,19 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the parallelogram consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the parallelogram. It's the hit point on the drawable.</param>
-        /// <param name="a">Specifies the edge length of the a side of the parallelogram</param>
-        /// <param name="h">Specifies the height parallelogram</param>
+        /// <param name="aLength">Specifies the edge length of the a side of the parallelogram</param>
+        /// <param name="hLength">Specifies the height parallelogram</param>
         /// <param name="offset">Specifies by how much points C and D of the parallelogram should be moved.
         /// If the offset is in the negative range, the points will be shifted to the left.
         /// In the positive range, to the right.</param>
         /// <returns>The positions of the parallelogram.</returns>
-        public static Vector3[] Parallelogram(Vector3 point, float a, float h, float offset)
+        public static Vector3[] Parallelogram(Vector3 point, float aLength, float hLength, float offset)
         {
-            Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(B.x + offset, B.y + h, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(A.x + offset, A.y + h, 0) - ValueHolder.DistanceToDrawable;
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - aLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(point.x + aLength / 2, point.y - hLength / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(b.x + offset, b.y + hLength, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(a.x + offset, a.y + hLength, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -182,18 +181,17 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Thus, the trapezoid consists of five points.
         /// </summary>
         /// <param name="point">The middle point of the trapezoid. It's the hit point on the drawable.</param>
-        /// <param name="a">Specifies the edge length of the a side (bottom side) of the trapezoid</param>
-        /// <param name="c">Specifies the edge length of the c side (upper side) of the trapezoid</param>
-        /// <param name="h">Specifies the height of the trapezoid</param>
+        /// <param name="aLength">Specifies the edge length of the a side (bottom side) of the trapezoid</param>
+        /// <param name="cLength">Specifies the edge length of the c side (upper side) of the trapezoid</param>
+        /// <param name="height">Specifies the height of the trapezoid</param>
         /// <returns>the calculated positions of the trapezoid.</returns>
-        public static Vector3[] Trapezoid(Vector3 point, float a, float c, float h)
+        public static Vector3[] Trapezoid(Vector3 point, float aLength, float cLength, float height)
         {
-            Vector3 A = new Vector3(point.x - a / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 B = new Vector3(point.x + a / 2, point.y - h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 C = new Vector3(point.x + c / 2, point.y + h / 2, 0) - ValueHolder.DistanceToDrawable;
-            Vector3 D = new Vector3(point.x - c / 2, point.y + h / 2, 0) - ValueHolder.DistanceToDrawable;
-
-            return new Vector3[] { A, B, C, D, A };
+            Vector3 a = new Vector3(point.x - aLength / 2, point.y - height / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 b = new Vector3(point.x + aLength / 2, point.y - height / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 c = new Vector3(point.x + cLength / 2, point.y + height / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 d = new Vector3(point.x - cLength / 2, point.y + height / 2, 0) - ValueHolder.DistanceToDrawable;
+            return new Vector3[] { a, b, c, d, a };
         }
 
         /// <summary>
@@ -246,64 +244,64 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// and the connecting lines would always be on the corner edges of the rectangle.
         /// </summary>
         /// <param name="point">The middle point of the rectangle. It's the hit point on the drawable.</param>
-        /// <param name="a">Specifies the edge length of the a sides of the rectangle</param>
-        /// <param name="b">Specifies the edge length of the b sides of the rectangle</param>
+        /// <param name="aLength">Specifies the edge length of the a sides of the rectangle</param>
+        /// <param name="bLength">Specifies the edge length of the b sides of the rectangle</param>
         /// <returns>The positions for the rectangle</returns>
-        public static Vector3[] MindMapRectangle(Vector3 point, float a, float b)
+        public static Vector3[] MindMapRectangle(Vector3 point, float aLength, float bLength)
         {
-            float splitA = a / 12;
-            float splitB = b / 12;
+            float splitA = aLength / 12;
+            float splitB = bLength / 12;
 
-            Vector3 A = new Vector3(point.x - a / 2, point.y - b / 2, 0) - ValueHolder.DistanceToDrawable;
+            Vector3 a = new Vector3(point.x - aLength / 2, point.y - bLength / 2, 0) - ValueHolder.DistanceToDrawable;
 
             /// Calculates the points between A and B.
-            Vector3[] AB = new Vector3[14];
-            AB[0] = A;
+            Vector3[] ab = new Vector3[14];
+            ab[0] = a;
             for (int i = 1; i < 13; i++)
             {
-                AB[i] = new Vector3(AB[i - 1].x + splitA, AB[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
+                ab[i] = new Vector3(ab[i - 1].x + splitA, ab[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 B = new Vector3(A.x + a, A.y, 0) - ValueHolder.DistanceToDrawable;
-            AB[13] = B;
+            Vector3 b = new Vector3(a.x + aLength, a.y, 0) - ValueHolder.DistanceToDrawable;
+            ab[13] = b;
 
             /// Calculates the points between B and C.
-            Vector3[] BC = new Vector3[14];
-            BC[0] = B;
+            Vector3[] bc = new Vector3[14];
+            bc[0] = b;
             for (int i = 1; i < 13; i++)
             {
-                BC[i] = new Vector3(BC[i - 1].x, BC[i - 1].y + splitB, 0) - ValueHolder.DistanceToDrawable;
+                bc[i] = new Vector3(bc[i - 1].x, bc[i - 1].y + splitB, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 C = new Vector3(B.x, B.y + b, 0) - ValueHolder.DistanceToDrawable;
-            BC[13] = C;
+            Vector3 c = new Vector3(b.x, b.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            bc[13] = c;
 
             /// Calculates the points between C and D.
-            Vector3[] CD = new Vector3[14];
-            CD[0] = C;
+            Vector3[] cd = new Vector3[14];
+            cd[0] = c;
             for (int i = 1; i < 13; i++)
             {
-                CD[i] = new Vector3(CD[i - 1].x - splitA, CD[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
+                cd[i] = new Vector3(cd[i - 1].x - splitA, cd[i - 1].y, 0) - ValueHolder.DistanceToDrawable;
             }
 
-            Vector3 D = new Vector3(A.x, A.y + b, 0) - ValueHolder.DistanceToDrawable;
-            CD[13] = D;
+            Vector3 d = new Vector3(a.x, a.y + bLength, 0) - ValueHolder.DistanceToDrawable;
+            cd[13] = d;
 
             /// Calculates the points between D and A.
-            Vector3[] DA = new Vector3[14];
-            DA[0] = D;
+            Vector3[] da = new Vector3[14];
+            da[0] = d;
             for (int i = 1; i < 13; i++)
             {
-                DA[i] = new Vector3(DA[i - 1].x, DA[i - 1].y - splitB, 0) - ValueHolder.DistanceToDrawable;
+                da[i] = new Vector3(da[i - 1].x, da[i - 1].y - splitB, 0) - ValueHolder.DistanceToDrawable;
             }
-            DA[13] = A;
+            da[13] = a;
 
             /// Concatenates all arrays.
-            Vector3[] all = new Vector3[AB.Length + BC.Length + CD.Length + DA.Length];
-            AB.CopyTo(all, 0);
-            BC.CopyTo(all, AB.Length);
-            CD.CopyTo(all, AB.Length + BC.Length);
-            DA.CopyTo(all, AB.Length + BC.Length + CD.Length);
+            Vector3[] all = new Vector3[ab.Length + bc.Length + cd.Length + da.Length];
+            ab.CopyTo(all, 0);
+            bc.CopyTo(all, ab.Length);
+            cd.CopyTo(all, ab.Length + bc.Length);
+            da.CopyTo(all, ab.Length + bc.Length + cd.Length);
             return all;
         }
     }
