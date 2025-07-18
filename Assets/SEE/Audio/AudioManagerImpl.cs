@@ -329,7 +329,6 @@ namespace SEE.Audio
         /// </summary>
         private void TriggerVolumeChanges()
         {
-
             musicPlayer.volume = MusicVolume;
             musicPlayer.mute = MusicMuted;
             soundEffectPlayer.volume = SoundEffectsVolume;
