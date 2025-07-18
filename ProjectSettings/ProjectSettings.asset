@@ -406,6 +406,7 @@ PlayerSettings:
   - serializedVersion: 2
     m_BuildTarget: PS4
     m_EncodingQuality: 1
+  m_BuildTargetGroupHDRCubemapEncodingQuality: []
   m_BuildTargetGroupLightmapSettings: []
   m_BuildTargetGroupLoadStoreDebugModeSettings: []
   m_BuildTargetNormalMapEncoding: []
@@ -700,6 +701,7 @@ PlayerSettings:
     LinuxHeadlessSimulation: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;DOTWEEN
     Lumin: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV
     Nintendo Switch: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;CT_RTFB;DOTWEEN
+    Nintendo Switch 2: CT_RTV;CT_PROC;UNITY_POST_PROCESSING_STACK_V2
     PS4: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;CT_RTFB;DOTWEEN
     PS5: UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTV;CT_RTFB;DOTWEEN
     QNX: CT_RTV;UNITY_POST_PROCESSING_STACK_V2;CT_PROC;CT_RTFB;DOTWEEN
