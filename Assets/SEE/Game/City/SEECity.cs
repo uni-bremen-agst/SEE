@@ -622,15 +622,13 @@ namespace SEE.Game.City
             base.Restore(attributes);
             if (DataProvider != null && DataProvider.Pipeline.Count > 0)
             {
-                Debug.Log($"Case 1");
                 DataProvider.Pipeline = (SingleGraphProvider.Restore(attributes, dataProviderPathLabel)
                     as SingleGraphPipelineProvider).Pipeline;
             }
             else
             {
-                Debug.Log($"Case 2");
-                DataProvider =
-                               SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+                DataProvider = SingleGraphProvider.Restore(attributes, dataProviderPathLabel)
+                    as SingleGraphPipelineProvider;
             }
         }
 

@@ -210,6 +210,13 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         private const string citySwitcherPath = "City Switcher";
 
+        /// <summary>
+        /// Indicator whether the provider
+        /// (<see cref="SingleGraphPipelineProvider"/> or <see cref="MultiGraphPipelineProvider"/>)
+        /// needs to be rebuit.
+        /// </summary>
+        private bool rebuildProvider = false;
+
         protected override void StartDesktop()
         {
             base.StartDesktop();
@@ -393,7 +400,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // add button listeners
             if (methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
-                ||methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
+                || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
             {
                 buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
             }
@@ -444,7 +451,6 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     doRebuild = await task;
                 }
-                //OnUpdateMenuValues?.Invoke();
                 UpdateCityMethodNetAction netAction = new()
                 {
                     CityIndex = CityIndex,
@@ -454,18 +460,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 CheckControlConditionsWithDelay();
                 if (doRebuild)
                 {
-                    Debug.Log($"Do rebuild");
-                    await UniTask.DelayFrame(10);
+                    rebuildProvider = true;
                     OnUpdateMenuValues?.Invoke();
-                    Debug.Log($"After Invoke");
-                    //if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                    //{
-                    //    runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
-                    //}
-                    //else
-                    //{
-                    //    throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
-                    //}
                 }
             }
         }
@@ -863,17 +859,33 @@ namespace SEE.UI.RuntimeConfigMenu
                         obj);
                     OnUpdateMenuValues += () =>
                     {
-                        List<SingleGraphProvider> pip = (List<SingleGraphProvider>)pipeline.GetValue(value);
-                        pip.ForEach(sgp =>
+                        if (rebuildProvider)
                         {
-                            Debug.Log($"{sgp.GetType()}");
-                            if (sgp is ReflexionGraphProvider reflexion)
-                            {
-                                Debug.Log($"Arch: {reflexion.Architecture}");
-                                Debug.Log($"Impl: {reflexion.Implementation}");
-                                Debug.Log($"Mapping: {reflexion.Mapping}");
-                            }
-                        });
+                            // Deletes the content of the old provider list and stores the sibling index.
+                            GameObject oldProvider = parent.FindDescendant(settingName);
+                            int siblingIndex = oldProvider.transform.GetSiblingIndex();
+                            Destroyer.Destroy(oldProvider);
+
+                            // Creates a new provider list based on the current pipline value.
+                            List<SingleGraphProvider> pip = (List<SingleGraphProvider>)pipeline.GetValue(value);
+                            CreateSetting(() => pipeline.GetValue(value),
+                                settingName,
+                                parent,
+                                removable,
+                                null,
+                                attributeArray,
+                                value.GetType().GetField(nameof(SingleGraphPipelineProvider.Pipeline))!,
+                                obj);
+
+                            // Restores the original sibling index to maintain hierarchy order.
+                            GameObject newProvider = parent.GetComponentsInChildren<Transform>()
+                                .LastOrDefault(t => t.gameObject.name == settingName)?
+                                .gameObject;
+                            newProvider.transform.SetSiblingIndex(siblingIndex);
+
+                            // Resets the rebuild flag.
+                            rebuildProvider = false;
+                        }
                     };
                     break;
 
@@ -2037,7 +2049,7 @@ namespace SEE.UI.RuntimeConfigMenu
             OnUpdateMenuValues += () =>
             {
                 bool isAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
-                if (filePicker.didStart)
+                if (filePicker != null && filePicker.didStart)
                 {
                     filePicker.SyncPath(isAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath, isAbsolute);
                     filePicker.SyncDropdown((int)dataPath.Root);
