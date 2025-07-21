@@ -279,10 +279,6 @@ namespace SEE.UI.RuntimeConfigMenu
             bool HasTabAttribute(MemberInfo memberInfo) =>
                 !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
 
-            float GetOrderOfMemberInfo(MemberInfo memberInfo) =>
-                (memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
-                    .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
-
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
