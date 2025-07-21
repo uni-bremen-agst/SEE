@@ -620,8 +620,18 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider =
-                SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            if (DataProvider != null && DataProvider.Pipeline.Count > 0)
+            {
+                Debug.Log($"Case 1");
+                DataProvider.Pipeline = (SingleGraphProvider.Restore(attributes, dataProviderPathLabel)
+                    as SingleGraphPipelineProvider).Pipeline;
+            }
+            else
+            {
+                Debug.Log($"Case 2");
+                DataProvider =
+                               SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            }
         }
 
         #endregion

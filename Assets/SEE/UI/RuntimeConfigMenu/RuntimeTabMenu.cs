@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -865,6 +865,20 @@ namespace SEE.UI.RuntimeConfigMenu
                         attributeArray,
                         pipeline,
                         obj);
+                    OnUpdateMenuValues += () =>
+                    {
+                        List<SingleGraphProvider> pip = (List<SingleGraphProvider>)pipeline.GetValue(value);
+                        pip.ForEach(sgp =>
+                        {
+                            Debug.Log($"{sgp.GetType()}");
+                            if (sgp is ReflexionGraphProvider reflexion)
+                            {
+                                Debug.Log($"Arch: {reflexion.Architecture}");
+                                Debug.Log($"Impl: {reflexion.Implementation}");
+                                Debug.Log($"Mapping: {reflexion.Mapping}");
+                            }
+                        });
+                    };
                     break;
 
                 case MultiGraphPipelineProvider:
@@ -1234,7 +1248,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             /// Returns the desired type from a dictionary, depending on searchKeyType.
             /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
-            /// If it�s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
+            /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
             /// the second case is used, where the base type is examined.
             /// If the types cannot be determined here either, it tries to extract the types directly from the first entry.
             /// However, this only works if the dictionary is not empty.
@@ -2026,12 +2040,12 @@ namespace SEE.UI.RuntimeConfigMenu
 
             OnUpdateMenuValues += () =>
             {
-                Debug.Log($"Update {settingName}");
-                Debug.Log($"Original datapath {dataPath}");
                 bool isAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
-                Debug.Log($"isAbsolute {isAbsolute}, absolute {dataPath.AbsolutePath}, relative {dataPath.RelativePath}");
-                filePicker.SyncPath(isAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath, isAbsolute);
-                filePicker.SyncDropdown((int)dataPath.Root);
+                if (filePicker.didStart)
+                {
+                    filePicker.SyncPath(isAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath, isAbsolute);
+                    filePicker.SyncDropdown((int)dataPath.Root);
+                }
             };
         }
 
