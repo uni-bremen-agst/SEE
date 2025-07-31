@@ -367,8 +367,11 @@ namespace SEE.Game.SceneManipulation
                 .Where(node => node != null)
                 .ToList(),
                 nodeTypes);
-            RestoreGraph(nodesOrEdges);
-            foreach (GameObject nodeOrEdge in nodesOrEdges)
+            ISet<GameObject> filtered = nodesOrEdges
+                .Where(go => go.GetComponent<NodeRef>() != null || go.GetComponent<EdgeRef>() != null)
+                .ToHashSet();
+            RestoreGraph(filtered);
+            foreach (GameObject nodeOrEdge in filtered)
             {
                 SetActive(nodeOrEdge);
                 GameObjectFader.FadingIn(nodeOrEdge);
