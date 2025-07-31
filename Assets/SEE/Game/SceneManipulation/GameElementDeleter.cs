@@ -109,10 +109,6 @@ namespace SEE.Game.SceneManipulation
                             subMem.Parents.ForEach(pair => subgraphMemento.Parents.Add(pair));
                             subMem.Edges.ForEach(edge => subgraphMemento.Edges.Add(edge));
                         }
-                        if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                        {
-                            runtimeConfigMenu.BlockOpening();
-                        }
                         return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }
                     else

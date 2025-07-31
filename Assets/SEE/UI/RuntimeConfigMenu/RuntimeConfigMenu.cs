@@ -41,12 +41,6 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool menuReady = false;
 
         /// <summary>
-        /// Indicator of whether opening the menu should be blocked.
-        /// This is only the case during the deletion process.
-        /// </summary>
-        private bool blockOpening;
-
-        /// <summary>
         /// Instantiates the tab menu for each city.
         /// </summary>
         private void Start()
@@ -169,12 +163,6 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             if (SEEInput.ToggleConfigMenu())
             {
-                if (blockOpening)
-                {
-                    ShowNotification.Warn("Menu opening is blocked.",
-                        "A deletion process is in progress, and therefore the menu cannot be opened.");
-                    return;
-                }
                 if (cityMenus.Length <= currentCity)
                 {
                     currentCity = cityMenus.Length - 1;
@@ -241,20 +229,11 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Sets the notification that the opening of the menu is blocked.
-        /// </summary>
-        public void BlockOpening()
-        {
-            blockOpening = true;
-        }
-
-        /// <summary>
         /// Performs a tab rebuild for the given <paramref name="city"/>.
         /// </summary>
         /// <param name="city">The city whose tab should be rebuilt.</param>
         public void PerformTabRebuild(AbstractSEECity city)
         {
-            blockOpening = false;
             RebuildTabAsync(GetIndexForCity(city)).Forget();
         }
 
@@ -294,7 +273,6 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="city">The city for which the update should be performed.</param>
         public void PerformUpdate(AbstractSEECity city)
         {
-            blockOpening = false;
             int index = GetIndexForCity(city);
             if (index < 0 || index >= cityMenus.Length)
             {
