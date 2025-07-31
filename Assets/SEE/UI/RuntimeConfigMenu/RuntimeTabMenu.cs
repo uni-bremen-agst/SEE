@@ -399,8 +399,7 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
-            if (methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
-                || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
+            if (IsLoadMethod(methodInfo))
             {
                 buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
             }
@@ -429,10 +428,18 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (methodName == methodInfo.Name)
                 {
-                    // calls the method and updates the menu
-                    methodInfo.Invoke(city, null);
-                    OnUpdateMenuValues?.Invoke();
-                    CheckControlConditionsWithDelay();
+                    if (IsLoadMethod(methodInfo))
+                    {
+                        ExecuteLoadAsyncWithoutNetwork().Forget();
+                    }
+                    else
+                    {
+                        // calls the method and updates the menu
+                        methodInfo.Invoke(city, null);
+                        OnUpdateMenuValues?.Invoke();
+                        CheckControlConditionsWithDelay();
+                    }
+
                 }
             };
 
@@ -443,7 +450,13 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             controlConditions.Add((methodInfo, button, city));
 
-            async UniTask ExecuteLoadAsync()
+            bool IsLoadMethod(MethodInfo methodInfo)
+            {
+                return methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
+                || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync));
+            }
+
+            async UniTask ExecuteLoadAsyncWithoutNetwork()
             {
                 object result = methodInfo.Invoke(city, null);
                 bool doRebuild = true;
@@ -451,18 +464,23 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     doRebuild = await task;
                 }
-                UpdateCityMethodNetAction netAction = new()
-                {
-                    CityIndex = CityIndex,
-                    MethodName = methodInfo.Name
-                };
-                netAction.Execute();
                 CheckControlConditionsWithDelay();
                 if (doRebuild)
                 {
                     rebuildProvider = true;
                     OnUpdateMenuValues?.Invoke();
                 }
+            }
+
+            async UniTask ExecuteLoadAsync()
+            {
+                await ExecuteLoadAsyncWithoutNetwork();
+                UpdateCityMethodNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    MethodName = methodInfo.Name
+                };
+                netAction.Execute();
             }
         }
 
