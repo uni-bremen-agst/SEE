@@ -294,6 +294,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="city">The city for which the update should be performed.</param>
         public void PerformUpdate(AbstractSEECity city)
         {
+            blockOpening = false;
             int index = GetIndexForCity(city);
             if (index < 0 || index >= cityMenus.Length)
             {
