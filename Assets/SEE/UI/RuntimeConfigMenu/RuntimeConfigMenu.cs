@@ -286,5 +286,20 @@ namespace SEE.UI.RuntimeConfigMenu
                     .Entries.FirstOrDefault(entry => entry.Title.Equals(active)));
             }
         }
+
+        /// <summary>
+        /// Performs an immediate update for the specified <paramref name="city"/>,
+        /// if it exists whithin the vailid index range.
+        /// </summary>
+        /// <param name="city">The city for which the update should be performed.</param>
+        public void PerformUpdate(AbstractSEECity city)
+        {
+            int index = GetIndexForCity(city);
+            if (index < 0 || index >= cityMenus.Length)
+            {
+                return;
+            }
+            cityMenus[index].ImmediateUpdate();
+        }
     }
 }

@@ -2305,6 +2305,14 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
+        /// Triggers the immediate update.
+        /// </summary>
+        public void ImmediateUpdate()
+        {
+            OnUpdateMenuValues?.Invoke();
+        }
+
+        /// <summary>
         /// Assigns a color to a tab button.
         ///
         /// Uses a base brightness and alternately makes that color slightly brighter/darker.

@@ -557,12 +557,19 @@ namespace SEE.Game.City
                     graphProvider.Implementation = path;
                 }
 
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                UpdateRuntimeMenu().Forget();
+
+                return (graph, (GraphRenderer)Renderer);
+            }
+
+            async UniTask UpdateRuntimeMenu()
+            {
+                // We need to wait for the changes to occur.
+                await UniTask.Yield();
                 if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                 {
-                    runtimeConfigMenu.PerformTabRebuild(this);
+                    runtimeConfigMenu.PerformUpdate(this);
                 }
-                return (graph, (GraphRenderer)Renderer);
             }
 
             void AddMissingNodeTypes(Graph graph, GraphRenderer renderer)
