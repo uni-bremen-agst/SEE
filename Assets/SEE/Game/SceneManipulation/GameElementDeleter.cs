@@ -177,7 +177,7 @@ namespace SEE.Game.SceneManipulation
                 /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
                 if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                 {
-                    runtimeConfigMenu.PerformTabRebuild(city);
+                    runtimeConfigMenu.PerformUpdate(city);
                 }
             }
 
@@ -516,7 +516,7 @@ namespace SEE.Game.SceneManipulation
                 {
                     foreach (SEEReflexionCity city in affectedCities)
                     {
-                        runtimeConfigMenu.PerformTabRebuild(city);
+                        runtimeConfigMenu.PerformUpdate(city);
                     }
                 }
             }
