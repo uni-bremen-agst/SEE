@@ -83,6 +83,8 @@ namespace SEE.UI.RuntimeConfigMenu
             // Wait one frame to ensure all pending city deletions are complete to avoid redundant rebuilds.
             await UniTask.DelayFrame(1);
             RuntimeTabMenu currentTab = cityMenus[currentCity];
+            int index = currentTab.CityIndex;
+
             bool isOpen = currentTab.ShowMenu;
             if (isOpen)
             {
@@ -113,6 +115,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (!newCities.Any(city => city.Equals(oldCity)))
                 {
                     int oldIndex = Array.IndexOf(currentMenuCities, oldCity);
+                    if (oldIndex == currentCity && currentCity > 0)
+                    {
+                        currentCity--;
+                    }
                     Destroyer.Destroy(oldMenus[oldIndex]);
                 }
             }
@@ -120,13 +126,16 @@ namespace SEE.UI.RuntimeConfigMenu
             currentMenuCities = newCities;
             await UniTask.WaitUntil(() => cityMenus.All(menu => menu != null));
             cityMenus.ForEach(menu => menu.UpdateCitySwitcher());
+            if (currentTab != null && index != currentTab.CityIndex)
+            {
+                currentCity = currentTab.CityIndex;
+            }
             menuReady = true;
 
             if (isOpen)
             {
                 if (currentTab != null)
                 {
-                    SwitchCity(currentTab.CityIndex);
                     currentTab.ShowMenu = true;
                 }
                 else
