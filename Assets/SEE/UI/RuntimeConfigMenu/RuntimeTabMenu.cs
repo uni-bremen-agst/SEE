@@ -23,6 +23,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -235,6 +236,47 @@ namespace SEE.UI.RuntimeConfigMenu
             };
 
             SetupMenu();
+
+            List<GameObject> list = Content.GetComponentsInChildren<RuntimeConfigMenuCollapse>(true).Select(rcmc => rcmc.gameObject).ToList();
+            foreach (GameObject go in list)
+            {
+                go.FindDescendant("CollapseButton").GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() =>
+                {
+                    Scrollbar scrollbar = GetTabScrollbar(GetRuntimeTabGameObject(go));
+                    float viewPosition = scrollbar.value;
+                    ResetViewPosition(scrollbar, viewPosition).Forget();
+                });
+            }
+
+            GameObject GetRuntimeTabGameObject(GameObject go)
+            {
+                if (go.transform.parent == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    if (go.transform.parent.name.Equals("City Configuration"))
+                    {
+                        return go.transform.parent.gameObject;
+                    }
+                    else
+                    {
+                        return GetRuntimeTabGameObject(go.transform.parent.gameObject);
+                    }
+                }
+            }
+
+            Scrollbar GetTabScrollbar(GameObject go)
+            {
+                return go.FindDescendant("TabScrollbar", false).GetComponent<Scrollbar>();
+            }
+
+            async UniTask ResetViewPosition(Scrollbar scrollbar, float value)
+            {
+                await UniTask.WaitUntil(() => scrollbar.value != value);
+                scrollbar.value = value;
+            }
         }
 
         /// <summary>
