@@ -547,11 +547,6 @@ namespace SEE.Game.City
         {
             base.Reset();
             ResetGraphData();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
             if (TryGetComponent(out CitySelectionManager csm))
             {
                 csm.enabled = true;
