@@ -237,10 +237,15 @@ namespace SEE.UI.RuntimeConfigMenu
 
             SetupMenu();
 
-            List<GameObject> list = Content.GetComponentsInChildren<RuntimeConfigMenuCollapse>(true).Select(rcmc => rcmc.gameObject).ToList();
-            foreach (GameObject go in list)
+            List<GameObject> collapseGO = Content
+                .GetComponentsInChildren<RuntimeConfigMenuCollapse>(true)
+                .Select(collapseElements => collapseElements.gameObject)
+                .ToList();
+
+            foreach (GameObject go in collapseGO)
             {
-                go.FindDescendant("CollapseButton").GetComponent<ButtonManagerBasicIcon>().clickEvent.AddListener(() =>
+                go.FindDescendant("CollapseButton").GetComponent<ButtonManagerBasicIcon>()
+                    .clickEvent.AddListener(() =>
                 {
                     Scrollbar scrollbar = GetTabScrollbar(GetRuntimeTabGameObject(go));
                     float viewPosition = scrollbar.value;
