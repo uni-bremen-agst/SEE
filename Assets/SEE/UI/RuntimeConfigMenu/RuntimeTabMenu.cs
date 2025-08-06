@@ -236,7 +236,16 @@ namespace SEE.UI.RuntimeConfigMenu
             };
 
             SetupMenu();
+            RegisterCollapseListeners();
+        }
 
+        /// <summary>
+        ///  Adds click listeners to all collapse buttons in the menu.
+        /// The listener preserves the scroll position
+        /// and prevents unwanted jumps when sections are toggled.
+        /// </summary>
+        private void RegisterCollapseListeners()
+        {
             List<GameObject> collapseGO = Content
                 .GetComponentsInChildren<RuntimeConfigMenuCollapse>(true)
                 .Select(collapseElements => collapseElements.gameObject)
@@ -246,11 +255,10 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 go.FindDescendant("CollapseButton").GetComponent<ButtonManagerBasicIcon>()
                     .clickEvent.AddListener(() =>
-                {
-                    Scrollbar scrollbar = GetTabScrollbar(GetRuntimeTabGameObject(go));
-                    float viewPosition = scrollbar.value;
-                    ResetViewPosition(scrollbar, viewPosition).Forget();
-                });
+                    {
+
+                        ResetViewPosition(go).Forget();
+                    });
             }
 
             GameObject GetRuntimeTabGameObject(GameObject go)
@@ -277,10 +285,43 @@ namespace SEE.UI.RuntimeConfigMenu
                 return go.FindDescendant("TabScrollbar", false).GetComponent<Scrollbar>();
             }
 
-            async UniTask ResetViewPosition(Scrollbar scrollbar, float value)
+            async UniTask ResetViewPosition(GameObject go)
             {
-                await UniTask.WaitUntil(() => scrollbar.value != value);
-                scrollbar.value = value;
+                GameObject runtimeTabGO = GetRuntimeTabGameObject(go);
+
+                Scrollbar scrollbar = GetTabScrollbar(runtimeTabGO);
+                float oldScrollPos = scrollbar.value;
+
+                GameObject viewList = runtimeTabGO.FindDescendant("ViewList");
+                float viewportHeight = viewList.GetComponent<RectTransform>().rect.height;
+
+                RectTransform contentRect = viewList.FindDescendant("Content", false)
+                    .GetComponent<RectTransform>();
+                float oldContentHeight = contentRect.rect.height;
+
+                int maxFrames = 5;
+                int frameCount = 0;
+                await UniTask.WaitUntil(() =>
+                {
+                    frameCount++;
+                    return scrollbar.value != oldScrollPos
+                        || frameCount > maxFrames && oldContentHeight < viewportHeight;
+                });
+
+                float newContentHeight = contentRect.rect.height;
+                float scrollPosPixels = (1 - oldScrollPos) * (oldContentHeight - viewportHeight);
+                float newScrollValue;
+
+                if (newContentHeight <= viewportHeight)
+                {
+                    newScrollValue = 1f;
+                }
+                else
+                {
+                    newScrollValue = 1 - (scrollPosPixels / (newContentHeight - viewportHeight));
+                    newScrollValue = Mathf.Clamp01(newScrollValue);
+                }
+                scrollbar.value = newScrollValue;
             }
         }
 

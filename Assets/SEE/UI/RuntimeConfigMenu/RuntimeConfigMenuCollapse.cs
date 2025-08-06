@@ -13,6 +13,11 @@ namespace SEE.UI.RuntimeConfigMenu
         private bool visibility = true;
 
         /// <summary>
+        /// Gets the value of <see cref="visibility"/>.
+        /// </summary>
+        public bool Visibility => visibility;
+
+        /// <summary>
         /// Parent game object that contains all setting objects.
         /// </summary>
         public GameObject MainContentContainer;
