@@ -47,10 +47,18 @@ namespace SEE.Controls.Actions
             if (gameObject.TryGetComponent(out AuthorRef authorRef))
             {
                 // When the author threashold is reached for the node, we do not show the edges.
-                if (authorRef.Edges.Count >= branchCity.AuthorThreshold)
+                if (authorRef.Edges.Count >= branchCity.AuthorThreshold && branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
                 {
-                    return;
+                    if (show)
+                    {
+                        await UniTask.Delay(ShowEdges.TransitiveDelay, cancellationToken: token);
+                    }
+                    if (token.IsCancellationRequested)
+                    {
+                        return;
+                    }
                 }
+
                 foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
                 {
                     edge.EdgeOperator()?.ShowOrHide(show, animationKind);

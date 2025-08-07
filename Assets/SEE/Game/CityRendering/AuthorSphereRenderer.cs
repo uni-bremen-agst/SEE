@@ -133,17 +133,26 @@ namespace SEE.Game.CityRendering
 
                     authorSphere.Edges.Add((gameEdge, churn));
 
-                    if (Settings is BranchCity branchCity && branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+                    if (Settings is BranchCity branchCity)
                     {
-                        gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-
-                        if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                        switch (branchCity.ShowEdgesStrategy)
                         {
-                            foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
-                            {
-                                edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                            }
+                            case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
+                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+
+                                if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                {
+                                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                    {
+                                        edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                    }
+                                }
+                                break;
+                            case ShowAuthorEdgeStrategy.ShowOnHover:
+                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                break;
                         }
+
                     }
                 }
             }
