@@ -415,6 +415,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     netAction.Execute();
                 });
                 buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
+                buttonManager.clickEvent.AddListener(() => RestorePreviousScrollPosition());
             }
 
             // add network listener
@@ -432,6 +433,7 @@ namespace SEE.UI.RuntimeConfigMenu
                         methodInfo.Invoke(city, null);
                         OnUpdateMenuValues?.Invoke();
                         CheckControlConditionsWithDelay();
+                        RestorePreviousScrollPosition();
                     }
 
                 }
@@ -463,12 +465,18 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                     {
-                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                        float oldScrollValue = GetContentSizeWatcher(button).CurrentScrollValue;
+                        await runtimeConfigMenu.RebuildTabAsync(CityIndex);
+                        RestorePreviousScrollPositionAfterRebuild(oldScrollValue);
                     }
                     else
                     {
                         throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
                     }
+                }
+                else
+                {
+                    RestorePreviousScrollPosition();
                 }
             }
 
@@ -481,6 +489,24 @@ namespace SEE.UI.RuntimeConfigMenu
                     MethodName = methodInfo.Name
                 };
                 netAction.Execute();
+            }
+
+            ContentSizeWatcher GetContentSizeWatcher(GameObject go)
+            {
+                GameObject runtimeTabGO = ContentSizeWatcher.GetRuntimeTabGameObject(go);
+                return runtimeTabGO.GetComponentInChildren<ContentSizeWatcher>();
+            }
+
+            void RestorePreviousScrollPosition()
+            {
+                GetContentSizeWatcher(button).ApplyPreviousScrollPositionAsync().Forget();
+            }
+
+            void RestorePreviousScrollPositionAfterRebuild(float oldScrollPos)
+            {
+                UICanvas.Canvas.FindDescendant(ContentSizeWatcher.CityConfiguration, false)
+                    .GetComponentInChildren<ContentSizeWatcher>()
+                    .ApplyPreviousScrollPositionAsync(oldScrollPos).Forget();
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using SEE.GO;
+﻿using Cysharp.Threading.Tasks;
+using SEE.GO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -35,9 +36,19 @@ namespace SEE.UI.RuntimeConfigMenu
         private float oldScrollValue = 1f;
 
         /// <summary>
+        /// Getter property of <see cref="oldScrollValue"/>.
+        /// </summary>
+        public float CurrentScrollValue => oldScrollValue;
+
+        /// <summary>
         /// The scrollbar controlling vertical scrolling of the view.
         /// </summary>
         private Scrollbar scrollbar;
+
+        /// <summary>
+        /// Constant for city configuration.
+        /// </summary>
+        public const string CityConfiguration = "City Configuration";
 
         /// <summary>
         /// Initializes references to the content, viewport, and scrollbar.
@@ -102,7 +113,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// </summary>
         /// <param name="go">The starting GameObject.</param>
         /// <returns>The runtime tab GameObject, or null if not found.</returns>
-        private GameObject GetRuntimeTabGameObject(GameObject go)
+        public static GameObject GetRuntimeTabGameObject(GameObject go)
         {
             if (go.transform.parent == null)
             {
@@ -110,7 +121,7 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             else
             {
-                if (go.transform.parent.name.Equals("City Configuration"))
+                if (go.transform.parent.name.Equals(CityConfiguration))
                 {
                     return go.transform.parent.gameObject;
                 }
@@ -119,6 +130,18 @@ namespace SEE.UI.RuntimeConfigMenu
                     return GetRuntimeTabGameObject(go.transform.parent.gameObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// Restores the previous scrollbar position based on the last known scroll value
+        /// and the current content and viewport sizes. Should be used when the layout is
+        /// reloaded but no content height change occurred.
+        /// </summary>
+        public async UniTask ApplyPreviousScrollPositionAsync(float scrollValue = -1f)
+        {
+            float value = scrollValue != -1f? scrollValue: oldScrollValue;
+            await UniTask.DelayFrame(3);
+            scrollbar.value = value;
         }
     }
 }
