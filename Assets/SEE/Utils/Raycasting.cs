@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using SEE.XR;
 using SEE.Game;
+using SEE.UI;
 
 namespace SEE.Utils
 {
@@ -365,8 +366,11 @@ namespace SEE.Utils
             {
                 Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
-                return lastGameObject != null && lastGameObject.layer == uiLayer
-                                              && !ignoredUINames.Contains(lastGameObject.name);
+                return lastGameObject != null && !ignoredUINames.Contains(lastGameObject.name)
+                    && (lastGameObject.layer == uiLayer
+                        || lastGameObject.HasParentWithLayer(uiLayer)
+                        || lastGameObject.FindParentWithName(UICanvas.Canvas.name) != null);
+
             }
         }
 
