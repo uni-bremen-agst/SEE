@@ -115,21 +115,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <returns>The runtime tab GameObject, or null if not found.</returns>
         public static GameObject GetRuntimeTabGameObject(GameObject go)
         {
-            if (go.transform.parent == null)
-            {
-                return null;
-            }
-            else
-            {
-                if (go.transform.parent.name.Equals(CityConfiguration))
-                {
-                    return go.transform.parent.gameObject;
-                }
-                else
-                {
-                    return GetRuntimeTabGameObject(go.transform.parent.gameObject);
-                }
-            }
+            return go.FindParentWithName(CityConfiguration);
         }
 
         /// <summary>
