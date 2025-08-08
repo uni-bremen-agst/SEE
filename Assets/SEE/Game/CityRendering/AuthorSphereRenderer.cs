@@ -33,6 +33,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
+        /// <param name="graph">The graph which was rendered.</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
             List<FileAuthor> authors =
@@ -119,8 +120,7 @@ namespace SEE.Game.CityRendering
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
-                    // gameEdge.AddComponent<InteractableObject>();
-                    // GraphElementRef graphElemRef = gameEdge.AddComponent<GraphElementRef>();
+
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
@@ -135,7 +135,7 @@ namespace SEE.Game.CityRendering
 
                     if (Settings is BranchCity branchCity)
                     {
-                        switch (branchCity.ShowEdgesStrategy)
+                        switch (branchCity.ShowAuthorEdgesStrategy)
                         {
                             case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
@@ -187,9 +187,6 @@ namespace SEE.Game.CityRendering
             Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
             Node rootNode = graph.GetRoots().First();
-
-
-            //NodeRef parentNodeRef = parent.GetComponent<NodeRef>();
 
             // Calculating number of rows and columns needed and the space between the spheres.
             // The spheres will be distributed in a rectangle around the code city table.

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls.Actions;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -83,7 +82,6 @@ namespace SEE.Game.CityRendering
             {
                 Portal.SetPortal(city, gameNode, Portal.IncludeDescendants.AllDescendants);
             }
-
         }
 
         /// <summary>

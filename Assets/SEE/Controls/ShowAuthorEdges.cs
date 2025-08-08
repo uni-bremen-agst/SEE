@@ -62,13 +62,13 @@ namespace SEE.Controls.Actions
         /// <returns>Returns an empty task.</returns>
         private async Task ToggleAuthorEdgesForNodeAsync(bool show, EdgeAnimationKind animationKind, AuthorRef authorRef, BranchCity branchCity, CancellationToken token)
         {
-            if (branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowAllways)
+            if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAllways)
             {
                 return;
             }
 
             // When the author threashold is reached for the node, we do not show the edges.
-            if (authorRef.Edges.Count >= branchCity.AuthorThreshold && branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+            if (authorRef.Edges.Count >= branchCity.AuthorThreshold && branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
             {
                 if (show)
                 {
@@ -103,9 +103,9 @@ namespace SEE.Controls.Actions
         /// <param name="branchCity">Configuration of the code city.</param>
         /// <param name="token">Cancelation token.</param>
         /// <returns>Returns an empty task.</returns>
-        private async Task ToggleAuthorEdgesForAuthorSphere(bool show, EdgeAnimationKind animationKind, AuthorSphere sphere, BranchCity branchCity, CancellationToken token)
+        private async Task ToggleAuthorEdgesForAuthorSphereAsync(bool show, EdgeAnimationKind animationKind, AuthorSphere sphere, BranchCity branchCity, CancellationToken token)
         {
-            if (branchCity.ShowEdgesStrategy == ShowAuthorEdgeStrategy.ShowAllways)
+            if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAllways)
             {
                 return;
             }
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions
         /// <param name="token">Cancelation token.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
         /// <returns>Returns an empty task.</returns>
-        private async UniTaskVoid ToggleAuthorEdges(bool show, EdgeAnimationKind animationKind, CancellationToken token, BranchCity branchCity)
+        private async UniTaskVoid ToggleAuthorEdgesAsync(bool show, EdgeAnimationKind animationKind, CancellationToken token, BranchCity branchCity)
         {
             // When the user hovers over a graph node
             if (gameObject.TryGetComponent(out AuthorRef authorRef))
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions
             // When the user hovers over an AuthorSphere.
             else if (gameObject.TryGetComponent(out AuthorSphere sphere))
             {
-                await ToggleAuthorEdgesForAuthorSphere(show, animationKind, sphere, branchCity, token);
+                await ToggleAuthorEdgesForAuthorSphereAsync(show, animationKind, sphere, branchCity, token);
             }
         }
 
@@ -158,14 +158,14 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="interactableObject">The actual object, the user hovers over.</param>
         /// <param name="isInitiator">Will be ignored here.</param>
-        private async void OnHoverIn(InteractableObject interactableObject, bool isInitiator)
+        private void OnHoverIn(InteractableObject interactableObject, bool isInitiator)
         {
             if (City() is BranchCity branchCity)
             {
                 edgeToggleToken?.Cancel();
                 edgeToggleToken = new CancellationTokenSource();
 
-                ToggleAuthorEdges(true, branchCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token, branchCity).Forget();
+                ToggleAuthorEdgesAsync(true, branchCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token, branchCity).Forget();
             }
         }
 
@@ -182,7 +182,7 @@ namespace SEE.Controls.Actions
                 edgeToggleToken?.Cancel();
                 edgeToggleToken = new CancellationTokenSource();
 
-                ToggleAuthorEdges(false, branchCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token, branchCity).Forget();
+                ToggleAuthorEdgesAsync(false, branchCity.EdgeLayoutSettings.AnimationKind, edgeToggleToken.Token, branchCity).Forget();
             }
         }
     }

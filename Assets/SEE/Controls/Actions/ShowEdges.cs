@@ -287,7 +287,6 @@ namespace SEE.Controls.Actions
             if (gameObject.TryGetNode(out Node node))
             {
                 codeCity ??= City();
-                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();
@@ -298,12 +297,14 @@ namespace SEE.Controls.Actions
                                                        followSource: layout.AnimateTransitiveSourceEdges,
                                                        followTarget: layout.AnimateTransitiveTargetEdges,
                                                        fromSelection);
-                ToggleEdges(edges, edgeToggleToken.Token, animationKind).Forget();
+                ToggleEdges(edges, edgeToggleToken.Token).Forget();
             }
             return;
 
-            async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token, EdgeAnimationKind animationKind)
+            async UniTaskVoid ToggleEdges(IEnumerable<IList<Edge>> edges, CancellationToken token)
             {
+                EdgeAnimationKind animationKind = codeCity.EdgeLayoutSettings.AnimationKind;
+
                 foreach (IList<Edge> edgeLevel in edges)
                 {
                     foreach (Edge edge in edgeLevel)
