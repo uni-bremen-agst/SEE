@@ -21,9 +21,10 @@ namespace SEE.Controls.Actions
         /// The token used to cancel the edge toggling operation.
         /// </summary>
         private CancellationTokenSource edgeToggleToken;
-+                 /// <summary>
-+                 /// Disposes the CancellationTokenSource to prevent resource leaks.
-+                 /// </summary>
+
+        /// <summary>
+        /// Disposes the CancellationTokenSource.
+        /// </summary>
         public void Dispose()
         {
             edgeToggleToken?.Dispose();
