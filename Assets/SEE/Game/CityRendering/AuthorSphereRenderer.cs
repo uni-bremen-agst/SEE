@@ -142,6 +142,7 @@ namespace SEE.Game.CityRendering
 
                                 if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                                 {
+                                    // Show only edges for nodes with multiple authors.
                                     foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
                                     {
                                         edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);

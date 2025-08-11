@@ -29,19 +29,6 @@ namespace SEE.Game.City
         public string Date = SEEDate.Now();
 
         /// <summary>
-        /// If this is true, the authors of the commits with similar identities will be combined.
-        /// This binding can either be done manually (by specifing the aliases in <see cref="AuthorAliasMap"/>)
-        /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
-        /// <seealso cref="AutoMapAuthors"/>
-        /// <seealso cref="AuthorAliasMap"/>
-        /// </summary>
-        [Tooltip("If true, the authors of the commits with similar identities will be combined."),
-         TabGroup(VCSFoldoutGroup),
-         RuntimeTab(VCSFoldoutGroup)]
-        public bool CombineAuthors;
-
-
-        /// <summary>
         /// Specifies how the edges connecting authors and their commits should be shown.
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
@@ -62,24 +49,6 @@ namespace SEE.Game.City
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
         public int AuthorThreshold = 2;
-
-
-        /// <summary>
-        /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
-        /// This is used to manually group commit authors with similar identities together.
-        /// The mapping enables aggregating commit data under a single normalized author identity.
-        /// </summary>
-        [NonSerialized, OdinSerialize,
-         DictionaryDrawerSettings(
-              DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
-              KeyLabel = "Author", ValueLabel = "Aliases"),
-         Tooltip("Author alias mapping."),
-         ShowIf("CombineAuthors"),
-         RuntimeShowIf("CombineAuthors"),
-         TabGroup(VCSFoldoutGroup),
-         RuntimeTab(VCSFoldoutGroup),
-         HideReferenceObjectPicker]
-        public AuthorMapping AuthorAliasMap = new();
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here in addition to

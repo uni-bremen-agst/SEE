@@ -279,6 +279,7 @@ namespace SEE.Game.City
                 GameObject child = childTransform.gameObject;
                 if (child.TryGetComponent(out AuthorSphere _))
                 {
+                    // Do not set NodeRef/EdgeRef for AuthorSpheres.
                     continue;
                 }
                 if (child.TryGetComponent(out NodeRef nodeRef))

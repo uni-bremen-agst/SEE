@@ -3,7 +3,7 @@ namespace SEE.Game.City
     /// <summary>
     /// This strategy shows edges connecting authors and their commits.
     /// </summary>
-    public enum ShowAuthorEdgeStrategy : byte
+    public enum ShowAuthorEdgeStrategy
     {
         /// <summary>
         /// Show edges connecting authors and their commits all the time.
