@@ -397,6 +397,17 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Resets the selected node types to be visualized.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
+        public override void ResetSelectedNodeTypes()
+        {
+            NodeTypes.ClearToInitialReflexion();
+        }
+
         #region SEEReflexionCity creation during in play mode
         /// <summary>
         /// Loads the initial reflexion city.

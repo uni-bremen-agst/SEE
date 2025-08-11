@@ -397,7 +397,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
         [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
-        public void ResetSelectedNodeTypes()
+        public virtual void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
         }

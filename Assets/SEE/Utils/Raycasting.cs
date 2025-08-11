@@ -366,11 +366,13 @@ namespace SEE.Utils
             {
                 Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
+                /// Prevent wrong IsMouseOverGUI() state when a newly created child object (e.g.,
+                /// a ripple from ButtonManagerBasicIcon with useRipple enabled) does not have
+                /// the UI layer. In this case, also check parent objects for the UI layer or UI canvas name.
                 return lastGameObject != null && !ignoredUINames.Contains(lastGameObject.name)
                     && (lastGameObject.layer == uiLayer
                         || lastGameObject.HasParentWithLayer(uiLayer)
                         || lastGameObject.FindParentWithName(UICanvas.Canvas.name) != null);
-
             }
         }
 

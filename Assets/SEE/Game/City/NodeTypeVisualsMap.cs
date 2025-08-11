@@ -1,4 +1,6 @@
-﻿using SEE.Utils.Config;
+﻿using SEE.DataModel.DG;
+using SEE.Tools.ReflexionAnalysis;
+using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections;
@@ -82,6 +84,24 @@ namespace SEE.Game.City
         public void Clear()
         {
             map.Clear();
+        }
+
+        /// <summary>
+        /// Resets this <see cref="NodeTypeVisualsMap"/> to the initial Reflexion city mapping.
+        /// </summary>
+        public void ClearToInitialReflexion()
+        {
+            ISet<string> types = Types;
+
+            foreach (string type in types)
+            {
+                if (!type.Equals(Graph.RootType)
+                    && !type.Equals(ReflexionGraph.ArchitectureType)
+                    && !type.Equals(ReflexionGraph.ImplementationType))
+                {
+                    Remove(type);
+                }
+            }
         }
 
         /// <summary>
