@@ -8,7 +8,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Show edges connecting authors and their commits all the time.
         /// </summary>
-        ShowAllways,
+        ShowAlways,
 
         /// <summary>
         /// Show edges connecting author spheres and nodes only when the user hovers over the author sphere or the node.
