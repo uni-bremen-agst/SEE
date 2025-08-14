@@ -3,7 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Cysharp.Threading.Tasks;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
@@ -76,18 +75,20 @@ namespace SEE.Controls.Actions
                     return;
                 }
             }
-
-            foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+            else
             {
-                edge.EdgeOperator()?.ShowOrHide(show, animationKind);
-            }
-            if (show)
-            {
-                await UniTask.Delay(ShowEdges.TransitiveDelay, cancellationToken: token);
-            }
-            if (token.IsCancellationRequested)
-            {
-                return;
+                foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                {
+                    edge.EdgeOperator()?.ShowOrHide(show, animationKind);
+                }
+                if (show)
+                {
+                    await UniTask.Delay(ShowEdges.TransitiveDelay, cancellationToken: token);
+                }
+                if (token.IsCancellationRequested)
+                {
+                    return;
+                }
             }
         }
 
@@ -114,9 +115,13 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
             {
+                bool hasAuthorEdge = edge.TryGetComponent(out AuthorEdge authorEdge);
                 // Only show edges in which the author threshold is not reached.
-                if (edge.TryGetComponent(out AuthorEdge authorEdge)
-                    && authorEdge.targetNode.Edges.Count < branchCity.AuthorThreshold)
+                bool belowThreshold = hasAuthorEdge && authorEdge.targetNode.Edges.Count < branchCity.AuthorThreshold;
+                // Or if ShowOnHover was set as strategy.
+                bool showOnHover = branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover;
+
+                if (belowThreshold || showOnHover)
                 {
                     edge.EdgeOperator()?.ShowOrHide(show, animationKind);
                 }
