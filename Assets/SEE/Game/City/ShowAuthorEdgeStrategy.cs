@@ -1,12 +1,13 @@
 namespace SEE.Game.City
 {
     /// <summary>
-    /// This strategy shows edges connecting authors and their commits.
+    /// This strategy shows edges connecting authors and the nodes
+    /// they changed.
     /// </summary>
     public enum ShowAuthorEdgeStrategy : byte
     {
         /// <summary>
-        /// Show edges connecting authors and their commits all the time.
+        /// Show edges connecting authors and their changed nodes all the time.
         /// </summary>
         ShowAlways,
 
@@ -17,7 +18,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Show edges connecting author spheres and nodes only when the user hovers over the author sphere or the node.
-        /// Edges of nodes which have multiple authors (exceeding <see cref="BranchCity.AuthorThreshold"/>) will always been shown.
+        /// Edges of nodes that have multiple authors (exceeding <see cref="BranchCity.AuthorThreshold"/>) will always been shown.
         /// </summary>
         ShowOnHoverOrWithMultipleAuthors,
     }
