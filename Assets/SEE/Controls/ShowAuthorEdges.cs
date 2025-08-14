@@ -31,7 +31,7 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Sets <see cref="Interactable"/> and subscribes to hover events.
+        /// Subscribes to hover events of the game object.
         /// </summary>
         void OnEnable()
         {
