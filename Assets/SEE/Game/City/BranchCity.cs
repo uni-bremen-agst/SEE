@@ -44,8 +44,8 @@ namespace SEE.Game.City
         /// If the number of authors is below this threshold, the edges will only be shown when
         /// the user hovers over the node or the author sphere.
         /// </summary>
-        [ShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
-         RuntimeShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+        [ShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         RuntimeShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
          Range(2, 20),
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
