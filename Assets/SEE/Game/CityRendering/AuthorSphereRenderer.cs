@@ -33,7 +33,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
-        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
+        /// <param name="graph">The graph which was rendered.</param>
+        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
             List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
@@ -43,7 +44,7 @@ namespace SEE.Game.CityRendering
                     .Select(x => new FileAuthor(x))
                     .ToList();
 
-            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent);
+            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
 
             // Drawing edges
             RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
@@ -119,14 +120,46 @@ namespace SEE.Game.CityRendering
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
-                    gameEdge.AddComponent<InteractableObject>();
+
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSpheres.Add(sphere);
                     authorRef.Edges.Add((gameEdge, churn));
 
+                    AuthorEdge authorEdge = gameEdge.AddComponent<AuthorEdge>();
+                    authorEdge.targetNode = authorRef;
+                    authorEdge.authorSphere = authorSphere;
+
                     authorSphere.Edges.Add((gameEdge, churn));
+
+                    if (Settings is BranchCity branchCity)
+                    {
+                        switch (branchCity.ShowAuthorEdgesStrategy)
+                        {
+                            case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
+                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+
+                                if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                {
+                                    // Show only edges for nodes with multiple authors.
+                                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                    {
+                                        edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                    }
+                                }
+                                break;
+                            case ShowAuthorEdgeStrategy.ShowOnHover:
+                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                break;
+                            case ShowAuthorEdgeStrategy.ShowAlways:
+                                break; // nothing to do here, edges are always shown
+                            default:
+                                throw new System.ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
+                                    branchCity.ShowAuthorEdgesStrategy,
+                                    $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
+                        }
+                    }
                 }
             }
         }
@@ -154,11 +187,12 @@ namespace SEE.Game.CityRendering
         /// <param name="authors">The authors to create the spheres for.</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent)
+        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
         {
             IList<GameObject> result = new List<GameObject>();
             Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
+            Node rootNode = graph.GetRoots().First();
 
             // Calculating number of rows and columns needed and the space between the spheres.
             // The spheres will be distributed in a rectangle around the code city table.
@@ -200,8 +234,10 @@ namespace SEE.Game.CityRendering
                     AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
                     author.Author = authors[counter];
 
+                    gameObject.AddComponent<NodeRef>().Value = rootNode;
+
                     gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowHovering>();
+                    gameObject.AddComponent<ShowAuthorEdges>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;

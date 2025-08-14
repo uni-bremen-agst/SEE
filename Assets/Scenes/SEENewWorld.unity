@@ -1649,7 +1649,131 @@ MonoBehaviour:
       Entry: 12
       Data: 1
     - Name: 
-      Entry: 6
+      Entry: 7
+      Data: 34|SEE.GraphProviders.GitBranchesGraphProvider, SEE
+    - Name: GitRepository
+      Entry: 7
+      Data: 35|SEE.VCS.GitRepository, SEE
+    - Name: RepositoryPath
+      Entry: 7
+      Data: 36|SEE.Utils.Paths.DataPath, SEE
+    - Name: Root
+      Entry: 3
+      Data: 1
+    - Name: RelativePath
+      Entry: 1
+      Data: 
+    - Name: AbsolutePath
+      Entry: 1
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: VCSFilter
+      Entry: 7
+      Data: 37|SEE.VCS.Filter, SEE
+    - Name: Globbing
+      Entry: 7
+      Data: 38|SEE.Utils.Globbing, SEE
+    - Name: comparer
+      Entry: 9
+      Data: 4
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 1
+      Data: '**/*.cs'
+    - Name: $v
+      Entry: 5
+      Data: true
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: RepositoryPaths
+      Entry: 7
+      Data: 39|System.String[], mscorlib
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 1
+      Data: Assets/SEE/GraphProviders
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: Branches
+      Entry: 7
+      Data: 40|System.Collections.Generic.HashSet`1[[System.String, mscorlib]], System.Core
+    - Name: 
+      Entry: 12
+      Data: 2
+    - Name: 
+      Entry: 1
+      Data: 849-encapsulate-all-vcs-queries
+    - Name: 
+      Entry: 1
+      Data: master
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: SimplifyGraph
+      Entry: 5
+      Data: false
+    - Name: CombineAuthors
+      Entry: 5
+      Data: false
+    - Name: AuthorAliasMap
+      Entry: 7
+      Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 42|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: AutoFetch
+      Entry: 5
+      Data: false
+    - Name: PollingInterval
+      Entry: 3
+      Data: 5
+    - Name: MarkerTime
+      Entry: 3
+      Data: 10
+    - Name: 
+      Entry: 8
       Data: 
     - Name: 
       Entry: 13
@@ -1677,7 +1801,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.1
   BaseAnimationDuration: 1
-  ProgressBar: 0
+  ProgressBar: 0.13441955
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -1747,6 +1871,8 @@ MonoBehaviour:
     RelativePath: /
     AbsolutePath: 
   Date: 2025/01/01
+  ShowAuthorEdgesStrategy: 1
+  AuthorThreshold: 2
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0

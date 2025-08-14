@@ -49,6 +49,7 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowLabel>();
                 gameObject.AddComponentIfNecessary<ShowHoverInfo>();
                 gameObject.AddComponentIfNecessary<ShowEdges>();
+                gameObject.AddComponentIfNecessary<ShowAuthorEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
             }
         }

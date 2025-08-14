@@ -1,9 +1,7 @@
-using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,6 +25,31 @@ namespace SEE.Game.City
          Tooltip("The beginning date after which commits should be considered (" + SEEDate.DateFormat + ")"),
          TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public string Date = SEEDate.Now();
+
+        /// <summary>
+        /// Specifies how the edges connecting authors and their commits should be shown.
+        /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
+        /// </summary>
+        [TabGroup(EdgeFoldoutGroup),
+         RuntimeTab(EdgeFoldoutGroup)]
+        public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy =
+                ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+
+        /// <summary>
+        /// Only relevant if <see cref="ShowAuthorEdgesStrategy"/> is set to
+        /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
+        ///
+        /// This is the threshold for the number of authors at which edges between authors
+        /// and nodes are shown permanently.
+        /// If the number of authors is below this threshold, the edges will only be shown when
+        /// the user hovers over the node or the author sphere.
+        /// </summary>
+        [ShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         RuntimeShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         Range(2, 20),
+         TabGroup(EdgeFoldoutGroup),
+         RuntimeTab(EdgeFoldoutGroup)]
+        public int AuthorThreshold = 2;
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here in addition to
@@ -88,16 +111,30 @@ namespace SEE.Game.City
         /// </summary>
         private const string dateLabel = "Date";
 
+        /// <summary>
+        /// Label of attribute <see cref="ShowAuthorEdgesStrategy"/> in the configuration file.
+        /// </summary>
+        private const string showEdgesStrategy = "ShowAuthorEdgesStrategy";
+
+        /// <summary>
+        /// Label of attribute <see cref="AuthorThreshold"/> in the configuration file.
+        /// </summary>
+        private const string suthorThresholdLabel = "AuthorThreshold";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
+            writer.Save(ShowAuthorEdgesStrategy.ToString(), showEdgesStrategy);
+            writer.Save(AuthorThreshold, suthorThresholdLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
+            ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref ShowAuthorEdgesStrategy);
+            ConfigIO.Restore(attributes, suthorThresholdLabel, ref AuthorThreshold);
         }
 
         #endregion
