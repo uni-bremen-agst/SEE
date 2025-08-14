@@ -1,9 +1,7 @@
-using SEE.GraphProviders.VCS;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -38,10 +36,13 @@ namespace SEE.Game.City
                 ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
 
         /// <summary>
-        /// Only relevant if <see cref="ShowAuthorEdgesStrategy"/> is set to <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
+        /// Only relevant if <see cref="ShowAuthorEdgesStrategy"/> is set to
+        /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
         ///
-        /// This is the threashold for the number of authors a node must have to show their edges permanently.
-        /// If the number of authors is below this threshold, the edges will only be shown when the user hovers over the node or the author sphere.
+        /// This is the threshold for the number of authors at which edges between authors
+        /// and nodes are shown permanently.
+        /// If the number of authors is below this threshold, the edges will only be shown when
+        /// the user hovers over the node or the author sphere.
         /// </summary>
         [ShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
          RuntimeShowIf("ShowEdgesStrategy", ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
