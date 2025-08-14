@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This action show/animates edges connecting authors spheres and nodes when the user hovers over them.
+    /// This action shows/animates edges connecting authors spheres and nodes when the user hovers over them.
     /// This script can be added to both AuthorSpheres and nodes.
     /// </summary>
     internal class ShowAuthorEdges : InteractableObjectAction, IDisposable
@@ -40,23 +40,6 @@ namespace SEE.Controls.Actions
                 Interactable.HoverIn += OnHoverIn;
                 Interactable.HoverOut += OnHoverOut;
             }
-        }
-
-        /// <summary>
-        /// Returns the code city holding the settings for the visualization of the node.
-        /// May be null.
-        /// </summary>
-        private AbstractSEECity City()
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null)
-            {
-                Debug.LogError($"Could not retrieve CodeCity for {gameObject.name}!");
-                return null;
-            }
-
-            codeCityObject.TryGetComponent(out AbstractSEECity city);
-            return city;
         }
 
         /// <summary>
@@ -168,7 +151,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">Will be ignored here.</param>
         private void OnHoverIn(InteractableObject interactableObject, bool isInitiator)
         {
-            if (City() is BranchCity branchCity)
+            if (gameObject.ContainingCity() is BranchCity branchCity)
             {
                 edgeToggleToken?.Cancel();
                 edgeToggleToken = new CancellationTokenSource();
@@ -185,7 +168,7 @@ namespace SEE.Controls.Actions
         /// <param name="isInitiator">Will be ignored here.</param>
         private void OnHoverOut(InteractableObject interactableObject, bool isInitiator)
         {
-            if (City() is BranchCity branchCity)
+            if (gameObject.ContainingCity() is BranchCity branchCity)
             {
                 edgeToggleToken?.Cancel();
                 edgeToggleToken = new CancellationTokenSource();
