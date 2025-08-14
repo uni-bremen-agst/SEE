@@ -152,8 +152,13 @@ namespace SEE.Game.CityRendering
                             case ShowAuthorEdgeStrategy.ShowOnHover:
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
                                 break;
+                            case ShowAuthorEdgeStrategy.ShowAlways:
+                                break; // nothing to do here, edges are always shown
+                            default:
+                                throw new System.ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
+                                    branchCity.ShowAuthorEdgesStrategy,
+                                    $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
                         }
-
                     }
                 }
             }
