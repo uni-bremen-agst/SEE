@@ -45,13 +45,18 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Toggles the visibility of author edges for a node.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hides them.</param>
+        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
         /// <param name="animationKind">Animation kind to use (will be set by <see cref="BranchCity"/>).</param>
         /// <param name="authorRef"><see cref="AuthorRef"/> instance which the user hovered over.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
         /// <param name="token">Cancellation token.</param>
         /// <returns>Returns an empty task.</returns>
-        private async Task ToggleAuthorEdgesForNodeAsync(bool show, EdgeAnimationKind animationKind, AuthorRef authorRef, BranchCity branchCity, CancellationToken token)
+        private async Task ToggleAuthorEdgesForNodeAsync
+            (bool show,
+            EdgeAnimationKind animationKind,
+            AuthorRef authorRef,
+            BranchCity branchCity,
+            CancellationToken token)
         {
             if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAlways)
             {
@@ -59,7 +64,8 @@ namespace SEE.Controls.Actions
             }
 
             // When the author threshold is reached for the node, we do not show the edges.
-            if (authorRef.Edges.Count >= branchCity.AuthorThreshold && branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+            if (authorRef.Edges.Count >= branchCity.AuthorThreshold
+                && branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
             {
                 if (show)
                 {
@@ -88,13 +94,18 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Toggles the visibility of author edges for an author sphere.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hides them.</param>
+        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
         /// <param name="animationKind">Animation kind to use (will be set by <see cref="BranchCity"/>).</param>
         /// <param name="sphere">The <see cref="AuthorSphere"/> the user hovers over.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
         /// <param name="token">Cancelation token.</param>
         /// <returns>Returns an empty task.</returns>
-        private async Task ToggleAuthorEdgesForAuthorSphereAsync(bool show, EdgeAnimationKind animationKind, AuthorSphere sphere, BranchCity branchCity, CancellationToken token)
+        private async Task ToggleAuthorEdgesForAuthorSphereAsync
+            (bool show,
+            EdgeAnimationKind animationKind,
+            AuthorSphere sphere,
+            BranchCity branchCity,
+            CancellationToken token)
         {
             if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAlways)
             {
@@ -104,7 +115,8 @@ namespace SEE.Controls.Actions
             foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
             {
                 // Only show edges in which the author threshold is not reached.
-                if (edge.TryGetComponent(out AuthorEdge authorEdge) && authorEdge.targetNode.Edges.Count < branchCity.AuthorThreshold)
+                if (edge.TryGetComponent(out AuthorEdge authorEdge)
+                    && authorEdge.targetNode.Edges.Count < branchCity.AuthorThreshold)
                 {
                     edge.EdgeOperator()?.ShowOrHide(show, animationKind);
                 }
@@ -121,9 +133,9 @@ namespace SEE.Controls.Actions
 
 
         /// <summary>
-        /// Toggles the visibility of author edges of the node or author sphere the user hovers over.
+        /// Toggles the visibility of author edges of the node or the author sphere the user hovers over.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hides them.</param>
+        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
         /// <param name="animationKind">Animation kind to use (will be set by <see cref="BranchCity"/>).</param>
         /// <param name="token">Cancelation token.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
@@ -144,12 +156,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Handles the hover in event of the interactable object.
+        /// Handles the hover-in event of the <paramref name="interactableObject"/>.
         /// Toggles the visibility of author edges for the node or author sphere the user hovers over.
         /// </summary>
-        /// <param name="interactableObject">The actual object, the user hovers over.</param>
-        /// <param name="isInitiator">Will be ignored here.</param>
-        private void OnHoverIn(InteractableObject interactableObject, bool isInitiator)
+        /// <param name="interactableObject">The actual object the user hovers over.</param>
+        private void OnHoverIn(InteractableObject interactableObject, bool _)
         {
             if (gameObject.ContainingCity() is BranchCity branchCity)
             {
@@ -161,12 +172,11 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Handles the hover out event of the interactable object.
+        /// Handles the hover-out event of the interactable object.
         /// Toggles the visibility of author edges for the node or author sphere the user hovers over.
         /// </summary>
         /// <param name="interactableObject">The actual object, the user hovers over.</param>
-        /// <param name="isInitiator">Will be ignored here.</param>
-        private void OnHoverOut(InteractableObject interactableObject, bool isInitiator)
+        private void OnHoverOut(InteractableObject interactableObject, bool _)
         {
             if (gameObject.ContainingCity() is BranchCity branchCity)
             {
