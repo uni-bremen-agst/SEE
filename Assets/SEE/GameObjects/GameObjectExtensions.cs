@@ -79,25 +79,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this
-        /// object is contained in will be returned. Otherwise null is returned.
+        /// Returns the city this <paramref name="gameObject"/> is contained in.
+        /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">graph node or edge whose containing city is requested</param>
+        /// <param name="gameObject">object whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
         public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represents a graph node or edge, the city of type <typeparamref name="T"/>
-        /// this object is contained in will be returned. Otherwise null is returned.
+        /// Returns the city of type <typeparamref name="T"/> this <paramref name="gameObject"/> is contained.
+        /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">graph node or edge whose containing city of type <typeparamref name="T"/>
+        /// <param name="gameObject">object whose containing city of type <typeparamref name="T"/>
         /// is requested</param>
         /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
         /// or null</returns>
         /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
         public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
-            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            if (gameObject == null)
             {
                 return null;
             }
