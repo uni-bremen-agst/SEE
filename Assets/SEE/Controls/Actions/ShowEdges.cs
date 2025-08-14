@@ -7,7 +7,6 @@ using MoreLinq;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GameObjects;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
