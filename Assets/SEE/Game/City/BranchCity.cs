@@ -110,18 +110,32 @@ namespace SEE.Game.City
         /// </summary>
         private const string dateLabel = "Date";
 
+        /// <summary>
+        /// Label of attribute <see cref="ShowAuthorEdgesStrategy"/> in the configuration file.
+        /// </summary>
+        private const string ShowEdgesStrategy = "ShowAuthorEdgesStrategy";
+
+        /// <summary>
+        /// Label of attribute <see cref="AuthorThreshold"/> in the configuration file.
+        /// </summary>
+        private const string AuthorThresholdLabel = "AuthorThreshold";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
+            writer.Save(ShowAuthorEdgesStrategy.ToString(), ShowEdgesStrategy);
+            writer.Save(AuthorThreshold, AuthorThresholdLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
-        }
+            ConfigIO.RestoreEnum(attributes, ShowEdgesStrategy, ref ShowAuthorEdgesStrategy);
+            ConfigIO.Restore(attributes, AuthorThresholdLabel, ref AuthorThreshold);
 
-        #endregion
+            #endregion
+        }
     }
 }
