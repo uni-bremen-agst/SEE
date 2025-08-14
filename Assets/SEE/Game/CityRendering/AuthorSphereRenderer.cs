@@ -11,6 +11,7 @@ using SEE.Utils;
 using TinySpline;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
@@ -61,6 +62,8 @@ namespace SEE.Game.CityRendering
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> spheresObjects, GameObject parent)
         {
+
+
             IEnumerable<Node> nodesWithChurn = nodeMap.Keys
                 .Where(x => x.IntAttributes.ContainsKey(DataModel.DG.VCS.Churn));
 
@@ -138,6 +141,8 @@ namespace SEE.Game.CityRendering
                         switch (branchCity.ShowAuthorEdgesStrategy)
                         {
                             case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
+                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
+
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
 
                                 if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
@@ -150,6 +155,8 @@ namespace SEE.Game.CityRendering
                                 }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowOnHover:
+                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
+
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
                                 break;
                             case ShowAuthorEdgeStrategy.ShowAlways:

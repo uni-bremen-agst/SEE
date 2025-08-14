@@ -31,7 +31,8 @@ namespace SEE.Game.City
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
         [TabGroup(EdgeFoldoutGroup),
-         RuntimeTab(EdgeFoldoutGroup)]
+         RuntimeTab(EdgeFoldoutGroup), InfoBox("An edge animation kind must be set to use this feature.",
+             InfoMessageType.Error, nameof(ShowWarningBoxOfMissingAnimationKind)),]
         public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy =
                 ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
 
@@ -50,6 +51,13 @@ namespace SEE.Game.City
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
         public int AuthorThreshold = 2;
+
+        /// <summary>
+        /// Returns true if the user should be warned about a missing animation kind.
+        /// </summary>
+        private bool ShowWarningBoxOfMissingAnimationKind =>
+            ShowAuthorEdgesStrategy != ShowAuthorEdgeStrategy.ShowAlways &&
+            EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None;
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here in addition to
