@@ -62,8 +62,6 @@ namespace SEE.Game.CityRendering
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> spheresObjects, GameObject parent)
         {
-
-
             IEnumerable<Node> nodesWithChurn = nodeMap.Keys
                 .Where(x => x.IntAttributes.ContainsKey(DataModel.DG.VCS.Churn));
 
