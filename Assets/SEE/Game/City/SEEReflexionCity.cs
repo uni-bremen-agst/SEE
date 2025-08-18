@@ -193,10 +193,11 @@ namespace SEE.Game.City
         /// Ensures that the initial Reflexion city is loaded.
         /// Is used in the Odin and Runtime menu.
         /// </summary>
-        [RuntimeButton(DataButtonsGroup, "Switch to initial Reflexion city")]
-        [PropertyOrder(DataButtonsGroupOrderSwitch), RuntimeGroupOrder(DataButtonsGroupOrderSwitch)]
-        [RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
-        [RuntimeHideIf(nameof(IsInitialReflexionCity))]
+        [Button("Switch to initial Reflexion city", ButtonSizes.Small)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Switch to initial Reflexion city")]
+        [PropertyOrder(ConfigurationButtonsGroupSwitch), RuntimeGroupOrder(ConfigurationButtonsGroupSwitch)]
+        [EnableIf(nameof(IsLoadedReflexionCity)), RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
+        [HideIf(nameof(IsInitialReflexionCity)), RuntimeHideIf(nameof(IsInitialReflexionCity))]
         public void SwitchInitial()
         {
             initialReflexionCity = true;
@@ -213,8 +214,8 @@ namespace SEE.Game.City
         /// Ensures that the Reflexion city is loaded from a file.
         /// </summary>
         [Button("Switch to loaded Reflexion city", ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Switch to loaded Reflexion city")]
-        [PropertyOrder(DataButtonsGroupOrderSwitch), RuntimeGroupOrder(DataButtonsGroupOrderSwitch)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Switch to loaded Reflexion city")]
+        [PropertyOrder(ConfigurationButtonsGroupSwitch), RuntimeGroupOrder(ConfigurationButtonsGroupSwitch)]
         [EnableIf(nameof(IsInitialReflexionCity)), RuntimeEnableIf(nameof(IsInitialReflexionCity))]
         [HideIf(nameof(IsLoadedReflexionCity)), RuntimeHideIf(nameof(IsLoadedReflexionCity))]
         public void SwitchLoaded()

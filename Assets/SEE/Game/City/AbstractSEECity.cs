@@ -724,14 +724,9 @@ namespace SEE.Game.City
         protected const string DataButtonsGroup = "DataButtonsGroup";
 
         /// <summary>
-        /// The order of the Switch buttons in the button group <see cref="DataButtonsGroup"/>.
-        /// </summary>
-        protected const float DataButtonsGroupOrderSwitch = 1;
-
-        /// <summary>
         /// The order of the Load button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
-        protected const float DataButtonsGroupOrderLoad = DataButtonsGroupOrderSwitch + 1;
+        protected const float DataButtonsGroupOrderLoad = 1;
 
         /// <summary>
         /// The order of the Draw button in the button group <see cref="DataButtonsGroup"/>.
@@ -774,9 +769,14 @@ namespace SEE.Game.City
         protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
-        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// The order of the save button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
         protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
+
+        /// <summary>
+        /// The order of the switch button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupSwitch = ConfigurationButtonsGroupSave + 1;
 
         /// <summary>
         /// Name of the Inspector foldout group for the metric setttings.
