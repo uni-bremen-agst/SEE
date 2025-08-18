@@ -101,7 +101,7 @@ namespace SEE.Game.City
         public override UniTask LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
-            return UniTask.FromResult(false);
+            return UniTask.CompletedTask;
         }
 
         //----------------------------------------------------------------------------
