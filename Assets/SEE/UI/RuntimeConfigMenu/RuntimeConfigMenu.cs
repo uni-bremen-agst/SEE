@@ -247,7 +247,14 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
-        /// Rebuilds the tab at the specified <paramref name="index"/>.
+        /// Rebuilds the tab at the specified <paramref name="index"/>
+        /// by destroying and recreating it.
+        /// If the tab is currently active, the method preserves its state by:
+        /// <list type="bullet">
+        ///   <item><description>storing and restoring the current scroll position,</description></item>
+        ///   <item><description>reopening the menu if it was previously open,</description></item>
+        ///   <item><description>and reselecting the previously active entry.</description></item>
+        /// </list>
         /// </summary>
         /// <param name="index">The index of the tab to rebuild.</param>
         public async UniTask RebuildTabAsync(int index)
@@ -259,8 +266,13 @@ namespace SEE.UI.RuntimeConfigMenu
             bool shouldToggle = index == currentCity
                 && cityMenus[currentCity].ShowMenu;
             string active = "";
+            float scrollValue = 1f;
             if (shouldToggle)
             {
+                scrollValue = cityMenus[currentCity]
+                                .Content
+                                .GetComponentInChildren<ContentSizeWatcher>()
+                                .CurrentScrollValue;
                 cityMenus[currentCity].ToggleMenu();
                 active = cityMenus[currentCity].ActiveEntry.Title;
             }
@@ -272,6 +284,10 @@ namespace SEE.UI.RuntimeConfigMenu
                 cityMenus[currentCity].ToggleMenu();
                 cityMenus[currentCity].SelectEntry(cityMenus[currentCity]
                     .Entries.FirstOrDefault(entry => entry.Title.Equals(active)));
+                await cityMenus[currentCity]
+                        .Content
+                        .GetComponentInChildren<ContentSizeWatcher>()
+                        .ApplyPreviousScrollPositionAsync(scrollValue);
             }
         }
 

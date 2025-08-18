@@ -465,9 +465,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 {
                     if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                     {
-                        float oldScrollValue = GetContentSizeWatcher(button).CurrentScrollValue;
                         await runtimeConfigMenu.RebuildTabAsync(CityIndex);
-                        RestorePreviousScrollPositionAfterRebuild(oldScrollValue);
                     }
                     else
                     {
