@@ -499,13 +499,6 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 GetContentSizeWatcher(button).ApplyPreviousScrollPositionAsync().Forget();
             }
-
-            void RestorePreviousScrollPositionAfterRebuild(float oldScrollPos)
-            {
-                UICanvas.Canvas.FindDescendant(ContentSizeWatcher.CityConfiguration, false)
-                    .GetComponentInChildren<ContentSizeWatcher>()
-                    .ApplyPreviousScrollPositionAsync(oldScrollPos).Forget();
-            }
         }
 
         /// <summary>
