@@ -60,6 +60,13 @@ namespace SEE.Game.City
         private bool initialCityStateLoaded = false;
 
         /// <summary>
+        /// Stores the previous <see cref="DataPath"/>
+        /// when switching the Reflexion city type (Loaded / Initial).
+        /// Used as a backup to restore the original data path if needed.
+        /// </summary>
+        private DataPath backupConfigurationPath;
+
+        /// <summary>
         /// Checks whether the city is in its initial configuration state.
         /// </summary>
         /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
@@ -87,7 +94,7 @@ namespace SEE.Game.City
         public override void LoadConfiguration()
         {
             base.LoadConfiguration();
-            SwitchLoaded();
+            initialReflexionCity = false;
             initialCityStateLoaded = false;
         }
 
@@ -107,24 +114,14 @@ namespace SEE.Game.City
             bool needMenuAdjustments = false;
             if (initialReflexionCity)
             {
-                needMenuAdjustments = !IsInitialState();
-                ResetToInitial();
                 LoadInitial(gameObject.name);
                 return needMenuAdjustments;
-            }
-            else if (IsInitialState())
-            {
-                LoadConfiguration();
-                needMenuAdjustments = true;
             }
 
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
-            if (LoadedGraph != null)
-            {
-                Reset();
-            }
+            ResetGraphIfNeeded();
             using (LoadingSpinner.ShowDeterminate($"Loading reflexion city \"{gameObject.name}\"...",
                                                   out Action<float> reportProgress))
             {
@@ -142,10 +139,26 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Resets the current graph state if a <see cref="LoadedGraph"/> exists.
+        /// </summary>
+        private void ResetGraphIfNeeded()
+        {
+            if (LoadedGraph != null)
+            {
+                Reset();
+            }
+        }
+
+        /// <summary>
         /// Resets all configuration values to their initial default state.
         /// </summary>
         private void ResetToInitial()
         {
+            backupConfigurationPath = ConfigurationPath;
+            DataProvider.Pipeline.Clear();
+            ConfigurationPath = new();
+            SolutionPath = new();
+            SourceCodeDirectory = new();
             LODCulling = 0.001f;
             HierarchicalEdges = HierarchicalEdgeTypes();
             HiddenEdges = new();
@@ -189,6 +202,13 @@ namespace SEE.Game.City
         public void SwitchInitial()
         {
             initialReflexionCity = true;
+            ResetGraphIfNeeded();
+            bool doRebuild = !IsInitialState();
+            ResetToInitial();
+            if (doRebuild && LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu menu))
+            {
+                menu.PerformTabRebuild(this);
+            }
         }
 
         /// <summary>
@@ -202,6 +222,13 @@ namespace SEE.Game.City
         public void SwitchLoaded()
         {
             initialReflexionCity = false;
+            ResetGraphIfNeeded();
+            ConfigurationPath = backupConfigurationPath;
+            LoadConfiguration();
+            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu menu))
+            {
+                menu.PerformTabRebuild(this);
+            }
         }
 
         /// <summary>

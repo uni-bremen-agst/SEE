@@ -23,7 +23,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices.WindowsRuntime;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -449,7 +448,7 @@ namespace SEE.UI.RuntimeConfigMenu
             bool IsLoadMethod(MethodInfo methodInfo)
             {
                 return methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
-                || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync));
+                    || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync));
             }
 
             async UniTask ExecuteLoadAsyncWithoutNetwork()
@@ -474,6 +473,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 }
                 else
                 {
+                    OnUpdateMenuValues?.Invoke();
                     RestorePreviousScrollPosition();
                 }
             }
