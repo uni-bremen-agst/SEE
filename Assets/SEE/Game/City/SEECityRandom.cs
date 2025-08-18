@@ -98,7 +98,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
-        public override UniTask<bool> LoadDataAsync()
+        public override UniTask LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
             return UniTask.FromResult(false);

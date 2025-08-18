@@ -454,10 +454,10 @@ namespace SEE.UI.RuntimeConfigMenu
             async UniTask ExecuteLoadAsyncWithoutNetwork()
             {
                 object result = methodInfo.Invoke(city, null);
-                bool doRebuild = true;
-                if (result is UniTask<bool> task)
+                bool doRebuild = methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration));
+                if (result is UniTask task)
                 {
-                    doRebuild = await task;
+                    await task;
                 }
                 CheckControlConditionsWithDelay();
                 if (doRebuild)

@@ -59,11 +59,10 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
         [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
-        public override async UniTask<bool> LoadDataAsync()
+        public override async UniTask LoadDataAsync()
         {
             await base.LoadDataAsync();
             LoadJLG();
-            return false;
         }
 
         /// <summary>

@@ -329,7 +329,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
-        public virtual async UniTask<bool> LoadDataAsync()
+        public virtual async UniTask LoadDataAsync()
         {
             if (DataProvider != null)
             {
@@ -369,7 +369,6 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
-            return false;
         }
 
         /// <summary>

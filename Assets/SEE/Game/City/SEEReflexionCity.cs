@@ -109,13 +109,12 @@ namespace SEE.Game.City
         [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
-        public override async UniTask<bool> LoadDataAsync()
+        public override async UniTask LoadDataAsync()
         {
-            bool needMenuAdjustments = false;
             if (initialReflexionCity)
             {
                 LoadInitial(gameObject.name);
-                return needMenuAdjustments;
+                return;
             }
 
             // Makes the necessary changes for the initial types of a reflexion city.
@@ -135,7 +134,6 @@ namespace SEE.Game.City
             }
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
-            return needMenuAdjustments;
         }
 
         /// <summary>
