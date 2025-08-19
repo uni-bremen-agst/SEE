@@ -373,7 +373,6 @@ namespace SEE.Controls.Actions
                 {
                     city.LoadAndDrawSubgraphAsync(implDataPath, projectFolder).Forget();
                     new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implDataPath, projectFolder).Execute();
-
                 }
 
                 if (dialog.TryGetArchitectureDataPath(out DataPath archDataPath))
@@ -461,7 +460,6 @@ namespace SEE.Controls.Actions
                     _ => throw new ArgumentOutOfRangeException()
                 });
                 UpdateEntries(popupMenu, position, subMenuEntries);
-
             }, Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 1));
 
             return entries;
@@ -758,7 +756,6 @@ namespace SEE.Controls.Actions
             {
                 ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
             }
-
         }
 
         /// <summary>

@@ -297,12 +297,16 @@ namespace SEE.Game.City
                 // This should be the case by the end of this frame.
                 // TODO: In the future, the GraphRenderer should be an observer to the Graph,
                 //       so that these cases are handled properly.
-                await UniTask.WaitForEndOfFrame();
+                //await UniTask.WaitForEndOfFrame();
+                //await UniTask.DelayFrame(2);
+                await UniTask.WaitUntil(() => edgeChange.Edge.GameObject() is { } go && go.GetComponent<GraphElementOperator>() != null
+                    || edgeChange.Edge.HasToggle(GraphElement.IsVirtualToggle));
                 edge = edgeChange.Edge.GameObject();
             }
 
             if (edge != null)
             {
+                await UniTask.WaitForEndOfFrame();
                 (Color start, Color end) newColors = GetEdgeGradient(edgeChange.Edge.State());
                 EdgeOperator edgeOperator = edge.EdgeOperator();
                 edgeOperator.ShowOrHide(!edgeChange.Edge.HasToggle(Edge.IsHiddenToggle), city.EdgeLayoutSettings.AnimationKind);

@@ -255,7 +255,7 @@ namespace SEE.Controls.Actions
                     // Queue successors, if there are any.
                     connected.Select(getSuccessorNode)
                              .Where(x => x != null)
-                             .Select(x => (x, distance+1))
+                             .Select(x => (x, distance + 1))
                              .ForEach(nodeQueue.Enqueue);
                 }
                 return results.OrderBy(x => x.Key).Select(x => x.Value);
