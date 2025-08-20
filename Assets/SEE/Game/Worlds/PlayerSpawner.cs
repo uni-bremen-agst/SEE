@@ -296,23 +296,6 @@ namespace SEE.Game.Worlds
                 // A caveat of the above two rules is when one of the children GameObjects also
                 // has a NetworkObject component assigned to it (a.k.a. "Nested NetworkObjects").
                 // Nested NetworkObject components aren't permitted in network prefabs.
-
-                //GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam", parent: player.transform);
-
-#if false // FIXME: The FaceCam is already added in the prefab of the player. No need to add it by the code below.
-
-#if !PLATFORM_LUMIN || UNITY_EDITOR
-                if (networkManager.IsServer)
-                {
-                    // Netcode uses a server authoritative networking model so spawning netcode objects
-                    // can only be done on a server or host.
-                    // Add the FaceCam to the player.
-                    GameObject faceCam = PrefabInstantiator.InstantiatePrefab("Prefabs/FaceCam/FaceCam");
-                    faceCam.GetComponent<NetworkObject>().Spawn();
-                    faceCam.transform.parent = player.transform;
-                }
-#endif
-#endif
             }
             // Sets the name of the player on the server side. Instances of the player prefab
             // instantiated on other clients will request their name when they are spawned
