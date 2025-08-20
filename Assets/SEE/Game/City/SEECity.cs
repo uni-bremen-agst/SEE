@@ -1,9 +1,13 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
+using Newtonsoft.Json;
+using OpenAI.Files;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
+using SEE.Game.Operator;
+using SEE.Game.SceneManipulation;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -18,8 +22,10 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -633,7 +639,49 @@ namespace SEE.Game.City
             throw new NotImplementedException();
         }
 
-        SeeCitySnapshot ICodeCityPersitance.CreateSnapshot()
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot locally")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+
+        public void SaveSnapshot()
+        {
+            SeeCitySnapshot snap = CreateSnapshot();
+            string snapshotJson = JsonConvert.SerializeObject(snap,
+            new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+
+            });
+
+            File.WriteAllText($"/home/maakinoh/snapshot2.json", snapshotJson);
+        }
+
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load local Snapshot")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        public async Task ApplySnapshot()
+        {
+            string json = File.ReadAllText($"/home/maakinoh/snapshot2.json");
+            SeeCitySnapshot snapshot = JsonConvert.DeserializeObject<SeeCitySnapshot>(json, new JsonSerializerSettings
+            {
+                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
+            });
+            foreach (SnapshotNode node in snapshot.Nodes)
+            {
+                Node graphNode = LoadedGraph.GetNode(node.NodeId);
+                //GameNodeEditor.ChangeName(graphNode, node.Node.SourceName);
+                //GameNodeEditor.ChangeType(graphNode, node.Node.Type);
+                // graphNode.SourceName = node.Node.SourceName;
+                // graphNode.Type = node.Node.Type;
+                NodeOperator nodeOperator = graphNode.Operator();
+                nodeOperator.MoveTo(node.CenterPosition);
+                //nodeOperator.ScaleTo(node.AbsoluteScale);
+                //nodeOperator.RotateTo(node.Rotation);
+            }
+
+        }
+
+        public SeeCitySnapshot CreateSnapshot()
         {
             if (renderResult == null)
             {

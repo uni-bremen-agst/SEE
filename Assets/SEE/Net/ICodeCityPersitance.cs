@@ -15,14 +15,14 @@ namespace SEE.Net
         /// Loads the code city data from <paramref name="snapshot"/>
         /// </summary>
         /// <param name="snapshot"></param>
-        void LoadFromSnapshot(SeeCitySnapshot snapshot);
+        public void LoadFromSnapshot(SeeCitySnapshot snapshot);
 
         /// <summary>
         /// Saves the current code city data to a snapshot.
         /// </summary>
         /// <returns>The snapshot that should be saved</returns>
-        SeeCitySnapshot CreateSnapshot();
+        public SeeCitySnapshot CreateSnapshot();
 
-        CityTypes GetCityType();
+        public CityTypes GetCityType();
     }
 }
