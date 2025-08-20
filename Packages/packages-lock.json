@@ -318,7 +318,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.transport": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 0,
       "source": "registry",
       "dependencies": {
