@@ -1,5 +1,4 @@
-﻿using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Layout
 {
