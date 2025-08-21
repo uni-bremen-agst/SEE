@@ -6,6 +6,8 @@ namespace SEE.Net
     public class SnapshotEdge
     {
 
+        public string EdgeId { get; set; }
+
         public string EdgeType { get; set; }
 
         /// <summary>
@@ -18,8 +20,9 @@ namespace SEE.Net
         /// </summary>
         public string TargetNodeId { get; set; }
 
-        public SnapshotEdge(string sourceNodeId, string targetNodeId, string edgeType)
+        public SnapshotEdge(string edgeId, string sourceNodeId, string targetNodeId, string edgeType)
         {
+            EdgeId = edgeId;
             EdgeType = edgeType;
             SourceNodeId = sourceNodeId;
             TargetNodeId = targetNodeId;
