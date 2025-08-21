@@ -5,6 +5,9 @@ namespace SEE.Net
     /// </summary>
     public class SnapshotEdge
     {
+
+        public string EdgeType { get; set; }
+
         /// <summary>
         /// Unique identifier of the source node.
         /// </summary>
@@ -15,8 +18,9 @@ namespace SEE.Net
         /// </summary>
         public string TargetNodeId { get; set; }
 
-        public SnapshotEdge(string sourceNodeId, string targetNodeId)
+        public SnapshotEdge(string sourceNodeId, string targetNodeId, string edgeType)
         {
+            EdgeType = edgeType;
             SourceNodeId = sourceNodeId;
             TargetNodeId = targetNodeId;
         }

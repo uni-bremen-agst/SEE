@@ -666,6 +666,7 @@ namespace SEE.Game.City
             {
                 ReferenceLoopHandling = ReferenceLoopHandling.Ignore
             });
+
             foreach (SnapshotNode node in snapshot.Nodes)
             {
                 Node graphNode = LoadedGraph.GetNode(node.NodeId);
@@ -679,6 +680,25 @@ namespace SEE.Game.City
                 //nodeOperator.RotateTo(node.Rotation);
             }
 
+            foreach (SnapshotEdge edge in snapshot.Edges)
+            {
+                Edge graphEdge = loadedGraph.Edges().FirstOrDefault(e => e.Source.ID == edge.SourceNodeId && e.Target.ID == edge.TargetNodeId);
+                if (graphEdge == null)
+                {
+                    var testGO = loadedGraph.Nodes()[0].GameObject();
+                    string sourceId = edge.SourceNodeId;
+                    string edgeType = edge.EdgeType;
+                    Node sourceNode = loadedGraph.GetNode(edge.SourceNodeId);
+                    Node targetNode = loadedGraph.GetNode(edge.TargetNodeId);
+                    GameObject from = sourceNode.GameObject();
+                    GameObject to = targetNode.GameObject();
+                    // Edge newEdge = new Edge(sourceNode, targetNode, edge.EdgeType);
+                    //loadedGraph.AddEdge(newEdge);
+                    GameObject obj = GameEdgeAdder.Add(from, to, edgeType);
+                    Assert.IsNotNull(obj, $"Could not add edge from {from.name} to {to.name} with type {edgeType}.");
+                }
+            }
+
         }
 
         public SeeCitySnapshot CreateSnapshot()
@@ -689,15 +709,16 @@ namespace SEE.Game.City
             }
             return new SeeCitySnapshot
             {
-                Nodes = renderResult.Nodes.Select(node => new SnapshotNode()
+                Nodes = loadedGraph.Nodes().Select(node => new SnapshotNode()
                 {
                     NodeId = node.ID,
-                    CenterPosition = node.CenterPosition,
-                    AbsoluteScale = node.AbsoluteScale,
-                    Rotation = node.Rotation
-                }).ToList(),
-                Edges = renderResult.Edges.Select(edge => new SnapshotEdge(edge.Source.ID, edge.Target.ID))
+                    CenterPosition = node.GameObject().transform.position,
+                    AbsoluteScale = node.GameObject().transform.localScale,
+                    Rotation = node.GameObject().transform.rotation.y,
+                }),
+                Edges = loadedGraph.Edges().Select(edge => new SnapshotEdge(edge.Source.ID, edge.Target.ID, edge.Type))
             };
+
         }
 
         public CityTypes GetCityType()
