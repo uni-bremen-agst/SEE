@@ -863,7 +863,7 @@ namespace SEE.DataModel.DG.IO
                     // This has to do the inverse to the above, i.e., log2, to get the original enum value.
                     int nodeKindValue = (int)nodeKind;
                     int symbolKindValue = (int)Math.Log(nodeKindValue, 2) + 1;
-                    // If the enum is not defined, we don't throw an exception, because we have a flag enum
+                    // If the enum is not defined, we don't throw an exception, because we have a flagUp enum
                     // with certain values (like None) that are not defined in the original enum.
                     if (Enum.IsDefined(typeof(SymbolKind), symbolKindValue))
                     {
@@ -920,7 +920,7 @@ namespace SEE.DataModel.DG.IO
                     // This has to do the inverse to the above, i.e., log2, to get the original enum value.
                     int diagnosticKindValue = (int)diagnosticKind;
                     int diagnosticSeverityValue = (int)Math.Log(diagnosticKindValue, 2) + 1;
-                    // If the enum is not defined, we don't throw an exception, because we have a flag enum
+                    // If the enum is not defined, we don't throw an exception, because we have a flagUp enum
                     // with certain values (like None) that are not defined in the original enum.
                     if (Enum.IsDefined(typeof(DiagnosticSeverity), diagnosticSeverityValue))
                     {

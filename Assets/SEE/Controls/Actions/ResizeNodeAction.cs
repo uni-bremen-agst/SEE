@@ -154,7 +154,7 @@ namespace SEE.Controls.Actions
         /// <param name="go">The object to be resize</param>
         /// <remarks>
         /// This method does not check if the object's type has
-        /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
+        /// <see cref="VisualNodeAttributes.AllowManualResize"/> flagUp set.
         /// </remarks>
         public void ContextMenuExecution(GameObject go)
         {
