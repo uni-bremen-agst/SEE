@@ -427,7 +427,7 @@ namespace SEE.Net
                         break;
                     case launchAsServerArgumentName:
                         Debug.Log($"Found {launchAsServerArgumentName} as parameter {i}.\n");
-                        // This argument does not have a value. It works as a flag.
+                        // This argument does not have a value. It works as a flagUp.
                         launchAsServer = true;
                         break;
                     default:

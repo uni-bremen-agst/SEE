@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
+using SEE.Controls;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
@@ -158,9 +159,10 @@ namespace SEE.Game.Avatars
         Vector3 rightHandPositionOffset = new Vector3(0.37f, 1.56f, 0.23f);
         Vector3 rightHandTargetPos;
 
-        public Boolean bringHandsToStartPositions()
+        private bool IsPointing = true;
+
+        public bool bringHandsToStartPositions()
         {
-            Debug.Log(transform);
             Transform headBone = transform.Find(headName);
             headPosition = transform.InverseTransformPoint(headBone.position);
 
@@ -208,13 +210,46 @@ namespace SEE.Game.Avatars
 
         public void solveHandsPositions(PoseLandmarkerResult resultPoseLandmarker)
         {
+            Transform leftHand = transform.Find(leftHandName);
+            Transform rightHand = transform.Find(rightHandName);
+
+            if(SEEInput.TogglePointing())
+            {
+                if(IsPointing == true)
+                {
+                    IsPointing = false;
+                }
+                else 
+                {
+                    IsPointing = true;
+                }
+            }
+
+            if(IsPointing == false)
+            {
+                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+                leftHandTargetRotation = leftHand.rotation;
+                leftHand.localRotation = startLeftHandRotation;
+
+                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+                rightHandTargetRotation = rightHand.rotation;
+                rightHand.localRotation = startRightHandRotation;
+            }
+            else
+            {
+                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
+                leftHandTargetRotation = leftHand.rotation;
+                leftHand.localRotation = startLeftHandRotation;
+
+                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+                rightHandTargetRotation = rightHand.rotation;
+                rightHand.localRotation = startRightHandRotation;
+            }
+
             ik.solver.leftHandEffector.position = leftHandTargetPos;
             ik.solver.rightHandEffector.position = rightHandTargetPos;
             ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
             ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
-
-            Transform leftHand = transform.Find(leftHandName);
-            Transform rightHand = transform.Find(rightHandName);
 
             var poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
             var mediapipeLeftHandPosition = poseLandmarks[15];
@@ -249,9 +284,6 @@ namespace SEE.Game.Avatars
             LeftHandZRotationForMovementDown = leftHandTargetRotation * Quaternion.Euler(0, 0, 60);
             RightHandZRotationForMovementDown = rightHandTargetRotation * Quaternion.Euler(0, 0, -60);
 
-
-
-
             var mediapipeHeadPosition = poseLandmarks[0];
 
             previousLeftHandMediapipeCoordinates = newLeftHandMediapipeCoordinates;
@@ -268,13 +300,20 @@ namespace SEE.Game.Avatars
             if (mediapipeLeftHandPosition.presence > AcceptableHandPresenceProbability)
             {
                 leftHandToHeadCoordinateDifference = new Vector3(mediapipeLeftHandPosition.x - mediapipeHeadPosition.x, mediapipeLeftHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
-                var newHandPosition = headPosition + leftHandToHeadCoordinateDifference;//transform.InverseTransformPoint(headPosition) + leftHandToHeadCoordinateDifference;
+                var newHandPosition = headPosition + leftHandToHeadCoordinateDifference;
                 ik.solver.leftHandEffector.position = transform.TransformPoint(newHandPosition);
 
                 //interval where palm should be facing the camera
                 if (leftHandToHeadCoordinateDifference.x < HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && leftHandToHeadCoordinateDifference.x > HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
+                    if(IsPointing == true)
+                    {
+                        leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
+                    }
+                    else 
+                    {
+                        leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+                    }
                     leftHandTargetRotation = leftHand.rotation;
                     leftHand.localRotation = startLeftHandRotation;
                     currentLeftHandRotation = Quaternion.Slerp(currentLeftHandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
@@ -333,22 +372,28 @@ namespace SEE.Game.Avatars
             {
 
                 rightHandToHeadCoordinateDifference = new Vector3(mediapipeRightHandPosition.x - mediapipeHeadPosition.x, mediapipeRightHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(rightHandTargetPos).z - headPosition.z);
-                var newHandPosition = headPosition + rightHandToHeadCoordinateDifference;//transform.InverseTransformPoint(headPosition) + rightHandToHeadCoordinateDifference;
+                var newHandPosition = headPosition + rightHandToHeadCoordinateDifference;
                 ik.solver.rightHandEffector.position = transform.TransformPoint(newHandPosition);
 
 
                 //interval where palm should be facing the camera
                 if (rightHandToHeadCoordinateDifference.x > -HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && rightHandToHeadCoordinateDifference.x < -HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+                    if(IsPointing == true)
+                    {
+                        rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+                    }
+                    else
+                    {
+                        rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+                    }
                     rightHandTargetRotation = rightHand.rotation;
                     rightHand.localRotation = startRightHandRotation;
                     currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                     ik.solver.rightHandEffector.rotation = currentRightHandRotation;
                 }
                 //there if the hand is moving to the left, in front of the character
-                else if (/**rightHandToHeadCoordinateDifference.x >= HandXCoordinatesDiffIntervalMovingInFront.Item1
-                            &&*/ rightHandToHeadCoordinateDifference.x <= -HandXCoordinatesDiffIntervalMovingInFront.Item1)
+                else if (rightHandToHeadCoordinateDifference.x <= -HandXCoordinatesDiffIntervalMovingInFront.Item1)
                 {
                     rightHandTargetRotation = RightHandRotationInFrontOfTheCharacter;
                     if (ik.solver.rightHandEffector.rotation.eulerAngles.y > RightHandRotationInFrontOfTheCharacter.eulerAngles.y)
@@ -356,7 +401,7 @@ namespace SEE.Game.Avatars
                         currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                         ik.solver.rightHandEffector.rotation = currentRightHandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
-                        ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);//new Vector3(-3.85f, 0.48f, -6.3f);
+                        ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
                     }
                 }
                 //moving to the side, not in front of the character
