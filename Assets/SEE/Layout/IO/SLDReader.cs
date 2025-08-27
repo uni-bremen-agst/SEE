@@ -1,6 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Globalization;
+using SEE.DataModel.DG;
+using SEE.Utils;
 
 namespace SEE.Layout.IO
 {
@@ -13,6 +15,61 @@ namespace SEE.Layout.IO
     /// </summary>
     public class SLDReader
     {
+
+
+        public static void Read(string filename, IEnumerable<Node> nodes)
+        {
+            Dictionary<string, Node> result = ToMap(nodes);
+
+            string[] data = System.IO.File.ReadAllLines(filename);
+
+            int lineNumber = 0;
+            foreach (string line in data)
+            {
+                lineNumber++;
+                string[] columns = line.Split(SLDWriter.Delimiter);
+
+                if (columns.Length < minimalColumns)
+                {
+                    Debug.LogError
+                        ($"{filename}:{lineNumber}: Data format error. Expected at least {minimalColumns} entries separated by {SLDWriter.Delimiter}."
+                        + $"Got: {columns.Length} in '{line}'.\n");
+                }
+                else
+                {
+                    string id = columns[0];
+
+                    if (result.TryGetValue(id, out Node node))
+                    {
+                        Vector3 position;
+                        position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
+                        position.y = float.Parse(columns[2], CultureInfo.InvariantCulture);
+                        position.z = float.Parse(columns[3], CultureInfo.InvariantCulture);
+
+                        Vector3 eulerAngles;
+                        eulerAngles.x = float.Parse(columns[4], CultureInfo.InvariantCulture);
+                        eulerAngles.y = float.Parse(columns[5], CultureInfo.InvariantCulture);
+                        eulerAngles.z = float.Parse(columns[6], CultureInfo.InvariantCulture);
+
+                        Vector3 scale;
+                        scale.x = float.Parse(columns[7], CultureInfo.InvariantCulture);
+                        scale.y = float.Parse(columns[8], CultureInfo.InvariantCulture);
+                        scale.z = float.Parse(columns[9], CultureInfo.InvariantCulture);
+
+                        // Note: We ignore all remaining columns if there are any.
+
+                        node.GameObject().transform.position = position;
+                        node.GameObject().transform.rotation = Quaternion.Euler(eulerAngles);
+                        //node.GameObject().transform.localScale = scale;
+                    }
+                    else
+                    {
+                        Debug.LogError($"{filename}:{lineNumber}: Unknown node ID {id}.\n");
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Reads layout information from given SLD file with given <paramref name="filename"/>.
         /// The given position and scale of the <paramref name="gameNodes"/> are updated
@@ -102,6 +159,19 @@ namespace SEE.Layout.IO
             foreach (IGameNode gameNode in gameNodes)
             {
                 result[gameNode.ID] = gameNode;
+            }
+            return result;
+        }
+
+        private static Dictionary<string, Node> ToMap(IEnumerable<Node> nodes)
+        {
+            Dictionary<string, Node> result = new();
+            foreach (Node node in nodes)
+            {
+                if (node is Node gameNode)
+                {
+                    result[gameNode.ID] = gameNode;
+                }
             }
             return result;
         }
