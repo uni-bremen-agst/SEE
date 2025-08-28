@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Dissonance;
-using Newtonsoft.Json;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Notification;
@@ -1199,9 +1198,9 @@ namespace SEE.Net
 
         }
 
-        #endregion
+#endregion
 
-        #region Vivox
+#region Vivox
 
         public const string VivoxIssuer = "torben9605-se19-dev";
         public const string VivoxDomain = "vdx5.vivox.com";
@@ -1335,6 +1334,6 @@ namespace SEE.Net
             Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
-        #endregion
+#endregion
     }
 }
