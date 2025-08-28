@@ -16,7 +16,55 @@ namespace SEE.Layout.IO
     public class SLDReader
     {
 
+        /// <summary>
+        /// Extracts the position from the given list <paramref name="columns"/> of an SLD file line.
+        /// </summary>
+        /// <param name="columns">Represents a line in a SLD file.</param>
+        /// <returns></returns>
+        private static Vector3 ExtractPositionFromColumnList(string[] columns)
+        {
+            Vector3 position;
+            position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
+            position.y = float.Parse(columns[2], CultureInfo.InvariantCulture);
+            position.z = float.Parse(columns[3], CultureInfo.InvariantCulture);
+            return position;
+        }
 
+        /// <summary>
+        /// Extracts the Euler angles from the given list <paramref name="columns"/> of an SLD file line.
+        /// </summary>
+        /// <param name="columns">Represents a line in a SLD file.</param>
+        /// <returns></returns>
+        private static Vector3 ExtractEulerAnglesFromColumnList(string[] columns)
+        {
+            Vector3 eulerAngles;
+            eulerAngles.x = float.Parse(columns[4], CultureInfo.InvariantCulture);
+            eulerAngles.y = float.Parse(columns[5], CultureInfo.InvariantCulture);
+            eulerAngles.z = float.Parse(columns[6], CultureInfo.InvariantCulture);
+            return eulerAngles;
+        }
+
+        /// <summary>
+        /// Extracts the scale from the given list <paramref name="columns"/> of an SLD file line.
+        /// </summary>
+        /// <param name="columns">Represents a line in a SLD file.s</param>
+        /// <returns></returns>
+        private static Vector3 ExtractScaleFromColumnList(string[] columns)
+        {
+            Vector3 scale;
+            scale.x = float.Parse(columns[7], CultureInfo.InvariantCulture);
+            scale.y = float.Parse(columns[8], CultureInfo.InvariantCulture);
+            scale.z = float.Parse(columns[9], CultureInfo.InvariantCulture);
+            return scale;
+        }
+
+        /// <summary>
+        /// Analog to <see cref="Read(string, IEnumerable{IGameNode})"/>, but works on <see cref="IEnumerable{Node}"/> instead of <see cref="IEnumerable{IGameNode}"/>.
+        ///
+        /// This method will load the layout information from the given SLD file at <paramref name="filename"/> and apply it to the nodes in <paramref name="nodes"/>.
+        /// </summary>
+        /// <param name="filename">Name of the SLD file.</param>
+        /// <param name="nodes">The game nodes whose position and scale are to be updated.</param>
         public static void Read(string filename, IEnumerable<Node> nodes)
         {
             Dictionary<string, Node> result = ToMap(nodes);
@@ -41,26 +89,15 @@ namespace SEE.Layout.IO
 
                     if (result.TryGetValue(id, out Node node))
                     {
-                        Vector3 position;
-                        position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
-                        position.y = float.Parse(columns[2], CultureInfo.InvariantCulture);
-                        position.z = float.Parse(columns[3], CultureInfo.InvariantCulture);
-
-                        Vector3 eulerAngles;
-                        eulerAngles.x = float.Parse(columns[4], CultureInfo.InvariantCulture);
-                        eulerAngles.y = float.Parse(columns[5], CultureInfo.InvariantCulture);
-                        eulerAngles.z = float.Parse(columns[6], CultureInfo.InvariantCulture);
-
-                        Vector3 scale;
-                        scale.x = float.Parse(columns[7], CultureInfo.InvariantCulture);
-                        scale.y = float.Parse(columns[8], CultureInfo.InvariantCulture);
-                        scale.z = float.Parse(columns[9], CultureInfo.InvariantCulture);
-
+                        Vector3 position = ExtractPositionFromColumnList(columns);
+                        Vector3 eulerAngles = ExtractEulerAnglesFromColumnList(columns);
+                        Vector3 scale = ExtractScaleFromColumnList(columns);
                         // Note: We ignore all remaining columns if there are any.
 
-                        node.GameObject().transform.position = position;
-                        node.GameObject().transform.rotation = Quaternion.Euler(eulerAngles);
-                        //node.GameObject().transform.localScale = scale;
+                        GameObject goOfNode = node.GameObject();
+                        goOfNode.transform.position = position;
+                        goOfNode.transform.rotation = Quaternion.Euler(eulerAngles);
+                        goOfNode.transform.localScale = scale;
                     }
                     else
                     {
@@ -85,8 +122,8 @@ namespace SEE.Layout.IO
         /// exist in <paramref name="gameNodes"/>. IGameNodes contained in <paramref name="gameNodes"/>
         /// for which no layout information exist in the layout file will not be updated.
         /// </summary>
-        /// <param name="filename">name of GVL file</param>
-        /// <param name="gameNodes">the game nodes whose position and scale are to be updated</param>
+        /// <param name="filename">Name of SLD file.</param>
+        /// <param name="gameNodes">The game nodes whose position and scale are to be updated.</param>
         public static void Read(string filename, IEnumerable<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = ToMap(gameNodes);
@@ -111,21 +148,9 @@ namespace SEE.Layout.IO
 
                     if (result.TryGetValue(id, out IGameNode node))
                     {
-                        Vector3 position;
-                        position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
-                        position.y = float.Parse(columns[2], CultureInfo.InvariantCulture);
-                        position.z = float.Parse(columns[3], CultureInfo.InvariantCulture);
-
-                        Vector3 eulerAngles;
-                        eulerAngles.x = float.Parse(columns[4], CultureInfo.InvariantCulture);
-                        eulerAngles.y = float.Parse(columns[5], CultureInfo.InvariantCulture);
-                        eulerAngles.z = float.Parse(columns[6], CultureInfo.InvariantCulture);
-
-                        Vector3 scale;
-                        scale.x = float.Parse(columns[7], CultureInfo.InvariantCulture);
-                        scale.y = float.Parse(columns[8], CultureInfo.InvariantCulture);
-                        scale.z = float.Parse(columns[9], CultureInfo.InvariantCulture);
-
+                        Vector3 position = ExtractPositionFromColumnList(columns);
+                        Vector3 eulerAngles = ExtractEulerAnglesFromColumnList(columns);
+                        Vector3 scale = ExtractScaleFromColumnList(columns);
                         // Note: We ignore all remaining columns if there are any.
 
                         node.CenterPosition = position;
