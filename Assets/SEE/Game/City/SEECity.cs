@@ -529,6 +529,30 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Loads the layout of the city from a file at <see cref="LayoutPath"/> and maps it on the current loaded graph.
+        ///
+        /// Precondition: The graph must be fully loaded and drawn before calling this method.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        public void LoadLayout()
+        {
+            Assert.IsTrue(IsGraphDrawn, "The graph must be fully loaded and drawn before loading a layout.");
+
+            string path = NodeLayoutSettings.LayoutPath.Path;
+            Debug.Log($"Loading layout data from {path}.\n");
+            if (Filenames.HasExtension(path, Filenames.GVLExtension))
+            {
+                //Layout.IO.GVLReader.Load(path, AllNodeDescendants(gameObject));
+            }
+            else
+            {
+                Layout.IO.SLDReader.Read(path, renderResult.Nodes);
+            }
+        }
+
+        /// <summary>
         /// This method will cancel any running graph provider pipeline and delete the currently
         /// loaded graph.
         /// </summary>
@@ -670,14 +694,11 @@ namespace SEE.Game.City
             foreach (SnapshotNode node in snapshot.Nodes)
             {
                 Node graphNode = LoadedGraph.GetNode(node.NodeId);
-                //GameNodeEditor.ChangeName(graphNode, node.Node.SourceName);
-                //GameNodeEditor.ChangeType(graphNode, node.Node.Type);
-                // graphNode.SourceName = node.Node.SourceName;
-                // graphNode.Type = node.Node.Type;
+                Node parentNode = LoadedGraph.GetNode(node.ParentNodeId);
                 NodeOperator nodeOperator = graphNode.Operator();
                 nodeOperator.MoveTo(node.CenterPosition);
-                //nodeOperator.ScaleTo(node.AbsoluteScale);
-                //nodeOperator.RotateTo(node.Rotation);
+
+                GameNodeMover.SetParent(graphNode.GameObject(), parentNode.GameObject());
             }
 
 
@@ -709,6 +730,7 @@ namespace SEE.Game.City
             {
                 Nodes = loadedGraph.Nodes().Select(node => new SnapshotNode()
                 {
+                    ParentNodeId = node.Parent?.ID,
                     NodeId = node.ID,
                     CenterPosition = node.GameObject().transform.position,
                     AbsoluteScale = node.GameObject().transform.localScale,
