@@ -35,7 +35,7 @@ namespace SEE.Game.City
     /// Manages settings of the graph data showing a single version of a software
     /// system needed at runtime.
     /// </summary>
-    public class SEECity : AbstractSEECity, ICodeCityPersitance
+    public class SEECity : AbstractSEECity
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
@@ -548,7 +548,7 @@ namespace SEE.Game.City
             }
             else
             {
-                Layout.IO.SLDReader.Read(path, renderResult.Nodes);
+                Layout.IO.SLDReader.Read(path, loadedGraph.Nodes());
             }
         }
 
@@ -656,89 +656,6 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
-        }
-
-        public void LoadFromSnapshot(SeeCitySnapshot snapshot)
-        {
-            throw new NotImplementedException();
-        }
-
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot locally")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
-
-        public void SaveSnapshot()
-        {
-            SeeCitySnapshot snap = CreateSnapshot();
-            string snapshotJson = JsonConvert.SerializeObject(snap,
-            new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-
-            });
-
-            File.WriteAllText($"/home/maakinoh/snapshot2.json", snapshotJson);
-        }
-
-        [Button(ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load local Snapshot")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
-        public async Task ApplySnapshot()
-        {
-            string json = File.ReadAllText($"/home/maakinoh/snapshot2.json");
-            SeeCitySnapshot snapshot = JsonConvert.DeserializeObject<SeeCitySnapshot>(json, new JsonSerializerSettings
-            {
-                ReferenceLoopHandling = ReferenceLoopHandling.Ignore
-            });
-
-            foreach (SnapshotNode node in snapshot.Nodes)
-            {
-                Node graphNode = LoadedGraph.GetNode(node.NodeId);
-                Node parentNode = LoadedGraph.GetNode(node.ParentNodeId);
-                NodeOperator nodeOperator = graphNode.Operator();
-                nodeOperator.MoveTo(node.CenterPosition);
-
-                GameNodeMover.SetParent(graphNode.GameObject(), parentNode.GameObject());
-            }
-
-
-            foreach (SnapshotEdge edge in snapshot.Edges)
-            {
-                Edge graphEdge = loadedGraph.Edges().FirstOrDefault(e => e.ID == edge.EdgeId);
-
-                if (graphEdge == null)
-                {
-                    var testGO = loadedGraph.Nodes()[0].GameObject();
-                    string sourceId = edge.SourceNodeId;
-                    string edgeType = edge.EdgeType;
-                    Node sourceNode = loadedGraph.GetNode(edge.SourceNodeId);
-                    Node targetNode = loadedGraph.GetNode(edge.TargetNodeId);
-                    GameEdgeAdder.Add(sourceNode.GameObject(), targetNode.GameObject(), edge.EdgeType);
-                    //Assert.IsNotNull(obj, $"Could not add edge from {sourceNode.SourceName} to {targetNode.SourceName} with type {edgeType}.");
-                }
-            }
-
-        }
-
-        public SeeCitySnapshot CreateSnapshot()
-        {
-            if (renderResult == null)
-            {
-                return null;
-            }
-            return new SeeCitySnapshot
-            {
-                Nodes = loadedGraph.Nodes().Select(node => new SnapshotNode()
-                {
-                    ParentNodeId = node.Parent?.ID,
-                    NodeId = node.ID,
-                    CenterPosition = node.GameObject().transform.position,
-                    AbsoluteScale = node.GameObject().transform.localScale,
-                    Rotation = node.GameObject().transform.rotation.y,
-                }),
-                Edges = loadedGraph.Edges().Select(edge => new SnapshotEdge(edge.ID, edge.Source.ID, edge.Target.ID, edge.Type))
-            };
-
         }
 
         public CityTypes GetCityType()
