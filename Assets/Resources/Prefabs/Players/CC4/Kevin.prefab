@@ -8572,6 +8572,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 1001888434835009534}
+    - targetCorrespondingSourceObject: {fileID: 1906181387538679423, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 7525250950306510587}
   m_SourcePrefab: {fileID: 100100000, guid: 628493a4652d54b47aaee2226a0c0890, type: 3}
 --- !u!1 &5078152191984370877 stripped
 GameObject:
@@ -16040,13 +16044,24 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   poseLandmarkerModelAsset: {fileID: 4900000, guid: f9b04d8d67a79ef4582f03c1b24e3987,
     type: 3}
-  handLandmarkerModelAsset: {fileID: 4900000, guid: 735c9015906dd574890a25463883d942,
+  handLandmarkerModelAsset: {fileID: 4900000, guid: a27c80a1a0183bb448f0402baccde5b2,
     type: 3}
   gestureRecognizerModelAsset: {fileID: 4900000, guid: 26c55d750d5644b47b87012cf04d879d,
     type: 3}
-  weight: 1
-  currentLeftHandRotation: {x: 0, y: 0, z: 0, w: 0}
-  currentRightHandRotation: {x: 0, y: 0, z: 0, w: 0}
+  IsLocallyControlled: 1
+--- !u!114 &7525250950306510587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5078152191984370877}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2e9f3dd1f66e8e48b3cfc0255f7ba7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
 --- !u!4 &5562763782413475335 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1242937920193830085, guid: 628493a4652d54b47aaee2226a0c0890,

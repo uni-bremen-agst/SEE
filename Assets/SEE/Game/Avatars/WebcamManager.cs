@@ -5,13 +5,13 @@ namespace SEE.Game.Avatars
 {
     public static class WebcamManager
     {
-        private static WebCamTexture sharedWebCamTexture;
+        private static WebCamTexture webCamTexture;
 
-        public static WebCamTexture SharedWebCamTexture => sharedWebCamTexture;
+        public static WebCamTexture WebCamTexture => webCamTexture;
 
         public static void Initialize()
         {
-            if (sharedWebCamTexture != null)
+            if (webCamTexture != null)
                 return; // Already initialized
 
             var devices = WebCamTexture.devices;
@@ -24,8 +24,8 @@ namespace SEE.Game.Avatars
             }
 
             var device = devices[0];
-            sharedWebCamTexture = new WebCamTexture(device.name, 1240, 720, 30);
-            sharedWebCamTexture.Play();
+            webCamTexture = new WebCamTexture(device.name, 1240, 720, 30);
+            webCamTexture.Play();
 
             Debug.Log("Webcam initialized: " + device.name);
         }

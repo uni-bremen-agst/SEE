@@ -12,53 +12,53 @@ namespace SEE.Game.Avatars
 {
     public class HandsAnimator
     {
-        Transform transform; //main transform of the avatar
+        public Transform transform; //main transform of the avatar
 
-        private const string headName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
+        public const string headName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
 
-        private const string leftHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
+        public const string leftHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
 
-        private const string leftMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1";
-        private const string leftMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2";
-        private const string leftMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
+        public const string leftMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1";
+        public const string leftMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2";
+        public const string leftMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
 
-        private const string leftIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1";
-        private const string leftIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2";
-        private const string leftIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
+        public const string leftIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1";
+        public const string leftIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2";
+        public const string leftIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
 
-        private const string leftRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1";
-        private const string leftRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2";
-        private const string leftRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
+        public const string leftRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1";
+        public const string leftRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2";
+        public const string leftRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
 
-        private const string leftPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1";
-        private const string leftPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
-        private const string leftPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
+        public const string leftPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1";
+        public const string leftPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
+        public const string leftPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
 
-        private const string leftThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1";
-        private const string leftThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
-        private const string leftThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
+        public const string leftThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1";
+        public const string leftThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
+        public const string leftThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
 
-        private const string rightHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
+        public const string rightHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
 
-        private const string rightMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1";
-        private const string rightMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2";
-        private const string rightMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
+        public const string rightMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1";
+        public const string rightMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2";
+        public const string rightMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
 
-        private const string rightIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1";
-        private const string rightIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2";
-        private const string rightIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
+        public const string rightIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1";
+        public const string rightIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2";
+        public const string rightIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
 
-        private const string rightRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1";
-        private const string rightRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2";
-        private const string rightRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
+        public const string rightRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1";
+        public const string rightRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2";
+        public const string rightRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
 
-        private const string rightPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1";
-        private const string rightPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
-        private const string rightPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
+        public const string rightPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1";
+        public const string rightPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
+        public const string rightPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
 
-        private const string rightThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1";
-        private const string rightThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
-        private const string rightThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
+        public const string rightThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1";
+        public const string rightThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
+        public const string rightThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
 
         private FullBodyBipedIK ik;
 
@@ -76,6 +76,8 @@ namespace SEE.Game.Avatars
 
         private const float moveSpeed = 0.5f;
         private const float arrivalThreshold = 0.01f;
+        private float AcceptableHandPresenceProbability = 0.5f;
+
         private bool startHandsPositionReached = false;
         private bool isFirstPoseLandmark = true;
 
@@ -87,16 +89,46 @@ namespace SEE.Game.Avatars
         Vector3 leftHandStartPos = Vector3.zero;
         Vector3 rightHandStartPos = Vector3.zero;
 
-        private float AcceptableHandPresenceProbability = 0.5f;
         private Quaternion LeftHandRotationInFrontOfTheCharacter;
         private Quaternion RightHandRotationInFrontOfTheCharacter;
         private Quaternion LeftHandYRotationMovementToTheSide;
         private Quaternion RightHandYRotationMovementToTheSide;
         private Quaternion LeftHandZRotationForMovementDown;
         private Quaternion RightHandZRotationForMovementDown;
+
         private Tuple<float, float> HandXCoordinatesDiffIntervalToFaceTheCamera = Tuple.Create(-0.47f, -0.15f);
         private Tuple<float, float> HandXCoordinatesDiffIntervalMovingInFront = Tuple.Create(-0.15f, 0.28f);
         private float HandYCoordinatesDiffToMoveDownFrom = -0.3f;
+
+        /// <summary>
+        /// Hand animation parameters needed to visualise a player's Avatar
+        /// for all other clients
+        /// </summary>
+        public Vector3 leftBendGoalLocalPosition = Vector3.zero;
+        public Vector3 rightBendGoalLocalPosition = Vector3.zero;
+
+        public Vector3 leftHandEffectorPosition = Vector3.zero;
+        public Quaternion leftHandEffectorRotation = Quaternion.Euler(0, 0, 0);
+        public float lefthandRotationWeight = 1f;
+        public Vector3 rightHandEffectorPosition = Vector3.zero;
+        public Quaternion rightHandEffectorRotation = Quaternion.Euler(0, 0, 0);
+        public float righthandRotationWeight = 1f;
+
+        public Vector3 rightIndexFingerRotations = Vector3.zero;
+        public Vector3 rightMiddleFingerRotations = Vector3.zero;
+        public Vector3 rightRingFingerRotations = Vector3.zero;
+        public Vector3 rightPinkyFingerRotations = Vector3.zero;
+        public Quaternion rightThumb1Rotations = Quaternion.Euler(0, 0, 0);
+        public Quaternion rightThumb2Rotations = Quaternion.Euler(0, 0, 0);
+        public Quaternion rightThumb3Rotations = Quaternion.Euler(0, 0, 0);
+
+        public Vector3 leftIndexFingerRotations = Vector3.zero;
+        public Vector3 leftMiddleFingerRotations = Vector3.zero;
+        public Vector3 leftRingFingerRotations = Vector3.zero;
+        public Vector3 leftPinkyFingerRotations = Vector3.zero;
+        public Quaternion leftThumb1Rotations = Quaternion.Euler(0, 0, 0);
+        public Quaternion leftThumb2Rotations = Quaternion.Euler(0, 0, 0);
+        public Quaternion leftThumb3Rotations = Quaternion.Euler(0, 0, 0);
 
 
         public void initialize(Transform mainTrasform, FullBodyBipedIK ikComponent)
@@ -135,16 +167,23 @@ namespace SEE.Game.Avatars
 
             ik.solver.leftHandEffector.positionWeight = weight;
             ik.solver.leftHandEffector.rotationWeight = weight;
+            lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
+
+            ik.solver.rightHandEffector.positionWeight = weight;
+            ik.solver.rightHandEffector.rotationWeight = weight;
+            righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
 
             GameObject leftElbowBendGoal = new GameObject("LeftElbowBendGoal");
             leftElbowBendGoal.transform.SetParent(mainTrasform, false);
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftElbowBendGoal.transform;
             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
+            leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
             GameObject rightElbowBendGoal = new GameObject("RightElbowBendGoal");
             rightElbowBendGoal.transform.SetParent(mainTrasform, false);
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightElbowBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
+            rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
         }
 
 
@@ -191,6 +230,7 @@ namespace SEE.Game.Avatars
 
                 ik.solver.leftHandEffector.positionWeight = weight;
                 ik.solver.leftHandEffector.rotationWeight = weight;
+                lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
 
                 currentRightHandPosition = Vector3.Lerp(currentRightHandPosition, rightHandTargetPos, Time.deltaTime * moveSpeed * 4);
                 currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 4);
@@ -199,6 +239,27 @@ namespace SEE.Game.Avatars
 
                 ik.solver.rightHandEffector.positionWeight = weight;
                 ik.solver.rightHandEffector.rotationWeight = weight;
+                righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
+
+                leftHandEffectorPosition = ik.solver.leftHandEffector.position;
+                leftHandEffectorRotation = ik.solver.leftHandEffector.rotation;
+
+                rightHandEffectorPosition = ik.solver.rightHandEffector.position;
+                rightHandEffectorRotation = ik.solver.rightHandEffector.rotation;
+
+                Transform leftThumb1Bone = transform.Find(leftThumb1Name);
+                Transform leftThumb2Bone = transform.Find(leftThumb2Name);
+                Transform leftThumb3Bone = transform.Find(leftThumb3Name);
+                leftThumb1Rotations = leftThumb1Bone.localRotation;
+                leftThumb2Rotations = leftThumb2Bone.localRotation;
+                leftThumb3Rotations = leftThumb3Bone.localRotation;
+
+                Transform rightThumb1Bone = transform.Find(rightThumb1Name);
+                Transform rightThumb2Bone = transform.Find(rightThumb2Name);
+                Transform rightThumb3Bone = transform.Find(rightThumb3Name);
+                rightThumb1Rotations = rightThumb1Bone.localRotation;
+                rightThumb2Rotations = rightThumb2Bone.localRotation;
+                rightThumb3Rotations = rightThumb3Bone.localRotation;
 
                 return false;
             }
@@ -329,7 +390,9 @@ namespace SEE.Game.Avatars
                         currentLeftHandRotation = Quaternion.Slerp(currentLeftHandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                         ik.solver.leftHandEffector.rotation = currentLeftHandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
+                        lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                         ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
+                        leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                     }
                 }
                 //moving to the side, not in front of the character
@@ -341,6 +404,7 @@ namespace SEE.Game.Avatars
                         currentLeftHandRotation = Quaternion.Slerp(currentLeftHandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 5);
                         ik.solver.leftHandEffector.rotation = currentLeftHandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
+                        lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                     }
                 }
                 //moving the hand down
@@ -352,6 +416,7 @@ namespace SEE.Game.Avatars
                         currentLeftHandRotation = Quaternion.Slerp(currentLeftHandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                         ik.solver.leftHandEffector.rotation = currentLeftHandRotation;
                         ik.solver.leftHandEffector.rotationWeight = weight;
+                        lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                     }
                 }
             }
@@ -401,7 +466,9 @@ namespace SEE.Game.Avatars
                         currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                         ik.solver.rightHandEffector.rotation = currentRightHandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
+                        righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                         ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
+                        rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                     }
                 }
                 //moving to the side, not in front of the character
@@ -413,6 +480,7 @@ namespace SEE.Game.Avatars
                         currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 5);
                         ik.solver.rightHandEffector.rotation = currentRightHandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
+                        righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                     }
                 }
                 //moving the hand down
@@ -424,6 +492,7 @@ namespace SEE.Game.Avatars
                         currentRightHandRotation = Quaternion.Slerp(currentRightHandRotation, rightHandTargetRotation, Time.deltaTime * moveSpeed * 10);
                         ik.solver.rightHandEffector.rotation = currentRightHandRotation;
                         ik.solver.rightHandEffector.rotationWeight = weight;
+                        righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                     }
                 }
             }
@@ -435,6 +504,12 @@ namespace SEE.Game.Avatars
                     ik.solver.rightHandEffector.position = transform.TransformPoint(newHandPosition);
                 }
             }
+
+            leftHandEffectorPosition = ik.solver.leftHandEffector.position;
+            leftHandEffectorRotation = ik.solver.leftHandEffector.rotation;
+
+            rightHandEffectorPosition = ik.solver.rightHandEffector.position;
+            rightHandEffectorRotation = ik.solver.rightHandEffector.rotation;
 
         }
 
@@ -451,7 +526,6 @@ namespace SEE.Game.Avatars
         Vector3 leftPinkyFinger3StartPos = Vector3.zero;
         Vector3 leftPinkyFinger2StartPos = Vector3.zero;
         Vector3 leftThumb3StartPos = Vector3.zero;
-        Quaternion leftThumb2BoneStartRotation = Quaternion.Euler(0, 0, 0);
         Vector3 leftHandToHeadCoordinateDifference = Vector3.zero;
 
         private bool firstRightHandLandmark = true;
@@ -474,12 +548,15 @@ namespace SEE.Game.Avatars
         {
             var leftHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
-            var leftHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
+            int leftHandInTheGesturesList = -1;
+            if(resultGestureRecognizer.handedness != null)
+            {
+                leftHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
+            }
             String leftHandGesture = "None";
             if (leftHandInTheGesturesList != -1)
             {
                 leftHandGesture = resultGestureRecognizer.gestures[leftHandInTheGesturesList].categories[0].categoryName;
-                //Debug.Log("what gesture leftHand: " + resultGestureRecognizer.gestures[leftHandInTheGesturesList].categories[0].categoryName);
             }
 
             if (leftHandResultIndex >= 0)
@@ -548,13 +625,11 @@ namespace SEE.Game.Avatars
 
                     leftIndexFinger1StartPos = new Vector3(leftIndexFinger1Position.x - leftHandPosition.x, leftIndexFinger1Position.y - leftHandPosition.y, 0);
 
-                    leftThumb2BoneStartRotation = leftThumb2Bone.localRotation;
-
                     firstLeftHandLandmark = false;
                 }
 
                 /// <summary>
-                /// Rtating the wrist
+                /// Rotating the wrist
                 /// </summary>
                 //interval where palm should be facing the camera
                 if (leftHandToHeadCoordinateDifference.x < HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && leftHandToHeadCoordinateDifference.x > HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
@@ -572,6 +647,7 @@ namespace SEE.Game.Avatars
                         leftHandTargetRotation = startLeftHandRotation * leftHandRotationOffset;
                         ik.solver.leftHandEffector.rotation *= Quaternion.Euler(0, 0, newElbowRotation + leftHandTargetRotation.z - ik.solver.leftHandEffector.rotation.eulerAngles.z);
                         ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f + newElbowRotation / 100, 0);
+                        leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
                         leftThumb1Bone.localRotation *= Quaternion.Euler(0, 0, 0);
                         leftThumb2Bone.localRotation *= Quaternion.Euler(-20, 0, 0);
@@ -598,21 +674,14 @@ namespace SEE.Game.Avatars
                         float newWristAngle = rotationSolver.findXRotation(leftIndexFinger1Position, leftHandPosition, leftIndexFinger1StartPos);
                         ik.solver.leftHandEffector.rotation *= Quaternion.Euler(-newWristAngle, 0, 0);//hello
 
-                        /**if (leftIndexFinger1Position.y - leftIndexFinger1StartPos.y <= 0.005f)
-                        {
-                            newWristAngle = rotationSolver.findWristYRotation(leftIndexFinger1Position, leftHandPosition, leftIndexFinger1StartPos);
-                            if (!float.IsNaN(newWristAngle))
-                            {
-                                ik.solver.leftHandEffector.rotation *= Quaternion.Euler(0, newWristAngle, 0);
-                            }
-                        }*/
-
 
                         if (leftHandGesture == "Thumb_Up")
                         {
                             ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(-90, -80, -80);
                             ik.solver.leftHandEffector.rotationWeight = 0.8f;
+                            lefthandRotationWeight = ik.solver.leftHandEffector.rotationWeight;
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
+                            leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
@@ -638,6 +707,7 @@ namespace SEE.Game.Avatars
                         {
                             ik.solver.leftHandEffector.rotation = leftHandTargetRotation * Quaternion.Euler(80, -60, -60);
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-1.5f, 0.5f, 0);
+                            leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
                             leftThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             leftThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             leftThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
@@ -661,12 +731,14 @@ namespace SEE.Game.Avatars
                         else
                         {
                             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
+                            leftBendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
                             /// <summary>
                             /// Middle Finger
                             /// </summary>
                             float newAngle = rotationSolver.findTopDownRotation(leftMiddleFinger3Position, leftMiddleFinger2Position, leftMidFinger3StartPos);
                             rotationSolver.setFingertipRotation(newAngle, leftMidFinger3Bone, leftMidFinger2Bone);
+                            float newAngleMiddleFinger = newAngle;
 
 
                             newAngle = rotationSolver.findTopDownRotation(leftMiddleFinger2Position, leftMiddleFinger1Position, leftMidFinger2StartPos);
@@ -677,6 +749,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(leftIndexFinger3Position, leftIndexFinger2Position, leftIndexFinger3StartPos);
                             rotationSolver.setFingertipRotation(newAngle, leftIndexFinger3Bone, leftIndexFinger2Bone);
+                            float newAngleIndexFinger = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(leftIndexFinger2Position, leftIndexFinger1Position, leftIndexFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(newAngle, leftIndexFinger1Bone);
@@ -687,6 +760,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(leftRingFinger3Position, leftRingFinger2Position, leftRingFinger3StartPos);
                             rotationSolver.setFingertipRotation(newAngle, leftRingFinger3Bone, leftRingFinger2Bone);
+                            float newAngleRingFinger = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(leftRingFinger2Position, leftRingFinger1Position, leftRingFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(newAngle, leftRingFinger1Bone);
@@ -696,6 +770,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(leftPinkyFinger3Position, leftPinkyFinger2Position, leftPinkyFinger3StartPos);
                             rotationSolver.setFingertipRotation(newAngle, leftPinkyFinger3Bone, leftPinkyFinger2Bone);
+                            float newAnglePinky = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(leftPinkyFinger2Position, leftPinkyFinger1Position, leftPinkyFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(newAngle, leftPinkyFinger1Bone);
@@ -704,14 +779,29 @@ namespace SEE.Game.Avatars
                             /// Thumb
                             /// </summary>
                             float newAngleThumb = rotationSolver.findXRotation(leftThumb3Position, leftThumb2Position, leftThumb3StartPos);
-                            leftThumb2Bone.localRotation = leftThumb2BoneStartRotation * Quaternion.Euler(-newAngleThumb, 0, 0);
+                            leftThumb2Bone.localRotation *= Quaternion.Euler(-newAngleThumb, 0, 0);
+
+
+                            if (leftIndexFinger1Position.y - leftIndexFinger1StartPos.y <= 0.005f)
+                            {
+                                newWristAngle = rotationSolver.findWristYRotation(leftIndexFinger1Position, leftHandPosition, leftIndexFinger1StartPos);
+                                if (!float.IsNaN(newWristAngle) && newWristAngle <= 120f && !areFingersRotated(newAngleIndexFinger, newAngleMiddleFinger, newAngleRingFinger, newAnglePinky))
+                                {
+                                    ik.solver.leftHandEffector.rotation *= Quaternion.Euler(0, newWristAngle, 0);
+                                }
+                            }
                         }
-
                     }
-
                 }
-
-
+                leftHandEffectorPosition = ik.solver.leftHandEffector.position;
+                leftHandEffectorRotation = ik.solver.leftHandEffector.rotation;
+                leftIndexFingerRotations = new Vector3(leftIndexFinger1Bone.localRotation.eulerAngles.z, leftIndexFinger2Bone.localRotation.eulerAngles.z, leftIndexFinger3Bone.localRotation.eulerAngles.z);
+                leftMiddleFingerRotations = new Vector3(leftMidFinger1Bone.localRotation.eulerAngles.z, leftMidFinger2Bone.localRotation.eulerAngles.z, leftMidFinger3Bone.localRotation.eulerAngles.z);
+                leftRingFingerRotations = new Vector3(leftRingFinger1Bone.localRotation.eulerAngles.z, leftRingFinger2Bone.localRotation.eulerAngles.z, leftRingFinger3Bone.localRotation.eulerAngles.z);
+                leftPinkyFingerRotations = new Vector3(leftPinkyFinger1Bone.localRotation.eulerAngles.z, leftPinkyFinger2Bone.localRotation.eulerAngles.z, leftPinkyFinger3Bone.localRotation.eulerAngles.z);
+                leftThumb1Rotations = leftThumb1Bone.localRotation;
+                leftThumb2Rotations = leftThumb2Bone.localRotation;
+                leftThumb3Rotations = leftThumb3Bone.localRotation;
             }
         }
 
@@ -719,12 +809,15 @@ namespace SEE.Game.Avatars
         {
             var rightHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
 
-            var rightHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
+            int rightHandInTheGesturesList = -1;
+            if(resultGestureRecognizer.handedness != null)
+            {
+                rightHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
+            }
             String rightHandGesture = "None";
             if (rightHandInTheGesturesList != -1)
             {
                 rightHandGesture = resultGestureRecognizer.gestures[rightHandInTheGesturesList].categories[0].categoryName;
-                //Debug.Log("what gesture RIGHT Hand: " + resultGestureRecognizer.gestures[rightHandInTheGesturesList].categories[0].categoryName);
             }
 
             if (rightHandResultIndex >= 0)
@@ -796,7 +889,7 @@ namespace SEE.Game.Avatars
                 }
 
                 /// <summary>
-                /// Rotation the wrist
+                /// Rotation the wrist and also "Thumb up" and "Thumb down" gestures
                 /// </summary>
                 //interval where palm should be facing the camera
                 if (rightHandToHeadCoordinateDifference.x > -HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && rightHandToHeadCoordinateDifference.x < -HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
@@ -815,6 +908,7 @@ namespace SEE.Game.Avatars
                         ik.solver.rightHandEffector.rotation *= Quaternion.Euler(0, 0, -newElbowRotation + rightHandTargetRotation.z - ik.solver.rightHandEffector.rotation.eulerAngles.z);
 
                         ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f + newElbowRotation / 100, 0);
+                        rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
 
                         rightThumb1Bone.localRotation *= Quaternion.Euler(0, 0, 0);
                         rightThumb2Bone.localRotation *= Quaternion.Euler(20, 0, 0);
@@ -839,22 +933,15 @@ namespace SEE.Game.Avatars
                     else
                     {
                         float newWristAngle = rotationSolver.findXRotation(rightIndexFinger1Position, rightHandPosition, rightIndexFinger1StartPos);
-                        ik.solver.rightHandEffector.rotation *= Quaternion.Euler(newWristAngle, 0, 0);//hello
-
-                        /**newWristAngle = rotationSolver.findWristYRotation(rightIndexFinger1Position, rightHandPosition, rightIndexFinger1StartPos);
-                        if (rightIndexFinger1Position.y - rightIndexFinger1StartPos.y <= 0.005f)
-                        {
-                            if (!float.IsNaN(newWristAngle))
-                            {
-                                ik.solver.rightHandEffector.rotation *= Quaternion.Euler(0, -newWristAngle, 0);
-                            }
-                        }*/
+                        ik.solver.rightHandEffector.rotation *= Quaternion.Euler(newWristAngle, 0, 0);
 
                         if (rightHandGesture == "Thumb_Up")
                         {
                             ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(-90, -80, -80);
                             ik.solver.rightHandEffector.rotationWeight = 0.8f;
+                            righthandRotationWeight = ik.solver.rightHandEffector.rotationWeight;
                             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
+                            rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                             rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f);
                             rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
@@ -879,6 +966,7 @@ namespace SEE.Game.Avatars
                         {
                             ik.solver.rightHandEffector.rotation = rightHandTargetRotation * Quaternion.Euler(80, -60, -60);
                             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(1.5f, 1f, 0);
+                            rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
                             rightThumb1Bone.localRotation = Quaternion.Euler(57f, 35f, 30f); ;
                             rightThumb2Bone.localRotation = Quaternion.Euler(0, 0, 0);
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 0);
@@ -901,13 +989,19 @@ namespace SEE.Game.Avatars
                         }
                         else
                         {
+                            /// <summary>
+                            /// Right Hand finger rotations
+                            /// </summary>
+
                             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
+                            rightBendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
 
                             /// <summary>
                             /// Middle Finger
                             /// </summary>
                             float newAngle = rotationSolver.findTopDownRotation(rightMiddleFinger3Position, rightMiddleFinger2Position, rightMidFinger3StartPos);
                             rotationSolver.setFingertipRotation(-newAngle, rightMidFinger3Bone, rightMidFinger2Bone);
+                            float newAngleMiddleFinger = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(rightMiddleFinger2Position, rightMiddleFinger1Position, rightMidFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(-newAngle, rightMidFinger1Bone);
@@ -917,6 +1011,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(rightIndexFinger3Position, rightIndexFinger2Position, rightIndexFinger3StartPos);
                             rotationSolver.setFingertipRotation(-newAngle, rightIndexFinger3Bone, rightIndexFinger2Bone);
+                            float newAngleIndexFinger = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(rightIndexFinger2Position, rightIndexFinger1Position, rightIndexFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(-newAngle, rightIndexFinger1Bone);
@@ -927,6 +1022,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(rightRingFinger3Position, rightRingFinger2Position, rightRingFinger3StartPos);
                             rotationSolver.setFingertipRotation(-newAngle, rightRingFinger3Bone, rightRingFinger2Bone);
+                            float newAngleRingFinger = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(rightRingFinger2Position, rightRingFinger1Position, rightRingFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(-newAngle, rightRingFinger1Bone);
@@ -936,6 +1032,7 @@ namespace SEE.Game.Avatars
                             /// </summary>
                             newAngle = rotationSolver.findTopDownRotation(rightPinkyFinger3Position, rightPinkyFinger2Position, rightPinkyFinger3StartPos);
                             rotationSolver.setFingertipRotation(-newAngle, rightPinkyFinger3Bone, rightPinkyFinger2Bone);
+                            float newAnglePinky = newAngle;
 
                             newAngle = rotationSolver.findTopDownRotation(rightPinkyFinger2Position, rightPinkyFinger1Position, rightPinkyFinger2StartPos);
                             rotationSolver.setBaseOfTheFingerRotation(-newAngle, rightPinkyFinger1Bone);
@@ -949,14 +1046,41 @@ namespace SEE.Game.Avatars
                             rightThumb3Bone.localRotation = Quaternion.Euler(0, 0, 5f);
                             rightThumb2Bone.localRotation *= Quaternion.Euler(newAngleThumb, 0, 0);
                             rightThumb1Bone.localRotation *= Quaternion.Euler(newAngleThumb / 4, 0, 0);
+
+
+                            if (rightIndexFinger1Position.y - rightIndexFinger1StartPos.y <= 0.005f)
+                            {
+                                newWristAngle = rotationSolver.findWristYRotation(rightIndexFinger1Position, rightHandPosition, rightIndexFinger1StartPos);
+                                if (!float.IsNaN(newWristAngle) && newWristAngle <= 120f && !areFingersRotated(newAngleIndexFinger, newAngleMiddleFinger, newAngleRingFinger, newAnglePinky))
+                                {
+                                    ik.solver.rightHandEffector.rotation *= Quaternion.Euler(0, -newWristAngle, 0);
+                                }
+                            }
                         }
-
                     }
-
                 }
+                rightHandEffectorPosition = ik.solver.rightHandEffector.position;
+                rightHandEffectorRotation = ik.solver.rightHandEffector.rotation;
+                rightIndexFingerRotations = new Vector3(rightIndexFinger1Bone.localRotation.eulerAngles.z, rightIndexFinger2Bone.localRotation.eulerAngles.z, rightIndexFinger3Bone.localRotation.eulerAngles.z);
+                rightMiddleFingerRotations = new Vector3(rightMidFinger1Bone.localRotation.eulerAngles.z, rightMidFinger2Bone.localRotation.eulerAngles.z, rightMidFinger3Bone.localRotation.eulerAngles.z);
+                rightRingFingerRotations = new Vector3(rightRingFinger1Bone.localRotation.eulerAngles.z, rightRingFinger2Bone.localRotation.eulerAngles.z, rightRingFinger3Bone.localRotation.eulerAngles.z);
+                rightPinkyFingerRotations = new Vector3(rightPinkyFinger1Bone.localRotation.eulerAngles.z, rightPinkyFinger2Bone.localRotation.eulerAngles.z, rightPinkyFinger3Bone.localRotation.eulerAngles.z);
+                rightThumb1Rotations = rightThumb1Bone.localRotation;
+                rightThumb2Rotations = rightThumb2Bone.localRotation;
+                rightThumb3Rotations = rightThumb3Bone.localRotation;
             }
-
         }
 
+        public bool areFingersRotated( float newAngleIndexFinger, float newAngleMiddleFinger, float newAngleRingFinger, float newAnglePinky)
+        {
+            if(newAngleIndexFinger >= 50f || newAngleMiddleFinger >= 50f || newAngleRingFinger >= 50f || newAnglePinky >= 50f)
+            {
+                return true;
+            }
+            else 
+            {
+                return false;
+            }
+        }
     }
 }

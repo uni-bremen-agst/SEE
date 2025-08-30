@@ -13,12 +13,12 @@ using Mediapipe.Tasks.Vision.GestureRecognizer;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Animates the hands of the avatar.
+    /// Animates the hands movements of the avatar.
     /// </summary>
     /// <remarks>This component is assumed to be attached to the avatar's root object.</remarks>
     internal class BodyAnimator : MonoBehaviour
     {
-        HandsAnimator handsAnimator = new HandsAnimator();
+        public HandsAnimator handsAnimator = new HandsAnimator();
 
         [SerializeField] private TextAsset poseLandmarkerModelAsset;
         [SerializeField] private TextAsset handLandmarkerModelAsset;
@@ -34,15 +34,16 @@ namespace SEE.Game.Avatars
 
         private FullBodyBipedIK ik;
 
+        [Tooltip("If true, local interactions control where the avatar is pointing to.")]
+        public bool IsLocallyControlled = true;
+
         private void Awake()
         {
-            if (webCamTexture == null)
+            if(IsLocallyControlled)
             {
-                UnityEngine.Debug.Log("WebCamTexture is not initialized yet.");
                 WebcamManager.Initialize();
+                webCamTexture = WebcamManager.WebCamTexture;
             }
-
-            webCamTexture = WebcamManager.SharedWebCamTexture;
 
             var poseLandmarkerOptions = new PoseLandmarkerOptions(
                 baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
@@ -80,7 +81,7 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
-            else
+            else if(IsLocallyControlled)
             {
                 handsAnimator.initialize(transform, ik);
             }
@@ -91,43 +92,51 @@ namespace SEE.Game.Avatars
         private void LateUpdate()
         {
             /// <summary>
-            /// Animating the movement of the left hand with Full Body Biped IK and Mediapipe Landmarks 
-            /// by rotating the hand and changing the position coordinates
+            /// Animating the movement of the hands with Full Body Biped IK and MediaPipe Landmarks 
+            /// by rotating hands and changing positions coordinates.
             /// </summary>
-            /// 
-            if (handsAnimator.bringHandsToStartPositions())
+            if (IsLocallyControlled)
             {
-                textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
-                using var poseLandmarkerImage = textureFrame.BuildCPUImage();
-
-                var resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
-
-                if (resultPoseLandmarker.poseWorldLandmarks == null)
+                if (handsAnimator.bringHandsToStartPositions())
                 {
-                    UnityEngine.Debug.Log("No Pose Landmarks found");
-                }
-                else
-                {
-                    handsAnimator.solveHandsPositions(resultPoseLandmarker);
+                    textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
+                    using var poseLandmarkerImage = textureFrame.BuildCPUImage();
 
-                    /// <summary>
-                    /// Rotation of hands and fingers 
-                    /// </summary>
-                    var imageForHandLandmarker = textureFrame.BuildCPUImage();
-                    var resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
+                    var resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
 
-                    textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
-                    var imageForGestureRecognizer = textureFrame.BuildCPUImage();
-                    var resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
-
-                    if (resultHandLandmarker.handLandmarks?.Count > 0)
+                    if (resultPoseLandmarker.poseWorldLandmarks == null)
                     {
-                        handsAnimator.solveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                        handsAnimator.solveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                        UnityEngine.Debug.Log("No Pose Landmarks found");
                     }
                     else
                     {
-                        Debug.Log("No hand landmarks found");
+                        /// <summary>
+                        /// Changing positions of the hands with MediaPipe Pose Landmarker model
+                        /// and Full Body Biped IK.
+                        /// </summary>
+                        handsAnimator.solveHandsPositions(resultPoseLandmarker);
+
+                        /// <summary>
+                        /// Rotation of hands and fingers based on the
+                        /// MediaPipe hands landmakrs and gestures detected with
+                        /// MediaPipe Gesture Recognizer task.
+                        /// </summary>
+                        var imageForHandLandmarker = textureFrame.BuildCPUImage();
+                        var resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
+
+                        textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
+                        var imageForGestureRecognizer = textureFrame.BuildCPUImage();
+                        var resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
+
+                        if (resultHandLandmarker.handLandmarks?.Count > 0)
+                        {
+                            handsAnimator.solveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                            handsAnimator.solveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                        }
+                        else
+                        {
+                            Debug.Log("No hand landmarks found");
+                        }
                     }
                 }
             }
