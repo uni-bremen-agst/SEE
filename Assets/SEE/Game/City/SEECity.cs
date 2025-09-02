@@ -544,11 +544,16 @@ namespace SEE.Game.City
             Debug.Log($"Loading layout data from {path}.\n");
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
-                //Layout.IO.GVLReader.Load(path, AllNodeDescendants(gameObject));
+                new Layout.IO.GVLReader(path, renderResult.Nodes.Cast<IGameNode>().ToList());
             }
             else
             {
-                Layout.IO.SLDReader.Read(path, loadedGraph.Nodes());
+                Layout.IO.SLDReader.Read(path, renderResult.Nodes);
+            }
+
+            foreach (Node node in loadedGraph.Nodes())
+            {
+                node.Operator().UpdateEdgeLayout(0f);
             }
         }
 
