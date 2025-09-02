@@ -1,18 +1,13 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
-using Newtonsoft.Json;
-using OpenAI.Files;
 using SEE.DataModel;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
-using SEE.Game.Operator;
-using SEE.Game.SceneManipulation;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
-using SEE.Net;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -22,10 +17,8 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -130,6 +123,11 @@ namespace SEE.Game.City
         /// </summary>
         protected bool IsPipelineRunning;
 
+        /// <summary>
+        /// The result of the last rendering of the graph.
+        ///
+        /// This will be used for appling a layout loaded from a file.
+        /// </summary>
         private GraphRenderResult renderResult;
 
         /// <summary>
@@ -551,6 +549,7 @@ namespace SEE.Game.City
                 Layout.IO.SLDReader.Read(path, renderResult.Nodes);
             }
 
+            // Update the edge layout because the nodes may have moved.
             foreach (Node node in loadedGraph.Nodes())
             {
                 node.Operator().UpdateEdgeLayout(0f);
@@ -661,11 +660,6 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
-        }
-
-        public CityTypes GetCityType()
-        {
-            return CityTypes.CodeCity;
         }
 
         #endregion

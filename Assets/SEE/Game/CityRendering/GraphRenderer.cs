@@ -10,7 +10,6 @@ using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
 using SEE.Layout;
-using SEE.Layout.EdgeLayouts;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
@@ -286,6 +285,7 @@ namespace SEE.Game.CityRendering
         /// <param name="token">cancellation token with which to cancel the operation</param>
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
+        /// <returns>The resulting layout informations of the rendering.</returns>
         public async UniTask<GraphRenderResult> DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
                                             CancellationToken token = default, bool doNotAddUniqueRoot = false)
         {
