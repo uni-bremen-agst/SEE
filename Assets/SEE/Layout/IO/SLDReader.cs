@@ -17,48 +17,6 @@ namespace SEE.Layout.IO
     {
 
         /// <summary>
-        /// Extracts the position from the given list <paramref name="columns"/> of an SLD file line.
-        /// </summary>
-        /// <param name="columns">Represents a line in a SLD file.</param>
-        /// <returns></returns>
-        private static Vector3 ExtractPositionFromColumnList(string[] columns)
-        {
-            Vector3 position;
-            position.x = float.Parse(columns[1], CultureInfo.InvariantCulture);
-            position.y = float.Parse(columns[2], CultureInfo.InvariantCulture);
-            position.z = float.Parse(columns[3], CultureInfo.InvariantCulture);
-            return position;
-        }
-
-        /// <summary>
-        /// Extracts the Euler angles from the given list <paramref name="columns"/> of an SLD file line.
-        /// </summary>
-        /// <param name="columns">Represents a line in a SLD file.</param>
-        /// <returns></returns>
-        private static Vector3 ExtractEulerAnglesFromColumnList(string[] columns)
-        {
-            Vector3 eulerAngles;
-            eulerAngles.x = float.Parse(columns[4], CultureInfo.InvariantCulture);
-            eulerAngles.y = float.Parse(columns[5], CultureInfo.InvariantCulture);
-            eulerAngles.z = float.Parse(columns[6], CultureInfo.InvariantCulture);
-            return eulerAngles;
-        }
-
-        /// <summary>
-        /// Extracts the scale from the given list <paramref name="columns"/> of an SLD file line.
-        /// </summary>
-        /// <param name="columns">Represents a line in a SLD file.s</param>
-        /// <returns></returns>
-        private static Vector3 ExtractScaleFromColumnList(string[] columns)
-        {
-            Vector3 scale;
-            scale.x = float.Parse(columns[7], CultureInfo.InvariantCulture);
-            scale.y = float.Parse(columns[8], CultureInfo.InvariantCulture);
-            scale.z = float.Parse(columns[9], CultureInfo.InvariantCulture);
-            return scale;
-        }
-
-        /// <summary>
         /// Reads layout information from given SLD file with given <paramref name="filename"/>.
         /// The given position and scale of the <paramref name="gameNodes"/> are updated
         /// according to the layout data contained therein. The IGameNode's rotation around
