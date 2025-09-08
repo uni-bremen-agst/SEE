@@ -36,11 +36,6 @@ namespace SEE.Net.Util
         private const string serverContentDirectory = "Multiplayer/";
 
         /// <summary>
-        /// Path to the directory where snapshots are stored before they are sent to the server.
-        /// </summary>
-        private static readonly string SnapshotPath = Path.Combine(Path.GetTempPath(), "see_snapshots");
-
-        /// <summary>
         /// The data structure for logging into the backend.
         /// </summary>
         [System.Serializable]
@@ -111,91 +106,6 @@ namespace SEE.Net.Util
             public static implicit operator FileData(string json)
             {
                 return FromJson(json);
-            }
-        }
-
-        internal struct ServerSnapshotResponse
-        {
-            [JsonProperty(PropertyName = "id", Required = Required.Always)]
-            public string id;
-
-            [JsonProperty(PropertyName = "creationTime", Required = Required.Always)]
-            public DateTime creationTime;
-
-            [JsonProperty(PropertyName = "size", Required = Required.Always)]
-            public long size;
-
-            public static ServerSnapshotResponse FromJson(string json)
-            {
-                return JsonConvert.DeserializeObject<ServerSnapshotResponse>(json);
-            }
-
-
-        }
-
-        internal static async UniTask InitSnapshots()
-        {
-            Debug.Log("Initializing Snapshots...\n");
-            if (await LogInAsync())
-            {
-                ServerSnapshotResponse? latestSnapshot = await FetchLatestSnapshotAsync();
-                if (latestSnapshot.HasValue)
-                {
-                    Debug.Log(
-                        $"Latest snapshot ID: {latestSnapshot.Value.id}, Creation Time: {latestSnapshot.Value.creationTime}, Size: {latestSnapshot.Value.size} bytes\n");
-                    await DownloadSnapshotAsync(latestSnapshot.Value);
-
-                }
-            }
-        }
-
-        /// <summary>
-        /// Fetches the latest snapshot from the backend server.
-        /// </summary>
-        /// <returns></returns>
-        internal static async UniTask<ServerSnapshotResponse?> FetchLatestSnapshotAsync()
-        {
-            string url = $"{Network.ClientRestAPI}server/snapshots:latest?serverId={Network.ServerId}";
-            using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
-            UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
-            await operation.ToUniTask();
-
-            if (fetchRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogWarning("Fetching server snapshots failed!\n");
-                Debug.Log(fetchRequest.error);
-                return null;
-            }
-
-            return JsonConvert.DeserializeObject<ServerSnapshotResponse>(fetchRequest.downloadHandler.text);
-        }
-
-
-
-        /// <summary>
-        /// Downloads a server snapshot file from the backend.
-        /// </summary>
-        /// <param name="snapshot">The snapshot that should be downloaded.</param>
-        /// <returns></returns>
-        internal static async UniTask DownloadSnapshotAsync(ServerSnapshotResponse snapshot)
-        {
-            if (!await LogInAsync())
-            {
-                Debug.LogError("Unable to download files!\n");
-                return;
-            }
-
-            string targetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "snapshot.seearchive");
-
-            string url = $"{Network.ClientRestAPI}serversnapshot/{snapshot.id}/download";
-            using UnityWebRequest getRequest = UnityWebRequest.Get(url);
-            getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
-            UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
-            await asyncOp.ToUniTask();
-
-            if (getRequest.result != UnityWebRequest.Result.Success)
-            {
-                Debug.LogError(getRequest.error);
             }
         }
 
