@@ -394,9 +394,9 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
-            string outputFile = Application.streamingAssetsPath + "/output.gxl";
             if (LoadedGraph != null)
             {
+                string outputFile = Application.streamingAssetsPath + "/output.gxl";
                 GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
