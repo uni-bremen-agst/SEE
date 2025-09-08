@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using System.Globalization;
-using SEE.DataModel.DG;
-using SEE.Utils;
 
 namespace SEE.Layout.IO
 {
@@ -15,7 +13,6 @@ namespace SEE.Layout.IO
     /// </summary>
     public class SLDReader
     {
-
         /// <summary>
         /// Reads layout information from given SLD file with given <paramref name="filename"/>.
         /// The given position and scale of the <paramref name="gameNodes"/> are updated
@@ -103,19 +100,6 @@ namespace SEE.Layout.IO
             foreach (IGameNode gameNode in gameNodes)
             {
                 result[gameNode.ID] = gameNode;
-            }
-            return result;
-        }
-
-        private static Dictionary<string, Node> ToMap(IEnumerable<Node> nodes)
-        {
-            Dictionary<string, Node> result = new();
-            foreach (Node node in nodes)
-            {
-                if (node is Node gameNode)
-                {
-                    result[gameNode.ID] = gameNode;
-                }
             }
             return result;
         }
