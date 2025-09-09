@@ -37,7 +37,7 @@ namespace SEE.Layout.IO
             }
             if (Filenames.HasExtension(filename, Filenames.GVLExtension))
             {
-                new GVLReader(filename, gameNodes, NodeLayout.groundLevel, new SEELogger());
+                new GVLReader(filename, gameNodes, NodeLayout.GroundLevel, new SEELogger());
             }
             else if (Filenames.HasExtension(filename, Filenames.SLDExtension))
             {
