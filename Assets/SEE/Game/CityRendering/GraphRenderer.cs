@@ -286,8 +286,12 @@ namespace SEE.Game.CityRendering
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
         /// <returns>The resulting layout informations of the rendering.</returns>
-        public async UniTask<GraphRenderResult> DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
+        public async UniTask<GraphRenderResult> DrawGraphAsync
+            (Graph graph,
+             GameObject parent,
+             Action<float> updateProgress = null,
+             CancellationToken token = default,
+             bool doNotAddUniqueRoot = false)
         {
             if (graph.NodeCount == 0)
             {
@@ -376,7 +380,6 @@ namespace SEE.Game.CityRendering
                 Nodes = layoutNodes,
                 Edges = LayoutEdges(edgeLayouts).Values
             };
-
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {
