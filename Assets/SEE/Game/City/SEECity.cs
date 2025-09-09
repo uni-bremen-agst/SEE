@@ -8,6 +8,7 @@ using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Layout.IO;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -17,6 +18,7 @@ using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -126,7 +128,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The result of the last rendering of the graph.
         ///
-        /// This will be used for appling a layout loaded from a file.
+        /// This will be used for applying a layout loaded from a file.
         /// </summary>
         private GraphRenderResult renderResult;
 
@@ -516,18 +518,13 @@ namespace SEE.Game.City
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
             Debug.Log($"Saving layout data to {path}.\n");
-            if (Filenames.HasExtension(path, Filenames.GVLExtension))
-            {
-                Layout.IO.GVLWriter.Save(path, LoadedGraph.Name, AllNodeDescendants(gameObject));
-            }
-            else
-            {
-                Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
-            }
+            string graphName = LoadedGraph.Name;
+            Writer.Save(path, graphName, AllNodeDescendants(gameObject));
         }
 
         /// <summary>
-        /// Loads the layout of the city from a file at <see cref="LayoutPath"/> and maps it on the current loaded graph.
+        /// Loads the layout of the city from a file at <see cref="LayoutPath"/> and maps it on the
+        /// currently loaded graph.
         ///
         /// Precondition: The graph must be fully loaded and drawn before calling this method.
         /// </summary>
@@ -536,9 +533,23 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public void LoadLayout()
         {
-            Assert.IsTrue(IsGraphDrawn, "The graph must be fully loaded and drawn before loading a layout.");
+            if (!IsGraphDrawn)
+            {
+                ShowNotification.Error("Load Layout", "The graph must be fully loaded and drawn before loading a layout.");
+                return;
+            }
 
             string path = NodeLayoutSettings.LayoutPath.Path;
+            if (string.IsNullOrEmpty(path))
+            {
+                ShowNotification.Error("Load Layout", $"The {nameof(NodeLayoutSettings.LayoutPath)} must be set.");
+                return;
+            }
+            if (!File.Exists(path)) {
+                ShowNotification.Error("Load Layout", $"The layout file {path} does not exist.");
+                return;
+            }
+
             Debug.Log($"Loading layout data from {path}.\n");
             if (Filenames.HasExtension(path, Filenames.GVLExtension))
             {
