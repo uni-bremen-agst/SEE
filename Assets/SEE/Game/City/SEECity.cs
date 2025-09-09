@@ -551,14 +551,7 @@ namespace SEE.Game.City
             }
 
             Debug.Log($"Loading layout data from {path}.\n");
-            if (Filenames.HasExtension(path, Filenames.GVLExtension))
-            {
-                new Layout.IO.GVLReader(path, renderResult.Nodes.Cast<IGameNode>().ToList());
-            }
-            else
-            {
-                Layout.IO.SLDReader.Read(path, renderResult.Nodes);
-            }
+            Reader.Read(path, renderResult.Nodes.Cast<IGameNode>().ToList());
 
             // Update the edge layout because the nodes may have moved.
             foreach (Node node in loadedGraph.Nodes())
