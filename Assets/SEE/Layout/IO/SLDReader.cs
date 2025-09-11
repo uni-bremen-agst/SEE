@@ -72,6 +72,8 @@ namespace SEE.Layout.IO
                         // Note: We ignore all remaining columns if there are any.
 
                         node.CenterPosition = position;
+                        node.Rotation = eulerAngles.y;
+                        node.AbsoluteScale = scale;
                     }
                     else
                     {
