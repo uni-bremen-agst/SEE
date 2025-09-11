@@ -13,7 +13,7 @@ namespace SEE.Layout.IO
     /// class frees all clients from making the distinction of the specific format
     /// themselves.
     /// </summary>
-    internal static class Reader
+    internal static class LayoutReader
     {
         /// <summary>
         /// Reads the layout information for all <paramref name="gameNodes"/>

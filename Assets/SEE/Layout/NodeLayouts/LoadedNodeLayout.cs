@@ -48,7 +48,7 @@ namespace SEE.Layout.NodeLayouts
             IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
             ICollection<IGameNode> gameNodes = layoutNodeList.Cast<IGameNode>().ToList();
 
-            Reader.Read(filename, gameNodes);
+            LayoutReader.Read(filename, gameNodes);
 
             // Apply the layout for the result.
             foreach (ILayoutNode node in layoutNodeList)

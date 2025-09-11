@@ -398,7 +398,7 @@ namespace SEE.Game.City
         {
             if (LoadedGraph != null)
             {
-                string outputFile = Application.streamingAssetsPath + "/output.gxl";
+                string outputFile = GraphSnapshotPath.Path;
                 GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
@@ -439,7 +439,7 @@ namespace SEE.Game.City
         /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
-        protected async UniTaskVoid DrawGraphAsync(Graph graph)
+        protected async UniTask DrawGraphAsync(Graph graph)
         {
             GraphRenderer renderer = new(this, graph);
             try
@@ -531,7 +531,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
-        public void LoadLayout()
+        public async UniTask LoadLayout()
         {
             if (!IsGraphDrawn)
             {
@@ -545,19 +545,55 @@ namespace SEE.Game.City
                 ShowNotification.Error("Load Layout", $"The {nameof(NodeLayoutSettings.LayoutPath)} must be set.");
                 return;
             }
-            if (!File.Exists(path)) {
+            if (!File.Exists(path))
+            {
                 ShowNotification.Error("Load Layout", $"The layout file {path} does not exist.");
                 return;
             }
 
             Debug.Log($"Loading layout data from {path}.\n");
-            Reader.Read(path, renderResult.Nodes.Cast<IGameNode>().ToList());
-
-            // Update the edge layout because the nodes may have moved.
-            foreach (Node node in loadedGraph.Nodes())
+            using (LoadingSpinner.ShowIndeterminate($"Apply layout to city \"{gameObject.name}\""))
             {
-                node.Operator().UpdateEdgeLayout(0f);
+                LayoutReader.Read(path, renderResult.Nodes.Cast<IGameNode>().ToList());
+
+                // Update the edge layout because the nodes may have moved.
+                foreach (Node node in loadedGraph.Nodes())
+                {
+                    node.Operator().UpdateEdgeLayout(0f);
+                }
             }
+        }
+
+        /// <summary>
+        /// Saves both the data and the layout of the city. Equivalent to calling
+        /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        public void SaveSnapshot()
+        {
+            SaveData();
+            SaveLayout();
+        }
+
+        /// <summary>
+        /// Loads both the data (in GXL format) and the layout of the city.
+        /// </summary>
+        /// <returns>An empty task.</returns>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        public async UniTask LoadSnapshotAsync()
+        {
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath}.\n");
+            // Use a single GXL provider to load the graph.
+            GXLSingleGraphProvider gxlProvider = new GXLSingleGraphProvider();
+            gxlProvider.Path = GraphSnapshotPath;
+            LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
+
+            await DrawGraphAsync(LoadedGraph);
+            await LoadLayout();
         }
 
         /// <summary>
