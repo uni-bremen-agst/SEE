@@ -14,6 +14,7 @@ using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
@@ -45,6 +46,15 @@ namespace SEE.Game.City
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
          HideReferenceObjectPicker, RuntimeGroupOrder(DataProviderOrder)]
         public SingleGraphPipelineProvider DataProvider = new();
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where a graph snapshot (data + layout) will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath GraphSnapshotPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are

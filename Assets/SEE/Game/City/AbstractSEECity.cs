@@ -102,15 +102,6 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// The path where a graph snapshot in GXL format is stored.
-        /// </summary>
-        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
-        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
-        [PropertyTooltip("File path where a graph snapshot will be saved to")]
-        [HideReferenceObjectPicker]
-        public DataPath GraphSnapshotPath = new();
-
-        /// <summary>
         /// Will be called whenever a new value is assigned to <see cref="SourceCodeDirectory"/>.
         /// This gives our subclasses a chance to update their graphs.
         /// </summary>
