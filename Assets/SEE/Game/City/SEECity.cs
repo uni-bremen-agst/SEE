@@ -724,10 +724,16 @@ namespace SEE.Game.City
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
+        /// <summary>
+        /// Label of attribute <see cref="GraphSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string graphSnapshotPathLabel = "GraphSnapshotPath";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
+            GraphSnapshotPath.Save(writer, graphSnapshotPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -735,6 +741,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            GraphSnapshotPath.Restore(attributes, graphSnapshotPathLabel);
         }
 
         #endregion
