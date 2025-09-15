@@ -1793,6 +1793,10 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: /SEE.sln
@@ -4444,6 +4448,10 @@ MonoBehaviour:
     Root: 3
     RelativePath: /JLGExample
     AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -4517,16 +4525,16 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  JLGPath:
+    Root: 3
+    RelativePath: /JLGExample/CodeFacts.jlg
+    AbsolutePath: 
   BreakpointClass: classname
   BreakpointLine: 0
   DistanceAboveCity: 0.3
   DistanceBehindCity: 0.3
   LineWidth: 0.01
   ShowOnlyCalls: 0
-  JLGPath:
-    Root: 3
-    RelativePath: /JLGExample/CodeFacts.jlg
-    AbsolutePath: 
 --- !u!114 &264006614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8068,6 +8076,10 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 3
+    RelativePath: /SEE/CodeFacts-snapshot.gxl.xz
+    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: 
@@ -8090,8 +8102,8 @@ MonoBehaviour:
     Architecture: 3
     Implementation: 3
     LayoutPath:
-      Root: 2
-      RelativePath: 
+      Root: 3
+      RelativePath: /SEE/CodeFacts-layout.sld
       AbsolutePath: 
     ArchitectureLayoutPath:
       Root: 2
@@ -8100,8 +8112,8 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 0
-    AnimateInnerEdges: 1
+    AnimationKind: 2
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
@@ -10172,6 +10184,10 @@ MonoBehaviour:
     RelativePath: /net/net.cfg
     AbsolutePath: 
   sourceCodeDirectory:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
+  GraphSnapshotPath:
     Root: 2
     RelativePath: 
     AbsolutePath: 
@@ -14211,6 +14227,10 @@ MonoBehaviour:
     AbsolutePath: 
   sourceCodeDirectory:
     Root: 1
+    RelativePath: 
+    AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
     RelativePath: 
     AbsolutePath: 
   SolutionPath:
@@ -20827,6 +20847,10 @@ MonoBehaviour:
     Root: 0
     RelativePath: 
     AbsolutePath: C:/Users/koschke/develop/jacoco
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -27057,6 +27081,10 @@ MonoBehaviour:
     Root: 1
     RelativePath: 
     AbsolutePath: C:/Users/koschke/develop/SEE
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -31514,6 +31542,10 @@ MonoBehaviour:
   sourceCodeDirectory:
     Root: 3
     RelativePath: /reflexion/compiler/minilax
+    AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
     AbsolutePath: 
   SolutionPath:
     Root: 2
