@@ -1793,10 +1793,6 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: /SEE.sln
@@ -1870,6 +1866,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 1
     RelativePath: /
@@ -4448,10 +4448,6 @@ MonoBehaviour:
     Root: 3
     RelativePath: /JLGExample
     AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -4525,6 +4521,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   JLGPath:
     Root: 3
     RelativePath: /JLGExample/CodeFacts.jlg
@@ -8076,10 +8076,6 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 3
-    RelativePath: /SEE/CodeFacts-snapshot.gxl.xz
-    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: 
@@ -8153,6 +8149,10 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 3
+    RelativePath: /SEE/CodeFacts-snapshot.gxl.xz
+    AbsolutePath: 
 --- !u!114 &326121977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10187,10 +10187,6 @@ MonoBehaviour:
     Root: 2
     RelativePath: 
     AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -10264,6 +10260,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
 --- !u!114 &407024185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14227,10 +14227,6 @@ MonoBehaviour:
     AbsolutePath: 
   sourceCodeDirectory:
     Root: 1
-    RelativePath: 
-    AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 2
     RelativePath: 
     AbsolutePath: 
   SolutionPath:
@@ -20847,10 +20843,6 @@ MonoBehaviour:
     Root: 0
     RelativePath: 
     AbsolutePath: C:/Users/koschke/develop/jacoco
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -20924,6 +20916,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -27081,10 +27077,6 @@ MonoBehaviour:
     Root: 1
     RelativePath: 
     AbsolutePath: C:/Users/koschke/develop/SEE
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -27158,6 +27150,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -31543,10 +31539,6 @@ MonoBehaviour:
     Root: 3
     RelativePath: /reflexion/compiler/minilax
     AbsolutePath: 
-  GraphSnapshotPath:
-    Root: 2
-    RelativePath: 
-    AbsolutePath: 
   SolutionPath:
     Root: 2
     RelativePath: 
@@ -31620,6 +31612,10 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
