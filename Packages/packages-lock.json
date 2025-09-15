@@ -72,7 +72,7 @@
       }
     },
     "com.unity.ai.navigation": {
-      "version": "2.0.8",
+      "version": "2.0.9",
       "depth": 0,
       "source": "registry",
       "dependencies": {
@@ -338,7 +338,7 @@
       }
     },
     "com.unity.xr.core-utils": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {

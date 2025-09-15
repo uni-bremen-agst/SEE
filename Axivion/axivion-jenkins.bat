@@ -107,7 +107,7 @@ if "%AXIVION_DASHBOARD_URL%"=="" (
 )
 
 if "%UNITY%"=="" (
-  set "UNITY=C:\Program Files\Unity\Hub\Editor\6000.2.2f1"
+  set "UNITY=C:\Program Files\Unity\Hub\Editor\6000.2.4f1"
 )
 
 if not exist "%UNITY%" (
