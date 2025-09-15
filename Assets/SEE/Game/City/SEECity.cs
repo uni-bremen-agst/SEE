@@ -588,8 +588,10 @@ namespace SEE.Game.City
         {
             Debug.Log($"Loading snapshot graph from {GraphSnapshotPath}.\n");
             // Use a single GXL provider to load the graph.
-            GXLSingleGraphProvider gxlProvider = new GXLSingleGraphProvider();
-            gxlProvider.Path = GraphSnapshotPath;
+            GXLSingleGraphProvider gxlProvider = new()
+            {
+                Path = GraphSnapshotPath
+            };
             LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
 
             await DrawGraphAsync(LoadedGraph);
