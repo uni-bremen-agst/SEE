@@ -108,9 +108,7 @@ namespace SEE.Game.City
         [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
         [PropertyTooltip("File path where a graph snapshot will be saved to")]
         [HideReferenceObjectPicker]
-        [SerializeField, HideInInspector]
         public DataPath GraphSnapshotPath = new();
-
 
         /// <summary>
         /// Will be called whenever a new value is assigned to <see cref="SourceCodeDirectory"/>.
