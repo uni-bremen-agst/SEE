@@ -330,12 +330,12 @@ namespace SEE.Game.City
             DrawGraph();
         }
 
+        #region Load/Save Data
         /// <summary>
         /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
         /// everything will be reset by calling <see cref="Reset"/>.
-        /// Second, the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath() are loaded. The loaded graph is available
-        /// in <see cref="LoadedGraph"/> afterwards.
+        /// Second, the graph data are loaded using the <see cref="DataProvider"/>.
+        /// The loaded graph is available in <see cref="LoadedGraph"/> afterwards.
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
@@ -344,6 +344,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [Tooltip("Loads the data (but does not draw them).")]
         public virtual async UniTask<bool> LoadDataAsync()
         {
             if (DataProvider != null)
@@ -394,6 +395,7 @@ namespace SEE.Game.City
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Saves the current city (as GXL).")]
         public virtual void SaveData()
         {
             if (LoadedGraph != null)
@@ -403,6 +405,7 @@ namespace SEE.Game.City
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
+        #endregion Load/Save Data
 
         /// <summary>
         /// Returns whether the graph has been loaded.
@@ -417,6 +420,7 @@ namespace SEE.Game.City
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Draws the data as a code city. Data must have been loaded.")]
         public virtual void DrawGraph()
         {
             if (IsPipelineRunning)
@@ -506,6 +510,12 @@ namespace SEE.Game.City
         public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
 
         /// <summary>
+        /// True if the graph has been loaded and drawn.
+        /// </summary>
+        protected bool IsGraphLoadedAndDrawn => IsGraphLoaded && IsGraphDrawn;
+
+        #region Save/Load Layout
+        /// <summary>
         /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.
         /// The format of the written file depends upon the file extension. If the extension
         /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
@@ -514,6 +524,8 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [Tooltip("Saves the current layout of the city.")]
+        [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
@@ -531,6 +543,8 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [Tooltip("Loads the layout and applies it to the city.")]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public async UniTask LoadLayout()
         {
             if (!IsGraphDrawn)
@@ -563,14 +577,18 @@ namespace SEE.Game.City
                 }
             }
         }
+        #endregion Save/Load Layout
 
+        #region Save/Load Snapshot
         /// <summary>
         /// Saves both the data and the layout of the city. Equivalent to calling
         /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
         /// </summary>
-        [Button(ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Save Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
+        [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveSnapshot()
         {
             SaveData();
@@ -581,8 +599,9 @@ namespace SEE.Game.City
         /// Loads both the data (in GXL format) and the layout of the city.
         /// </summary>
         /// <returns>An empty task.</returns>
-        [Button(ButtonSizes.Small)]
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public async UniTask LoadSnapshotAsync()
         {
@@ -597,7 +616,9 @@ namespace SEE.Game.City
             await DrawGraphAsync(LoadedGraph);
             await LoadLayout();
         }
+        #endregion Save/Load Snapshot
 
+        #region Reset Data
         /// <summary>
         /// This method will cancel any running graph provider pipeline and delete the currently
         /// loaded graph.
@@ -624,6 +645,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public override void Reset()
         {
             base.Reset();
@@ -633,6 +655,7 @@ namespace SEE.Game.City
                 csm.enabled = true;
             }
         }
+        #endregion Reset Data
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
