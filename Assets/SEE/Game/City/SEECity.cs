@@ -615,7 +615,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         public async UniTask LoadSnapshotAsync()
         {
-            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath}.\n");
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
             // Use a single GXL provider to load the graph.
             GXLSingleGraphProvider gxlProvider = new()
             {
