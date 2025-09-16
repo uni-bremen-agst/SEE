@@ -655,7 +655,6 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
         [PropertyOrder(ResetButtonsGroupOrderReset)]
-        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public override void Reset()
         {
             base.Reset();
