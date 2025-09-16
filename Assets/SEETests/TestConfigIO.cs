@@ -540,35 +540,6 @@ namespace SEE.Utils
             }
         }
 
-        /// <summary>
-        /// Test for SEEJlgCity.
-        /// </summary>
-        [Test]
-        public void TestSEEJlgCity()
-        {
-            string filename = Path.GetTempFileName();
-            try
-            {
-                // First save a new city with all its default values.
-                SEEJlgCity savedCity = NewVanillaSEECity<SEEJlgCity>();
-                savedCity.Save(filename);
-
-                // Create a new city with all its default values and then
-                // wipe out all its attributes to see whether they are correctly
-                // restored from the saved configuration file.
-                SEEJlgCity loadedCity = NewVanillaSEECity<SEEJlgCity>();
-                WipeOutSEEJlgCityAttributes(loadedCity);
-                // Load the saved attributes from the configuration file.
-                loadedCity.Load(filename);
-
-                SEEJlgCityAttributesAreEqual(savedCity, loadedCity);
-            }
-            finally
-            {
-                FileIO.DeleteIfExists(filename);
-            }
-        }
-
         //--------------------------------------------------------
         // AreEqual comparisons
         //--------------------------------------------------------
@@ -609,18 +580,6 @@ namespace SEE.Utils
             AreEqual(expected.LeafConstraint, actual.LeafConstraint);
             AreEqual(expected.InnerNodeConstraint, actual.InnerNodeConstraint);
             AreEqual(expected.LeafAttributes, actual.LeafAttributes);
-        }
-
-        /// <summary>
-        /// Checks whether the configuration attributes of <paramref name="expected"/> and
-        /// <paramref name="actual"/> are equal.
-        /// </summary>
-        /// <param name="expected">expected settings</param>
-        /// <param name="actual">actual settings</param>
-        private static void SEEJlgCityAttributesAreEqual(SEEJlgCity expected, SEEJlgCity actual)
-        {
-            SEECityAttributesAreEqual(expected, actual);
-            AreEqual(expected.JLGPath, actual.JLGPath);
         }
 
         /// <summary>
@@ -840,20 +799,6 @@ namespace SEE.Utils
             city.LeafConstraint = new Constraint(nodeType: "X", edgeType: "Y", nodeNumber: 5, edgeDensity: 0);
             city.InnerNodeConstraint = new Constraint(nodeType: "N", edgeType: "T", nodeNumber: 1, edgeDensity: 1);
             city.LeafAttributes = new List<RandomAttributeDescriptor>();
-        }
-
-        /// <summary>
-        /// Assigns all attributes of given <paramref name="city"/> to arbitrary values
-        /// different from their default values.
-        /// </summary>
-        /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private void WipeOutSEEJlgCityAttributes(SEEJlgCity city)
-        {
-            WipeOutSEECityAttributes(city);
-            city.JLGPath = new()
-            {
-                Path = "C:/MyAbsoluteDirectory/MyAbsoluteFile.jlg"
-            };
         }
 
         /// <summary>
