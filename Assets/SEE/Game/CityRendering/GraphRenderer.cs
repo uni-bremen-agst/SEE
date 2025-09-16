@@ -329,30 +329,33 @@ namespace SEE.Game.CityRendering
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
-            // Create the laid out edges; they will be children of the unique root game node
+            // Decorations must be applied after the blocks have been placed, so that
+            // we also know their positions.
+            AddDecorations(nodeMap.Values);
+
+            // Create the laid out edges; they will be children of the unique rootGameNode
             // representing the node hierarchy. This way the edges can be moved along with
             // the nodes.
             GameObject rootGameNode = RootGameNode(parent);
 
             ICollection<GameObject> edgeLayouts = new List<GameObject>();
-            try
+            if (Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
             {
-                edgeLayouts = await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
-            }
-            catch (OperationCanceledException)
-            {
-                // If the operation gets canceled, we need to clean up the dangling edge game objects.
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
+                try
                 {
-                    Destroyer.Destroy(edge);
+                    edgeLayouts = await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
                 }
-                // Then re-throw.
-                throw;
+                catch (OperationCanceledException)
+                {
+                    // If the operation gets canceled, we need to clean up the dangling edge game objects.
+                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
+                    {
+                        Destroyer.Destroy(edge);
+                    }
+                    // Then re-throw.
+                    throw;
+                }
             }
-
-            // Decorations must be applied after the blocks have been placed, so that
-            // we also know their positions.
-            AddDecorations(nodeMap.Values);
 
             Portal.SetPortal(parent);
 
@@ -378,7 +381,9 @@ namespace SEE.Game.CityRendering
             return new GraphRenderResult
             {
                 Nodes = layoutNodes,
-                Edges = LayoutEdges(edgeLayouts).Values
+                Edges = Settings.EdgeLayoutSettings.Kind == EdgeLayoutKind.None ?
+                                                                new List<ILayoutEdge<ILayoutNode>>()
+                                                              : LayoutEdges(edgeLayouts).Values
             };
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
