@@ -1866,6 +1866,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 1
     RelativePath: /
@@ -6267,8 +6271,8 @@ MonoBehaviour:
     Architecture: 3
     Implementation: 3
     LayoutPath:
-      Root: 2
-      RelativePath: 
+      Root: 3
+      RelativePath: /SEE/CodeFacts-layout.sld
       AbsolutePath: 
     ArchitectureLayoutPath:
       Root: 2
@@ -6277,8 +6281,8 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 0
-    AnimateInnerEdges: 1
+    AnimationKind: 2
+    AnimateInnerEdges: 0
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
     EdgeWidth: 0.01
@@ -6318,6 +6322,10 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 3
+    RelativePath: /SEE/CodeFacts-snapshot.gxl.xz
+    AbsolutePath: 
 --- !u!114 &326121977
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8374,8 +8382,8 @@ MonoBehaviour:
     Architecture: 3
     Implementation: 3
     LayoutPath:
-      Root: 2
-      RelativePath: 
+      Root: 3
+      RelativePath: /net/CodeFacts-snapshot.sld
       AbsolutePath: 
     ArchitectureLayoutPath:
       Root: 2
@@ -8425,6 +8433,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 3
+    RelativePath: /net/CodeFacts-snapshot.gxl.xz
+    AbsolutePath: 
 --- !u!114 &407024185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19077,6 +19089,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -19721,6 +19737,7 @@ GameObject:
   - component: {fileID: 1334775386}
   - component: {fileID: 1334775385}
   - component: {fileID: 1334775388}
+  - component: {fileID: 1334775389}
   m_Layer: 0
   m_Name: Server
   m_TagString: Untagged
@@ -19851,6 +19868,18 @@ MonoBehaviour:
       type: 3}
     Position: {x: -3.5, y: 0, z: -7.8}
     Rotation: 90
+--- !u!114 &1334775389
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1334775384}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d559df8621b541ce6a60fd6a8a3cec2b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1001 &1339535448
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -25182,6 +25211,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -29640,6 +29673,10 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 3
+    RelativePath: /reflexion/compiler/Graph-snapshot.gxl.xz
+    AbsolutePath: 
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0

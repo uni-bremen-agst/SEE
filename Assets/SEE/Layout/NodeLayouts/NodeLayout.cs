@@ -126,7 +126,7 @@ namespace SEE.Layout.NodeLayouts
         /// The y co-ordinate of the ground level where all nodes will be placed initially
         /// by calling <see cref="Layout(IEnumerable{ILayoutNode}, Vector2)"/>.
         /// </summary>
-        protected const float groundLevel = 0.0f;
+        public const float GroundLevel = 0.0f;
 
         #region Modifiers
 

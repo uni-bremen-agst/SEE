@@ -512,7 +512,7 @@ namespace SEE.Game.Operator
         /// This involves recalculating the edge layout for each attached edge.
         /// </summary>
         /// <param name="duration">Time in seconds the animation should take.</param>
-        private void UpdateEdgeLayout(float duration)
+        public void UpdateEdgeLayout(float duration)
         {
             // We remember the old position and scale, and move the node to the new position and scale so that
             // edge layouts (dependent on position and scale) can be correctly calculated.

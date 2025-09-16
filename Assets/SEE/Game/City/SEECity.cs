@@ -7,15 +7,19 @@ using SEE.Game.CityRendering;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
+using SEE.Layout;
+using SEE.Layout.IO;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
+using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
@@ -42,6 +46,15 @@ namespace SEE.Game.City
          TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup),
          HideReferenceObjectPicker, RuntimeGroupOrder(DataProviderOrder)]
         public SingleGraphPipelineProvider DataProvider = new();
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where a graph snapshot (data + layout) will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath GraphSnapshotPath = new();
 
         /// <summary>
         /// The graph that is visualized in the scene and whose visualization settings are
@@ -121,6 +134,13 @@ namespace SEE.Game.City
         /// True if the pipeline of <see cref="PipelineGraphProvider"/> is still running.
         /// </summary>
         protected bool IsPipelineRunning;
+
+        /// <summary>
+        /// The result of the last rendering of the graph.
+        ///
+        /// This will be used for applying a layout loaded from a file.
+        /// </summary>
+        private GraphRenderResult renderResult;
 
         /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
@@ -320,12 +340,12 @@ namespace SEE.Game.City
             DrawGraph();
         }
 
+        #region Load/Save Data
         /// <summary>
         /// First, if a graph was already loaded (<see cref="LoadedGraph"/> is not null),
         /// everything will be reset by calling <see cref="Reset"/>.
-        /// Second, the graph data from the GXL file with GXLPath() and the metrics
-        /// from the CSV file with CSVPath() are loaded. The loaded graph is available
-        /// in <see cref="LoadedGraph"/> afterwards.
+        /// Second, the graph data are loaded using the <see cref="DataProvider"/>.
+        /// The loaded graph is available in <see cref="LoadedGraph"/> afterwards.
         ///
         /// This method loads only the data, but does not actually render the graph.
         /// </summary>
@@ -334,6 +354,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [Tooltip("Loads the data (but does not draw them).")]
         public virtual async UniTask<bool> LoadDataAsync()
         {
             if (DataProvider != null)
@@ -384,15 +405,17 @@ namespace SEE.Game.City
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Saves the current city (as GXL).")]
         public virtual void SaveData()
         {
             if (LoadedGraph != null)
             {
-                string outputFile = Application.streamingAssetsPath + "/output.gxl";
+                string outputFile = GraphSnapshotPath.Path;
                 GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
+        #endregion Load/Save Data
 
         /// <summary>
         /// Returns whether the graph has been loaded.
@@ -407,6 +430,7 @@ namespace SEE.Game.City
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
         [PropertyOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Draws the data as a code city. Data must have been loaded.")]
         public virtual void DrawGraph()
         {
             if (IsPipelineRunning)
@@ -429,7 +453,7 @@ namespace SEE.Game.City
         /// Precondition: The <paramref name="graph"/> and its metrics have been loaded.
         /// </summary>
         /// <param name="graph">graph to be drawn</param>
-        protected async UniTaskVoid DrawGraphAsync(Graph graph)
+        protected async UniTask DrawGraphAsync(Graph graph)
         {
             GraphRenderer renderer = new(this, graph);
             try
@@ -442,7 +466,7 @@ namespace SEE.Game.City
                         updateProgress(x);
                     }
 
-                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
+                    renderResult = await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
@@ -496,6 +520,12 @@ namespace SEE.Game.City
         public override IGraphRenderer Renderer => graphRenderer ??= new GraphRenderer(this, VisualizedSubGraph);
 
         /// <summary>
+        /// True if the graph has been loaded and drawn.
+        /// </summary>
+        protected bool IsGraphLoadedAndDrawn => IsGraphLoaded && IsGraphDrawn;
+
+        #region Save/Load Layout
+        /// <summary>
         /// Saves the current layout of the city in a file named <see cref="LayoutPath"/>.
         /// The format of the written file depends upon the file extension. If the extension
         /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
@@ -504,20 +534,102 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [Tooltip("Saves the current layout of the city.")]
+        [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
             Debug.Log($"Saving layout data to {path}.\n");
-            if (Filenames.HasExtension(path, Filenames.GVLExtension))
-            {
-                Layout.IO.GVLWriter.Save(path, LoadedGraph.Name, AllNodeDescendants(gameObject));
-            }
-            else
-            {
-                Layout.IO.SLDWriter.Save(path, AllNodeDescendants(gameObject));
-            }
+            string graphName = LoadedGraph.Name;
+            Writer.Save(path, graphName, AllNodeDescendants(gameObject));
         }
 
+        /// <summary>
+        /// Loads the layout of the city from a file at <see cref="LayoutPath"/> and maps it on the
+        /// currently loaded graph.
+        ///
+        /// Precondition: The graph must be fully loaded and drawn before calling this method.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [Tooltip("Loads the layout and applies it to the city.")]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        public async UniTask LoadLayout()
+        {
+            if (!IsGraphDrawn)
+            {
+                ShowNotification.Error("Load Layout", "The graph must be fully loaded and drawn before loading a layout.");
+                return;
+            }
+
+            string path = NodeLayoutSettings.LayoutPath.Path;
+            if (string.IsNullOrEmpty(path))
+            {
+                ShowNotification.Error("Load Layout", $"The {nameof(NodeLayoutSettings.LayoutPath)} must be set.");
+                return;
+            }
+            if (!File.Exists(path))
+            {
+                ShowNotification.Error("Load Layout", $"The layout file {path} does not exist.");
+                return;
+            }
+
+            Debug.Log($"Loading layout data from {path}.\n");
+            using (LoadingSpinner.ShowIndeterminate($"Apply layout to city \"{gameObject.name}\""))
+            {
+                LayoutReader.Read(path, renderResult.Nodes.Cast<IGameNode>().ToList());
+
+                // Update the edge layout because the nodes may have moved.
+                foreach (Node node in loadedGraph.Nodes())
+                {
+                    node.Operator().UpdateEdgeLayout(0f);
+                }
+            }
+        }
+        #endregion Save/Load Layout
+
+        #region Save/Load Snapshot
+        /// <summary>
+        /// Saves both the data and the layout of the city. Equivalent to calling
+        /// <see cref="SaveData"/> and <see cref="SaveLayout"/>.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Save Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
+        [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
+        public void SaveSnapshot()
+        {
+            SaveData();
+            SaveLayout();
+        }
+
+        /// <summary>
+        /// Loads both the data (in GXL format) and the layout of the city.
+        /// </summary>
+        /// <returns>An empty task.</returns>
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        public async UniTask LoadSnapshotAsync()
+        {
+            Reset();
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            // Use a single GXL provider to load the graph.
+            GXLSingleGraphProvider gxlProvider = new()
+            {
+                Path = GraphSnapshotPath
+            };
+            LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
+
+            await DrawGraphAsync(LoadedGraph);
+            await LoadLayout();
+        }
+        #endregion Save/Load Snapshot
+
+        #region Reset Data
         /// <summary>
         /// This method will cancel any running graph provider pipeline and delete the currently
         /// loaded graph.
@@ -553,6 +665,7 @@ namespace SEE.Game.City
                 csm.enabled = true;
             }
         }
+        #endregion Reset Data
 
         /// <summary>
         /// Returns the names of all node metrics that truly exist in the underlying
@@ -611,10 +724,16 @@ namespace SEE.Game.City
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
+        /// <summary>
+        /// Label of attribute <see cref="GraphSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string graphSnapshotPathLabel = "GraphSnapshotPath";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
+            GraphSnapshotPath.Save(writer, graphSnapshotPathLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -622,6 +741,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            GraphSnapshotPath.Restore(attributes, graphSnapshotPathLabel);
         }
 
         #endregion

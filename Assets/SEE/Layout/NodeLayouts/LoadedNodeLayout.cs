@@ -44,35 +44,16 @@ namespace SEE.Layout.NodeLayouts
              Vector2 rectangle)
         {
             Dictionary<ILayoutNode, NodeTransform> result = new();
-            if (File.Exists(filename))
-            {
-                // Where to add the loaded node layout.
-                IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
-                // Load the layout from the file.
-                if (Filenames.HasExtension(filename, Filenames.GVLExtension))
-                {
-                    new GVLReader(filename, layoutNodeList.Cast<IGameNode>().ToList(), groundLevel, new SEELogger());
-                    // The elements in layoutNodeList will be stacked onto each other starting at groundLevel.
-                }
-                else if (Filenames.HasExtension(filename, Filenames.SLDExtension))
-                {
-                    SLDReader.Read(filename, layoutNodeList.Cast<IGameNode>().ToList());
-                    // The elements in layoutNodeList will have the y position as it was saved in the file.
-                }
-                else
-                {
-                    throw new Exception($"Unknown layout file format for file extension of {filename}.");
-                }
+            // Where to add the loaded node layout.
+            IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
+            ICollection<IGameNode> gameNodes = layoutNodeList.Cast<IGameNode>().ToList();
 
-                // Apply the layout for the result.
-                foreach (ILayoutNode node in layoutNodeList)
-                {
-                    result[node] = new NodeTransform(node.CenterPosition, node.AbsoluteScale);
-                }
-            }
-            else
+            LayoutReader.Read(filename, gameNodes);
+
+            // Apply the layout for the result.
+            foreach (ILayoutNode node in layoutNodeList)
             {
-                throw new Exception($"Layout file {filename} does not exist. No layout could be loaded.");
+                result[node] = new NodeTransform(node.CenterPosition, node.AbsoluteScale);
             }
             return result;
         }

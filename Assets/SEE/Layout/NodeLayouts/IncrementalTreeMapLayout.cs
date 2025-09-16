@@ -91,7 +91,7 @@ namespace SEE.Layout.NodeLayouts
 
             Roots = LayoutNodes.GetRoots(layoutNodesList);
             InitNodes(rectangle);
-            CalculateLayout(Roots, new Rectangle(x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y), groundLevel);
+            CalculateLayout(Roots, new Rectangle(x: -rectangle.x / 2.0f, z: -rectangle.y / 2.0f, rectangle.x, rectangle.y), GroundLevel);
             return layoutResult;
         }
 
