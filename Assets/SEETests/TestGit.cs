@@ -1,7 +1,9 @@
 ﻿using LibGit2Sharp;
+using UnityEngine;
 using NUnit.Framework;
 using SEE.Utils;
 using System.IO;
+using System.Linq;
 
 namespace SEE.VCS
 {
@@ -77,19 +79,31 @@ namespace SEE.VCS
         [Test]
         public void TestCloneAndFetchTestRepo()
         {
-            TestCloneAndFetchRepo(TestRepo);
+            TestCloneAndFetchRepo(TestRepo, false);
         }
 
         /// <summary>
         /// Clones and fetches a GitHub repository described by <paramref name="repositoryInfo"/>.
         /// </summary>
-        private static void TestCloneAndFetchRepo(RepositoryInfo repositoryInfo)
+        /// <param name="repositoryInfo">information about the repository to be cloned and fetched</param>
+        /// <param name="cloneFirst">if true, the repository will be cloned first and deleted
+        /// after the test; if false, it is assumed that the repository has already been cloned
+        /// and the repository will not be deleted</param>
+        private static void TestCloneAndFetchRepo(RepositoryInfo repositoryInfo, bool cloneFirst)
         {
             string localRepoPath = LocalPath(repositoryInfo.Url);
+            if (cloneFirst)
+            {
+                DeleteDirectoryIfItExists(localRepoPath);
+            }
+
             try
             {
                 // First clone the repository, then fetch.
-                Repository.Clone(repositoryInfo.AddToken, localRepoPath, new CloneOptions());
+                if (cloneFirst)
+                {
+                    Repository.Clone(repositoryInfo.AddToken, localRepoPath, new CloneOptions());
+                }
 
                 using Repository repo = new(localRepoPath);
 
@@ -97,7 +111,25 @@ namespace SEE.VCS
                 Remote remote = repo.Network.Remotes["origin"];
 
                 // Fetch the changes from the remote.
+                // A refspec specifies the mapping between remote and local reference names when
+                // fetching or pushing. Passing null or an empty array means to use the base refspecs.
+                // Passing null as the log message means to use the default message "fetch".
                 Commands.Fetch(repo, remote.Name, new string[] { }, new FetchOptions(), null);
+                // Fetch downloads new commits from the remote repository. These commits are stored
+                // locally but are not integrated into the working directory or local branches.
+                // They reside on remote-tracking branches (remotes/origin/main).
+
+                foreach (Branch currentBranch in repo.Branches.Where(b => !b.IsRemote))
+                {
+                    if (HasChangesToPull(repo, currentBranch))
+                    {
+                        Debug.Log($"Your branch {currentBranch.FriendlyName} has new changes to pull!\n");
+                    }
+                    else
+                    {
+                        Debug.Log($"Your branch {currentBranch.FriendlyName} is up to date with the remote.");
+                    }
+                }
             }
             catch (LibGit2SharpException)
             {
@@ -105,8 +137,35 @@ namespace SEE.VCS
             }
             finally
             {
-                DeleteDirectoryIfItExists(localRepoPath);
+                if (cloneFirst)
+                {
+                    DeleteDirectoryIfItExists(localRepoPath);
+                }
             }
+        }
+
+        private static bool HasChangesToPull(Repository repo, Branch localBranch)
+        {
+            // Get the remote-tracking branch for localBranch.
+            Branch remoteBranch = repo.Branches[localBranch.TrackedBranch.FriendlyName];
+
+            if (remoteBranch == null)
+            {
+                // The local branch is not configured to track a remote branch.
+                return false;
+            }
+
+            // Determine the commits on the remote branch that are not in the local branch.
+            ICommitLog commitLog = repo.Commits.QueryBy(new CommitFilter
+            {
+                IncludeReachableFrom = remoteBranch.Tip,
+                ExcludeReachableFrom = localBranch.Tip
+            });
+
+            int aheadBy = commitLog.Count();
+
+            // If the count is greater than zero, there are changes to pull.
+            return aheadBy > 0;
         }
 
         /// <summary>
