@@ -34,8 +34,6 @@ namespace SEE.VCS
             /// For instance, AddToken("https://github.com/koschke/TestProjectForSEE.git", "mytoken")
             /// yields "https://mytoken@github.com/koschke/TestProjectForSEE.git".
             /// </summary>
-            /// <param name="repositoryUrl">URL to the repository; must start with https://</param>
-            /// <param name="accessToken">access token to be added</param>
             /// <returns><paramref name="repositoryUrl"/> where <paramref name="accessToken"/> has
             /// been added</returns>
             public string AddToken => Url.Replace("https://", $"https://{AccessToken}@");
