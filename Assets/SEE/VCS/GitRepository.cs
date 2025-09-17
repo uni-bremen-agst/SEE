@@ -100,6 +100,37 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
+        /// </summary>
+        /// <param name="url">URL for the repository</param>
+        /// <param name="accessToken">the access token for the repository</param>
+        /// <exception cref="Exception"></exception>
+        public void Clone(string url, string accessToken)
+        {
+            try
+            {
+                Debug.Log($"Cloned into {Repository.Clone(MergeToken(url, accessToken), RepositoryPath.Path, new CloneOptions())}\n");
+            }
+            catch (LibGit2SharpException e)
+            {
+                throw new Exception
+                       ($"Error while cloning repository from {url} into path {RepositoryPath.Path}: {e.Message}.\n");
+            }
+        }
+
+        /// <summary>
+        /// Returns the <paramref name="url"/> with the added <paramref name="accessToken"/>.
+        ///
+        /// For instance, MergeToken("https://github.com/koschke/TestProjectForSEE.git", "mytoken")
+        /// yields "https://mytoken@github.com/koschke/TestProjectForSEE.git".
+        /// </summary>
+        /// <param name="url">URL to the repository; must start with https://</param>
+        /// <param name="accessToken">access token to be added</param>
+        /// <returns><paramref name="url"/> where <paramref name="accessToken"/> has
+        /// been added</returns>
+        private static string MergeToken(string url, string accessToken) => url.Replace("https://", $"https://{accessToken}@");
+
+        /// <summary>
         /// Creates a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>
         /// if none exists yet.
         /// </summary>
@@ -119,23 +150,94 @@ namespace SEE.VCS
         /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
+        /// <returns>true if there are any changes (new, deleted, or changed remote branches); false otherwise</returns>
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
-        public void FetchRemotes()
+        public bool FetchRemotes()
         {
             OpenRepository();
 
-            // Fetch all remote branches
-            foreach (Remote remote in repository.Network.Remotes)
+            bool result = false;
+
+            // Fetch all remotes; this is needed if there are multiple remotes.
+            // As a matter of fact, a repository may have multiple remotes.
+            foreach (LibGit2Sharp.Remote remote in repository.Network.Remotes)
             {
                 IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
                 try
                 {
-                    Commands.Fetch(repository, remote.Name, refSpecs, null, "");
+                    Dictionary<string, string> previousBranches = GetBranches(repository);
+                    //Print(currentBranches, "previous");
+
+                    // Fetch downloads new commits from the remote repository. These commits are stored
+                    // locally but are not integrated into the working directory or local branches.
+                    // They reside on remote-tracking branches (remotes/origin/main).
+                    // Option Prune=true removes any remote-tracking references that no longer exist on the remote.
+                    //Debug.Log($"Fetching remote {remote.Name} for repository path {RepositoryPath.Path}.\n");
+                    Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions() { Prune = true}, "");
+
+                    Dictionary<string, string> newBranches = GetBranches(repository);
+                    //Print(currentBranches, "new");
+
+                    // Compare previousBranches to newBranches for new and changed branches.
+                    foreach (KeyValuePair<string, string> pair in newBranches)
+                    {
+                        if (previousBranches.TryGetValue(pair.Key, out string previousSha))
+                        {
+                            // Existed before.
+                            if (previousSha != pair.Value)
+                            {
+                                // Has changed.
+                                //Debug.Log($"Remote branch {pair.Key} has changed from SHA {previousSha} to SHA {pair.Value}.\n");
+                                result = true;
+                            }
+                            else
+                            {
+                                // Unchanged.
+                                //Debug.Log($"Remote branch {pair.Key} is unchanged with SHA {pair.Value}.\n");
+                            }
+                        }
+                        else
+                        {
+                            // New branch.
+                            //Debug.Log($"New remote branch {pair.Key} with SHA {pair.Value}.\n");
+                            result = true;
+                        }
+                    }
+                    // Compare previousBranches to newBranches for deleted branches.
+                    foreach (KeyValuePair<string, string> pair in previousBranches)
+                    {
+                        if (!newBranches.ContainsKey(pair.Key))
+                        {
+                            //Debug.Log($"Remote branch {pair.Key} with SHA {pair.Value} has been deleted.\n");
+                            result = true;
+                        }
+                    }
                 }
                 catch (LibGit2SharpException e)
                 {
                     throw new Exception
                         ($"Error while running git fetch for repository path {RepositoryPath.Path} and remote name {remote.Name}: {e.Message}.\n");
+                }
+            }
+            return result;
+
+            static Dictionary<string, string> GetBranches(Repository repository)
+            {
+                Dictionary<string, string> remoteBranches = new();
+
+                foreach (Branch remoteBranch in repository.Branches.Where(b => b.IsRemote))
+                {
+                    remoteBranches[remoteBranch.CanonicalName] = remoteBranch.Tip.Sha;
+                }
+                return remoteBranches;
+            }
+
+            static void Print(Dictionary<string, string> branches, string message)
+            {
+                Debug.Log($"The {message} branches are:\n");
+                foreach (KeyValuePair<string, string> pair in branches)
+                {
+                    Debug.Log($"Branch: {pair.Key} SHA={pair.Value}\n");
                 }
             }
         }
