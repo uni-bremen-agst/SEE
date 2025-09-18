@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -31,10 +30,23 @@ namespace SEE.Game.CityRendering
         ///
         /// The collected authors are then rendered as spheres floating over the city.
         /// </summary>
-        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
+        /// <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
+        /// <param name="parent">Parent <see cref="GameObject"/>. All spheres will become children of this object.</param>
         /// <param name="graph">The graph which was rendered.</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
+        {
+            IList<GameObject> gameSpheresObjects = RenderSpheres(nodeMap, parent, graph);
+            RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
+        }
+
+        /// <summary>
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
+        /// </summary>
+        ///  <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
+        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
+        /// <param name="graph">The graph which was rendered.</param>
+        /// <returns>A list of the generated sphere game objects.</returns>
+        private IList<GameObject> RenderSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
             /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> separated by commas.
@@ -46,19 +58,6 @@ namespace SEE.Game.CityRendering
                     .Select(x => new FileAuthor(x))
                     .ToList();
 
-            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
-            RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
-        }
-
-        /// <summary>
-        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
-        /// </summary>
-        /// <param name="authors">The authors to create the spheres for.</param>
-        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
-        /// <param name="graph">The graph which was rendered.</param>
-        /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
-        {
             IList<GameObject> result = new List<GameObject>();
             Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
@@ -98,6 +97,7 @@ namespace SEE.Game.CityRendering
                         return result;
                     }
 
+                    // FIXME: We need to add a collider.
                     GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
                     gameObject.name = "AuthorSphere:" + authors[currentAuthor];
 
@@ -168,22 +168,20 @@ namespace SEE.Game.CityRendering
         ///
         /// This method should be called after the sphere where rendered.
         /// </summary>
-        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
+        /// <param name="nodeMap">A mapping from the graph file nodes to the gameobject.</param>
         /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
-        private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
-            IEnumerable<GameObject> spheresObjects, GameObject parent)
+        private void RenderEdgesForSpheres
+                       (IDictionary<Node, GameObject> nodeMap,
+                        IEnumerable<GameObject> spheresObjects,
+                        GameObject parent)
         {
-            IEnumerable<Node> nodesWithChurn = nodeMap.Keys
-                .Where(x => x.IntAttributes.ContainsKey(DataModel.DG.VCS.Churn));
-
-            if (!nodesWithChurn.Any())
+            float maximalChurn = MaximalChurn(nodeMap);
+            if (maximalChurn == 0)
             {
-                return;
+                // Avoid division by zero below.
+                maximalChurn = Settings.EdgeLayoutSettings.EdgeWidth;
             }
-
-            int maximalChurn = nodesWithChurn
-                .Max(x => x.IntAttributes[DataModel.DG.VCS.Churn]);
 
             foreach (GameObject sphere in spheresObjects)
             {
@@ -192,10 +190,8 @@ namespace SEE.Game.CityRendering
 
                 IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
-                    .Where(x =>
-                        x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
-                            .Split(',')
-                            .Contains(authorName.ToString()));
+                    .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
+                                   .Split(',').Contains(authorName.ToString()));
 
                 foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
                 {
@@ -219,8 +215,9 @@ namespace SEE.Game.CityRendering
                     line.sharedMaterial = material;
 
                     LineFactory.SetDefaults(line);
-                    float width = Mathf.Clamp((float)churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
-                        Settings.EdgeLayoutSettings.EdgeWidth);
+                    float width = Mathf.Clamp((float)churn / maximalChurn,
+                                              Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
+                                              Settings.EdgeLayoutSettings.EdgeWidth);
 
                     LineFactory.SetWidth(line, width);
 
@@ -294,6 +291,28 @@ namespace SEE.Game.CityRendering
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the maximal churn value of all nodes in <paramref name="nodeMap"/>.
+        /// </summary>
+        /// <param name="nodeMap">the nodes to be queried</param>
+        /// <returns>maximal churn</returns>
+        private float MaximalChurn(IDictionary<Node, GameObject> nodeMap)
+        {
+            float max = 0;
+
+            foreach (Node node in nodeMap.Keys)
+            {
+                if (node.TryGetInt(DataModel.DG.VCS.Churn, out int churn))
+                {
+                    if (churn > max)
+                    {
+                        max = churn;
+                    }
+                }
+            }
+            return max;
         }
 
         /// <summary>
