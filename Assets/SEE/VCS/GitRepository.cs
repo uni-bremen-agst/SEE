@@ -587,17 +587,19 @@ namespace SEE.VCS
         /// Adds the distinct filenames in the given <paramref name="tree"/> passing
         /// the criteria <see cref="Filter.RepositoryPaths"/> and <see cref="Filter.Matcher"/>
         /// of the given <paramref name="filter"/>.
+        ///
+        /// If <see cref="Filter.RepositoryPaths"/> is null or empty, all files in the entire
+        /// <paramref name="tree"/> are retrieved. Otherwise, only the files in the subtrees
+        /// denoted by <see cref="Filter.RepositoryPaths"/> are retrieved. In case a path
+        /// does not exist in the <paramref name="tree"/>, it is ignored.
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
         /// <param name="paths">where the passing files are to be added</param>
-        /// <exception cref="Exception">thrown if attribute <see cref="Filter.RepositoryPaths"/> of
-        /// <paramref name="filter"/> is different from null and at least one of the paths in
-        /// <see cref="Filter.RepositoryPaths"/> does not exist in the <paramref name="tree"/>
-        /// or does not denote a directory.</exception>
         private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
+                // We collect all files in the entire tree.
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
@@ -606,6 +608,7 @@ namespace SEE.VCS
             }
             else
             {
+                // We collect all files in the subtrees denoted by the repository paths.
                 foreach (string repositoryPath in VCSFilter.RepositoryPaths)
                 {
                     if (!string.IsNullOrWhiteSpace(repositoryPath))
@@ -614,7 +617,13 @@ namespace SEE.VCS
                         {
                             throw new OperationCanceledException(token);
                         }
-                        CollectFiles(Find(tree, repositoryPath), VCSFilter.Matcher, paths, token);
+                        LibGit2Sharp.Tree subtree = Find(tree, repositoryPath);
+                        // It can happen that we do not find the subtree, because
+                        // it may exist in some branches, but not in others.
+                        if (subtree != null)
+                        {
+                            CollectFiles(subtree, VCSFilter.Matcher, paths, token);
+                        }
                     }
                 }
             }
@@ -629,20 +638,22 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="tree">the root tree</param>
         /// <param name="repositoryPath">relative path of descendants nested in <paramref name="tree"/></param>
-        /// <returns>the subtree</returns>
-        /// <exception cref="Exception">thrown if <paramref name="repositoryPath"/> does not match
-        /// any descendant in <paramref name="tree"/> or if <paramref name="repositoryPath"/>
-        /// is not a tree (for instance, a blob).</exception>
-        private static LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
+        /// <returns>the subtree or null if it does not exist</returns>
+        private LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
         {
-            TreeEntry result = tree[repositoryPath] ?? throw new Exception($"The path {repositoryPath} does not exist in the repository.");
+            TreeEntry result = tree[repositoryPath];
+            if (result == null)
+            {
+                // Path does not exist.
+                return null;
+            }
             if (result.TargetType == TreeEntryTargetType.Tree)
             {
                 return (LibGit2Sharp.Tree)result.Target;
             }
             else
             {
-                throw new Exception($"The path {repositoryPath} is not a directory in the repository.");
+                return null;
             }
         }
 
