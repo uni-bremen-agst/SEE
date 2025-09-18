@@ -47,8 +47,120 @@ namespace SEE.Game.CityRendering
                     .ToList();
 
             IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
-
             RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
+        }
+
+        /// <summary>
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
+        /// </summary>
+        /// <param name="authors">The authors to create the spheres for.</param>
+        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
+        /// <param name="graph">The graph which was rendered.</param>
+        /// <returns>A list of the generated sphere game objects.</returns>
+        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
+        {
+            IList<GameObject> result = new List<GameObject>();
+            Renderer parentRenderer = parent.GetComponent<Renderer>();
+            int authorsCount = authors.Count;
+            Node rootNode = graph.GetRoots().First();
+
+            // Calculating number of rows and columns needed and the space between the spheres.
+            // The spheres will be distributed in a rectangle around the code city table.
+            int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
+            int columns = Mathf.CeilToInt((float)authorsCount / rows);
+            float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
+            float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
+
+            // When we only have one row.
+            if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
+            {
+                spacingX = parentRenderer.bounds.size.x;
+            }
+            // When we only have one column.
+            if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
+            {
+                spacingZ = parentRenderer.bounds.size.z;
+            }
+
+            int currentAuthor = 0;
+            // Define materials for the spheres.
+            Materials materials = new(Materials.ShaderType.PortalFree,
+                new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
+
+            // iterate over all rows.
+            for (int i = 0; i < rows; i++)
+            {
+                // iterate over all columns.
+                for (int j = 0; j < columns; j++)
+                {
+                    if (currentAuthor >= authorsCount)
+                    {
+                        return result;
+                    }
+
+                    GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    gameObject.name = "AuthorSphere:" + authors[currentAuthor];
+
+                    AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
+                    author.Author = authors[currentAuthor];
+
+                    // FIXME
+                    //gameObject.AddComponent<NodeRef>().Value = rootNode;
+
+                    // FIXME
+                    //gameObject.AddComponent<InteractableObject>();
+                    gameObject.AddComponent<ShowAuthorEdges>();
+
+                    Vector3 startLabelPosition = gameObject.GetTop();
+
+                    AddLabel(authors, parent, currentAuthor, materials, gameObject, startLabelPosition);
+
+                    AddLOD(gameObject);
+
+                    // Calculate the position of the sphere.
+                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
+                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
+
+                    gameObject.transform.position
+                        = new Vector3(xPos,
+                                      parentRenderer.bounds.size.y + 1.2f, zPos) + parent.transform.position;
+
+                    result.Add(gameObject);
+                    currentAuthor++;
+                }
+            }
+
+            return result;
+
+            // Adds a label with the authors email which will float above the sphere.
+            static void AddLabel(IList<FileAuthor> authors, GameObject parent, int currentAuthor, Materials materials,
+                                 GameObject gameObject, Vector3 startLabelPosition, float fontSize = 2f)
+            {
+                GameObject nodeLabel = new("Text " + authors[currentAuthor])
+                {
+                    tag = Tags.Text
+                };
+                nodeLabel.transform.position = startLabelPosition;
+
+                TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
+                tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                tm.fontSize = fontSize;
+                tm.text = authors[currentAuthor].ToString();
+                tm.color = Color.white;
+                tm.alignment = TextAlignmentOptions.Center;
+
+                nodeLabel.name = "Label:" + authors[currentAuthor];
+                nodeLabel.AddComponent<FaceCamera>();
+                nodeLabel.transform.SetParent(gameObject.transform);
+
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+                Material mat = materials.Get(0, currentAuthor);
+                // Override shader so the spheres don't clip over the code city.
+                mat.shader = Shader.Find("Standard");
+                renderer.sharedMaterial = mat;
+                gameObject.transform.SetParent(parent.transform);
+                gameObject.transform.transform.localScale *= 0.25f;
+            }
         }
 
         /// <summary>
@@ -199,119 +311,6 @@ namespace SEE.Game.CityRendering
             {
                 ControlPoints = TinySplineInterop.VectorsToList(points)
             };
-        }
-
-        /// <summary>
-        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
-        /// </summary>
-        /// <param name="authors">The authors to create the spheres for.</param>
-        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
-        /// <param name="graph">The graph which was rendered.</param>
-        /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
-        {
-            IList<GameObject> result = new List<GameObject>();
-            Renderer parentRenderer = parent.GetComponent<Renderer>();
-            int authorsCount = authors.Count;
-            Node rootNode = graph.GetRoots().First();
-
-            // Calculating number of rows and columns needed and the space between the spheres.
-            // The spheres will be distributed in a rectangle around the code city table.
-            int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
-            int columns = Mathf.CeilToInt((float)authorsCount / rows);
-            float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
-            float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
-
-            // When we only have one row.
-            if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
-            {
-                spacingX = parentRenderer.bounds.size.x;
-            }
-            // When we only have one column.
-            if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
-            {
-                spacingZ = parentRenderer.bounds.size.z;
-            }
-
-            int currentAuthor = 0;
-            // Define materials for the spheres.
-            Materials materials = new(Materials.ShaderType.PortalFree,
-                new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
-
-            // iterate over all rows.
-            for (int i = 0; i < rows; i++)
-            {
-                // iterate over all columns.
-                for (int j = 0; j < columns; j++)
-                {
-                    if (currentAuthor >= authorsCount)
-                    {
-                        return result;
-                    }
-
-                    GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    gameObject.name = "AuthorSphere:" + authors[currentAuthor];
-
-                    AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
-                    author.Author = authors[currentAuthor];
-
-                    // FIXME
-                    //gameObject.AddComponent<NodeRef>().Value = rootNode;
-
-                    // FIXME
-                    //gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowAuthorEdges>();
-
-                    Vector3 startLabelPosition = gameObject.GetTop();
-
-                    AddLabel(authors, parent, currentAuthor, materials, gameObject, startLabelPosition);
-
-                    AddLOD(gameObject);
-
-                    // Calculate the position of the sphere.
-                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
-
-                    gameObject.transform.position
-                        = new Vector3(xPos,
-                                      parentRenderer.bounds.size.y + 1.2f, zPos) + parent.transform.position;
-
-                    result.Add(gameObject);
-                    currentAuthor++;
-                }
-            }
-
-            return result;
-
-            // Adds a label with the authors email which will float above the sphere.
-            static void AddLabel(IList<FileAuthor> authors, GameObject parent, int currentAuthor, Materials materials,
-                                 GameObject gameObject, Vector3 startLabelPosition, float fontSize = 2f)
-            {
-                GameObject nodeLabel = new("Text " + authors[currentAuthor])
-                {
-                    tag = Tags.Text
-                };
-                nodeLabel.transform.position = startLabelPosition;
-
-                TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
-                tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-                tm.fontSize = fontSize;
-                tm.text = authors[currentAuthor].ToString();
-                tm.color = Color.white;
-                tm.alignment = TextAlignmentOptions.Center;
-
-                nodeLabel.name = "Label:" + authors[currentAuthor];
-                nodeLabel.AddComponent<FaceCamera>();
-                nodeLabel.transform.SetParent(gameObject.transform);
-
-                Renderer renderer = gameObject.GetComponent<Renderer>();
-                Material mat = materials.Get(0, currentAuthor);
-                // Override shader so the spheres don't clip over the code city.
-                mat.shader = Shader.Find("Standard");
-                renderer.sharedMaterial = mat;
-                gameObject.transform.SetParent(parent.transform);
-                gameObject.transform.transform.localScale *= 0.25f;
-            }
         }
     }
 }
