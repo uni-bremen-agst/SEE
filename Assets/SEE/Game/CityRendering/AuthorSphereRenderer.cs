@@ -57,7 +57,7 @@ namespace SEE.Game.CityRendering
         /// This method should be called after the sphere where rendered.
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="spheresObjects">A list of the previous rendered spheres.</param>
+        /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> spheresObjects, GameObject parent)
