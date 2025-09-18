@@ -76,11 +76,6 @@ namespace SEE.GraphProviders
             {
                 throw new ArgumentException($"Date is impossible or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
             }
-
-            if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
-            {
-                throw new ArgumentException("Repository path is not set or does not exist.");
-            }
         }
 
         /// <summary>

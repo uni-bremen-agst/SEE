@@ -90,7 +90,6 @@ namespace SEE.GraphProviders
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
-            city.VCSPath = new DataPath(gitDirPath);
             using GitRepository gitRepository = new(new DataPath(gitDirPath),
                                                     new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
                                                                        repositoryPaths: null,
