@@ -11,7 +11,6 @@ using SEE.Utils;
 using TinySpline;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
@@ -37,6 +36,8 @@ namespace SEE.Game.CityRendering
         /// <param name="graph">The graph which was rendered.</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
+            /// Collecting all authors from the file nodes. The authors reside in the string attribute
+            /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> separated by commas.
             List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
@@ -47,7 +48,6 @@ namespace SEE.Game.CityRendering
 
             IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
 
-            // Drawing edges
             RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
         }
 
@@ -202,10 +202,11 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// This method renders all spheres for the authors specified in the list <paramref name="authors"/>.
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
         /// </summary>
         /// <param name="authors">The authors to create the spheres for.</param>
-        /// <param name="parent">The parent <see cref="GameObject"/> to add the to.</param>
+        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
+        /// <param name="graph">The graph which was rendered.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
         private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
         {
@@ -232,9 +233,9 @@ namespace SEE.Game.CityRendering
                 spacingZ = parentRenderer.bounds.size.z;
             }
 
-            int counter = 0;
+            int currentAuthor = 0;
             // Define materials for the spheres.
-            Materials materials = new Materials(Materials.ShaderType.PortalFree,
+            Materials materials = new(Materials.ShaderType.PortalFree,
                 new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
             // iterate over all rows.
@@ -243,67 +244,74 @@ namespace SEE.Game.CityRendering
                 // iterate over all columns.
                 for (int j = 0; j < columns; j++)
                 {
-                    if (counter >= authorsCount)
+                    if (currentAuthor >= authorsCount)
                     {
                         return result;
                     }
 
                     GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    gameObject.name = "AuthorSphere:" + authors[counter];
+                    gameObject.name = "AuthorSphere:" + authors[currentAuthor];
 
                     AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
-                    author.Author = authors[counter];
+                    author.Author = authors[currentAuthor];
 
-                    gameObject.AddComponent<NodeRef>().Value = rootNode;
+                    // FIXME
+                    //gameObject.AddComponent<NodeRef>().Value = rootNode;
 
-                    gameObject.AddComponent<InteractableObject>();
+                    // FIXME
+                    //gameObject.AddComponent<InteractableObject>();
                     gameObject.AddComponent<ShowAuthorEdges>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
-                    float fontSize = 2f;
 
-                    // Adding a label with the authors email which will float above the sphere.
-                    GameObject nodeLabel = new GameObject("Text " + authors[counter])
-                    {
-                        tag = Tags.Text
-                    };
-                    nodeLabel.transform.position = startLabelPosition;
-
-                    TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
-                    tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-                    tm.fontSize = fontSize;
-                    tm.text = authors[counter].ToString();
-                    tm.color = Color.white;
-                    tm.alignment = TextAlignmentOptions.Center;
-
-                    nodeLabel.name = "Label:" + authors[counter];
-                    nodeLabel.AddComponent<FaceCamera>();
-                    nodeLabel.transform.SetParent(gameObject.transform);
+                    AddLabel(authors, parent, currentAuthor, materials, gameObject, startLabelPosition);
 
                     AddLOD(gameObject);
-
-                    Renderer renderer = gameObject.GetComponent<Renderer>();
-                    Material mat = materials.Get(0, counter);
-                    // Override shader so the spheres don't clip over the code city.
-                    mat.shader = Shader.Find("Standard");
-                    renderer.sharedMaterial = mat;
-                    gameObject.transform.SetParent(parent.transform);
-                    gameObject.transform.transform.localScale *= 0.25f;
 
                     // Calculate the position of the sphere.
                     float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
                     float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
 
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 1.2f, zPos) +
-                                             parent.transform.position;
-                    gameObject.transform.position = spherePosition;
+                    gameObject.transform.position
+                        = new Vector3(xPos,
+                                      parentRenderer.bounds.size.y + 1.2f, zPos) + parent.transform.position;
 
                     result.Add(gameObject);
-                    counter++;
+                    currentAuthor++;
                 }
             }
 
             return result;
+
+            // Adds a label with the authors email which will float above the sphere.
+            static void AddLabel(IList<FileAuthor> authors, GameObject parent, int currentAuthor, Materials materials,
+                                 GameObject gameObject, Vector3 startLabelPosition, float fontSize = 2f)
+            {
+                GameObject nodeLabel = new("Text " + authors[currentAuthor])
+                {
+                    tag = Tags.Text
+                };
+                nodeLabel.transform.position = startLabelPosition;
+
+                TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
+                tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+                tm.fontSize = fontSize;
+                tm.text = authors[currentAuthor].ToString();
+                tm.color = Color.white;
+                tm.alignment = TextAlignmentOptions.Center;
+
+                nodeLabel.name = "Label:" + authors[currentAuthor];
+                nodeLabel.AddComponent<FaceCamera>();
+                nodeLabel.transform.SetParent(gameObject.transform);
+
+                Renderer renderer = gameObject.GetComponent<Renderer>();
+                Material mat = materials.Get(0, currentAuthor);
+                // Override shader so the spheres don't clip over the code city.
+                mat.shader = Shader.Find("Standard");
+                renderer.sharedMaterial = mat;
+                gameObject.transform.SetParent(parent.transform);
+                gameObject.transform.transform.localScale *= 0.25f;
+            }
         }
     }
 }
