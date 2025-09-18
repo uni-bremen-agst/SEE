@@ -139,7 +139,10 @@ namespace SEE.Game.CityRendering
                         switch (branchCity.ShowAuthorEdgesStrategy)
                         {
                             case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
+                                {
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
 
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
 
@@ -153,7 +156,10 @@ namespace SEE.Game.CityRendering
                                 }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowOnHover:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
+                                {
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
 
                                 gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
                                 break;
