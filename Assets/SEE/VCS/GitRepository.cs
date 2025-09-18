@@ -472,7 +472,7 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the hashes of all tip commits from all branches in this <see cref="GitRepository"/>.
+        /// Returns the hashes of all tip commits from all relevant branches in this <see cref="GitRepository"/>.
         /// </summary>
         /// <returns>The hashes of the tip commits of all branches.</returns>
         public IList<string> GetTipHashes()
