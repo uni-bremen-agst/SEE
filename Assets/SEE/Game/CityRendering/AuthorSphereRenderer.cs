@@ -143,15 +143,21 @@ namespace SEE.Game.CityRendering
                                 {
                                     throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
                                 }
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-
-                                if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                if (Application.isPlaying)
                                 {
-                                    // Show only edges for nodes with multiple authors.
-                                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                    // The containing method may be called in the Unity editor, but hiding the edges
+                                    // only makes sense when the game is running. Moreover, hiding the edges in the editor
+                                    // may even lead to exceptions because the city's BaseAnimationDuration will be queried
+                                    // but the city is set only OnEnable of the edge operator.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+
+                                    if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                                     {
-                                        edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                        // Show only edges for nodes with multiple authors.
+                                        foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                        {
+                                            edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                        }
                                     }
                                 }
                                 break;
@@ -160,8 +166,11 @@ namespace SEE.Game.CityRendering
                                 {
                                     throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
                                 }
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                if (Application.isPlaying)
+                                {
+                                    // See above. Must not be run in editor mode.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowAlways:
                                 break; // nothing to do here, edges are always shown
