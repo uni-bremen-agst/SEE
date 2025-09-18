@@ -1,6 +1,4 @@
-﻿using DG.Tweening;
-using SEE.DataModel.DG;
-using SEE.Game.Operator;
+﻿using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout;
 using Sirenix.Utilities;
