@@ -27,7 +27,7 @@ namespace SEE.Game.CityRendering
         /// This method should be executed after the graph was rendered.
         ///
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
-        /// <see cref="AuthorAttributeName"/> attribute which sets the author.
+        /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> attribute which sets the author.
         ///
         /// The collected authors are then rendered as spheres floating over the city.
         /// </summary>
@@ -146,7 +146,7 @@ namespace SEE.Game.CityRendering
                 TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
                 tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
                 tm.fontSize = fontSize;
-                tm.text = authors[currentAuthor].ToString();
+                tm.text = authors[currentAuthor].Name;
                 tm.color = Color.white;
                 tm.alignment = TextAlignmentOptions.Center;
 
@@ -193,12 +193,12 @@ namespace SEE.Game.CityRendering
                 // Collect all (file) nodes the current author has contributed to.
                 // Maps from the graph node (a file) onto the game object representing the (file) node.
                 // FIXME: Looks like this can be simplified and optimized.
-                IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
+                IEnumerable<KeyValuePair<Node, GameObject>> filesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
                     .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
                                    .Split(',').Contains(authorName.ToString()));
 
-                foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
+                foreach (KeyValuePair<Node, GameObject> fileOfAuthor in filesOfAuthor)
                 {
                     // The game object representing the edge between the author and the file.
                     GameObject authorToFileLine = new()
@@ -206,25 +206,25 @@ namespace SEE.Game.CityRendering
                         tag = Tags.Edge,
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
-                        name = authorName + ":" + nodeOfAuthor.Key.ID
+                        name = authorName + ":" + fileOfAuthor.Key.ID
                     };
                     // It will be the child of parent.
                     authorToFileLine.transform.parent = parent.transform;
 
                     // Specific churn of the current author for the current sphere.
-                    int churn = nodeOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
+                    int churn = fileOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
-                    CreateLine(authorToFileLine, sphere, nodeOfAuthor.Value, (float)churn / maximalChurn);
+                    CreateLine(authorToFileLine, sphere, fileOfAuthor.Value, (float)churn / maximalChurn);
 
                     AddLOD(authorToFileLine);
 
-                    AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
+                    AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSpheres.Add(sphere);
                     authorRef.Edges.Add((authorToFileLine, churn));
 
                     AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
-                    authorEdge.targetNode = authorRef;
-                    authorEdge.authorSphere = authorSphere;
+                    authorEdge.TargetNode = authorRef;
+                    authorEdge.AuthorSphere = authorSphere;
 
                     authorSphere.Edges.Add((authorToFileLine, churn));
 
@@ -235,7 +235,7 @@ namespace SEE.Game.CityRendering
                             case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
                                 if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
                                 {
-                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                    throw new Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
                                 }
                                 if (Application.isPlaying)
                                 {
@@ -258,7 +258,7 @@ namespace SEE.Game.CityRendering
                             case ShowAuthorEdgeStrategy.ShowOnHover:
                                 if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
                                 {
-                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                    throw new Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
                                 }
                                 if (Application.isPlaying)
                                 {
@@ -269,7 +269,7 @@ namespace SEE.Game.CityRendering
                             case ShowAuthorEdgeStrategy.ShowAlways:
                                 break; // nothing to do here, edges are always shown
                             default:
-                                throw new System.ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
+                                throw new ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
                                     branchCity.ShowAuthorEdgesStrategy,
                                     $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
                         }
