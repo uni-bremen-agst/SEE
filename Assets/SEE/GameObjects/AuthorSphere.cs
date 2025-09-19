@@ -16,8 +16,8 @@ namespace SEE.GameObjects
         public FileAuthor Author;
 
         /// <summary>
-        /// The list of all edges the author sphere has and their associated churn.
+        /// All edges connecting the author sphere to the files they contributed to.
         /// </summary>
-        public IList<(GameObject, int)> Edges = new List<(GameObject, int)>();
+        public IList<GameObject> Edges = new List<GameObject>();
     }
 }

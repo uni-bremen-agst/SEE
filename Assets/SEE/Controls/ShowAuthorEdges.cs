@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            foreach (GameObject edge in sphere.Edges.Select(x => x.Item1))
+            foreach (GameObject edge in sphere.Edges)
             {
                 bool hasAuthorEdge = edge.TryGetComponent(out AuthorEdge authorEdge);
                 // Only show edges in which the author threshold is not reached.

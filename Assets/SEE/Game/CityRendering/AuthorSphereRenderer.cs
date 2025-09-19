@@ -225,8 +225,9 @@ namespace SEE.Game.CityRendering
                     AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
                     authorEdge.TargetNode = authorRef;
                     authorEdge.AuthorSphere = authorSphere;
+                    authorEdge.Churn = churn;
 
-                    authorSphere.Edges.Add((authorToFileLine, churn));
+                    authorSphere.Edges.Add(authorToFileLine);
 
                     if (Settings is BranchCity branchCity)
                     {
