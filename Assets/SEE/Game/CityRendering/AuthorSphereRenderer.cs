@@ -4,11 +4,9 @@ using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders.VCS;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TinySpline;
 using TMPro;
 using UnityEngine;
 
@@ -214,17 +212,18 @@ namespace SEE.Game.CityRendering
                     // Specific churn of the current author for the current sphere.
                     int churn = fileOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
-                    CreateLine(authorToFileLine, sphere, fileOfAuthor.Value, (float)churn / maximalChurn);
-
                     AddLOD(authorToFileLine);
 
                     AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.Edges.Add(authorToFileLine);
 
                     AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
-                    authorEdge.TargetNode = authorRef;
+                    authorEdge.FileNode = authorRef;
                     authorEdge.AuthorSphere = authorSphere;
-                    authorEdge.Churn = churn;
+                    authorEdge.Width = Mathf.Clamp((float)churn / maximalChurn,
+                                                    Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
+                                                    Settings.EdgeLayoutSettings.EdgeWidth);
+                    authorEdge.Draw();
 
                     authorSphere.Edges.Add(authorToFileLine);
 
@@ -276,35 +275,6 @@ namespace SEE.Game.CityRendering
                     }
                 }
             }
-
-            // Draws a line between the center of fromAuthor and the roof center of toFile.
-            // The LineRenderer representing the line will be added to authorToFileLine.
-            void CreateLine(GameObject authorToFileLine, GameObject fromAuthor, GameObject toFile, float lineWidth)
-            {
-                LineRenderer line = authorToFileLine.AddComponent<LineRenderer>();
-
-                Color edgeColor = fromAuthor.GetComponent<Renderer>().sharedMaterial.color;
-                Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
-                material.shader = Shader.Find("Standard");
-                line.sharedMaterial = material;
-
-                LineFactory.SetDefaults(line);
-
-                LineFactory.SetWidth(line, (float)Mathf.Clamp(lineWidth,
-                                                              Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
-                                                              Settings.EdgeLayoutSettings.EdgeWidth));
-
-                line.useWorldSpace = false;
-
-                SEESpline spline = authorToFileLine.AddComponent<SEESpline>();
-                BSpline bSpline = CreateSpline(fromAuthor.transform.position, toFile.GetRoofCenter());
-                spline.Spline = bSpline;
-                spline.GradientColors = (edgeColor, edgeColor);
-
-                Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
-                line.positionCount = positions.Length; // number of vertices
-                line.SetPositions(positions);
-            }
         }
 
         /// <summary>
@@ -327,23 +297,6 @@ namespace SEE.Game.CityRendering
                 }
             }
             return max;
-        }
-
-        /// <summary>
-        /// Creates <see cref="BSpline"/> connecting two points.
-        /// </summary>
-        /// <param name="start">The start point.</param>
-        /// <param name="end">The end point.</param>
-        /// <returns>A <see cref="BSpline"/> instance connecting two points.</returns>
-        private BSpline CreateSpline(Vector3 start, Vector3 end)
-        {
-            Vector3[] points = new Vector3[2];
-            points[0] = start;
-            points[1] = end;
-            return new BSpline(2, 3, 1)
-            {
-                ControlPoints = TinySplineInterop.VectorsToList(points)
-            };
         }
     }
 }

@@ -119,7 +119,7 @@ namespace SEE.Controls.Actions
             {
                 bool hasAuthorEdge = edge.TryGetComponent(out AuthorEdge authorEdge);
                 // Only show edges in which the author threshold is not reached.
-                bool belowThreshold = hasAuthorEdge && authorEdge.TargetNode.Edges.Count < branchCity.AuthorThreshold;
+                bool belowThreshold = hasAuthorEdge && authorEdge.FileNode.Edges.Count < branchCity.AuthorThreshold;
                 // Or if ShowOnHover was set as strategy.
                 bool showOnHover = branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover;
 
