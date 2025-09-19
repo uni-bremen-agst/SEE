@@ -34,8 +34,8 @@ namespace SEE.Game.CityRendering
         /// <param name="graph">The graph which was rendered.</param>
         public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
-            IList<GameObject> gameSpheresObjects = RenderSpheres(nodeMap, parent, graph);
-            RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
+            IList<GameObject> gameSpheresObjects = RenderAuthors(nodeMap, parent, graph);
+            RenderEdges(nodeMap, gameSpheresObjects, parent);
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace SEE.Game.CityRendering
         /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
         /// <param name="graph">The graph which was rendered.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
+        private IList<GameObject> RenderAuthors(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
             /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> separated by commas.
@@ -170,7 +170,7 @@ namespace SEE.Game.CityRendering
         /// <param name="nodeMap">A mapping from the graph file nodes to the gameobject.</param>
         /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
-        private void RenderEdgesForSpheres
+        private void RenderEdges
                        (IDictionary<Node, GameObject> nodeMap,
                         IEnumerable<GameObject> spheresObjects,
                         GameObject parent)
