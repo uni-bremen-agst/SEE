@@ -44,7 +44,7 @@ namespace SEE.VCS
         /// <remarks>Can be null.</remarks>
         [OdinSerialize]
         [ShowInInspector, ListDrawerSettings(ShowItemCount = true),
-        Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
+         Tooltip("Path globbings and whether they are inclusive (true) or exclusive (false)."),
          HideReferenceObjectPicker]
          public Globbing Globbing = new()
          {
@@ -72,10 +72,14 @@ namespace SEE.VCS
         /// in <see cref="RepositoryPaths"/> to pass the filter.
         /// </summary>
         /// <remarks>Can be null.</remarks>
+        [Tooltip("Directory paths relative to the root of the repository, where the forward slash is used as a delimiter between directories. "
+            + "If this value is null or empty, the files of all subdirectories in the repository will be considered. "
+            + "Otherwise, a file must exist in one of the subdirectories specified by this attribute to pass the filter.")]
         public string[] RepositoryPaths;
 
         /// <summary>
-        /// The set of branches whose files are to be considered.
+        /// The set of branches whose files are to be considered. The comparison is made against the
+        /// friendly name of a branch.
         ///
         /// If null or empty, all currently existing branches will be considered. Otherwise
         /// only files that exist in at least one of those branches will pass the filter.
@@ -83,6 +87,11 @@ namespace SEE.VCS
         /// The names in this set can be regular expressions.
         /// </summary>
         /// <remarks>Can be null.</remarks>
+        [Tooltip("The set of branches whose files are to be considered. "
+            + "If null or empty, all currently existing branches will be considered. "
+            + "Otherwise only files that exist in at least one of those branches will pass the filter. "
+            + "The names in this set can be regular expressions. "
+            + "The comparison is made against the friendly name of a branch.")]
         public HashSet<string> Branches;
 
         /// <summary>

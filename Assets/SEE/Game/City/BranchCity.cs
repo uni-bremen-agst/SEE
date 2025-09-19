@@ -127,14 +127,14 @@ namespace SEE.Game.City
         /// <summary>
         /// Label of attribute <see cref="AuthorThreshold"/> in the configuration file.
         /// </summary>
-        private const string suthorThresholdLabel = "AuthorThreshold";
+        private const string authorThresholdLabel = "AuthorThreshold";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
             writer.Save(ShowAuthorEdgesStrategy.ToString(), showEdgesStrategy);
-            writer.Save(AuthorThreshold, suthorThresholdLabel);
+            writer.Save(AuthorThreshold, authorThresholdLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -142,7 +142,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
             ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref ShowAuthorEdgesStrategy);
-            ConfigIO.Restore(attributes, suthorThresholdLabel, ref AuthorThreshold);
+            ConfigIO.Restore(attributes, authorThresholdLabel, ref AuthorThreshold);
         }
 
         #endregion

@@ -57,7 +57,7 @@ namespace SEE.Game.CityRendering
         /// This method should be called after the sphere where rendered.
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="spheresObjects">A list of the previous rendered spheres.</param>
+        /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> spheresObjects, GameObject parent)
@@ -139,23 +139,38 @@ namespace SEE.Game.CityRendering
                         switch (branchCity.ShowAuthorEdgesStrategy)
                         {
                             case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-
-                                if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
                                 {
-                                    // Show only edges for nodes with multiple authors.
-                                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
+                                if (Application.isPlaying)
+                                {
+                                    // The containing method may be called in the Unity editor, but hiding the edges
+                                    // only makes sense when the game is running. Moreover, hiding the edges in the editor
+                                    // may even lead to exceptions because the city's BaseAnimationDuration will be queried
+                                    // but the city is set only OnEnable of the edge operator.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+
+                                    if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                                     {
-                                        edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                        // Show only edges for nodes with multiple authors.
+                                        foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                        {
+                                            edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                        }
                                     }
                                 }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowOnHover:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
+                                {
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
+                                if (Application.isPlaying)
+                                {
+                                    // See above. Must not be run in editor mode.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowAlways:
                                 break; // nothing to do here, edges are always shown
