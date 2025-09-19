@@ -555,7 +555,7 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
         [Tooltip("Loads the layout and applies it to the city.")]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
-        public async UniTask LoadLayout()
+        public void LoadLayout()
         {
             if (!IsGraphDrawn)
             {
@@ -625,7 +625,7 @@ namespace SEE.Game.City
             LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
 
             await DrawGraphAsync(LoadedGraph);
-            await LoadLayout();
+            LoadLayout();
         }
         #endregion Save/Load Snapshot
 
