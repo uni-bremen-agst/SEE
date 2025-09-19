@@ -639,7 +639,7 @@ namespace SEE.VCS
         /// <param name="tree">the root tree</param>
         /// <param name="repositoryPath">relative path of descendants nested in <paramref name="tree"/></param>
         /// <returns>the subtree or null if it does not exist</returns>
-        private LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
+        private static LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
         {
             TreeEntry result = tree[repositoryPath];
             if (result == null)
