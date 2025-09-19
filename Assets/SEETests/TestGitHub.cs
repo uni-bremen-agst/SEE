@@ -23,17 +23,21 @@ namespace SEE.VCS
         }
 
         /// <summary>
+        /// Access token for the GitHub repository at <see cref="repositoryUrl"/>.
+        /// ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
+        /// </summary>
+        private const string accessToken = "";
+
+        /// <summary>
         /// Clones the repository at <see cref="repositoryUrl"/> into a temporary directory.
         /// </summary>
         private static void CloneGitHub()
         {
-            // ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
-            string accessToken = "";
             string localPath = LocalPath(repositoryUrl);
             DeleteDirectoryIfItExists(localPath);
 
-            using GitRepository repo = new(new DataPath(localPath), null);
-            repo.Clone(repositoryUrl, accessToken);
+            using GitRepository repo = new(new DataPath(localPath), null, accessToken);
+            repo.Clone(repositoryUrl);
         }
 
         /// <summary>
@@ -51,7 +55,7 @@ namespace SEE.VCS
                 // We need the using block to ensure that repo is disposed, otherwise
                 // the subsequent deletion of the directory may fail because the
                 // repo still has files open.
-                using GitRepository repo = new(new DataPath(localPath), null);
+                using GitRepository repo = new(new DataPath(localPath), null, accessToken);
                 repo.FetchRemotes();
             }
             DeleteDirectoryIfItExists(localPath);
