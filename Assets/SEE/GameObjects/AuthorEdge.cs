@@ -6,6 +6,7 @@ namespace SEE.GameObjects
     /// Attribute of an author edge connecting an <see cref="AuthorSphere"/>
     /// to <see cref="AuthorRef"/>.
     /// </summary>
+    /// <remarks>This component will be attached to connections between authors and their edited files.</remarks>
     public class AuthorEdge : SerializedMonoBehaviour
     {
         /// <summary>
