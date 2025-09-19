@@ -11,8 +11,10 @@ using UnityEngine;
 namespace SEE.Controls.Actions
 {
     /// <summary>
-    /// This action shows/animates edges connecting authors spheres and nodes when the user hovers over them.
-    /// This script can be added to both AuthorSpheres and nodes.
+    /// This action shows/animates edges connecting authors spheres and nodes when
+    /// the user hovers over them.
+    /// This script can be added to both <see cref="AuthorSphere"/>s and game objects
+    /// representing graph nodes (aka game nodes).
     /// </summary>
     internal class ShowAuthorEdges : InteractableObjectAction, IDisposable
     {
@@ -117,7 +119,7 @@ namespace SEE.Controls.Actions
             {
                 bool hasAuthorEdge = edge.TryGetComponent(out AuthorEdge authorEdge);
                 // Only show edges in which the author threshold is not reached.
-                bool belowThreshold = hasAuthorEdge && authorEdge.targetNode.Edges.Count < branchCity.AuthorThreshold;
+                bool belowThreshold = hasAuthorEdge && authorEdge.TargetNode.Edges.Count < branchCity.AuthorThreshold;
                 // Or if ShowOnHover was set as strategy.
                 bool showOnHover = branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover;
 
