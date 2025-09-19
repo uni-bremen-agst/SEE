@@ -16,7 +16,7 @@ namespace SEE.GameObjects
         public ISet<GameObject> AuthorSpheres = new HashSet<GameObject>();
 
         /// <summary>
-        /// A list of tuples of edges to author spheres and the churn of the author of this specific file.
+        /// The edges to the authors of this specific file.
         /// </summary>
         public IList<(GameObject, int)> Edges = new List<(GameObject, int)>();
     }
