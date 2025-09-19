@@ -96,33 +96,12 @@ namespace SEE.Game.CityRendering
                         return result;
                     }
 
-                    // FIXME: We need to add a collider.
-                    GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    gameObject.name = "AuthorSphere:" + authors[currentAuthor];
-
-                    AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
-                    author.Author = authors[currentAuthor];
-
-                    // FIXME
-                    //gameObject.AddComponent<NodeRef>().Value = rootNode;
-
-                    // FIXME
-                    //gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowAuthorEdges>();
-
-                    Vector3 startLabelPosition = gameObject.GetTop();
-
-                    AddLabel(authors, parent, currentAuthor, materials, gameObject, startLabelPosition);
-
-                    AddLOD(gameObject);
-
                     // Calculate the position of the sphere.
-                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
+                    Vector3 position = new(i * spacingX - (parentRenderer.bounds.size.x / 2),
+                                           parentRenderer.bounds.size.y + 1.2f, // FIXME: Calcualte height based on city height.
+                                           j * spacingZ - (parentRenderer.bounds.size.z / 2));
 
-                    gameObject.transform.position
-                        = new Vector3(xPos,
-                                      parentRenderer.bounds.size.y + 1.2f, zPos) + parent.transform.position;
+                    GameObject gameObject = CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), position);
 
                     result.Add(gameObject);
                     currentAuthor++;
@@ -132,10 +111,9 @@ namespace SEE.Game.CityRendering
             return result;
 
             // Adds a label with the authors email which will float above the sphere.
-            static void AddLabel(IList<FileAuthor> authors, GameObject parent, int currentAuthor, Materials materials,
-                                 GameObject gameObject, Vector3 startLabelPosition, float fontSize = 2f)
+            static GameObject AddLabel(FileAuthor author, Vector3 startLabelPosition, float fontSize = 2f)
             {
-                GameObject nodeLabel = new("Text " + authors[currentAuthor])
+                GameObject nodeLabel = new("Text " + author)
                 {
                     tag = Tags.Text
                 };
@@ -144,21 +122,49 @@ namespace SEE.Game.CityRendering
                 TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
                 tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
                 tm.fontSize = fontSize;
-                tm.text = authors[currentAuthor].Name;
+                tm.text = author.Name;
                 tm.color = Color.white;
                 tm.alignment = TextAlignmentOptions.Center;
 
-                nodeLabel.name = "Label:" + authors[currentAuthor];
+                nodeLabel.name = "Label:" + author;
                 nodeLabel.AddComponent<FaceCamera>();
-                nodeLabel.transform.SetParent(gameObject.transform);
 
-                Renderer renderer = gameObject.GetComponent<Renderer>();
-                Material mat = materials.Get(0, currentAuthor);
+                return nodeLabel;
+            }
+
+            GameObject CreateAuthor (GameObject parent, FileAuthor author, Material material, Vector3 position)
+            {
+                // FIXME: We need to add a collider.
+                GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                result.name = "AuthorSphere:" + author;
+
+                AuthorSphere authorSphere = result.AddComponent<AuthorSphere>();
+                authorSphere.Author = author;
+
+                // FIXME
+                //gameObject.AddComponent<NodeRef>().Value = rootNode;
+
+                // FIXME
+                //gameObject.AddComponent<InteractableObject>();
+                result.AddComponent<ShowAuthorEdges>();
+
+                Vector3 startLabelPosition = result.GetTop();
+
+                GameObject label = AddLabel(author, startLabelPosition);
+                label.transform.SetParent(result.transform);
+
+                result.transform.SetParent(parent.transform);
+                result.transform.localScale *= 0.25f;
+
+                Renderer renderer = result.GetComponent<Renderer>();
                 // Override shader so the spheres don't clip over the code city.
-                mat.shader = Shader.Find("Standard");
-                renderer.sharedMaterial = mat;
-                gameObject.transform.SetParent(parent.transform);
-                gameObject.transform.transform.localScale *= 0.25f;
+                material.shader = Shader.Find("Standard");
+                renderer.sharedMaterial = material;
+
+                AddLOD(result);
+
+                result.transform.position = position + parent.transform.position;
+                return result;
             }
         }
 
