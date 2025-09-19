@@ -1,9 +1,9 @@
 ﻿using LibGit2Sharp;
-using UnityEngine;
 using NUnit.Framework;
 using SEE.Utils;
 using System.IO;
 using System.Linq;
+using UnityEngine;
 
 namespace SEE.VCS
 {
@@ -46,6 +46,40 @@ namespace SEE.VCS
             new("https://github.com/koschke/TestProjectForSEE.git",
                 ""); // ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
 
+        /// <summary>
+        /// This test shows how to set up a credential provider for LibGit2Sharp.
+        /// </summary>
+        [Test]
+        public void TestCredentialProvider()
+        {
+            string localRepoPath = LocalPath(TestRepo.Url);
+            DeleteDirectoryIfItExists(localRepoPath);
+
+            try
+            {
+                CloneOptions options = new();
+
+                options.FetchOptions.CredentialsProvider = (_url, _user, _types) =>
+                        new UsernamePasswordCredentials
+                        {
+                            Username = TestRepo.AccessToken,
+                            Password = string.Empty
+                        };
+
+                Repository.Clone(TestRepo.Url, localRepoPath, options);
+                // Exists and is not empty.
+                Assert.IsTrue(Directory.Exists(localRepoPath)
+                    && Directory.EnumerateFileSystemEntries(localRepoPath).Any());
+            }
+            catch (LibGit2SharpException)
+            {
+                throw;
+            }
+            finally
+            {
+                DeleteDirectoryIfItExists(localRepoPath);
+            }
+        }
 
         [Test]
         public void TestCloneTestRepo()
@@ -77,7 +111,7 @@ namespace SEE.VCS
         [Test]
         public void TestCloneAndFetchTestRepo()
         {
-            TestCloneAndFetchRepo(TestRepo, false);
+            TestCloneAndFetchRepo(TestRepo, true);
         }
 
         /// <summary>
