@@ -118,7 +118,6 @@ namespace SEE.VCS
         [TearDown]
         public static void TearDown()
         {
-            return;
             DeleteDirectoryIfItExists(originalRepoPath);
             DeleteDirectoryIfItExists(cloneRepoPath);
         }
