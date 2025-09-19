@@ -18,6 +18,6 @@ namespace SEE.GameObjects
         /// <summary>
         /// The edges to the authors of this specific file.
         /// </summary>
-        public IList<(GameObject, int)> Edges = new List<(GameObject, int)>();
+        public IList<GameObject> Edges = new List<GameObject>();
     }
 }

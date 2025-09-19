@@ -220,7 +220,7 @@ namespace SEE.Game.CityRendering
 
                     AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSpheres.Add(sphere);
-                    authorRef.Edges.Add((authorToFileLine, churn));
+                    authorRef.Edges.Add(authorToFileLine);
 
                     AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
                     authorEdge.TargetNode = authorRef;
@@ -249,7 +249,7 @@ namespace SEE.Game.CityRendering
                                     if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                                     {
                                         // Show only edges for nodes with multiple authors.
-                                        foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                        foreach (GameObject edge in authorRef.Edges)
                                         {
                                             edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
                                         }

@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                foreach (GameObject edge in authorRef.Edges)
                 {
                     edge.EdgeOperator()?.ShowOrHide(show, animationKind);
                 }
