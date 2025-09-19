@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -7,6 +5,9 @@ using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using TinySpline;
 using TMPro;
 using UnityEngine;
@@ -186,8 +187,12 @@ namespace SEE.Game.CityRendering
             foreach (GameObject sphere in spheresObjects)
             {
                 AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
+                // The author represented by the current sphere.
                 FileAuthor authorName = authorSphere.Author;
 
+                // Collect all (file) nodes the current author has contributed to.
+                // Maps from the graph node (a file) onto the game object representing the (file) node.
+                // FIXME: Looks like this can be simplified and optimized.
                 IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
                     .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
@@ -195,53 +200,33 @@ namespace SEE.Game.CityRendering
 
                 foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
                 {
-                    BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.GetRoofCenter());
-                    int churn = nodeOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
-
-                    GameObject gameEdge = new()
+                    // The game object representing the edge between the author and the file.
+                    GameObject authorToFileLine = new()
                     {
                         tag = Tags.Edge,
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
                         name = authorName + ":" + nodeOfAuthor.Key.ID
                     };
-                    gameEdge.transform.parent = parent.transform;
+                    // It will be the child of parent.
+                    authorToFileLine.transform.parent = parent.transform;
 
-                    LineRenderer line = gameEdge.AddComponent<LineRenderer>();
+                    // Specific churn of the current author for the current sphere.
+                    int churn = nodeOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
-                    Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
-                    Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
-                    material.shader = Shader.Find("Standard");
-                    line.sharedMaterial = material;
+                    CreateLine(authorToFileLine, sphere, nodeOfAuthor.Value, (float)churn / maximalChurn);
 
-                    LineFactory.SetDefaults(line);
-                    float width = Mathf.Clamp((float)churn / maximalChurn,
-                                              Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
-                                              Settings.EdgeLayoutSettings.EdgeWidth);
-
-                    LineFactory.SetWidth(line, width);
-
-                    line.useWorldSpace = false;
-
-                    SEESpline spline = gameEdge.AddComponent<SEESpline>();
-                    spline.Spline = bSpline;
-                    spline.GradientColors = (edgeColor, edgeColor);
-
-                    Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
-                    line.positionCount = positions.Length; // number of vertices
-                    line.SetPositions(positions);
-
-                    AddLOD(gameEdge);
+                    AddLOD(authorToFileLine);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSpheres.Add(sphere);
-                    authorRef.Edges.Add((gameEdge, churn));
+                    authorRef.Edges.Add((authorToFileLine, churn));
 
-                    AuthorEdge authorEdge = gameEdge.AddComponent<AuthorEdge>();
+                    AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
                     authorEdge.targetNode = authorRef;
                     authorEdge.authorSphere = authorSphere;
 
-                    authorSphere.Edges.Add((gameEdge, churn));
+                    authorSphere.Edges.Add((authorToFileLine, churn));
 
                     if (Settings is BranchCity branchCity)
                     {
@@ -258,7 +243,7 @@ namespace SEE.Game.CityRendering
                                     // only makes sense when the game is running. Moreover, hiding the edges in the editor
                                     // may even lead to exceptions because the city's BaseAnimationDuration will be queried
                                     // but the city is set only OnEnable of the edge operator.
-                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                    authorToFileLine.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
 
                                     if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
                                     {
@@ -278,7 +263,7 @@ namespace SEE.Game.CityRendering
                                 if (Application.isPlaying)
                                 {
                                     // See above. Must not be run in editor mode.
-                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                    authorToFileLine.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
                                 }
                                 break;
                             case ShowAuthorEdgeStrategy.ShowAlways:
@@ -290,6 +275,35 @@ namespace SEE.Game.CityRendering
                         }
                     }
                 }
+            }
+
+            // Draws a line between the center of fromAuthor and the roof center of toFile.
+            // The LineRenderer representing the line will be added to authorToFileLine.
+            void CreateLine(GameObject authorToFileLine, GameObject fromAuthor, GameObject toFile, float lineWidth)
+            {
+                LineRenderer line = authorToFileLine.AddComponent<LineRenderer>();
+
+                Color edgeColor = fromAuthor.GetComponent<Renderer>().sharedMaterial.color;
+                Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
+                material.shader = Shader.Find("Standard");
+                line.sharedMaterial = material;
+
+                LineFactory.SetDefaults(line);
+
+                LineFactory.SetWidth(line, (float)Mathf.Clamp(lineWidth,
+                                                              Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
+                                                              Settings.EdgeLayoutSettings.EdgeWidth));
+
+                line.useWorldSpace = false;
+
+                SEESpline spline = authorToFileLine.AddComponent<SEESpline>();
+                BSpline bSpline = CreateSpline(fromAuthor.transform.position, toFile.GetRoofCenter());
+                spline.Spline = bSpline;
+                spline.GradientColors = (edgeColor, edgeColor);
+
+                Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
+                line.positionCount = positions.Length; // number of vertices
+                line.SetPositions(positions);
             }
         }
 
