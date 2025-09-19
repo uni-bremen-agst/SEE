@@ -80,11 +80,20 @@ namespace SEE.VCS
         public Filter VCSFilter = new();
 
         /// <summary>
+        /// The access token for accessing the repository, if needed.
+        /// </summary>
+        /// <remarks>This attribute is not saved into the configuration file
+        /// because of security reasons.</remarks>
+        [Tooltip("Access token for accessing the repository, if needed."),
+         RuntimeTab(graphProviderFoldoutGroup)]
+        public string AccessToken = "";
+
+        /// <summary>
         /// Constructor setting default values for the fields.
         /// </summary>
         public GitRepository()
         {
-            // Intentionally left blank.
+            // Intentionally left empty.
         }
 
         /// <summary>
@@ -92,24 +101,37 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryPath">path to the repository</param>
         /// <param name="filter">the filter to be used to retrieve the relevant files from the repository</param>
-        public GitRepository(DataPath repositoryPath, Filter filter)
+        /// <param name="accessToken">the access token for this repository if needed</param>
+        public GitRepository(DataPath repositoryPath, Filter filter, string accessToken = null)
         {
             RepositoryPath = repositoryPath ??
                 throw new ArgumentNullException(nameof(repositoryPath), "Repository path must not be null.");
             VCSFilter = filter;
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                this.AccessToken = accessToken;
+            }
         }
 
         /// <summary>
         /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
         /// </summary>
         /// <param name="url">URL for the repository</param>
-        /// <param name="accessToken">the access token for the repository</param>
-        /// <exception cref="Exception"></exception>
-        public void Clone(string url, string accessToken)
+        /// <exception cref="Exception">thrown in case of a Git cloning problem</exception>
+        public void Clone(string url)
         {
             try
             {
-                Debug.Log($"Cloned into {Repository.Clone(MergeToken(url, accessToken), RepositoryPath.Path, new CloneOptions())}\n");
+                CloneOptions options = new();
+
+                options.FetchOptions.CredentialsProvider = (_url, _user, _types) =>
+                        new UsernamePasswordCredentials
+                        {
+                            Username = AccessToken,
+                            Password = string.Empty
+                        };
+
+                Debug.Log($"Cloned into {Repository.Clone(url, RepositoryPath.Path, options)}\n");
             }
             catch (LibGit2SharpException e)
             {
@@ -117,18 +139,6 @@ namespace SEE.VCS
                        ($"Error while cloning repository from {url} into path {RepositoryPath.Path}: {e.Message}.\n");
             }
         }
-
-        /// <summary>
-        /// Returns the <paramref name="url"/> with the added <paramref name="accessToken"/>.
-        ///
-        /// For instance, MergeToken("https://github.com/koschke/TestProjectForSEE.git", "mytoken")
-        /// yields "https://mytoken@github.com/koschke/TestProjectForSEE.git".
-        /// </summary>
-        /// <param name="url">URL to the repository; must start with https://</param>
-        /// <param name="accessToken">access token to be added</param>
-        /// <returns><paramref name="url"/> where <paramref name="accessToken"/> has
-        /// been added</returns>
-        private static string MergeToken(string url, string accessToken) => url.Replace("https://", $"https://{accessToken}@");
 
         /// <summary>
         /// Creates a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>
@@ -173,7 +183,15 @@ namespace SEE.VCS
                     // They reside on remote-tracking branches (remotes/origin/main).
                     // Option Prune=true removes any remote-tracking references that no longer exist on the remote.
                     //Debug.Log($"Fetching remote {remote.Name} for repository path {RepositoryPath.Path}.\n");
-                    Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions() { Prune = true}, "");
+                    Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions()
+                    {
+                        Prune = true,
+                        CredentialsProvider = (_url, _user, _types) => new UsernamePasswordCredentials
+                        {
+                            Username = AccessToken,
+                            Password = string.Empty
+                        }
+                    }, "");
 
                     Dictionary<string, string> newBranches = GetBranches(repository);
                     //Print(currentBranches, "new");
@@ -221,6 +239,7 @@ namespace SEE.VCS
             }
             return result;
 
+            // Returns a dictionary mapping the canonical name of each remote branch onto the SHA of its tip.
             static Dictionary<string, string> GetBranches(Repository repository)
             {
                 Dictionary<string, string> remoteBranches = new();
@@ -232,6 +251,7 @@ namespace SEE.VCS
                 return remoteBranches;
             }
 
+            // Prints the given branches. For debugging only.
             static void Print(Dictionary<string, string> branches, string message)
             {
                 Debug.Log($"The {message} branches are:\n");
