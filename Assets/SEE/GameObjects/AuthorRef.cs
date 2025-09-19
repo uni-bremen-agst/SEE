@@ -5,7 +5,8 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// Reference to all author spheres and edges of a node.
+    /// Reference to all author spheres and edges of a file game node.
+    /// This component will be attached to all file game nodes.
     /// </summary>
     public class AuthorRef : SerializedMonoBehaviour
     {
