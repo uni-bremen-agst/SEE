@@ -5,16 +5,11 @@ using UnityEngine;
 namespace SEE.GameObjects
 {
     /// <summary>
-    /// Reference to all author spheres and edges of a file game node.
+    /// Holds the connections of a file all its authors.
     /// This component will be attached to all file game nodes.
     /// </summary>
     public class AuthorRef : SerializedMonoBehaviour
     {
-        /// <summary>
-        /// A list of author-sphere game objects which contributed to that file.
-        /// </summary>
-        public ISet<GameObject> AuthorSpheres = new HashSet<GameObject>();
-
         /// <summary>
         /// The edges to the authors of this specific file.
         /// </summary>

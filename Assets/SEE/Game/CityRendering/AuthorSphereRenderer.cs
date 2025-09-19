@@ -219,7 +219,6 @@ namespace SEE.Game.CityRendering
                     AddLOD(authorToFileLine);
 
                     AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
-                    authorRef.AuthorSpheres.Add(sphere);
                     authorRef.Edges.Add(authorToFileLine);
 
                     AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
@@ -246,7 +245,7 @@ namespace SEE.Game.CityRendering
                                     // but the city is set only OnEnable of the edge operator.
                                     authorToFileLine.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
 
-                                    if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                    if (authorRef.Edges.Count >= branchCity.AuthorThreshold)
                                     {
                                         // Show only edges for nodes with multiple authors.
                                         foreach (GameObject edge in authorRef.Edges)
