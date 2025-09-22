@@ -20,8 +20,8 @@ namespace SEE.Controls
     /// <summary>
     /// InteractableObject components can be attached to different kinds of objects such as game
     /// nodes or edges but also markers or scroll views in metric charts. A HoverFlag indicates
-    /// to which kind of game object the hovering event relates to. A HoverFlag is used as a single bit
-    /// that occurs in hovering flags.
+    /// to which kind of game object the hovering event relates to. A HoverFlag is used as a
+    /// single bit that occurs in hovering flags.
     /// </summary>
     public enum HoverFlag
     {
@@ -126,13 +126,16 @@ namespace SEE.Controls
         /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
         /// If the bit is set, this <see cref="InteractableObject"/> is to be considered hovered over for interaction
-        /// events in the respective scope of interactable objects. For instance, if this <see cref="InteractableObject"/>
-        /// is attached to a game object representing a graph node in a code city, then <see cref="HoverFlag.World"/>
-        /// would be set and whenever a hovering event occurs relating to <see cref="HoverFlag.World"/> objects,
-        /// the graph node will be considered being hovered over. If instead this <see cref="InteractableObject"/>
-        /// is attached to a marker in a metric chart, then <see cref="HoverFlag.ChartMarker"/> will be set.
-        /// If a hovering event occurs relating to <see cref="HoverFlag.World"/> objects, the marker will not
-        /// be considered being hovered over.
+        /// events in the respective scope of interactable objects.
+        ///
+        /// For instance, if this <see cref="InteractableObject"/> is attached to a game object representing
+        /// a graph element in a code city, then <see cref="HoverFlag.World"/> would be set and whenever
+        /// a hovering event occurs relating to <see cref="HoverFlag.World"/> objects, the graph element
+        /// will be considered being hovered over.
+        ///
+        /// If instead this <see cref="InteractableObject"/> is attached to a marker in a metric chart, then
+        /// <see cref="HoverFlag.ChartMarker"/> will be set. If a hovering event occurs relating
+        /// to <see cref="HoverFlag.World"/> objects, the marker will not be considered being hovered over.
         /// </summary>
         public uint HoverFlags { get; private set; } = 0;
 
@@ -329,12 +332,6 @@ namespace SEE.Controls
                 HoveredObjects.Remove(this);
                 if ((prevHoverFlags & (uint)HoverFlag.World) != 0)
                 {
-                    // FIXME: This assertion is often violated. I (RK) don't know why. This needs further
-                    // investigation.
-                    //if (HoveredObjectWithWorldFlag != null)
-                    //{
-                    //    Debug.LogWarning($"HoveredObjectWithWorldFlag was expected to be null.\n.");
-                    //}
                     HoveredObjectWithWorldFlag = null;
                 }
             }
