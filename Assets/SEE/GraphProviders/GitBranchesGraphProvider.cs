@@ -10,7 +10,6 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.VCS;
 using Sirenix.OdinInspector;
-using Sirenix.Utilities;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -75,11 +74,6 @@ namespace SEE.GraphProviders
             if (!SEEDate.IsValid(branchCity.Date))
             {
                 throw new ArgumentException($"Date is impossible or cannot be parsed. Expected: {SEEDate.DateFormat} Actual: {branchCity.Date}");
-            }
-
-            if (branchCity.VCSPath.Path.IsNullOrWhitespace() || !Directory.Exists(branchCity.VCSPath.Path))
-            {
-                throw new ArgumentException("Repository path is not set or does not exist.");
             }
         }
 
