@@ -40,6 +40,17 @@ namespace SEE.GameObjects
 
             LineFactory.Draw(gameObject, linePoints, Width, authorMaterial);
         }
+
+        /// <summary>
+        /// Sets the visibility of the edge.
+        /// </summary>
+        /// <param name="show">whether to show the line</param>
+        internal void ShowOrHide(bool show)
+        {
+            if (TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.enabled = show;
+            }
+        }
     }
 }
-

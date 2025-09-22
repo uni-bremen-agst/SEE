@@ -98,17 +98,12 @@ namespace SEE.Controls.Actions
         /// Toggles the visibility of author edges for an author sphere.
         /// </summary>
         /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
-        /// <param name="animationKind">Animation kind to use (will be set by <see cref="BranchCity"/>).</param>
         /// <param name="sphere">The <see cref="AuthorSphere"/> the user hovers over.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
-        /// <param name="token">Cancelation token.</param>
-        /// <returns>Returns an empty task.</returns>
-        private async Task ToggleAuthorEdgesForAuthorSphereAsync
+        private void ToggleAuthorEdgesForAuthorSphere
             (bool show,
-            EdgeAnimationKind animationKind,
-            AuthorSphere sphere,
-            BranchCity branchCity,
-            CancellationToken token)
+             AuthorSphere sphere,
+             BranchCity branchCity)
         {
             if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAlways)
             {
@@ -117,27 +112,20 @@ namespace SEE.Controls.Actions
 
             foreach (GameObject edge in sphere.Edges)
             {
-                bool hasAuthorEdge = edge.TryGetComponent(out AuthorEdge authorEdge);
-                // Only show edges in which the author threshold is not reached.
-                bool belowThreshold = hasAuthorEdge && authorEdge.FileNode.Edges.Count < branchCity.AuthorThreshold;
-                // Or if ShowOnHover was set as strategy.
-                bool showOnHover = branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover;
-
-                if (belowThreshold || showOnHover)
+                if (edge.TryGetComponent(out AuthorEdge authorEdge))
                 {
-                    edge.EdgeOperator()?.ShowOrHide(show, animationKind);
+                    // Only show edges in which the author threshold is not reached.
+                    bool belowThreshold = authorEdge.FileNode.Edges.Count < branchCity.AuthorThreshold;
+                    // Or if ShowOnHover was set as strategy.
+                    bool showOnHover = branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover;
+
+                    if (belowThreshold || showOnHover)
+                    {
+                        authorEdge.ShowOrHide(show);
+                    }
                 }
             }
-            if (show)
-            {
-                await UniTask.Delay(ShowEdges.TransitiveDelay, cancellationToken: token);
-            }
-            if (token.IsCancellationRequested)
-            {
-                return;
-            }
         }
-
 
         /// <summary>
         /// Toggles the visibility of author edges of the node or the author sphere the user hovers over.
@@ -147,18 +135,18 @@ namespace SEE.Controls.Actions
         /// <param name="token">Cancelation token.</param>
         /// <param name="branchCity">Configuration of the code city.</param>
         /// <returns>Returns an empty task.</returns>
-        private async UniTask ToggleAuthorEdgesAsync(bool show, EdgeAnimationKind animationKind, CancellationToken token, BranchCity branchCity)
+        private async UniTask ToggleAuthorEdgesAsync
+            (bool show, EdgeAnimationKind animationKind, CancellationToken token, BranchCity branchCity)
         {
-            // When the user hovers over a graph node
             if (gameObject.TryGetComponent(out AuthorRef authorRef))
             {
+                // When the user hovers over a graph game node
                 await ToggleAuthorEdgesForNodeAsync(show, animationKind, authorRef, branchCity, token);
             }
-
-            // When the user hovers over an AuthorSphere.
             else if (gameObject.TryGetComponent(out AuthorSphere sphere))
             {
-                await ToggleAuthorEdgesForAuthorSphereAsync(show, animationKind, sphere, branchCity, token);
+                // When the user hovers over an AuthorSphere.
+                ToggleAuthorEdgesForAuthorSphere(show, sphere, branchCity);
             }
         }
 
