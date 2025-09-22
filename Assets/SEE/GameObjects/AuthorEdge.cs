@@ -1,7 +1,5 @@
 using SEE.GO;
-using SEE.Utils;
 using Sirenix.OdinInspector;
-using TinySpline;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -33,46 +31,14 @@ namespace SEE.GameObjects
         /// </summary>
         internal void Draw()
         {
-            LineRenderer line = gameObject.AddOrGetComponent<LineRenderer>();
+            // The edge inherits the material of the AuthorSphere.
+            Material authorMaterial = AuthorSphere.gameObject.GetComponent<Renderer>().sharedMaterial;
 
-            Color edgeColor = FileNode.gameObject.GetComponent<Renderer>().sharedMaterial.color;
-            Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
-            material.shader = Shader.Find("Standard");
-            line.sharedMaterial = material;
+            Vector3[] linePoints = new Vector3[2];
+            linePoints[0] = AuthorSphere.gameObject.transform.position;
+            linePoints[1] = FileNode.gameObject.GetRoofCenter();
 
-            LineFactory.SetDefaults(line);
-
-            LineFactory.SetWidth(line, Width);
-
-            line.useWorldSpace = false;
-
-            SEESpline spline = gameObject.AddComponent<SEESpline>();
-            BSpline bSpline = CreateSpline(AuthorSphere.gameObject.transform.position, FileNode.gameObject.GetRoofCenter());
-            spline.Spline = bSpline;
-            spline.GradientColors = (edgeColor, edgeColor);
-
-            Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
-            line.positionCount = positions.Length; // number of vertices
-            line.SetPositions(positions);
-
-            return;
-
-            /// <summary>
-            /// Creates <see cref="BSpline"/> connecting two points.
-            /// </summary>
-            /// <param name="start">The start point.</param>
-            /// <param name="end">The end point.</param>
-            /// <returns>A <see cref="BSpline"/> instance connecting two points.</returns>
-            static BSpline CreateSpline(Vector3 start, Vector3 end)
-            {
-                Vector3[] points = new Vector3[2];
-                points[0] = start;
-                points[1] = end;
-                return new BSpline(2, 3, 1)
-                {
-                    ControlPoints = TinySplineInterop.VectorsToList(points)
-                };
-            }
+            LineFactory.Draw(gameObject, linePoints, Width, authorMaterial);
         }
     }
 }
