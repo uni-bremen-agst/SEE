@@ -1,5 +1,4 @@
 using SEE.Game;
-using SEE.Game.SceneManipulation;
 using UnityEngine;
 
 namespace SEE.Controls
