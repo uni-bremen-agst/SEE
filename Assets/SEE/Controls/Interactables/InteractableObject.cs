@@ -373,13 +373,7 @@ namespace SEE.Controls
                 // Update all selected object list
                 SelectedObjects.Add(this);
 
-                // Start blinking indefinitely.
-                GraphElementOperator op = gameObject.Operator();
-                op.Blink(-1);
-                if (op is EdgeOperator eop)
-                {
-                    eop.AnimateDataFlow(true);
-                }
+                Highlight();
 
                 // Invoke events
                 SelectIn?.Invoke(this, isInitiator);
@@ -397,13 +391,7 @@ namespace SEE.Controls
                 // Update all selected object list
                 SelectedObjects.Remove(this);
 
-                // Stop blinking.
-                GraphElementOperator op = gameObject.Operator();
-                op.Blink(0);
-                if (op is EdgeOperator eop)
-                {
-                    eop.AnimateDataFlow(false);
-                }
+                Unhighlight();
 
                 // Invoke events
                 SelectOut?.Invoke(this, isInitiator);
@@ -420,6 +408,32 @@ namespace SEE.Controls
             if (isInitiator)
             {
                 new SetSelectNetAction(this, select).Execute();
+            }
+        }
+
+        /// <summary>
+        /// Start blinking indefinitely.
+        /// </summary>
+        private void Highlight()
+        {
+            GraphElementOperator op = gameObject.Operator();
+            op.Blink(-1);
+            if (op is EdgeOperator eop)
+            {
+                eop.AnimateDataFlow(true);
+            }
+        }
+
+        /// <summary>
+        /// Stop blinking.
+        /// </summary>
+        private void Unhighlight()
+        {
+            GraphElementOperator op = gameObject.Operator();
+            op.Blink(0);
+            if (op is EdgeOperator eop)
+            {
+                eop.AnimateDataFlow(false);
             }
         }
 
