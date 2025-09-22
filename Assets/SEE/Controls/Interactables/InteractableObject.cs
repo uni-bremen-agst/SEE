@@ -15,7 +15,7 @@ using SEE.Game.Avatars;
 namespace SEE.Controls
 {
     /// <summary>
-    /// InteractableObject components can be attached to different kinds of objects such as game
+    /// <see cref="InteractableObject"/> components can be attached to different kinds of objects such as game
     /// nodes or edges but also markers or scroll views in metric charts. A HoverFlag indicates
     /// to which kind of game object the hovering event relates to. A HoverFlag is used as a
     /// single bit that occurs in hovering flags.
@@ -196,11 +196,12 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Returns the interactable object of given id or <code>null</code>, if it does
-        /// not exist.
+        /// Returns the interactable object of given <paramref name="id"/>
+        /// or <code>null</code>, if it does not exist.
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
-        /// <returns>the interactable with the given <paramref name="id"/>; null if none exists</returns>
+        /// <returns>the interactable with the given <paramref name="id"/>;
+        /// null if none exists</returns>
         public static InteractableObject Get(string id)
         {
             idToInteractableObjectDict.TryGetValue(id, out InteractableObject result);
