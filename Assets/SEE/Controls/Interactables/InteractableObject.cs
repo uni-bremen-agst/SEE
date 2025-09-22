@@ -111,11 +111,6 @@ namespace SEE.Controls
         public static bool MultiSelectionAllowed = true;
 
         /// <summary>
-        /// The selected objects per graph.
-        /// </summary>
-        private static readonly Dictionary<Graph, HashSet<InteractableObject>> graphToSelectedIOs = new();
-
-        /// <summary>
         /// The graph element this interactable object is attached to.
         /// </summary>
         public GraphElementRef GraphElemRef { get; private set; }
@@ -134,7 +129,7 @@ namespace SEE.Controls
         /// <see cref="HoverFlag.ChartMarker"/> will be set. If a hovering event occurs relating
         /// to <see cref="HoverFlag.World"/> objects, the marker will not be considered being hovered over.
         /// </summary>
-        public uint HoverFlags { get; private set; } = 0;
+        private uint HoverFlags { get; set; } = 0;
 
         /// <summary>
         /// Whether the object is currently hovered over by e.g. the mouse or the VR
@@ -206,22 +201,6 @@ namespace SEE.Controls
         {
             idToInteractableObjectDict.TryGetValue(id, out InteractableObject result);
             return result;
-        }
-
-        /// <summary>
-        /// Returns the currently selected objects of given graph.
-        /// </summary>
-        /// <param name="graph">The graph, that the selected objects must be contained
-        /// by.</param>
-        /// <returns>The currently selected objects of given graph.</returns>
-        public static HashSet<InteractableObject> GetSelectedObjectsOfGraph(Graph graph)
-        {
-            if (!graphToSelectedIOs.ContainsKey(graph))
-            {
-                graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
-            }
-
-            return graphToSelectedIOs[graph];
         }
 
         #region Interaction
@@ -394,15 +373,6 @@ namespace SEE.Controls
                 // Update all selected object list
                 SelectedObjects.Add(this);
 
-                // Update all selected object list per graph
-                Graph graph = GraphElemRef.Elem.ItsGraph;
-                if (!graphToSelectedIOs.ContainsKey(graph))
-                {
-                    graphToSelectedIOs[graph] = new HashSet<InteractableObject>();
-                }
-
-                graphToSelectedIOs[graph].Add(this);
-
                 // Start blinking indefinitely.
                 GraphElementOperator op = gameObject.Operator();
                 op.Blink(-1);
@@ -426,9 +396,6 @@ namespace SEE.Controls
             {
                 // Update all selected object list
                 SelectedObjects.Remove(this);
-
-                // Update all selected object list per graph
-                graphToSelectedIOs[GraphElemRef.Elem.ItsGraph].Remove(this);
 
                 // Stop blinking.
                 GraphElementOperator op = gameObject.Operator();
@@ -513,26 +480,6 @@ namespace SEE.Controls
                 }
 
                 ReplaceSelect?.Invoke(replaced, by, isInitiator);
-            }
-        }
-
-        /// <summary>
-        /// Deselects all currently selected interactable objects within given
-        /// <paramref name="graph"/>.
-        /// </summary>
-        /// <param name="graph">The graph of which the objects are to be deselected.</param>
-        /// <param name="isInitiator">Whether this client is initiating the action.</param>
-        public static void UnselectAllInGraph(Graph graph, bool isInitiator)
-        {
-            if (graphToSelectedIOs.TryGetValue(graph, out HashSet<InteractableObject> s))
-            {
-                HashSet<InteractableObject>.Enumerator e;
-                while (s.Count != 0)
-                {
-                    e = s.GetEnumerator();
-                    e.MoveNext();
-                    e.Current.SetSelect(false, isInitiator);
-                }
             }
         }
 
