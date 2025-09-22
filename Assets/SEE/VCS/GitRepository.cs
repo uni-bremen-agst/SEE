@@ -170,19 +170,17 @@ namespace SEE.VCS
 
             // Fetch all remotes; this is needed if there are multiple remotes.
             // As a matter of fact, a repository may have multiple remotes.
-            foreach (LibGit2Sharp.Remote remote in repository.Network.Remotes)
+            foreach (Remote remote in repository.Network.Remotes)
             {
                 IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
                 try
                 {
                     Dictionary<string, string> previousBranches = GetBranches(repository);
-                    //Print(currentBranches, "previous");
 
                     // Fetch downloads new commits from the remote repository. These commits are stored
                     // locally but are not integrated into the working directory or local branches.
                     // They reside on remote-tracking branches (remotes/origin/main).
                     // Option Prune=true removes any remote-tracking references that no longer exist on the remote.
-                    //Debug.Log($"Fetching remote {remote.Name} for repository path {RepositoryPath.Path}.\n");
                     Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions()
                     {
                         Prune = true,
@@ -194,7 +192,6 @@ namespace SEE.VCS
                     }, "");
 
                     Dictionary<string, string> newBranches = GetBranches(repository);
-                    //Print(currentBranches, "new");
 
                     // Compare previousBranches to newBranches for new and changed branches.
                     foreach (KeyValuePair<string, string> pair in newBranches)
@@ -205,19 +202,12 @@ namespace SEE.VCS
                             if (previousSha != pair.Value)
                             {
                                 // Has changed.
-                                //Debug.Log($"Remote branch {pair.Key} has changed from SHA {previousSha} to SHA {pair.Value}.\n");
                                 result = true;
-                            }
-                            else
-                            {
-                                // Unchanged.
-                                //Debug.Log($"Remote branch {pair.Key} is unchanged with SHA {pair.Value}.\n");
                             }
                         }
                         else
                         {
                             // New branch.
-                            //Debug.Log($"New remote branch {pair.Key} with SHA {pair.Value}.\n");
                             result = true;
                         }
                     }
@@ -226,7 +216,7 @@ namespace SEE.VCS
                     {
                         if (!newBranches.ContainsKey(pair.Key))
                         {
-                            //Debug.Log($"Remote branch {pair.Key} with SHA {pair.Value} has been deleted.\n");
+                            // Deleted branch.
                             result = true;
                         }
                     }
@@ -249,16 +239,6 @@ namespace SEE.VCS
                     remoteBranches[remoteBranch.CanonicalName] = remoteBranch.Tip.Sha;
                 }
                 return remoteBranches;
-            }
-
-            // Prints the given branches. For debugging only.
-            static void Print(Dictionary<string, string> branches, string message)
-            {
-                Debug.Log($"The {message} branches are:\n");
-                foreach (KeyValuePair<string, string> pair in branches)
-                {
-                    Debug.Log($"Branch: {pair.Key} SHA={pair.Value}\n");
-                }
             }
         }
 
