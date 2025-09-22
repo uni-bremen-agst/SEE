@@ -6,9 +6,6 @@ using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
-#if INCLUDE_STEAM_VR
-using Valve.VR.InteractionSystem;
-#endif
 using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
@@ -166,14 +163,6 @@ namespace SEE.Controls
         /// </summary>
         public bool IsGrabbed { get; private set; }
 
-#if INCLUDE_STEAM_VR
-        /// <summary>
-        /// The interactable component, that is used by SteamVR. The interactable
-        /// component is attached to <code>this.gameObject</code>.
-        /// </summary>
-        private Interactable interactable;
-#endif
-
         /// <summary>
         /// The synchronizer is attached to <code>this.gameObject</code>, iff it is
         /// grabbed.
@@ -182,11 +171,7 @@ namespace SEE.Controls
 
         private void Awake()
         {
-#if INCLUDE_STEAM_VR
-            gameObject.TryGetComponentOrLog(out interactable);
-#endif
             GraphElemRef = GetComponent<GraphElementRef>();
-
             hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
         }
 
@@ -208,9 +193,6 @@ namespace SEE.Controls
             }
 
             GraphElemRef = null;
-#if INCLUDE_STEAM_VR
-            interactable = null;
-#endif
         }
 
         /// <summary>
@@ -596,13 +578,7 @@ namespace SEE.Controls
             if (isInitiator)
             {
                 new SetGrabNetAction(this, grab).Execute();
-                if (grab)
-                {
-#if INCLUDE_STEAM_VR
-                    InteractableSynchronizer = interactable.gameObject.AddComponent<Synchronizer>();
-#endif
-                }
-                else
+                if (!grab)
                 {
                     Destroyer.Destroy(InteractableSynchronizer);
                     InteractableSynchronizer = null;
@@ -924,23 +900,6 @@ namespace SEE.Controls
                 SetHoverFlag(HoverFlag.World, false, true);
             }
         }
-
-        //----------------------------------------------------------------
-        // Private actions called by the hand when the object is hovered.
-        // These methods are called by SteamVR by way of the interactable.
-        // <see cref="Hand.Update"/>
-        //----------------------------------------------------------------
-#if INCLUDE_STEAM_VR
-        private const Hand.AttachmentFlags AttachmentFlags
-            = Hand.defaultAttachmentFlags
-            & ~Hand.AttachmentFlags.SnapOnAttach
-            & ~Hand.AttachmentFlags.DetachOthers
-            & ~Hand.AttachmentFlags.VelocityMovement;
-
-        private void OnHandHoverBegin(Hand hand) => SetHoverFlag(HoverFlag.World, true, true);
-        private void OnHandHoverEnd(Hand hand) => SetHoverFlag(HoverFlag.World, false, true);
-#endif
-
         #endregion
     }
 }
