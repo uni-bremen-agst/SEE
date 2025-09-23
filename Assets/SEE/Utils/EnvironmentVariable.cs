@@ -20,7 +20,7 @@ namespace SEE.Utils
     /// [EnvironmentVariable("DEBUG_LOG")]
     /// public bool debugLog;
     /// </code>
-    /// Then, wherever you initialize the class (i.e. the constructor or <c>Start</c>/<c>Awake</c>),
+    /// Then, wherever you Initialize the class (i.e. the constructor or <c>Start</c>/<c>Awake</c>),
     /// you'll need to call <see cref="EnvironmentVariableRetriever.SetEnvironmentVariableFields"/>:
     /// <code>
     /// public void Awake()

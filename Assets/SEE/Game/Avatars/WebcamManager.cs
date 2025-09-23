@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace SEE.Game.Avatars
 {
+    /// <summary>
+    /// Controls the initialization and use of WebCamTexture, since this texture cannot be initialized more than once.
+    /// </summary>
     public static class WebcamManager
     {
         private static WebCamTexture webCamTexture;

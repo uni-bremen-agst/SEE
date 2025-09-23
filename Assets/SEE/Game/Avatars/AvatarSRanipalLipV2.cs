@@ -6,7 +6,7 @@ using ViveSR.anipal.Lip;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Changed version of <see cref="SRanipal_AvatarLipSample_v2"/>. Used to initialize LipShape Tables.
+    /// Changed version of <see cref="SRanipal_AvatarLipSample_v2"/>. Used to Initialize LipShape Tables.
     /// </summary>
     public class AvatarSRanipalLipV2 : MonoBehaviour
     {

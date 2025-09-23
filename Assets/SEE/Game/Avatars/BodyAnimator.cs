@@ -1,7 +1,23 @@
-﻿using UnityEngine;
+﻿// This script uses MediaPipe Unity Plugin availible at
+// https://github.com/homuler/MediaPipeUnityPlugin
+//
+// Copyright (c) 2021 homuler
+//
+// Use of the source code of the plugin is governed by an MIT-style
+// license that can be found at
+// https://github.com/homuler/MediaPipeUnityPlugin/blob/master/LICENSE
+//
+//
+// This script also relies on the Task-API-Tutorium by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
+// https://github.com/homuler/MediaPipeUnityPlugin/blob/master/docs/Tutorial-Task-API.md
+
+using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
 
+/// <summary>
+/// These namespaces are imported to be able to use MediaPipe solutions
+/// </summary>
 using Stopwatch = System.Diagnostics.Stopwatch;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
@@ -13,39 +29,74 @@ using Mediapipe.Tasks.Vision.GestureRecognizer;
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Animates the hands movements of the avatar.
+    /// Calls models from MediaPipe to further animate the hands and finger movements of the avatar.
     /// </summary>
     /// <remarks>This component is assumed to be attached to the avatar's root object.</remarks>
+    /// <remarks>The animation itself occurs using the functions of the class <see cref="HandsAnimator"/>.</remarks>
     internal class BodyAnimator : MonoBehaviour
     {
-        public HandsAnimator handsAnimator = new HandsAnimator();
+        /// <summary>
+        /// Instance of class <see cref="HandsAnimator"/> responsible for animation.
+        /// </summary>
+        public HandsAnimator HandsAnimator = new HandsAnimator();
 
+        /// <summary>
+        /// Text assets that define configurations of MediaPipe models.
+        /// </summary>
         [SerializeField] private TextAsset poseLandmarkerModelAsset;
         [SerializeField] private TextAsset handLandmarkerModelAsset;
         [SerializeField] private TextAsset gestureRecognizerModelAsset;
 
+        /// <summary>
+        /// Stores the texture from the device's webcam.
+        /// </summary>
         private WebCamTexture webCamTexture;
 
-        Stopwatch stopwatch = new Stopwatch();
-        TextureFrame textureFrame;
-        PoseLandmarker poseLandmarker;
-        HandLandmarker handLandmarker;
-        GestureRecognizer gestureRecognizer;
+        /// <summary>
+        /// Used to calculate timestamps needed by MediaPipe calculators.
+        /// </summary>
+        private Stopwatch stopwatch = new Stopwatch();
 
+        /// <summary>
+        /// TextureFrame object to hold a copy of the webcam texture on the CPU.
+        /// </summary>
+        private TextureFrame textureFrame;
+
+        /// <summary>
+        /// Solvers from MediaPipe that are used to detect pose and hand landmarks.
+        /// </summary>
+        private PoseLandmarker poseLandmarker;
+        private HandLandmarker handLandmarker;
+
+        /// <summary>
+        /// MediaPipe model used to classify detected gestures.
+        /// </summary>
+        private GestureRecognizer gestureRecognizer;
+
+        /// <summary>
+        /// The FullBodyBiped IK solver attached to the avatar.
+        /// </summary>
         private FullBodyBipedIK ik;
 
-        [Tooltip("If true, local interactions control where the avatar is pointing to.")]
+        /// <summary>
+        /// If true, local interactions control the avatar.
+        /// <summary>
         public bool IsLocallyControlled = true;
 
+        /// <summary>
+        /// Initializes the MediaPipe models and the instance of <see cref="HandsAnimator"/>.
+        /// </summary>
         private void Awake()
         {
-            if(IsLocallyControlled)
+            //Use local WebCamTexture.
+            if (IsLocallyControlled)
             {
                 WebcamManager.Initialize();
                 webCamTexture = WebcamManager.WebCamTexture;
             }
 
-            var poseLandmarkerOptions = new PoseLandmarkerOptions(
+            // Generate the MediaPipe Tasks by setting options.
+            PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
                 baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                     Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                     modelAssetBuffer: poseLandmarkerModelAsset.bytes),
@@ -53,7 +104,7 @@ namespace SEE.Game.Avatars
 
             poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
 
-            var handLandmarkerOptions = new HandLandmarkerOptions(
+            HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
                 baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                     Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                     modelAssetBuffer: handLandmarkerModelAsset.bytes),
@@ -62,76 +113,71 @@ namespace SEE.Game.Avatars
 
             handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
 
-            var gestureRecognizerOptions = new GestureRecognizerOptions(
+            GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
               baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
                 Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
                 modelAssetBuffer: gestureRecognizerModelAsset.bytes
               ),
               runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-              numHands: 2
-            );
+              numHands: 2);
 
             gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
 
+            //Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
             stopwatch.Start();
             textureFrame = new Mediapipe.Unity.Experimental.TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+
 
             if (!gameObject.TryGetComponentOrLog(out ik))
             {
                 enabled = false;
                 return;
             }
-            else if(IsLocallyControlled)
+            else if (IsLocallyControlled)
             {
-                handsAnimator.initialize(transform, ik);
+                HandsAnimator.Initialize(transform, ik); 
             }
         }
 
 
-
+        /// <summary>
+        /// Receives the results from the MediaPipe models and calls the <see cref="HandsAnimator"/> class functions for animation.
+        /// </summary>
         private void LateUpdate()
         {
-            /// <summary>
-            /// Animating the movement of the hands with Full Body Biped IK and MediaPipe Landmarks 
-            /// by rotating hands and changing positions coordinates.
-            /// </summary>
+            //Animate with this script only if the avatar is locally controlled.
             if (IsLocallyControlled)
             {
-                if (handsAnimator.bringHandsToStartPositions())
+                // If the avatar's hands are already in the starting position and ready for animation.
+                if (HandsAnimator.BringHandsToStartPositions())
                 {
+                    // Needed to flip the image since MediaPipe and Unity handle pixel data differently.
                     textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
-                    using var poseLandmarkerImage = textureFrame.BuildCPUImage();
+                    Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
 
-                    var resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
-
+                    PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
+                    
                     if (resultPoseLandmarker.poseWorldLandmarks == null)
                     {
                         UnityEngine.Debug.Log("No Pose Landmarks found");
                     }
                     else
                     {
-                        /// <summary>
-                        /// Changing positions of the hands with MediaPipe Pose Landmarker model
-                        /// and Full Body Biped IK.
-                        /// </summary>
-                        handsAnimator.solveHandsPositions(resultPoseLandmarker);
+                        //Changing positions of the hands.
+                        HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
 
-                        /// <summary>
-                        /// Rotation of hands and fingers based on the
-                        /// MediaPipe hands landmakrs and gestures detected with
-                        /// MediaPipe Gesture Recognizer task.
-                        /// </summary>
-                        var imageForHandLandmarker = textureFrame.BuildCPUImage();
-                        var resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
+                        Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
+                        HandLandmarkerResult resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
 
                         textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
-                        var imageForGestureRecognizer = textureFrame.BuildCPUImage();
-                        var resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
+                        Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
+                        GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
 
                         if (resultHandLandmarker.handLandmarks?.Count > 0)
                         {
-                            handsAnimator.solveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                            handsAnimator.solveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                            //Rotate hands and fingers.
+                            HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                            HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
                         }
                         else
                         {

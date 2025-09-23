@@ -136,7 +136,7 @@ namespace SEE.UI.Window
                     }
                     break;
                 case 0 when windows.Any(x => x.Window):
-                    // We need to initialize at least one panel.
+                    // We need to Initialize at least one panel.
                     InitializePanel();
                     break;
                 case 0: return; // If no window is initialized yet, there's nothing we can do.

@@ -267,7 +267,7 @@ namespace SEE.UI.DebugAdapterProtocol
             DebugBreakpointManager.OnBreakpointAdded += OnBreakpointsChanged;
             DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointsChanged;
 
-            // sends the initialize request
+            // sends the Initialize request
             try
             {
                 capabilities = adapterHost.SendRequestSync(new InitializeRequest()

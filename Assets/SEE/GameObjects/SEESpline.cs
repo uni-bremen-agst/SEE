@@ -722,7 +722,7 @@ namespace SEE.GO
     /// of a <see cref="GameObject"/>. A spline morphism can be thought of as
     /// a linear interpolation between a `source' and a `target' spline (where
     /// `source' and `target' may have any structure with regard to degree,
-    /// control points, and knots). To initialize the morphism, call
+    /// control points, and knots). To Initialize the morphism, call
     /// <see cref="Init(BSpline, BSpline)"/> with desired source and target
     /// spline. To evaluate the morphism at a certain point, call
     /// <see cref="Morph(double)"/> with corresponding time parameter.

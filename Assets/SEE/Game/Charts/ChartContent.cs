@@ -248,7 +248,7 @@ namespace SEE.Game.Charts
         private int currentRevisionCountCache = 0;
 
         /// <summary>
-        /// Calls methods to initialize a chart.
+        /// Calls methods to Initialize a chart.
         /// </summary>
         private void Awake()
         {

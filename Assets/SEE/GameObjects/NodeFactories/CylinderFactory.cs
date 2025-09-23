@@ -95,7 +95,7 @@ namespace SEE.GO.NodeFactories
             // optional: log the number of tris
             // Debug.Log ("CustomCylinder has " + trisArrayLength/3 + " tris");
 
-            // initialize arrays
+            // Initialize arrays
             Vector3[] vertices = new Vector3[numVertices];
             // UV is the mapping specifying which part of a two-dimensional texture is to
             // be mapped onto which triangle of the three-dimensional mesh.
