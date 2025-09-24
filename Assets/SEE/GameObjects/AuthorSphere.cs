@@ -72,9 +72,11 @@ namespace SEE.GameObjects
         /// <returns>new game object representing the author</returns>
         public static GameObject CreateAuthor(GameObject parent, FileAuthor author, Material material, Vector3 positionOffset)
         {
-            // FIXME: We need to add a collider.
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             result.name = "AuthorSphere:" + author;
+            result.layer = Layers.InteractableGraphObjects;
+
+            InteractionDecorator.PrepareAuthorForInteraction(result);
 
             AuthorSphere authorSphere = result.AddComponent<AuthorSphere>();
             authorSphere.Author = author;
@@ -88,7 +90,7 @@ namespace SEE.GameObjects
             result.transform.localScale *= 0.25f;
 
             Renderer renderer = result.GetComponent<Renderer>();
-            // Override shader so the spheres don't clip over the code city.
+
             material.shader = Shader.Find("Standard");
             renderer.sharedMaterial = material;
 
