@@ -1,4 +1,3 @@
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
@@ -7,7 +6,6 @@ using SEE.GraphProviders.VCS;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using TMPro;
 using UnityEngine;
 
 namespace SEE.Game.CityRendering
@@ -109,7 +107,6 @@ namespace SEE.Game.CityRendering
             }
 
             return result;
-
         }
 
         /// <summary>
