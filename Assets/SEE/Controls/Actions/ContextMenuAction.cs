@@ -1,9 +1,11 @@
 using Cysharp.Threading.Tasks;
 using MoreLinq;
+using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.GO.Menu;
 using SEE.Net.Actions;
@@ -104,13 +106,13 @@ namespace SEE.Controls.Actions
             {
                 if (!multiselection)
                 {
-                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject hitObject);
                     if (hit == HitGraphElement.None)
                     {
                         return;
                     }
                     if (SceneSettings.InputType == PlayerInputType.VRPlayer
-                        || (o == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
+                        || (hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
                         if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
                         {
@@ -121,14 +123,14 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
-                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(popupMenu, position, raycastHit.point, o.GraphElemRef.Elem, o.gameObject);
+                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptions(raycastHit, hitObject);
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
                 else
                 {
-                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject o);
+                    HitGraphElement hit = Raycasting.RaycastInteractableObject(out RaycastHit _, out InteractableObject o);
                     if (hit == HitGraphElement.None)
                     {
                         return;
@@ -144,11 +146,37 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
-                        IEnumerable<PopupMenuEntry> entries = GetApplicableOptionsForMultiselection(popupMenu, InteractableObject.SelectedObjects);
+                        // Note: as of now, multiselection only works for graph elements.
+                        // We currently do not have multiselection options for authors.
+                        IEnumerable<PopupMenuEntry> entries
+                            = GetApplicableOptionsForGraphElementMultiselection(popupMenu,
+                                                                                InteractableGraphElements(InteractableObject.SelectedObjects));
                         onSelect = false;
                         popupMenu.ShowWith(entries, position);
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Returns the applicable options for the given hit object depending on its type.
+        /// </summary>
+        /// <param name="raycastHit">where the raycast hit <paramref name="hitObject"/></param>
+        /// <param name="hitObject">the hit object</param>
+        /// <returns>applicable options</returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptions(RaycastHit raycastHit, InteractableObject hitObject)
+        {
+            if (hitObject is InteractableGraphElement graphElement)
+            {
+                return GetApplicableOptionsForGraphElement(popupMenu, position, raycastHit.point, graphElement.GraphElemRef.Elem, graphElement.gameObject);
+            }
+            else if (hitObject is InteractableAuthor author)
+            {
+                return GetApplicableOptionsForAuthor(popupMenu, position, author);
+            }
+            else
+            {
+                return Enumerable.Empty<PopupMenuEntry>();
             }
         }
 
@@ -163,6 +191,15 @@ namespace SEE.Controls.Actions
             popupMenu.ShowWith(entries, position);
         }
 
+        /// <summary>
+        /// Returns all elements in <paramref name="selectedObjects"/> whose type is <see cref="InteractableGraphElement"/>.
+        /// </summary>
+        /// <returns>all <see cref="InteractableGraphElement"/>s in <paramref name="selectedObjects"/></returns>
+        private static IEnumerable<InteractableGraphElement> InteractableGraphElements(IEnumerable<InteractableObject> list)
+        {
+            return list.OfType<InteractableGraphElement>();
+        }
+
         #region Multiple-Selection
         /// <summary>
         /// Returns the options available for multiple selection.
@@ -170,11 +207,12 @@ namespace SEE.Controls.Actions
         /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
         /// <param name="selectedObjects">The selected objects.</param>
         /// <returns>Options available for the selected objects.</returns>
-        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForMultiselection(PopupMenu popupMenu, HashSet<InteractableObject> selectedObjects)
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElementMultiselection
+            (PopupMenu popupMenu, IEnumerable<InteractableGraphElement> selectedObjects)
         {
             List<PopupMenuEntry> entries = new()
             {
-                new PopupMenuHeading($"{selectedObjects.Count} elements selected!", int.MaxValue),
+                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),
 
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
@@ -182,7 +220,7 @@ namespace SEE.Controls.Actions
                     {
                         new PopupMenuAction("Inspect", () =>
                         {
-                            UpdateEntries(popupMenu, position, GetApplicableOptionsForMultiselection(popupMenu, selectedObjects));
+                            UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElementMultiselection(popupMenu, selectedObjects));
                         }, Icons.ArrowLeft, CloseAfterClick: false),
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
                         new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
@@ -293,11 +331,42 @@ namespace SEE.Controls.Actions
                 }
             }
         }
-
-
         #endregion
 
         #region Single-Selection
+
+        /// <summary>
+        /// Returns the options available for the given <paramref name="author"/>.
+        /// </summary>
+        /// <param name="popupMenu">The popup menu in which the options should be displayed.</param>
+        /// <param name="menuPosition">The position where the menu should be opened.</param>
+        /// <param name="author">The hit author for which to return the options.</param>
+        /// <returns>options applicable to <paramref name="author"/></returns>
+        private IEnumerable<PopupMenuEntry> GetApplicableOptionsForAuthor(PopupMenu popupMenu, Vector3 menuPosition, InteractableAuthor author)
+        {
+            if (!author.TryGetComponent(out AuthorSphere authorSphere))
+            {
+                return Enumerable.Empty<PopupMenuEntry>();
+            }
+
+            string name = authorSphere.Author.Name;
+
+            IList<PopupMenuEntry> entries = new List<PopupMenuEntry>
+            {
+                new PopupMenuHeading(name, Priority: int.MaxValue),
+                new PopupMenuAction("Properties", () => ShowProperties(), Icons.Info, Priority: 0)
+            };
+
+            return entries;
+
+            void ShowProperties()
+            {
+                // FIXME: Implement author properties window.
+                //ActivateWindow(CreatePropertyWindow(author.gameObject);
+                Debug.Log($"{nameof(ShowProperties)}({name})\n");
+            }
+        }
+
         /// <summary>
         /// Returns the options available for the given graph element.
         /// </summary>
@@ -311,7 +380,7 @@ namespace SEE.Controls.Actions
         public static IEnumerable<PopupMenuAction> GetOptionsForTreeView(PopupMenu popupMenu, Vector3 position,
             GraphElement graphElement, GameObject gameObject = null, IEnumerable<PopupMenuAction> appendActions = null)
         {
-            return GetApplicableOptions(popupMenu, position, position, graphElement, gameObject, appendActions)
+            return GetApplicableOptionsForGraphElement(popupMenu, position, position, graphElement, gameObject, appendActions)
                   .OfType<PopupMenuAction>();
         }
 
@@ -326,7 +395,7 @@ namespace SEE.Controls.Actions
         /// <param name="appendActions">Actions to be append at the end of the entries.</param>
         /// <returns>Options available for the given graph element</returns>
         /// <exception cref="ArgumentOutOfRangeException">Thrown if the graph element is neither a node nor an edge</exception>
-        private static IEnumerable<PopupMenuEntry> GetApplicableOptions(PopupMenu popupMenu, Vector3 position,
+        private static IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElement(PopupMenu popupMenu, Vector3 position,
             Vector3 raycastHitPosition, GraphElement graphElement, GameObject gameObject = null,
             IEnumerable<PopupMenuAction> appendActions = null)
         {
@@ -538,7 +607,7 @@ namespace SEE.Controls.Actions
         {
             if (appendActions != null)
             {
-                List<PopupMenuAction> actions = new(GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                List<PopupMenuAction> actions = new(GetApplicableOptionsForGraphElement(popupMenu, position, raycastHitPosition,
                     graphElement, gameObject, appendActions)
                     .OfType<PopupMenuAction>()
                     .Where(x => !x.Name.Contains("TreeWindow")));
@@ -547,7 +616,7 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                UpdateEntries(popupMenu, position, GetApplicableOptions(popupMenu, position, raycastHitPosition,
+                UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElement(popupMenu, position, raycastHitPosition,
                     graphElement, gameObject));
             }
         }
