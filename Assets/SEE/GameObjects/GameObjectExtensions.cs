@@ -538,8 +538,7 @@ namespace SEE.GO
             }
 
             // No renderer, so we use lossyScale as a fallback.
-            // Note: This should not happen. If the object has no renderer, it has no size at all.
-            Debug.LogWarning($"GameObject has no Renderer component, using lossyScale as fallback: {gameObject.name}");
+            // Note: This may happen for container objects that have no mesh.
             size = gameObject.transform.lossyScale;
             position = gameObject.transform.position;
             return false;
