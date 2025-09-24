@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -9,7 +8,6 @@ using UnityEngine.Assertions;
 using SEE.Net.Actions;
 using SEE.Audio;
 using SEE.Game;
-using SEE.Game.Operator;
 using SEE.Game.Avatars;
 
 namespace SEE.Controls
@@ -26,13 +24,13 @@ namespace SEE.Controls
         World = 0x1, // an object in the city world is being hovered over (game nodes or edges and the like)
         ChartMarker = 0x2, // a marker in a chart is being hovered over
         ChartMultiSelect = 0x4, // multiple markers in a chart are being hovered over (within a rectangular bound)
-        ChartScrollViewToggle = 0x8 // the scroll view of a metric chart is being hovered over
+        ChartScrollViewToggle = 0x8, // the scroll view of a metric chart is being hovered over
     }
 
     /// <summary>
     /// User-interactable graph elements.
     /// </summary>
-    public sealed class InteractableObject : InteractableObjectBase
+    public abstract class InteractableObject : InteractableObjectBase
     {
         /// <inheritdoc />
         public override int InteractableLayer => Layers.InteractableGraphObjects;
@@ -46,17 +44,7 @@ namespace SEE.Controls
         /// <summary>
         /// Backing field for the <see cref="HitColor"/> property.
         /// </summary>
-        private Color hitColor = LaserPointer.HitColor;
-
-        /// <summary>
-        /// The color of the laser pointer when it is hovering over a node.
-        /// </summary>
-        private static Color nodeHitColor = Color.green;
-
-        /// <summary>
-        /// The color of the laser pointer when it is hovering over an edge.
-        /// </summary>
-        private static Color edgeHitColor = Color.blue;
+        protected Color hitColor = LaserPointer.HitColor;
 
         // Tutorial on grabbing objects:
         // https://www.youtube.com/watch?v=MKOc8J877tI&t=15s
@@ -111,11 +99,6 @@ namespace SEE.Controls
         public static bool MultiSelectionAllowed = true;
 
         /// <summary>
-        /// The graph element this interactable object is attached to.
-        /// </summary>
-        public GraphElementRef GraphElemRef { get; private set; }
-
-        /// <summary>
         /// A bit vector for hovering flags. Each flag is a bit as defined in <see cref="HoverFlag"/>.
         /// If the bit is set, this <see cref="InteractableObject"/> is to be considered hovered over for interaction
         /// events in the respective scope of interactable objects.
@@ -164,13 +147,12 @@ namespace SEE.Controls
         /// </summary>
         public Synchronizer InteractableSynchronizer { get; private set; }
 
-        private void Awake()
+        protected virtual void Awake()
         {
-            GraphElemRef = GetComponent<GraphElementRef>();
-            hitColor = gameObject.IsNode() ? nodeHitColor : edgeHitColor;
+            hitColor = Color.green;
         }
 
-        private void OnDestroy()
+        protected virtual void OnDestroy()
         {
             if (IsHovered)
             {
@@ -186,8 +168,6 @@ namespace SEE.Controls
             {
                 SetGrab(false, true);
             }
-
-            GraphElemRef = null;
         }
 
         /// <summary>
@@ -216,7 +196,11 @@ namespace SEE.Controls
         /// <param name="point">The hit point on the object.</param>
         new public bool IsInteractable(Vector3? point = null)
         {
-            if (IsGrabbed) return false;
+            if (IsGrabbed)
+            {
+                // A grabbed object is never interactable.
+                return false;
+            }
             return base.IsInteractable(point);
         }
 
@@ -412,30 +396,14 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Start blinking indefinitely.
+        /// Visually emphasizes this object for selection.
         /// </summary>
-        private void Highlight()
-        {
-            GraphElementOperator op = gameObject.Operator();
-            op.Blink(-1);
-            if (op is EdgeOperator eop)
-            {
-                eop.AnimateDataFlow(true);
-            }
-        }
+        protected abstract void Highlight();
 
         /// <summary>
-        /// Stop blinking.
+        /// Stops the visual emphasis of this object for selection.
         /// </summary>
-        private void Unhighlight()
-        {
-            GraphElementOperator op = gameObject.Operator();
-            op.Blink(0);
-            if (op is EdgeOperator eop)
-            {
-                eop.AnimateDataFlow(false);
-            }
-        }
+        protected abstract void Unhighlight();
 
         /// <summary>
         /// Deselects all currently selected interactable objects and invokes the
