@@ -30,9 +30,8 @@ namespace SEE.Game.City
         /// Specifies how the edges connecting authors and their commits should be shown.
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
-        [TabGroup(EdgeFoldoutGroup),
-         RuntimeTab(EdgeFoldoutGroup), InfoBox("An edge animation kind must be set to use this feature.",
-             InfoMessageType.Error, nameof(ShowWarningBoxOfMissingAnimationKind)),]
+        [TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup),
+            Tooltip("When connecting lines between authors and files should be shown.")]
         public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy =
                 ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
 
@@ -51,13 +50,6 @@ namespace SEE.Game.City
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
         public int AuthorThreshold = 2;
-
-        /// <summary>
-        /// Returns true if the user should be warned about a missing animation kind.
-        /// </summary>
-        private bool ShowWarningBoxOfMissingAnimationKind =>
-            ShowAuthorEdgesStrategy != ShowAuthorEdgeStrategy.ShowAlways &&
-            EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None;
 
         /// <summary>
         /// Resets everything that is specific to a given graph. Here in addition to
