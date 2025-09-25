@@ -480,28 +480,6 @@ namespace SEE.Game.Operator
                     {
                         // The edge layout needs to be updated only if we actually have an edge layout.
                         UpdateEdgeLayout(duration);
-
-                        // If the operator was invoked in a BranchCity, the author-sphere edges should be moved, too.
-                        if (City is BranchCity)
-                        {
-                            if (gameObject.TryGetComponent(out AuthorRef authorRef))
-                            {
-                                foreach (GameObject edge in authorRef.Edges)
-                                {
-                                    SEESpline seeSpline = edge.GetComponent<SEESpline>();
-                                    seeSpline.UpdateEndPosition(gameObject.transform.position);
-                                }
-                            }
-                            else
-                            {
-                                foreach (AuthorRef child in gameObject.GetComponentsInChildren<AuthorRef>())
-                                {
-                                    child.Edges.ForEach(x =>
-                                        x.GetComponent<SEESpline>()
-                                            .UpdateEndPosition(child.gameObject.transform.position));
-                                }
-                            }
-                        }
                     }
                 }
             }
