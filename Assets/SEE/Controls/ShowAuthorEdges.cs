@@ -1,9 +1,5 @@
 using System;
-using System.Threading;
-using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.GO;
-using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -16,16 +12,10 @@ namespace SEE.Controls.Actions
     internal class ShowAuthorEdges : InteractableObjectAction, IDisposable
     {
         /// <summary>
-        /// The token used to cancel the edge toggling operation.
-        /// </summary>
-        private CancellationTokenSource edgeToggleToken;
-
-        /// <summary>
         /// Disposes the CancellationTokenSource.
         /// </summary>
         public void Dispose()
         {
-            edgeToggleToken?.Dispose();
         }
 
         /// <summary>
@@ -41,79 +31,62 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Unsubscribes from hover events of the game object.
+        /// </summary>
+        void OnDisable()
+        {
+            if (Interactable != null)
+            {
+                Interactable.HoverIn -= OnHoverIn;
+                Interactable.HoverOut -= OnHoverOut;
+            }
+        }
+
+        /// <summary>
         /// Toggles the visibility of author edges for a node.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
+        /// <param name="isHovered">Whether the game object is currently hovered.</param>
         /// <param name="authorRef"><see cref="AuthorRef"/> instance which the user hovered over.</param>
-        /// <param name="branchCity">Configuration of the code city.</param>
-        private void ToggleAuthorEdgesForNode
-            (bool show,
-            AuthorRef authorRef,
-            BranchCity branchCity)
+        /// <remarks>This will be executed at the hovering of file nodes.</remarks>
+        private void ToggleAuthorEdgesForNode(bool isHovered, AuthorRef authorRef)
         {
-            if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAlways)
+            foreach (AuthorEdge authorEdge in authorRef.Edges)
             {
-                return;
-            }
-
-            // When the author threshold is reached for the node, we do not show the edges.
-            if (authorRef.Edges.Count < branchCity.AuthorThreshold
-                || branchCity.ShowAuthorEdgesStrategy != ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
-            {
-                foreach (GameObject edge in authorRef.Edges)
-                {
-                    if (edge.TryGetComponent(out AuthorEdge authorEdge))
-                    {
-                        authorEdge.ShowOrHide(show);
-                    }
-
-                }
+                authorEdge.ShowOrHide(isHovered);
             }
         }
 
         /// <summary>
         /// Toggles the visibility of author edges for an author sphere.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
+        /// <param name="isHovered">Whether the game object is currently hovered.</param>
         /// <param name="sphere">The <see cref="AuthorSphere"/> the user hovers over.</param>
-        /// <param name="branchCity">Configuration of the code city.</param>
-        private void ToggleAuthorEdgesForAuthorSphere(bool show, AuthorSphere sphere, BranchCity branchCity)
+        /// <remarks>This will be executed at the hovering of authors.</remarks>
+        private void ToggleAuthorEdgesForAuthorSphere(bool isHovered, AuthorSphere sphere)
         {
-            if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowAlways)
+            foreach (AuthorEdge authorEdge in sphere.Edges)
             {
-                return;
-            }
-
-            foreach (GameObject edge in sphere.Edges)
-            {
-                if (edge.TryGetComponent(out AuthorEdge authorEdge))
-                {
-                    // Only show edges if ShowOnHover was set as strategy or if the author threshold is not reached.
-                    if (branchCity.ShowAuthorEdgesStrategy == ShowAuthorEdgeStrategy.ShowOnHover
-                        || authorEdge.FileNode.Edges.Count < branchCity.AuthorThreshold)
-                    {
-                        authorEdge.ShowOrHide(show);
-                    }
-                }
+                authorEdge.ShowOrHide(isHovered);
             }
         }
 
         /// <summary>
         /// Toggles the visibility of author edges of the node or the author sphere the user hovers over.
         /// </summary>
-        /// <param name="show">Should be set to true if the animation should show the edges and false if it should hide them.</param>
-        /// <param name="branchCity">Configuration of the code city.</param>
-        private void ToggleAuthorEdges(bool show, BranchCity branchCity)
+        /// <param name="isHovered">Whether the game object is currently hovered.</param>
+        /// <remarks>This <see cref="ShowAuthorEdges"/> component could be added to authors as
+        /// well as file nodes.</remarks>
+        private void ToggleAuthorEdges(bool isHovered)
         {
             if (gameObject.TryGetComponent(out AuthorRef authorRef))
             {
                 // When the user hovers over a graph game node
-                ToggleAuthorEdgesForNode(show, authorRef, branchCity);
+                ToggleAuthorEdgesForNode(isHovered, authorRef);
             }
             else if (gameObject.TryGetComponent(out AuthorSphere sphere))
             {
                 // When the user hovers over an AuthorSphere.
-                ToggleAuthorEdgesForAuthorSphere(show, sphere, branchCity);
+                ToggleAuthorEdgesForAuthorSphere(isHovered, sphere);
             }
         }
 
@@ -124,13 +97,7 @@ namespace SEE.Controls.Actions
         /// <param name="interactableObject">The actual object the user hovers over.</param>
         private void OnHoverIn(InteractableObject interactableObject, bool _)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity)
-            {
-                edgeToggleToken?.Cancel();
-                edgeToggleToken = new CancellationTokenSource();
-
-                ToggleAuthorEdges(true, branchCity);
-            }
+            ToggleAuthorEdges(true);
         }
 
         /// <summary>
@@ -140,13 +107,7 @@ namespace SEE.Controls.Actions
         /// <param name="interactableObject">The actual object, the user hovers over.</param>
         private void OnHoverOut(InteractableObject interactableObject, bool _)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity)
-            {
-                edgeToggleToken?.Cancel();
-                edgeToggleToken = new CancellationTokenSource();
-
-                ToggleAuthorEdges(false, branchCity);
-            }
+            ToggleAuthorEdges(false);
         }
     }
 }

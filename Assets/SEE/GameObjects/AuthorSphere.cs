@@ -2,6 +2,7 @@ using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
 using SEE.GraphProviders.VCS;
+using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace SEE.GameObjects
     /// Attributes of an author sphere.
     /// </summary>
     /// <remarks>This component will be attached to all author spheres.</remarks>
-    public class AuthorSphere : MonoBehaviour
+    public class AuthorSphere : SerializedMonoBehaviour
     {
         /// <summary>
         /// The identity of the author.
@@ -22,7 +23,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// All edges connecting the author sphere to the files they contributed to.
         /// </summary>
-        public IList<GameObject> Edges = new List<GameObject>();
+        public IList<AuthorEdge> Edges = new List<AuthorEdge>();
 
         /// <summary>
         /// Returns a camera-facing label with the author's name which will float above the sphere.

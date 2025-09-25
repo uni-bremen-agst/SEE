@@ -143,28 +143,30 @@ namespace SEE.Game.CityRendering
                     .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
                                    .Split(',').Contains(authorName.ToString()));
 
+                // For all files of the given author.
                 foreach (KeyValuePair<Node, GameObject> fileOfAuthor in filesOfAuthor)
                 {
                     // The game object representing the edge between the author and the file.
-                    GameObject authorToFileLine = new()
+                    GameObject connectingLine = new()
                     {
-                        tag = Tags.Edge,
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
                         name = authorName + ":" + fileOfAuthor.Key.ID
                     };
                     // It will be the child of parent.
-                    authorToFileLine.transform.parent = parent.transform;
+                    connectingLine.transform.parent = parent.transform;
 
                     // Specific churn of the current author for the current sphere.
                     int churn = fileOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
-                    AddLOD(authorToFileLine);
+                    AddLOD(connectingLine);
 
+                    // The target of the connectingLine is the file node.
+                    // An AuthorRef will be added to a file node. One may exist already
+                    // because a different author may have contributed to the same file.
                     AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
-                    authorRef.Edges.Add(authorToFileLine);
 
-                    AuthorEdge authorEdge = authorToFileLine.AddComponent<AuthorEdge>();
+                    AuthorEdge authorEdge = connectingLine.AddComponent<AuthorEdge>();
                     authorEdge.FileNode = authorRef;
                     authorEdge.AuthorSphere = authorSphere;
                     authorEdge.Width = Mathf.Clamp((float)churn / maximalChurn,
@@ -172,54 +174,8 @@ namespace SEE.Game.CityRendering
                                                     Settings.EdgeLayoutSettings.EdgeWidth);
                     authorEdge.Draw();
 
-                    authorSphere.Edges.Add(authorToFileLine);
-
-                    if (Settings is BranchCity branchCity)
-                    {
-                        switch (branchCity.ShowAuthorEdgesStrategy)
-                        {
-                            case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
-                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
-                                {
-                                    throw new Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
-                                }
-                                if (Application.isPlaying)
-                                {
-                                    // The containing method may be called in the Unity editor, but hiding the edges
-                                    // only makes sense when the game is running. Moreover, hiding the edges in the editor
-                                    // may even lead to exceptions because the city's BaseAnimationDuration will be queried
-                                    // but the city is set only OnEnable of the edge operator.
-                                    authorToFileLine.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-
-                                    if (authorRef.Edges.Count >= branchCity.AuthorThreshold)
-                                    {
-                                        // Show only edges for nodes with multiple authors.
-                                        foreach (GameObject edge in authorRef.Edges)
-                                        {
-                                            edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                                        }
-                                    }
-                                }
-                                break;
-                            case ShowAuthorEdgeStrategy.ShowOnHover:
-                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
-                                {
-                                    throw new Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
-                                }
-                                if (Application.isPlaying)
-                                {
-                                    // See above. Must not be run in editor mode.
-                                    authorToFileLine.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                                }
-                                break;
-                            case ShowAuthorEdgeStrategy.ShowAlways:
-                                break; // nothing to do here, edges are always shown
-                            default:
-                                throw new ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
-                                    branchCity.ShowAuthorEdgesStrategy,
-                                    $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
-                        }
-                    }
+                    authorRef.Edges.Add(authorEdge);
+                    authorSphere.Edges.Add(authorEdge);
                 }
             }
         }

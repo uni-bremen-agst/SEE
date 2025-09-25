@@ -1,5 +1,7 @@
+using SEE.Game.City;
 using SEE.GO;
 using Sirenix.OdinInspector;
+using System;
 using UnityEngine;
 
 namespace SEE.GameObjects
@@ -44,12 +46,24 @@ namespace SEE.GameObjects
         /// <summary>
         /// Sets the visibility of the edge.
         /// </summary>
-        /// <param name="show">whether to show the line</param>
-        internal void ShowOrHide(bool show)
+        /// <param name="isHovered">whether any end of the edge (author or file node) is currently hovered</param>
+        internal void ShowOrHide(bool isHovered)
         {
-            if (TryGetComponent(out LineRenderer lineRenderer))
+            if (gameObject.ContainingCity() is BranchCity branchCity)
             {
-                lineRenderer.enabled = show;
+                bool show = branchCity.ShowAuthorEdgesStrategy switch
+                {
+                    ShowAuthorEdgeStrategy.ShowAlways => true,
+                    ShowAuthorEdgeStrategy.ShowOnHoverOnly => isHovered,
+                    ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors => isHovered
+                                                                               || FileNode.Edges.Count >= branchCity.AuthorThreshold,
+                    _ => throw new NotImplementedException(),
+                };
+
+                if (TryGetComponent(out LineRenderer lineRenderer))
+                {
+                    lineRenderer.enabled = show;
+                }
             }
         }
     }

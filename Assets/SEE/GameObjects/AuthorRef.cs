@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using Sirenix.OdinInspector;
-using UnityEngine;
 
 namespace SEE.GameObjects
 {
@@ -13,6 +12,6 @@ namespace SEE.GameObjects
         /// <summary>
         /// The edges to the authors of this specific file.
         /// </summary>
-        public IList<GameObject> Edges = new List<GameObject>();
+        public IList<AuthorEdge> Edges = new List<AuthorEdge>();
     }
 }
