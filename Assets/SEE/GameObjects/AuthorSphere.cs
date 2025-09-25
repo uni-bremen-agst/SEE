@@ -26,28 +26,48 @@ namespace SEE.GameObjects
         public IList<AuthorEdge> Edges = new List<AuthorEdge>();
 
         /// <summary>
-        /// Returns a camera-facing label with the author's name which will float above the sphere.
+        /// The font used for author labels.
         /// </summary>
+        private static TMP_FontAsset font;
+
+        /// <summary>
+        /// Prefix for game object names of node labels.
+        /// </summary>
+        private const string labelPrefix = "Label ";
+
+        /// <summary>
+        /// Returns a camera-facing label with the <paramref name="author"/>'s name which will float above
+        /// <paramref name="gameObject"/>. The label will be a child of <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object this label should be added to (on top of it).</param>
         /// <param name="author">The author represented by the label.</param>
-        /// <param name="position">The world-space position of the label.</param>
         /// <param name="fontSize">The font size of the label.</param>
         /// <returns>New game object representing the label</returns>
-        private static GameObject AddLabel(FileAuthor author, Vector3 position, float fontSize = 2f)
+        private static GameObject AddLabel(GameObject gameObject, FileAuthor author, float fontSize = 2f)
         {
-            GameObject nodeLabel = new("Text " + author)
+            // Load is not allowed to be called from a field initializer; that is why we do it here.
+            if (font == null)
             {
-                tag = Tags.Text
+                font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+            }
+
+            GameObject nodeLabel = new(labelPrefix + author)
+            {
+                tag = Tags.Text,
+                name = labelPrefix + author
             };
-            nodeLabel.transform.position = position;
+            nodeLabel.transform.position = gameObject.GetTop();
 
             TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
-            tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
+            tm.font = font;
             tm.fontSize = fontSize;
             tm.text = author.Name;
             tm.color = Color.white;
             tm.alignment = TextAlignmentOptions.Center;
 
-            nodeLabel.name = "Label:" + author;
+            TextFactory.LiftText(nodeLabel, tm);
+
+            nodeLabel.transform.SetParent(gameObject.transform);
             nodeLabel.AddComponent<FaceCamera>();
 
             return nodeLabel;
@@ -74,8 +94,10 @@ namespace SEE.GameObjects
         public static GameObject CreateAuthor(GameObject parent, FileAuthor author, Material material, Vector3 positionOffset)
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+            result.transform.localScale *= 0.25f; // Standard size is too large.
             result.name = "AuthorSphere:" + author;
             result.layer = Layers.InteractableGraphObjects;
+            result.transform.SetParent(parent.transform);
 
             InteractionDecorator.PrepareAuthorForInteraction(result);
 
@@ -84,11 +106,7 @@ namespace SEE.GameObjects
 
             result.AddComponent<ShowAuthorEdges>();
 
-            GameObject label = AddLabel(author, result.GetTop());
-            label.transform.SetParent(result.transform);
-
-            result.transform.SetParent(parent.transform);
-            result.transform.localScale *= 0.25f;
+            AddLabel(result, author);
 
             Renderer renderer = result.GetComponent<Renderer>();
 
