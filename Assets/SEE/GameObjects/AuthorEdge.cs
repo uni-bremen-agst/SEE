@@ -41,6 +41,9 @@ namespace SEE.GameObjects
             linePoints[1] = FileNode.gameObject.GetRoofCenter();
 
             LineFactory.Draw(gameObject, linePoints, Width, authorMaterial);
+
+            // Initial visibility of the edge must be set according to the current strategy.
+            ShowOrHide(isHovered: true);
         }
 
         /// <summary>
