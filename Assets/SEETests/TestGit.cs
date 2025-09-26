@@ -47,6 +47,18 @@ namespace SEE.VCS
                 ""); // ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
 
         /// <summary>
+        /// Make sure that an access token for <see cref="TestRepo"/> has been provided.
+        /// </summary>
+        [SetUp]
+        public static void Setup()
+        {
+            if (string.IsNullOrWhiteSpace(TestRepo.AccessToken))
+            {
+                Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(TestRepo)} definition in {nameof(TestGit)} to run the tests.");
+            }
+        }
+
+        /// <summary>
         /// This test shows how to set up a credential provider for LibGit2Sharp.
         /// </summary>
         [Test]

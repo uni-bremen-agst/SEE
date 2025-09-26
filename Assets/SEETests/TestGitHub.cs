@@ -29,6 +29,18 @@ namespace SEE.VCS
         private const string accessToken = "";
 
         /// <summary>
+        /// Make sure that an access token for <see cref="TestGitHub"/> has been provided.
+        /// </summary>
+        [SetUp]
+        public static void Setup()
+        {
+            if (string.IsNullOrWhiteSpace(accessToken))
+            {
+                Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(accessToken)} definition in {nameof(TestGitHub)} to run the tests.");
+            }
+        }
+
+        /// <summary>
         /// Clones the repository at <see cref="repositoryUrl"/> into a temporary directory.
         /// </summary>
         private static void CloneGitHub()

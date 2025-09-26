@@ -12,7 +12,7 @@ using UnityEngine;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Tests for <see cref="VCS.GitRepository"/> using the local Git SEE repository
+    /// Tests for <see cref="GitRepository"/> using the local Git SEE repository
     /// in which these tests are run.
     /// </summary>
     internal class TestGitSEE : TestGitRepository
@@ -320,6 +320,10 @@ namespace SEE.VCS
         public void TestFetchRemotesForSEE()
         {
             GitRepository repo = GetRepository();
+            if (string.IsNullOrWhiteSpace(repo.AccessToken))
+            {
+                Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(repo.AccessToken)} definition in {nameof(TestGitSEE)} to run the tests.");
+            }
             Performance p = Performance.Begin(nameof(GitRepository.FetchRemotes));
             repo.FetchRemotes();
             p.End(true);
