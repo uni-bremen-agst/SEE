@@ -1,3 +1,4 @@
+using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -28,18 +29,52 @@ namespace SEE.Game.City
         public string Date = SEEDate.Now();
 
         /// <summary>
+        /// Backing attribute for <see cref="ShowAuthorEdges"/>.
+        /// </summary>
+        [OdinSerialize, NonSerialized, HideInInspector]
+        private ShowAuthorEdgeStrategy showAuthorEdges = ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+
+        /// <summary>
         /// Specifies how the edges connecting authors and their commits should be shown.
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
-        [TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup),
-            Tooltip("When connecting lines between authors and files should be shown."),
-            ShowInInspector,
-            OdinSerialize]
-        public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy { get; set; } =
-                ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+        [ShowInInspector,
+            TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup),
+            Tooltip("Whether connecting lines between authors and files should be shown.")]
+        public ShowAuthorEdgeStrategy ShowAuthorEdges
+        {
+            get => showAuthorEdges;
+            set
+            {
+                if (value != showAuthorEdges)
+                {
+                    showAuthorEdges = value;
+                    UpdateAuthorEdges();
+                }
+            }
+        }
 
         /// <summary>
-        /// Only relevant if <see cref="ShowAuthorEdgesStrategy"/> is set to
+        /// Updates the visibility of all author edges.
+        /// </summary>
+        private void UpdateAuthorEdges()
+        {
+            GameObject root = gameObject.FirstChildNode();
+            if (root != null)
+            {
+                // Edges are located under the root node.
+                foreach (Transform child in root.transform)
+                {
+                    if (child.TryGetComponent(out GameObjects.AuthorEdge edge))
+                    {
+                        edge.ShowOrHide(isHovered: false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Only relevant if <see cref="ShowAuthorEdges"/> is set to
         /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
         ///
         /// This is the threshold for the number of authors at which edges between authors
@@ -47,8 +82,8 @@ namespace SEE.Game.City
         /// If the number of authors is below this threshold, the edges will only be shown when
         /// the user hovers over the node or the author sphere.
         /// </summary>
-        [ShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
-         RuntimeShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+        [ShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         RuntimeShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
          Range(2, 20),
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
@@ -115,7 +150,7 @@ namespace SEE.Game.City
         private const string dateLabel = "Date";
 
         /// <summary>
-        /// Label of attribute <see cref="ShowAuthorEdgesStrategy"/> in the configuration file.
+        /// Label of attribute <see cref="ShowAuthorEdges"/> in the configuration file.
         /// </summary>
         private const string showEdgesStrategy = "ShowAuthorEdgesStrategy";
 
@@ -128,7 +163,7 @@ namespace SEE.Game.City
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
-            writer.Save(ShowAuthorEdgesStrategy.ToString(), showEdgesStrategy);
+            writer.Save(ShowAuthorEdges.ToString(), showEdgesStrategy);
             writer.Save(AuthorThreshold, authorThresholdLabel);
         }
 
@@ -137,10 +172,10 @@ namespace SEE.Game.City
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
             {
-                ShowAuthorEdgeStrategy showAuthorEdgesStrategy = ShowAuthorEdgesStrategy;
+                ShowAuthorEdgeStrategy showAuthorEdgesStrategy = ShowAuthorEdges;
                 if (ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref showAuthorEdgesStrategy))
                 {
-                    ShowAuthorEdgesStrategy = showAuthorEdgesStrategy;
+                    ShowAuthorEdges = showAuthorEdgesStrategy;
                 }
             }
             ConfigIO.Restore(attributes, authorThresholdLabel, ref AuthorThreshold);
