@@ -29,12 +29,16 @@ namespace SEE.VCS
         private Repository repository;
 
         /// <summary>
+        /// Indicates whether the object has been disposed.
+        /// </summary>
+        private bool disposed = false;
+
+        /// <summary>
         /// Disposes the repository if it is not null.
         /// </summary>
         public void Dispose()
         {
-            // Dispose of the repository if it is not null to release resources.
-            repository?.Dispose();
+            Dispose(true);
             // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
             // finalization when Dispose is called explicitly.
             GC.SuppressFinalize(this);
@@ -45,7 +49,20 @@ namespace SEE.VCS
         /// </summary>
         ~GitRepository()
         {
-            Dispose();
+            Dispose(false);
+        }
+
+        private void Dispose(bool disposing)
+        {
+            // Check if the object has already been disposed to prevent double-disposal.
+            if (disposed)
+            {
+                return;
+            }
+            // Dispose of the repository if it is not null to release resources.
+            repository?.Dispose();
+            repository = null;
+            disposed = true;
         }
 
         /// <summary>
