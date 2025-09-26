@@ -66,5 +66,18 @@ namespace SEE.GameObjects
                 }
             }
         }
+
+        /// <summary>
+        /// Updates the positions of the edge's line renderer to match the current positions
+        /// of the <see cref="AuthorSphere"/> and the <see cref="FileNode"/>.
+        /// </summary>
+        internal void Update()
+        {
+            if (TryGetComponent(out LineRenderer lineRenderer))
+            {
+                lineRenderer.SetPosition(0, AuthorSphere.gameObject.transform.position);
+                lineRenderer.SetPosition(1, FileNode.gameObject.GetRoofCenter());
+            }
+        }
     }
 }

@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -476,10 +475,17 @@ namespace SEE.Game.Operator
                 {
                     // If we are moving the root node, the whole graph will be moved,
                     // hence, the layout of the edges does not need to be updated.
-                    if (updateEdges && City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                    if (updateEdges)
                     {
-                        // The edge layout needs to be updated only if we actually have an edge layout.
-                        UpdateEdgeLayout(duration);
+                        if (City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                        {
+                            // The edge layout needs to be updated only if we actually have an edge layout.
+                            UpdateEdgeLayout(duration);
+                        }
+                        if (TryGetComponent(out AuthorRef author))
+                        {
+                            author.UpdateEdges();
+                        }
                     }
                 }
             }
