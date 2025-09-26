@@ -358,7 +358,7 @@ public class EchoFace : MonoBehaviour
             skinnedMeshRenderer = transform.Find("CC_Base_Body")?.GetComponent<SkinnedMeshRenderer>();
             if (skinnedMeshRenderer == null)
             {
-                Debug.LogWarning("SkinnedMeshRenderer not found. Please assign it manually.");
+                Debug.LogWarning("[EchoFace] SkinnedMeshRenderer not found. Please assign it manually.");
             }
         }
 
@@ -368,7 +368,7 @@ public class EchoFace : MonoBehaviour
             headTransform = FindDeepChild(transform, "CC_Base_Head");
             if (headTransform == null)
             {
-                Debug.LogWarning("Head bone transform not found. Head rotation will be disabled.");
+                Debug.LogWarning("[EchoFace] Head bone transform not found. Head rotation will be disabled.");
             }
             else
             {
@@ -529,7 +529,7 @@ public class EchoFace : MonoBehaviour
             !landmarks.ContainsKey(Landmarks.LeftUpperEyelid) ||
             !landmarks.ContainsKey(Landmarks.RightUpperEyelid))
         {
-            Debug.LogWarning("Required landmarks for head pose not found in the received data.");
+            Debug.LogWarning("[EchoFace] Required landmarks for head pose not found in the received data.");
             return _currentHeadRotation;
         }
 
@@ -631,7 +631,7 @@ public class EchoFace : MonoBehaviour
 
         if (leftEyeTransform == null || rightEyeTransform == null)
         {
-            Debug.LogWarning("Eye bone transforms not found. Eye rotation will be disabled.");
+            Debug.LogWarning("[EchoFace] Eye bone transforms not found. Eye rotation will be disabled.");
         }
         else
         {
@@ -682,11 +682,11 @@ public class EchoFace : MonoBehaviour
                 Name = "UDPEchoFace"
             };
             _receiveThread.Start();
-            Debug.Log($"UDP listener started on port {port}.");
+            Debug.Log($"[EchoFace] UDP listener started on port {port}.");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"UDP listener failed to start on port {port}: {ex.Message}");
+            Debug.LogError($"[EchoFace] UDP listener failed to start on port {port}: {ex.Message}");
         }
     }
 
@@ -714,17 +714,17 @@ public class EchoFace : MonoBehaviour
             catch (SocketException ex) when (ex.ErrorCode == 10004)
             {
                 if (_isRunning)
-                    Debug.LogWarning("UDP socket interrupted (normal shutdown).");
+                    Debug.LogWarning("[EchoFace] UDP socket interrupted (normal shutdown).");
             }
             catch (ObjectDisposedException)
             {
                 if (_isRunning)
-                    Debug.LogWarning("UDP client disposed (normal shutdown).");
+                    Debug.LogWarning("[EchoFace] UDP client disposed (normal shutdown).");
             }
             catch (Exception ex)
             {
                 if (_isRunning)
-                    Debug.LogError($"UDP receive error: {ex.Message}");
+                    Debug.LogError($"[EchoFace] UDP receive error: {ex.Message}");
             }
         }
     }
@@ -756,7 +756,7 @@ public class EchoFace : MonoBehaviour
             }
             else
             {
-                Debug.LogWarning($"Blendshape '{name}' not found on the mesh.");
+                Debug.LogWarning($"[EchoFace] Blendshape '{name}' not found on the mesh.");
             }
         }
     }
@@ -777,7 +777,7 @@ public class EchoFace : MonoBehaviour
             _receiveThread.Join(500); // Wait up to 500ms for the thread to exit
             if (_receiveThread.IsAlive)
             {
-                Debug.LogWarning("UDP receive thread did not terminate gracefully.");
+                Debug.LogWarning("[EchoFace] UDP receive thread did not terminate gracefully.");
             }
         }
 
