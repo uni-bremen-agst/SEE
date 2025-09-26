@@ -43,7 +43,7 @@ namespace SEE.GameObjects
             LineFactory.Draw(gameObject, linePoints, Width, authorMaterial);
 
             // Initial visibility of the edge must be set according to the current strategy.
-            ShowOrHide(isHovered: true);
+            ShowOrHide(isHovered: false);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace SEE.GameObjects
         {
             if (gameObject.ContainingCity() is BranchCity branchCity)
             {
-                bool show = branchCity.ShowAuthorEdgesStrategy switch
+                bool show = branchCity.ShowAuthorEdges switch
                 {
                     ShowAuthorEdgeStrategy.ShowAlways => true,
                     ShowAuthorEdgeStrategy.ShowOnHoverOnly => isHovered,
