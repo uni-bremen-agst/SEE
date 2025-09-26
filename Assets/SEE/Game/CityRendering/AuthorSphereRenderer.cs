@@ -174,7 +174,7 @@ namespace SEE.Game.CityRendering
                                                     Settings.EdgeLayoutSettings.EdgeWidth);
                     authorEdge.Draw();
 
-                    authorRef.Edges.Add(authorEdge);
+                    authorRef.Add(authorEdge);
                     authorSphere.Edges.Add(authorEdge);
                 }
             }

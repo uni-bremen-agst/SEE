@@ -59,7 +59,7 @@ namespace SEE.GameObjects
                     ShowAuthorEdgeStrategy.ShowAlways => true,
                     ShowAuthorEdgeStrategy.ShowOnHoverOnly => isHovered,
                     ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors => isHovered
-                                                                               || FileNode.Edges.Count >= branchCity.AuthorThreshold,
+                                                                               || FileNode.Count >= branchCity.AuthorThreshold,
                     _ => throw new NotImplementedException(),
                 };
 
@@ -74,13 +74,38 @@ namespace SEE.GameObjects
         /// Updates the positions of the edge's line renderer to match the current positions
         /// of the <see cref="AuthorSphere"/> and the <see cref="FileNode"/>.
         /// </summary>
-        internal void Update()
+        internal void UpdateLayout()
         {
             if (TryGetComponent(out LineRenderer lineRenderer))
             {
                 lineRenderer.SetPosition(0, AuthorSphere.gameObject.transform.position);
                 lineRenderer.SetPosition(1, FileNode.gameObject.GetRoofCenter());
             }
+        }
+
+        /// <summary>
+        /// Updates the visibility of the associated line renderer based on the number of authors  and the visibility
+        /// strategy of the containing city.
+        /// </summary>
+        /// <remarks>This method enables the line renderer if the containing city is a <see
+        /// cref="BranchCity"/>  with a visibility strategy of <see
+        /// cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>, and the number of authors meets or
+        /// exceeds the city's author threshold.</remarks>
+        /// <param name="numberOfAuthors">The number of authors associated with the current object.</param>
+        /// <returns>True if the visibility of the line renderer was changed; otherwise, false.</returns>
+        internal bool UpdateVisibility(int numberOfAuthors)
+        {
+            if (gameObject.ContainingCity() is BranchCity branchCity
+                && branchCity.ShowAuthorEdges == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+            {
+                if (TryGetComponent(out LineRenderer lineRenderer))
+                {
+                    bool isLineVisible = lineRenderer.enabled;
+                    lineRenderer.enabled = numberOfAuthors >= branchCity.AuthorThreshold;
+                    return isLineVisible != lineRenderer.enabled;
+                }
+            }
+            return false;
         }
     }
 }

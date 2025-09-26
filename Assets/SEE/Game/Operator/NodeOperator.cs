@@ -484,7 +484,7 @@ namespace SEE.Game.Operator
                         }
                         if (TryGetComponent(out AuthorRef author))
                         {
-                            author.UpdateEdges();
+                            author.UpdateLayout();
                         }
                     }
                 }

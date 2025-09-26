@@ -50,7 +50,7 @@ namespace SEE.Controls.Actions
         /// <remarks>This will be executed at the hovering of file nodes.</remarks>
         private void ToggleAuthorEdgesForNode(bool isHovered, AuthorRef authorRef)
         {
-            foreach (AuthorEdge authorEdge in authorRef.Edges)
+            foreach (AuthorEdge authorEdge in authorRef)
             {
                 authorEdge.ShowOrHide(isHovered);
             }
