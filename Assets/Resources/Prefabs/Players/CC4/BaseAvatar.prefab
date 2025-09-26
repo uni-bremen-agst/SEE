@@ -588,6 +588,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5907350534295900748}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 6831185425261647939}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -1134,6 +1138,34 @@ MonoBehaviour:
   Tongue_Bulge_L_Value: 0
   Neck_Tighten_L_Value: 0
   Neck_Tighten_R_Value: 0
+--- !u!114 &6831185425261647939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0c095ca9a316a9a4a84485feef3e87c9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  port: 12345
+  skinnedMeshRenderer: {fileID: 0}
+  enableFaceAnimation: 1
+  smoothingFactor: 0.5
+  visemeSmoothingFactor: 0.9
+  eyeSquintPower: 3
+  mouthDownValue: 0.7
+  enableHeadRotation: 1
+  headTransform: {fileID: 0}
+  rotationSmoothingFactor: 0.5
+  tiltCorrection: -15
+  enableEyeRotation: 1
+  leftEyeTransform: {fileID: 0}
+  rightEyeTransform: {fileID: 0}
+  eyeRotationSmoothingFactor: 0.5
+  eyeLookScale: 30
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
