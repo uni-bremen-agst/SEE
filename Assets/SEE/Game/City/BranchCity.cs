@@ -2,6 +2,7 @@ using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -31,8 +32,10 @@ namespace SEE.Game.City
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
         [TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup),
-            Tooltip("When connecting lines between authors and files should be shown.")]
-        public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy =
+            Tooltip("When connecting lines between authors and files should be shown."),
+            ShowInInspector,
+            OdinSerialize]
+        public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy { get; set; } =
                 ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
 
         /// <summary>
@@ -133,7 +136,13 @@ namespace SEE.Game.City
         {
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
-            ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref ShowAuthorEdgesStrategy);
+            {
+                ShowAuthorEdgeStrategy showAuthorEdgesStrategy = ShowAuthorEdgesStrategy;
+                if (ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref showAuthorEdgesStrategy))
+                {
+                    ShowAuthorEdgesStrategy = showAuthorEdgesStrategy;
+                }
+            }
             ConfigIO.Restore(attributes, authorThresholdLabel, ref AuthorThreshold);
         }
 
