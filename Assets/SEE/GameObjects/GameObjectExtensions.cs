@@ -46,6 +46,25 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the first immediate child of <paramref name="gameObject"/> that
+        /// is a graph node, i.e., has a <see cref="NodeRef"/> attached to it
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>).
+        /// </summary>
+        /// <param name="gameObject"></param>
+        /// <returns></returns>
+        public static GameObject FirstChildNode(this GameObject gameObject)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.gameObject.IsNode())
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns true if a code city was drawn for this <paramref name="gameObject"/>.
         /// A code city is assumed to be drawn in there is at least one immediate child
         /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
