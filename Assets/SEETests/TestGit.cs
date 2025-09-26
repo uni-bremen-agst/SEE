@@ -13,7 +13,7 @@ namespace SEE.VCS
     /// <remarks>These are not really tests, but rather a playground to
     /// explore the API of <see cref="LibGit2Sharp"/>.</remarks>
     [Category("SkipOnCI")]
-    internal class TestGit
+    internal class TestGit : TestGitRepository
     {
         // For more examples of using LibGit2Sharp, see:
         //   https://github.com/libgit2/libgit2sharp/blob/master/LibGit2Sharp.Tests/
@@ -43,8 +43,7 @@ namespace SEE.VCS
         /// A private repository on GitHub used for testing purposes.
         /// </summary>
         private static readonly RepositoryInfo TestRepo =
-            new("https://github.com/koschke/TestProjectForSEE.git",
-                ""); // ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
+            new(testRepositoryUrl, testRepositoryAccessToken);
 
         /// <summary>
         /// Make sure that an access token for <see cref="TestRepo"/> has been provided.
