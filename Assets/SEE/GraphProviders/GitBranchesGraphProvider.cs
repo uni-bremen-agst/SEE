@@ -1,7 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -10,6 +6,11 @@ using SEE.Utils;
 using SEE.Utils.Config;
 using SEE.VCS;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
 using UnityEngine;
 
 namespace SEE.GraphProviders
@@ -32,6 +33,17 @@ namespace SEE.GraphProviders
         #region Attributes
 
         /// <summary>
+        /// The poller which will regularly fetch the repository for new changes.
+        /// </summary>
+        private GitPoller poller;
+
+        /// <summary>
+        /// Backing field for <see cref="AutoFetch"/>.
+        /// </summary>
+        [OdinSerialize, NonSerialized, HideInInspector]
+        private bool autoFetch = false;
+
+        /// <summary>
         /// Specifies if SEE should automatically fetch for new commits in the
         /// repository <see cref="RepositoryData"/>.
         ///
@@ -40,8 +52,27 @@ namespace SEE.GraphProviders
         /// Note: the repository must be fetch-able without any credentials
         /// since we can't store them securely yet.
         /// </summary>
-        [Tooltip("If true, the repository will be polled regularly for new changes.")]
-        public bool AutoFetch = false;
+        [ShowInInspector,
+            Tooltip("If true, the repository will be polled regularly for new changes.")]
+        public bool AutoFetch
+        {
+            get => autoFetch;
+            set
+            {
+                if (value != autoFetch)
+                {
+                    autoFetch = value;
+                    if (autoFetch)
+                    {
+                        poller?.Start();
+                    }
+                    else
+                    {
+                        poller?.Stop();
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// The interval in seconds in which git fetch should be called.
@@ -101,10 +132,17 @@ namespace SEE.GraphProviders
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
 
-            // Only add the poller when in play mode.
-            if (AutoFetch && Application.isPlaying)
+            if (AutoFetch) // && Application.isPlaying)
             {
-                branchCity.GetOrAddGitPollerComponent(PollingInterval, MarkerTime).Repository = GitRepository;
+                // We can create the poller only now that we know the city.
+                poller = new GitPoller
+                {
+                    MarkerTime = MarkerTime,
+                    PollingInterval = PollingInterval,
+                    CodeCity = branchCity,
+                    Repository = GitRepository
+                };
+                poller.Start();
             }
 
             return task;
@@ -198,7 +236,7 @@ namespace SEE.GraphProviders
         protected override void RestoreAttributes(Dictionary<string, object> attributes)
         {
             base.RestoreAttributes(attributes);
-            ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
+            ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
             ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
             ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
         }

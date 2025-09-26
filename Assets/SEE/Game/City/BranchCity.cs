@@ -90,25 +90,6 @@ namespace SEE.Game.City
         public int AuthorThreshold = 2;
 
         /// <summary>
-        /// Resets everything that is specific to a given graph. Here in addition to
-        /// the overridden method, the <see cref="GitPoller"/> component will be
-        /// removed.
-        /// </summary>
-        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
-        [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
-        public override void Reset()
-        {
-            base.Reset();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
-        }
-
-        /// <summary>
         /// Validates <see cref="Date"/>.
         /// </summary>
         /// <param name="result">where the error results are to be added (if any)</param>
@@ -119,27 +100,6 @@ namespace SEE.Game.City
             {
                 result.AddError("Invalid date!");
             }
-        }
-
-        /// <summary>
-        /// Returns or adds a <see cref="GitPoller"/> component to the game object this
-        /// <paramref name="city"/> is attached to.
-        /// </summary>
-        /// <param name="pollingInterval">VCS polling interval in seconds.</param>
-        /// <param name="markerTime">Time in seconds for how long the markers should be shown.</param>
-        /// <returns>The <see cref="GitPoller"/> component</returns>
-        public GitPoller GetOrAddGitPollerComponent(int pollingInterval, int markerTime)
-        {
-            if (TryGetComponent(out GitPoller poller))
-            {
-                return poller;
-            }
-
-            GitPoller newPoller = gameObject.AddComponent<GitPoller>();
-            newPoller.CodeCity = this;
-            newPoller.PollingInterval = pollingInterval;
-            newPoller.MarkerTime = markerTime;
-            return newPoller;
         }
 
         #region Config I/O
