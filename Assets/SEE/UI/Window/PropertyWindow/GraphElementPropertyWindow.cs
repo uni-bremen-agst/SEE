@@ -52,11 +52,11 @@ namespace SEE.UI.Window.PropertyWindow
             /// for example "Source", "Metric", etc. The name is split at the first dot.
             if (!contextMenu.Grouper)
             {
-                GroupByValueType();
+                GroupByType();
             }
             else
             {
-                GroupByNameType();
+                GroupByName();
             }
 
             // Sorts the properties
@@ -69,7 +69,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             // Creates the items for the value type group, when attributes should be
             // grouped by their value type (i.e., toggle, string, int, float attributes).
-            void GroupByValueType()
+            void GroupByType()
             {
                 // Toggle Attributes
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
@@ -98,7 +98,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             // Creates the items for the name type group, when attributes should be
             // grouped by their name type (i.e., Source, Metric, etc.).
-            void GroupByNameType()
+            void GroupByName()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
