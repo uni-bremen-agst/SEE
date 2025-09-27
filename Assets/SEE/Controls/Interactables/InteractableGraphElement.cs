@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace SEE.Controls.Interactables
 {
+    /// <summary>
+    /// Represents an interactable object that is associated with a graph element, such as a node or an edge.
+    /// </summary>
+    /// <remarks>This class provides functionality for interacting with graph elements in a visual graph
+    /// representation. It supports highlighting and unhighlighting behaviors, which can trigger visual effects such as
+    /// blinking or animating data flow. The specific behavior depends on whether the associated graph element is a node
+    /// or an edge.</remarks>
     internal sealed class InteractableGraphElement : InteractableObject
     {
         /// <summary>
