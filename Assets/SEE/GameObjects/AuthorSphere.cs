@@ -116,5 +116,15 @@ namespace SEE.GameObjects
             result.transform.position = positionOffset + parent.transform.position;
             return result;
         }
+
+        /// <summary>
+        /// The number of files this author has contributed to.
+        /// More precisely, the number of <see cref="Edges"/>.
+        /// </summary>
+        /// <returns></returns>
+        internal int NumberOfFiles()
+        {
+            return Edges.Count;
+        }
     }
 }

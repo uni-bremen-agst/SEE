@@ -11,6 +11,15 @@ namespace SEE.UI.Window.PropertyWindow
     internal class AuthorPropertyWindow : PropertyWindow
     {
         /// <summary>
+        /// The name of the author email attribute.
+        /// </summary>
+        private const string EmailAttribute = "E-Mail";
+        /// <summary>
+        /// The name of the attribute showing the number of files an author has committed.
+        /// </summary>
+        private const string NumberOfFiles = "Number of Files";
+
+        /// <summary>
         /// The author whose properties are shown in this window.
         /// </summary>
         public AuthorSphere author;
@@ -57,49 +66,65 @@ namespace SEE.UI.Window.PropertyWindow
             void GroupByValueType()
             {
                 // Toggle Attributes
+                /* Currently, there are no boolean attributes for authors.
+
                 if (contextMenu.Filter.IncludeToggleAttributes)
                 {
-                    DisplayGroup(PropertyTypes.ToggleAttributes, new Dictionary<string, string>{ { "Is Admin", "yes" } });
+                    DisplayGroup(PropertyTypes.ToggleAttributes,
+                                 new Dictionary<string, string>{ { "Is Admin", "yes" } });
                 }
+                */
 
                 // String Attributes
                 if (contextMenu.Filter.IncludeStringAttributes)
                 {
-                    DisplayGroup(PropertyTypes.StringAttributes, new Dictionary<string, string> { { "E-Mail", author.Author.Email } });
+                    DisplayGroup(PropertyTypes.StringAttributes,
+                                 new Dictionary<string, string> { { EmailAttribute, author.Author.Email } });
                 }
 
                 // Int Attributes
                 if (contextMenu.Filter.IncludeIntAttributes)
                 {
-                    DisplayGroup(PropertyTypes.IntAttributes, new Dictionary<string, string> { { "Number of Commits", "10" } });
+                    DisplayGroup(PropertyTypes.IntAttributes,
+                                 new Dictionary<string, string> { { NumberOfFiles, author.NumberOfFiles().ToString() } });
                 }
 
                 // Float Attributes
+                /* Currently, there are no float attributes for authors.
                 if (contextMenu.Filter.IncludeFloatAttributes)
                 {
-                    DisplayGroup(PropertyTypes.FloatAttributes, new Dictionary<string, string> { { "Hours", "10.0" } });
+                    DisplayGroup(PropertyTypes.FloatAttributes,
+                                 new Dictionary<string, string> { { "Hours", "10.0" } });
                 }
+                */
             }
 
+            // Creates the items for the name type group, when attributes should be
+            // grouped by their name type.
             void GroupByNameType()
             {
                 Dictionary<string, object> attributes = new();
+
+                /* Currently, there are no boolean attributes for authors.
                 if (contextMenu.Filter.IncludeToggleAttributes)
                 {
                     attributes.Add("Is Admin", "yes");
                 }
+                */
                 if (contextMenu.Filter.IncludeStringAttributes)
                 {
-                    attributes.Add("E-Mail", author.Author.Email);
+                    attributes.Add(EmailAttribute, author.Author.Email);
                 }
                 if (contextMenu.Filter.IncludeIntAttributes)
                 {
-                    attributes.Add("Number of Commits", "10");
+                    attributes.Add(NumberOfFiles, author.NumberOfFiles());
                 }
+                /* Currently, there are no float attributes for authors.
                 if (contextMenu.Filter.IncludeFloatAttributes)
                 {
                     attributes.Add("Hours", "10.0");
                 }
+                */
                 SplitInAttributeGroup(attributes);
             }
         }
