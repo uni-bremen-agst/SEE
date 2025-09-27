@@ -14,7 +14,7 @@ namespace SEE.Game.CityRendering
     /// Implements the methods for rendering author spheres in a branch city.
     ///
     /// This functionality is primarily needed for a <see cref="BranchCity"/> and builds on the precondition that
-    /// nodes have authors which are marked by the <see cref="DataModel.DG.VCS.AuthorAttributeName"/> attribute.
+    /// nodes have authors which are marked by the <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> attribute.
     /// </summary>
     public partial class GraphRenderer
     {
@@ -23,7 +23,7 @@ namespace SEE.Game.CityRendering
         /// This method should be executed after the graph was rendered.
         ///
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
-        /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> attribute which sets the author.
+        /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> attribute which sets the author.
         ///
         /// The collected authors are then rendered as spheres floating over the city.
         /// </summary>
@@ -46,10 +46,10 @@ namespace SEE.Game.CityRendering
         private IList<GameObject> RenderAuthors(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
-            /// <see cref="DataModel.DG.VCS.AuthorAttributeName"/> separated by commas.
+            /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> separated by commas.
             List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
-                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
+                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorsAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
                     .Select(x => new FileAuthor(x))
@@ -139,8 +139,8 @@ namespace SEE.Game.CityRendering
                 // Maps from the graph node (a file) onto the game object representing the (file) node.
                 // FIXME: Looks like this can be simplified and optimized.
                 IEnumerable<KeyValuePair<Node, GameObject>> filesOfAuthor = nodeMap
-                    .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
-                    .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
+                    .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorsAttributeName))
+                    .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorsAttributeName]
                                    .Split(',').Contains(authorName.ToString()));
 
                 // For all files of the given author.
