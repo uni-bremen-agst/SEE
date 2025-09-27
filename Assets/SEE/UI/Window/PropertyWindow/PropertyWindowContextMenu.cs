@@ -56,7 +56,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// If true, grouping is done by the names of the attributes.
         /// Otherwise, grouping is done by the type of the attributes.
         /// </summary>
-        public bool GroupByName;
+        public bool GroupByName = true;
 
         /// <summary>
         /// Construcotr.
@@ -81,7 +81,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             ResetFilter();
             ResetSort();
-            ResetGroup();
+            GroupByName = true;
 
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
             this.filterButton.clickEvent.AddListener(() => {
@@ -296,7 +296,7 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 new PopupMenuAction("Value Type", () =>
                 {
-                    ResetGroup();
+                    GroupByName = false;
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
                 }, Radio(!GroupByName), CloseAfterClick: false),
@@ -305,7 +305,7 @@ namespace SEE.UI.Window.PropertyWindow
                     GroupByName = true;
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
-                }, Radio(GroupByName), CloseAfterClick: false)
+                }, Radio(GroupByName), CloseAfterClick: false, Priority: 1)
             };
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
@@ -319,14 +319,6 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="value">Whether the radio button is checked.</param>
         /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
         private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
-
-        /// <summary>
-        /// Resets the grouper to its default state.
-        /// </summary>
-        private void ResetGroup()
-        {
-            GroupByName = false;
-        }
         #endregion
     }
 }
