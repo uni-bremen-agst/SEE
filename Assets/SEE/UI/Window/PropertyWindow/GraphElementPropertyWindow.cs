@@ -50,13 +50,13 @@ namespace SEE.UI.Window.PropertyWindow
             /// graph element attribute kind.
             /// The second one creates groups according to the qualified name of the graph element attribute,
             /// for example "Source", "Metric", etc. The name is split at the first dot.
-            if (!contextMenu.GroupByName)
+            if (contextMenu.GroupByName)
             {
-                GroupByType();
+                GroupByName();
             }
             else
             {
-                GroupByName();
+                GroupByType();
             }
 
             // Sorts the properties
