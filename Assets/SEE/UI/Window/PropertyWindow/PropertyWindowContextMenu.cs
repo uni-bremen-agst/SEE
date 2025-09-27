@@ -209,13 +209,7 @@ namespace SEE.UI.Window.PropertyWindow
                         string text = x.FindDescendant("ValueLine").MustGetComponent<TextMeshProUGUI>().text;
                         if (int.TryParse(text, out int intValue))
                         {
-                            if (!GroupByName) {
-                                return intValue;
-                            }
-                            else
-                            {
-                                return (float)intValue;
-                            }
+                            return GroupByName ? (float)intValue : intValue;
                         }
                         else if (float.TryParse(text, out float floatValue))
                         {
