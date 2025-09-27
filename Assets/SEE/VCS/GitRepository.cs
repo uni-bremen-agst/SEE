@@ -23,8 +23,8 @@ namespace SEE.VCS
     public class GitRepository: IDisposable
     {
         /// <summary>
-        /// The underlying <see cref="Repository"/> object that provides access to
-        /// the Git repository.
+        /// The underlying <see cref="Repository"/> object that provides access to the Git repository.
+        /// If this is null, the repository has not been opened yet or was disposed.
         /// </summary>
         private Repository repository;
 
@@ -52,6 +52,10 @@ namespace SEE.VCS
             Dispose(false);
         }
 
+        /// <summary>
+        /// Disposes the repository if it is not null.
+        /// </summary>
+        /// <param name="disposing"></param>
         private void Dispose(bool disposing)
         {
             // Check if the object has already been disposed to prevent double-disposal.
@@ -60,8 +64,8 @@ namespace SEE.VCS
                 return;
             }
             // Dispose of the repository if it is not null to release resources.
-            repository?.Dispose();
-            repository = null;
+            // repository?.Dispose(); // FIXME(#873)
+            // repository = null;
             disposed = true;
         }
 
