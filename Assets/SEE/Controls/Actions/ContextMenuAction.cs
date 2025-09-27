@@ -919,16 +919,16 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns a <see cref="PropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// Returns a <see cref="GraphElementPropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
         /// </summary>
         /// <param name="graphElementRef">The graph element to activate the property window for</param>
-        /// <returns>The <see cref="PropertyWindow"/> object showing the attributes of the specified graph element.</returns>
-        private static PropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
+        /// <returns>The <see cref="GraphElementPropertyWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static GraphElementPropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one
-            if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
+            if (!graphElementRef.TryGetComponent(out GraphElementPropertyWindow propertyMenu))
             {
-                propertyMenu = graphElementRef.gameObject.AddComponent<PropertyWindow>();
+                propertyMenu = graphElementRef.gameObject.AddComponent<GraphElementPropertyWindow>();
                 propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
                 propertyMenu.GraphElement = graphElementRef.Elem;
             }

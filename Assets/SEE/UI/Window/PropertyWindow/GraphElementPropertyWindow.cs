@@ -20,7 +20,7 @@ namespace SEE.UI.Window.PropertyWindow
     /// It consists of a search field and a list of properties, where each property is represented by a row
     /// holding the attribute name and its value.
     /// </summary>
-    public class PropertyWindow : BaseWindow
+    public class GraphElementPropertyWindow : BaseWindow
     {
         #region Attributes
         /// <summary>
@@ -30,7 +30,7 @@ namespace SEE.UI.Window.PropertyWindow
 
         #region Prefabs
         /// <summary>
-        /// Prefab for the <see cref="PropertyWindow"/>.
+        /// Prefab for the <see cref="GraphElementPropertyWindow"/>.
         /// </summary>
         private readonly string WindowPrefab = UIPrefabFolder + "PropertyWindow";
 
