@@ -281,7 +281,7 @@ namespace SEE.Controls.Actions
                 {
                     if (iO.gameObject != null)
                     {
-                        ActivateWindow(CreatePropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                        ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -361,9 +361,7 @@ namespace SEE.Controls.Actions
 
             void ShowProperties()
             {
-                // FIXME: Implement author properties window.
-                //ActivateWindow(CreatePropertyWindow(author.gameObject);
-                Debug.Log($"{nameof(ShowProperties)}({name})\n");
+                ActivateWindow(CreateAuthorPropertyWindow(author.gameObject.MustGetComponent<AuthorSphere>()));
             }
         }
 
@@ -560,7 +558,7 @@ namespace SEE.Controls.Actions
 
             void ShowProperties()
             {
-                ActivateWindow(CreatePropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
+                ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowMetrics()
@@ -923,7 +921,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         /// <param name="graphElementRef">The graph element to activate the property window for</param>
         /// <returns>The <see cref="GraphElementPropertyWindow"/> object showing the attributes of the specified graph element.</returns>
-        private static GraphElementPropertyWindow CreatePropertyWindow(GraphElementRef graphElementRef)
+        private static GraphElementPropertyWindow CreateGraphElementPropertyWindow(GraphElementRef graphElementRef)
         {
             // Create new window for active selection, or use existing one
             if (!graphElementRef.TryGetComponent(out GraphElementPropertyWindow propertyMenu))
@@ -931,6 +929,23 @@ namespace SEE.Controls.Actions
                 propertyMenu = graphElementRef.gameObject.AddComponent<GraphElementPropertyWindow>();
                 propertyMenu.Title = "Properties for " + graphElementRef.Elem.ToShortString();
                 propertyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return propertyMenu;
+        }
+
+        /// <summary>
+        /// Returns an <see cref="AuthorPropertyWindow"/> showing the attributes of <paramref name="author"/>.
+        /// </summary>
+        /// <param name="author">The author to activate the property window for</param>
+        /// <returns>The <see cref="AuthorPropertyWindow"/> object showing the attributes of the specified author.</returns>
+        private static AuthorPropertyWindow CreateAuthorPropertyWindow(AuthorSphere author)
+        {
+            // Create new window for active selection, or use existing one
+            if (!author.TryGetComponent(out AuthorPropertyWindow propertyMenu))
+            {
+                propertyMenu = author.gameObject.AddComponent<AuthorPropertyWindow>();
+                propertyMenu.Title = "Properties for " + author.Author.Name;
+                propertyMenu.author = author;
             }
             return propertyMenu;
         }
