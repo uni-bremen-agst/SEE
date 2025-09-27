@@ -223,7 +223,6 @@ namespace SEE.Controls.Actions
                             UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElementMultiselection(popupMenu, selectedObjects));
                         }, Icons.ArrowLeft, CloseAfterClick: false),
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
-                        new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
                         new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
                     };
 
@@ -282,17 +281,6 @@ namespace SEE.Controls.Actions
                     if (iO.gameObject != null)
                     {
                         ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
-                    }
-                }
-            }
-
-            void ShowMetrics()
-            {
-                foreach (InteractableObject iO in selectedObjects)
-                {
-                    if (iO.gameObject != null)
-                    {
-                        ActivateWindow(CreateMetricWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -505,7 +493,6 @@ namespace SEE.Controls.Actions
                         },
                             Icons.ArrowLeft, CloseAfterClick: false),
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
-                        new PopupMenuAction("Show Metrics", ShowMetrics, Icons.Info),
                     };
                 if (gameObject != null)
                 {
@@ -559,11 +546,6 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
-            }
-
-            void ShowMetrics()
-            {
-                ActivateWindow(CreateMetricWindow(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
@@ -897,23 +879,6 @@ namespace SEE.Controls.Actions
             }
             manager.ActiveWindow = openWindow;
             return openWindow;
-        }
-
-        /// <summary>
-        /// Returns a <see cref="MetricWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
-        /// </summary>
-        /// <param name="graphElementRef">The graph element to activate the metric window for</param>
-        /// <returns>The <see cref="MetricWindow"/> object showing the attributes of the specified graph element.</returns>
-        private static MetricWindow CreateMetricWindow(GraphElementRef graphElementRef)
-        {
-            // Create new window for active selection, or use existing one
-            if (!graphElementRef.TryGetComponent(out MetricWindow metricMenu))
-            {
-                metricMenu = graphElementRef.gameObject.AddComponent<MetricWindow>();
-                metricMenu.Title = "Metrics for " + graphElementRef.Elem.ToShortString();
-                metricMenu.GraphElement = graphElementRef.Elem;
-            }
-            return metricMenu;
         }
 
         /// <summary>
