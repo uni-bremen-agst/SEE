@@ -96,7 +96,7 @@ namespace SEE.Game.CityRendering
 
                     // Calculate the position of the sphere.
                     Vector3 position = new(i * spacingX - (parentRenderer.bounds.size.x / 2),
-                                           parentRenderer.bounds.size.y + 1.2f, // FIXME: Calcualte height based on city height.
+                                           parentRenderer.bounds.size.y + 1.2f,
                                            j * spacingZ - (parentRenderer.bounds.size.z / 2));
 
                     GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), position);
@@ -137,7 +137,7 @@ namespace SEE.Game.CityRendering
 
                 // Collect all (file) nodes the current author has contributed to.
                 // Maps from the graph node (a file) onto the game object representing the (file) node.
-                // FIXME: Looks like this can be simplified and optimized.
+                // Looks like this can be simplified and optimized.
                 IEnumerable<KeyValuePair<Node, GameObject>> filesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorsAttributeName))
                     .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorsAttributeName]
