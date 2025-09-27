@@ -53,6 +53,11 @@ namespace SEE.UI.Window.PropertyWindow
                 groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
                 expandedItems.Add("Header");
             }
+            // There are two ways to group the attributes: by value type or by name type.
+            // The first one creates groups like "String Attributes", "Int Attributes", etc.
+            // according to the kind of graph element attribute kind.
+            // The second one creates groups according to the qualified name of the graph element attribute,
+            // for example "Source", "Metric", etc. The name is split at the first dot.
             if (!contextMenu.Grouper)
             {
                 GroupByValueType();
@@ -70,7 +75,8 @@ namespace SEE.UI.Window.PropertyWindow
 
             return;
 
-            // Creates the items for the value type group.
+            // Creates the items for the value type group, when attributes should be
+            // grouped by their value type (i.e., toggle, string, int, float attributes).
             void GroupByValueType()
             {
                 // Toggle Attributes
@@ -98,7 +104,8 @@ namespace SEE.UI.Window.PropertyWindow
                 }
             }
 
-            // Creates the items for the name type group.
+            // Creates the items for the name type group, when attributes should be
+            // grouped by their name type (i.e., Source, Metric, etc.).
             void GroupByNameType()
             {
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
