@@ -13,7 +13,7 @@
         /// <summary>
         /// Name for string attribute type.
         /// </summary>
-        public const string StringAttributes = "String Attributes";
+        public const string StringAttributes = "String";
 
         /// <summary>
         /// Name for integer attribute type.
