@@ -73,25 +73,25 @@ namespace SEE.UI.Window.PropertyWindow
                 // Toggle Attributes
                 if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
                 {
-                    DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
+                    DisplayGroup(PropertyTypes.ToggleAttributes, GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
                 }
 
                 // String Attributes
                 if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
                 {
-                    DisplayGroup("String Attributes", GraphElement.StringAttributes);
+                    DisplayGroup(PropertyTypes.StringAttributes, GraphElement.StringAttributes);
                 }
 
                 // Int Attributes
                 if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
                 {
-                    DisplayGroup("Int Attributes", GraphElement.IntAttributes);
+                    DisplayGroup(PropertyTypes.IntAttributes, GraphElement.IntAttributes);
                 }
 
                 // Float Attributes
                 if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
                 {
-                    DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
+                    DisplayGroup(PropertyTypes.FloatAttributes, GraphElement.FloatAttributes);
                 }
             }
 

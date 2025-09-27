@@ -127,25 +127,25 @@ namespace SEE.UI.Window.PropertyWindow
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeHeader), CloseAfterClick: false),
-                new PopupMenuAction("Toggle Attributes", () =>
+                new PopupMenuAction(PropertyTypes.ToggleAttributes, () =>
                 {
                     Filter.IncludeToggleAttributes = !Filter.IncludeToggleAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeToggleAttributes), CloseAfterClick: false),
-                new PopupMenuAction("String Attributes", () =>
+                new PopupMenuAction(PropertyTypes.StringAttributes, () =>
                 {
                     Filter.IncludeStringAttributes = !Filter.IncludeStringAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeStringAttributes), CloseAfterClick: false),
-                new PopupMenuAction("Int Attributes", () =>
+                new PopupMenuAction(PropertyTypes.IntAttributes, () =>
                 {
                     Filter.IncludeIntAttributes = !Filter.IncludeIntAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeIntAttributes), CloseAfterClick: false),
-                new PopupMenuAction("Float Attributes", () =>
+                new PopupMenuAction(PropertyTypes.FloatAttributes, () =>
                 {
                     Filter.IncludeFloatAttributes = !Filter.IncludeFloatAttributes;
                     UpdateFilterMenuEntries();
