@@ -1,5 +1,4 @@
-﻿using Assets.SEE.UI.Window.PropertyWindow;
-using Michsky.UI.ModernUIPack;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window.DrawableManagerWindow;
