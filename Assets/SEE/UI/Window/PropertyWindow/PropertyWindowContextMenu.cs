@@ -53,11 +53,10 @@ namespace SEE.UI.Window.PropertyWindow
         public readonly GameObjectSorter Sorter;
 
         /// <summary>
-        /// Status of whether the grouper is active.
-        /// If it is active, grouping is done by the names of the metrics.
-        /// Otherwise, grouping is done by the type of attributes.
+        /// If true, grouping is done by the names of the attributes.
+        /// Otherwise, grouping is done by the type of the attributes.
         /// </summary>
-        public bool Grouper;
+        public bool GroupByName;
 
         /// <summary>
         /// Construcotr.
@@ -210,7 +209,7 @@ namespace SEE.UI.Window.PropertyWindow
                         string text = x.FindDescendant("ValueLine").MustGetComponent<TextMeshProUGUI>().text;
                         if (int.TryParse(text, out int intValue))
                         {
-                            if (!Grouper) {
+                            if (!GroupByName) {
                                 return intValue;
                             }
                             else
@@ -306,13 +305,13 @@ namespace SEE.UI.Window.PropertyWindow
                     ResetGroup();
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
-                }, Radio(!Grouper), CloseAfterClick: false),
+                }, Radio(!GroupByName), CloseAfterClick: false),
                 new PopupMenuAction("Name Type", () =>
                 {
-                    Grouper = true;
+                    GroupByName = true;
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
-                }, Radio(Grouper), CloseAfterClick: false)
+                }, Radio(GroupByName), CloseAfterClick: false)
             };
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
@@ -332,7 +331,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// </summary>
         private void ResetGroup()
         {
-            Grouper = false;
+            GroupByName = false;
         }
         #endregion
     }
