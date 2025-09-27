@@ -44,11 +44,12 @@ namespace SEE.UI.Window.PropertyWindow
                 groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
                 expandedItems.Add("Header");
             }
-            // There are two ways to group the attributes: by value type or by name type.
-            // The first one creates groups like "String Attributes", "Int Attributes", etc.
-            // according to the kind of graph element attribute kind.
-            // The second one creates groups according to the qualified name of the graph element attribute,
-            // for example "Source", "Metric", etc. The name is split at the first dot.
+            /// There are two ways to group the attributes: by value type or by name type.
+            /// The first one creates groups like <see cref="PropertyTypes.ToggleAttributes"/>,
+            /// <see cref="PropertyTypes.StringAttributes"/>, etc. according to the kind of
+            /// graph element attribute kind.
+            /// The second one creates groups according to the qualified name of the graph element attribute,
+            /// for example "Source", "Metric", etc. The name is split at the first dot.
             if (!contextMenu.Grouper)
             {
                 GroupByValueType();
