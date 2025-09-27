@@ -436,11 +436,7 @@ namespace SEE.UI.Window.PropertyWindow
                 foreach (IEnumerable<GameObject> values in groupHolder.Values)
                 {
                     List<GameObject> list = values.Where(x => x.name.Contains("RowLine")).ToList();
-                    if (!contextMenu.GroupByName)
-                    {
-                        ChangeOrder(list);
-                    }
-                    else
+                    if (contextMenu.GroupByName)
                     {
                         List<GameObject> texts = new();
                         List<GameObject> numbers = new();
@@ -465,6 +461,10 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             ChangeOrder(texts);
                         }
+                    }
+                    else
+                    {
+                        ChangeOrder(list);
                     }
                 }
             }
