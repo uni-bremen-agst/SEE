@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.UI3D;
@@ -69,11 +70,14 @@ namespace SEE.GO
         /// <param name="interactableObject">the selected object</param>
         private void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph != null && city.LoadedGraph != null
-                && selectedGraph.Equals(city.LoadedGraph))
+            if (interactableObject is InteractableGraphElement graphElement)
             {
-                Cursor.AddFocus(interactableObject);
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
+                if (selectedGraph != null && city.LoadedGraph != null
+                    && selectedGraph.Equals(city.LoadedGraph))
+                {
+                    Cursor.AddFocus(interactableObject);
+                }
             }
         }
 
@@ -85,10 +89,13 @@ namespace SEE.GO
         /// <param name="interactableObject">the unselected object</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
+            if (interactableObject is InteractableGraphElement graphElement)
             {
-                Cursor.RemoveFocus(interactableObject);
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
+                if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
+                {
+                    Cursor.RemoveFocus(interactableObject);
+                }
             }
         }
     }

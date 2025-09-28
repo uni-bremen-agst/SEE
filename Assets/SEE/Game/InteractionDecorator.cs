@@ -4,6 +4,7 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Actions;
+using SEE.Controls.Interactables;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -29,21 +30,14 @@ namespace SEE.Game
         /// or edge.
         /// </summary>
         /// <param name="gameObject">game object where the components are to be added to</param>
-        public static void PrepareForInteraction(GameObject gameObject)
+        public static void PrepareGraphElementForInteraction(GameObject gameObject)
         {
-            gameObject.isStatic = false; // we want to move the object during the game
-#if INCLUDE_STEAM_VR
+            gameObject.AddComponentIfNecessary<InteractableGraphElement>();
 
-            Interactable interactable = gameObject.AddComponentIfNecessary<Interactable>();
-            interactable.highlightOnHover = false;
-#endif
-            gameObject.AddComponentIfNecessary<InteractableObject>();
-            // The following additions of components must come after the addition of InteractableObject
-            // because they require the presence of an InteractableObject.
-            gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
-            gameObject.AddComponentIfNecessary<ShowHovering>();
-            gameObject.AddComponentIfNecessary<ShowSelection>();
-            gameObject.AddComponentIfNecessary<ShowGrabbing>();
+            gameObject.isStatic = false; // we want to move the object during the game
+                                         // The following additions of components must come after the addition of InteractableObject
+                                         // because they require the presence of an InteractableObject.
+            AddGeneralComponents(gameObject);
             if (gameObject.HasNodeRef())
             {
                 gameObject.AddComponentIfNecessary<ShowLabel>();
@@ -52,6 +46,34 @@ namespace SEE.Game
                 gameObject.AddComponentIfNecessary<ShowAuthorEdges>();
                 gameObject.AddComponentIfNecessary<HighlightErosion>();
             }
+        }
+
+        /// <summary>
+        /// Addes the following components to given <paramref name="gameObject"/>:
+        /// <see cref="InteractableAuthor"/> (if not already present), <see cref="ShowAuthorEdges"/>,
+        /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
+        /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// </summary>
+        /// <param name="gameObject">where the components should be added to</param>
+        public static void PrepareAuthorForInteraction(GameObject gameObject)
+        {
+            gameObject.AddComponentIfNecessary<InteractableAuthor>();
+            gameObject.AddComponentIfNecessary<ShowAuthorEdges>();
+            AddGeneralComponents(gameObject);
+        }
+
+        /// <summary>
+        /// Adds the following components to given <paramref name="gameObject"/>:
+        /// <see cref="XRSimpleInteractable"/>, <see cref="ShowHovering"/>,
+        /// <see cref="ShowSelection"/>, <see cref="ShowGrabbing"/>.
+        /// </summary>
+        /// <param name="gameObject">where the components should be added to</param>
+        private static void AddGeneralComponents(GameObject gameObject)
+        {
+            gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
+            gameObject.AddComponentIfNecessary<ShowHovering>();
+            gameObject.AddComponentIfNecessary<ShowSelection>();
+            gameObject.AddComponentIfNecessary<ShowGrabbing>();
         }
 
         /// <summary>
@@ -100,7 +122,7 @@ namespace SEE.Game
             float i = 0;
             await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, cancellationToken: token))
             {
-                PrepareForInteraction(go);
+                PrepareGraphElementForInteraction(go);
                 updateProgress(++i / totalGameObjects);
             }
         }

@@ -23,18 +23,22 @@ namespace SEE.VCS
     public class GitRepository: IDisposable
     {
         /// <summary>
-        /// The underlying <see cref="Repository"/> object that provides access to
-        /// the Git repository.
+        /// The underlying <see cref="Repository"/> object that provides access to the Git repository.
+        /// If this is null, the repository has not been opened yet or was disposed.
         /// </summary>
         private Repository repository;
+
+        /// <summary>
+        /// Indicates whether the object has been disposed.
+        /// </summary>
+        private bool disposed = false;
 
         /// <summary>
         /// Disposes the repository if it is not null.
         /// </summary>
         public void Dispose()
         {
-            // Dispose of the repository if it is not null to release resources.
-            repository?.Dispose();
+            Dispose(true);
             // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
             // finalization when Dispose is called explicitly.
             GC.SuppressFinalize(this);
@@ -45,7 +49,24 @@ namespace SEE.VCS
         /// </summary>
         ~GitRepository()
         {
-            Dispose();
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Disposes the repository if it is not null.
+        /// </summary>
+        /// <param name="disposing"></param>
+        private void Dispose(bool disposing)
+        {
+            // Check if the object has already been disposed to prevent double-disposal.
+            if (disposed)
+            {
+                return;
+            }
+            // Dispose of the repository if it is not null to release resources.
+            // repository?.Dispose(); // FIXME(#873)
+            // repository = null;
+            disposed = true;
         }
 
         /// <summary>
@@ -80,11 +101,20 @@ namespace SEE.VCS
         public Filter VCSFilter = new();
 
         /// <summary>
+        /// The access token for accessing the repository, if needed.
+        /// </summary>
+        /// <remarks>This attribute is not saved into the configuration file
+        /// because of security reasons.</remarks>
+        [Tooltip("Access token for accessing the repository, if needed."),
+         RuntimeTab(graphProviderFoldoutGroup)]
+        public string AccessToken = "";
+
+        /// <summary>
         /// Constructor setting default values for the fields.
         /// </summary>
         public GitRepository()
         {
-            // Intentionally left blank.
+            // Intentionally left empty.
         }
 
         /// <summary>
@@ -92,11 +122,43 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="repositoryPath">path to the repository</param>
         /// <param name="filter">the filter to be used to retrieve the relevant files from the repository</param>
-        public GitRepository(DataPath repositoryPath, Filter filter)
+        /// <param name="accessToken">the access token for this repository if needed</param>
+        public GitRepository(DataPath repositoryPath, Filter filter, string accessToken = null)
         {
             RepositoryPath = repositoryPath ??
                 throw new ArgumentNullException(nameof(repositoryPath), "Repository path must not be null.");
             VCSFilter = filter;
+            if (!string.IsNullOrWhiteSpace(accessToken))
+            {
+                this.AccessToken = accessToken;
+            }
+        }
+
+        /// <summary>
+        /// Clones the repository at <paramref name="url"/> into the <see cref="RepositoryPath"/>.
+        /// </summary>
+        /// <param name="url">URL for the repository</param>
+        /// <exception cref="Exception">thrown in case of a Git cloning problem</exception>
+        public void Clone(string url)
+        {
+            try
+            {
+                CloneOptions options = new();
+
+                options.FetchOptions.CredentialsProvider = (_url, _user, _types) =>
+                        new UsernamePasswordCredentials
+                        {
+                            Username = AccessToken,
+                            Password = string.Empty
+                        };
+
+                Debug.Log($"Cloned into {Repository.Clone(url, RepositoryPath.Path, options)}\n");
+            }
+            catch (LibGit2SharpException e)
+            {
+                throw new Exception
+                       ($"Error while cloning repository from {url} into path {RepositoryPath.Path}: {e.Message}.\n");
+            }
         }
 
         /// <summary>
@@ -119,24 +181,85 @@ namespace SEE.VCS
         /// <summary>
         /// Fetches all remote branches for the given repository path.
         /// </summary>
+        /// <returns>true if there are any changes (new, deleted, or changed remote branches); false otherwise</returns>
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
-        public void FetchRemotes()
+        public bool FetchRemotes()
         {
             OpenRepository();
 
-            // Fetch all remote branches
+            bool result = false;
+
+            // Fetch all remotes; this is needed if there are multiple remotes.
+            // As a matter of fact, a repository may have multiple remotes.
             foreach (Remote remote in repository.Network.Remotes)
             {
                 IEnumerable<string> refSpecs = remote.FetchRefSpecs.Select(x => x.Specification);
                 try
                 {
-                    Commands.Fetch(repository, remote.Name, refSpecs, null, "");
+                    Dictionary<string, string> previousBranches = GetBranches(repository);
+
+                    // Fetch downloads new commits from the remote repository. These commits are stored
+                    // locally but are not integrated into the working directory or local branches.
+                    // They reside on remote-tracking branches (remotes/origin/main).
+                    // Option Prune=true removes any remote-tracking references that no longer exist on the remote.
+                    Commands.Fetch(repository, remote.Name, refSpecs, new FetchOptions()
+                    {
+                        Prune = true,
+                        CredentialsProvider = (_url, _user, _types) => new UsernamePasswordCredentials
+                        {
+                            Username = AccessToken,
+                            Password = string.Empty
+                        }
+                    }, "");
+
+                    Dictionary<string, string> newBranches = GetBranches(repository);
+
+                    // Compare previousBranches to newBranches for new and changed branches.
+                    foreach (KeyValuePair<string, string> pair in newBranches)
+                    {
+                        if (previousBranches.TryGetValue(pair.Key, out string previousSha))
+                        {
+                            // Existed before.
+                            if (previousSha != pair.Value)
+                            {
+                                // Has changed.
+                                result = true;
+                            }
+                        }
+                        else
+                        {
+                            // New branch.
+                            result = true;
+                        }
+                    }
+                    // Compare previousBranches to newBranches for deleted branches.
+                    foreach (KeyValuePair<string, string> pair in previousBranches)
+                    {
+                        if (!newBranches.ContainsKey(pair.Key))
+                        {
+                            // Deleted branch.
+                            result = true;
+                        }
+                    }
                 }
                 catch (LibGit2SharpException e)
                 {
                     throw new Exception
                         ($"Error while running git fetch for repository path {RepositoryPath.Path} and remote name {remote.Name}: {e.Message}.\n");
                 }
+            }
+            return result;
+
+            // Returns a dictionary mapping the canonical name of each remote branch onto the SHA of its tip.
+            static Dictionary<string, string> GetBranches(Repository repository)
+            {
+                Dictionary<string, string> remoteBranches = new();
+
+                foreach (Branch remoteBranch in repository.Branches.Where(b => b.IsRemote))
+                {
+                    remoteBranches[remoteBranch.CanonicalName] = remoteBranch.Tip.Sha;
+                }
+                return remoteBranches;
             }
         }
 
@@ -370,7 +493,7 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the hashes of all tip commits from all branches in this <see cref="GitRepository"/>.
+        /// Returns the hashes of all tip commits from all relevant branches in this <see cref="GitRepository"/>.
         /// </summary>
         /// <returns>The hashes of the tip commits of all branches.</returns>
         public IList<string> GetTipHashes()
@@ -485,17 +608,19 @@ namespace SEE.VCS
         /// Adds the distinct filenames in the given <paramref name="tree"/> passing
         /// the criteria <see cref="Filter.RepositoryPaths"/> and <see cref="Filter.Matcher"/>
         /// of the given <paramref name="filter"/>.
+        ///
+        /// If <see cref="Filter.RepositoryPaths"/> is null or empty, all files in the entire
+        /// <paramref name="tree"/> are retrieved. Otherwise, only the files in the subtrees
+        /// denoted by <see cref="Filter.RepositoryPaths"/> are retrieved. In case a path
+        /// does not exist in the <paramref name="tree"/>, it is ignored.
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
         /// <param name="paths">where the passing files are to be added</param>
-        /// <exception cref="Exception">thrown if attribute <see cref="Filter.RepositoryPaths"/> of
-        /// <paramref name="filter"/> is different from null and at least one of the paths in
-        /// <see cref="Filter.RepositoryPaths"/> does not exist in the <paramref name="tree"/>
-        /// or does not denote a directory.</exception>
         private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
+                // We collect all files in the entire tree.
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
@@ -504,6 +629,7 @@ namespace SEE.VCS
             }
             else
             {
+                // We collect all files in the subtrees denoted by the repository paths.
                 foreach (string repositoryPath in VCSFilter.RepositoryPaths)
                 {
                     if (!string.IsNullOrWhiteSpace(repositoryPath))
@@ -512,7 +638,13 @@ namespace SEE.VCS
                         {
                             throw new OperationCanceledException(token);
                         }
-                        CollectFiles(Find(tree, repositoryPath), VCSFilter.Matcher, paths, token);
+                        LibGit2Sharp.Tree subtree = Find(tree, repositoryPath);
+                        // It can happen that we do not find the subtree, because
+                        // it may exist in some branches, but not in others.
+                        if (subtree != null)
+                        {
+                            CollectFiles(subtree, VCSFilter.Matcher, paths, token);
+                        }
                     }
                 }
             }
@@ -527,20 +659,22 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="tree">the root tree</param>
         /// <param name="repositoryPath">relative path of descendants nested in <paramref name="tree"/></param>
-        /// <returns>the subtree</returns>
-        /// <exception cref="Exception">thrown if <paramref name="repositoryPath"/> does not match
-        /// any descendant in <paramref name="tree"/> or if <paramref name="repositoryPath"/>
-        /// is not a tree (for instance, a blob).</exception>
+        /// <returns>the subtree or null if it does not exist</returns>
         private static LibGit2Sharp.Tree Find(LibGit2Sharp.Tree tree, string repositoryPath)
         {
-            TreeEntry result = tree[repositoryPath] ?? throw new Exception($"The path {repositoryPath} does not exist in the repository.");
+            TreeEntry result = tree[repositoryPath];
+            if (result == null)
+            {
+                // Path does not exist.
+                return null;
+            }
             if (result.TargetType == TreeEntryTargetType.Tree)
             {
                 return (LibGit2Sharp.Tree)result.Target;
             }
             else
             {
-                throw new Exception($"The path {repositoryPath} is not a directory in the repository.");
+                return null;
             }
         }
 

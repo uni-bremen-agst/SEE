@@ -518,7 +518,7 @@ namespace SEE.GraphProviders.VCS
                 n.SetInt(DataModel.DG.VCS.TruckNumber, file.Value.TruckFactor);
                 if (file.Value.Authors.Any())
                 {
-                    n.SetString(DataModel.DG.VCS.AuthorAttributeName, String.Join(',', file.Value.Authors));
+                    n.SetString(DataModel.DG.VCS.AuthorsAttributeName, String.Join(',', file.Value.Authors));
                 }
 
                 foreach (KeyValuePair<FileAuthor, int> authorChurn in file.Value.AuthorsChurn)

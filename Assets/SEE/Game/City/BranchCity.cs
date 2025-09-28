@@ -1,7 +1,9 @@
+using SEE.GO;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
+using Sirenix.Serialization;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -27,17 +29,52 @@ namespace SEE.Game.City
         public string Date = SEEDate.Now();
 
         /// <summary>
+        /// Backing attribute for <see cref="ShowAuthorEdges"/>.
+        /// </summary>
+        [OdinSerialize, NonSerialized, HideInInspector]
+        private ShowAuthorEdgeStrategy showAuthorEdges = ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+
+        /// <summary>
         /// Specifies how the edges connecting authors and their commits should be shown.
         /// See <see cref="ShowAuthorEdgeStrategy"/> for more details what each options should do.
         /// </summary>
-        [TabGroup(EdgeFoldoutGroup),
-         RuntimeTab(EdgeFoldoutGroup), InfoBox("An edge animation kind must be set to use this feature.",
-             InfoMessageType.Error, nameof(ShowWarningBoxOfMissingAnimationKind)),]
-        public ShowAuthorEdgeStrategy ShowAuthorEdgesStrategy =
-                ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors;
+        [ShowInInspector,
+            TabGroup(EdgeFoldoutGroup), RuntimeTab(EdgeFoldoutGroup),
+            Tooltip("Whether connecting lines between authors and files should be shown.")]
+        public ShowAuthorEdgeStrategy ShowAuthorEdges
+        {
+            get => showAuthorEdges;
+            set
+            {
+                if (value != showAuthorEdges)
+                {
+                    showAuthorEdges = value;
+                    UpdateAuthorEdges();
+                }
+            }
+        }
 
         /// <summary>
-        /// Only relevant if <see cref="ShowAuthorEdgesStrategy"/> is set to
+        /// Updates the visibility of all author edges.
+        /// </summary>
+        private void UpdateAuthorEdges()
+        {
+            GameObject root = gameObject.FirstChildNode();
+            if (root != null)
+            {
+                // Edges are located under the root node.
+                foreach (Transform child in root.transform)
+                {
+                    if (child.TryGetComponent(out GameObjects.AuthorEdge edge))
+                    {
+                        edge.ShowOrHide(isHovered: false);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Only relevant if <see cref="ShowAuthorEdges"/> is set to
         /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
         ///
         /// This is the threshold for the number of authors at which edges between authors
@@ -45,38 +82,12 @@ namespace SEE.Game.City
         /// If the number of authors is below this threshold, the edges will only be shown when
         /// the user hovers over the node or the author sphere.
         /// </summary>
-        [ShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
-         RuntimeShowIf(nameof(ShowAuthorEdgesStrategy), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+        [ShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
+         RuntimeShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
          Range(2, 20),
          TabGroup(EdgeFoldoutGroup),
          RuntimeTab(EdgeFoldoutGroup)]
         public int AuthorThreshold = 2;
-
-        /// <summary>
-        /// Returns true if the user should be warned about a missing animation kind.
-        /// </summary>
-        private bool ShowWarningBoxOfMissingAnimationKind =>
-            ShowAuthorEdgesStrategy != ShowAuthorEdgeStrategy.ShowAlways &&
-            EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None;
-
-        /// <summary>
-        /// Resets everything that is specific to a given graph. Here in addition to
-        /// the overridden method, the <see cref="GitPoller"/> component will be
-        /// removed.
-        /// </summary>
-        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
-        [Button(ButtonSizes.Small, Name = "Reset Data")]
-        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
-        public override void Reset()
-        {
-            base.Reset();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
-        }
 
         /// <summary>
         /// Validates <see cref="Date"/>.
@@ -91,27 +102,6 @@ namespace SEE.Game.City
             }
         }
 
-        /// <summary>
-        /// Returns or adds a <see cref="GitPoller"/> component to the game object this
-        /// <paramref name="city"/> is attached to.
-        /// </summary>
-        /// <param name="pollingInterval">VCS polling interval in seconds.</param>
-        /// <param name="markerTime">Time in seconds for how long the markers should be shown.</param>
-        /// <returns>The <see cref="GitPoller"/> component</returns>
-        public GitPoller GetOrAddGitPollerComponent(int pollingInterval, int markerTime)
-        {
-            if (TryGetComponent(out GitPoller poller))
-            {
-                return poller;
-            }
-
-            GitPoller newPoller = gameObject.AddComponent<GitPoller>();
-            newPoller.CodeCity = this;
-            newPoller.PollingInterval = pollingInterval;
-            newPoller.MarkerTime = markerTime;
-            return newPoller;
-        }
-
         #region Config I/O
 
         /// <summary>
@@ -120,29 +110,35 @@ namespace SEE.Game.City
         private const string dateLabel = "Date";
 
         /// <summary>
-        /// Label of attribute <see cref="ShowAuthorEdgesStrategy"/> in the configuration file.
+        /// Label of attribute <see cref="ShowAuthorEdges"/> in the configuration file.
         /// </summary>
         private const string showEdgesStrategy = "ShowAuthorEdgesStrategy";
 
         /// <summary>
         /// Label of attribute <see cref="AuthorThreshold"/> in the configuration file.
         /// </summary>
-        private const string suthorThresholdLabel = "AuthorThreshold";
+        private const string authorThresholdLabel = "AuthorThreshold";
 
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
             writer.Save(Date, dateLabel);
-            writer.Save(ShowAuthorEdgesStrategy.ToString(), showEdgesStrategy);
-            writer.Save(AuthorThreshold, suthorThresholdLabel);
+            writer.Save(ShowAuthorEdges.ToString(), showEdgesStrategy);
+            writer.Save(AuthorThreshold, authorThresholdLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
             ConfigIO.Restore(attributes, dateLabel, ref Date);
-            ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref ShowAuthorEdgesStrategy);
-            ConfigIO.Restore(attributes, suthorThresholdLabel, ref AuthorThreshold);
+            {
+                ShowAuthorEdgeStrategy showAuthorEdgesStrategy = ShowAuthorEdges;
+                if (ConfigIO.RestoreEnum(attributes, showEdgesStrategy, ref showAuthorEdgesStrategy))
+                {
+                    ShowAuthorEdges = showAuthorEdgesStrategy;
+                }
+            }
+            ConfigIO.Restore(attributes, authorThresholdLabel, ref AuthorThreshold);
         }
 
         #endregion

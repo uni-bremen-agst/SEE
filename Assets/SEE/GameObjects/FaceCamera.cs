@@ -72,10 +72,16 @@ namespace SEE.GO
 
         /// <summary>
         /// A delegate to be called when a camera is available.
+        /// Sets <see cref="mainCamera"/> and enables this component.
         /// </summary>
         /// <param name="camera">the availabe camera</param>
         private void OnCameraAvailable(Camera camera)
         {
+            if (camera == null)
+            {
+                Debug.LogError($"No main camera found. {name}.{nameof(FaceCamera)} remains disabled.");
+                return;
+            }
             mainCamera = camera.transform;
             enabled = true;
         }
@@ -85,6 +91,14 @@ namespace SEE.GO
         /// </summary>
         private void LateUpdate()
         {
+            if (mainCamera == null)
+            {
+                // Although our code makes sure the camera is available, during shutdown
+                // the camera might have been destroyed already while this component
+                // is still active.
+                return;
+            }
+
             {
                 // Rotate such that the front of game objects looks at the camera.
                 Quaternion rotation = mainCamera.rotation;

@@ -47,7 +47,7 @@ namespace SEE.GraphProviders
          DictionaryDrawerSettings(
               DisplayMode = DictionaryDisplayOptions.CollapsedFoldout,
               KeyLabel = "Author", ValueLabel = "Aliases"),
-         Tooltip("Author alias mapping."),
+         Tooltip("Author alias mapping. Can be used to specify a list of aliases of a given author."),
          ShowIf("CombineAuthors"),
          RuntimeShowIf("CombineAuthors"),
          HideReferenceObjectPicker]

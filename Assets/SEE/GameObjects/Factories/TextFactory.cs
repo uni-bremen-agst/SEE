@@ -106,7 +106,7 @@ namespace SEE.GO
 
             tm.fontSize = fontSize;
 
-            Finalize(lift, tm, textObject);
+            Finalize(textObject, lift, tm);
             return textObject;
         }
 
@@ -141,36 +141,36 @@ namespace SEE.GO
             tm.fontSizeMin = 0.0f;
             tm.fontSizeMax = 5;
 
-            Finalize(lift, tm, textObject);
+            Finalize(textObject, lift, tm);
             return textObject;
         }
 
         /// <summary>
         /// Finalizes the text by lifting it up (if <paramref name="lift"/> is true) and disabling shadow casting mode.
         /// </summary>
+        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
         /// <param name="lift">if true, the <paramref name="textObject"/> will be lifted up by its extent; that is,
         /// its y position is actually the bottom line (position.y + extents.y)</param>
         /// <param name="tm">the <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
         /// relevant for the lifting</param>
-        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
-        private static void Finalize(bool lift, TextMeshPro tm, GameObject textObject)
+        private static void Finalize(GameObject textObject, bool lift, TextMeshPro tm)
         {
             // No shading as this might be expensive and even distract.
             DisableShading(textObject);
 
             if (lift)
             {
-                LiftText(tm, textObject);
+                LiftText(textObject, tm);
             }
         }
 
         /// <summary>
         /// Lifts the <paramref name="textObject"/> up by the y extent of <paramref name="tm"/>.
         /// </summary>
+        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
         /// <param name="tm">the <see cref="TextMeshPro"/> component attached to <paramref name="textObject"/>;
         /// relevant for the lifting</param>
-        /// <param name="textObject">the object representing the text (holding <paramref name="tm"/>)</param>
-        private static void LiftText(TextMeshPro tm, GameObject textObject)
+        public static void LiftText(GameObject textObject, TextMeshPro tm)
         {
             // may need to be called before retrieving the bounds to make sure they are up to date
             tm.ForceMeshUpdate();

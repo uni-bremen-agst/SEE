@@ -1,12 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
+using SEE.Utils;
 using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.VCS;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Timers;
 using UnityEngine;
 
 namespace SEE.Game.City
@@ -21,7 +23,7 @@ namespace SEE.Game.City
     /// This component will be added automatically by <see cref="GitBranchesGraphProvider"/>
     /// if <see cref="GitBranchesGraphProvider.AutoFetch"/> is set to true.
     /// </summary>
-    public class GitPoller : MonoBehaviour
+    public class GitPoller : PollerBase
     {
         /// <summary>
         /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
@@ -30,21 +32,10 @@ namespace SEE.Game.City
         public BranchCity CodeCity;
 
         /// <summary>
-        /// The interval in seconds in which git should be polled.
-        /// </summary>
-        public int PollingInterval = 5;
-
-        /// <summary>
         /// The time in seconds for how long the node markers should be shown for newly
         /// added or modified nodes.
         /// </summary>
         public int MarkerTime = 10;
-
-        /// <summary>
-        /// Maps the repository (path) to a list of all hashes of the branches from
-        /// the repository.
-        /// </summary>
-        private IList<string> TipHashes = new List<string>();
 
         /// <summary>
         /// MarkerFactory for generating node markers.
@@ -63,27 +54,12 @@ namespace SEE.Game.City
         public GitRepository Repository { set; private get; }
 
         /// <summary>
-        /// Runs git fetch on all remotes for all branches.
-        /// </summary>
-        private void RunGitFetch()
-        {
-            Repository.FetchRemotes();
-        }
-
-        /// <summary>
-        /// Gets the hashes of all tip commits from all branches in <see cref="Repository"/>.
-        /// </summary>
-        /// <returns>All tip commits.</returns>
-        private IList<string> GetTipHashes()
-        {
-            return Repository.GetTipHashes();
-        }
-
-        /// <summary>
         /// Starts the actual poller.
         /// </summary>
-        private void Start()
+        public override void Start()
         {
+            base.Start();
+
             if (Repository == null)
             {
                 Debug.Log("No watched repositories.\n");
@@ -92,14 +68,15 @@ namespace SEE.Game.City
 
             markerFactory = new MarkerFactory(CodeCity.MarkerAttributes);
 
-            InitialPoll().Forget();
-            return;
+            timer.Elapsed += OnTimedEvent;
+        }
 
-            async UniTaskVoid InitialPoll()
-            {
-                TipHashes = await UniTask.RunOnThreadPool(GetTipHashes);
-                InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
-            }
+        /// <summary>
+        /// Executed on every timer event. Runs the <see cref="PollReposAsync"/> method.
+        /// </summary>
+        private void OnTimedEvent(object source, ElapsedEventArgs events)
+        {
+            PollReposAsync().Forget();
         }
 
         /// <summary>
@@ -118,25 +95,23 @@ namespace SEE.Game.City
         /// <summary>
         /// Is called in every <see cref="PollingInterval"/> seconds.
         ///
-        /// This method will fetch the newest commits and, if new commits exist, the
-        /// code city is refreshed.
+        /// This method will fetch the newest commits of all remote branches of all remote
+        /// repository and, if new commits exist, the code city is refreshed.
         /// </summary>
         private async UniTaskVoid PollReposAsync()
         {
             if (!doNotPoll)
             {
                 doNotPoll = true;
-                IList<string> newHashes = await UniTask.RunOnThreadPool(() =>
+                bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
-                    RunGitFetch();
-                    return GetTipHashes();
+                    return Repository.FetchRemotes();
                 });
 
-                if (!newHashes.SequenceEqual(TipHashes))
+                if (needsUpdate)
                 {
                     ShowNewCommitsMessage();
 
-                    TipHashes = newHashes;
                     // Backup old graph
                     Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
                     await CodeCity.LoadDataAsync();
@@ -169,12 +144,10 @@ namespace SEE.Game.City
                         markerFactory.MarkBorn(GraphElementIDMap.Find(addedNode.ID, true));
                     }
 
-                    ShowRemovedNodes(removedNodes);
-
                     // Removed nodes are not marked, because they are not in the graph anymore.
-                    // But we may want animate their removal.
-
-                    Invoke(nameof(RemoveMarker), MarkerTime);
+                    // In the futre, we may want animate their removal.
+                    ShowRemovedNodes(removedNodes);
+                    RemoveMarkerAsync().Forget();
                 }
 
                 doNotPoll = false;
@@ -194,8 +167,12 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Removes all markers.
+        /// Removes all markers after <see cref="MarkerTime"/> seconds.
         /// </summary>
-        private void RemoveMarker() => markerFactory.Clear();
+        private async UniTaskVoid RemoveMarkerAsync()
+        {
+            await Task.Delay(MarkerTime);
+            markerFactory.Clear();
+        }
     }
 }
