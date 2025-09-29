@@ -44,7 +44,7 @@ namespace SEE.VCS
         /// </summary>
         /// <remarks>This attribute is not saved into the configuration file
         /// because of security reasons.</remarks>
-        [Tooltip("Access token for accessing the repository, if needed."),
+        [Tooltip("Access token for accessing the repository, if needed. BE AWARE THAT THIS PROPERTY WILL BE SERIALIZED."),
          RuntimeTab(graphProviderFoldoutGroup)]
         public string AccessToken = "";
 
