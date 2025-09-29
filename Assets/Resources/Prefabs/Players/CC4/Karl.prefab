@@ -119,14 +119,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 381878168462415337}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.14579658, y: 0.0000134964475, z: -0.00003650361, w: 0.9893146}
-  m_LocalPosition: {x: 9.965151e-10, y: 0.039120786, z: -0.0000002670288}
+  m_LocalRotation: {x: -0.14081927, y: 0.25606608, z: -0.037770096, w: 0.9556011}
+  m_LocalPosition: {x: -0.0000030879098, y: 0.039357327, z: -0.000076419914}
   m_LocalScale: {x: 1, y: 1.0000001, z: 1.0000001}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2100934619732184686}
   m_Father: {fileID: 5859106070191561053}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: -14.465, y: 31.091, z: -8.571}
 --- !u!1 &422660644415814707
 GameObject:
   m_ObjectHideFlags: 0
@@ -13211,7 +13211,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0

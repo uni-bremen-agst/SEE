@@ -5686,8 +5686,8 @@ SkinnedMeshRenderer:
   - 0
   - 0
   - 0
-  - 100
-  - 100
+  - 0
+  - 0
   - 0
   - 0
   - 0
@@ -7028,18 +7028,18 @@ MonoBehaviour:
       min: 0
       max: 0.56
   valueSets:
-  - {x: 0, y: 0.97, z: 0, w: 0}
-  - {x: 0, y: 0, z: 0, w: 0}
-  - {x: 0, y: 0, z: 0, w: 0}
-  - {x: 0, y: 0, z: 0, w: 0}
-  - {x: 0, y: 0, z: 0, w: 0}
-  - {x: 0, y: 0.97, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
-  - {x: 0.03, y: 0.03, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
+  - {x: 0, y: 0, z: 0, w: 0}
 --- !u!1 &8097513050150702509
 GameObject:
   m_ObjectHideFlags: 0
@@ -7629,6 +7629,11 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: b52f270ca50bda0459afc204163905e8, type: 3}
+    - target: {fileID: 5179106205997057727, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 6e34972e6d04d5040b981261b3f580a8, type: 2}
     - target: {fileID: 5673393830814623364, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -7946,7 +7951,7 @@ MonoBehaviour:
   emphasizerTrigger: 0
   analysisValue: 0
   sampleSize: 512
-  audioUpdateDelay: 0.095
+  audioUpdateDelay: 0.098375
   playheadBias: 2800
   autoAdjustAnalysis: 1
   autoAdjustMicrophone: 0
@@ -7968,7 +7973,7 @@ MonoBehaviour:
   usePersistence: 0
   useTimingsOverride: 1
   globalDurON: 0.125
-  globalDurOFF: 0.06
+  globalDurOFF: 0.1025
   globalDurOffBalance: -0.18
   originalUpdateDelay: 0
   globalNuanceBalance: -0.213
@@ -9898,7 +9903,7 @@ MonoBehaviour:
         isAnimatorControlled: 0
         useOffset: 0
         useOffsetFollow: 1
-        inspFoldout: 0
+        inspFoldout: 1
         enabled: 1
         isBonePreviewUpdated: 0
         frac: 1
@@ -10008,7 +10013,7 @@ MonoBehaviour:
         isAnimatorControlled: 0
         useOffset: 0
         useOffsetFollow: 1
-        inspFoldout: 0
+        inspFoldout: 1
         enabled: 1
         isBonePreviewUpdated: 0
         frac: 1
@@ -10342,10 +10347,10 @@ MonoBehaviour:
         textures: []
         materialRenderer: {fileID: 0}
         materials: []
-      inspFoldout: 0
+      inspFoldout: 1
       previewDisplayMode: 0
       collectionExpand: 0
-    trigger: 0.32653064
+    trigger: 0.18467347
   - expData:
       name: ee
       components:
@@ -11177,7 +11182,7 @@ MonoBehaviour:
         textures: []
         materialRenderer: {fileID: 0}
         materials: []
-      inspFoldout: 0
+      inspFoldout: 1
       previewDisplayMode: 0
       collectionExpand: 0
     trigger: 0.7346939
@@ -11188,8 +11193,8 @@ MonoBehaviour:
   useAudioAnalysis: 1
   needAudioSource: 1
   inspStateFoldoutProcessing: 1
-  inspStateFoldoutSettings: 0
-  inspStateFoldoutVisemes: 0
+  inspStateFoldoutSettings: 1
+  inspStateFoldoutVisemes: 1
   inspCollectionDisplayMode: 0
   inspAnalysisDisplay: 0
   inspOverrideSecondaryMix: 0
