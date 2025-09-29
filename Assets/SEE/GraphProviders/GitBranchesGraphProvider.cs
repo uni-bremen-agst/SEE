@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Game.CityRendering;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
 using SEE.Utils.Config;
@@ -37,6 +38,9 @@ namespace SEE.GraphProviders
         /// </summary>
         private GitPoller poller;
 
+
+        private TransitionRenderer transitionRenderer;
+
         /// <summary>
         /// Backing field for <see cref="AutoFetch"/>.
         /// </summary>
@@ -53,7 +57,7 @@ namespace SEE.GraphProviders
         /// since we can't store them securely yet.
         /// </summary>
         [ShowInInspector,
-            Tooltip("If true, the repository will be polled regularly for new changes.")]
+            Tooltip("If true, the repository will be polled periodically for new changes.")]
         public bool AutoFetch
         {
             get => autoFetch;
@@ -79,7 +83,7 @@ namespace SEE.GraphProviders
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
             EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int PollingInterval = 5;
+        public int PollingInterval = 5; /// // FIXME: We need to update poller's PollingInterval if it changes!
 
         /// <summary>
         /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
@@ -88,7 +92,7 @@ namespace SEE.GraphProviders
         [Tooltip(
              "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
          EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int MarkerTime = 10;
+        public int MarkerTime = 10; /// FIXME: We need to update <see cref="transitionRenderer"/> if MarkerTime changes!
 
         #endregion
 
@@ -118,9 +122,9 @@ namespace SEE.GraphProviders
         /// <returns>The graph generated from the git repository <see cref="RepositoryData"/>.</returns>
         public override async UniTask<Graph> ProvideAsync
             (Graph graph,
-            AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default)
+             AbstractSEECity city,
+             Action<float> changePercentage = null,
+             CancellationToken token = default)
         {
             if (city is not BranchCity branchCity)
             {
@@ -132,20 +136,30 @@ namespace SEE.GraphProviders
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
 
-            if (AutoFetch) // && Application.isPlaying)
+            if (AutoFetch)
             {
-                // We can create the poller only now that we know the city.
-                poller = new GitPoller
-                {
-                    MarkerTime = MarkerTime,
-                    PollingInterval = PollingInterval,
-                    BranchCity = branchCity,
-                    Repository = GitRepository
-                };
-                poller.Start();
+                CreatePoller(branchCity);
             }
 
             return task;
+        }
+
+        /// <summary>
+        /// Creates (if it does not yet exist) and starts the <see cref="poller"/>.
+        /// </summary>
+        private void CreatePoller(BranchCity branchCity)
+        {
+            if (poller != null)
+            {
+                poller.Stop();
+            }
+            else
+            {
+                poller = new GitPoller(PollingInterval, GitRepository);
+                // We can create the transitionRenderer only now that we know the city.
+                transitionRenderer = new(branchCity, poller, MarkerTime);
+            }
+            poller.Start();
         }
 
         /// <summary>
