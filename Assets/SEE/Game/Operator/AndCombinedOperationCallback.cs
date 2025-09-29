@@ -86,7 +86,7 @@ namespace SEE.Game.Operator
             foreach (IOperationCallback<C> operationCallback in callbacks)
             {
                 this.callbacks.Add(operationCallback);
-                // We Initialize the dictionary with 0, indicating that no callback has been triggered.
+                // We initialize the dictionary with 0, indicating that no callback has been triggered.
                 callbackCounter[operationCallback] = 0;
             }
 

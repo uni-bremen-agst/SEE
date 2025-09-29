@@ -20288,11 +20288,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: -9219055360011771250, guid: 1d6e6256ec2d1854eafccc11773294aa,
-        type: 3}
-      propertyPath: inspSalsaLinked
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8095649970383662242, guid: 1d6e6256ec2d1854eafccc11773294aa,
         type: 3}
       propertyPath: m_Name

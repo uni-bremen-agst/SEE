@@ -105,7 +105,7 @@ namespace SEE.Scanner
         /// Converts a <see cref="TokenModifiers"/> to the name of a tag that can be used in
         /// TextMeshPro's rich text markup.
         /// </summary>
-        /// <param name="modifiers">The <see cref="TokenModifiers"/> to convert. Should be a single flagUp.</param>
+        /// <param name="modifiers">The <see cref="TokenModifiers"/> to convert. Should be a single flag.</param>
         /// <returns>The name of a tag that can be used in TextMeshPro's rich text markup.</returns>
         public static string ToRichTextTag(this TokenModifiers modifiers)
         {

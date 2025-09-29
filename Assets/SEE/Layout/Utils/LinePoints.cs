@@ -101,7 +101,7 @@ namespace SEE.Layout.Utils
             int i = 0;
             int next = 0;
             // Random value; this value will not never be added based on the
-            // logic of the loop, but the compiler forces us to Initialize v.
+            // logic of the loop, but the compiler forces us to initialize v.
             Vector3 v = Vector3.zero;
             foreach (double value in values)
             {

@@ -14,7 +14,7 @@ namespace SEE.Controls
         /// <summary>
         /// If true, all logical inputs that require keyboard interactions are enabled.
         /// If false, we will not listen to keyboard inputs for any of the logical
-        /// input queries. This flagUp is provided to disable the keyboard shortcuts
+        /// input queries. This flag is provided to disable the keyboard shortcuts
         /// when there are dialogs asking the user for keybord inputs. If the shortcuts
         /// were enabled, they would interfere with the user's input for the dialog.
         /// For instance, pressing W would enter the text "W" and move the player

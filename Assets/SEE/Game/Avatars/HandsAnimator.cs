@@ -224,17 +224,17 @@ namespace SEE.Game.Avatars
             Transform rightHandBone = mainTrasform.Find(RightHandName);
             if (headBone == null)
             {
-                UnityEngine.Debug.LogError($"Head bone not found: {HeadName}");
+                UnityEngine.Debug.LogError($"Head bone not found: {HeadName}" + "\n");
                 return;
             }
             else if (leftHandBone == null)
             {
-                UnityEngine.Debug.LogError($"Left hand bone not found: {LeftHandName}");
+                UnityEngine.Debug.LogError($"Left hand bone not found: {LeftHandName}" + "\n");
                 return;
             }
             else if (rightHandBone == null)
             {
-                UnityEngine.Debug.LogError($"Right hand bone not found: {RightHandName}");
+                UnityEngine.Debug.LogError($"Right hand bone not found: {RightHandName}" + "\n");
                 return;
             }
 
@@ -357,9 +357,9 @@ namespace SEE.Game.Avatars
             Transform rightHand = transform.Find(RightHandName);
 
             // Whether the laser pointer was toggled
-            if(SEEInput.TogglePointing())
+            if (SEEInput.TogglePointing())
             {
-                if(IsPointing == true)
+                if (IsPointing == true)
                 {
                     IsPointing = false;
                 }
@@ -453,7 +453,7 @@ namespace SEE.Game.Avatars
                 // Interval where palm should be facing the camera.
                 if (LeftHandTransformState.HandToHeadCoordinateDifference.x < HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && LeftHandTransformState.HandToHeadCoordinateDifference.x > HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if(IsPointing == true)
+                    if (IsPointing == true)
                     {
                         leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                     }
@@ -524,11 +524,10 @@ namespace SEE.Game.Avatars
                 Vector3 newHandPosition = headPosition + RightHandTransformState.HandToHeadCoordinateDifference;
                 ik.solver.rightHandEffector.position = transform.TransformPoint(newHandPosition);
 
-
                 // Interval where palm should be facing the camera.
                 if (RightHandTransformState.HandToHeadCoordinateDifference.x > -HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && RightHandTransformState.HandToHeadCoordinateDifference.x < -HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if(IsPointing == true)
+                    if (IsPointing == true)
                     {
                         rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
                     }
@@ -612,7 +611,7 @@ namespace SEE.Game.Avatars
             int leftHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
             int leftHandInTheGesturesList = -1;
-            if(resultGestureRecognizer.handedness != null)
+            if (resultGestureRecognizer.handedness != null)
             {
                 //Index of values ​​for the left hand in the output from gesture recognizer model.
                 leftHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
@@ -876,7 +875,7 @@ namespace SEE.Game.Avatars
             int rightHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
 
             int rightHandInTheGesturesList = -1;
-            if(resultGestureRecognizer.handedness != null)
+            if (resultGestureRecognizer.handedness != null)
             {
                 //Index of values ​​for the right hand in the output from gesture recognizer model.
                 rightHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
@@ -1132,7 +1131,7 @@ namespace SEE.Game.Avatars
         }
 
         /// <summary>
-        /// Checks to see if at least one finger is bent (does not include the thumb)юъ.
+        /// Checks to see if at least one finger is bent (does not include the thumb).
         /// </summary>
         /// <param name="newAngleIndexFinger">The value to be assigned to the index finger for rotation.</param>
         /// <param name="newAngleMiddleFinger">The value to be assigned to the middle finger for rotation.</param>
@@ -1141,14 +1140,7 @@ namespace SEE.Game.Avatars
         /// <returns></returns>
         public bool AreFingersBent( float newAngleIndexFinger, float newAngleMiddleFinger, float newAngleRingFinger, float newAnglePinky)
         {
-            if(newAngleIndexFinger >= 50f || newAngleMiddleFinger >= 50f || newAngleRingFinger >= 50f || newAnglePinky >= 50f)
-            {
-                return true;
-            }
-            else 
-            {
-                return false;
-            }
+            return newAngleIndexFinger >= 50f || newAngleMiddleFinger >= 50f || newAngleRingFinger >= 50f || newAnglePinky >= 50f;
         }
     }
 }

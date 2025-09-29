@@ -8,7 +8,7 @@
 // https://github.com/homuler/MediaPipeUnityPlugin/blob/master/LICENSE
 //
 //
-// This script also relies on the Task-API-Tutorium by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
+// This script also relies on the Task-API-Tutorial by homuler to use MediaPipe solutions in Unity scripts. The tutorial is available at the link:
 // https://github.com/homuler/MediaPipeUnityPlugin/blob/master/docs/Tutorial-Task-API.md
 
 using UnityEngine;
@@ -23,8 +23,6 @@ using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
-
-
 
 namespace SEE.Game.Avatars
 {
@@ -127,7 +125,6 @@ namespace SEE.Game.Avatars
             stopwatch.Start();
             textureFrame = new Mediapipe.Unity.Experimental.TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
 
-
             if (!gameObject.TryGetComponentOrLog(out ik))
             {
                 enabled = false;
@@ -138,7 +135,6 @@ namespace SEE.Game.Avatars
                 HandsAnimator.Initialize(transform, ik); 
             }
         }
-
 
         /// <summary>
         /// Receives the results from the MediaPipe models and calls the <see cref="HandsAnimator"/> class functions for animation.
@@ -159,7 +155,7 @@ namespace SEE.Game.Avatars
                     
                     if (resultPoseLandmarker.poseWorldLandmarks == null)
                     {
-                        UnityEngine.Debug.Log("No Pose Landmarks found");
+                        Debug.Log("No Pose Landmarks found" + "\n");
                     }
                     else
                     {
@@ -181,7 +177,7 @@ namespace SEE.Game.Avatars
                         }
                         else
                         {
-                            Debug.Log("No hand landmarks found");
+                            Debug.Log("No hand landmarks found" + "\n");
                         }
                     }
                 }

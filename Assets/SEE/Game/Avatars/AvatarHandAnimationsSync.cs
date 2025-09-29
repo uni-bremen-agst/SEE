@@ -51,14 +51,38 @@ namespace SEE.Game.Avatars
         private NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// Rotations of the joints of the fingers of the left hand.
+        /// Rotations of the joints of the index finger of the left hand.
         /// </summary>
         private NetworkVariable<Vector3> leftIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the middle finger of the left hand.
+        /// </summary>
         private NetworkVariable<Vector3> leftMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the ring finger of the left hand.
+        /// </summary>
         private NetworkVariable<Vector3> leftRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the little finger of the left hand.
+        /// </summary>
         private NetworkVariable<Vector3> leftPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the thumb bone of the left hand, which lies at the base of the thumb.
+        /// </summary>
         private NetworkVariable<Quaternion> leftThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the middle bone of the thumb of the left hand.
+        /// </summary>
         private NetworkVariable<Quaternion> leftThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the fingertip bone of the thumb of the left hand.
+        /// </summary>
         private NetworkVariable<Quaternion> leftThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner); 
 
         /// <summary>
@@ -72,14 +96,38 @@ namespace SEE.Game.Avatars
         private NetworkVariable<Quaternion> rightHandRotation = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// Rotations of the joints of the fingers of the right hand.
+        /// Rotations of the joints of the index finger of the right hand.
         /// </summary>
         private NetworkVariable<Vector3> rightIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the middle finger of the right hand.
+        /// </summary>
         private NetworkVariable<Vector3> rightMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the ring finger of the right hand.
+        /// </summary>
         private NetworkVariable<Vector3> rightRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the joints of the little finger of the right hand.
+        /// </summary>
         private NetworkVariable<Vector3> rightPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the thumb bone of the right hand, which lies at the base of the thumb.
+        /// </summary>
         private NetworkVariable<Quaternion> rightThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the middle bone of the thumb of the right hand.
+        /// </summary>
         private NetworkVariable<Quaternion> rightThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// Rotations of the fingertip bone of the thumb of the right hand.
+        /// </summary>
         private NetworkVariable<Quaternion> rightThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
@@ -238,6 +286,5 @@ namespace SEE.Game.Avatars
             rightThumb2Bone.localRotation = rightThumb2Rotations.Value;
             rightThumb3Bone.localRotation = rightThumb3Rotations.Value; 
         }
-
     }
 }

@@ -22,19 +22,16 @@ namespace SEE.Game.Avatars
             // based on the first coordinates found by the mediapipe.
             float distance = Vector3.Distance(new Vector3(0, 0, 0), childBoneStartPos);
             float squaredDifference = distance*distance - coordinateDifferenceChildToParent.y * coordinateDifferenceChildToParent.y - coordinateDifferenceChildToParent.x * coordinateDifferenceChildToParent.x;
+            
             float newZCoordinate = Mathf.Sqrt(squaredDifference);
             Vector3 newChildPosition = new Vector3(coordinateDifferenceChildToParent.x, coordinateDifferenceChildToParent.y, newZCoordinate);
+            
             Vector2 rotateFrom = new Vector2(childBoneStartPos.y, childBoneStartPos.z);
-
             Vector2 rotateTo = new Vector2(newChildPosition.y, newChildPosition.z);
             float newAngle = Vector2.Angle(rotateFrom, rotateTo);
 
             //If the value found is too large and with it the fingers would pass through the palm, assign such a value so that the palm is completely bent.
-            if (newAngle >= 130f)
-            {
-                newAngle = 130f;
-            }
-            if (childBoneLandmark.y < parentBoneLandmark.y && squaredDifference<0)
+            if (newAngle >= 130f || (childBoneLandmark.y < parentBoneLandmark.y && squaredDifference < 0))
             {
                 newAngle = 130f;
             }
@@ -56,17 +53,20 @@ namespace SEE.Game.Avatars
         /// to take the square root of a negative number when using the formula for Euclidean distance.</remarks>
         public void SetFingertipRotation(float angleToSet, Transform fingertipBone, Transform fingerMiddleBone)
         {
-            if (!float.IsNaN(angleToSet))
-            {
-                Quaternion newFinger2Rotation = fingerMiddleBone.localRotation * Quaternion.Euler(0, 0, angleToSet - fingerMiddleBone.localRotation.eulerAngles.z);
-                fingerMiddleBone.localRotation = newFinger2Rotation;
-            }
-            else
+            if (float.IsNaN(angleToSet))
             {
                 fingerMiddleBone.localRotation = Quaternion.Euler(fingerMiddleBone.localRotation.eulerAngles.x, fingerMiddleBone.localRotation.eulerAngles.y, 0);
             }
+            else
+            {
+                fingerMiddleBone.localRotation *= Quaternion.Euler(0, 0, angleToSet - fingerMiddleBone.localRotation.eulerAngles.z);
+            }
 
-            if (!float.IsNaN(angleToSet))
+            if (float.IsNaN(angleToSet))
+            {
+                fingertipBone.localRotation = Quaternion.Euler(fingertipBone.localRotation.eulerAngles.x, fingertipBone.localRotation.eulerAngles.y, 0);
+            }
+            else
             {
                 angleToSet = angleToSet / 2;
                 if (angleToSet >= 60f)
@@ -79,15 +79,9 @@ namespace SEE.Game.Avatars
                 }
                 else
                 {
-                    Quaternion newMidFinger3Rotation = fingertipBone.localRotation * Quaternion.Euler(0, 0, angleToSet - fingertipBone.localRotation.eulerAngles.z);
-                    fingertipBone.localRotation = newMidFinger3Rotation;
+                    fingertipBone.localRotation *= Quaternion.Euler(0, 0, angleToSet - fingertipBone.localRotation.eulerAngles.z);
                 }
             }
-            else
-            {
-                fingertipBone.localRotation = Quaternion.Euler(fingertipBone.localRotation.eulerAngles.x, fingertipBone.localRotation.eulerAngles.y, 0);
-            }
-
         }
 
         /// <summary>
@@ -99,14 +93,13 @@ namespace SEE.Game.Avatars
         /// to take the square root of a negative number when using the formula for Euclidean distance.</remarks>
         public void SetBaseOfTheFingerRotation(float angleToSet, Transform baseOfTheFingerBone)
         {
-            if (!float.IsNaN(angleToSet))
+            if (float.IsNaN(angleToSet))
             {
-                Quaternion newFinger1Rotation = baseOfTheFingerBone.localRotation * Quaternion.Euler(0, 0, angleToSet - baseOfTheFingerBone.localRotation.eulerAngles.z);
-                baseOfTheFingerBone.localRotation = newFinger1Rotation;
+                baseOfTheFingerBone.localRotation = Quaternion.Euler(baseOfTheFingerBone.localRotation.eulerAngles.x, baseOfTheFingerBone.localRotation.eulerAngles.y, 0);
             }
             else
             {
-                baseOfTheFingerBone.localRotation = Quaternion.Euler(baseOfTheFingerBone.localRotation.eulerAngles.x, baseOfTheFingerBone.localRotation.eulerAngles.y, 0);
+                baseOfTheFingerBone.localRotation *= Quaternion.Euler(0, 0, angleToSet - baseOfTheFingerBone.localRotation.eulerAngles.z);
             }
         }
 
@@ -116,7 +109,7 @@ namespace SEE.Game.Avatars
         /// <param name="childBoneLandmark">Landmark of the bone, which is the child of the second bone.</param>
         /// <param name="parentBoneLandmark">Landmark of the finger bone that is the parent of the first bone.</param>
         /// <param name="childBoneStartPos">The position of the child bone relative to the parent's position, recognized by MediaPipe at startup.</param>
-        /// <returns></returns>
+        /// <returns>Rotation values ​​in degrees to be assigned</returns>
         public float FindThumbAndWristXRotation(Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark, Mediapipe.Tasks.Components.Containers.Landmark parentBoneLandmark, Vector3 childBoneStartPos)
         {
             Vector2 rotateFrom = new Vector2(childBoneStartPos.x, childBoneStartPos.y);
@@ -134,21 +127,25 @@ namespace SEE.Game.Avatars
         /// from facing forward to the back of the palm facing forward.</param>
         /// <param name="parentBoneLandmark">Landmark of the hand.</param>
         /// <param name="childBoneStartPos">The position of the finger bone relative to the parent's position, recognized by MediaPipe at startup.</param>
-        /// <returns></returns>
+        /// <returns>Rotation values ​​in degrees to be assigned</returns>
         public float FindWristYRotation(Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark, Mediapipe.Tasks.Components.Containers.Landmark parentBoneLandmark, Vector3 childBoneStartPos)
         {
+            // New position of the child bone relative to the parent's position.
             Vector3 coordinateDifferenceChildToParent = new Vector3(childBoneLandmark.x - parentBoneLandmark.x, childBoneLandmark.y - parentBoneLandmark.y, 0);
+
+            // Euclidean distance, which represents the length of the bone between the two keypoints (e.g. hand and base of the index finger),
+            // based on the first coordinates found by the mediapipe.
             float distance = Vector3.Distance(Vector3.zero, childBoneStartPos);
             float squaredDifference = distance * distance - coordinateDifferenceChildToParent.x * coordinateDifferenceChildToParent.x - coordinateDifferenceChildToParent.y* coordinateDifferenceChildToParent.y;
 
             float newZcoordinate = Mathf.Sqrt(squaredDifference);
             Vector3 newChildPosition = new Vector3(coordinateDifferenceChildToParent.x, coordinateDifferenceChildToParent.y, newZcoordinate);
 
-            Vector2 rotateFrom1 = new Vector2(childBoneStartPos.x, childBoneStartPos.z);
-            Vector2 rotateTo1 = new Vector2(newChildPosition.x, newChildPosition.z);
-            float newAngle1 = Vector2.Angle(rotateFrom1, rotateTo1);
+            Vector2 rotateFrom = new Vector2(childBoneStartPos.x, childBoneStartPos.z);
+            Vector2 rotateTo = new Vector2(newChildPosition.x, newChildPosition.z);
+            float newAngle = Vector2.Angle(rotateFrom, rotateTo);
 
-            return newAngle1;
+            return newAngle;
         }
 
         /// <summary>
@@ -157,21 +154,23 @@ namespace SEE.Game.Avatars
         /// <param name="handLandmark">Landmark of the hand, detected by MediaPipe.</param>
         /// <param name="elbowLandmark">Landmark of the elbow, detected by MediaPipe.</param>
         /// <param name="handStartPos">The position of the hand relative to the elbow's position, recognized by MediaPipe at startup.</param>
-        /// <returns></returns>
+        /// <returns>Rotation values ​​in degrees to be assigned</returns>
         public float FindElbowRotation(Mediapipe.Tasks.Components.Containers.Landmark handLandmark, Mediapipe.Tasks.Components.Containers.Landmark elbowLandmark, Vector3 handStartPos)
         {
+            // New position of the child bone relative to the parent's position.
             Vector3 coordinateDifferenceChildToParent = new Vector3(handStartPos.x, handLandmark.y - elbowLandmark.y, 0);
 
-            float distance1 = Vector3.Distance(new Vector3(0, 0, 0), handStartPos);
+            // Euclidean distance, which represents the length of the bone between the two keypoints (e.g. hand and elbow),
+            // based on the first coordinates found by the mediapipe.
+            float distance = Vector3.Distance(new Vector3(0, 0, 0), handStartPos);
+            float squaredDifference = distance * distance - coordinateDifferenceChildToParent.y * coordinateDifferenceChildToParent.y - coordinateDifferenceChildToParent.x * coordinateDifferenceChildToParent.x;
+            float newZCoordinate = Mathf.Sqrt(squaredDifference);
+            Vector3 newChildPosition = new Vector3(coordinateDifferenceChildToParent.x, coordinateDifferenceChildToParent.y, newZCoordinate);
+            Vector2 rotateFrom = new Vector2(handStartPos.y, handStartPos.z);
+            Vector2 rotateTo = new Vector2(newChildPosition.y, newChildPosition.z);
+            float newAngle = Vector2.Angle(rotateFrom, rotateTo);
 
-            float squaredDifference1 = distance1 * distance1 - coordinateDifferenceChildToParent.y * coordinateDifferenceChildToParent.y - coordinateDifferenceChildToParent.x * coordinateDifferenceChildToParent.x;
-            float newZCoordinate1 = Mathf.Sqrt(squaredDifference1);
-            Vector3 newChildPosition1 = new Vector3(coordinateDifferenceChildToParent.x, coordinateDifferenceChildToParent.y, newZCoordinate1);
-            Vector2 rotateFrom1 = new Vector2(handStartPos.y, handStartPos.z);
-            Vector2 rotateTo1 = new Vector2(newChildPosition1.y, newChildPosition1.z);
-            float newAngle1 = Vector2.Angle(rotateFrom1, rotateTo1);
-
-            return newAngle1;
+            return newAngle;
         }
     }
 }

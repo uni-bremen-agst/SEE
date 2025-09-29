@@ -5,7 +5,7 @@ using UnityEngine.XR.Management;
 namespace SEE.XR
 {
     /// <summary>
-    /// Allows to manually Initialize XR.
+    /// Allows to manually initialize XR.
     ///
     /// This component is assumed to be attached to an object that comes
     /// into existence only if XR is to be started locally (i.e, within

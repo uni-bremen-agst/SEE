@@ -55,7 +55,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Initializes all action state types and groups.
         ///
-        /// C# uses lazy evaluation of initializers. That is why we Initialize the action state
+        /// C# uses lazy evaluation of initializers. That is why we initialize the action state
         /// types and groups ourselves in this static constructor. This will make sure that they
         /// actually have defined value (different from null) when used. That is particularly
         /// important for action state groups which are used in the initialization of all

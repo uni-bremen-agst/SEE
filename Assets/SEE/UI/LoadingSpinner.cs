@@ -118,7 +118,7 @@ namespace SEE.UI
                 throw new InvalidOperationException("There can only be one loading spinner.");
             }
 
-            // We Initialize the loading spinner so that it can be quickly shown when needed.
+            // We initialize the loading spinner so that it can be quickly shown when needed.
             loadingSpinner = PrefabInstantiator.InstantiatePrefab(loadingSpinnerPrefab, Canvas.transform, false);
             processCountText = loadingSpinner.transform.Find("Counter").gameObject.MustGetComponent<TextMeshProUGUI>();
             processInfoText = loadingSpinner.transform.Find("Info").gameObject.MustGetComponent<TextMeshProUGUI>();

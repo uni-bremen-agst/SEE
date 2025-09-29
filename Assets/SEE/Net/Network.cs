@@ -231,7 +231,7 @@ namespace SEE.Net
         public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
 
         /// <summary>
-        /// The Unity main thread. Note that we cannot Initialize its value here
+        /// The Unity main thread. Note that we cannot initialize its value here
         /// because the elaboration code initializing static attributes may be
         /// executed by a thread different from Unity's main thread. This attribute
         /// will be initialized in <see cref="Awake"/> for this reason.
@@ -427,7 +427,7 @@ namespace SEE.Net
                         break;
                     case launchAsServerArgumentName:
                         Debug.Log($"Found {launchAsServerArgumentName} as parameter {i}.\n");
-                        // This argument does not have a value. It works as a flagUp.
+                        // This argument does not have a value. It works as a flag.
                         launchAsServer = true;
                         break;
                     default:
@@ -1241,7 +1241,7 @@ namespace SEE.Net
                 // happen, VivoxInitialize() must always be called AFTER the server
                 // and client were initialized, because if this client tries to connect
                 // to a server and can not connect, it will go to offline mode and not
-                // Initialize Vivox.
+                // initialize Vivox.
                 VivoxChannelSession = VivoxLoginSession.GetChannelSession(channelID);
                 VivoxChannelSession.PropertyChanged += VivoxOnChannelPropertyChanged;
                 VivoxChannelSession.MessageLog.AfterItemAdded += VivoxOnChannelMessageReceived;

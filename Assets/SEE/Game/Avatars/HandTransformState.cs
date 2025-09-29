@@ -8,7 +8,7 @@ namespace SEE.Game.Avatars
     /// as well as other information needed for animation and synchronization of animations.
     /// </summary>
     public class HandTransformState
-    {
+    {  
         /// <summary>
         /// Position of the hand.
         /// </summary>
@@ -108,7 +108,6 @@ namespace SEE.Game.Avatars
         /// Coordinates of the hand position relative to the head position.
         /// </summary>
         public Vector3 HandToHeadCoordinateDifference = Vector3.zero;
-
 
         // Parameters needed to animate a player's Avatar
         // for all other players.
