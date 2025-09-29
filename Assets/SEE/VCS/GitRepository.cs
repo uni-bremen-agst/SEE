@@ -23,67 +23,6 @@ namespace SEE.VCS
     public class GitRepository: IDisposable
     {
         /// <summary>
-        /// The underlying <see cref="Repository"/> object that provides access to the Git repository.
-        /// If this is null, the repository has not been opened yet or was disposed.
-        /// </summary>
-        private Repository repository;
-
-        /// <summary>
-        /// Indicates whether the object has been disposed.
-        /// </summary>
-        private bool disposed = false;
-
-        /// <summary>
-        /// Disposes the repository if it is not null.
-        /// </summary>
-        public void Dispose()
-        {
-            Dispose(true);
-            // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
-            // finalization when Dispose is called explicitly.
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Finalizer in case <see cref="Dispose"/> is not called explicitly
-        /// </summary>
-        ~GitRepository()
-        {
-            Dispose(false);
-        }
-
-        /// <summary>
-        /// Disposes the repository if it is not null.
-        /// </summary>
-        /// <param name="disposing"></param>
-        private void Dispose(bool disposing)
-        {
-            // Check if the object has already been disposed to prevent double-disposal.
-            if (disposed)
-            {
-                return;
-            }
-            // Dispose of the repository if it is not null to release resources.
-            // repository?.Dispose(); // FIXME(#873)
-            // repository = null;
-            disposed = true;
-        }
-
-        /// <summary>
-        /// Returns a string representation of the object, the repository path, more precisely.
-        /// </summary>
-        /// <returns>the repository path</returns>
-        public override string ToString()
-        {
-            return $"GitRepository: {RepositoryPath.Path}";
-        }
-
-        /// <summary>
-        /// Used for the tab name in runtime config menu.
-        /// </summary>
-        private const string graphProviderFoldoutGroup = "Data";
-
-        /// <summary>
         /// The path to the git repository.
         /// </summary>
         [ShowInInspector, Tooltip("Path to the git repository."), HideReferenceObjectPicker,
@@ -108,6 +47,78 @@ namespace SEE.VCS
         [Tooltip("Access token for accessing the repository, if needed."),
          RuntimeTab(graphProviderFoldoutGroup)]
         public string AccessToken = "";
+
+        /// <summary>
+        /// The underlying <see cref="Repository"/> object that provides access to the Git repository.
+        /// If this is null, the repository has not been opened yet or was disposed.
+        /// </summary>
+        private Repository repository;
+
+        /// <summary>
+        /// Indicates whether the object has been disposed.
+        /// </summary>
+        [OdinSerialize, HideInInspector]
+        private bool disposed = false;
+
+        /// <summary>
+        /// Disposes the repository if it is not null.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+            // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
+            // finalization when Dispose is called explicitly.
+            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Finalizer in case <see cref="Dispose"/> is not called explicitly.
+        /// </summary>
+        ~GitRepository()
+        {
+            // Calling Dispose(false) to release only unmanaged resources. We can't safely
+            // access managed objects (i.e., repository) from the finalizer because
+            // the garbage collector might have already collected them.
+            Dispose(false);
+        }
+
+        /// <summary>
+        /// Disposes the repository.
+        /// </summary>
+        /// <param name="disposing">If true, all managed and unmanaged ressources are are
+        /// released; if false, only the unmanaged ones.</param>
+        private void Dispose(bool disposing)
+        {
+            // Check if the object has already been disposed to prevent double-disposal.
+            if (disposed)
+            {
+                return;
+            }
+            if (disposing)
+            {
+                // Dispose of the repository if it is not null to release resources.
+                repository?.Dispose();
+            }
+            // We could now also release unmanaged resources here if we had any,
+            // but we don't.
+
+            repository = null;
+            disposed = true;
+        }
+
+        /// <summary>
+        /// Returns a string representation of the object, the repository path, more precisely.
+        /// </summary>
+        /// <returns>the repository path</returns>
+        public override string ToString()
+        {
+            return $"GitRepository: {RepositoryPath.Path}";
+        }
+
+        /// <summary>
+        /// Used for the tab name in runtime config menu.
+        /// </summary>
+        private const string graphProviderFoldoutGroup = "Data";
 
         /// <summary>
         /// Constructor setting default values for the fields.
@@ -768,6 +779,7 @@ namespace SEE.VCS
             writer.BeginGroup(label);
             RepositoryPath.Save(writer, repositoryPathLabel);
             VCSFilter.Save(writer, vcsFilterLabel);
+            // Note: We do not save the access token for security reasons.
             writer.EndGroup();
         }
 
