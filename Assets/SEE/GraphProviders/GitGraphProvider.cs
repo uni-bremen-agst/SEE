@@ -11,7 +11,7 @@ using UnityEngine;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Provides a graph for git repositories.
+    /// Abstract superclass for all <see cref="GraphProvider"/>s for Git repositories.
     /// </summary>
     internal abstract class GitGraphProvider : SingleGraphProvider
     {
@@ -36,7 +36,7 @@ namespace SEE.GraphProviders
         /// or automatically (by setting <see cref="AutoMapAuthors"/> to true).
         /// </summary>
         [Tooltip("If true, the authors of the commits with similar identities will be combined.")]
-        public bool CombineAuthors;
+        public bool CombineAuthors = false;
 
         /// <summary>
         /// A dictionary mapping a commit author's identity (<see cref="FileAuthor"/>) to a list of aliases.
