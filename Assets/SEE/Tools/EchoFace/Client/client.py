@@ -6,7 +6,7 @@ import cv2
 
 from face_analysis_engine import FaceAnalysisEngine
 from face_data_sender import FaceDataSender
-from webcam_stream import WebcamStream
+from video_io import BaseStream, WebcamStream, VideoStream, FrameViewer
 from helpers import draw_landmarks_on_image, draw_centered_text
 
 logging.basicConfig(
@@ -19,35 +19,55 @@ logger = logging.getLogger(__name__)
 
 class EchoFaceClient:
     """
-    EchoFaceClient encapsulates a webcam-based face tracking client
-    that streams blendshape and landmark data over UDP.
-
-    The client performs the core tasks: real-time face landmark and blendshape detection using MediaPipe,
-    continuous streaming of this processed data to a specified UDP server,
-    and a local webcam display that includes an optional landmark
-    overlay and a user-controlled pause/resume function.
+    EchoFaceClient orchestrates stream capture, face analysis, data sending, and display.
     """
 
-    def __init__(self, ip: str, port: int, show_landmarks: bool = True,
-                 camera_index: int = 0, target_fps: int = 30):
+    def __init__(self, ip: str, port: int, show_landmarks: bool = False,
+                 camera_index: int = 0, video_path: str = None, target_fps: int = 30):
         """
-        Initializes the client, including configuration of UDP sender, webcam, and face engine.
+        Initializes the client, sets up the network sender, selects the video source,
+        and initializes the frame viewer.
 
         Args:
-            ip: The UDP server IP address.
+            ip: The UDP server IP address to send data to.
             port: The UDP server port.
             show_landmarks: A flag to determine whether to overlay
-                landmarks on the webcam feed.
-            camera_index: The index of the webcam device to use.
-            target_fps: The requested frame rate for the webcam.
+                            detected face landmarks on the stream display window.
+            camera_index: The numerical index of the webcam device to use (e.g., 0).
+                          This is ignored if video_path is provided.
+            video_path: The filesystem path to a video file to process. If provided,
+                        it is used instead of the webcam.
+            target_fps: The requested frame rate (FPS) for the stream and processing.
+
+        Raises:
+            RuntimeError: If the selected video source (webcam or file) fails to start.
         """
+
         self.face_data_sender = FaceDataSender(ip, port)
         self.show_landmarks = show_landmarks
 
-        self.webcam_stream = WebcamStream(
-            camera_index=camera_index,
-            window_name="Webcam Feed (Client)",
-            target_fps=target_fps
+        # 1. Initialize I/O Stream Source
+        if video_path:
+            logger.info(f"Initializing VideoStream for file: {video_path}")
+            self.video_source: BaseStream = VideoStream(
+                video_path=video_path,
+                target_fps=target_fps
+            )
+        else:
+            logger.info(f"Initializing WebcamStream for index: {camera_index}")
+            self.video_source: BaseStream = WebcamStream(
+                camera_index=camera_index,
+                target_fps=target_fps
+            )
+
+        # Must start the source to get the actual FPS for display timing
+        if not self.video_source.start():
+            raise RuntimeError("Failed to start video source.")
+
+        # 2. Initialize Display/UI Controller using the actual stream FPS
+        self.frame_viewer = FrameViewer(
+            window_name="Stream Feed (Client)",
+            stream_fps=self.video_source.get_actual_fps()
         )
 
         self.engine = FaceAnalysisEngine(on_new_result_callback=self.face_data_sender.send_face_data)
@@ -57,38 +77,27 @@ class EchoFaceClient:
         self.last_frame = None
         self.paused_frame_displayed = False
 
+        logger.info(f"Stream running at {self.video_source.get_actual_fps():.2f} FPS.")
+
     def toggle_pause(self):
-        """
-        Toggles the paused state and resets the paused frame display flag.
-        """
+        """Toggles the paused state of the client."""
         self.paused = not self.paused
         self.paused_frame_displayed = False
-        # logger.info(f"Toggled pause state. Current state: {'PAUSED' if self.paused else 'RUNNING'}")
+        logger.info(f"Application {'PAUSED' if self.paused else 'RESUMED'}")
 
     def run(self):
         """
-        Main loop of the client.
-
-        Starts the UDP socket, webcam, and face engine,
-        and handles frame capture, face detection, UDP streaming,
-        pause/resume logic, and frame display.
+        The main execution loop of the client.
+        It reads frames, processes them, sends data, and manages the display until terminated.
         """
-        # Start UDP socket
+
         self.face_data_sender.start()
-        logger.info("FaceDataSender started.")
-
-        if not self.webcam_stream.start():
-            logger.error("Failed to start webcam. Exiting.")
-            self.face_data_sender.close()
-            return
-
         self.engine.start()
         logger.info("Press 'q' to quit, 'p' to pause/resume...")
-        logger.info(f"Webcam reports actual FPS: {self.webcam_stream.get_actual_fps():.2f}.")
 
         try:
             while True:
-                key = self.webcam_stream.check_key()
+                key = self.frame_viewer.check_key()
                 if key == ord("q"):
                     logger.info(" 'q' pressed. Exiting...")
                     break
@@ -99,61 +108,53 @@ class EchoFaceClient:
                     self._process_frame()
                 else:
                     self._display_paused_frame()
+                    time.sleep(1)  # Reduce CPU usage when paused
         finally:
             self._cleanup()
 
     def _process_frame(self):
-        """
-        Processes a single webcam frame.
-
-        The steps include capturing the frame, converting it to RGB format,
-        submitting it to the face engine for asynchronous detection, sending the results via UDP,
-        and finally displaying the processed frame in the window.
-        """
-        ret, frame_bgr = self.webcam_stream.read_frame()
+        """Reads a frame from the source, runs face detection, and displays the result."""
+        ret, frame_bgr = self.video_source.read_frame()
         if not ret:
             logger.warning("Failed to grab frame. Exiting...")
-            raise RuntimeError("Webcam frame read failed")
+            if not isinstance(self.video_source, VideoStream):
+                raise RuntimeError("Stream frame read failed")
+            return
 
         self.last_frame = frame_bgr
         self.paused_frame_displayed = False
 
+        # Conversion and Detection
         rgb_frame = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
         frame_timestamp_ms = time.time_ns() // 1_000_000
         self.engine.detect_async(mp_image, frame_timestamp_ms)
 
+        # Display Logic
         frame_to_display = frame_bgr
         if self.show_landmarks and self.engine.latest_detection_result:
             annotated_rgb_frame = draw_landmarks_on_image(rgb_frame, self.engine.latest_detection_result)
             frame_to_display = cv2.cvtColor(annotated_rgb_frame, cv2.COLOR_RGB2BGR)
 
-        self.webcam_stream.display_frame(frame_to_display)
+        self.frame_viewer.display_frame(frame_to_display)
 
     def _display_paused_frame(self):
-        """
-        Displays the last captured frame with a "PAUSED" overlay.
-        Ensures the paused frame is drawn only once.
-        """
+        """Displays the last captured frame with a "PAUSED" overlay."""
         if self.last_frame is None:
             return
 
         if not self.paused_frame_displayed:
             frame_to_display = self.last_frame.copy()
-            self.engine.latest_detection_result = None
             frame_to_display = draw_centered_text(frame_to_display, "PAUSED")
-            self.webcam_stream.display_frame(frame_to_display)
+            self.frame_viewer.display_frame(frame_to_display)
             self.paused_frame_displayed = True
 
-        time.sleep(1)  # Reduce CPU usage while paused
-
     def _cleanup(self):
-        """
-        Releases all resources cleanly: webcam, face engine, and UDP sender.
-        """
-        self.webcam_stream.release()
+        """Releases all resources cleanly, including the stream, engine, sender, and display window."""
+        self.video_source.release()
         self.engine.stop()
         self.face_data_sender.close()
+        self.frame_viewer.cleanup()
         logger.info("Client application closed cleanly.")
 
 
@@ -162,20 +163,46 @@ def parse_arguments() -> argparse.Namespace:
     Parses command-line arguments for the client application.
     Provides defaults for local testing.
     """
-    parser = argparse.ArgumentParser(description="Face Landmarker client streaming blendshapes and landmarks via UDP.")
+    parser = argparse.ArgumentParser(
+        description="Face Landmarker client streams blendshape and landmark data via UDP."
+    )
+
+    # Network Arguments
     parser.add_argument("--ip", type=str, default="127.0.0.1",
-                        help="UDP server IP address (default: 127.0.0.1).")
+                        help="The UDP server IP address to send data to (default: 127.0.0.1).")
     parser.add_argument("--port", type=int, default=12345,
-                        help="UDP server port (default: 12345).")
+                        help="The UDP server port (default: 12345).")
+
+    # Source Arguments
+    parser.add_argument("--camera-index", type=int, default=0,
+                        help="The index of the webcam device to use (default: 0). This is ignored if --video-path is specified.")
+    parser.add_argument("--video-path", type=str, default=None,
+                        help="Path to a video file to process instead of a live webcam feed. The video will loop.")
+
+    # Display/Processing Arguments
     parser.add_argument("--show-landmarks", action="store_true",
-                        help="Display face landmarks on the webcam feed.")
+                        help="If set, overlays the detected face landmarks on the stream display window.")
+    parser.add_argument("--target-fps", type=int, default=30,
+                        help="The target frame rate (FPS) for the stream and processing. Used as a fallback if the video source FPS is unknown.")
+
     return parser.parse_args()
 
 
 def main():
     args = parse_arguments()
-    client = EchoFaceClient(ip=args.ip, port=args.port, show_landmarks=args.show_landmarks)
-    client.run()
+    try:
+        client = EchoFaceClient(
+            ip=args.ip,
+            port=args.port,
+            show_landmarks=args.show_landmarks,
+            camera_index=args.camera_index,
+            video_path=args.video_path,
+            target_fps=args.target_fps
+        )
+        client.run()
+    except RuntimeError as e:
+        logger.error(f"Application failed to start or run: {e}")
+        cv2.destroyAllWindows()
 
 
 if __name__ == "__main__":
