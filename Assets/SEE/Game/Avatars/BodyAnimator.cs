@@ -132,7 +132,7 @@ namespace SEE.Game.Avatars
             }
             else if (IsLocallyControlled)
             {
-                HandsAnimator.Initialize(transform, ik); 
+                HandsAnimator.Initialize(transform, ik);
             }
         }
 
@@ -152,7 +152,7 @@ namespace SEE.Game.Avatars
                     Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
 
                     PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
-                    
+
                     if (resultPoseLandmarker.poseWorldLandmarks == null)
                     {
                         Debug.Log("No Pose Landmarks found" + "\n");

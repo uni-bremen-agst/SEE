@@ -20,8 +20,8 @@ namespace SEE.Game.Avatars
 
         /// <summary>
         /// Initializes the webcam manager.
-        /// - If already initialized, this method does nothing. 
-        /// - If no webcams are found on the system, an error is logged and no texture is created. 
+        /// - If already initialized, this method does nothing.
+        /// - If no webcams are found on the system, an error is logged and no texture is created.
         /// - If a webcam is available, the first detected device is selected, and a <see cref="webCamTexture"/> is created and started.
         /// </summary>
         public static void Initialize()

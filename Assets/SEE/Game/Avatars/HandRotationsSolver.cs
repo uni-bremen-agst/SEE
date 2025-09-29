@@ -22,10 +22,10 @@ namespace SEE.Game.Avatars
             // based on the first coordinates found by the mediapipe.
             float distance = Vector3.Distance(new Vector3(0, 0, 0), childBoneStartPos);
             float squaredDifference = distance*distance - coordinateDifferenceChildToParent.y * coordinateDifferenceChildToParent.y - coordinateDifferenceChildToParent.x * coordinateDifferenceChildToParent.x;
-            
+
             float newZCoordinate = Mathf.Sqrt(squaredDifference);
             Vector3 newChildPosition = new Vector3(coordinateDifferenceChildToParent.x, coordinateDifferenceChildToParent.y, newZCoordinate);
-            
+
             Vector2 rotateFrom = new Vector2(childBoneStartPos.y, childBoneStartPos.z);
             Vector2 rotateTo = new Vector2(newChildPosition.y, newChildPosition.z);
             float newAngle = Vector2.Angle(rotateFrom, rotateTo);
@@ -35,7 +35,7 @@ namespace SEE.Game.Avatars
             {
                 newAngle = 130f;
             }
-            
+
             return newAngle;
         }
 
@@ -45,9 +45,9 @@ namespace SEE.Game.Avatars
         /// <param name="angleToSet">Angle found for rotation.</param>
         /// <param name="fingertipBone">Transform component of the fingertip bone.</param>
         /// <param name="fingerMiddleBone">Transform component of the middle finger bone.</param>
-        /// <remarks>The same calculated value is used to assign rotations to the middle finger bone and the last finger bone. 
-        /// The idea was that bending only the very tip of the finger without bending the middle joint is practically impossible, 
-        /// so there's no need to calculate the rotation angle for the tip of the finger separately. 
+        /// <remarks>The same calculated value is used to assign rotations to the middle finger bone and the last finger bone.
+        /// The idea was that bending only the very tip of the finger without bending the middle joint is practically impossible,
+        /// so there's no need to calculate the rotation angle for the tip of the finger separately.
         /// It will receive a value that's half the rotation of the middle bone.</remarks>
         /// <remarks>IsNaN check is needed due to inconsistency in MediaPipe coordinates which can result in trying
         /// to take the square root of a negative number when using the formula for Euclidean distance.</remarks>

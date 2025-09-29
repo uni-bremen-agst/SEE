@@ -83,7 +83,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Rotations of the fingertip bone of the thumb of the left hand.
         /// </summary>
-        private NetworkVariable<Quaternion> leftThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner); 
+        private NetworkVariable<Quaternion> leftThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Position of the right hand.
@@ -181,7 +181,7 @@ namespace SEE.Game.Avatars
             leftPinkyFingerRotations.Value = handsAnimator.LeftHandTransformState.PinkyFingerRotations;
             leftThumb1Rotations.Value = handsAnimator.LeftHandTransformState.Thumb1Rotations;
             leftThumb2Rotations.Value = handsAnimator.LeftHandTransformState.Thumb2Rotations;
-            leftThumb3Rotations.Value = handsAnimator.LeftHandTransformState.Thumb3Rotations; 
+            leftThumb3Rotations.Value = handsAnimator.LeftHandTransformState.Thumb3Rotations;
 
             rightHandPosition.Value = handsAnimator.RightHandTransformState.HandIKEffectorPosition;
             rightHandRotation.Value = handsAnimator.RightHandTransformState.HandIKEffectorRotation;
@@ -243,8 +243,7 @@ namespace SEE.Game.Avatars
             Transform leftThumb3Bone = transform.Find(HandsAnimator.LeftThumb3Name);
             leftThumb1Bone.localRotation = leftThumb1Rotations.Value;
             leftThumb2Bone.localRotation = leftThumb2Rotations.Value;
-            leftThumb3Bone.localRotation = leftThumb3Rotations.Value; 
-
+            leftThumb3Bone.localRotation = leftThumb3Rotations.Value;
 
             ik.solver.rightHandEffector.position = rightHandPosition.Value;
             ik.solver.rightHandEffector.rotation = rightHandRotation.Value;
@@ -284,7 +283,7 @@ namespace SEE.Game.Avatars
             Transform rightThumb3Bone = transform.Find(HandsAnimator.RightThumb3Name);
             rightThumb1Bone.localRotation = rightThumb1Rotations.Value;
             rightThumb2Bone.localRotation = rightThumb2Rotations.Value;
-            rightThumb3Bone.localRotation = rightThumb3Rotations.Value; 
+            rightThumb3Bone.localRotation = rightThumb3Rotations.Value;
         }
     }
 }

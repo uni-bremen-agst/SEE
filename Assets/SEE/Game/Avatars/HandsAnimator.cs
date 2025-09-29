@@ -113,8 +113,8 @@ namespace SEE.Game.Avatars
         private FullBodyBipedIK ik;
 
         /// <summary>
-        /// HandTransformState instances for left and right hand which are used to store 
-        /// the status of the current rotations and positions of the hands and fingers 
+        /// HandTransformState instances for left and right hand which are used to store
+        /// the status of the current rotations and positions of the hands and fingers
         /// as well as other information required for animations.
         /// </summary>
         public HandTransformState LeftHandTransformState = new HandTransformState();
@@ -197,14 +197,14 @@ namespace SEE.Game.Avatars
         private Tuple<float, float> HandXCoordinatesDiffIntervalToFaceTheCamera = Tuple.Create(-0.47f, -0.15f);
 
         /// <summary>
-        /// The interval at which the avatar's palm should be slightly rotated to avoid unnatural animations 
+        /// The interval at which the avatar's palm should be slightly rotated to avoid unnatural animations
         /// when moving the hand in front of the avatar's body (the values ​​are the difference in coordinates between the hand and the head).
         /// </summary>
         private Tuple<float, float> HandXCoordinatesDiffIntervalMovingInFront = Tuple.Create(-0.15f, 0.28f);
 
         /// <summary>
-        /// The difference in the y-coordinate between the hand and the head, 
-        /// from which it can be assumed that the hand is moving downwards and therefore 
+        /// The difference in the y-coordinate between the hand and the head,
+        /// from which it can be assumed that the hand is moving downwards and therefore
         /// should be slightly rotated to avoid unnatural animations.
         /// </summary>
         private const float HandYCoordinatesDiffToMoveDownFrom = -0.3f;
@@ -252,7 +252,7 @@ namespace SEE.Game.Avatars
 
             ik.solver.leftHandEffector.positionWeight = weight;
             ik.solver.leftHandEffector.rotationWeight = weight;
-            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight; 
+            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
 
             ik.solver.rightHandEffector.positionWeight = weight;
             ik.solver.rightHandEffector.rotationWeight = weight;
@@ -363,7 +363,7 @@ namespace SEE.Game.Avatars
                 {
                     IsPointing = false;
                 }
-                else 
+                else
                 {
                     IsPointing = true;
                 }
@@ -457,7 +457,7 @@ namespace SEE.Game.Avatars
                     {
                         leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                     }
-                    else 
+                    else
                     {
                         leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
                     }

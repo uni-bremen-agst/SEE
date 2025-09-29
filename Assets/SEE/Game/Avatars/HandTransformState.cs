@@ -4,11 +4,11 @@
 namespace SEE.Game.Avatars
 {
     /// <summary>
-    /// Stores values ​​to display the current position and rotation of the hand and fingers, 
+    /// Stores values ​​to display the current position and rotation of the hand and fingers,
     /// as well as other information needed for animation and synchronization of animations.
     /// </summary>
     public class HandTransformState
-    {  
+    {
         /// <summary>
         /// Position of the hand.
         /// </summary>
