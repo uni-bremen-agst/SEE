@@ -139,7 +139,7 @@ namespace SEE.GraphProviders
                 {
                     MarkerTime = MarkerTime,
                     PollingInterval = PollingInterval,
-                    CodeCity = branchCity,
+                    BranchCity = branchCity,
                     Repository = GitRepository
                 };
                 poller.Start();

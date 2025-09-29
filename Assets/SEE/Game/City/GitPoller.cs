@@ -15,7 +15,7 @@ namespace SEE.Game.City
 {
     /// <summary>
     /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
-    /// git repositories specified im <see cref="WatchedRepositories"/>.
+    /// git repositories specified im <see cref="BranchCity"/>.
     ///
     /// When a new commit was detected on any branch, a refresh of the CodeCity is initiated.
     /// Newly added or changed nodes will be marked after the refresh.
@@ -29,7 +29,7 @@ namespace SEE.Game.City
         /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
         /// was executed and which should be updated when a new commit is detected.
         /// </summary>
-        public BranchCity CodeCity;
+        public BranchCity BranchCity;
 
         /// <summary>
         /// The time in seconds for how long the node markers should be shown for newly
@@ -66,7 +66,7 @@ namespace SEE.Game.City
                 return;
             }
 
-            markerFactory = new MarkerFactory(CodeCity.MarkerAttributes);
+            markerFactory = new MarkerFactory(BranchCity.MarkerAttributes);
 
             timer.Elapsed += OnTimedEvent;
         }
@@ -102,6 +102,7 @@ namespace SEE.Game.City
         {
             if (!doNotPoll)
             {
+                Debug.Log($"Fetching repository {Repository.RepositoryPath.Path}...\n");
                 doNotPoll = true;
                 bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
@@ -113,21 +114,21 @@ namespace SEE.Game.City
                     ShowNewCommitsMessage();
 
                     // Backup old graph
-                    Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
-                    await CodeCity.LoadDataAsync();
+                    Graph oldGraph = BranchCity.LoadedGraph.Clone() as Graph;
+                    await BranchCity.LoadDataAsync();
                     try
                     {
-                        CodeCity.ReDrawGraph();
+                        BranchCity.ReDrawGraph();
                     }
                     catch (Exception e)
                     {
                         Debug.LogError(e);
                     }
 
-                    CodeCity.LoadedGraph.Diff(oldGraph,
+                    BranchCity.LoadedGraph.Diff(oldGraph,
                         g => g.Nodes(),
                         (g, id) => g.GetNode(id),
-                        GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
+                        GraphExtensions.AttributeDiff(BranchCity.LoadedGraph, oldGraph),
                         nodeEqualityComparer,
                         out ISet<Node> addedNodes,
                         out ISet<Node> removedNodes,
