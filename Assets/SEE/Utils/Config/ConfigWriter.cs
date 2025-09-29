@@ -58,7 +58,7 @@ namespace SEE.Utils.Config
         /// Whenever we enter a list, an InList ist pushed. Upon leaving a composite or list
         /// value, the context stack is popped.
         /// </summary>
-        private readonly Stack<ContextInfo> context = new Stack<ContextInfo>();
+        private readonly Stack<ContextInfo> context = new();
 
         /// <summary>
         /// Emits given <paramref name="label"/> followed by <see cref="NiceLabelValueSeparator"/>

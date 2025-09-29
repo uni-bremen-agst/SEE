@@ -82,6 +82,18 @@ namespace SEE.Game.City
             return this.GetEnumerator();
         }
 
+        #region Config I/O
+
+        /// <summary>
+        /// The label of the name of the property in the configuration file.
+        /// </summary>
+        private const string nameLabel = "name";
+
+        /// <summary>
+        /// The label of the color of the property in the configuration file.
+        /// </summary>
+        private const string colorLabel = "color";
+
         /// <summary>
         /// Saves this <see cref="ColorMap"/> as a list of groups (metric name, color)
         /// using <paramref name="writer"/> under the given <paramref name="label"/>.
@@ -125,7 +137,7 @@ namespace SEE.Game.City
                         continue;
                     }
                     // color
-                    ColorRange color = new ColorRange();
+                    ColorRange color = new();
                     if (!color.Restore(dict, colorLabel))
                     {
                         Debug.LogError($"Entry of {typeof(ColorMap)} has no value for {colorLabel}\n");
@@ -142,14 +154,6 @@ namespace SEE.Game.City
             }
         }
 
-        /// <summary>
-        /// The label of the name of the property in the configuration file.
-        /// </summary>
-        private const string nameLabel = "name";
-
-        /// <summary>
-        /// The label of the color of the property in the configuration file.
-        /// </summary>
-        private const string colorLabel = "color";
+        #endregion Config I/O
     }
 }

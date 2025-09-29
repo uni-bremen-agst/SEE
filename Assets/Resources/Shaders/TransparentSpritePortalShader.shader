@@ -11,7 +11,8 @@ Shader "Unlit/TransparentSpritePortalShader"
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _Portal ("Portal", vector) = (-10, -10, 10, 10)
+        _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
+        _PortalFade ("Portal Edge Fade (World Units)", Float) = 0.01
     }
     SubShader
     {
@@ -54,6 +55,7 @@ Shader "Unlit/TransparentSpritePortalShader"
             sampler2D _MainTex;
             float4 _MainTex_ST;
             float4 _Portal;
+            float _PortalFade;
 
             v2f vert (appdata v)
             {
@@ -67,18 +69,33 @@ Shader "Unlit/TransparentSpritePortalShader"
             fixed4 frag (v2f i) : SV_Target
             {
                 // sample the texture
-                fixed4 col = tex2D(_MainTex, i.uv);
+                fixed4 color = tex2D(_MainTex, i.uv);
 
-                // Discard coordinates if transparent or outside portal
-                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-                if (col.a <= 0 ||
-                    i.worldPos.x < _Portal.x || i.worldPos.z < _Portal.y ||
-                    i.worldPos.x > _Portal.z || i.worldPos.z > _Portal.w)
+                // Discard coordinates if completely transparent
+                if (color.a <= 0)
                 {
                     discard;
                 }
 
-                return col;
+                // Portal: Calculate overhang in each direction
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                float overhangLeft   = max(_Portal.x - i.worldPos.x, 0.0);
+                float overhangBottom = max(_Portal.y - i.worldPos.z, 0.0);
+                float overhangRight  = max(i.worldPos.x - _Portal.z, 0.0);
+                float overhangTop    = max(i.worldPos.z - _Portal.w, 0.0);
+
+                // Discard coordinates if outside portal
+                if (overhangLeft > _PortalFade || overhangRight > _PortalFade ||
+                    overhangBottom > _PortalFade || overhangTop > _PortalFade)
+                {
+                    discard;
+                }
+
+                // Fade effect
+                float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
+                color.a *= fade;
+
+                return color;
             }
             ENDHLSL
         }

@@ -4,6 +4,8 @@ using System.Linq;
 using UnityEngine;
 using SEE.Audio;
 using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -12,7 +14,6 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
-using SEE.Game.City;
 
 namespace SEE.Controls.Actions
 {
@@ -78,12 +79,17 @@ namespace SEE.Controls.Actions
             {
                 case ProgressState.NoNodeSelected:
                     if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
-                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) == HitGraphElement.Node)
+                        && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
+                        && ger.gameObject.TryGetComponent(out InteractableObject io)
+                        && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
-                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef() &&
-                        XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out raycastHit))
+                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer
+                        && XRSEEActions.Selected
+                        && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
+                        && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef()
+                        && XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out raycastHit))
                     {
                         XRSEEActions.Selected = false;
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
@@ -102,7 +108,7 @@ namespace SEE.Controls.Actions
                 case ProgressState.Finish:
                     result = true;
                     CurrentState = IReversibleAction.Progress.Completed;
-                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, addedGameNode);
+                    AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.NewNodeSound, addedGameNode, true);
                     break;
                 default:
                     throw new NotImplementedException($"Unhandled case {nameof(progress)}.");
@@ -568,6 +574,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             public readonly GameObject Parent;
             /// <summary>
+            /// The parent node ID.
+            /// </summary>
+            public readonly string ParentID;
+            /// <summary>
             /// The position of the new node in world space.
             /// </summary>
             public readonly Vector3 Position;
@@ -597,6 +607,7 @@ namespace SEE.Controls.Actions
             public Memento(GameObject child, GameObject parent)
             {
                 Parent = parent;
+                ParentID = parent.name;
                 Position = child.transform.position;
                 Scale = child.transform.lossyScale;
                 NodeID = null;
@@ -611,6 +622,8 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            addedGameNode = addedGameNode != null?
+                addedGameNode : GraphElementIDMap.Find(memento.NodeID);
             if (addedGameNode != null)
             {
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
@@ -626,11 +639,13 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            addedGameNode = GameNodeAdder.AddChild(memento.Parent, worldSpacePosition: memento.Position,
+            GameObject parent = memento.Parent != null?
+                memento.Parent : GraphElementIDMap.Find(memento.ParentID);
+            addedGameNode = GameNodeAdder.AddChild(parent, worldSpacePosition: memento.Position,
                                                    worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
-                new AddNodeNetAction(parentID: memento.Parent.name,
+                new AddNodeNetAction(parentID: memento.ParentID,
                     newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
 
                 if (!string.IsNullOrEmpty(memento.Type))
@@ -678,7 +693,7 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.Parent.name,
+                memento.ParentID,
                 memento.NodeID
             };
         }

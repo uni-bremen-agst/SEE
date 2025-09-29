@@ -192,7 +192,7 @@ namespace SEE.Controls.Actions
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
-                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<VCSCity>() != null))
+                        if (selectedObjects.Any(o => o.gameObject.ContainingCity<CommitCity>() != null))
                         {
                             submenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
                         }
@@ -274,10 +274,10 @@ namespace SEE.Controls.Actions
             {
                 foreach (InteractableObject iO in selectedObjects)
                 {
-                    if (iO.gameObject != null && iO.gameObject.ContainingCity<VCSCity>())
+                    if (iO.gameObject != null && iO.gameObject.ContainingCity<CommitCity>())
                     {
                         ActivateWindow(ShowCodeAction.ShowVCSDiff(iO.gameObject.MustGetComponent<GraphElementRef>(),
-                                                          iO.gameObject.ContainingCity<CommitCity>()));
+                                                                  iO.gameObject.ContainingCity<CommitCity>()));
                     }
                 }
             }
@@ -373,7 +373,6 @@ namespace SEE.Controls.Actions
                 {
                     city.LoadAndDrawSubgraphAsync(implDataPath, projectFolder).Forget();
                     new LoadPartOfReflexionCityNetAction(city.transform.parent.name, false, implDataPath, projectFolder).Execute();
-
                 }
 
                 if (dialog.TryGetArchitectureDataPath(out DataPath archDataPath))
@@ -449,7 +448,7 @@ namespace SEE.Controls.Actions
                 if (graphElement.Filename != null)
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
-                    if (gameObject.ContainingCity<VCSCity>() != null)
+                    if (gameObject.ContainingCity<CommitCity>() != null)
                     {
                         subMenuEntries.Add(new PopupMenuAction("Show Code Diff", ShowDiffCode, Icons.Code));
                     }
@@ -461,7 +460,6 @@ namespace SEE.Controls.Actions
                     _ => throw new ArgumentOutOfRangeException()
                 });
                 UpdateEntries(popupMenu, position, subMenuEntries);
-
             }, Icons.Info, Icons.ArrowRight, CloseAfterClick: false, Priority: 1));
 
             return entries;
@@ -758,7 +756,6 @@ namespace SEE.Controls.Actions
             {
                 ActivateWindow(ShowCodeAction.ShowUnifiedDiff(gameObject.MustGetComponent<EdgeRef>()));
             }
-
         }
 
         /// <summary>

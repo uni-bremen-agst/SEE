@@ -6,10 +6,12 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.GraphProviders.VCS;
 using SEE.Utils;
 using TinySpline;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
@@ -32,16 +34,18 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
-        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent)
+        /// <param name="graph">The graph which was rendered.</param>
+        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
         {
-            List<string> authors =
+            List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
+                    .Select(x => new FileAuthor(x))
                     .ToList();
 
-            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent);
+            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
 
             // Drawing edges
             RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
@@ -53,7 +57,7 @@ namespace SEE.Game.CityRendering
         /// This method should be called after the sphere where rendered.
         /// </summary>
         /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="spheresObjects">A list of the previous rendered spheres.</param>
+        /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
         private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
             IEnumerable<GameObject> spheresObjects, GameObject parent)
@@ -72,14 +76,14 @@ namespace SEE.Game.CityRendering
             foreach (GameObject sphere in spheresObjects)
             {
                 AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
-                string authorName = authorSphere.Author;
+                FileAuthor authorName = authorSphere.Author;
 
                 IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
                     .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
                     .Where(x =>
                         x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
                             .Split(',')
-                            .Contains(authorName));
+                            .Contains(authorName.ToString()));
 
                 foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
                 {
@@ -89,6 +93,7 @@ namespace SEE.Game.CityRendering
                     GameObject gameEdge = new()
                     {
                         tag = Tags.Edge,
+                        layer = Layers.InteractableGraphObjects,
                         isStatic = false,
                         name = authorName + ":" + nodeOfAuthor.Key.ID
                     };
@@ -116,14 +121,65 @@ namespace SEE.Game.CityRendering
                     Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
                     line.positionCount = positions.Length; // number of vertices
                     line.SetPositions(positions);
-                    gameEdge.AddComponent<InteractableObject>();
+
                     AddLOD(gameEdge);
 
                     AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
                     authorRef.AuthorSpheres.Add(sphere);
                     authorRef.Edges.Add((gameEdge, churn));
 
+                    AuthorEdge authorEdge = gameEdge.AddComponent<AuthorEdge>();
+                    authorEdge.targetNode = authorRef;
+                    authorEdge.authorSphere = authorSphere;
+
                     authorSphere.Edges.Add((gameEdge, churn));
+
+                    if (Settings is BranchCity branchCity)
+                    {
+                        switch (branchCity.ShowAuthorEdgesStrategy)
+                        {
+                            case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
+                                {
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
+                                if (Application.isPlaying)
+                                {
+                                    // The containing method may be called in the Unity editor, but hiding the edges
+                                    // only makes sense when the game is running. Moreover, hiding the edges in the editor
+                                    // may even lead to exceptions because the city's BaseAnimationDuration will be queried
+                                    // but the city is set only OnEnable of the edge operator.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+
+                                    if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
+                                    {
+                                        // Show only edges for nodes with multiple authors.
+                                        foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
+                                        {
+                                            edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                        }
+                                    }
+                                }
+                                break;
+                            case ShowAuthorEdgeStrategy.ShowOnHover:
+                                if (Settings.EdgeLayoutSettings.AnimationKind == EdgeAnimationKind.None)
+                                {
+                                    throw new System.Exception("If author edges are to be shown on hovering, an edge animation must be activated.");
+                                }
+                                if (Application.isPlaying)
+                                {
+                                    // See above. Must not be run in editor mode.
+                                    gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
+                                }
+                                break;
+                            case ShowAuthorEdgeStrategy.ShowAlways:
+                                break; // nothing to do here, edges are always shown
+                            default:
+                                throw new System.ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
+                                    branchCity.ShowAuthorEdgesStrategy,
+                                    $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
+                        }
+                    }
                 }
             }
         }
@@ -151,11 +207,12 @@ namespace SEE.Game.CityRendering
         /// <param name="authors">The authors to create the spheres for.</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the to.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<string> authors, GameObject parent)
+        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
         {
             IList<GameObject> result = new List<GameObject>();
             Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
+            Node rootNode = graph.GetRoots().First();
 
             // Calculating number of rows and columns needed and the space between the spheres.
             // The spheres will be distributed in a rectangle around the code city table.
@@ -197,8 +254,10 @@ namespace SEE.Game.CityRendering
                     AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
                     author.Author = authors[counter];
 
+                    gameObject.AddComponent<NodeRef>().Value = rootNode;
+
                     gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowHovering>();
+                    gameObject.AddComponent<ShowAuthorEdges>();
 
                     Vector3 startLabelPosition = gameObject.GetTop();
                     float fontSize = 2f;
@@ -213,7 +272,7 @@ namespace SEE.Game.CityRendering
                     TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
                     tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
                     tm.fontSize = fontSize;
-                    tm.text = authors[counter];
+                    tm.text = authors[counter].ToString();
                     tm.color = Color.white;
                     tm.alignment = TextAlignmentOptions.Center;
 

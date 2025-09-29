@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using SEE.Game;
+using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Utils;
 using SEE.Utils.History;
+using Plane = UnityEngine.Plane;
 
 namespace SEE.Controls.Actions
 {
@@ -60,9 +62,9 @@ namespace SEE.Controls.Actions
         /// <returns>all IDs of gameObjects manipulated by this action</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return memento.GameObject == null || CurrentState == IReversibleAction.Progress.NoEffect
+            return String.IsNullOrEmpty(memento.ID) || CurrentState == IReversibleAction.Progress.NoEffect
                 ? new HashSet<string>()
-                : new HashSet<string>() { memento.GameObject.name };
+                : new HashSet<string>() { memento.ID };
         }
 
         /// <summary
@@ -121,13 +123,16 @@ namespace SEE.Controls.Actions
         {
             base.Undo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.OriginalLocalScale, memento.OriginalPosition);
+            new ResizeNodeNetAction(memento.ID, memento.OriginalLocalScale, memento.OriginalPosition).Execute();
         }
 
         /// <summary>
@@ -137,13 +142,16 @@ namespace SEE.Controls.Actions
         {
             base.Redo();
 
-            if (memento.GameObject == null)
+            GameObject resizedObj = memento.GameObject != null ?
+                memento.GameObject : GraphElementIDMap.Find(memento.ID);
+
+            if (resizedObj == null)
             {
                 return;
             }
 
-            memento.GameObject.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
-            new ResizeNodeNetAction(memento.GameObject.name, memento.NewLocalScale, memento.NewPosition).Execute();
+            resizedObj.NodeOperator().ResizeTo(memento.NewLocalScale, memento.NewPosition);
+            new ResizeNodeNetAction(memento.ID, memento.NewLocalScale, memento.NewPosition).Execute();
         }
 
         #endregion ReversibleAction
@@ -193,8 +201,13 @@ namespace SEE.Controls.Actions
 
             // Incompatible type
             GameObject selectedGameObject = interactableObject.gameObject;
-            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef)
-                || !selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type].AllowManualResize)
+            if (!selectedGameObject.TryGetNodeRef(out NodeRef selectedNodeRef))
+            {
+                return;
+            }
+
+            VisualNodeAttributes attrs = selectedGameObject.ContainingCity().NodeTypes[selectedNodeRef.Value.Type];
+            if (!attrs.AllowManualResize)
             {
                 return;
             }
@@ -202,6 +215,7 @@ namespace SEE.Controls.Actions
             // Start resizing
             memento = new Memento(selectedGameObject);
             gizmo = memento.GameObject.AddOrGetComponent<ResizeGizmo>();
+            gizmo.HeightResizeEnabled = attrs.AllowManualHeightResize;
             gizmo.OnSizeChanged += OnResizeStep;
         }
 
@@ -222,7 +236,7 @@ namespace SEE.Controls.Actions
             memento.NewPosition = newPosition;
 
             // Apply new position and scale to update edges and propagate changes to other players
-            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false);
+            memento.GameObject.NodeOperator().ResizeTo(newLocalScale, newPosition, 0, reparentChildren: false, updateLayers: false);
             new ResizeNodeNetAction(memento.GameObject.name, newLocalScale, newPosition).Execute();
         }
 
@@ -235,6 +249,11 @@ namespace SEE.Controls.Actions
             /// The <c>GameObject</c> of the game object.
             /// </summary>
             public readonly GameObject GameObject;
+
+            /// <summary>
+            /// The ID of the game object.
+            /// </summary>
+            public readonly string ID;
 
             /// <summary>
             /// The original world-space position of the game object.
@@ -262,6 +281,7 @@ namespace SEE.Controls.Actions
             public Memento(GameObject go)
             {
                 GameObject = go;
+                ID = go.name;
                 OriginalPosition = go.transform.position;
                 OriginalLocalScale = go.transform.localScale;
                 NewPosition = OriginalPosition;
@@ -324,21 +344,9 @@ namespace SEE.Controls.Actions
             private bool clicked = false;
 
             /// <summary>
-            /// The last recorded rotation of the camera. Used to detect camera orientation changes.
+            /// Is height resize active?
             /// </summary>
-            private Quaternion lastCameraRotation;
-
-            /// <summary>
-            /// The forward vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarForward;
-
-            /// <summary>
-            /// The right vector of the camera projected onto the horizontal plane.
-            /// Used for calculating movement relative to the camera's orientation.
-            /// </summary>
-            private Vector3 cameraPlanarRight;
+            public bool HeightResizeEnabled = false;
 
             #region Configurations
 
@@ -346,11 +354,6 @@ namespace SEE.Controls.Actions
             /// The size of the handles.
             /// </summary>
             private static readonly Vector3 handleScale = new(0.005f, 0.005f, 0.005f);
-
-            /// <summary>
-            /// The color of the handles.
-            /// </summary>
-            private static Color handleColor = Color.cyan;
 
             #endregion Configurations
 
@@ -447,10 +450,13 @@ namespace SEE.Controls.Actions
                 Vector3 parentSize = gameObject.WorldSpaceSize();
                 float yPos = parentPosition.y + 0.5f * parentSize.y + SpatialMetrics.PlacementOffset;
                 handles = directions.ToDictionary(CreateHandle);
-                GameObject upDownHandle = CreateHandle(Vector3.up);
-                upDownHandleTransform = upDownHandle.transform;
-                handles[upDownHandle] = Vector3.up;
 
+                if (HeightResizeEnabled)
+                {
+                    GameObject upDownHandle = CreateHandle(Vector3.up);
+                    upDownHandleTransform = upDownHandle.transform;
+                    handles[upDownHandle] = Vector3.up;
+                }
 
                 /// <summary>
                 /// Creates a resize handle game object at the appropriate position.
@@ -496,7 +502,13 @@ namespace SEE.Controls.Actions
 
                     handle.name = $"handle__{direction.x}_{direction.y}_{direction.z}";
                     handle.transform.SetParent(transform);
+
+                    // Contain interaction within the portal.
                     Portal.InheritPortal(from: transform.gameObject, to: handle);
+                    InteractableAuxiliaryObject io = handle.AddOrGetComponent<InteractableAuxiliaryObject>();
+                    io.UpdateLayer();
+                    io.PartiallyInteractable = true;
+
                     return handle;
                 }
             }
@@ -557,11 +569,13 @@ namespace SEE.Controls.Actions
             /// </summary>
             void StartResizing()
             {
-                if (!Raycasting.RaycastAnything(out RaycastHit hit))
+                if (!Raycasting.RaycastInteractableAuxiliaryObject(out RaycastHit hit, out InteractableAuxiliaryObject io, false)
+                        || !io.IsInteractable(hit.point))
                 {
                     return;
                 }
-                Vector3? resizeDirection = handles.TryGetValue(hit.collider.gameObject, out Vector3 value) ? value : null;
+                GameObject hitObject = io.gameObject;
+                Vector3? resizeDirection = handles.TryGetValue(hitObject, out Vector3 value) ? value : null;
                 if (resizeDirection == null)
                 {
                     return;
@@ -575,48 +589,25 @@ namespace SEE.Controls.Actions
             /// </summary>
             void UpdateSize()
             {
-                Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out _, nodeRef);
-                if (!targetObjectHit.HasValue && !currentResizeStep.Up)
-                {
-                    return;
-                }
-
                 // Calculate new scale and position
-                // TODO (#806): Make cursorMovement compatible with VR controls
                 Vector3 cursorMovement;
+                Vector3 newCursorPosition;
+
                 if (currentResizeStep.Up)
                 {
-                    cursorMovement = new(0f, (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) / Screen.height, 0f);
+                    Vector3 normalToCamera = upDownHandleTransform.up;
+                    Plane plane = new(normalToCamera, Vector3.Scale(normalToCamera, currentResizeStep.InitialHitPoint));
+                    Raycasting.RaycastPlane(plane, out Vector3 hit);
+                    newCursorPosition = hit;
                 }
                 else
                 {
-                    // Update cached camera rotation if necessary
-                    if (!Equals(mainCameraTransform.rotation, lastCameraRotation))
-                    {
-                        // Is camera looking straight up or down?
-                        if (Mathf.Abs(Vector3.Dot(mainCameraTransform.forward, Vector3.up)) >= 1.0)
-                        {
-                            // Use the camera's right vector projected onto the horizontal plane
-                            cameraPlanarRight = Vector3.ProjectOnPlane(mainCameraTransform.right, Vector3.up).normalized;
-                            // Calculate forward based on right, ensuring it's perpendicular
-                            cameraPlanarForward = Vector3.Cross(Vector3.up, cameraPlanarRight).normalized * Mathf.Sign(mainCameraTransform.forward.y);
-                        }
-                        else
-                        {
-                            lastCameraRotation = mainCameraTransform.rotation;
-                            cameraPlanarForward = Vector3.ProjectOnPlane(mainCameraTransform.forward, Vector3.up).normalized;
-                            cameraPlanarRight = Vector3.Cross(Vector3.up, cameraPlanarForward).normalized;
-                        }
-                    }
-
-                    float deltaX = (currentResizeStep.InitialMousePosition.x - Input.mousePosition.x) * currentResizeStep.InvScreenHeight;
-                    float deltaY = (currentResizeStep.InitialMousePosition.y - Input.mousePosition.y) * currentResizeStep.InvScreenHeight;
-
-                    cursorMovement = new Vector3(
-                            (cameraPlanarRight.x * deltaX + cameraPlanarForward.x * deltaY) * currentResizeStep.Direction.x,
-                            0f,
-                            (cameraPlanarRight.z * deltaX + cameraPlanarForward.z * deltaY) * currentResizeStep.Direction.z);
+                    Plane plane = new(Vector3.up, new Vector3(0, currentResizeStep.InitialHitPoint.y, 0));
+                    Raycasting.RaycastPlane(plane, out Vector3 hit);
+                    newCursorPosition = hit;
                 }
+                cursorMovement = Vector3.Scale(currentResizeStep.Direction, currentResizeStep.InitialHitPoint - newCursorPosition);
+
                 Vector3 newLocalSize = currentResizeStep.InitialLocalSize - Vector3.Scale(currentResizeStep.LocalScaleFactor, cursorMovement);
                 Vector3 newLocalPosition = currentResizeStep.InitialLocalPosition
                     - 0.5f * Vector3.Scale(currentResizeStep.LocalScaleFactor, Vector3.Scale(cursorMovement, currentResizeStep.Direction));
@@ -677,9 +668,9 @@ namespace SEE.Controls.Actions
                     {
                         Vector3 siblingSize = sibling.gameObject.LocalSize();
                         Vector3 siblingPos = sibling.localPosition;
-                        otherBounds.Left  = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Left = siblingPos.x - siblingSize.x / 2 - currentResizeStep.LocalPadding.x;
                         otherBounds.Right = siblingPos.x + siblingSize.x / 2 + currentResizeStep.LocalPadding.x;
-                        otherBounds.Back  = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Back = siblingPos.z - siblingSize.z / 2 - currentResizeStep.LocalPadding.z;
                         otherBounds.Front = siblingPos.z + siblingSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (bounds.Back > otherBounds.Front || bounds.Front < otherBounds.Back
@@ -744,9 +735,9 @@ namespace SEE.Controls.Actions
                         // Child position and scale on common parent
                         Vector3 childPos = Vector3.Scale(child.localPosition, transform.localScale) + transform.localPosition;
                         Vector3 childSize = Vector3.Scale(child.gameObject.LocalSize(), transform.localScale);
-                        otherBounds.Left  = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
+                        otherBounds.Left = childPos.x - childSize.x / 2 - currentResizeStep.LocalPadding.x;
                         otherBounds.Right = childPos.x + childSize.x / 2 + currentResizeStep.LocalPadding.x;
-                        otherBounds.Back  = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
+                        otherBounds.Back = childPos.z - childSize.z / 2 - currentResizeStep.LocalPadding.z;
                         otherBounds.Front = childPos.z + childSize.z / 2 + currentResizeStep.LocalPadding.z;
 
                         if (currentResizeStep.Right && bounds.Right < otherBounds.Right)
@@ -810,11 +801,11 @@ namespace SEE.Controls.Actions
                 foreach (Transform child in children)
                 {
                     // Adapt children's position based on changed position and size
-                        bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
-                        child.localPosition = new(
-                                child.localPosition.x + (shift2D ? 0.5f * posDiff.x : 0f),
-                                child.localPosition.y + posDiff.y, // we always resize height in positive direction
-                                child.localPosition.z + (shift2D ? 0.5f * posDiff.z : 0f));
+                    bool shift2D = !child.gameObject.IsNodeAndActiveSelf();
+                    child.localPosition = new(
+                            child.localPosition.x + (shift2D ? 0.5f * posDiff.x : 0f),
+                            child.localPosition.y + posDiff.y, // we always resize height in positive direction
+                            child.localPosition.z + (shift2D ? 0.5f * posDiff.z : 0f));
 
                     // Fix base handle position
                     if (child != upDownHandleTransform && handles.TryGetValue(child.gameObject, out Vector3 direction))
@@ -843,11 +834,6 @@ namespace SEE.Controls.Actions
                 /// The initial raycast hit from which the resize step is started.
                 /// </summary>
                 public readonly Vector3 InitialHitPoint;
-
-                /// <summary>
-                /// The initial mouse position.
-                /// </summary>
-                public readonly Vector2 InitialMousePosition;
 
                 /// <summary>
                 /// The resize direction.
@@ -920,10 +906,9 @@ namespace SEE.Controls.Actions
                 /// <summary>
                 /// Initializes the struct.
                 /// </summary>
-                public ResizeStepData (Vector3 initialHitPoint, Vector3 direction, Transform transform)
+                public ResizeStepData(Vector3 initialHitPoint, Vector3 direction, Transform transform)
                 {
                     InitialHitPoint = initialHitPoint;
-                    InitialMousePosition = Input.mousePosition;
                     Direction = direction;
                     InitialLocalPosition = transform.localPosition;
                     InitialLocalSize = transform.gameObject.LocalSize();
@@ -941,11 +926,11 @@ namespace SEE.Controls.Actions
                     );
                     MinLocalSize = Vector3.Scale(SpatialMetrics.MinNodeSize, LocalScaleFactor);
                     LocalPadding = SpatialMetrics.Padding.x * LocalScaleFactor;
-                    Left    = Direction.x < 0;
-                    Right   = Direction.x > 0;
-                    Back    = Direction.z < 0;
+                    Left = Direction.x < 0;
+                    Right = Direction.x > 0;
+                    Back = Direction.z < 0;
                     Forward = Direction.z > 0;
-                    Up      = Direction.y > 0;
+                    Up = Direction.y > 0;
                     InvScreenHeight = 1f / Screen.height;
                     IsSet = true;
                 }

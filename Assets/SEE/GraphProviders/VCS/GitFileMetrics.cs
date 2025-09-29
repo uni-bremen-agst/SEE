@@ -15,7 +15,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// A list of the authors which contributed to this file.
         /// </summary>
-        public ISet<string> Authors { get; set; }
+        public ISet<FileAuthor> Authors { get; set; }
 
         /// <summary>
         /// A collection of other files, which where changed together in the same commit.
@@ -26,7 +26,7 @@ namespace SEE.GraphProviders.VCS
         /// <summary>
         /// The churn (total number of changed lines) of each author.
         /// </summary>
-        public IDictionary<string, int> AuthorsChurn { get; set; }
+        public IDictionary<FileAuthor, int> AuthorsChurn { get; set; }
 
         /// <summary>
         /// The truck/bus factor of this file.
@@ -36,22 +36,35 @@ namespace SEE.GraphProviders.VCS
         public int TruckFactor { get; set; }
 
         /// <summary>
-        /// Total sum of changed lines (added or removed).
+        /// The number of lines added in this file.
         /// </summary>
-        public int Churn { get; set; }
+        public int LinesAdded { get; set; }
+
+        /// <summary>
+        /// The number of lines removed in this file.
+        /// </summary>
+        public int LinesRemoved { get; set; }
+
+        /// <summary>
+        /// Total sum of changed lines (added or removed).
+        /// Equivalent to LinesAdded + LinesRemoved.
+        /// </summary>
+        public int Churn => LinesAdded + LinesRemoved;
 
         /// <summary>
         /// The constructor of <see cref="GitFileMetrics"/>.
         /// </summary>
         /// <param name="numberOfCommits">The number of commits.</param>
         /// <param name="authors">A list of authors.</param>
-        /// <param name="churn">The churn.</param>
-        public GitFileMetrics(int numberOfCommits, HashSet<string> authors, int churn)
+        /// <param name="linesAdded">The number of lines added in this file.</param>
+        /// <param name="linesRemoved">The number of lines removed in this file.</param>
+        public GitFileMetrics(int numberOfCommits, HashSet<FileAuthor> authors, int linesAdded, int linesRemoved)
         {
             NumberOfCommits = numberOfCommits;
             Authors = authors;
-            Churn = churn;
-            AuthorsChurn = new Dictionary<string, int>();
+            LinesAdded = linesAdded;
+            LinesRemoved = linesRemoved;
+            AuthorsChurn = new Dictionary<FileAuthor, int>();
             FilesChangesTogether = new Dictionary<string, int>();
             TruckFactor = 0;
         }
