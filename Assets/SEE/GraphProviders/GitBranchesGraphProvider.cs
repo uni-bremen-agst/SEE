@@ -1,18 +1,12 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.CityRendering;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.VCS;
-using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
-using UnityEngine;
 
 namespace SEE.GraphProviders
 {
@@ -31,73 +25,6 @@ namespace SEE.GraphProviders
     [Serializable]
     internal class GitBranchesGraphProvider : GitGraphProvider
     {
-        #region Attributes
-
-        /// <summary>
-        /// The poller which will regularly fetch the repository for new changes.
-        /// </summary>
-        private GitPoller poller;
-
-
-        private TransitionRenderer transitionRenderer;
-
-        /// <summary>
-        /// Backing field for <see cref="AutoFetch"/>.
-        /// </summary>
-        [OdinSerialize, NonSerialized, HideInInspector]
-        private bool autoFetch = false;
-
-        /// <summary>
-        /// Specifies if SEE should automatically fetch for new commits in the
-        /// repository <see cref="RepositoryData"/>.
-        ///
-        /// This will append the path of this repo to <see cref="GitPoller"/>.
-        ///
-        /// Note: the repository must be fetch-able without any credentials
-        /// since we can't store them securely yet.
-        /// </summary>
-        [ShowInInspector,
-            Tooltip("If true, the repository will be polled periodically for new changes.")]
-        public bool AutoFetch
-        {
-            get => autoFetch;
-            set
-            {
-                if (value != autoFetch)
-                {
-                    autoFetch = value;
-                    if (autoFetch)
-                    {
-                        poller?.Start();
-                    }
-                    else
-                    {
-                        poller?.Stop();
-                    }
-                }
-            }
-        }
-
-        /// <summary>
-        /// The interval in seconds in which git fetch should be called.
-        /// </summary>
-        [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int PollingInterval = 5; /// // FIXME: We need to update poller's PollingInterval if it changes!
-
-        /// <summary>
-        /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
-        /// will be marked. This field specifies for how long these markers should appear.
-        /// </summary>
-        [Tooltip(
-             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-         EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int MarkerTime = 10; /// FIXME: We need to update <see cref="transitionRenderer"/> if MarkerTime changes!
-
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Checks if all attributes are set correctly.
         /// Otherwise, an exception is thrown.
@@ -136,30 +63,7 @@ namespace SEE.GraphProviders
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
 
-            if (AutoFetch)
-            {
-                CreatePoller(branchCity);
-            }
-
             return task;
-        }
-
-        /// <summary>
-        /// Creates (if it does not yet exist) and starts the <see cref="poller"/>.
-        /// </summary>
-        private void CreatePoller(BranchCity branchCity)
-        {
-            if (poller != null)
-            {
-                poller.Stop();
-            }
-            else
-            {
-                poller = new GitPoller(PollingInterval, GitRepository);
-                // We can create the transitionRenderer only now that we know the city.
-                transitionRenderer = new(branchCity, poller, MarkerTime);
-            }
-            poller.Start();
         }
 
         /// <summary>
@@ -211,50 +115,5 @@ namespace SEE.GraphProviders
         {
             return SingleGraphProviderKind.GitAllBranches;
         }
-
-        #endregion
-
-        #region Config I/O
-
-        /// <summary>
-        /// Label for serializing the <see cref="AutoFetch"/> field.
-        /// </summary>
-        private const string autoFetchLabel = "AutoFetch";
-
-        /// <summary>
-        /// Label for serializing the <see cref="PollingInterval"/> field.
-        /// </summary>
-        private const string pollingIntervalLabel = "PollingInterval";
-
-        /// <summary>
-        /// Label for serializing the <see cref="MarkerTime"/> field.
-        /// </summary>
-        private const string markerTimeLabel = "MarkerTime";
-
-        /// <summary>
-        /// Saves the attributes of this provider to <paramref name="writer"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            base.SaveAttributes(writer);
-            writer.Save(AutoFetch, autoFetchLabel);
-            writer.Save(PollingInterval, pollingIntervalLabel);
-            writer.Save(MarkerTime, markerTimeLabel);
-        }
-
-        /// <summary>
-        /// Restores the attributes of this provider from <paramref name="attributes"/>.
-        /// </summary>
-        /// <param name="attributes">The attributes to restore from.</param>
-        protected override void RestoreAttributes(Dictionary<string, object> attributes)
-        {
-            base.RestoreAttributes(attributes);
-            ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
-            ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
-            ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
-        }
-
-        #endregion Config I/O
     }
 }
