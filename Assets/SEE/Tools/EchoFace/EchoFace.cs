@@ -84,11 +84,6 @@ public class EchoFace : MonoBehaviour
     [SerializeField]
     private float eyeSquintPower = 3f;
 
-    [Tooltip("Adjust the default mouth-down offset for the avatar's neutral pose.")]
-    [Range(0f, 1.0f)]
-    [SerializeField]
-    private float mouthDownValue = 0.7f;
-
     [Header("Head Rotation Settings")]
     [Tooltip("Enable head rotation based on landmarks.")]
     public bool enableHeadRotation = true;
@@ -203,7 +198,7 @@ public class EchoFace : MonoBehaviour
             Mathf.Clamp01(
                 arkit["mouthPucker"] * 0.7f
                 + arkit["mouthFunnel"] * 0.6f
-                + (1f - arkit["jawOpen"]) * 0.15f
+                + (1f - arkit["jawOpen"]) * 0.2f
                 + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.1f
                 - Mathf.Max(arkit["mouthSmileLeft"], arkit["mouthSmileRight"]) * 0.3f
             )
@@ -214,7 +209,7 @@ public class EchoFace : MonoBehaviour
             Mathf.Clamp01(
                 Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
                 + arkit["mouthClose"] * 0.5f
-                + (1f - arkit["jawOpen"]) * 0.4f
+                //+ (1f - arkit["jawOpen"]) * 0.2f
                 + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
                 + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.15f
             )
@@ -237,7 +232,7 @@ public class EchoFace : MonoBehaviour
             Mathf.Clamp01(
                 arkit["mouthFunnel"] * 1.0f
                 + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.4f
-                + (1f - arkit["jawOpen"]) * 0.3f
+                //+ (1f - arkit["jawOpen"]) * 0.3f
                 + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
                 + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.1f
             )
@@ -332,18 +327,18 @@ public class EchoFace : MonoBehaviour
     private readonly Dictionary<string, float> _residualBlendshapeFactors =
     new()
     {
-        { "Mouth_Up_Upper_L", 0.3f },
-        { "Mouth_Up_Upper_R", 0.3f },
-        { "Mouth_Down_Lower_L", 0.2f },
-        { "Mouth_Down_Lower_R", 0.2f },
-        { "Mouth_Funnel_Up_L", 0.1f },
-        { "Mouth_Funnel_Up_R", 0.1f },
-        { "Mouth_Funnel_Down_L", 0.1f },
-        { "Mouth_Funnel_Down_R", 0.1f },
-        { "Mouth_Pucker_Up_L", 0.8f },
-        { "Mouth_Pucker_Up_R", 0.8f },
-        { "Mouth_Pucker_Down_L", 0.8f },
-        { "Mouth_Pucker_Down_R", 0.8f },
+        { "Mouth_Up_Upper_L", 0.5f },
+        { "Mouth_Up_Upper_R", 0.5f },
+        { "Mouth_Down_Lower_L", 0.5f },
+        { "Mouth_Down_Lower_R", 0.5f },
+        { "Mouth_Funnel_Up_L", 0.3f },
+        { "Mouth_Funnel_Up_R", 0.3f },
+        { "Mouth_Funnel_Down_L", 0.3f },
+        { "Mouth_Funnel_Down_R", 0.3f },
+        { "Mouth_Pucker_Up_L", 0.4f },
+        { "Mouth_Pucker_Up_R", 0.4f },
+        { "Mouth_Pucker_Down_L", 0.4f },
+        { "Mouth_Pucker_Down_R", 0.4f },
     };
 
     //-------------------------------------------------
@@ -482,14 +477,20 @@ public class EchoFace : MonoBehaviour
                 );
         }
 
+        // If mouthUpperUp is high, reduce Mouth_Down to avoid gummy smile
+        targetBlendshapeValues["Mouth_Down"] = Mathf.Max(
+            blendshapes.GetValueOrDefault("mouthUpperUpLeft", 0f),
+            blendshapes.GetValueOrDefault("mouthUpperUpRight", 0f)
+        ) * Mathf.Max(
+            blendshapes.GetValueOrDefault("mouthSmileLeft", 0f),
+            blendshapes.GetValueOrDefault("mouthSmileRight", 0f)
+        );
+
         // 2. Synthesize and Apply Visemes
         foreach (var visemeKvp in _visemeSynthesisMap)
         {
             targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(blendshapes);
         }
-
-        // Add slight mouth down since the model's neutral is a bit too up
-        targetBlendshapeValues["Mouth_Down"] = mouthDownValue;
 
         // 3. Smooth and Set Blendshape Weights
         foreach (var kvp in targetBlendshapeValues)
