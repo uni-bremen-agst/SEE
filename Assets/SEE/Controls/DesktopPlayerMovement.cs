@@ -240,7 +240,7 @@ namespace SEE.Controls
 
         /// <summary>
         /// If the user wants us, we rotate the gameobject according to mouse input.
-        /// Modifies <see cref="cameraState.yaw"/> and <see cref="cameraState.pitch"/>.
+        /// Modifies <see cref="CameraState.Yaw"/> and <see cref="CameraState.Pitch"/>.
         ///
         /// Note: This is a workaround of issues with the correct mouse position
         /// in a remote-desktop session.
