@@ -58,6 +58,11 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Backing field for <see cref="AuthorThreshold"/>.
+        /// </summary>
+        private int authorThreshold = 2;
+
+        /// <summary>
         /// Only relevant if <see cref="ShowAuthorEdges"/> is set to
         /// <see cref="ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors"/>.
         ///
@@ -68,10 +73,25 @@ namespace SEE.Game.City
         /// </summary>
         [ShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
          RuntimeShowIf(nameof(ShowAuthorEdges), ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors),
-         Range(2, 20),
+         Range(1, 200),
          TabGroup(VCSFoldoutGroup),
          RuntimeTab(VCSFoldoutGroup)]
-        public int AuthorThreshold = 2;
+        public int AuthorThreshold
+        {
+            get => authorThreshold;
+            set
+            {
+                if (value < 0)
+                {
+                    throw new ArgumentOutOfRangeException("Author threshold must not be negative.");
+                }
+                if (value != authorThreshold)
+                {
+                    authorThreshold = value;
+                    UpdateAuthorEdges();
+                }
+            }
+        }
 
         /// <summary>
         /// Draws the graph.
@@ -93,22 +113,31 @@ namespace SEE.Game.City
             StartPoller();
         }
 
+        /// <summary>
+        /// Starts the <see cref="poller"/>.
+        /// </summary>
         private void OnEnable()
         {
             StartPoller();
         }
 
+        /// <summary>
+        /// Stops the <see cref="poller"/>.
+        /// </summary>
         private void OnDisable()
         {
             StopPoller();
         }
 
         /// <summary>
-        /// The poller which will regularly fetch the repository for new changes.
+        /// The poller which will periodically fetch the repository for new changes.
         /// </summary>
         private GitPoller poller;
 
-
+        /// <summary>
+        /// The transition renderer which will updates the rendering of the city
+        /// in the light of new commits.
+        /// </summary>
         private TransitionRenderer transitionRenderer;
 
         /// <summary>
@@ -150,25 +179,68 @@ namespace SEE.Game.City
         }
 
         /// <summary>
+        /// Backing field for <see cref="PollingInterval"/>.
+        /// </summary>
+        private int pollingInterval = 5;
+
+        /// <summary>
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
             EnableIf(nameof(AutoFetch)), Range(5, 200),
-            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public int PollingInterval = 5; /// // FIXME: We need to update poller's PollingInterval if it changes!
+            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup),
+            ShowInInspector]
+        public int PollingInterval
+        {
+            get => pollingInterval;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException("Polling interval must be positive.");
+                }
+                pollingInterval = value;
+                if (poller != null)
+                {
+                    poller.PollingInterval = pollingInterval;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="MarkerTime"/>.
+        /// </summary>
+        private int markerTime = 10;
 
         /// <summary>
         /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
         /// will be marked. This field specifies for how long these markers should appear.
         /// </summary>
-        [Tooltip(
+        [ShowInInspector,
+            Tooltip(
              "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
          EnableIf(nameof(AutoFetch)), Range(5, 200),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public int MarkerTime = 10; /// FIXME: We need to update <see cref="transitionRenderer"/> if MarkerTime changes!
+        public int MarkerTime
+        {
+            get => markerTime;
+            set
+            {
+                if (value <= 0)
+                {
+                    throw new ArgumentOutOfRangeException("Marker time must be positive.");
+                }
+                markerTime = value;
+                if (transitionRenderer != null)
+                {
+                    transitionRenderer.MarkerTime = markerTime;
+                }
+            }
+        }
 
         /// <summary>
-        /// Creates (if it does not yet exist) and starts the <see cref="poller"/>.
+        /// Creates (if it does not yet exist) and starts the <see cref="poller"/>
+        /// (and creates <see cref="transitionRenderer"/>, too) when <see cref="AutoFetch"/> is true.
         /// </summary>
         private void StartPoller()
         {
@@ -189,6 +261,9 @@ namespace SEE.Game.City
             }
         }
 
+        /// <summary>
+        /// Stops the <see cref="poller"/> if it exists.
+        /// </summary>
         private void StopPoller()
         {
             poller?.Stop();
@@ -308,6 +383,8 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
+            // Note: We are assigning the properties instead of the backing fields
+            // so that the wanted effects (like updating the author edges) are executed.
             ConfigIO.Restore(attributes, dateLabel, ref Date);
             {
                 ShowAuthorEdgeStrategy showAuthorEdgesStrategy = ShowAuthorEdges;
@@ -316,10 +393,34 @@ namespace SEE.Game.City
                     ShowAuthorEdges = showAuthorEdgesStrategy;
                 }
             }
-            ConfigIO.Restore(attributes, authorThresholdLabel, ref AuthorThreshold);
-            ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch);
-            ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
-            ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
+            {
+                int authorThreshold = AuthorThreshold;
+                if (ConfigIO.Restore(attributes, authorThresholdLabel, ref authorThreshold))
+                {
+                    AuthorThreshold = authorThreshold;
+                }
+            }
+            {
+                bool autoFetch = AutoFetch;
+                if (ConfigIO.Restore(attributes, autoFetchLabel, ref autoFetch))
+                {
+                    AutoFetch = autoFetch;
+                }
+            }
+            {
+                int pollingInterval = PollingInterval;
+                if (ConfigIO.Restore(attributes, pollingIntervalLabel, ref pollingInterval))
+                {
+                    PollingInterval = pollingInterval;
+                }
+            }
+            {
+                int markerTime = MarkerTime;
+                if (ConfigIO.Restore(attributes, markerTimeLabel, ref markerTime))
+                {
+                    MarkerTime = markerTime;
+                }
+            }
         }
 
         #endregion
