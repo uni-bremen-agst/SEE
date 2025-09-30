@@ -98,9 +98,6 @@ namespace SEE.GraphProviders
             {
                 GitRepository = gitRepository,
                 SimplifyGraph = true,
-                AutoFetch = true,
-                PollingInterval = 60,
-                MarkerTime = 3,
             };
             city.Date = date;
 
