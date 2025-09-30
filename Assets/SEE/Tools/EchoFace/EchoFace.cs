@@ -80,9 +80,9 @@ public class EchoFace : MonoBehaviour
     private float visemeSmoothingFactor = 0.9f;
 
     [Tooltip("Power curve for eye squint expression, to make it more pronounced.")]
-    [Range(0f, 5f)]
+    [Range(0f, 12f)]
     [SerializeField]
-    private float eyeSquintPower = 3f;
+    private float eyeSquintPower = 12f;     // Note: Optimal value would be around 3
 
     [Header("Head Rotation Settings")]
     [Tooltip("Enable head rotation based on landmarks.")]
