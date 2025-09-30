@@ -32,7 +32,7 @@ namespace SEE.Game
         /// <param name="gameObject">game object where the components are to be added to</param>
         public static void PrepareGraphElementForInteraction(GameObject gameObject)
         {
-            gameObject.AddComponentIfNecessary<InteractableGraphElement>();
+            gameObject.AddOrGetComponent<InteractableGraphElement>();
 
             gameObject.isStatic = false; // we want to move the object during the game
                                          // The following additions of components must come after the addition of InteractableObject
@@ -40,11 +40,11 @@ namespace SEE.Game
             AddGeneralComponents(gameObject);
             if (gameObject.HasNodeRef())
             {
-                gameObject.AddComponentIfNecessary<ShowLabel>();
-                gameObject.AddComponentIfNecessary<ShowHoverInfo>();
-                gameObject.AddComponentIfNecessary<ShowEdges>();
-                gameObject.AddComponentIfNecessary<ShowAuthorEdges>();
-                gameObject.AddComponentIfNecessary<HighlightErosion>();
+                gameObject.AddOrGetComponent<ShowLabel>();
+                gameObject.AddOrGetComponent<ShowHoverInfo>();
+                gameObject.AddOrGetComponent<ShowEdges>();
+                gameObject.AddOrGetComponent<ShowAuthorEdges>();
+                gameObject.AddOrGetComponent<HighlightErosion>();
             }
         }
 
@@ -57,8 +57,8 @@ namespace SEE.Game
         /// <param name="gameObject">where the components should be added to</param>
         public static void PrepareAuthorForInteraction(GameObject gameObject)
         {
-            gameObject.AddComponentIfNecessary<InteractableAuthor>();
-            gameObject.AddComponentIfNecessary<ShowAuthorEdges>();
+            gameObject.AddOrGetComponent<InteractableAuthor>();
+            gameObject.AddOrGetComponent<ShowAuthorEdges>();
             AddGeneralComponents(gameObject);
         }
 
@@ -70,30 +70,10 @@ namespace SEE.Game
         /// <param name="gameObject">where the components should be added to</param>
         private static void AddGeneralComponents(GameObject gameObject)
         {
-            gameObject.AddComponentIfNecessary<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
-            gameObject.AddComponentIfNecessary<ShowHovering>();
-            gameObject.AddComponentIfNecessary<ShowSelection>();
-            gameObject.AddComponentIfNecessary<ShowGrabbing>();
-        }
-
-        /// <summary>
-        /// Adds a component of type <typeparamref name="T"/> to <paramref name="gameObject"/>
-        /// if <paramref name="gameObject"/> does not have one already. The new or the
-        /// existing component, respectively, is returned.
-        /// </summary>
-        /// <typeparam name="T">component that should be part of <paramref name="gameObject"/></typeparam>
-        /// <param name="gameObject">game object that should have a component of <typeparamref name="T"/></param>
-        /// <returns>component in <paramref name="gameObject"/></returns>
-        private static T AddComponentIfNecessary<T>(this GameObject gameObject) where T : MonoBehaviour
-        {
-            if (gameObject.TryGetComponent(out T component))
-            {
-                return component;
-            }
-            else
-            {
-                return gameObject.AddComponent<T>();
-            }
+            gameObject.AddOrGetComponent<XRSimpleInteractable>().colliders.Add(gameObject.GetComponent<BoxCollider>());
+            gameObject.AddOrGetComponent<ShowHovering>();
+            gameObject.AddOrGetComponent<ShowSelection>();
+            gameObject.AddOrGetComponent<ShowGrabbing>();
         }
 
         /// <summary>
