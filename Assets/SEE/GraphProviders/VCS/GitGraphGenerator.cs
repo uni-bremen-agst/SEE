@@ -158,30 +158,27 @@ namespace SEE.GraphProviders.VCS
             {
                 throw new OperationCanceledException(token);
             }
-            // Includes all commits between the baseline commit and the commitID
-            // including the commitID itself but excluding the baseline commit.
-            IEnumerable<Commit> commitList = repository.CommitsBetween(baselineCommitID, commitID);
             percentage = 0.3f;
             changePercentage?.Invoke(percentage);
 
-            int commitCount = commitList.Count();
-            int currentCommitIndex = 0;
+            // Includes all commits between the baseline commit and the commitID
+            // including the commitID itself but excluding the baseline commit.
 
-            foreach (Commit commit in commitList)
+            repository.ForEachCommitBetween(baselineCommitID, commitID, Apply);
+
+            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+
+            changePercentage?.Invoke(1f);
+            return graph;
+
+            void Apply(Repository repository, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
                 UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
-                currentCommitIndex++;
-                changePercentage?.Invoke(Mathf.Clamp((float)currentCommitIndex / commitCount, percentage, 0.98f));
             }
-
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
-
-            changePercentage?.Invoke(1f);
-            return graph;
         }
 
         /// <summary>
@@ -250,24 +247,22 @@ namespace SEE.GraphProviders.VCS
              Action<float> changePercentage,
              CancellationToken token)
         {
-            IList<Commit> commitList = repository.CommitsAfter(startDate);
             HashSet<string> files = repository.AllFiles(token);
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
-            int counter = 0;
-            int commitLength = commitList.Count();
-            foreach (Commit commit in commitList)
+            repository.ForEachCommitAfter(startDate, Apply);
+
+            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            changePercentage?.Invoke(1f);
+
+            void Apply(Repository repo, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
-                UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
-                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
-                counter++;
+                UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
             }
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
-            changePercentage?.Invoke(1f);
         }
 
         /// <summary>
@@ -388,14 +383,14 @@ namespace SEE.GraphProviders.VCS
         /// very first commit in the version history, which is perfectly okay.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map</param>
-        /// <param name="gitRepository">The diff will be retrieved from this repository.</param>
-        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="gitRepository"/></param>
+        /// <param name="repository">The diff will be retrieved from this repository.</param>
+        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/></param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
-             GitRepository gitRepository,
+             Repository repository,
              Commit commit,
              bool consultAliasMap,
              AuthorMapping authorAliasMap)
@@ -408,12 +403,12 @@ namespace SEE.GraphProviders.VCS
             {
                 foreach (Commit parent in commit.Parents)
                 {
-                    UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(parent, commit), consultAliasMap, authorAliasMap);
+                    UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
                 }
             }
             else
             {
-                UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(null, commit), consultAliasMap, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
             }
         }
 
