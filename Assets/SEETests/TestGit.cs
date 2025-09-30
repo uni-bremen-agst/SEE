@@ -1,6 +1,5 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.Utils;
 using System.IO;
 using System.Linq;
 using UnityEngine;
