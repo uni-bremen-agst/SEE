@@ -210,43 +210,5 @@ namespace SEE.VCS
             // If the count is greater than zero, there are changes to pull.
             return aheadBy > 0;
         }
-
-        /// <summary>
-        /// Yields the local temporary directory path where the repository
-        /// at <paramref name="repositoryUrl"/> can be checked out. It will
-        /// a subdirectory of the system's temporary directory named after
-        /// the last part of the repository URL.
-        ///
-        /// For instance, LocalPath("https://github.com/koschke/TestProjectForSEE.git")
-        /// yields something like "C:\Users\koschke\AppData\Local\Temp\TestProjectForSEE.git"
-        /// on a Windows machine.
-        /// </summary>
-        /// <param name="repositoryUrl">the URL to the repository</param>
-        /// <returns>local temporary directory path</returns>
-        private static string LocalPath(string repositoryUrl)
-        {
-            return Path.Combine(Path.GetTempPath(), Filenames.Basename(repositoryUrl, '/'));
-        }
-
-        /// <summary>
-        /// Deletes the directory at <paramref name="path"/> if it exists.
-        /// </summary>
-        /// <param name="path"></param>
-        private static void DeleteDirectoryIfItExists(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                // Remove read-only attribute from directory and all its contents
-                // so that we can delete everything.
-                DirectoryInfo directory = new(path) { Attributes = FileAttributes.Normal };
-
-                foreach (FileSystemInfo info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-                {
-                    info.Attributes = FileAttributes.Normal;
-                }
-
-                directory.Delete(true);
-            }
-        }
     }
 }
