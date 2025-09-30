@@ -329,8 +329,8 @@ public class EchoFace : MonoBehaviour
     {
         { "Mouth_Up_Upper_L", 0.5f },
         { "Mouth_Up_Upper_R", 0.5f },
-        { "Mouth_Down_Lower_L", 0.5f },
-        { "Mouth_Down_Lower_R", 0.5f },
+        //{ "Mouth_Down_Lower_L", 0.5f },
+        //{ "Mouth_Down_Lower_R", 0.5f },
         { "Mouth_Funnel_Up_L", 0.3f },
         { "Mouth_Funnel_Up_R", 0.3f },
         { "Mouth_Funnel_Down_L", 0.3f },
