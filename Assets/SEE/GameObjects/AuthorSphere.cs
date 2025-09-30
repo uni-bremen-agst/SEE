@@ -104,8 +104,6 @@ namespace SEE.GameObjects
             AuthorSphere authorSphere = result.AddComponent<AuthorSphere>();
             authorSphere.Author = author;
 
-            result.AddComponent<ShowAuthorEdges>();
-
             AddLabel(result, author);
 
             Renderer renderer = result.GetComponent<Renderer>();
