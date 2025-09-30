@@ -1846,9 +1846,6 @@ MonoBehaviour:
     - Name: AccessToken
       Entry: 1
       Data: 
-    - Name: disposed
-      Entry: 5
-      Data: false
     - Name: 
       Entry: 8
       Data: 
@@ -1877,15 +1874,6 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: autoFetch
-      Entry: 5
-      Data: false
-    - Name: PollingInterval
-      Entry: 3
-      Data: 5
-    - Name: MarkerTime
-      Entry: 3
-      Data: 10
     - Name: 
       Entry: 8
       Data: 
@@ -1901,6 +1889,9 @@ MonoBehaviour:
     - Name: showAuthorEdges
       Entry: 3
       Data: 2
+    - Name: autoFetch
+      Entry: 5
+      Data: false
   LODCulling: 0.001
   ConfigurationPath:
     Root: 0
@@ -1984,7 +1975,6 @@ MonoBehaviour:
       RelativePath: 
       AbsolutePath: 
   Date: 2024/07/01
-  AuthorThreshold: 2
 --- !u!114 &153801761
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -24306,7 +24296,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1914333879
 Transform:
   m_ObjectHideFlags: 0
@@ -25172,7 +25162,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: 849-encapsulate-all-vcs-queries
+      Data: master
     - Name: 
       Entry: 13
       Data: 
@@ -25185,9 +25175,6 @@ MonoBehaviour:
     - Name: AccessToken
       Entry: 1
       Data: 
-    - Name: disposed
-      Entry: 5
-      Data: false
     - Name: 
       Entry: 8
       Data: 
