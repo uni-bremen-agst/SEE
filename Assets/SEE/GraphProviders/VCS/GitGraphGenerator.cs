@@ -144,13 +144,14 @@ namespace SEE.GraphProviders.VCS
             graph.SetCommitID(commitID);
             graph.SetRepositoryPath(repositoryPath);
 
-            float percentage = 0.05f;
-            changePercentage?.Invoke(percentage);
-
+            /// Note: The following code is very similar to
+            /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// The difference is that we consider only the files present at <paramref name="commitID"/>
+            /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
             HashSet<string> files = repository.AllFiles(commitID, token);
-            percentage = 0.2f;
-            changePercentage?.Invoke(percentage);
+
+            changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
@@ -158,8 +159,7 @@ namespace SEE.GraphProviders.VCS
             {
                 throw new OperationCanceledException(token);
             }
-            percentage = 0.3f;
-            changePercentage?.Invoke(percentage);
+            changePercentage?.Invoke(0.6f);
 
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
@@ -247,10 +247,21 @@ namespace SEE.GraphProviders.VCS
              Action<float> changePercentage,
              CancellationToken token)
         {
+            /// Note: The following code is very similar to
+            /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// The difference is that we consider all relevant files passing the repository
+            /// filter and all commits after <paramref name="startDate"/>.
             HashSet<string> files = repository.AllFiles(token);
+            changePercentage?.Invoke(0.3f);
+
             FileToMetrics fileToMetrics = Prepare(graph, files);
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
 
             repository.ForEachCommitAfter(startDate, Apply);
+            changePercentage?.Invoke(0.6f);
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
             changePercentage?.Invoke(1f);
@@ -431,7 +442,7 @@ namespace SEE.GraphProviders.VCS
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}");
+                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}\n");
                 return new List<AntlrToken>();
             }
         }
