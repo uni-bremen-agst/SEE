@@ -17,6 +17,12 @@ namespace SEE.Game.CityRendering
     public class TransitionRenderer
     {
         /// <summary>
+        /// The time in seconds for how long the node markers should be shown for newly
+        /// added or modified nodes.
+        /// </summary>
+        public int MarkerTime = 10;
+
+        /// <summary>
         /// Constructor.
         /// </summary>
         /// <param name="branchCity">the city to be re-drawn</param>
@@ -26,7 +32,7 @@ namespace SEE.Game.CityRendering
         public TransitionRenderer(BranchCity branchCity, GitPoller poller, int markerTime)
         {
             this.branchCity = branchCity;
-            this.markerTime = markerTime;
+            this.MarkerTime = markerTime;
             this.poller = poller;
             markerFactory = new MarkerFactory(this.branchCity.MarkerAttributes);
             poller.OnChangeDetected += Render;
@@ -119,11 +125,11 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Removes all markers after <see cref="markerTime"/> seconds.
+        /// Removes all markers after <see cref="MarkerTime"/> seconds.
         /// </summary>
         private async UniTaskVoid RemoveMarkerAsync()
         {
-            await Task.Delay(markerTime);
+            await Task.Delay(MarkerTime);
             markerFactory.Clear();
         }
 
@@ -132,12 +138,6 @@ namespace SEE.Game.CityRendering
         /// was executed and which should be updated when a new commit is detected.
         /// </summary>
         private readonly BranchCity branchCity;
-
-        /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly
-        /// added or modified nodes.
-        /// </summary>
-        private readonly int markerTime = 10;
 
         /// <summary>
         /// MarkerFactory for generating node markers.
