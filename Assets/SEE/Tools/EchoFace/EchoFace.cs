@@ -335,10 +335,10 @@ public class EchoFace : MonoBehaviour
         { "Mouth_Funnel_Up_R", 0.3f },
         { "Mouth_Funnel_Down_L", 0.3f },
         { "Mouth_Funnel_Down_R", 0.3f },
-        { "Mouth_Pucker_Up_L", 0.4f },
-        { "Mouth_Pucker_Up_R", 0.4f },
-        { "Mouth_Pucker_Down_L", 0.4f },
-        { "Mouth_Pucker_Down_R", 0.4f },
+        { "Mouth_Pucker_Up_L", 0.8f },
+        { "Mouth_Pucker_Up_R", 0.8f },
+        { "Mouth_Pucker_Down_L", 0.8f },
+        { "Mouth_Pucker_Down_R", 0.8f },
     };
 
     //-------------------------------------------------
@@ -477,7 +477,10 @@ public class EchoFace : MonoBehaviour
                 );
         }
 
-        // If mouthUpperUp is high, reduce Mouth_Down to avoid gummy smile
+        // 2. Apply custom logic for specific blendshapes
+
+        // Multiply upper lip lift by the smile intensity to drive Mouth_Down,
+        // creating a counter-pull to hide the upper gums while smiling.
         targetBlendshapeValues["Mouth_Down"] = Mathf.Max(
             blendshapes.GetValueOrDefault("mouthUpperUpLeft", 0f),
             blendshapes.GetValueOrDefault("mouthUpperUpRight", 0f)
@@ -486,13 +489,25 @@ public class EchoFace : MonoBehaviour
             blendshapes.GetValueOrDefault("mouthSmileRight", 0f)
         );
 
-        // 2. Synthesize and Apply Visemes
+        // Damp the lower lip's downward movement proportionally to 'jawOpen' to prevent the lip
+        // from drooping and exposing the lower gums when the mouth is wide open.
+        targetBlendshapeValues["Mouth_Down_Lower_L"] = Mathf.Clamp01(
+            blendshapes.GetValueOrDefault("mouthLowerDownLeft", 0f)
+            * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+        );
+
+        targetBlendshapeValues["Mouth_Down_Lower_R"] = Mathf.Clamp01(
+            blendshapes.GetValueOrDefault("mouthLowerDownRight", 0f)
+            * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
+        );
+
+        // 3. Synthesize and Apply Visemes
         foreach (var visemeKvp in _visemeSynthesisMap)
         {
             targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(blendshapes);
         }
 
-        // 3. Smooth and Set Blendshape Weights
+        // 4. Smooth and Set Blendshape Weights
         foreach (var kvp in targetBlendshapeValues)
         {
             // Get the index from the cache. If it doesn't exist, we can't set the weight.
