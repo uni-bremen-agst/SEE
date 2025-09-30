@@ -72,7 +72,7 @@ namespace SEE.VCS
         {
             GitRepository repo = GetRepository(null); // all branches
             Performance p = Performance.Begin(nameof(GitRepository.CommitsBetween));
-            IEnumerable<Commit> commits = repo.CommitsBetween(oldCommit, newCommit);
+            IEnumerable<string> commits = repo.CommitsBetween(oldCommit, newCommit);
             p.End(true);
             //Debug.Log($"Number of commits between {oldCommit} and {newCommit}: {commits.Count()}\n");
             //Print(commits);
@@ -180,7 +180,7 @@ namespace SEE.VCS
 
             GitRepository repo = new(new DataPath(Path.GetDirectoryName(Application.dataPath)),
                                      new Filter(globbing: pathGlobbing, repositoryPaths: null, branches: null));
-            List<string> commits = repo.CommitsBetween(oldCommit, newCommit).Select(c => c.Sha).ToList();
+            IList<string> commits = repo.CommitsBetween(oldCommit, newCommit);
             Assert.AreEqual(expected, commits);
         }
 
@@ -194,7 +194,7 @@ namespace SEE.VCS
 
             GitRepository repo = GetRepository();
             Performance p = Performance.Begin(nameof(GitRepository.CommitsAfter));
-            IList<Commit> commits = repo.CommitsAfter(date);
+            IList<string> commits = repo.CommitsAfter(date);
             p.End(true);
             // commits.Count() should be the same as:
             //  git log --oneline --no-merges | wc -l
@@ -293,25 +293,6 @@ namespace SEE.VCS
             Debug.Log($"Number of branches: {branches.Count()}\n");
             //Print(branches);
         }
-
-        /// <summary>
-        /// Diff of two successive commits in the repository.
-        /// </summary>
-        [Test]
-        public void TestDiffImmediate()
-        {
-            Print(GetRepository().Diff("ea764b42cdd5d94ca3d1fc2a1f581c8d75409f22", "e9183c9e67448738f3428f22e05dec178bc383fb"));
-        }
-
-        /// <summary>
-        /// Diff of two commits farther away in the repository.
-        /// </summary>
-        [Test]
-        public void TestDiffLargerHistory()
-        {
-            Print(GetRepository().Diff("b0aa9acadf6f7ea7c90494099eccd9e431da3523", "95e392c4fd66df3a25c99bf64c4062725e0b0979"));
-        }
-
 
         /// <summary>
         /// Test for <see cref="GitRepository.FetchRemotes()"/>.
