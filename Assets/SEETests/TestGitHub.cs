@@ -37,7 +37,7 @@ namespace SEE.VCS
             string localPath = LocalPath(testRepositoryUrl);
             DeleteDirectoryIfItExists(localPath);
 
-            using GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
+            GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
             repo.Clone(testRepositoryUrl);
         }
 
@@ -56,7 +56,7 @@ namespace SEE.VCS
                 // We need the using block to ensure that repo is disposed, otherwise
                 // the subsequent deletion of the directory may fail because the
                 // repo still has files open.
-                using GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
+                GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
                 repo.FetchRemotes();
             }
             DeleteDirectoryIfItExists(localPath);
