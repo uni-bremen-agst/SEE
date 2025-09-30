@@ -402,6 +402,7 @@ namespace SEE.VCS
         /// Returns the diff between the two given commits <paramref name="oldCommit"/>
         /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
         /// </summary>
+        /// <param name="repository">the repository containing the commits</param>
         /// <param name="oldCommit">earlier commit ID; can be null</param>
         /// <param name="newCommit">later commit ID; must not be null</param>
         /// <returns>diff between the two given commits</returns>
@@ -582,6 +583,7 @@ namespace SEE.VCS
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>all distinct file paths</returns>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="tree"/> is null</exception>
         private HashSet<string> AllFiles(LibGit2Sharp.Tree tree, CancellationToken token = default)
@@ -601,6 +603,7 @@ namespace SEE.VCS
         /// Analogous to <see cref="AllFiles(LibGit2Sharp.Tree)"/>, where the tree for the commit is passed.
         /// </summary>
         /// <param name="commitID">The unique identifier of the commit. Must not be null, empty, or consist only of whitespace.</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>A collection of file paths representing all files in the specified commit.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="commitID"/> is null, empty,
         /// or consists only of whitespace.</exception>
@@ -626,6 +629,7 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
         /// <param name="paths">where the passing files are to be added</param>
+        /// <param name="token">For cancelling this operation.</param>
         private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
@@ -701,6 +705,7 @@ namespace SEE.VCS
         /// <param name="tree">The tree whose files are requested.</param>
         /// <param name="matcher">the inclusion/exclusion path globbings</param>
         /// <param name="paths">the set of paths to which the paths are to be added</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>the set of distinct paths.</returns>
         private static void CollectFiles(LibGit2Sharp.Tree tree, Matcher matcher, HashSet<string> paths, CancellationToken token)
         {
@@ -721,7 +726,6 @@ namespace SEE.VCS
             }
         }
 
-        #region Author Aliasing
         /// <summary>
         /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
         /// will be returned.
@@ -753,7 +757,6 @@ namespace SEE.VCS
                                                                && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
             }
         }
-        #endregion Author Aliasing
 
         #region Config I/O
 
