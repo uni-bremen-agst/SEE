@@ -51,7 +51,9 @@ namespace SEE.Game.City
         private GitRepository Repository { set; get; }
 
         /// <summary>
-        /// Starts the actual poller.
+        /// Starts the actual poller. Observers on <see cref="OnChangeDetected"/> will be
+        /// notified when a change is detected. The repository will be fetched periodically
+        /// every <see cref="PollingInterval"/> seconds.
         /// </summary>
         public override void Start()
         {
@@ -68,13 +70,17 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Stops the poller.
+        /// Stops the poller. Observers on <see cref="OnChangeDetected"/> will no longer be
+        /// notified.
         /// </summary>
         public override void Stop()
         {
-            timer.Elapsed -= OnTimedEvent;
+            if (timer != null)
+            {
+                Debug.Log($"Stopping GitPoller on {Repository.RepositoryPath.Path}...\n");
+                timer.Elapsed -= OnTimedEvent;
+            }
             base.Stop();
-            Debug.Log($"Stopping GitPoller on {Repository.RepositoryPath.Path}...\n");
         }
 
         /// <summary>

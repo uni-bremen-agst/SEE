@@ -38,10 +38,12 @@ namespace SEE.Utils
         /// </summary>
         public virtual void Stop()
         {
-            // Always stop and dispose of the timer when you're finished
-            timer.Stop();
-            timer.Dispose();
-            timer = null;
+            if (timer != null)
+            {
+                timer.Stop();
+                timer.Dispose();
+                timer = null;
+            }
         }
     }
 }
