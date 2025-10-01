@@ -266,8 +266,11 @@ namespace SEE.GO
         {
             foreach (GameObject gameObject in beamMarkers)
             {
-                gameObject.transform.SetParent(null);
-                Destroyer.Destroy(gameObject);
+                if (gameObject != null)
+                {
+                    gameObject.transform.SetParent(null);
+                    Destroyer.Destroy(gameObject);
+                }
             }
             beamMarkers.Clear();
             // We reset all marker materials to their original value.
