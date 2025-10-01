@@ -187,7 +187,8 @@ namespace SEE.Game.City
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200),
+            EnableIf(nameof(AutoFetch)), RuntimeEnableIf(nameof(AutoFetch)),
+            Range(5, 200),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup),
             ShowInInspector]
         public int PollingInterval
@@ -219,7 +220,8 @@ namespace SEE.Game.City
         [ShowInInspector,
             Tooltip(
              "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-         EnableIf(nameof(AutoFetch)), Range(5, 200),
+            EnableIf(nameof(AutoFetch)), RuntimeEnableIf(nameof(AutoFetch)),
+            Range(5, 200),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
         public int MarkerTime
         {
