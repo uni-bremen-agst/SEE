@@ -276,11 +276,13 @@ namespace SEE.Game.CityRendering
         ///
         /// The game objects representing the nodes will be children of <paramref name="parent"/>, while
         /// the game objects drawn for edges will always be children of the unique root game object representing
-        /// the code city as a whole.
+        /// the code city as a whole. The <paramref name="parent"/> will generally be the object holding a
+        /// <see cref="AbstractSEECity"/> component, while the unique root game object is representing the
+        /// root of the graph node hierarchy, i.e., is part of the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor since
         /// the node-type factories and the like are set up by the constructor</param>
-        /// <param name="parent">every game object drawn will be become an immediate child to this parent</param>
+        /// <param name="parent">every game object drawn will become an immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
@@ -314,11 +316,13 @@ namespace SEE.Game.CityRendering
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
-            {
-                Vector3 position = parent.transform.position;
-                position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
-                NodeLayout.Apply(nodeLayout.Create(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z)));
-            }
+            // The center position of the rectangular plane where the nodes should be placed.
+            Vector3 planeCenterposition = parent.transform.position;
+            planeCenterposition.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
+            // The rectangle (width, depth) of the plane in which the nodes should be placed.
+            Vector2 planeRectangle = new(parent.transform.lossyScale.x, parent.transform.lossyScale.z);
+            NodeLayout.Apply(nodeLayout.Create(layoutNodes, planeCenterposition, planeRectangle));
+
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
 
@@ -364,7 +368,7 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode, graph);
+                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
