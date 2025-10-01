@@ -171,6 +171,11 @@ namespace SEE.UI.RuntimeConfigMenu
         private readonly List<(MemberInfo, GameObject, object)> controlConditions = new();
 
         /// <summary>
+        /// A list of all the small editor buttons included in this menu.
+        /// </summary>
+        public readonly List<RuntimeSmallEditorButton> SmallEditorButtons = new();
+
+        /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
@@ -1384,6 +1389,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
+
+                SmallEditorButtons.Add(smallEditorButton);
             }
             return sliderGameObject;
 
@@ -1603,6 +1610,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
+
+                SmallEditorButtons.Add(smallEditorButton);
             }
             return switchGameObject;
         }
@@ -1687,6 +1696,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
+
+                SmallEditorButtons.Add(smallEditorButton);
             }
             return stringGameObject;
         }
@@ -1852,6 +1863,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
+
+                SmallEditorButtons.Add(smallEditorButton);
             }
             return dropDownGameObject;
         }
@@ -1979,6 +1992,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateColorPicker(settingName, smallEditor, setter, getter, true, getWidgetName);
+
+                SmallEditorButtons.Add(smallEditorButton);
             }
         }
 

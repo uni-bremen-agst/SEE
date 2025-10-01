@@ -4,9 +4,9 @@ using SEE.Controls;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GameObjects;
-using SEE.UI.Notification;
 using SEE.Utils;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -247,6 +247,14 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
+        /// Simple record to capture the state of an active tab.
+        /// This is used to preserve and restore the tab state during a rebuild.
+        /// </summary>
+        /// <param name="ActiveEntry">The title of the currently active entry.</param>
+        /// <param name="Scroll">The current scroll position.</param>
+        private record TabStateSnapshot(string ActiveEntry, float Scroll);
+
+        /// <summary>
         /// Rebuilds the tab at the specified <paramref name="index"/>
         /// by destroying and recreating it.
         /// If the tab is currently active, the method preserves its state by:
@@ -259,35 +267,69 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <param name="index">The index of the tab to rebuild.</param>
         public async UniTask RebuildTabAsync(int index)
         {
+            // Ensure index is valid
             if (index < 0 || index >= cityMenus.Length)
             {
                 return;
             }
-            bool shouldToggle = index == currentCity
-                && cityMenus[currentCity].ShowMenu;
-            string active = "";
-            float scrollValue = 1f;
-            if (shouldToggle)
+
+            // Check if the tab to rebuild is the currently active city tab
+            bool isCurrentCity = index == currentCity;
+
+            // If this is the current city tab but the menu is not open,
+            // hide any small editor that are currently shown
+            if (isCurrentCity && !cityMenus[currentCity].ShowMenu)
             {
-                scrollValue = cityMenus[currentCity]
-                                .Content
-                                .GetComponentInChildren<ContentSizeWatcher>()
-                                .CurrentScrollValue;
-                cityMenus[currentCity].ToggleMenu();
-                active = cityMenus[currentCity].ActiveEntry.Title;
+                List<RuntimeSmallEditorButton> smallButtons = cityMenus[currentCity].SmallEditorButtons
+                    .Where(smallEditorButton => smallEditorButton.ShowMenu).ToList();
+
+                foreach (RuntimeSmallEditorButton button in smallButtons)
+                {
+                    button.ShowMenu = false;
+                }
             }
+
+            // Capture the current tab state if it's active
+            TabStateSnapshot state = null;
+            if (isCurrentCity && cityMenus[currentCity].ShowMenu)
+            {
+                // Save scroll position and active entry
+                state = CaptureTabState(cityMenus[currentCity]);
+                cityMenus[currentCity].ToggleMenu();
+            }
+
+            // Destroy and recreate the tab
             Destroyer.Destroy(cityMenus[index]);
             AddCity(index);
-            if (shouldToggle)
+
+            // Restore previous state if tab was active
+            if (state != null)
             {
                 await UniTask.Yield();
                 cityMenus[currentCity].ToggleMenu();
-                cityMenus[currentCity].SelectEntry(cityMenus[currentCity]
-                    .Entries.FirstOrDefault(entry => entry.Title.Equals(active)));
-                await cityMenus[currentCity]
-                        .Content
-                        .GetComponentInChildren<ContentSizeWatcher>()
-                        .ApplyPreviousScrollPositionAsync(scrollValue);
+                // Restore selected entry and scroll position
+                await RestoreTabState(cityMenus[currentCity], state);
+            }
+            return;
+
+            static TabStateSnapshot CaptureTabState(RuntimeTabMenu menu)
+            {
+                float scrollValue = menu.Content
+                                .GetComponentInChildren<ContentSizeWatcher>()
+                                .CurrentScrollValue;
+                string active = menu.ActiveEntry.Title;
+                return new TabStateSnapshot(active, scrollValue);
+            }
+
+            static async UniTask RestoreTabState(RuntimeTabMenu menu, TabStateSnapshot state)
+            {
+                // Select the previously active entry
+                menu.SelectEntry(menu.Entries.FirstOrDefault(e => e.Title.Equals(state.ActiveEntry)));
+
+                // Restore the scroll position asynchronously
+                await menu.Content
+                    .GetComponentInChildren<ContentSizeWatcher>()
+                    .ApplyPreviousScrollPositionAsync(state.Scroll);
             }
         }
 
