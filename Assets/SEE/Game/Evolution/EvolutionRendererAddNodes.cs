@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Layout;
 using Sirenix.Utilities;
@@ -52,7 +53,7 @@ namespace SEE.Game.Evolution
                 // A new node has no layout applied to it yet.
                 // If the node is new, we animate it by moving it out from the sky.
                 Vector3 initialPosition = layoutNode.CenterPosition;
-                initialPosition.y = skyLevel + layoutNode.AbsoluteScale.y;
+                initialPosition.y = AbstractSEECity.SkyLevel;
                 gameNode.transform.position = initialPosition;
 
                 gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);

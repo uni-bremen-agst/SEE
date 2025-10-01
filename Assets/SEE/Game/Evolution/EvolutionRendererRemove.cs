@@ -1,4 +1,5 @@
 ﻿using SEE.DataModel.DG;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
 using Sirenix.Utilities;
@@ -54,7 +55,7 @@ namespace SEE.Game.Evolution
 
         /// <summary>
         /// Removes the given node. The removal is animated by raising the
-        /// node to <see cref="skyLevel"/> (y dimension). The node is not
+        /// node to <see cref="AbstractSEECity.SkyLevel"/> (y dimension). The node is not
         /// destroyed when the animation has finished.
         /// </summary>
         /// <param name="node">leaf node to be removed</param>
@@ -83,9 +84,9 @@ namespace SEE.Game.Evolution
         private void AnimateToDeath(GameObject gameObject)
         {
             gameObject.transform.SetParent(null);
-            /// Let it raise to <see cref="skyLevel"/>.
+            /// Let it raise to <see cref="AbstractSEECity.SkyLevel"/>.
             Vector3 newPosition = gameObject.transform.position;
-            newPosition.y = skyLevel;
+            newPosition.y = AbstractSEECity.SkyLevel;
 
             MoveTo(gameObject, newPosition);
 
