@@ -339,7 +339,6 @@ namespace SEE.Game.CityRendering
         /// and has the width, height, and depth metrics set and is a leaf.
         /// </summary>
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
-        [Obsolete]
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
             Assert.IsNull(gameNode.transform.parent);
