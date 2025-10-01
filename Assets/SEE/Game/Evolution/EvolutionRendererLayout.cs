@@ -52,13 +52,16 @@ namespace SEE.Game.Evolution
         {
             // Determines the layouts of all loaded graphs upfront.
             Performance p = Performance.Begin($"Layouting all {graphs.Count} graphs");
-            graphs.ForEach(CalculateLayout);
+            foreach (Graph graph in graphs)
+            {
+                CalculateLayout(graph);
+            }
             objectManager.Clear();
             p.End(true);
         }
 
         /// <summary>
-        /// Calculates the node and edge layout data for <paramref name="graph"/> using the <see cref="graphRenderer"/>.
+        /// Calculates the node and edge layout data for <paramref name="graph"/> using the <see cref="Renderer"/>.
         /// All the game objects created for the nodes and edges of <paramref name="graph"/> will
         /// be created by the <see cref="objectManager"/>, thus, be available for later use. The layout
         /// is not actually applied.
@@ -107,8 +110,8 @@ namespace SEE.Game.Evolution
             }
 
             // Since incremental layouts must know the layout of the last revision
-            // but are also bound to the function calls of NodeLayout
-            // we must hand over this argument here separately
+            // but are also bound to the function calls of NodeLayout,
+            // we must hand over this argument here separately.
             if (nodeLayout is IIncrementalNodeLayout iNodeLayout && oldLayout is IIncrementalNodeLayout iOldLayout)
             {
                 iNodeLayout.OldLayout = iOldLayout;
