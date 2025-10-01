@@ -356,6 +356,18 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// If we can already determine the city this object belongs to, set the <see cref="City"/> property.
+        /// </summary>
+        public void SetCityIfPossible()
+        {
+            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            if (codeCityObject != null && codeCityObject.TryGetComponent(out AbstractSEECity city))
+            {
+                City = city;
+            }
+        }
+
+        /// <summary>
         /// Determines the <see cref="AbstractSEECity"/> this <paramref name="gameObject"/> belongs to and returns it.
         /// </summary>
         /// <param name="gameObject">The object to get the city for</param>
@@ -426,7 +438,6 @@ namespace SEE.Game.Operator
         {
             throw error;
         }
-
 
         protected virtual void OnEnable()
         {
