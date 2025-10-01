@@ -76,5 +76,13 @@ namespace SEE.Game.CityRendering
         /// it has the information about how to draw the node and portal of the city</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
         GameObject DrawNode(Node node, GameObject city = null);
+
+        /// <summary>
+        /// Adjusts the style of the given <paramref name="gameNode"/> according
+        /// to the metric value of the graph node attached to <paramref name="gameNode"/>
+        /// chosen to determine style.
+        /// </summary>
+        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
+        public void AdjustStyle(GameObject gameNode);
     }
 }

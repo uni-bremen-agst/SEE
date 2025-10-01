@@ -94,14 +94,6 @@ namespace SEE.Game.Evolution
         private bool edgesAreDrawn = false;
 
         /// <summary>
-        /// The y co-ordinate in world space where to move deleted nodes to and to move
-        /// added nodes from. Deleted nodes will be lifted to this level and then disappear.
-        /// Added nodes will appear there and then be moved to their location in the code
-        /// city.
-        /// </summary>
-        private const float skyLevel = 2.0f;
-
-        /// <summary>
         /// The message to be displayed while rendering the evolution city.
         /// </summary>
         private string LoadingMessage => $"Rendering evolution city {gameObject.name}...";
@@ -980,6 +972,14 @@ namespace SEE.Game.Evolution
                     graph.BasePath = basePath;
                 }
             }
+        }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.AdjustStyle(GameObject)"/>.
+        /// </summary>
+        public void AdjustStyle(GameObject gameNode)
+        {
+            Renderer.AdjustStyle(gameNode);
         }
     }
 }
