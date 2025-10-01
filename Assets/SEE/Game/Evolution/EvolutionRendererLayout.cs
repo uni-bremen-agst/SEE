@@ -1,10 +1,8 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
-using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
-using Sirenix.Utilities;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -54,125 +52,24 @@ namespace SEE.Game.Evolution
             Performance p = Performance.Begin($"Layouting all {graphs.Count} graphs");
             foreach (Graph graph in graphs)
             {
-                CalculateLayout(graph);
+                NextLayout.Calculate(graph, GetNode, Renderer, edgesAreDrawn, gameObject,
+                                               out ICollection<LayoutGraphNode> layoutNodes,
+                                               out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout,
+                                               ref oldLayout);
+                NodeLayouts.Add(ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>()));
+                if (edgesAreDrawn)
+                {
+                    EdgeLayouts.Add(edgeLayout);
+                }
             }
             objectManager.Clear();
             p.End(true);
-        }
 
-        /// <summary>
-        /// Calculates the node and edge layout data for <paramref name="graph"/> using the <see cref="Renderer"/>.
-        /// All the game objects created for the nodes and edges of <paramref name="graph"/> will
-        /// be created by the <see cref="objectManager"/>, thus, be available for later use. The layout
-        /// is not actually applied.
-        ///
-        /// The edge layout will be added to <see cref="EdgeLayouts"/>. The node layout will
-        /// be added to <see cref="NodeLayouts"/>.
-        ///
-        /// Note: This method assumes that it is called in the order of <see cref="graphs"/>,
-        /// that is, the i'th call is assumed to calculate the edge layout for
-        /// <paramref name="graph"/>[i].
-        /// </summary>
-        /// <param name="graph">graph for which the layout is to be calculated</param>
-        /// <returns>the node layout for all nodes in <paramref name="graph"/></returns>
-        private void CalculateLayout(Graph graph)
-        {
-            // The following code assumes that a leaf node remains a leaf across all
-            // graphs of the graph series and an inner node remains an inner node.
-            // This may not necessarily be true. For instance, an empty directory could
-            // get subdirectories in the course of the evolution.
-
-            // Collecting all game objects corresponding to nodes of the given graph.
-            // If the node existed in a previous graph, we will re-use its corresponding
-            // game object created earlier.
-            List<GameObject> gameObjects = new();
-
-            // Gather all nodes for the layout.
-            foreach (Node node in graph.Nodes())
+            GameObject GetNode(Node node)
             {
-                // All layouts (flat and hierarchical ones) must be able to handle leaves;
-                // hence, leaves can be added at any rate. For a hierarchical layout, we
-                // need to add the game objects for inner nodes, too. To put it differently,
-                // inner nodes are added only if we apply a hierarchical layout.
                 objectManager.GetNode(node, out GameObject gameNode);
-                // Now after having attached the new node to the game object,
-                // we must adjust the scale of it according to the newly attached node so
-                // that the layouter has these. We need to adjust the scale only for leaves,
-                // however, because the layouter will select the scale for inner nodes.
-                if (node.IsLeaf())
-                {
-                    Renderer.AdjustScaleOfLeaf(gameNode);
-                }
-                gameObjects.Add(gameNode);
+                return gameNode;
             }
-
-            // The layout to be applied.
-            NodeLayout nodeLayout = Renderer.GetLayout();
-
-            // Since incremental layouts must know the layout of the last revision
-            // but are also bound to the function calls of NodeLayout,
-            // we must hand over this argument here separately.
-            if (nodeLayout is IIncrementalNodeLayout iNodeLayout && oldLayout is IIncrementalNodeLayout iOldLayout)
-            {
-                iNodeLayout.OldLayout = iOldLayout;
-            }
-
-            // Calculate and apply the node layout.
-            ICollection<LayoutGraphNode> layoutNodes = ToAbstractLayoutNodes(gameObjects);
-            NodeLayout.Apply(nodeLayout.Create(layoutNodes, gameObject.transform.position,
-                                               new Vector2(gameObject.transform.lossyScale.x, gameObject.transform.lossyScale.z)));
-            oldLayout = nodeLayout;
-
-            if (edgesAreDrawn)
-            {
-                IList<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = Renderer.LayoutEdges(layoutNodes).ToList();
-                Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout = new(layoutEdges.Count);
-                foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
-                {
-                    edgeLayout.Add(le.ItsEdge.ID, le);
-                }
-                EdgeLayouts.Add(edgeLayout);
-            }
-            NodeLayouts.Add(ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>()));
-
-            // Note: The game objects for leaf nodes are already properly scaled by the call to
-            // objectManager.GetNode() above. Yet, inner nodes are generally not scaled by
-            // the layout and there may be layouts that may shrink leaf nodes. For instance,
-            // TreeMap shrinks leaves so that they fit into the available space.
-            // Anyhow, we do not need to apply the layout already now. That can be deferred
-            // to the point in time when the city is actually visualized. Here, we just calculate
-            // the layout for every graph in the graph series for later use.
-        }
-
-        /// <summary>
-        /// Yields the collection of <see cref="LayoutGraphNode"/>s corresponding to the given <paramref name="gameNodes"/>.
-        /// Each <see cref="LayoutGraphNode"/> has the position, scale, and rotation of the game node. The graph node
-        /// attached to the game node is passed on to the <see cref="LayoutGraphNode"/> so that the graph node data is
-        /// available to the node layout (e.g., Parent or Children).
-        /// Sets also the node levels of all resulting <see cref="LayoutGraphNode"/>.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of <see cref="LayoutGraphNode"/>s representing the information
-        /// of <paramref name="gameNodes"/> for layouting</returns>
-        private static ICollection<LayoutGraphNode> ToAbstractLayoutNodes(ICollection<GameObject> gameNodes)
-        {
-            IList<LayoutGraphNode> result = new List<LayoutGraphNode>();
-
-            foreach (GameObject gameObject in gameNodes)
-            {
-                Node node = gameObject.GetComponent<NodeRef>().Value;
-                LayoutGraphNode layoutNode = new(node)
-                {
-                    // We must transfer the scale from gameObject to layoutNode.
-                    // but the layout needs the game object's scale.
-                    // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                    // Note: LayoutGraphNode does not make a distinction between local and absolute scale.
-                    AbsoluteScale = gameObject.transform.lossyScale
-                };
-                result.Add(layoutNode);
-            }
-            LayoutNodes.SetLevels(result);
-            return result;
         }
 
         /// <summary>
