@@ -25,14 +25,21 @@ namespace SEE.Game.CityRendering
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
         /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> attribute which sets the author.
         ///
-        /// The collected authors are then rendered as spheres floating over the city.
+        /// The collected authors are then rendered as spheres floating over the rectangular plane
+        /// defined by <paramref name="planeCenterposition"/> and <paramref name="planeRectangle"/>.
         /// </summary>
         /// <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All spheres will become children of this object.</param>
         /// <param name="graph">The graph which was rendered.</param>
-        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
+        /// <param name="planeCenterposition">The world-space center position of the plane on which the city was rendered.</param>
+        /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
+        private void DrawAuthorSpheres
+            (IDictionary<Node, GameObject> nodeMap,
+            GameObject parent, Graph graph,
+            Vector3 planeCenterposition,
+            Vector2 planeRectangle)
         {
-            IList<GameObject> gameSpheresObjects = RenderAuthors(nodeMap, parent, graph);
+            IList<GameObject> gameSpheresObjects = RenderAuthors(nodeMap, parent, graph, planeCenterposition, planeRectangle);
             RenderEdges(nodeMap, gameSpheresObjects, parent);
         }
 
@@ -42,8 +49,15 @@ namespace SEE.Game.CityRendering
         ///  <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
         /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
         /// <param name="graph">The graph which was rendered.</param>
+        /// <param name="planeCenterposition">The world-space center position of the plane on which the city was rendered.</param>
+        /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
         /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderAuthors(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
+        private IList<GameObject> RenderAuthors
+            (IDictionary<Node, GameObject> nodeMap,
+            GameObject parent,
+            Graph graph,
+            Vector3 planeCenterposition,
+            Vector2 planeRectangle)
         {
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
             /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> separated by commas.
@@ -56,57 +70,82 @@ namespace SEE.Game.CityRendering
                     .ToList();
 
             IList<GameObject> result = new List<GameObject>();
-            Renderer parentRenderer = parent.GetComponent<Renderer>();
             int authorsCount = authors.Count;
             Node rootNode = graph.GetRoots().First();
-
-            // Calculating number of rows and columns needed and the space between the spheres.
-            // The spheres will be distributed in a rectangle around the code city table.
-            int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
-            int columns = Mathf.CeilToInt((float)authorsCount / rows);
-            float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
-            float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
-
-            // When we only have one row.
-            if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
-            {
-                spacingX = parentRenderer.bounds.size.x;
-            }
-            // When we only have one column.
-            if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
-            {
-                spacingZ = parentRenderer.bounds.size.z;
-            }
 
             int currentAuthor = 0;
             // Define materials for the spheres.
             Materials materials = new(Materials.ShaderType.PortalFree,
                 new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
-            // iterate over all rows.
-            for (int i = 0; i < rows; i++)
+            // Position the spheres on the plane above the city at sky level.
+            planeCenterposition.y = AbstractSEECity.SkyLevel;
+            foreach (Vector3 position in GetEvenlyDistributedPositions(authorsCount, planeRectangle.x, 0, planeRectangle.y))
             {
-                // iterate over all columns.
-                for (int j = 0; j < columns; j++)
+                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), planeCenterposition + position);
+                result.Add(gameObject);
+                currentAuthor++;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the positions of <paramref name="n"/> objects evenly distributed on the border
+        /// of a rectangle with width <paramref name="x"/> and depth <paramref name="z"/> at
+        /// given <paramref name="height"/>.
+        ///
+        /// The first position will be at the top-left corner of the rectangle. The positions
+        /// will be distributed clockwise. The center of the rectangle is to be interpreted
+        /// as (<paramref name="x"/>, <paramref name="height"/>, <paramref name="z"/>). That
+        /// means, the first position will be at (-<paramref name="x"/>/2, <paramref name="height"/>,
+        /// <paramref name="z"/> / 2).
+        /// </summary>
+        /// <param name="n">Number of objects</param>
+        /// <param name="x">Width of the rectangle</param>
+        /// <param name="height">Height of the rectangle. All positions will have this height.</param>
+        /// <param name="z">Depth of the rectangle</param>
+        /// <returns>Positions on the rectangle</returns>
+        public List<Vector3> GetEvenlyDistributedPositions(int n, float x, float height, float z)
+        {
+            List<Vector3> positions = new(n);
+
+            // Calculate the perimeter and distance between objects
+            float perimeter = 2 * (x + z);
+            float distanceBetweenObjects = perimeter / n;
+
+            // The starting corner of the rectangle (Top-Left)
+            Vector3 startCorner = new(-x / 2, height, z / 2);
+
+            for (int i = 0; i < n; i++)
+            {
+                Vector3 currentPosition;
+                float currentDistance = i * distanceBetweenObjects;
+
+                // Top edge
+                if (currentDistance <= x)
                 {
-                    if (currentAuthor >= authorsCount)
-                    {
-                        return result;
-                    }
-
-                    // Calculate the position of the sphere.
-                    Vector3 position = new(i * spacingX - (parentRenderer.bounds.size.x / 2),
-                                           parentRenderer.bounds.size.y + 1.2f,
-                                           j * spacingZ - (parentRenderer.bounds.size.z / 2));
-
-                    GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), position);
-
-                    result.Add(gameObject);
-                    currentAuthor++;
+                    currentPosition = startCorner + new Vector3(currentDistance, height, 0);
                 }
+                // Right edge
+                else if (currentDistance <= x + z)
+                {
+                    currentPosition = startCorner + new Vector3(x, height, -(currentDistance - x));
+                }
+                // Bottom edge
+                else if (currentDistance <= 2 * x + z)
+                {
+                    currentPosition = startCorner + new Vector3(x - (currentDistance - (x + z)), height, -z);
+                }
+                // Left edge
+                else
+                {
+                    currentPosition = startCorner + new Vector3(0, height, -z + (currentDistance - (2 * x + z)));
+                }
+
+                positions.Add(currentPosition);
             }
 
-            return result;
+            return positions;
         }
 
         /// <summary>
