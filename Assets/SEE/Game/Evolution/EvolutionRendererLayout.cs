@@ -87,9 +87,6 @@ namespace SEE.Game.Evolution
             // game object created earlier.
             List<GameObject> gameObjects = new();
 
-            // The layout to be applied.
-            NodeLayout nodeLayout = Renderer.GetLayout();
-
             // Gather all nodes for the layout.
             foreach (Node node in graph.Nodes())
             {
@@ -108,6 +105,9 @@ namespace SEE.Game.Evolution
                 }
                 gameObjects.Add(gameNode);
             }
+
+            // The layout to be applied.
+            NodeLayout nodeLayout = Renderer.GetLayout();
 
             // Since incremental layouts must know the layout of the last revision
             // but are also bound to the function calls of NodeLayout,
