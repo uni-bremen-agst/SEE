@@ -87,7 +87,7 @@ namespace SEE.VCS
         public void TestFetchRemotes()
         {
             using Repository original = new(originalRepoPath);
-            using GitRepository clone = new(new DataPath(cloneRepoPath), null);
+            GitRepository clone = new(new DataPath(cloneRepoPath), null);
 
             Assert.IsFalse(clone.FetchRemotes());
 

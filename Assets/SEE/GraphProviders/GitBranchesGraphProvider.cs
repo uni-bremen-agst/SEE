@@ -1,16 +1,12 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.VCS;
 using SEE.Utils;
-using SEE.Utils.Config;
 using SEE.VCS;
-using Sirenix.OdinInspector;
-using UnityEngine;
+using System;
+using System.IO;
+using System.Threading;
 
 namespace SEE.GraphProviders
 {
@@ -29,40 +25,6 @@ namespace SEE.GraphProviders
     [Serializable]
     internal class GitBranchesGraphProvider : GitGraphProvider
     {
-        #region Attributes
-
-        /// <summary>
-        /// Specifies if SEE should automatically fetch for new commits in the
-        /// repository <see cref="RepositoryData"/>.
-        ///
-        /// This will append the path of this repo to <see cref="GitPoller"/>.
-        ///
-        /// Note: the repository must be fetch-able without any credentials
-        /// since we can't store them securely yet.
-        /// </summary>
-        [Tooltip("If true, the repository will be polled regularly for new changes.")]
-        public bool AutoFetch = false;
-
-        /// <summary>
-        /// The interval in seconds in which git fetch should be called.
-        /// </summary>
-        [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int PollingInterval = 5;
-
-        /// <summary>
-        /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
-        /// will be marked. This field specifies for how long these markers should appear.
-        /// </summary>
-        [Tooltip(
-             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-         EnableIf(nameof(AutoFetch)), Range(5, 200)]
-        public int MarkerTime = 10;
-
-        #endregion
-
-        #region Methods
-
         /// <summary>
         /// Checks if all attributes are set correctly.
         /// Otherwise, an exception is thrown.
@@ -87,9 +49,9 @@ namespace SEE.GraphProviders
         /// <returns>The graph generated from the git repository <see cref="RepositoryData"/>.</returns>
         public override async UniTask<Graph> ProvideAsync
             (Graph graph,
-            AbstractSEECity city,
-            Action<float> changePercentage = null,
-            CancellationToken token = default)
+             AbstractSEECity city,
+             Action<float> changePercentage = null,
+             CancellationToken token = default)
         {
             if (city is not BranchCity branchCity)
             {
@@ -100,12 +62,6 @@ namespace SEE.GraphProviders
 
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
-
-            // Only add the poller when in play mode.
-            if (AutoFetch && Application.isPlaying)
-            {
-                branchCity.GetOrAddGitPollerComponent(PollingInterval, MarkerTime).Repository = GitRepository;
-            }
 
             return task;
         }
@@ -159,50 +115,5 @@ namespace SEE.GraphProviders
         {
             return SingleGraphProviderKind.GitAllBranches;
         }
-
-        #endregion
-
-        #region Config I/O
-
-        /// <summary>
-        /// Label for serializing the <see cref="AutoFetch"/> field.
-        /// </summary>
-        private const string autoFetchLabel = "AutoFetch";
-
-        /// <summary>
-        /// Label for serializing the <see cref="PollingInterval"/> field.
-        /// </summary>
-        private const string pollingIntervalLabel = "PollingInterval";
-
-        /// <summary>
-        /// Label for serializing the <see cref="MarkerTime"/> field.
-        /// </summary>
-        private const string markerTimeLabel = "MarkerTime";
-
-        /// <summary>
-        /// Saves the attributes of this provider to <paramref name="writer"/>.
-        /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to save the attributes to.</param>
-        protected override void SaveAttributes(ConfigWriter writer)
-        {
-            base.SaveAttributes(writer);
-            writer.Save(AutoFetch, autoFetchLabel);
-            writer.Save(PollingInterval, pollingIntervalLabel);
-            writer.Save(MarkerTime, markerTimeLabel);
-        }
-
-        /// <summary>
-        /// Restores the attributes of this provider from <paramref name="attributes"/>.
-        /// </summary>
-        /// <param name="attributes">The attributes to restore from.</param>
-        protected override void RestoreAttributes(Dictionary<string, object> attributes)
-        {
-            base.RestoreAttributes(attributes);
-            ConfigIO.Restore(attributes, autoFetchLabel, ref AutoFetch);
-            ConfigIO.Restore(attributes, pollingIntervalLabel, ref PollingInterval);
-            ConfigIO.Restore(attributes, markerTimeLabel, ref MarkerTime);
-        }
-
-        #endregion Config I/O
     }
 }

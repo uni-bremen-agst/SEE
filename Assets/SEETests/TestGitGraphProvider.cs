@@ -90,17 +90,14 @@ namespace SEE.GraphProviders
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
-            using GitRepository gitRepository = new(new DataPath(gitDirPath),
-                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
-                                                                       repositoryPaths: null,
-                                                                       branches: null));
+            GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                 repositoryPaths: null,
+                                                                 branches: null));
             GitBranchesGraphProvider provider = new()
             {
                 GitRepository = gitRepository,
                 SimplifyGraph = true,
-                AutoFetch = true,
-                PollingInterval = 60,
-                MarkerTime = 3,
             };
             city.Date = date;
 
@@ -125,10 +122,10 @@ namespace SEE.GraphProviders
         private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
 
-            using GitRepository gitRepository = new(new DataPath(gitDirPath),
-                                                    new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
-                                                                       repositoryPaths: null,
-                                                                       branches: null));
+            GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                 repositoryPaths: null,
+                                                                 branches: null));
             GitEvolutionGraphProvider provider = new()
             {
                 Date = date,

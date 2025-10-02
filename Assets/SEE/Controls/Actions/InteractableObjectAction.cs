@@ -5,7 +5,7 @@ namespace SEE.Controls.Actions
 {
     /// <summary>
     /// Common abstract superclass of all actions relating to a game object that
-    /// has an InteractableObject component attached to them.
+    /// has an <see cref="InteractableObject"/> component attached to them.
     /// </summary>
     public abstract class InteractableObjectAction : MonoBehaviour
     {

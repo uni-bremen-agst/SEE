@@ -46,6 +46,26 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the first immediate child of <paramref name="gameObject"/> that
+        /// is a graph node, i.e., has a <see cref="NodeRef"/> attached to it
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>) or null if there
+        /// is none.
+        /// </summary>
+        /// <param name="gameObject">The game object whose child is to be retrieved</param>
+        /// <returns>first immediate child representing a node or null if there is none</returns>
+        public static GameObject FirstChildNode(this GameObject gameObject)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.gameObject.IsNode())
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
+        }
+
+        /// <summary>
         /// Returns true if a code city was drawn for this <paramref name="gameObject"/>.
         /// A code city is assumed to be drawn in there is at least one immediate child
         /// of this game object that represents a graph node, i.e., has a <see cref="NodeRef"/>
@@ -538,8 +558,7 @@ namespace SEE.GO
             }
 
             // No renderer, so we use lossyScale as a fallback.
-            // Note: This should not happen. If the object has no renderer, it has no size at all.
-            Debug.LogWarning($"GameObject has no Renderer component, using lossyScale as fallback: {gameObject.name}");
+            // Note: This may happen for container objects that have no mesh.
             size = gameObject.transform.lossyScale;
             position = gameObject.transform.position;
             return false;

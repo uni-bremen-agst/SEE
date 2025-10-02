@@ -118,6 +118,8 @@ namespace SEE.GraphProviders.Evolution
         /// <returns>The calculated graph series.</returns>
         private List<Graph> GetGraph(List<Graph> graph, Action<float> changePercentage, CancellationToken token)
         {
+            throw new NotImplementedException("GitEvolutionGraphProvider is not implemented yet.");
+            /*
             // This name will be used as the root node of the graph.
             // Its type will be <see cref="DataModel.DG.VCS.RepositoryType"/>.
             // It is the innermost directory of the git repository.
@@ -169,6 +171,7 @@ namespace SEE.GraphProviders.Evolution
             }
 
             return graph;
+            */
         }
 
         /// <summary>
