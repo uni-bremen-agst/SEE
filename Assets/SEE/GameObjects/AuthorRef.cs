@@ -20,9 +20,15 @@ namespace SEE.GameObjects
         /// <summary>
         /// Adds an edge to the list of edges to authors of this specific file.
         /// </summary>
-        /// <param name="authorEdge">edge to be added</param>
+        /// <param name="authorEdge">edge to be added (must not be null)</param>
+        /// <exception cref="System.ArgumentNullException">thrown in case
+        /// <paramref name="authorEdge"/> is null</exception>
         internal void Add(AuthorEdge authorEdge)
         {
+            if (authorEdge == null)
+            {
+                throw new System.ArgumentNullException(nameof(authorEdge));
+            }
             if (edges.Add(authorEdge))
             {
                 UpdateVisibility();
