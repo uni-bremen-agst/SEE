@@ -341,8 +341,6 @@ namespace SEE.Game.CityRendering
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
-            Assert.IsNull(gameNode.transform.parent);
-
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
