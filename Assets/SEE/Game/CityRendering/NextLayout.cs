@@ -23,8 +23,9 @@ namespace SEE.Game.CityRendering
         /// will be null</param>
         /// <param name="city">the game object representing the code city; created game nodes
         /// and edge will be descendants of it</param>
-        /// <param name="layoutNodes">the resulting node layout</param>
-        /// <param name="edgeLayout">the resulting edge layout if <paramref name="edgesAreDrawn"/> is true,
+        /// <param name="layout">the resulting node layout as a mapping of node Ids onto the layout information</param>
+        /// <param name="edgeLayout">the resulting edge layout as a mapping of edge Ids onto
+        /// the layout information if <paramref name="edgesAreDrawn"/> is true,
         /// otherwise null</param>
         /// <param name="oldLayout">in case an incremental layout was used by the <paramref name="renderer"/>,
         /// this parameter is expected to contain the previous layout that should be taken into account
@@ -34,10 +35,10 @@ namespace SEE.Game.CityRendering
         public static void Calculate
             (Graph graph,
              Func<Node, GameObject> getNode,
-             GraphRenderer renderer,
+             IGraphRenderer renderer,
              bool edgesAreDrawn,
              GameObject city,
-             out ICollection<LayoutGraphNode> layoutNodes,
+             out Dictionary<string, ILayoutNode> layout,
              out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout,
              ref NodeLayout oldLayout)
         {
@@ -76,7 +77,7 @@ namespace SEE.Game.CityRendering
             }
 
             // Calculate and apply the node layout.
-            layoutNodes = ToAbstractLayoutNodes(gameObjects);
+            ICollection<LayoutGraphNode> layoutNodes = ToAbstractLayoutNodes(gameObjects);
             NodeLayout.Apply(nodeLayout.Create(layoutNodes, city.transform.position,
                                                new Vector2(city.transform.lossyScale.x,
                                                            city.transform.lossyScale.z)));
@@ -95,6 +96,8 @@ namespace SEE.Game.CityRendering
             {
                 edgeLayout = null;
             }
+
+            layout = ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
 
             // Note: The game objects for leaf nodes are already properly scaled by the calls to
             // GetNode() and AdjustScaleOfLeaf() above. Yet, inner nodes are generally not scaled by
@@ -134,6 +137,16 @@ namespace SEE.Game.CityRendering
             }
             LayoutNodes.SetLevels(result);
             return result;
+        }
+
+        /// <summary>
+        /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
+        /// </summary>
+        /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
+        /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
+        private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
+        {
+            return layoutNodes.ToDictionary(layoutNode => layoutNode.ID);
         }
     }
 }

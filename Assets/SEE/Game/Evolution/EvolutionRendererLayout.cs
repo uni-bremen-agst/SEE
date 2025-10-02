@@ -37,7 +37,7 @@ namespace SEE.Game.Evolution
             = new List<Dictionary<string, ILayoutEdge<ILayoutNode>>>();
 
         /// <summary>
-        /// The last calculated <see cref="NodeLayout"/> used for <see cref="IncrementalTreeMapLayout"/>.
+        /// The last calculated <see cref="NodeLayout"/> (needed for incremental layouts).
         /// </summary>
         private NodeLayout oldLayout = null;
 
@@ -53,10 +53,11 @@ namespace SEE.Game.Evolution
             foreach (Graph graph in graphs)
             {
                 NextLayout.Calculate(graph, GetNode, Renderer, edgesAreDrawn, gameObject,
-                                               out ICollection<LayoutGraphNode> layoutNodes,
-                                               out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout,
-                                               ref oldLayout);
-                NodeLayouts.Add(ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>()));
+                                     out Dictionary<string, ILayoutNode> layout,
+                                     out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout,
+                                     ref oldLayout);
+
+                NodeLayouts.Add(layout);
                 if (edgesAreDrawn)
                 {
                     EdgeLayouts.Add(edgeLayout);
@@ -70,16 +71,6 @@ namespace SEE.Game.Evolution
                 objectManager.GetNode(node, out GameObject gameNode);
                 return gameNode;
             }
-        }
-
-        /// <summary>
-        /// Returns a mapping of graph-node IDs onto their corresponding <paramref name="layoutNodes"/>.
-        /// </summary>
-        /// <param name="layoutNodes">collection of layout nodes to be mapped</param>
-        /// <returns>mapping indexed by the IDs of the nodes corresponding to the layout nodes</returns>
-        private static Dictionary<string, T> ToNodeIDLayout<T>(ICollection<T> layoutNodes) where T : ILayoutNode
-        {
-            return layoutNodes.ToDictionary(layoutNode => layoutNode.ID);
         }
 
         /// <summary>
