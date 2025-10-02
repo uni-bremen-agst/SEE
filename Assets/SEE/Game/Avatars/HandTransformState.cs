@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 
-
 namespace SEE.Game.Avatars
 {
     /// <summary>
