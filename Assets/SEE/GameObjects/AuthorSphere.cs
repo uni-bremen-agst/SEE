@@ -42,7 +42,7 @@ namespace SEE.GameObjects
         /// <param name="gameObject">The game object this label should be added to (on top of it).</param>
         /// <param name="author">The author represented by the label.</param>
         /// <param name="fontSize">The font size of the label.</param>
-        /// <returns>New game object representing the label</returns>
+        /// <returns>New game object representing the label.</returns>
         private static GameObject AddLabel(GameObject gameObject, FileAuthor author, float fontSize = 2f)
         {
             // Load is not allowed to be called from a field initializer; that is why we do it here.
