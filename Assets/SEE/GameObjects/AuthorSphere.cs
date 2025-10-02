@@ -85,12 +85,12 @@ namespace SEE.GameObjects
         /// The following components will be added to the new game object:
         /// <see cref="AuthorSphere"/> and <see cref="ShowAuthorEdges"/>.
         /// </summary>
-        /// <param name="parent">game object the new game object will be placed as a child</param>
-        /// <param name="author">the author that will be represented by this game object</param>
-        /// <param name="material">the material to be used for the new game object</param>
-        /// <param name="positionOffset">the position offset of the new game object above
-        /// the world-space position of the <paramref name="parent"/></param>
-        /// <returns>new game object representing the author</returns>
+        /// <param name="parent">Game object the new game object will be placed as a child.</param>
+        /// <param name="author">The author that will be represented by this game object.</param>
+        /// <param name="material"The material to be used for the new game object.</param>
+        /// <param name="positionOffset">The position offset of the new game object above
+        /// the world-space position of the <paramref name="parent"/>.</param>
+        /// <returns>New game object representing the author.</returns>
         public static GameObject CreateAuthor(GameObject parent, FileAuthor author, Material material, Vector3 positionOffset)
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
