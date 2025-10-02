@@ -1,6 +1,7 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Layout;
+using SEE.Layout.NodeLayouts;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -67,6 +68,17 @@ namespace SEE.Game.CityRendering
         IDictionary<string, ILayoutEdge<ILayoutNode>> LayoutEdges(ICollection<GameObject> gameEdges);
 
         /// <summary>
+        /// Returns the connecting edges among <paramref name="layoutNodes"/> laid out by the
+        /// selected edge layout.
+        /// If <paramref name="layoutNodes"/> is null or empty or if no layout was selected
+        /// by the user, the empty collection is returned.
+        /// </summary>
+        /// <param name="layoutNodes">nodes whose connecting edges are to be laid out</param>
+        /// <returns>laid out edges</returns>
+        public ICollection<LayoutGraphEdge<T>> LayoutEdges<T>(ICollection<T> layoutNodes)
+            where T : AbstractLayoutNode;
+
+        /// <summary>
         /// Creates and returns a new game object for representing the given <paramref name="node"/>.
         /// The <paramref name="node"/> is attached to that new game object via a <see cref="NodeRef"/>
         /// component. LOD is added and the resulting node is prepared for interaction.
@@ -84,5 +96,18 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
         public void AdjustStyle(GameObject gameNode);
+
+        /// <summary>
+        /// Returns the node layout.
+        /// </summary>
+        /// <returns>node layout</returns>
+        NodeLayout GetLayout();
+
+        /// <summary>
+        /// Adjusts the scale of the given leaf <paramref name="gameNode"/> according
+        /// to the metric values of the <see cref="Node"/> attached to <paramref name="gameNode"/>.
+        /// </summary>
+        /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
+        void AdjustScaleOfLeaf(GameObject gameNode);
     }
 }

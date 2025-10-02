@@ -33,6 +33,7 @@ using UnityEngine.Events;
 using UnityEngine.Serialization;
 using SEE.Game.CityRendering;
 using SEE.UI;
+using SEE.Layout.NodeLayouts;
 
 namespace SEE.Game.Evolution
 {
@@ -980,6 +981,30 @@ namespace SEE.Game.Evolution
         public void AdjustStyle(GameObject gameNode)
         {
             Renderer.AdjustStyle(gameNode);
+        }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.GetLayout()"/>.
+        /// </summary>
+        public NodeLayout GetLayout()
+        {
+            return Renderer.GetLayout();
+        }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.AdjustScaleOfLeaf(GameObject)"/>.
+        /// </summary>
+        public void AdjustScaleOfLeaf(GameObject gameNode)
+        {
+            Renderer.AdjustScaleOfLeaf(gameNode);
+        }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.LayoutEdges{T}(ICollection{T})"/>.
+        /// </summary>
+        public ICollection<LayoutGraphEdge<T>> LayoutEdges<T>(ICollection<T> layoutNodes) where T : AbstractLayoutNode
+        {
+            return Renderer.LayoutEdges(layoutNodes);
         }
     }
 }
