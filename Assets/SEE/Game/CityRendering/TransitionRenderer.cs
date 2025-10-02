@@ -5,11 +5,13 @@ using SEE.Game.Operator;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
+using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -65,6 +67,11 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// The last calculated <see cref="NodeLayout"/> (needed for incremental layouts).
+        /// </summary>
+        private NodeLayout oldLayout = null;
+
+        /// <summary>
         /// Renders the transition when new commits were detected.
         /// This method implements the actual rendering.
         /// </summary>
@@ -72,6 +79,9 @@ namespace SEE.Game.CityRendering
         private async UniTask RenderAsync()
         {
             ShowNewCommitsMessage();
+
+            // Remove markers from previous rendering.
+            markerFactory.Clear();
 
             // Backup old graph
             Graph oldGraph = branchCity.LoadedGraph.Clone() as Graph;
@@ -87,27 +97,50 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> changedNodes,
                 out _);
 
+            NextLayout.Calculate(branchCity.LoadedGraph,
+                                 GetGameNode,
+                                 branchCity.Renderer,
+                                 branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None,
+                                 branchCity.gameObject,
+                                 out Dictionary<string, ILayoutNode> newNodelayout,
+                                 out _,
+                                 ref oldLayout);
+            // Note: At this point game nodes for new nodes have been created already.
+
             ShowRemovedNodes(removedNodes);
-            AnimateNodeDeathAsync(removedNodes, markerFactory).Forget();
+            Debug.Log($"Phase 1: Removing {removedNodes.Count} nodes.\n");
+            await AnimateNodeDeathAsync(removedNodes, markerFactory);
+            Debug.Log($"Phase 1: Finished.\n");
 
             ShowAddedNodes(addedNodes);
-            AnimateNodeBirthAsync(addedNodes, markerFactory).Forget();
+            Debug.Log($"Phase 2: Adding {addedNodes.Count} nodes.\n");
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, markerFactory);
+            Debug.Log($"Phase 2: Finished.\n");
 
             ShowChangedNodes(changedNodes);
-            AnimateNodeChangeAsync(changedNodes, markerFactory).Forget();
-
-            try
-            {
-                //branchCity.ReDrawGraph();
-            }
-            catch (Exception e)
-            {
-                Debug.LogError(e);
-            }
+            Debug.Log($"Phase 3: Changing {changedNodes.Count} nodes.\n");
+            await AnimateNodeChangeAsync(changedNodes, newNodelayout, markerFactory);
+            Debug.Log($"Phase 3: Finished.\n");
 
             RemoveMarkerAsync().Forget();
         }
 
+        /// <summary>
+        /// If a game node with the ID of the given <paramref name="node"/> exists, it is returned.
+        /// Otherwise, a new game node is created and returned with the given <paramref name="node"/>
+        /// attached to it.
+        /// </summary>
+        /// <param name="node">node for which a game node is requested</param>
+        /// <returns>existing or new game node</returns>
+        private GameObject GetGameNode(Node node)
+        {
+            GameObject go = GraphElementIDMap.Find(node.ID, false);
+            if (go != null)
+            {
+                return go;
+            }
+            return branchCity.Renderer.DrawNode(node, branchCity.gameObject);
+        }
         /// <summary>
         /// Renders <paramref name="removedNodes"/> and destroys their game objects.
         /// </summary>
@@ -134,6 +167,7 @@ namespace SEE.Game.CityRendering
 
             void OnComplete(GameObject go)
             {
+                Debug.Log($"Node {go.name} is destroyed.\n");
                 deads.Remove(go);
                 Destroyer.Destroy(go);
             }
@@ -143,29 +177,83 @@ namespace SEE.Game.CityRendering
         /// Creates new game objects for <paramref name="addedNodes"/> and renders them.
         /// </summary>
         /// <param name="addedNodes">nodes to be added</param>
+        /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
         /// <param name="markerFactory">factory used to mark nodes as born</param>
         /// <returns>task</returns>
-        private async UniTask AnimateNodeBirthAsync(ISet<Node> addedNodes, MarkerFactory markerFactory)
+        private async UniTask AnimateNodeBirthAsync
+            (ISet<Node> addedNodes,
+             Dictionary<string, ILayoutNode> newNodelayout,
+             MarkerFactory markerFactory)
         {
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
-            // The object representing the city and having the <see cref="Portal"/> component.
-            GameObject city = branchCity.gameObject;
 
+            // The temporary parent object for the new nodes. A new node must have
+            // a parent object with a Portal component; otherwise the NodeOperator
+            // will not work. Later, we will set the correct parent of the new node.
+            GameObject parent = branchCity.gameObject.FirstChildNode();
+
+            // First create new game objects for the new nodes, mark them as born,
+            // and add the NodeOperator component to them. The NodeOperator will
+            // be enabled only at the end of the current frame. We cannot use it
+            // earlier.
             foreach (Node node in addedNodes)
             {
-                GameObject parent = branchCity.gameObject.FirstChildNode(); // FIXME
-                GameObject go = branchCity.Renderer.DrawNode(node, city);
+                GameObject go = GetGameNode(node);
+                go.transform.SetParent(parent.transform);
                 markerFactory.MarkBorn(go);
+                // We need the NodeOperator component to animate the birth of the node.
+                go.AddOrGetComponent<NodeOperator>();
                 births.Add(go);
-                ILayoutNode layoutNode = GetLayout(go, node, branchCity);
-                Add(go, layoutNode, parent);
+            }
+
+            // Let the frame be finished so that the node is really added to the scene
+            // and its NodeOperator component is enabled.
+            // Note: UniTask.Yield() works only while the game is playing.
+            Debug.Log($"UniTask.Yield: {Time.frameCount}\n");
+            if (Application.isPlaying)
+            {
+                await UniTask.Yield();
+            }
+            else
+            {
+                // In edit mode, we cannot yield. Hence, we just wait a bit.
+                // Schedule the next part of the function to run on the next editor update.
+                EditorApplication.delayCall += OnNextEditorUpdate;
+                await UniTask.WaitUntil(() => nextEditorUpdate);
+                nextEditorUpdate = false;
+            }
+            Debug.Log($"UniTask.Yield: {Time.frameCount}\n");
+
+            // Now we can animate the birth of the new nodes.
+            foreach (GameObject go in births)
+            {
+                // go.name and node.ID are the same.
+                ILayoutNode layoutNode = newNodelayout[go.name];
+                if (layoutNode != null)
+                {
+                    Add(go, layoutNode, parent);
+                }
+                else
+                {
+                    Debug.LogError($"No layout for node {go.name}.\n");
+                }
             }
 
             await UniTask.WaitUntil(() => births.Count == 0);
 
             void OnComplete(GameObject go)
             {
+                // Now set the correct parent of the new node.
+                Node node = go.GetNode();
+                if (!node.IsRoot())
+                {
+                    GameObject parent = GraphElementIDMap.Find(node.Parent.ID, false);
+                    if (parent != null)
+                    {
+                        go.transform.SetParent(parent.transform);
+                    }
+                }
                 births.Remove(go);
             }
 
@@ -184,27 +272,26 @@ namespace SEE.Game.CityRendering
                 Assert.IsNotNull(parent);
                 gameNode.transform.SetParent(parent.transform);
 
+                Debug.Log($"Animating birth of node {gameNode.name} by moving it to {layoutNode.CenterPosition}.\n");
                 gameNode.NodeOperator()
                         .MoveTo(layoutNode.CenterPosition, updateEdges: false)
                         .OnComplete(() => OnComplete(gameNode));
             }
         }
 
-        private ILayoutNode GetLayout(GameObject go, Node node, BranchCity branchCity)
-        {
-            // Center position of the table the city is standing on.
-            Vector3 centerPosition = branchCity.transform.parent.position;
-            centerPosition.y = AbstractSEECity.SkyLevel - 1;
-            LayoutGraphNode layoutNode = new(node)
-            {
-                CenterPosition = centerPosition,
-                AbsoluteScale = go.transform.localScale
-            };
+        static bool nextEditorUpdate = false;
 
-            return layoutNode;
+        private static void OnNextEditorUpdate()
+        {
+            Debug.Log($"OnNextEditorUpdate: {Time.frameCount}\n");
+            nextEditorUpdate = true;
+            EditorApplication.delayCall -= OnNextEditorUpdate;
         }
 
-        private async UniTask AnimateNodeChangeAsync(ISet<Node> changedNodes, MarkerFactory markerFactory)
+        private async UniTask AnimateNodeChangeAsync
+            (ISet<Node> changedNodes,
+             Dictionary<string, ILayoutNode> newNodelayout,
+             MarkerFactory markerFactory)
         {
             HashSet<GameObject> changed = new();
 
@@ -213,18 +300,24 @@ namespace SEE.Game.CityRendering
                 GameObject go = GraphElementIDMap.Find(node.ID, true);
                 if (go != null)
                 {
-                    markerFactory.MarkChanged(go);
-                    changed.Add(go);
+                    ILayoutNode layoutNode = newNodelayout[node.ID];
+                    if (layoutNode != null)
+                    {
+                        markerFactory.MarkChanged(go);
+                        changed.Add(go);
 
-                    // There is a change. It may or may not be the metric determining the style.
-                    // We will not further check that and just call the following method.
-                    // If there is no change, this method does not need to be called because then
-                    // we know that the metric values determining the style and antenna of the former
-                    // and the new graph node are the same.
-                    branchCity.Renderer.AdjustStyle(go);
-
-                    ILayoutNode layoutNode = null;
-                    ScaleTo(go, layoutNode);
+                        // There is a change. It may or may not be the metric determining the style.
+                        // We will not further check that and just call the following method.
+                        // If there is no change, this method does not need to be called because then
+                        // we know that the metric values determining the style and antenna of the former
+                        // and the new graph node are the same.
+                        branchCity.Renderer.AdjustStyle(go);
+                        ScaleTo(go, layoutNode);
+                    }
+                    else
+                    {
+                        Debug.LogError($"No layout for node {node.ID}.\n");
+                    }
                 }
             }
 
@@ -236,6 +329,9 @@ namespace SEE.Game.CityRendering
                 // is in local space. Our game objects may be nested in other game objects,
                 // hence, the two spaces may be different.
                 // We may need to transform layoutNode.LocalScale from world space to local space.
+                Assert.IsNotNull(gameNode);
+                Assert.IsNotNull(layoutNode);
+
                 Vector3 localScale = gameNode.transform.parent == null ?
                                          layoutNode.AbsoluteScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
@@ -248,8 +344,12 @@ namespace SEE.Game.CityRendering
 
             void OnComplete(GameObject go)
             {
+                if (go is GameObject gameNode)
+                {
+                    // branchCity.Renderer.AdjustAntenna(gameNode); FIXME
+                    markerFactory.AdjustMarkerY(gameNode);
+                }
                 changed.Remove(go);
-                Destroyer.Destroy(go);
             }
         }
 
@@ -299,8 +399,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         private async UniTaskVoid RemoveMarkerAsync()
         {
-            await Task.Delay(MarkerTime);
-            markerFactory.Clear();
+            // MarkerTime is in seconds, but Task.Delay expects milliseconds.
+            await Task.Delay(MarkerTime * 1000);
         }
 
         /// <summary>
