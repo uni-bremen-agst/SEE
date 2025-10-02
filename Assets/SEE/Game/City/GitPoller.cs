@@ -57,6 +57,12 @@ namespace SEE.Game.City
         /// </summary>
         public override void Start()
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning($"{nameof(GitPoller)} works only while the game is playing.\n");
+                return;
+            }
+
             base.Start();
 
             Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
