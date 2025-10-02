@@ -115,7 +115,7 @@ namespace SEE.UI.Window.PropertyWindow
                     }
                 }
                 Dictionary<string, object> attributes = new();
-                if (GraphElement.StringAttributes.Count > 0 & contextMenu.Filter.IncludeStringAttributes)
+                if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
                 {
                     foreach (KeyValuePair<string, string> pair in GraphElement.StringAttributes)
                     {

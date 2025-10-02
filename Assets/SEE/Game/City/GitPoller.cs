@@ -65,13 +65,12 @@ namespace SEE.Game.City
 
             base.Start();
 
-            Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
             if (Repository == null)
             {
                 Debug.Log("No watched repositories.\n");
                 return;
             }
-
+            Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
             timer.Elapsed += OnTimedEvent;
         }
 

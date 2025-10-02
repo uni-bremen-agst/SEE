@@ -31,7 +31,7 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 Dictionary<string, string> header = new()
                 {
-                    { "Name", author.Author.Name },
+                    { "Name", author != null ? author.Author.Name : "Unknown" },
                 };
                 // Data Attributes
                 Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);

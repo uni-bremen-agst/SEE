@@ -48,10 +48,11 @@ namespace SEE.GO
         /// <summary>
         /// Returns the first immediate child of <paramref name="gameObject"/> that
         /// is a graph node, i.e., has a <see cref="NodeRef"/> attached to it
-        /// (checked by predicate <see cref="IsNode(GameObject)"/>).
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>) or null if there
+        /// is none.
         /// </summary>
-        /// <param name="gameObject"></param>
-        /// <returns></returns>
+        /// <param name="gameObject">The game object whose child is to be retrieved</param>
+        /// <returns>first immediate child representing a node or null if there is none</returns>
         public static GameObject FirstChildNode(this GameObject gameObject)
         {
             foreach (Transform child in gameObject.transform)
