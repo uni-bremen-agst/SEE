@@ -99,6 +99,10 @@ namespace SEE.Game.Avatars
             {
                 aimingSystem.IsLocallyControlled = isLocalPlayer;
             }
+            if (gameObject.TryGetComponentOrLog(out BodyAnimator bodyAnimator))
+            {
+                bodyAnimator.IsLocallyControlled = isLocalPlayer;
+            }
         }
 
         /// <summary>
