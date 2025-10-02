@@ -8,10 +8,8 @@ using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
 using SEE.Utils;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using UnityEditor;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -210,20 +208,7 @@ namespace SEE.Game.CityRendering
             // Let the frame be finished so that the node is really added to the scene
             // and its NodeOperator component is enabled.
             // Note: UniTask.Yield() works only while the game is playing.
-            Debug.Log($"UniTask.Yield: {Time.frameCount}\n");
-            if (Application.isPlaying)
-            {
-                await UniTask.Yield();
-            }
-            else
-            {
-                // In edit mode, we cannot yield. Hence, we just wait a bit.
-                // Schedule the next part of the function to run on the next editor update.
-                EditorApplication.delayCall += OnNextEditorUpdate;
-                await UniTask.WaitUntil(() => nextEditorUpdate);
-                nextEditorUpdate = false;
-            }
-            Debug.Log($"UniTask.Yield: {Time.frameCount}\n");
+            await UniTask.Yield();
 
             // Now we can animate the birth of the new nodes.
             foreach (GameObject go in births)
@@ -277,15 +262,6 @@ namespace SEE.Game.CityRendering
                         .MoveTo(layoutNode.CenterPosition, updateEdges: false)
                         .OnComplete(() => OnComplete(gameNode));
             }
-        }
-
-        static bool nextEditorUpdate = false;
-
-        private static void OnNextEditorUpdate()
-        {
-            Debug.Log($"OnNextEditorUpdate: {Time.frameCount}\n");
-            nextEditorUpdate = true;
-            EditorApplication.delayCall -= OnNextEditorUpdate;
         }
 
         private async UniTask AnimateNodeChangeAsync
