@@ -49,7 +49,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// Removes an edge from the list of edges to authors of this specific file.
         /// </summary>
-        /// <param name="authorEdge">edge to be added</param>
+        /// <param name="authorEdge">edge to be removed</param>
         internal void Remove(AuthorEdge authorEdge)
         {
             if (edges.Remove(authorEdge))
