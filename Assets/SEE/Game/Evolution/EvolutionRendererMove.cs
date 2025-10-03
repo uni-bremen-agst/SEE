@@ -17,11 +17,16 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// Implements the second phase in the transition from the <see cref="currentCity"/>
-        /// to the <paramref name="nextCity"/>.
+        /// Implements the second phase in the transition from the current graph
+        /// to the <paramref name="next"/> one.
         /// In this phase, all existing nodes (nodes in both graphs, no matter whether they were
         /// changed or not) will be moved to their new location. When this phase has been
         /// completed, <see cref="Phase3AdjustExistingGraphElements"/> will be called eventually.
+        ///
+        /// We assume that the node layouter was aware of the size of the nodes when
+        /// calculating the layout for <paramref name="next"/>, so that resizing the
+        /// nodes in the later <see cref="Phase3AdjustExistingGraphElements"/> can
+        /// adjust the dimension without having to move the nodes again.
         ///
         /// Note: <paramref name="next"/> will be a graph for the previous revision of
         /// the currently drawn graph in the graph series when the evolution visualization

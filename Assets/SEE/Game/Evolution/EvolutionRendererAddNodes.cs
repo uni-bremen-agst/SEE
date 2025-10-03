@@ -15,8 +15,8 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// Implements the fourth phase in the transition from the <see cref="currentCity"/>
-        /// to the <paramref name="nextCity"/>.
+        /// Implements the fourth phase in the transition from the current graph
+        /// to the next one.
         /// In this phase, all <see cref="addedNodes"/> will be rendered by new game objects.
         /// When their animated appearance has finished, <see cref="Phase5AddNewEdges"/>
         /// will be called.

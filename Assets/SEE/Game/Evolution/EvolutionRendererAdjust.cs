@@ -16,10 +16,12 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// Implements the third phase in the transition from the <see cref="currentCity"/>
-        /// to the <paramref name="nextCity"/>.
+        /// Implements the third phase in the transition from the current graph
+        /// to the next one.
         /// In this phase, the scale and style of all existing nodes (nodes in both graphs,
-        /// no matter whether they were changed or not) will adjusted.
+        /// no matter whether they were changed or not) will be adjusted.
+        /// We also adjust unchanged nodes because the layout could have changed their
+        /// dimensions. The treemap layout, for instance, may do that.
         /// When this phase has been completed, <see cref="Phase4AddNewNodes"/>
         /// will be called.
         /// </summary>
@@ -63,10 +65,10 @@ namespace SEE.Game.Evolution
 
             void ScaleTo(GameObject gameNode, ILayoutNode layoutNode)
             {
-                // layoutNode.LocalScale is in world space, while the animation by iTween
+                // layoutNode.AbsoluteScale is in world space, while the animation by iTween
                 // is in local space. Our game objects may be nested in other game objects,
                 // hence, the two spaces may be different.
-                // We may need to transform layoutNode.LocalScale from world space to local space.
+                // We may need to transform layoutNode.AbsoluteScale from world space to local space.
                 Vector3 localScale = gameNode.transform.parent == null ?
                                          layoutNode.AbsoluteScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);

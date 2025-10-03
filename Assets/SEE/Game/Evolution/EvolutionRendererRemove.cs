@@ -16,8 +16,8 @@ namespace SEE.Game.Evolution
     public partial class EvolutionRenderer
     {
         /// <summary>
-        /// Implements the first phase of the transition from the <paramref name="current"/> graph to
-        /// the <paramref name="next"/> graph in which nodes and edges present in <paramref name="current"/>
+        /// Implements the first phase of the transition from the current graph to
+        /// the <paramref name="next"/> graph in which nodes and edges present in the current graph
         /// but not in <paramref name="next"/> (in other words, the deleted nodes and edges) are removed.
         /// When all animations triggered in this first phase have completed, execution will continue with
         /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
@@ -27,13 +27,18 @@ namespace SEE.Game.Evolution
         /// deletion of nodes and edges in <paramref name="current"/> but not in <paramref name="next"/>.
         /// Then the methods implementing this deletion will be called for each graph element to
         /// be deleted; these are <see cref="RenderRemovedNode(Node)"/> and <see cref="RenderRemovedEdge(Edge)"/>,
-        /// respectively. When the animation of the deletion triggered by these has finished, each
+        /// respectively. When the animations of the deletion triggered by these has finished, each
         /// will signal the <see cref="animationWatchDog"/> its completion. The <see cref="animationWatchDog"/>
-        /// awaits all outstanding deletions and then finally calls
+        /// awaits all outstanding deletions and--as soon as all animations have finished--then finally calls
         /// <see cref="Phase2MoveExistingGraphElements(LaidOutGraph)"/>.
         ///
+        /// The removed nodes and edges are animated by raising them to <see cref="AbstractSEECity.SkyLevel"/>.
+        /// Once they reach that level, they will be destroyed (see <see cref="OnRemoveFinishedAnimation(object)"/>),
+        /// more precisely, the game object representing the node or edge will be destroyed
+        /// but not the underlying graph element.
+        ///
         /// Note: <paramref name="next"/> will be a graph for the previous revision of
-        /// <paramref name="current"/> in the graph series when the evolution visualization
+        /// the current graph in the graph series when the evolution visualization
         /// is played backward.
         /// </summary>
         /// <param name="next">the next graph to be shown</param>
