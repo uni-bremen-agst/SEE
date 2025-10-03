@@ -597,9 +597,9 @@ namespace SEE.Game.Evolution
         private void OnAnimationsFinished()
         {
             Debug.Log("Animation cycle has finished.\n");
-            MarkNodes();
+            //MarkNodes();
             UpdateNodeChangeBuffer();
-            UpdateGameNodeHierarchy();
+            GameNodeHierarchy.Update(gameObject);
 
             LoadingSpinner.Hide(LoadingMessage);
             IsStillAnimating = false;
@@ -607,83 +607,6 @@ namespace SEE.Game.Evolution
 
             // We have made the transition to the next graph.
             currentCity = nextCity;
-
-            /// <summary>
-            /// Updates the hierarchy of game nodes so that it is isomorphic to the node
-            /// hierarchy of the underlying graph.
-            /// </summary>
-            void UpdateGameNodeHierarchy()
-            {
-                Dictionary<Node, GameObject> nodeMap = new();
-                CollectNodes(gameObject, nodeMap);
-                //Check(nodeMap);
-                GraphRenderer.CreateGameNodeHierarchy(nodeMap, gameObject);
-
-                /// <summary>
-                /// Collects all graph nodes and their corresponding game nodes that are (transitive)
-                /// descendants of <paramref name="root"/>. The result is added to <paramref name="nodeMap"/>,
-                /// where the <paramref name="root"/> itself will not be added.
-                /// </summary>
-                /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
-                /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
-                /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
-                static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
-                {
-                    if (root != null)
-                    {
-                        foreach (Transform childTransform in root.transform)
-                        {
-                            GameObject child = childTransform.gameObject;
-                            /// If a game node was deleted, it was marked inactive in
-                            /// <see cref="OnRemoveFinishedAnimation"/>. We need to ignore such
-                            /// game nodes.
-                            if (child.activeInHierarchy && child.CompareTag(Tags.Node))
-                            {
-                                if (child.TryGetNodeRef(out NodeRef nodeRef))
-                                {
-                                    nodeMap[nodeRef.Value] = child;
-                                    CollectNodes(child, nodeMap);
-                                }
-                                else
-                                {
-                                    throw new Exception($"Game node {child.name} without valid node reference.");
-                                }
-                            }
-                        }
-                    }
-                }
-
-                /// <summary>
-                /// Checks whether all graph nodes and game nodes in <paramref name="nodeMap"/> are
-                /// members of the same graph. Emits warnings and asserts that they are all in
-                /// the same graph.
-                /// Used only for debugging.
-                /// </summary>
-                /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
-                static void Check(Dictionary<Node, GameObject> nodeMap)
-                {
-                    HashSet<Graph> graphs = new();
-
-                    foreach (GameObject go in nodeMap.Values)
-                    {
-                        graphs.Add(go.GetNode().ItsGraph);
-                    }
-                    foreach (Node node in nodeMap.Keys)
-                    {
-                        graphs.Add(node.ItsGraph);
-                    }
-                    if (graphs.Count > 1)
-                    {
-                        Debug.LogError("There are nodes from different graphs in the same game-node hierarchy!\n");
-                        foreach (GameObject go in nodeMap.Values)
-                        {
-                            Node node = go.GetNode();
-                            Debug.LogWarning($"Node {node.ID} contained in graph {node.ItsGraph.Name} from file {node.ItsGraph.Path}\n");
-                        }
-                    }
-                    Assert.AreEqual(1, graphs.Count);
-                }
-            }
 
             /// <summary>
             /// Updates <see cref="NodeChangesBuffer"/> with the <see cref="addedNodes"/>,
@@ -1005,6 +928,14 @@ namespace SEE.Game.Evolution
         public ICollection<LayoutGraphEdge<T>> LayoutEdges<T>(ICollection<T> layoutNodes) where T : AbstractLayoutNode
         {
             return Renderer.LayoutEdges(layoutNodes);
+        }
+
+        /// <summary>
+        /// Implements <see cref="IGraphRenderer.AdjustAntenna(GameObject)"/>.
+        /// </summary>
+        public void AdjustAntenna(GameObject gameNode)
+        {
+            Renderer.AdjustAntenna(gameNode);
         }
     }
 }
