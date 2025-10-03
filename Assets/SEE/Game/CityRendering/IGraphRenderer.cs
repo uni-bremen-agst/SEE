@@ -109,5 +109,13 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
         void AdjustScaleOfLeaf(GameObject gameNode);
+
+        /// <summary>
+        /// Adjusts the antenna of the given <paramref name="gameNode"/> according
+        /// to the metric value of the graph node attached to <paramref name="gameNode"/>
+        /// chosen to determine antenna segments.
+        /// </summary>
+        /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
+        void AdjustAntenna(GameObject gameNode);
     }
 }
