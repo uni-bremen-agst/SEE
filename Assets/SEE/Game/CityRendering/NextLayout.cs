@@ -79,7 +79,19 @@ namespace SEE.Game.CityRendering
 
             // Calculate and apply the node layout.
             Debug.Log($"Calculating node layout {nodeLayout.GetType().Name} for {gameObjects.Count} nodes.\n");
-            ICollection<LayoutGraphNode> layoutNodes = ToLayoutNodes(gameObjects);
+
+            // ICollection<LayoutGraphNode> layoutNodes = ToLayoutNodes(gameObjects);
+            ICollection<LayoutGraphNode> layoutNodes
+                = GraphRenderer.ToLayoutNodes<LayoutGraphNode>
+                    (gameObjects,
+                     (Node node, GameObject gameNode) =>
+                         new(node)
+                         {
+                            // We must transfer the scale from gameNode to layoutNode.
+                            // Rotation and CenterPosition are all zero. They will be computed by the layout,
+                            AbsoluteScale = gameNode.transform.lossyScale
+                         }).Values;
+
             NodeLayout.Apply(nodeLayout.Create(layoutNodes, city.transform.position,
                                                new Vector2(city.transform.lossyScale.x,
                                                            city.transform.lossyScale.z)));
@@ -108,59 +120,6 @@ namespace SEE.Game.CityRendering
             // Anyhow, we do not need to apply the layout already now. That can be deferred
             // to the point in time when the city is actually visualized. Here, we just calculate
             // the layout for every graph in the graph series for later use.
-        }
-
-        /// <summary>
-        /// Yields the collection of <see cref="LayoutGraphNode"/>s corresponding to the given <paramref name="gameNodes"/>.
-        /// Each <see cref="LayoutGraphNode"/> has the position, scale, and rotation of the game node. The graph node
-        /// attached to the game node is passed on to the <see cref="LayoutGraphNode"/> so that the graph node data is
-        /// available to the node layout (e.g., Parent or Children).
-        /// Sets also the node levels of all resulting <see cref="LayoutGraphNode"/>.
-        /// </summary>
-        /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
-        /// <returns>collection of <see cref="LayoutGraphNode"/>s representing the information
-        /// of <paramref name="gameNodes"/> for layouting</returns>
-        /// <remarks>This method is similar <see cref="GraphRenderer.ToLayoutNodes(ICollection{GameObject})"/>
-        private static ICollection<LayoutGraphNode> ToLayoutNodes(ICollection<GameObject> gameNodes)
-        {
-            Dictionary<Node, LayoutGraphNode> result = new(gameNodes.Count);
-
-            foreach (GameObject gameNode in gameNodes)
-            {
-                if (gameNode.TryGetNode(out Node node))
-                {
-                    LayoutGraphNode layoutNode = new(node)
-                    {
-                        // We must transfer the scale from gameObject to layoutNode.
-                        // but the layout needs the game object's scale.
-                        // Rotation and CenterPosition are all zero. They will be computed by the layout,
-                        // Note: LayoutGraphNode does not make a distinction between local and absolute scale.
-                        AbsoluteScale = gameNode.transform.lossyScale
-                    };
-
-                    result[node] = layoutNode;
-                }
-            }
-
-            // Now set the children of every layout node.
-            foreach (var item in result)
-            {
-                Node parent = item.Key;
-                LayoutGraphNode layoutNode = item.Value;
-                foreach (Node child in parent.Children())
-                {
-                    if (result.TryGetValue(child, out LayoutGraphNode layoutChild))
-                    {
-                        layoutNode.AddChild(layoutChild);
-                    }
-                    else
-                    {
-                        throw new Exception($"Child node {child.ID} of node {parent.ID} not found.");
-                    }
-                }
-            }
-            LayoutNodes.SetLevels(result.Values);
-            return result.Values;
         }
 
         /// <summary>
