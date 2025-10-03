@@ -306,7 +306,7 @@ namespace SEE.Game.CityRendering
             }
 
             // The representation of the nodes for the layout.
-            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values, (n, go) => new LayoutGameNode(go));
+            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values, NewLayoutNode);
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
@@ -383,6 +383,17 @@ namespace SEE.Game.CityRendering
                     Debug.Log($"Artificial unique root {artificialRoot.ID} was added.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="LayoutGameNode"/> for the given <paramref name="go"/>.
+        /// </summary>
+        /// <param name="node">ignored</param>
+        /// <param name="go">the game object for which to create the <see cref="LayoutGameNode"/></param>
+        /// <returns>new <see cref="LayoutGameNode"/> for the given <paramref name="go"/></returns>
+        private LayoutGameNode NewLayoutNode(Node node, GameObject go)
+        {
+            return new LayoutGameNode(go);
         }
 
         /// <summary>
