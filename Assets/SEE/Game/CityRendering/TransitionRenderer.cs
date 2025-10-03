@@ -2,6 +2,7 @@ using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Game.Operator;
+using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
@@ -9,7 +10,6 @@ using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -93,7 +93,14 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> addedNodes,
                 out ISet<Node> removedNodes,
                 out ISet<Node> changedNodes,
-                out _);
+                out ISet<Node> equalNodes);
+
+            // Before we can calculate the new layout, we must ensure that all game nodes
+            // representing nodes that are still present in the new graph are reattached
+            // so that their metrics are up to date. These are needed to determine the
+            // dimensions of the nodes in the new layout.
+            equalNodes.UnionWith(changedNodes);
+            ReattachNodes(equalNodes);
 
             NextLayout.Calculate(branchCity.LoadedGraph,
                                  GetGameNode,
@@ -103,24 +110,40 @@ namespace SEE.Game.CityRendering
                                  out Dictionary<string, ILayoutNode> newNodelayout,
                                  out _,
                                  ref oldLayout);
-            // Note: At this point game nodes for new nodes have been created already.
+            // Note: At this point, game nodes for new nodes have been created already.
+            // Their NodeRefs refer to nodes in the newly loaded graph.
+            // The removedNodes, changedNodes, and equalNodes have NodeRefs still
+            // referencing nodes in the oldGraph.
+            // That is no problem for removedNodes as these will be removed anyway.
+            // Yet, we need to update the game nodes with NodeRefs to all changedNodes
+            // and equalNodes.
 
             ShowRemovedNodes(removedNodes);
             Debug.Log($"Phase 1: Removing {removedNodes.Count} nodes.\n");
             await AnimateNodeDeathAsync(removedNodes, markerFactory);
             Debug.Log($"Phase 1: Finished.\n");
 
-            ShowAddedNodes(addedNodes);
-            Debug.Log($"Phase 2: Adding {addedNodes.Count} nodes.\n");
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, markerFactory);
+            Debug.Log($"Phase 2: Moving {removedNodes.Count} nodes.\n");
+            await AnimateNodeMoveAsync(equalNodes, newNodelayout, branchCity.transform);
             Debug.Log($"Phase 2: Finished.\n");
 
             ShowChangedNodes(changedNodes);
-            Debug.Log($"Phase 3: Changing {changedNodes.Count} nodes.\n");
-            await AnimateNodeChangeAsync(changedNodes, newNodelayout, markerFactory);
+            // Even the equal nodes need adjustments because the layout could have
+            // changed their dimensions. The treemap layout, for instance, may do that.
+            // Note that equalNodes is the union of the really equal nodes passed initially
+            // as a parameter and the changedNodes.
+            Debug.Log($"Phase 3: Changing {equalNodes.Count} nodes.\n");
+            await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory);
             Debug.Log($"Phase 3: Finished.\n");
 
-            RemoveMarkerAsync().Forget();
+            ShowAddedNodes(addedNodes);
+            Debug.Log($"Phase 4: Adding {addedNodes.Count} nodes.\n");
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, markerFactory);
+            Debug.Log($"Phase 4: Finished.\n");
+
+            GameNodeHierarchy.Update(branchCity.gameObject);
+            // FIXME: We need to scale the city as a whole so that it fits into the allotted space.
+            // FIXME: Update all author references.
         }
 
         /// <summary>
@@ -189,6 +212,8 @@ namespace SEE.Game.CityRendering
             // The temporary parent object for the new nodes. A new node must have
             // a parent object with a Portal component; otherwise the NodeOperator
             // will not work. Later, we will set the correct parent of the new node.
+            // At this time, the code city should have at least the (unique) root game
+            // node.
             GameObject parent = branchCity.gameObject.FirstChildNode();
 
             // First create new game objects for the new nodes, mark them as born,
@@ -264,14 +289,41 @@ namespace SEE.Game.CityRendering
             }
         }
 
-        private async UniTask AnimateNodeChangeAsync
-            (ISet<Node> changedNodes,
-             Dictionary<string, ILayoutNode> newNodelayout,
-             MarkerFactory markerFactory)
+        /// <summary>
+        /// Reattaches the given <paramref name="nodes"/> to their corresponding game nodes.
+        /// </summary>
+        /// <param name="nodes">graph nodes to be reattached</param>
+        private void ReattachNodes(ISet<Node> nodes)
         {
-            HashSet<GameObject> changed = new();
+            foreach (Node node in nodes)
+            {
+                GameObject go = GraphElementIDMap.Find(node.ID, true);
+                if (go != null)
+                {
+                    GraphElementReattacher.ReattachNode(go, node);
+                }
+            }
+        }
 
-            foreach (Node node in changedNodes)
+        /// <summary>
+        /// Animates the move of <paramref name="movedNodes"/> to their new positions
+        /// according to <paramref name="newNodelayout"/>. All moved nodes will be
+        /// temporarily re-parented to <paramref name="cityTransform"/> so that
+        /// the <see cref="NodeOperator"/> can move them individually.
+        /// </summary>
+        /// <param name="movedNodes">game nodes to be moved</param>
+        /// <param name="newNodelayout">new positions</param>
+        /// <param name="cityTransform">temporary parent representing the code city
+        /// as a whole</param>
+        /// <returns>task</returns>
+        private async UniTask AnimateNodeMoveAsync
+                                (ISet<Node> movedNodes,
+                                 Dictionary<string, ILayoutNode> newNodelayout,
+                                 Transform cityTransform)
+        {
+            HashSet<GameObject> moved = new();
+
+            foreach (Node node in movedNodes)
             {
                 GameObject go = GraphElementIDMap.Find(node.ID, true);
                 if (go != null)
@@ -279,7 +331,68 @@ namespace SEE.Game.CityRendering
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
-                        markerFactory.MarkChanged(go);
+                        // We want the animator to move each node separately, which is why we
+                        // remove each from the hierarchy; later the node hierarchy will be
+                        // re-established. It still needs to be a child of the code city,
+                        // however, because methods called in the course of the animation
+                        // will try to retrieve the code city from the game node.
+                        go.transform.SetParent(cityTransform);
+
+                        moved.Add(go);
+                        // Move the node to its new position.
+                        go.NodeOperator()
+                          .MoveTo(layoutNode.CenterPosition, updateEdges: false)
+                          .OnComplete(() => OnComplete(go));
+                    }
+                    else
+                    {
+                        Debug.LogError($"No layout for node {node.ID}.\n");
+                    }
+                }
+            }
+            await UniTask.WaitUntil(() => moved.Count == 0);
+
+            void OnComplete(GameObject go)
+            {
+                moved.Remove(go);
+            }
+        }
+
+        /// <summary>
+        /// Animates the change of <paramref name="nodesToAdjust"/> to their new
+        /// scale and style. The nodes in <paramref name="changedNodes"/> will
+        /// be marked as changed using <paramref name="markerFactory"/>.
+        ///
+        /// </summary>
+        /// <param name="nodesToAdjust">nodes whose dimensions, dimensions, and
+        /// markers need to be adjusted; we assume <paramref name="changedNodes"/>
+        /// is a subset of <paramref name="nodesToAdjust"/></param>
+        /// <param name="changedNodes">nodes to be marked for a change</param>
+        /// <param name="newNodelayout">new layout determining the new scale</param>
+        /// <param name="markerFactory">factory for marking as changed</param>
+        /// <returns>task</returns>
+        private async UniTask AnimateNodeChangeAsync
+            (ISet<Node> nodesToAdjust,
+             ISet<Node> changedNodes,
+             Dictionary<string, ILayoutNode> newNodelayout,
+             MarkerFactory markerFactory)
+        {
+            HashSet<GameObject> changed = new();
+
+            foreach (Node node in nodesToAdjust)
+            {
+                GameObject go = GraphElementIDMap.Find(node.ID, true);
+                if (go != null)
+                {
+                    ILayoutNode layoutNode = newNodelayout[node.ID];
+                    if (layoutNode != null)
+                    {
+                        // Apply MarkChanged only to the really changed nodes.
+                        // nodesToAdjust is the union of changedNodes and equalNodes.
+                        if (changedNodes.Contains(node))
+                        {
+                            markerFactory.MarkChanged(go);
+                        }
                         changed.Add(go);
 
                         // There is a change. It may or may not be the metric determining the style.
@@ -301,10 +414,10 @@ namespace SEE.Game.CityRendering
 
             void ScaleTo(GameObject gameNode, ILayoutNode layoutNode)
             {
-                // layoutNode.LocalScale is in world space, while the animation by iTween
+                // layoutNode.AbsoluteScale is in world space, while the animation by iTween
                 // is in local space. Our game objects may be nested in other game objects,
                 // hence, the two spaces may be different.
-                // We may need to transform layoutNode.LocalScale from world space to local space.
+                // We may need to transform layoutNode.AbsoluteScale from world space to local space.
                 Assert.IsNotNull(gameNode);
                 Assert.IsNotNull(layoutNode);
 
@@ -320,11 +433,10 @@ namespace SEE.Game.CityRendering
 
             void OnComplete(GameObject go)
             {
-                if (go is GameObject gameNode)
-                {
-                    // branchCity.Renderer.AdjustAntenna(gameNode); FIXME
-                    markerFactory.AdjustMarkerY(gameNode);
-                }
+                // Adjust the antenna and marker position after the scaling has finished;
+                // otherwise they would be scaling along with their parent.
+                branchCity.Renderer.AdjustAntenna(go);
+                markerFactory.AdjustMarkerY(go);
                 changed.Remove(go);
             }
         }
@@ -368,15 +480,6 @@ namespace SEE.Game.CityRendering
             {
                 ShowNotification.Info("File changed", $"File {node.ID} was changed.");
             }
-        }
-
-        /// <summary>
-        /// Removes all markers after <see cref="MarkerTime"/> seconds.
-        /// </summary>
-        private async UniTaskVoid RemoveMarkerAsync()
-        {
-            // MarkerTime is in seconds, but Task.Delay expects milliseconds.
-            await Task.Delay(MarkerTime * 1000);
         }
 
         /// <summary>
