@@ -201,7 +201,6 @@ namespace SEE.GO
         /// [0, <see cref="NumberOfMaterials"/> - 1].
         /// </summary>
         /// <param name="renderer">renderer whose shared material is to be set</param>
-        /// <param name="renderQueueOffset">the offset in the render queue</param>
         /// <param name="index">the index of the material</param>
         public void SetSharedMaterial(Renderer renderer, int index)
         {
