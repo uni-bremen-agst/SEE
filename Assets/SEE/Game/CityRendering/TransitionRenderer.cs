@@ -52,6 +52,15 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Renders the transition when new commits were detected.
+        /// This method is used as a delegate for <see cref="GitPoller.OnChangeDetected"/>.
+        /// </summary>
+        private void Render()
+        {
+            RenderAsync().Forget();
+        }
+
+        /// <summary>
         /// The poller notifying when there are changes.
         /// </summary>
         private readonly GitPoller poller;
@@ -63,18 +72,9 @@ namespace SEE.Game.CityRendering
         private readonly BranchCity branchCity;
 
         /// <summary>
-        /// MarkerFactory for generating node markers.
+        /// <see cref="MarkerFactory"> for generating node markers.
         /// </summary>
         private readonly MarkerFactory markerFactory;
-
-        /// <summary>
-        /// Renders the transition when new commits were detected.
-        /// This method is used as a delegate for <see cref="GitPoller.OnChangeDetected"/>.
-        /// </summary>
-        private void Render()
-        {
-            RenderAsync().Forget();
-        }
 
         /// <summary>
         /// The last calculated <see cref="NodeLayout"/> (needed for incremental layouts).
