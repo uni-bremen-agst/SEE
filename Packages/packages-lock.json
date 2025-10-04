@@ -47,14 +47,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.7",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.11",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "acd5392f98c21794d16ed776d1dae953318d874e"
+      "hash": "418da38db7660aeace39d62b620a6366ce1a8b15"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -338,7 +338,7 @@
       }
     },
     "com.unity.xr.core-utils": {
-      "version": "2.5.2",
+      "version": "2.5.3",
       "depth": 1,
       "source": "registry",
       "dependencies": {
@@ -386,7 +386,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.openxr": {
-      "version": "1.14.3",
+      "version": "1.15.1",
       "depth": 0,
       "source": "registry",
       "dependencies": {
