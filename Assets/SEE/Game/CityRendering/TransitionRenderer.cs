@@ -10,6 +10,7 @@ using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -90,10 +91,10 @@ namespace SEE.Game.CityRendering
                 (g, id) => g.GetNode(id),
                 GraphExtensions.AttributeDiff(branchCity.LoadedGraph, oldGraph),
                 nodeEqualityComparer,
-                out ISet<Node> addedNodes,
-                out ISet<Node> removedNodes,
-                out ISet<Node> changedNodes,
-                out ISet<Node> equalNodes);
+                out ISet<Node> addedNodes,   // nodes belong to LoadedGraph
+                out ISet<Node> removedNodes, // nodes belong to oldGraph
+                out ISet<Node> changedNodes, // nodes belong to LoadedGraph
+                out ISet<Node> equalNodes);  // nodes belong to LoadedGraph
 
             // Before we can calculate the new layout, we must ensure that all game nodes
             // representing nodes that are still present in the new graph are reattached
@@ -123,7 +124,7 @@ namespace SEE.Game.CityRendering
             await AnimateNodeDeathAsync(removedNodes, markerFactory);
             Debug.Log($"Phase 1: Finished.\n");
 
-            Debug.Log($"Phase 2: Moving {removedNodes.Count} nodes.\n");
+            Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
             await AnimateNodeMoveAsync(equalNodes, newNodelayout, branchCity.transform);
             Debug.Log($"Phase 2: Finished.\n");
 
@@ -132,7 +133,7 @@ namespace SEE.Game.CityRendering
             // changed their dimensions. The treemap layout, for instance, may do that.
             // Note that equalNodes is the union of the really equal nodes passed initially
             // as a parameter and the changedNodes.
-            Debug.Log($"Phase 3: Changing {equalNodes.Count} nodes.\n");
+            Debug.Log($"Phase 3: Changing {changedNodes.Count} nodes.\n");
             await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory);
             Debug.Log($"Phase 3: Finished.\n");
 
@@ -162,6 +163,7 @@ namespace SEE.Game.CityRendering
             }
             return branchCity.Renderer.DrawNode(node, branchCity.gameObject);
         }
+
         /// <summary>
         /// Renders <paramref name="removedNodes"/> and destroys their game objects.
         /// </summary>
@@ -179,8 +181,9 @@ namespace SEE.Game.CityRendering
                 {
                     deads.Add(go);
                     markerFactory.MarkDead(go);
-                    NodeOperator nodeOperator = go.NodeOperator();
-                    nodeOperator.MoveYTo(AbstractSEECity.SkyLevel).OnComplete(() => OnComplete(go));
+                    IOperationCallback<System.Action> animation = go.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel);
+                    animation.OnComplete(() => OnComplete(go));
+                    animation.OnKill(() => OnComplete(go));
                 }
             }
 
@@ -188,7 +191,6 @@ namespace SEE.Game.CityRendering
 
             void OnComplete(GameObject go)
             {
-                Debug.Log($"Node {go.name} is destroyed.\n");
                 deads.Remove(go);
                 Destroyer.Destroy(go);
             }
@@ -282,17 +284,19 @@ namespace SEE.Game.CityRendering
                 Assert.IsNotNull(parent);
                 gameNode.transform.SetParent(parent.transform);
 
-                Debug.Log($"Animating birth of node {gameNode.name} by moving it to {layoutNode.CenterPosition}.\n");
-                gameNode.NodeOperator()
-                        .MoveTo(layoutNode.CenterPosition, updateEdges: false)
-                        .OnComplete(() => OnComplete(gameNode));
+                IOperationCallback<System.Action> animation = gameNode.NodeOperator()
+                        .MoveTo(layoutNode.CenterPosition, updateEdges: false);
+                animation.OnComplete(() => OnComplete(gameNode));
+                animation.OnKill(() => OnComplete(gameNode));
             }
         }
 
         /// <summary>
         /// Reattaches the given <paramref name="nodes"/> to their corresponding game nodes.
+        /// The nodes belong to the new graph but have corresponding game nodes still representing
+        /// the same nodes (according to the ID) of the former graph.
         /// </summary>
-        /// <param name="nodes">graph nodes to be reattached</param>
+        /// <param name="nodes">graph nodes of the new graph to be reattached</param>
         private void ReattachNodes(ISet<Node> nodes)
         {
             foreach (Node node in nodes)
@@ -331,18 +335,22 @@ namespace SEE.Game.CityRendering
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
-                        // We want the animator to move each node separately, which is why we
-                        // remove each from the hierarchy; later the node hierarchy will be
-                        // re-established. It still needs to be a child of the code city,
-                        // however, because methods called in the course of the animation
-                        // will try to retrieve the code city from the game node.
-                        go.transform.SetParent(cityTransform);
+                        if (PositionHasChanged(go, layoutNode))
+                        {
+                            // We want the animator to move each node separately, which is why we
+                            // remove each from the hierarchy; later the node hierarchy will be
+                            // re-established. It still needs to be a child of the code city,
+                            // however, because methods called in the course of the animation
+                            // will try to retrieve the code city from the game node.
+                            go.transform.SetParent(cityTransform);
 
-                        moved.Add(go);
-                        // Move the node to its new position.
-                        go.NodeOperator()
-                          .MoveTo(layoutNode.CenterPosition, updateEdges: false)
-                          .OnComplete(() => OnComplete(go));
+                            moved.Add(go);
+                            // Move the node to its new position.
+                            IOperationCallback<System.Action> animation = go.NodeOperator()
+                              .MoveTo(layoutNode.CenterPosition, updateEdges: false);
+                            animation.OnComplete(() => OnComplete(go));
+                            animation.OnKill(() => OnComplete(go));
+                        }
                     }
                     else
                     {
@@ -352,9 +360,23 @@ namespace SEE.Game.CityRendering
             }
             await UniTask.WaitUntil(() => moved.Count == 0);
 
+            // True if the position of the given game object has actually changed
+            // by a relevant margin.
+            bool PositionHasChanged(GameObject go, ILayoutNode layoutNode)
+            {
+                Vector3 currentPosition = go.transform.position;
+                Vector3 newPosition = layoutNode.CenterPosition;
+                return Vector3.Distance(currentPosition, newPosition) > 0.001f;
+            }
+
             void OnComplete(GameObject go)
             {
                 moved.Remove(go);
+                Debug.Log($"Moved {go.name}. Awaiting {moved.Count} other nodes.\n");
+                if (moved.Count == 1)
+                {
+                   Debug.Log($"Last node to be moved: {moved.ToList().First().name}.\n");
+                }
             }
         }
 
