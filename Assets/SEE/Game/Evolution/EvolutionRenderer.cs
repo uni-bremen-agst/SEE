@@ -597,7 +597,7 @@ namespace SEE.Game.Evolution
         private void OnAnimationsFinished()
         {
             Debug.Log("Animation cycle has finished.\n");
-            //MarkNodes();
+            MarkNodes();
             UpdateNodeChangeBuffer();
             GameNodeHierarchy.Update(gameObject);
 
@@ -622,7 +622,7 @@ namespace SEE.Game.Evolution
             }
 
             /// <summary>
-            /// Markes all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
+            /// Marks all <see cref="addedNodes"/> and <see cref="changedNodes"/>.
             /// </summary>
             void MarkNodes()
             {
