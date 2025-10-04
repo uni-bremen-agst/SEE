@@ -57,6 +57,17 @@ namespace SEE.Game.CityRendering
         private readonly GitPoller poller;
 
         /// <summary>
+        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
+        /// was executed and which should be updated when a new commit is detected.
+        /// </summary>
+        private readonly BranchCity branchCity;
+
+        /// <summary>
+        /// MarkerFactory for generating node markers.
+        /// </summary>
+        private readonly MarkerFactory markerFactory;
+
+        /// <summary>
         /// Renders the transition when new commits were detected.
         /// This method is used as a delegate for <see cref="GitPoller.OnChangeDetected"/>.
         /// </summary>
@@ -503,17 +514,6 @@ namespace SEE.Game.CityRendering
                 ShowNotification.Info("File changed", $"File {node.ID} was changed.");
             }
         }
-
-        /// <summary>
-        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
-        /// was executed and which should be updated when a new commit is detected.
-        /// </summary>
-        private readonly BranchCity branchCity;
-
-        /// <summary>
-        /// MarkerFactory for generating node markers.
-        /// </summary>
-        private readonly MarkerFactory markerFactory;
 
         /// <summary>
         /// Shows a message to the user that a new commit was detected.
