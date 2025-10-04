@@ -150,12 +150,29 @@ namespace SEE.Game.CityRendering
 
             ShowAddedNodes(addedNodes);
             Debug.Log($"Phase 4: Adding {addedNodes.Count} nodes.\n");
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, markerFactory);
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout);
             Debug.Log($"Phase 4: Finished.\n");
 
             GameNodeHierarchy.Update(branchCity.gameObject);
-            // FIXME: We need to scale the city as a whole so that it fits into the allotted space.
+
+            MarkNodes(addedNodes, changedNodes);
             // FIXME: Update all author references.
+        }
+
+        /// <summary>
+        /// Marks all <paramref name="addedNodes"/> as born and all <paramref name="changedNodes"/>
+        /// as changed using <see cref="markerFactory"/>.
+        /// </summary>
+        void MarkNodes(ISet<Node> addedNodes, ISet<Node> changedNodes)
+        {
+            foreach (Node node in addedNodes)
+            {
+                markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+            }
+            foreach (Node node in changedNodes)
+            {
+                markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+            }
         }
 
         /// <summary>
@@ -212,12 +229,10 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="addedNodes">nodes to be added</param>
         /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
-        /// <param name="markerFactory">factory used to mark nodes as born</param>
         /// <returns>task</returns>
         private async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
-             Dictionary<string, ILayoutNode> newNodelayout,
-             MarkerFactory markerFactory)
+             Dictionary<string, ILayoutNode> newNodelayout)
         {
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
@@ -237,7 +252,6 @@ namespace SEE.Game.CityRendering
             {
                 GameObject go = GetGameNode(node);
                 go.transform.SetParent(parent.transform);
-                markerFactory.MarkBorn(go);
                 // We need the NodeOperator component to animate the birth of the node.
                 go.AddOrGetComponent<NodeOperator>();
                 births.Add(go);
@@ -383,11 +397,6 @@ namespace SEE.Game.CityRendering
             void OnComplete(GameObject go)
             {
                 moved.Remove(go);
-                Debug.Log($"Moved {go.name}. Awaiting {moved.Count} other nodes.\n");
-                if (moved.Count == 1)
-                {
-                   Debug.Log($"Last node to be moved: {moved.ToList().First().name}.\n");
-                }
             }
         }
 
@@ -424,16 +433,16 @@ namespace SEE.Game.CityRendering
                         // nodesToAdjust is the union of changedNodes and equalNodes.
                         if (changedNodes.Contains(node))
                         {
-                            markerFactory.MarkChanged(go);
+                            // There is a change. It may or may not be the metric determining the style.
+                            // We will not further check that and just call the following method.
+                            // If there is no change, this method does not need to be called because then
+                            // we know that the metric values determining the styles of the former
+                            // and the new graph node are the same. A style may include color, material,
+                            // and other visual properties of the node itself, exluding size and decorations
+                            // such as antenna and marker.
+                            branchCity.Renderer.AdjustStyle(go);
                         }
                         changed.Add(go);
-
-                        // There is a change. It may or may not be the metric determining the style.
-                        // We will not further check that and just call the following method.
-                        // If there is no change, this method does not need to be called because then
-                        // we know that the metric values determining the style and antenna of the former
-                        // and the new graph node are the same.
-                        branchCity.Renderer.AdjustStyle(go);
                         ScaleTo(go, layoutNode);
                     }
                     else
@@ -458,17 +467,23 @@ namespace SEE.Game.CityRendering
                                          layoutNode.AbsoluteScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
 
-                gameNode.NodeOperator()
-                        .ScaleTo(localScale, updateEdges: false)
-                        .OnComplete(() => OnComplete(gameNode));
-
+                IOperationCallback<System.Action> animation = gameNode.NodeOperator()
+                        .ScaleTo(localScale, updateEdges: false);
+                animation.OnComplete(() => OnComplete(gameNode));
+                animation.OnKill(() => OnComplete(gameNode));
             }
 
             void OnComplete(GameObject go)
             {
                 // Adjust the antenna and marker position after the scaling has finished;
                 // otherwise they would be scaling along with their parent.
-                branchCity.Renderer.AdjustAntenna(go);
+                if (changedNodes.Contains(go.GetNode()))
+                {
+                    // The adjustment of the antenna is needed only if the node has changed.
+                    // Similarly to the adjustment of the style, we do not check whether
+                    // the metrics determining the antenna have changed or not.
+                    branchCity.Renderer.AdjustAntenna(go);
+                }
                 markerFactory.AdjustMarkerY(go);
                 changed.Remove(go);
             }
