@@ -92,7 +92,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Adjusts the style of the given <paramref name="gameNode"/> according
         /// to the metric value of the graph node attached to <paramref name="gameNode"/>
-        /// chosen to determine style.
+        /// chosen to determine style. A style may include color, material, and other visual
+        /// properties.
         /// </summary>
         /// <param name="gameNode">a game node representing a leaf or inner graph node</param>
         public void AdjustStyle(GameObject gameNode);
