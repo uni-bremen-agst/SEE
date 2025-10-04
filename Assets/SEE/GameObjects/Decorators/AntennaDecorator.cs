@@ -89,7 +89,7 @@ namespace SEE.GO.Decorators
 
             // The empty antenna object that will be the parent of all
             // antenna segments. It will be created on demand, that is,
-            // if we have at least on antenna segment.
+            // if we have at least one antenna segment.
             GameObject antenna = null;
             Node node = gameNode.GetNode();
 
