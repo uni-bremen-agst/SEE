@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using SEE.GO;
 using SEE.Utils;
@@ -5,6 +6,18 @@ using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
+    /// <summary>
+    /// Detail level determines what visual information is shown for a node.
+    /// Calculated from both camera distance and zoom factor.
+    /// </summary>
+    public enum DetailLevel
+    {
+        Overview,  // Far away or zoomed out - minimal detail
+        Basic,     // Medium distance or some zoom - show basic info
+        Medium,    // Close or good zoom - show more details
+        Full       // Very close and high zoom - show everything
+    }
+
     /// <summary>
     /// Manages semantic zoom by tracking camera distance to nodes and determining
     /// detail levels based on both distance and zoom factor.
@@ -39,6 +52,9 @@ namespace SEE.Controls.Actions
         private float currentZoomFactor = 1.0f; // Cached from ZoomAction each update
         private int updateBatchIndex = 0; // For batched node updates
         private bool isInitialized = false;
+
+        // Global event for all detail level changes in this city
+        public event Action<CachedNodeInfo, DetailLevel, DetailLevel> OnDetailLevelChanged;
 
         private void Start()
         {
@@ -104,7 +120,18 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 
-                cachedNodes.Add(new CachedNodeInfo(nodeRef.gameObject, nodeRef));
+                CachedNodeInfo nodeInfo = new CachedNodeInfo(nodeRef.gameObject, nodeRef);
+                // Subscribe to individual node events and forward to controller event
+                nodeInfo.OnDetailLevelChanged += (node, oldLevel, newLevel) =>
+                {
+                    OnDetailLevelChanged?.Invoke(node, oldLevel, newLevel);
+
+                    if (debugMode)
+                    {
+                        Debug.Log($"[SemanticZoom] {node.NodeGameObject.name}: {oldLevel} → {newLevel}");
+                    }
+                };
+                cachedNodes.Add(nodeInfo);
             }
         }
 
@@ -161,10 +188,42 @@ namespace SEE.Controls.Actions
 
                 float distance = Vector3.Distance(mainCamera.transform.position, nodeInfo.NodeTransform.position);
                 nodeInfo.UpdateDistance(distance);
+
+                // Calculate and update detail level based on distance and zoom
+                DetailLevel newDetailLevel = CalculateDetailLevel(distance, currentZoomFactor);
+                nodeInfo.UpdateDetailLevel(newDetailLevel);
             }
 
             // Advance batch index for next update cycle
             updateBatchIndex = (updateBatchIndex + nodesToUpdate) % Mathf.Max(cachedNodes.Count, 1);
+        }
+
+        /// <summary>
+        /// Calculates appropriate detail level from distance and zoom factor.
+        /// Uses a two-factor decision matrix: closer distance OR higher zoom = more detail.
+        /// </summary>
+        private DetailLevel CalculateDetailLevel(float distance, float zoomFactor)
+        {
+            // Very close and high zoom = Full detail
+            if (distance <= veryCloseDistance && zoomFactor >= highZoomThreshold)
+            {
+                return DetailLevel.Full;
+            }
+
+            // Close distance or high zoom = Medium detail
+            if (distance <= closeDistance || zoomFactor >= highZoomThreshold)
+            {
+                return DetailLevel.Medium;
+            }
+
+            // Medium distance or medium zoom = Basic detail
+            if (distance <= mediumDistance || zoomFactor >= mediumZoomThreshold)
+            {
+                return DetailLevel.Basic;
+            }
+
+            // Far distance and low zoom = Overview only
+            return DetailLevel.Overview;
         }
 
         private void OnDrawGizmos()
@@ -228,7 +287,7 @@ namespace SEE.Controls.Actions
                 return;
             }
 
-            GUILayout.BeginArea(new Rect(10, 10, 350, 200));
+            GUILayout.BeginArea(new Rect(10, 10, 400, 250));
             GUILayout.Box($"Semantic Zoom - {gameObject.name}");
             GUILayout.Label($"Nodes: {cachedNodes.Count}");
             GUILayout.Label($"Zoom: {currentZoomFactor:F2}x");
@@ -239,10 +298,30 @@ namespace SEE.Controls.Actions
                 CachedNodeInfo closest = FindClosestNode();
                 if (closest != null && closest.NodeGameObject != null)
                 {
-                    GUILayout.Label($"Closest: {closest.NodeGameObject.name}");
-                    GUILayout.Label($"Distance: {closest.LastKnownDistance:F2}");
-                    GUILayout.Label($"Zone: {GetDistanceZoneName(closest.LastKnownDistance)}");
+                    GUILayout.Space(5);
+                    GUILayout.Label($"<b>Closest Node:</b>");
+                    GUILayout.Label($"  Name: {closest.NodeGameObject.name}");
+                    GUILayout.Label($"  Distance: {closest.LastKnownDistance:F2}");
+                    GUILayout.Label($"  Zone: {GetDistanceZoneName(closest.LastKnownDistance)}");
+                    GUILayout.Label($"  Detail: {closest.CurrentDetailLevel}");
                 }
+
+                // Count nodes at each detail level
+                int overview = 0, basic = 0, medium = 0, full = 0;
+                foreach (var node in cachedNodes)
+                {
+                    switch (node.CurrentDetailLevel)
+                    {
+                        case DetailLevel.Overview: overview++; break;
+                        case DetailLevel.Basic: basic++; break;
+                        case DetailLevel.Medium: medium++; break;
+                        case DetailLevel.Full: full++; break;
+                    }
+                }
+                GUILayout.Space(5);
+                GUILayout.Label($"<b>Detail Levels:</b>");
+                GUILayout.Label($"  Overview: {overview} | Basic: {basic}");
+                GUILayout.Label($"  Medium: {medium} | Full: {full}");
             }
 
             GUILayout.EndArea();
@@ -320,9 +399,14 @@ namespace SEE.Controls.Actions
     {
         public Transform NodeTransform { get; private set; }
         public GameObject NodeGameObject { get; private set; }
-        public NodeRef NodeRef { get; private set; } // Access to graph data model
-        public float LastKnownDistance { get; private set; } // Distance from camera in world units
+        public NodeRef NodeRef { get; private set; }
+        public float LastKnownDistance { get; private set; }
         public float LastUpdateTime { get; private set; }
+        public DetailLevel CurrentDetailLevel { get; private set; }
+        public DetailLevel PreviousDetailLevel { get; private set; }
+
+        // Event fired when detail level changes
+        public event Action<CachedNodeInfo, DetailLevel, DetailLevel> OnDetailLevelChanged;
 
         public CachedNodeInfo(GameObject nodeGameObject, NodeRef nodeRef)
         {
@@ -331,6 +415,8 @@ namespace SEE.Controls.Actions
             NodeRef = nodeRef;
             LastKnownDistance = float.MaxValue;
             LastUpdateTime = 0f;
+            CurrentDetailLevel = DetailLevel.Overview;
+            PreviousDetailLevel = DetailLevel.Overview;
         }
 
         /// <summary>
@@ -340,6 +426,19 @@ namespace SEE.Controls.Actions
         {
             LastKnownDistance = distance;
             LastUpdateTime = Time.realtimeSinceStartup;
+        }
+
+        /// <summary>
+        /// Updates detail level and fires event if it changed.
+        /// </summary>
+        public void UpdateDetailLevel(DetailLevel newLevel)
+        {
+            if (newLevel != CurrentDetailLevel)
+            {
+                PreviousDetailLevel = CurrentDetailLevel;
+                CurrentDetailLevel = newLevel;
+                OnDetailLevelChanged?.Invoke(this, PreviousDetailLevel, CurrentDetailLevel);
+            }
         }
     }
 }
