@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -292,6 +293,31 @@ namespace SEE.Controls.Actions
         protected static float ConvertZoomFactorToZoomSteps(float zoomFactor)
         {
             return Mathf.Log(zoomFactor, 2) / ZoomState.ZoomFactor;
+        }
+
+        /// <summary>
+        /// Returns the current zoom factor for the specified city root.
+        /// The zoom factor represents how much the city is scaled relative to its original size.
+        /// A value of 1.0 means no zoom (original scale), values greater than 1.0 mean zoomed in.
+        /// </summary>
+        /// <param name="cityRoot">The root transform of the city</param>
+        /// <returns>Current zoom factor (1.0 = original scale, higher values = zoomed in)</returns>
+        public float GetCurrentZoomFactor(Transform cityRoot)
+        {
+            if (cityRoot == null)
+            {
+                Debug.LogWarning("[ZoomAction] GetCurrentZoomFactor called with null cityRoot. Returning 1.0.");
+                return 1.0f;
+            }
+
+            if (rootTransformToZoomStates.TryGetValue(cityRoot, out ZoomState state))
+            {
+                return ConvertZoomStepsToZoomFactor(state.CurrentTargetZoomSteps);
+            }
+            else
+            {
+                return 1.0f;
+            }
         }
     }
 }

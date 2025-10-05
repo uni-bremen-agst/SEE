@@ -25,8 +25,8 @@ namespace SEE.Controls.Actions
             bool reset = SEEInput.Reset();
             // Whether the user presses a keyboard shortcut to zoom into the city.
             bool zoomInto = SEEInput.ZoomInto();
-            // Alternatively, the user can select the mouse wheel for zooming.
-            float zoomStepsDelta = Input.mouseScrollDelta.y;
+            // Zoom sensitivity reduced by 50%. 2 scroll notches to trigger 1 zoom step instead of 1 notch = 1 step.
+            float zoomStepsDelta = Input.mouseScrollDelta.y * 0.5f;
             // We need to round to the "next" full integer, otherwise not all scrolling will be counted.
             int zoomSteps = zoomStepsDelta < 0 ? Mathf.FloorToInt(zoomStepsDelta) : Mathf.CeilToInt(zoomStepsDelta);
             // Whether zooming per mouse wheel was requested.
@@ -36,7 +36,6 @@ namespace SEE.Controls.Actions
             {
                 return;
             }
-
             // If we don't hover over any part of a city, we can't initiate any zooming related action
             if (Raycasting.RaycastInteractableObject(out RaycastHit raycastHit, out InteractableObject io, false) != HitGraphElement.None)
             {
@@ -98,7 +97,7 @@ namespace SEE.Controls.Actions
 
                     if (reset)
                     {
-                        // Reset the city to its original non-zoomed size.
+                    // Reset the city to its original non-zoomed size.
                         zoomState.PushResetCommand(ZoomState.DefaultZoomDuration);
                     }
                     else
