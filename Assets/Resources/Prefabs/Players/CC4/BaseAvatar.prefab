@@ -1158,11 +1158,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0993c82ec46b3bf478cef956e67da192, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  poseLandmarkerModelAsset: {fileID: 4900000, guid: f9b04d8d67a79ef4582f03c1b24e3987,
+  poseLandmarkerModelAsset: {fileID: 4900000, guid: 996551d254a950675b263b1862d5273d,
     type: 3}
-  handLandmarkerModelAsset: {fileID: 4900000, guid: a27c80a1a0183bb448f0402baccde5b2,
+  handLandmarkerModelAsset: {fileID: 4900000, guid: b467f87f6b5d4d200974b3ca14f53987,
     type: 3}
-  gestureRecognizerModelAsset: {fileID: 4900000, guid: 26c55d750d5644b47b87012cf04d879d,
+  gestureRecognizerModelAsset: {fileID: 4900000, guid: 94802ed857ae0da9f8acbae261909318,
     type: 3}
   IsLocallyControlled: 1
 --- !u!114 &2782809671534296890
