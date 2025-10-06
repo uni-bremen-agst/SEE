@@ -42,6 +42,7 @@ namespace SEE.Game
             {
                 gameObject.AddOrGetComponent<ShowLabel>();
                 gameObject.AddOrGetComponent<ShowHoverInfo>();
+                gameObject.AddOrGetComponent<LogBuildingNameOnClick>();
                 gameObject.AddOrGetComponent<ShowEdges>();
                 gameObject.AddOrGetComponent<ShowAuthorEdges>();
                 gameObject.AddOrGetComponent<HighlightErosion>();
