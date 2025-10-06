@@ -23,112 +23,112 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Position of the left hand.
         /// </summary>
-        private NetworkVariable<Vector3> leftHandPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftHandPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotation of the left hand.
         /// </summary>
-        private NetworkVariable<Quaternion> leftHandRotation = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> leftHandRotation = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Local position of the left bend goal for the elbow (relative to the main trasform).
         /// </summary>
-        private NetworkVariable<Vector3> leftBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Local position of the right bend goal for the elbow (relative to the main trasform).
         /// </summary>
-        private NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// The value for the weight of the left hand, that determines the level of influence of changes in the IK effector of the left hand on other bones in the chain.
         /// </summary>
-        private NetworkVariable<float> leftHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<float> leftHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// The value for the weight of the right hand, that determines the level of influence of changes in the IK effector of the right hand on other bones in the chain.
         /// </summary>
-        private NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the index finger of the left hand.
         /// </summary>
-        private NetworkVariable<Vector3> leftIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the middle finger of the left hand.
         /// </summary>
-        private NetworkVariable<Vector3> leftMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the ring finger of the left hand.
         /// </summary>
-        private NetworkVariable<Vector3> leftRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the little finger of the left hand.
         /// </summary>
-        private NetworkVariable<Vector3> leftPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> leftPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the thumb bone of the left hand, which lies at the base of the thumb.
         /// </summary>
-        private NetworkVariable<Quaternion> leftThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> leftThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the middle bone of the thumb of the left hand.
         /// </summary>
-        private NetworkVariable<Quaternion> leftThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> leftThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the fingertip bone of the thumb of the left hand.
         /// </summary>
-        private NetworkVariable<Quaternion> leftThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> leftThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Position of the right hand.
         /// </summary>
-        private NetworkVariable<Vector3> rightHandPosition = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightHandPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotation of the right hand.
         /// </summary>
-        private NetworkVariable<Quaternion> rightHandRotation = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> rightHandRotation = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the index finger of the right hand.
         /// </summary>
-        private NetworkVariable<Vector3> rightIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightIndexFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the middle finger of the right hand.
         /// </summary>
-        private NetworkVariable<Vector3> rightMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightMiddleFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the ring finger of the right hand.
         /// </summary>
-        private NetworkVariable<Vector3> rightRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightRingFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the joints of the little finger of the right hand.
         /// </summary>
-        private NetworkVariable<Vector3> rightPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Vector3> rightPinkyFingerRotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the thumb bone of the right hand, which lies at the base of the thumb.
         /// </summary>
-        private NetworkVariable<Quaternion> rightThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> rightThumb1Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the middle bone of the thumb of the right hand.
         /// </summary>
-        private NetworkVariable<Quaternion> rightThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> rightThumb2Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Rotations of the fingertip bone of the thumb of the right hand.
         /// </summary>
-        private NetworkVariable<Quaternion> rightThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
+        private readonly NetworkVariable<Quaternion> rightThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
         /// Initializes the BodyAnimator, HandsAnimator, and FullBodyBipedIK components that this avatar uses.
@@ -146,7 +146,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if(IsOwner)
+            if (IsOwner)
             {
                 CaptureFromHandsAnimator();
             }
@@ -161,7 +161,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void CaptureFromHandsAnimator()
         {
-            if(handsAnimator == null)
+            if (handsAnimator == null)
             {
                 return;
             }

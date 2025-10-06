@@ -36,7 +36,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Instance of class <see cref="HandsAnimator"/> responsible for animation.
         /// </summary>
-        public HandsAnimator HandsAnimator = new HandsAnimator();
+        public HandsAnimator HandsAnimator = new();
 
         /// <summary>
         /// Text assets that define configurations of MediaPipe models.
@@ -53,7 +53,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Used to calculate timestamps needed by MediaPipe calculators.
         /// </summary>
-        private Stopwatch stopwatch = new Stopwatch();
+        private readonly Stopwatch stopwatch = new();
 
         /// <summary>
         /// TextureFrame object to hold a copy of the webcam texture on the CPU.
@@ -155,7 +155,7 @@ namespace SEE.Game.Avatars
 
                     if (resultPoseLandmarker.poseWorldLandmarks == null)
                     {
-                        Debug.Log("No Pose Landmarks found" + "\n");
+                        Debug.Log("No pose landmarks found.\n");
                     }
                     else
                     {
@@ -177,7 +177,7 @@ namespace SEE.Game.Avatars
                         }
                         else
                         {
-                            Debug.Log("No hand landmarks found" + "\n");
+                            Debug.Log("No hand landmarks found.\n");
                         }
                     }
                 }

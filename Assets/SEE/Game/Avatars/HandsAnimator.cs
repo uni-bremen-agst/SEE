@@ -1,14 +1,12 @@
 ﻿using System;
 using UnityEngine;
 using RootMotion.FinalIK;
-using SEE.GO;
 using SEE.Controls;
 using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using System.Collections.Generic;
 using Mediapipe.Tasks.Components.Containers;
-
 
 namespace SEE.Game.Avatars
 {
@@ -25,87 +23,120 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Name of the head bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string HeadName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
+        public const string HeadName
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
 
         /// <summary>
         /// Name of the left hand bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
+        public const string LeftHandName
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
 
         /// <summary>
         /// Names of the bones of the left middle finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1";
-        public const string LeftMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2";
-        public const string LeftMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
+        public const string LeftMidFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1";
+        public const string LeftMidFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2";
+        public const string LeftMidFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
 
         /// <summary>
         /// Names of the bones of the left index finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1";
-        public const string LeftIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2";
-        public const string LeftIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
+        public const string LeftIndexFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1";
+        public const string LeftIndexFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2";
+        public const string LeftIndexFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
 
         /// <summary>
         /// Names of the bones of the left ring finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1";
-        public const string LeftRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2";
-        public const string LeftRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
+        public const string LeftRingFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1";
+        public const string LeftRingFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2";
+        public const string LeftRingFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
 
         /// <summary>
         /// Names of the bones of the left little finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1";
-        public const string LeftPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
-        public const string LeftPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
+        public const string LeftPinkyFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1";
+        public const string LeftPinkyFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
+        public const string LeftPinkyFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
 
         /// <summary>
         /// Names of the bones of the left thumb in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1";
-        public const string LeftThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
-        public const string LeftThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
+        public const string LeftThumb1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1";
+        public const string LeftThumb2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
+        public const string LeftThumb3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
 
         /// <summary>
         /// Name of the right hand bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightHandName = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
+        public const string RightHandName
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
 
         /// <summary>
         /// Names of the bones of the right middle finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightMidFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1";
-        public const string RightMidFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2";
-        public const string RightMidFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
+        public const string RightMidFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1";
+        public const string RightMidFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2";
+        public const string RightMidFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
 
         /// <summary>
         /// Names of the bones of the right index finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightIndexFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1";
-        public const string RightIndexFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2";
-        public const string RightIndexFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
+        public const string RightIndexFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1";
+        public const string RightIndexFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2";
+        public const string RightIndexFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
 
         /// <summary>
         /// Names of the bones of the right ring finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightRingFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1";
-        public const string RightRingFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2";
-        public const string RightRingFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
+        public const string RightRingFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1";
+        public const string RightRingFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2";
+        public const string RightRingFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
 
         /// <summary>
         /// Names of the bones of the right little finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightPinkyFinger1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1";
-        public const string RightPinkyFinger2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
-        public const string RightPinkyFinger3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
+        public const string RightPinkyFinger1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1";
+        public const string RightPinkyFinger2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
+        public const string RightPinkyFinger3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
 
         /// <summary>
         /// Names of the bones of the right thumb in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightThumb1Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1";
-        public const string RightThumb2Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
-        public const string RightThumb3Name = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
+        public const string RightThumb1Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1";
+        public const string RightThumb2Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
+        public const string RightThumb3Name
+            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
 
         /// <summary>
         /// The FullBodyBiped IK solver attached to the avatar.
@@ -117,23 +148,23 @@ namespace SEE.Game.Avatars
         /// the status of the current rotations and positions of the hands and fingers
         /// as well as other information required for animations.
         /// </summary>
-        public HandTransformState LeftHandTransformState = new HandTransformState();
-        public HandTransformState RightHandTransformState = new HandTransformState();
+        public HandTransformState LeftHandTransformState = new();
+        public HandTransformState RightHandTransformState = new();
 
         /// <summary>
         /// Solver for calculating rotations.
         /// </summary>
-        private HandRotationsSolver rotationSolver = new HandRotationsSolver();
+        private readonly HandRotationsSolver rotationSolver = new();
 
         /// <summary>
         /// If true, the avatar's laser pointer is enabled.
         /// </summary>
-        private bool IsPointing = true;
+        private bool isPointing = true;
 
         /// <summary>
         /// The weight that determines the level of influence of changes in the IK effectors of the hands on other bones in the chain.
         /// </summary>
-        private float weight = 1f;
+        private const float weight = 1f;
 
         /// <summary>
         /// Фnimation speed of hand position changes and rotations.
@@ -168,7 +199,8 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Starting values ​​of positions and rotations of the hands before bringing them to the predefined start position.
         /// </summary>
-        /// <remarks>By start position is meant that the avatar's hands are in front of the avatar, bent at the elbows and the palms are facing forward.</remarks>
+        /// <remarks>By start position it is meant that the avatar's hands are in front of the avatar,
+        /// bent at the elbows and the palms are facing forward.</remarks>
         private Vector3 leftHandStartPos = Vector3.zero;
         private Vector3 rightHandStartPos = Vector3.zero;
         private Quaternion startLeftHandRotation;
@@ -185,32 +217,33 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// The values by which the positions and rotations of the hands must be changed at the beginning to reach the start position.
         /// </summary>
-        /// <remarks>By start position is meant that the avatar's hands are in front of the avatar, bent at the elbows and the palms are facing forward.</remarks>
+        /// <remarks>By start position it is meant that the avatar's hands are in front of the avatar, bent at the elbows and the palms are facing forward.</remarks>
         private Quaternion leftHandRotationOffset = Quaternion.Euler(170, 110, 0);
-        private Vector3 leftHandPositionOffset = new Vector3(-0.37f, 1.56f, 0.23f);
+        private Vector3 leftHandPositionOffset = new(-0.37f, 1.56f, 0.23f);
         private Quaternion rightHandRotationOffset = Quaternion.Euler(-40, 15, 60);
-        private Vector3 rightHandPositionOffset = new Vector3(0.37f, 1.56f, 0.23f);
+        private Vector3 rightHandPositionOffset = new(0.37f, 1.56f, 0.23f);
 
         /// <summary>
         /// The interval at which the avatar's palm should face the camera (the values ​​are the difference in coordinates between the hand and the head).
         /// </summary>
-        private Tuple<float, float> HandXCoordinatesDiffIntervalToFaceTheCamera = Tuple.Create(-0.47f, -0.15f);
+        private readonly Tuple<float, float> handXCoordinatesDiffIntervalToFaceTheCamera = Tuple.Create(-0.47f, -0.15f);
 
         /// <summary>
         /// The interval at which the avatar's palm should be slightly rotated to avoid unnatural animations
         /// when moving the hand in front of the avatar's body (the values ​​are the difference in coordinates between the hand and the head).
         /// </summary>
-        private Tuple<float, float> HandXCoordinatesDiffIntervalMovingInFront = Tuple.Create(-0.15f, 0.28f);
+        private readonly Tuple<float, float> handXCoordinatesDiffIntervalMovingInFront = Tuple.Create(-0.15f, 0.28f);
 
         /// <summary>
         /// The difference in the y-coordinate between the hand and the head,
         /// from which it can be assumed that the hand is moving downwards and therefore
         /// should be slightly rotated to avoid unnatural animations.
         /// </summary>
-        private const float HandYCoordinatesDiffToMoveDownFrom = -0.3f;
+        private const float handYCoordinatesDiffToMoveDownFrom = -0.3f;
 
         /// <summary>
-        /// Initializes the initial positions of the hands and the head, the main avatar transform, the ik component, and also adds Bend Goals for the elbows.
+        /// Initializes the initial positions of the hands and the head, the main avatar transform,
+        /// the ik component, and also adds Bend Goals for the elbows.
         /// </summary>
         /// <param name="mainTrasform">The main transform of the avatar.</param>
         /// <param name="ikComponent">The FullBodyBiped IK solver attached to the avatar.</param>
@@ -224,17 +257,17 @@ namespace SEE.Game.Avatars
             Transform rightHandBone = mainTrasform.Find(RightHandName);
             if (headBone == null)
             {
-                UnityEngine.Debug.LogError($"Head bone not found: {HeadName}" + "\n");
+                Debug.LogError($"Head bone not found: {HeadName}\n");
                 return;
             }
             else if (leftHandBone == null)
             {
-                UnityEngine.Debug.LogError($"Left hand bone not found: {LeftHandName}" + "\n");
+                Debug.LogError($"Left hand bone not found: {LeftHandName}\n");
                 return;
             }
             else if (rightHandBone == null)
             {
-                UnityEngine.Debug.LogError($"Right hand bone not found: {RightHandName}" + "\n");
+                Debug.LogError($"Right hand bone not found: {RightHandName}\n");
                 return;
             }
 
@@ -259,13 +292,13 @@ namespace SEE.Game.Avatars
             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
 
             //Add bend goals for the elbows so they bend downwards.
-            GameObject leftElbowBendGoal = new GameObject("LeftElbowBendGoal");
+            GameObject leftElbowBendGoal = new("LeftElbowBendGoal");
             leftElbowBendGoal.transform.SetParent(mainTrasform, false);
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftElbowBendGoal.transform;
             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
-            GameObject rightElbowBendGoal = new GameObject("RightElbowBendGoal");
+            GameObject rightElbowBendGoal = new("RightElbowBendGoal");
             rightElbowBendGoal.transform.SetParent(mainTrasform, false);
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightElbowBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
@@ -276,7 +309,8 @@ namespace SEE.Game.Avatars
         /// Smoothly brings the avatar's hands to the start position.
         /// </summary>
         /// <returns>True, if the start position was reached.</returns>
-        /// <remarks>By start position is meant that the avatar's hands are in front of the avatar, bent at the elbows and the palms are facing forward.</remarks>
+        /// <remarks>By start position it is meant that the avatar's hands are in front of the avatar,
+        /// bent at the elbows and the palms are facing forward.</remarks>
         public bool BringHandsToStartPositions()
         {
             Transform headBone = transform.Find(HeadName);
@@ -297,7 +331,9 @@ namespace SEE.Game.Avatars
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
 
             //If the start position has not yet been reached.
-            if (!startHandsPositionReached && (Vector3.Distance(LeftHandTransformState.HandPosition, leftHandTargetPos) >= arrivalThreshold || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
+            if (!startHandsPositionReached
+                && (Vector3.Distance(LeftHandTransformState.HandPosition, leftHandTargetPos) >= arrivalThreshold
+                    || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
             {
                 //Turn and move the hands slightly to get closer to the starting position.
                 LeftHandTransformState.HandPosition = Vector3.Lerp(LeftHandTransformState.HandPosition, leftHandTargetPos, Time.deltaTime * moveSpeed * 4);
@@ -341,7 +377,8 @@ namespace SEE.Game.Avatars
 
                 return false;
             }
-            else {
+            else
+            {
                 startHandsPositionReached = true;
                 return true;
             }
@@ -359,34 +396,27 @@ namespace SEE.Game.Avatars
             // Whether the laser pointer was toggled
             if (SEEInput.TogglePointing())
             {
-                if (IsPointing == true)
-                {
-                    IsPointing = false;
-                }
-                else
-                {
-                    IsPointing = true;
-                }
+                isPointing = !isPointing;
             }
 
             // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
-            if (IsPointing == false)
-            {
-                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
-                leftHandTargetRotation = leftHand.rotation;
-                leftHand.localRotation = startLeftHandRotation;
-
-                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
-                rightHandTargetRotation = rightHand.rotation;
-                rightHand.localRotation = startRightHandRotation;
-            }
-            else
+            if (isPointing)
             {
                 leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                 leftHandTargetRotation = leftHand.rotation;
                 leftHand.localRotation = startLeftHandRotation;
 
                 rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+                rightHandTargetRotation = rightHand.rotation;
+                rightHand.localRotation = startRightHandRotation;
+            }
+            else
+            {
+                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+                leftHandTargetRotation = leftHand.rotation;
+                leftHand.localRotation = startLeftHandRotation;
+
+                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
                 rightHandTargetRotation = rightHand.rotation;
                 rightHand.localRotation = startRightHandRotation;
             }
@@ -403,7 +433,7 @@ namespace SEE.Game.Avatars
             Landmark mediapipeLeftElbowPosition = poseLandmarks[13];
             Landmark mediapipeRightElbowPosition = poseLandmarks[14];
 
-            //Save the last detected coordinates.
+            // Save the last detected coordinates.
             if (isFirstPoseLandmark)
             {
                 LeftHandTransformState.NewMediapipeCoordinates.x = mediapipeLeftHandPosition.x;
@@ -420,7 +450,7 @@ namespace SEE.Game.Avatars
                 isFirstPoseLandmark = false;
             }
 
-            //Set values ​​for hand rotations when moving in front of the avatar's body, when moving away from the avatar, and when moving downwards.
+            // Set values ​​for hand rotations when moving in front of the avatar's body, when moving away from the avatar, and when moving downwards.
             LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar = leftHandTargetRotation * Quaternion.Euler(0, 55, 0);
             RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar = rightHandTargetRotation * Quaternion.Euler(0, -55, 0);
 
@@ -432,7 +462,7 @@ namespace SEE.Game.Avatars
 
             Landmark mediapipeHeadPosition = poseLandmarks[0];
 
-            //Save the last detected coordinates snd initialize new.
+            // Save the last detected coordinates snd initialize new.
             LeftHandTransformState.PreviousMediapipeCoordinates = LeftHandTransformState.NewMediapipeCoordinates;
             LeftHandTransformState.NewMediapipeCoordinates.x = mediapipeLeftHandPosition.x;
             LeftHandTransformState.NewMediapipeCoordinates.y = mediapipeLeftHandPosition.y;
@@ -443,7 +473,7 @@ namespace SEE.Game.Avatars
             RightHandTransformState.NewMediapipeCoordinates.y = mediapipeRightHandPosition.y;
             RightHandTransformState.NewMediapipeCoordinates.z = mediapipeRightHandPosition.z;
 
-            //If the probability with which the left hand is in the picture is acceptable for animation.
+            // If the probability with which the left hand is in the picture is acceptable for animation.
             if (mediapipeLeftHandPosition.presence > acceptableHandPresenceProbability)
             {
                 LeftHandTransformState.HandToHeadCoordinateDifference = new Vector3(mediapipeLeftHandPosition.x - mediapipeHeadPosition.x, mediapipeLeftHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(leftHandTargetPos).z - headPosition.z);
@@ -451,9 +481,10 @@ namespace SEE.Game.Avatars
                 ik.solver.leftHandEffector.position = transform.TransformPoint(newHandPosition);
 
                 // Interval where palm should be facing the camera.
-                if (LeftHandTransformState.HandToHeadCoordinateDifference.x < HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && LeftHandTransformState.HandToHeadCoordinateDifference.x > HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
+                    && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if (IsPointing == true)
+                    if (isPointing)
                     {
                         leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                     }
@@ -467,8 +498,8 @@ namespace SEE.Game.Avatars
                     ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
                 }
                 // If the hand is moving in front of the character.
-                else if (LeftHandTransformState.HandToHeadCoordinateDifference.x >= HandXCoordinatesDiffIntervalMovingInFront.Item1
-                    && LeftHandTransformState.HandToHeadCoordinateDifference.x <= HandXCoordinatesDiffIntervalMovingInFront.Item2)
+                else if (LeftHandTransformState.HandToHeadCoordinateDifference.x >= handXCoordinatesDiffIntervalMovingInFront.Item1
+                    && LeftHandTransformState.HandToHeadCoordinateDifference.x <= handXCoordinatesDiffIntervalMovingInFront.Item2)
                 {
                     leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                     if (ik.solver.leftHandEffector.rotation.eulerAngles.y < LeftHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
@@ -494,7 +525,7 @@ namespace SEE.Game.Avatars
                     }
                 }
                 // If the hand is moving downwards.
-                if (LeftHandTransformState.HandToHeadCoordinateDifference.y <= HandYCoordinatesDiffToMoveDownFrom)
+                if (LeftHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom)
                 {
                     leftHandTargetRotation = LeftHandTransformState.HandRotationForMovementDown;
                     if (ik.solver.leftHandEffector.rotation.z > LeftHandTransformState.HandRotationForMovementDown.z)
@@ -520,14 +551,18 @@ namespace SEE.Game.Avatars
             // If the probability with which the right hand is in the picture is acceptable for animation.
             if (mediapipeRightHandPosition.presence > acceptableHandPresenceProbability)
             {
-                RightHandTransformState.HandToHeadCoordinateDifference = new Vector3(mediapipeRightHandPosition.x - mediapipeHeadPosition.x, mediapipeRightHandPosition.y - mediapipeHeadPosition.y, transform.InverseTransformPoint(rightHandTargetPos).z - headPosition.z);
+                RightHandTransformState.HandToHeadCoordinateDifference
+                    = new Vector3(mediapipeRightHandPosition.x - mediapipeHeadPosition.x,
+                                  mediapipeRightHandPosition.y - mediapipeHeadPosition.y,
+                                  transform.InverseTransformPoint(rightHandTargetPos).z - headPosition.z);
                 Vector3 newHandPosition = headPosition + RightHandTransformState.HandToHeadCoordinateDifference;
                 ik.solver.rightHandEffector.position = transform.TransformPoint(newHandPosition);
 
                 // Interval where palm should be facing the camera.
-                if (RightHandTransformState.HandToHeadCoordinateDifference.x > -HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && RightHandTransformState.HandToHeadCoordinateDifference.x < -HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
+                    && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if (IsPointing == true)
+                    if (isPointing)
                     {
                         rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
                     }
@@ -541,7 +576,7 @@ namespace SEE.Game.Avatars
                     ik.solver.rightHandEffector.rotation = RightHandTransformState.HandRotation;
                 }
                 // If the hand is moving in front of the character.
-                else if (RightHandTransformState.HandToHeadCoordinateDifference.x <= -HandXCoordinatesDiffIntervalMovingInFront.Item1)
+                else if (RightHandTransformState.HandToHeadCoordinateDifference.x <= -handXCoordinatesDiffIntervalMovingInFront.Item1)
                 {
                     rightHandTargetRotation = RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar;
                     if (ik.solver.rightHandEffector.rotation.eulerAngles.y > RightHandTransformState.HandRotationForMovementInFrontOfTheAvatar.eulerAngles.y)
@@ -567,7 +602,7 @@ namespace SEE.Game.Avatars
                     }
                 }
                 // If the hand is moving downwards.
-                if (RightHandTransformState.HandToHeadCoordinateDifference.y <= HandYCoordinatesDiffToMoveDownFrom)
+                if (RightHandTransformState.HandToHeadCoordinateDifference.y <= handYCoordinatesDiffToMoveDownFrom)
                 {
                     rightHandTargetRotation = RightHandTransformState.HandRotationForMovementDown;
                     if (ik.solver.rightHandEffector.rotation.z > RightHandTransformState.HandRotationForMovementDown.z)
@@ -590,13 +625,12 @@ namespace SEE.Game.Avatars
                 }
             }
 
-            //Save information about current hand positions and rotations.
+            // Save information about current hand positions and rotations.
             LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
             LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
 
             RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
             RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
-
         }
 
         /// <summary>
@@ -605,16 +639,20 @@ namespace SEE.Game.Avatars
         /// <param name="resultHandLandmarker">Output from the mediapipe hand landmarker model.</param>
         /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
-        public void SolveLeftHand(HandLandmarkerResult resultHandLandmarker, GestureRecognizerResult resultGestureRecognizer, PoseLandmarkerResult resultPoseLandmarker)
+        public void SolveLeftHand(HandLandmarkerResult resultHandLandmarker,
+                                  GestureRecognizerResult resultGestureRecognizer,
+                                  PoseLandmarkerResult resultPoseLandmarker)
         {
             //Index of values ​​for the left hand in the list of coordinates from hand landmarker model.
-            int leftHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
+            int leftHandResultIndex
+                = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
             int leftHandInTheGesturesList = -1;
             if (resultGestureRecognizer.handedness != null)
             {
                 //Index of values ​​for the left hand in the output from gesture recognizer model.
-                leftHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
+                leftHandInTheGesturesList
+                    = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
             }
             String leftHandGesture = "None";
             if (leftHandInTheGesturesList != -1)
@@ -695,7 +733,8 @@ namespace SEE.Game.Avatars
 
                 // Rotating the wrist.
                 // Interval where palm should be facing the camera.
-                if (LeftHandTransformState.HandToHeadCoordinateDifference.x < HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && LeftHandTransformState.HandToHeadCoordinateDifference.x > HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
+                    && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
                     List<Landmark> poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
                     Landmark mediapipeLeftHandPosition = poseLandmarks[15];
@@ -850,13 +889,22 @@ namespace SEE.Game.Avatars
                         }
                     }
                 }
-                //Save information about current hand and finger rotations.
+
+                // Save information about current hand and finger rotations.
                 LeftHandTransformState.HandIKEffectorPosition = ik.solver.leftHandEffector.position;
                 LeftHandTransformState.HandIKEffectorRotation = ik.solver.leftHandEffector.rotation;
-                LeftHandTransformState.IndexFingerRotations = new Vector3(leftIndexFinger1Bone.localRotation.eulerAngles.z, leftIndexFinger2Bone.localRotation.eulerAngles.z, leftIndexFinger3Bone.localRotation.eulerAngles.z);
-                LeftHandTransformState.MiddleFingerRotations = new Vector3(leftMidFinger1Bone.localRotation.eulerAngles.z, leftMidFinger2Bone.localRotation.eulerAngles.z, leftMidFinger3Bone.localRotation.eulerAngles.z);
-                LeftHandTransformState.RingFingerRotations = new Vector3(leftRingFinger1Bone.localRotation.eulerAngles.z, leftRingFinger2Bone.localRotation.eulerAngles.z, leftRingFinger3Bone.localRotation.eulerAngles.z);
-                LeftHandTransformState.PinkyFingerRotations = new Vector3(leftPinkyFinger1Bone.localRotation.eulerAngles.z, leftPinkyFinger2Bone.localRotation.eulerAngles.z, leftPinkyFinger3Bone.localRotation.eulerAngles.z);
+                LeftHandTransformState.IndexFingerRotations = new Vector3(leftIndexFinger1Bone.localRotation.eulerAngles.z,
+                                                                          leftIndexFinger2Bone.localRotation.eulerAngles.z,
+                                                                          leftIndexFinger3Bone.localRotation.eulerAngles.z);
+                LeftHandTransformState.MiddleFingerRotations = new Vector3(leftMidFinger1Bone.localRotation.eulerAngles.z,
+                                                                           leftMidFinger2Bone.localRotation.eulerAngles.z,
+                                                                           leftMidFinger3Bone.localRotation.eulerAngles.z);
+                LeftHandTransformState.RingFingerRotations = new Vector3(leftRingFinger1Bone.localRotation.eulerAngles.z,
+                                                                         leftRingFinger2Bone.localRotation.eulerAngles.z,
+                                                                         leftRingFinger3Bone.localRotation.eulerAngles.z);
+                LeftHandTransformState.PinkyFingerRotations = new Vector3(leftPinkyFinger1Bone.localRotation.eulerAngles.z,
+                                                                          leftPinkyFinger2Bone.localRotation.eulerAngles.z,
+                                                                          leftPinkyFinger3Bone.localRotation.eulerAngles.z);
                 LeftHandTransformState.Thumb1Rotations = leftThumb1Bone.localRotation;
                 LeftHandTransformState.Thumb2Rotations = leftThumb2Bone.localRotation;
                 LeftHandTransformState.Thumb3Rotations = leftThumb3Bone.localRotation;
@@ -869,7 +917,10 @@ namespace SEE.Game.Avatars
         /// <param name="resultHandLandmarker">Output from the mediapipe hand landmarker model.</param>
         /// <param name="resultGestureRecognizer">Output from the mediapipe gesture recognizer model.</param>
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
-        public void SolveRightHand(HandLandmarkerResult resultHandLandmarker, GestureRecognizerResult resultGestureRecognizer, PoseLandmarkerResult resultPoseLandmarker)
+        public void SolveRightHand
+            (HandLandmarkerResult resultHandLandmarker,
+             GestureRecognizerResult resultGestureRecognizer,
+             PoseLandmarkerResult resultPoseLandmarker)
         {
             //Index of values ​​for the right hand in the list of coordinates from hand landmarker model.
             int rightHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
@@ -959,7 +1010,8 @@ namespace SEE.Game.Avatars
 
                 // Rotating the wrist.
                 // Interval where palm should be facing the camera.
-                if (RightHandTransformState.HandToHeadCoordinateDifference.x > -HandXCoordinatesDiffIntervalToFaceTheCamera.Item2 && RightHandTransformState.HandToHeadCoordinateDifference.x < -HandXCoordinatesDiffIntervalToFaceTheCamera.Item1)
+                if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
+                    && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
                     List<Landmark> poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
                     Landmark mediapipeRightHandPosition = poseLandmarks[16];
@@ -1001,7 +1053,8 @@ namespace SEE.Game.Avatars
                     else
                     {
                         // This rotation is mainly aimed at the "hello" gesture, it represents the bending of the hand from left to right and vice versa.
-                        float newWristAngle = rotationSolver.FindThumbAndWristXRotation(rightIndexFinger1Position, rightHandPosition, RightHandTransformState.IndexFinger1StartPos);
+                        float newWristAngle
+                            = rotationSolver.FindThumbAndWristXRotation(rightIndexFinger1Position, rightHandPosition, RightHandTransformState.IndexFinger1StartPos);
                         ik.solver.rightHandEffector.rotation *= Quaternion.Euler(newWristAngle, 0, 0);
 
                         // If the thumbs up or thumbs down gesture was recognized, animate accordingly.
@@ -1120,10 +1173,18 @@ namespace SEE.Game.Avatars
                 //Save information about current hand and finger rotations.
                 RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
                 RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
-                RightHandTransformState.IndexFingerRotations = new Vector3(rightIndexFinger1Bone.localRotation.eulerAngles.z, rightIndexFinger2Bone.localRotation.eulerAngles.z, rightIndexFinger3Bone.localRotation.eulerAngles.z);
-                RightHandTransformState.MiddleFingerRotations = new Vector3(rightMidFinger1Bone.localRotation.eulerAngles.z, rightMidFinger2Bone.localRotation.eulerAngles.z, rightMidFinger3Bone.localRotation.eulerAngles.z);
-                RightHandTransformState.RingFingerRotations = new Vector3(rightRingFinger1Bone.localRotation.eulerAngles.z, rightRingFinger2Bone.localRotation.eulerAngles.z, rightRingFinger3Bone.localRotation.eulerAngles.z);
-                RightHandTransformState.PinkyFingerRotations = new Vector3(rightPinkyFinger1Bone.localRotation.eulerAngles.z, rightPinkyFinger2Bone.localRotation.eulerAngles.z, rightPinkyFinger3Bone.localRotation.eulerAngles.z);
+                RightHandTransformState.IndexFingerRotations = new Vector3(rightIndexFinger1Bone.localRotation.eulerAngles.z,
+                                                                           rightIndexFinger2Bone.localRotation.eulerAngles.z,
+                                                                           rightIndexFinger3Bone.localRotation.eulerAngles.z);
+                RightHandTransformState.MiddleFingerRotations = new Vector3(rightMidFinger1Bone.localRotation.eulerAngles.z,
+                                                                            rightMidFinger2Bone.localRotation.eulerAngles.z,
+                                                                            rightMidFinger3Bone.localRotation.eulerAngles.z);
+                RightHandTransformState.RingFingerRotations = new Vector3(rightRingFinger1Bone.localRotation.eulerAngles.z,
+                                                                          rightRingFinger2Bone.localRotation.eulerAngles.z,
+                                                                          rightRingFinger3Bone.localRotation.eulerAngles.z);
+                RightHandTransformState.PinkyFingerRotations = new Vector3(rightPinkyFinger1Bone.localRotation.eulerAngles.z,
+                                                                           rightPinkyFinger2Bone.localRotation.eulerAngles.z,
+                                                                           rightPinkyFinger3Bone.localRotation.eulerAngles.z);
                 RightHandTransformState.Thumb1Rotations = rightThumb1Bone.localRotation;
                 RightHandTransformState.Thumb2Rotations = rightThumb2Bone.localRotation;
                 RightHandTransformState.Thumb3Rotations = rightThumb3Bone.localRotation;
@@ -1137,10 +1198,17 @@ namespace SEE.Game.Avatars
         /// <param name="newAngleMiddleFinger">The value to be assigned to the middle finger for rotation.</param>
         /// <param name="newAngleRingFinger">The value to be assigned to the ring finger for rotation.</param>
         /// <param name="newAnglePinky">The value to be assigned to the little finger for rotation.</param>
-        /// <returns></returns>
-        public bool AreFingersBent( float newAngleIndexFinger, float newAngleMiddleFinger, float newAngleRingFinger, float newAnglePinky)
+        /// <returns>true if at least one finger is bent</returns>
+        public bool AreFingersBent
+            (float newAngleIndexFinger,
+            float newAngleMiddleFinger,
+            float newAngleRingFinger,
+            float newAnglePinky)
         {
-            return newAngleIndexFinger >= 50f || newAngleMiddleFinger >= 50f || newAngleRingFinger >= 50f || newAnglePinky >= 50f;
+            return newAngleIndexFinger >= 50f
+                || newAngleMiddleFinger >= 50f
+                || newAngleRingFinger >= 50f
+                || newAnglePinky >= 50f;
         }
     }
 }
