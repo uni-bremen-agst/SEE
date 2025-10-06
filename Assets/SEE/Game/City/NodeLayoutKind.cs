@@ -12,6 +12,7 @@
         CirclePacking,
         Reflexion,
         IncrementalTreeMap,
-        FromFile
-    }
+        FromFile,
+        ZamaLayout
+  }
 }
