@@ -97,6 +97,9 @@ namespace SEE.Layout
     /// <summary>
     /// Creates a deep clone of this LayoutVertex.
     /// </summary>
+    /// 
+    /*
+     
     public override object Clone()
     {
       var clone = new LayoutVertex(this.id)
@@ -108,5 +111,6 @@ namespace SEE.Layout
 
       return clone;
     }
+     */
   }
 }

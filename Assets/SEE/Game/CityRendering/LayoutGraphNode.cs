@@ -91,6 +91,10 @@ namespace SEE.Game.CityRendering
     /// <summary>
     /// Creates a deep clone of this LayoutGraphNode, including its layout data and children.
     /// </summary>
+    /// 
+
+    /*
+     
     public override object Clone()
     {
       // Create new instance with same underlying graph node
@@ -110,5 +114,6 @@ namespace SEE.Game.CityRendering
 
       return clone;
     }
+     */
   }
 }

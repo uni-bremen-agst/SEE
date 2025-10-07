@@ -7,7 +7,7 @@ namespace SEE.Layout
   /// <summary>
   /// The position, scaling, and rotation of a node game object as determined by a node layout.
   /// </summary>
-  public class NodeTransform : ICloneable
+  public class NodeTransform 
   {
     /// <summary>
     /// Constructor setting the position and scale. The rotation will be 0 degrees.
@@ -192,6 +192,8 @@ namespace SEE.Layout
       return "position=" + centerPosition.ToString() + " scale=" + Scale.ToString() + " rotation=" + Rotation;
     }
 
+    /*
+     
     public object Clone()
     {
       // Vector3 is a struct, so it's copied by value.
@@ -203,5 +205,6 @@ namespace SEE.Layout
           Rotation
       );
     }
+     */
   }
 }

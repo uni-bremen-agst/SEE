@@ -50,6 +50,8 @@ namespace SEE.Layout.NodeLayouts
         Vector3 centerPosition,
         Vector2 rectangle)
     {
+      /*
+       
       if (oldLayout != null)
       {
         Debug.Log($"Layout called with {layoutNodes.Count()} nodes.");
@@ -63,6 +65,7 @@ namespace SEE.Layout.NodeLayouts
       {
         Debug.Log("Layout: No old layout available, starting fresh.");
       }
+       */
 
       IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
       if (layoutNodeList.Count == 1)

@@ -7,7 +7,7 @@ namespace SEE.Layout
   /// <summary>
   /// Defines the methods for all nodes to be laid out.
   /// </summary>
-  public abstract class ILayoutNode : IGameNode, IHierarchyNode<ILayoutNode>, ICloneable
+  public abstract class ILayoutNode : IGameNode, IHierarchyNode<ILayoutNode>
   {
     /// <summary>
     /// See <see cref="IGameNode.ID"/>.
@@ -92,7 +92,11 @@ namespace SEE.Layout
       child.Parent = null;
     }
 
+
+    /*
+     
     public abstract object Clone();
+     */
   
   }
 }

@@ -110,6 +110,10 @@ namespace SEE.Game.CityRendering
     /// Creates a deep clone of this LayoutGameNode.
     /// A new GameObject instance is created via Object.Instantiate.
     /// </summary>
+    /// 
+
+    /*
+     
     public override object Clone()
     {
       // Instantiate a deep copy of the GameObject
@@ -129,5 +133,6 @@ namespace SEE.Game.CityRendering
 
       return clone;
     } 
+     */
   }
 }
