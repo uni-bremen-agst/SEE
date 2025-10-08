@@ -552,7 +552,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Layout")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderLoadLayout)]
         [Tooltip("Loads the layout and applies it to the city.")]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public void LoadLayout()
@@ -597,7 +597,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Save Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Snapshot")]
         [Tooltip("Saves both the data (as GXL) and the layout of the city.")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderSaveSnapshot)]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveSnapshot()
         {
@@ -612,7 +612,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
         public async UniTask LoadSnapshotAsync()
         {
             Reset();
