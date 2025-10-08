@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text.RegularExpressions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;
@@ -45,6 +48,11 @@ namespace SEE.Controls.Actions
         [SerializeField] private bool showDistanceGizmos = false;
         [SerializeField] private bool showClosestNodeLines = false;
 
+        [Header("Class/Method Logging")]
+        [SerializeField] private bool logClassesAndMethods = true; // Enable/disable class and method logging
+        [SerializeField] private DetailLevel minDetailLevelForLogging = DetailLevel.Basic; // Minimum detail level to trigger logging
+        [SerializeField] private bool logOnlyHoveredNode = true; // Only log the node currently being pointed at
+
         private Camera mainCamera;
         private ZoomAction zoomAction; // References player's ZoomAction to get current zoom factor
         private readonly List<CachedNodeInfo> cachedNodes = new List<CachedNodeInfo>();
@@ -52,6 +60,8 @@ namespace SEE.Controls.Actions
         private float currentZoomFactor = 1.0f; // Cached from ZoomAction each update
         private int updateBatchIndex = 0; // For batched node updates
         private bool isInitialized = false;
+        private float lastZoomFactor = 1.0f; // Track previous zoom to detect zoom changes
+        private float lastZoomLogTime = 0f; // Prevent spam logging
 
         // Global event for all detail level changes in this city
         public event Action<CachedNodeInfo, DetailLevel, DetailLevel> OnDetailLevelChanged;
@@ -61,7 +71,6 @@ namespace SEE.Controls.Actions
             mainCamera = MainCamera.Camera;
             if (mainCamera == null)
             {
-                Debug.LogError($"[SemanticZoomController] No main camera found for city '{gameObject.name}'");
                 enabled = false;
                 return;
             }
@@ -69,25 +78,14 @@ namespace SEE.Controls.Actions
             zoomAction = FindObjectOfType<ZoomAction>();
             if (zoomAction == null)
             {
-                Debug.LogError($"[SemanticZoomController] No ZoomAction found for city '{gameObject.name}'");
                 enabled = false;
                 return;
             }
 
             DiscoverNodes();
 
-            if (cachedNodes.Count == 0)
-            {
-                Debug.LogWarning($"[SemanticZoomController] No nodes discovered in city '{gameObject.name}'");
-            }
-
             isInitialized = true;
             lastUpdateTime = Time.realtimeSinceStartup;
-
-            if (debugMode)
-            {
-                Debug.Log($"[SemanticZoomController] Initialized for '{gameObject.name}' with {cachedNodes.Count} nodes");
-            }
         }
 
         private void FixedUpdate()
@@ -122,16 +120,33 @@ namespace SEE.Controls.Actions
 
                 CachedNodeInfo nodeInfo = new CachedNodeInfo(nodeRef.gameObject, nodeRef);
                 // Subscribe to individual node events and forward to controller event
-                nodeInfo.OnDetailLevelChanged += (node, oldLevel, newLevel) =>
-                {
-                    OnDetailLevelChanged?.Invoke(node, oldLevel, newLevel);
-
-                    if (debugMode)
-                    {
-                        Debug.Log($"[SemanticZoom] {node.NodeGameObject.name}: {oldLevel} → {newLevel}");
-                    }
-                };
+                nodeInfo.OnDetailLevelChanged += HandleDetailLevelChanged;
                 cachedNodes.Add(nodeInfo);
+            }
+        }
+
+        /// <summary>
+        /// Handles detail level changes for nodes.
+        /// </summary>
+        private void HandleDetailLevelChanged(CachedNodeInfo node, DetailLevel oldLevel, DetailLevel newLevel)
+        {
+            OnDetailLevelChanged?.Invoke(node, oldLevel, newLevel);
+
+            // Log classes and methods when at sufficient detail level and zooming in (newLevel > oldLevel)
+            if (logClassesAndMethods && newLevel >= minDetailLevelForLogging && newLevel > oldLevel)
+            {
+                // If logOnlyHoveredNode is enabled, check if this node is being hovered
+                if (logOnlyHoveredNode)
+                {
+                    if (IsNodeBeingHovered(node))
+                    {
+                        LogClassAndMethods(node);
+                    }
+                }
+                else
+                {
+                    LogClassAndMethods(node);
+                }
             }
         }
 
@@ -148,18 +163,18 @@ namespace SEE.Controls.Actions
 
             float newZoomFactor = zoomAction.GetCurrentZoomFactor(transform);
 
-            if (debugMode)
+            // Detect zoom in action and log hovered class
+            if (logClassesAndMethods && newZoomFactor > lastZoomFactor && newZoomFactor >= 1.5f)
             {
-                if (!Mathf.Approximately(newZoomFactor, currentZoomFactor))
+                // Prevent spam - only log once per 0.5 seconds
+                if (Time.realtimeSinceStartup - lastZoomLogTime > 0.5f)
                 {
-                    Debug.Log($"[SemanticZoomController] Zoom: {currentZoomFactor:F2}x → {newZoomFactor:F2}x");
-                }
-                else if (Time.frameCount % 300 == 0)
-                {
-                    Debug.Log($"[SemanticZoomController] Querying zoom for '{transform.name}' = {newZoomFactor:F2}x");
+                    LogHoveredClass();
+                    lastZoomLogTime = Time.realtimeSinceStartup;
                 }
             }
 
+            lastZoomFactor = currentZoomFactor;
             currentZoomFactor = newZoomFactor;
         }
 
@@ -388,6 +403,137 @@ namespace SEE.Controls.Actions
         public void RefreshNodes()
         {
             DiscoverNodes();
+        }
+
+        /// <summary>
+        /// Logs the class and methods of the currently hovered node.
+        /// </summary>
+        private void LogHoveredClass()
+        {
+            // Use raycasting to find what the user is pointing at
+            HitGraphElement hitType = Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef elementRef);
+
+            if (hitType == HitGraphElement.Node && elementRef != null)
+            {
+                // Find the cached node info for this element
+                CachedNodeInfo nodeInfo = cachedNodes.Find(n => n.NodeGameObject == elementRef.gameObject);
+
+                if (nodeInfo != null)
+                {
+                    LogClassAndMethods(nodeInfo);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if the given node is currently being hovered over by the user's pointer.
+        /// </summary>
+        private bool IsNodeBeingHovered(CachedNodeInfo nodeInfo)
+        {
+            if (nodeInfo?.NodeGameObject == null)
+            {
+                return false;
+            }
+
+            // Use raycasting to check if the user is pointing at this node
+            HitGraphElement hitType = Raycasting.RaycastGraphElement(out RaycastHit hit, out GraphElementRef elementRef);
+
+            if (hitType == HitGraphElement.Node && elementRef != null)
+            {
+                // Check if the hit object matches this node
+                return elementRef.gameObject == nodeInfo.NodeGameObject;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Logs the class name and its methods when zoomed in.
+        /// </summary>
+        private void LogClassAndMethods(CachedNodeInfo nodeInfo)
+        {
+            if (nodeInfo?.NodeGameObject == null || nodeInfo?.NodeRef?.Value == null)
+            {
+                return;
+            }
+
+            var node = nodeInfo.NodeRef.Value;
+            string nodeType = node.Type ?? "Unknown";
+
+            // Only log class-type nodes
+            if (!nodeType.Contains("Class") && !nodeType.Contains("Type"))
+            {
+                return;
+            }
+
+            string className = node.SourceName ?? node.ID;
+            Debug.Log($"[Zoom] Zoomed into class: {className} (Type: {nodeType}, Detail: {nodeInfo.CurrentDetailLevel})");
+
+            try
+            {
+                string filePath = node.AbsolutePlatformPath();
+
+                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                {
+                    string sourceCode = File.ReadAllText(filePath);
+                    List<string> methods = ExtractMethods(sourceCode);
+
+                    if (methods.Count > 0)
+                    {
+                        Debug.Log($"  Methods in {className} ({methods.Count} total):");
+                        foreach (string method in methods.Take(15)) // Show first 15 methods
+                        {
+                            Debug.Log($"    - {method}");
+                        }
+                        if (methods.Count > 15)
+                        {
+                            Debug.Log($"    ... and {methods.Count - 15} more methods");
+                        }
+                    }
+                    else
+                    {
+                        Debug.Log($"  No methods found in {className}");
+                    }
+                }
+                else
+                {
+                    Debug.Log($"  (Source file not available)");
+                }
+            }
+            catch (Exception e)
+            {
+                Debug.Log($"  (Could not read source file)");
+            }
+        }
+
+        /// <summary>
+        /// Extracts method names from C# source code using regex.
+        /// </summary>
+        private List<string> ExtractMethods(string sourceCode)
+        {
+            List<string> methods = new List<string>();
+
+            // Regex pattern to match C# method declarations
+            // Matches: [access modifiers] [return type] [method name]([parameters])
+            string pattern = @"(?:public|private|protected|internal|static|\s)+\s+\w+\s+(\w+)\s*\([^)]*\)";
+
+            MatchCollection matches = Regex.Matches(sourceCode, pattern);
+
+            foreach (Match match in matches)
+            {
+                if (match.Groups.Count > 1)
+                {
+                    string methodName = match.Groups[1].Value;
+                    // Filter out common non-method keywords
+                    if (methodName != "if" && methodName != "while" && methodName != "for"
+                        && methodName != "foreach" && methodName != "switch" && methodName != "catch")
+                    {
+                        methods.Add(methodName);
+                    }
+                }
+            }
+
+            return methods;
         }
     }
 
