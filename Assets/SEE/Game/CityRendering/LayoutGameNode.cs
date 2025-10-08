@@ -40,7 +40,10 @@ namespace SEE.Game.CityRendering
             }
             set
             {
+                Transform parent = GameObject.transform.parent;
+                GameObject.transform.SetParent(null);
                 GameObject.transform.localScale = value;
+                GameObject.transform.SetParent(parent);
             }
         }
 
