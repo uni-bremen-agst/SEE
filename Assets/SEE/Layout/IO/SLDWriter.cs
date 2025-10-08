@@ -45,7 +45,7 @@ namespace SEE.Layout.IO
                 string name = ID(go);
                 Vector3 position = go.transform.position;
                 Vector3 rotation = go.transform.eulerAngles;
-                Vector3 scale = go.transform.localScale;
+                Vector3 scale = go.transform.lossyScale;
 
                 string output = name
                               + Delimiter + ToColumns(position)
