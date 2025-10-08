@@ -470,11 +470,11 @@ namespace SEE.Utils
                 // wipe out all its attributes to see whether they are correctly
                 // restored from the saved configuration file.
                 CommitCity loadedCity = NewVanillaSEECity<CommitCity>();
-                WipeOutDiffCityAttributes(loadedCity);
+                WipeOutCommitCityAttributes(loadedCity);
                 // Load the saved attributes from the configuration file.
                 loadedCity.Load(filename);
 
-                DiffCityAttributesAreEqual(savedCity, loadedCity);
+                CommitCityAttributesAreEqual(savedCity, loadedCity);
             }
             finally
             {
@@ -562,10 +562,12 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="expected">expected settings</param>
         /// <param name="actual">actual settings</param>
-        private static void DiffCityAttributesAreEqual(VCSCity expected, VCSCity actual)
+        private static void CommitCityAttributesAreEqual(CommitCity expected, CommitCity actual)
         {
             SEECityAttributesAreEqual(expected, actual);
             AreEqual(expected.VCSPath, actual.VCSPath);
+            Assert.AreEqual(expected.OldRevision, actual.OldRevision);
+            Assert.AreEqual(expected.NewRevision, actual.NewRevision);
         }
 
         /// <summary>
@@ -782,10 +784,12 @@ namespace SEE.Utils
         /// different from their default values.
         /// </summary>
         /// <param name="city">the city whose attributes are to be re-assigned</param>
-        private static void WipeOutDiffCityAttributes(VCSCity city)
+        private static void WipeOutCommitCityAttributes(CommitCity city)
         {
             WipeOutSEECityAttributes(city);
             city.VCSPath.Path = "C:/MyAbsoluteDirectory/MyVCSDirectory";
+            city.OldRevision = "myOldRevisionYYY";
+            city.NewRevision = "myNewRevisionXXX";
         }
 
         /// <summary>

@@ -41,12 +41,6 @@ namespace SEE.Game.City
         public int MarkerTime = 10;
 
         /// <summary>
-        /// Maps the repository (path) to a list of all hashes of the branches from
-        /// the repository.
-        /// </summary>
-        private IList<string> TipHashes = new List<string>();
-
-        /// <summary>
         /// MarkerFactory for generating node markers.
         /// </summary>
         private MarkerFactory markerFactory;
@@ -63,23 +57,6 @@ namespace SEE.Game.City
         public GitRepository Repository { set; private get; }
 
         /// <summary>
-        /// Runs git fetch on all remotes for all branches.
-        /// </summary>
-        private void RunGitFetch()
-        {
-            Repository.FetchRemotes();
-        }
-
-        /// <summary>
-        /// Gets the hashes of all tip commits from all branches in <see cref="Repository"/>.
-        /// </summary>
-        /// <returns>All tip commits.</returns>
-        private IList<string> GetTipHashes()
-        {
-            return Repository.GetTipHashes();
-        }
-
-        /// <summary>
         /// Starts the actual poller.
         /// </summary>
         private void Start()
@@ -92,14 +69,7 @@ namespace SEE.Game.City
 
             markerFactory = new MarkerFactory(CodeCity.MarkerAttributes);
 
-            InitialPoll().Forget();
-            return;
-
-            async UniTaskVoid InitialPoll()
-            {
-                TipHashes = await UniTask.RunOnThreadPool(GetTipHashes);
-                InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
-            }
+            InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
         }
 
         /// <summary>
@@ -118,25 +88,23 @@ namespace SEE.Game.City
         /// <summary>
         /// Is called in every <see cref="PollingInterval"/> seconds.
         ///
-        /// This method will fetch the newest commits and, if new commits exist, the
-        /// code city is refreshed.
+        /// This method will fetch the newest commits of all remote branches of all remote
+        /// repository and, if new commits exist, the code city is refreshed.
         /// </summary>
         private async UniTaskVoid PollReposAsync()
         {
             if (!doNotPoll)
             {
                 doNotPoll = true;
-                IList<string> newHashes = await UniTask.RunOnThreadPool(() =>
+                bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
-                    RunGitFetch();
-                    return GetTipHashes();
+                    return Repository.FetchRemotes();
                 });
 
-                if (!newHashes.SequenceEqual(TipHashes))
+                if (needsUpdate)
                 {
                     ShowNewCommitsMessage();
 
-                    TipHashes = newHashes;
                     // Backup old graph
                     Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
                     await CodeCity.LoadDataAsync();
