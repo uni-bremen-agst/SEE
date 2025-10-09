@@ -121,7 +121,7 @@ namespace SEE.Game.Avatars
 
             gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
 
-            //Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
+            // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
             stopwatch.Start();
             textureFrame = new Mediapipe.Unity.Experimental.TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
 
@@ -141,7 +141,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            //Animate with this script only if the avatar is locally controlled.
+            // Animate only if the avatar is locally controlled.
             if (IsLocallyControlled)
             {
                 // If the avatar's hands are already in the starting position and ready for animation.
@@ -159,7 +159,7 @@ namespace SEE.Game.Avatars
                     }
                     else
                     {
-                        //Changing positions of the hands.
+                        // Changing positions of the hands.
                         HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
 
                         Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
@@ -171,7 +171,7 @@ namespace SEE.Game.Avatars
 
                         if (resultHandLandmarker.handLandmarks?.Count > 0)
                         {
-                            //Rotate hands and fingers.
+                            // Rotate hands and fingers.
                             HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
                             HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
                         }
