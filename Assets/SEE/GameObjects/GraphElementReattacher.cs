@@ -94,5 +94,25 @@ namespace SEE.GameObjects
         {
             return Reattach(gameObject, edge, er => er.Value, (ref EdgeRef er, Edge e) => { er.Value = e; });
         }
+
+        /// <summary>
+        /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>.
+        ///
+        /// </summary>
+        /// <param name="gameObject">the game object where the graph element is to be attached</param>
+        /// <param name="graphElement">the graph element to be attached (either a <see cref="Node"/>
+        /// or an <see cref="Edge"/></param>
+        /// <returns></returns>
+        /// <exception cref="System.ArgumentException">thrown if <paramref name="graphElement"/>
+        /// is neither a <see cref="Node"/> nor an <see cref="Edge"/></exception>
+        public static GraphElement Reattach(GameObject gameObject, GraphElement graphElement)
+        {
+            return graphElement switch
+            {
+                Node node => ReattachNode(gameObject, node),
+                Edge edge => ReattachEdge(gameObject, edge),
+                _ => throw new System.ArgumentException($"Unsupported graph element type '{graphElement.GetType()}'"),
+            };
+        }
     }
 }
