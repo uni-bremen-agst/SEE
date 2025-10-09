@@ -1,5 +1,4 @@
-﻿using Mediapipe;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace SEE.Game.Avatars
 {
@@ -23,7 +22,8 @@ namespace SEE.Game.Avatars
         /// </summary>
         /// <param name="childBoneLandmark">Landmark of the finger bone, which is the child of the second bone.</param>
         /// <param name="parentBoneLandmark">Landmark of the finger bone that is the parent of the first bone.</param>
-        /// <param name="childBoneStartPos">The position of the child bone relative to the parent's position, recognized by MediaPipe at startup.</param>
+        /// <param name="childBoneStartPos">The position of the child bone relative to the parent's position,
+        /// recognized by MediaPipe at startup.</param>
         /// <returns>Rotation values ​​in degrees to be assigned</returns>
         public float FindRotationForFlexionAndExtention
             (Mediapipe.Tasks.Components.Containers.Landmark childBoneLandmark,
@@ -48,7 +48,8 @@ namespace SEE.Game.Avatars
             Vector2 rotateTo = new(newChildPosition.y, newChildPosition.z);
             float newAngle = Vector2.Angle(rotateFrom, rotateTo);
 
-            //If the value found is too large and with it the fingers would pass through the palm, assign such a value so that the palm is completely bent.
+            // If the value found is too large and with it the fingers would pass through the palm, assign
+            // such a value so that the palm is completely bent.
             if (newAngle >= 130f || (childBoneLandmark.y < parentBoneLandmark.y && squaredDifference < 0))
             {
                 newAngle = 130f;
