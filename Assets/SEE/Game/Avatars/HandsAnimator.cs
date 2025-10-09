@@ -21,122 +21,128 @@ namespace SEE.Game.Avatars
         private Transform transform;
 
         /// <summary>
+        /// Name of the spine bone in the hierarchy (relative to the root of the avatar).
+        /// It is the prefix of all other bones below.
+        /// </summary>
+        public const string Spine = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02";
+
+        /// <summary>
         /// Name of the head bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string HeadName
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
+        public const string Head
+            = Spine + "/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
 
         /// <summary>
         /// Name of the left hand bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftHandName
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
+        public const string LeftHand
+            = Spine + "/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand";
 
         /// <summary>
         /// Names of the bones of the left middle finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftMidFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1";
-        public const string LeftMidFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2";
-        public const string LeftMidFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
+        public const string LeftMidFinger1
+            = LeftHand + "/CC_Base_L_Mid1";
+        public const string LeftMidFinger2
+            = LeftHand + "/CC_Base_L_Mid1/CC_Base_L_Mid2";
+        public const string LeftMidFinger3
+            = LeftHand + "/CC_Base_L_Mid1/CC_Base_L_Mid2/CC_Base_L_Mid3";
 
         /// <summary>
         /// Names of the bones of the left index finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftIndexFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1";
-        public const string LeftIndexFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2";
-        public const string LeftIndexFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
+        public const string LeftIndexFinger1
+            = LeftHand + "/CC_Base_L_Index1";
+        public const string LeftIndexFinger2
+            = LeftHand + "/CC_Base_L_Index1/CC_Base_L_Index2";
+        public const string LeftIndexFinger3
+            = LeftHand + "/CC_Base_L_Index1/CC_Base_L_Index2/CC_Base_L_Index3";
 
         /// <summary>
         /// Names of the bones of the left ring finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftRingFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1";
-        public const string LeftRingFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2";
-        public const string LeftRingFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
+        public const string LeftRingFinger1
+            = LeftHand + "/CC_Base_L_Ring1";
+        public const string LeftRingFinger2
+            = LeftHand + "/CC_Base_L_Ring1/CC_Base_L_Ring2";
+        public const string LeftRingFinger3
+            = LeftHand + "/CC_Base_L_Ring1/CC_Base_L_Ring2/CC_Base_L_Ring3";
 
         /// <summary>
         /// Names of the bones of the left little finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftPinkyFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1";
-        public const string LeftPinkyFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
-        public const string LeftPinkyFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
+        public const string LeftPinkyFinger1
+            = LeftHand + "/CC_Base_L_Pinky1";
+        public const string LeftPinkyFinger2
+            = LeftHand + "/CC_Base_L_Pinky1/CC_Base_L_Pinky2";
+        public const string LeftPinkyFinger3
+            = LeftHand + "/CC_Base_L_Pinky1/CC_Base_L_Pinky2/CC_Base_L_Pinky3";
 
         /// <summary>
         /// Names of the bones of the left thumb in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string LeftThumb1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1";
-        public const string LeftThumb2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
-        public const string LeftThumb3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_L_Clavicle/CC_Base_L_Upperarm/CC_Base_L_Forearm/CC_Base_L_Hand/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
+        public const string LeftThumb1
+            = LeftHand + "/CC_Base_L_Thumb1";
+        public const string LeftThumb2
+            = LeftHand + "/CC_Base_L_Thumb1/CC_Base_L_Thumb2";
+        public const string LeftThumb3
+            = LeftHand + "/CC_Base_L_Thumb1/CC_Base_L_Thumb2/CC_Base_L_Thumb3";
 
         /// <summary>
         /// Name of the right hand bone in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightHandName
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
+        public const string RightHand
+            = Spine + "/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand";
 
         /// <summary>
         /// Names of the bones of the right middle finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightMidFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1";
-        public const string RightMidFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2";
-        public const string RightMidFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
+        public const string RightMidFinger1
+            = RightHand + "/CC_Base_R_Mid1";
+        public const string RightMidFinger2
+            = RightHand + "/CC_Base_R_Mid1/CC_Base_R_Mid2";
+        public const string RightMidFinger3
+            = RightHand + "/CC_Base_R_Mid1/CC_Base_R_Mid2/CC_Base_R_Mid3";
 
         /// <summary>
         /// Names of the bones of the right index finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightIndexFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1";
-        public const string RightIndexFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2";
-        public const string RightIndexFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
+        public const string RightIndexFinger1
+            = RightHand + "/CC_Base_R_Index1";
+        public const string RightIndexFinger2
+            = RightHand + "/CC_Base_R_Index1/CC_Base_R_Index2";
+        public const string RightIndexFinger3
+            = RightHand + "/CC_Base_R_Index1/CC_Base_R_Index2/CC_Base_R_Index3";
 
         /// <summary>
         /// Names of the bones of the right ring finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightRingFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1";
-        public const string RightRingFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2";
-        public const string RightRingFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
+        public const string RightRingFinger1
+            = RightHand + "/CC_Base_R_Ring1";
+        public const string RightRingFinger2
+            = RightHand + "/CC_Base_R_Ring1/CC_Base_R_Ring2";
+        public const string RightRingFinger3
+            = RightHand + "/CC_Base_R_Ring1/CC_Base_R_Ring2/CC_Base_R_Ring3";
 
         /// <summary>
         /// Names of the bones of the right little finger in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightPinkyFinger1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1";
-        public const string RightPinkyFinger2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
-        public const string RightPinkyFinger3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
+        public const string RightPinkyFinger1
+            = RightHand + "/CC_Base_R_Pinky1";
+        public const string RightPinkyFinger2
+            = RightHand + "/CC_Base_R_Pinky1/CC_Base_R_Pinky2";
+        public const string RightPinkyFinger3
+            = RightHand + "/CC_Base_R_Pinky1/CC_Base_R_Pinky2/CC_Base_R_Pinky3";
 
         /// <summary>
         /// Names of the bones of the right thumb in the hierarchy (relative to the root of the avatar).
         /// </summary>
-        public const string RightThumb1Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1";
-        public const string RightThumb2Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
-        public const string RightThumb3Name
-            = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_R_Clavicle/CC_Base_R_Upperarm/CC_Base_R_Forearm/CC_Base_R_Hand/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
+        public const string RightThumb1
+            = RightHand + "/CC_Base_R_Thumb1";
+        public const string RightThumb2
+            = RightHand + "/CC_Base_R_Thumb1/CC_Base_R_Thumb2";
+        public const string RightThumb3
+            = RightHand + "/CC_Base_R_Thumb1/CC_Base_R_Thumb2/CC_Base_R_Thumb3";
 
         /// <summary>
         /// The FullBodyBiped IK solver attached to the avatar.
@@ -252,22 +258,22 @@ namespace SEE.Game.Avatars
             this.ik = ikComponent;
             this.transform = mainTrasform;
 
-            Transform headBone = mainTrasform.Find(HeadName);
-            Transform leftHandBone = mainTrasform.Find(LeftHandName);
-            Transform rightHandBone = mainTrasform.Find(RightHandName);
+            Transform headBone = mainTrasform.Find(Head);
+            Transform leftHandBone = mainTrasform.Find(LeftHand);
+            Transform rightHandBone = mainTrasform.Find(RightHand);
             if (headBone == null)
             {
-                Debug.LogError($"Head bone not found: {HeadName}\n");
+                Debug.LogError($"Head bone not found: {Head}\n");
                 return;
             }
             else if (leftHandBone == null)
             {
-                Debug.LogError($"Left hand bone not found: {LeftHandName}\n");
+                Debug.LogError($"Left hand bone not found: {LeftHand}\n");
                 return;
             }
             else if (rightHandBone == null)
             {
-                Debug.LogError($"Right hand bone not found: {RightHandName}\n");
+                Debug.LogError($"Right hand bone not found: {RightHand}\n");
                 return;
             }
 
@@ -313,17 +319,17 @@ namespace SEE.Game.Avatars
         /// bent at the elbows and the palms are facing forward.</remarks>
         public bool BringHandsToStartPositions()
         {
-            Transform headBone = transform.Find(HeadName);
+            Transform headBone = transform.Find(Head);
             headPosition = transform.InverseTransformPoint(headBone.position);
 
-            Transform leftHand = transform.Find(LeftHandName);
+            Transform leftHand = transform.Find(LeftHand);
             leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
             leftHandTargetRotation = leftHand.rotation;
             leftHand.localRotation = startLeftHandRotation;
 
             leftHandTargetPos = transform.TransformPoint(leftHandPositionOffset);
 
-            Transform rightHand = transform.Find(RightHandName);
+            Transform rightHand = transform.Find(RightHand);
             rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
             rightHandTargetRotation = rightHand.rotation;
             rightHand.localRotation = startRightHandRotation;
@@ -361,16 +367,16 @@ namespace SEE.Game.Avatars
                 RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
 
                 //Save the thumbs rotations values ​​to control their animation in the future.
-                Transform leftThumb1Bone = transform.Find(LeftThumb1Name);
-                Transform leftThumb2Bone = transform.Find(LeftThumb2Name);
-                Transform leftThumb3Bone = transform.Find(LeftThumb3Name);
+                Transform leftThumb1Bone = transform.Find(LeftThumb1);
+                Transform leftThumb2Bone = transform.Find(LeftThumb2);
+                Transform leftThumb3Bone = transform.Find(LeftThumb3);
                 LeftHandTransformState.Thumb1Rotations = leftThumb1Bone.localRotation;
                 LeftHandTransformState.Thumb2Rotations = leftThumb2Bone.localRotation;
                 LeftHandTransformState.Thumb3Rotations = leftThumb3Bone.localRotation;
 
-                Transform rightThumb1Bone = transform.Find(RightThumb1Name);
-                Transform rightThumb2Bone = transform.Find(RightThumb2Name);
-                Transform rightThumb3Bone = transform.Find(RightThumb3Name);
+                Transform rightThumb1Bone = transform.Find(RightThumb1);
+                Transform rightThumb2Bone = transform.Find(RightThumb2);
+                Transform rightThumb3Bone = transform.Find(RightThumb3);
                 RightHandTransformState.Thumb1Rotations = rightThumb1Bone.localRotation;
                 RightHandTransformState.Thumb2Rotations = rightThumb2Bone.localRotation;
                 RightHandTransformState.Thumb3Rotations = rightThumb3Bone.localRotation;
@@ -390,8 +396,8 @@ namespace SEE.Game.Avatars
         /// <param name="resultPoseLandmarker">Output from the mediapipe pose landmarker model.</param>
         public void SolveHandsPositions(PoseLandmarkerResult resultPoseLandmarker)
         {
-            Transform leftHand = transform.Find(LeftHandName);
-            Transform rightHand = transform.Find(RightHandName);
+            Transform leftHand = transform.Find(LeftHand);
+            Transform rightHand = transform.Find(RightHand);
 
             // Whether the laser pointer was toggled
             if (SEEInput.TogglePointing())
@@ -688,25 +694,25 @@ namespace SEE.Game.Avatars
                 Landmark leftHandPosition = leftHandLandmarks[0];
 
                 //Get transform components of avatar fingers.
-                Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3Name);
-                Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2Name);
-                Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1Name);
+                Transform leftMidFinger3Bone = transform.Find(LeftMidFinger3);
+                Transform leftMidFinger2Bone = transform.Find(LeftMidFinger2);
+                Transform leftMidFinger1Bone = transform.Find(LeftMidFinger1);
 
-                Transform leftIndexFinger1Bone = transform.Find(LeftIndexFinger1Name);
-                Transform leftIndexFinger2Bone = transform.Find(LeftIndexFinger2Name);
-                Transform leftIndexFinger3Bone = transform.Find(LeftIndexFinger3Name);
+                Transform leftIndexFinger1Bone = transform.Find(LeftIndexFinger1);
+                Transform leftIndexFinger2Bone = transform.Find(LeftIndexFinger2);
+                Transform leftIndexFinger3Bone = transform.Find(LeftIndexFinger3);
 
-                Transform leftRingFinger1Bone = transform.Find(LeftRingFinger1Name);
-                Transform leftRingFinger2Bone = transform.Find(LeftRingFinger2Name);
-                Transform leftRingFinger3Bone = transform.Find(LeftRingFinger3Name);
+                Transform leftRingFinger1Bone = transform.Find(LeftRingFinger1);
+                Transform leftRingFinger2Bone = transform.Find(LeftRingFinger2);
+                Transform leftRingFinger3Bone = transform.Find(LeftRingFinger3);
 
-                Transform leftPinkyFinger1Bone = transform.Find(LeftPinkyFinger1Name);
-                Transform leftPinkyFinger2Bone = transform.Find(LeftPinkyFinger2Name);
-                Transform leftPinkyFinger3Bone = transform.Find(LeftPinkyFinger3Name);
+                Transform leftPinkyFinger1Bone = transform.Find(LeftPinkyFinger1);
+                Transform leftPinkyFinger2Bone = transform.Find(LeftPinkyFinger2);
+                Transform leftPinkyFinger3Bone = transform.Find(LeftPinkyFinger3);
 
-                Transform leftThumb1Bone = transform.Find(LeftThumb1Name);
-                Transform leftThumb2Bone = transform.Find(LeftThumb2Name);
-                Transform leftThumb3Bone = transform.Find(LeftThumb3Name);
+                Transform leftThumb1Bone = transform.Find(LeftThumb1);
+                Transform leftThumb2Bone = transform.Find(LeftThumb2);
+                Transform leftThumb3Bone = transform.Find(LeftThumb3);
 
                 // If these are the very first landmarks detected, save the starting positions of the bones (relative to their parent transforms)
                 // so that these values can be used ​​to calculate rotations later.
@@ -965,25 +971,25 @@ namespace SEE.Game.Avatars
                 Landmark rightHandPosition = rightHandLandmarks[0];
 
                 //Get transform components of avatar fingers.
-                Transform rightMidFinger3Bone = transform.Find(RightMidFinger3Name);
-                Transform rightMidFinger2Bone = transform.Find(RightMidFinger2Name);
-                Transform rightMidFinger1Bone = transform.Find(RightMidFinger1Name);
+                Transform rightMidFinger3Bone = transform.Find(RightMidFinger3);
+                Transform rightMidFinger2Bone = transform.Find(RightMidFinger2);
+                Transform rightMidFinger1Bone = transform.Find(RightMidFinger1);
 
-                Transform rightIndexFinger1Bone = transform.Find(RightIndexFinger1Name);
-                Transform rightIndexFinger2Bone = transform.Find(RightIndexFinger2Name);
-                Transform rightIndexFinger3Bone = transform.Find(RightIndexFinger3Name);
+                Transform rightIndexFinger1Bone = transform.Find(RightIndexFinger1);
+                Transform rightIndexFinger2Bone = transform.Find(RightIndexFinger2);
+                Transform rightIndexFinger3Bone = transform.Find(RightIndexFinger3);
 
-                Transform rightRingFinger1Bone = transform.Find(RightRingFinger1Name);
-                Transform rightRingFinger2Bone = transform.Find(RightRingFinger2Name);
-                Transform rightRingFinger3Bone = transform.Find(RightRingFinger3Name);
+                Transform rightRingFinger1Bone = transform.Find(RightRingFinger1);
+                Transform rightRingFinger2Bone = transform.Find(RightRingFinger2);
+                Transform rightRingFinger3Bone = transform.Find(RightRingFinger3);
 
-                Transform rightPinkyFinger1Bone = transform.Find(RightPinkyFinger1Name);
-                Transform rightPinkyFinger2Bone = transform.Find(RightPinkyFinger2Name);
-                Transform rightPinkyFinger3Bone = transform.Find(RightPinkyFinger3Name);
+                Transform rightPinkyFinger1Bone = transform.Find(RightPinkyFinger1);
+                Transform rightPinkyFinger2Bone = transform.Find(RightPinkyFinger2);
+                Transform rightPinkyFinger3Bone = transform.Find(RightPinkyFinger3);
 
-                Transform rightThumb1Bone = transform.Find(RightThumb1Name);
-                Transform rightThumb2Bone = transform.Find(RightThumb2Name);
-                Transform rightThumb3Bone = transform.Find(RightThumb3Name);
+                Transform rightThumb1Bone = transform.Find(RightThumb1);
+                Transform rightThumb2Bone = transform.Find(RightThumb2);
+                Transform rightThumb3Bone = transform.Find(RightThumb3);
 
                 // If these are the very first landmarks detected, save the starting positions of the bones (relative to their parent transforms)
                 // so that these values can be used ​​to calculate rotations later.

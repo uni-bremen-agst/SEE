@@ -210,37 +210,37 @@ namespace SEE.Game.Avatars
             Transform rightHandBendGoal = transform.Find("RightElbowBendGoal");
             rightHandBendGoal.localPosition = rightBendGoalLocalPosition.Value;
 
-            Transform leftMidFinger3Bone = transform.Find(HandsAnimator.LeftMidFinger3Name);
-            Transform leftMidFinger2Bone = transform.Find(HandsAnimator.LeftMidFinger2Name);
-            Transform leftMidFinger1Bone = transform.Find(HandsAnimator.LeftMidFinger1Name);
+            Transform leftMidFinger3Bone = transform.Find(HandsAnimator.LeftMidFinger3);
+            Transform leftMidFinger2Bone = transform.Find(HandsAnimator.LeftMidFinger2);
+            Transform leftMidFinger1Bone = transform.Find(HandsAnimator.LeftMidFinger1);
             leftMidFinger1Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.x);
             leftMidFinger2Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.y);
             leftMidFinger3Bone.localRotation = Quaternion.Euler(0,0,leftMiddleFingerRotations.Value.z);
 
-            Transform leftIndexFinger1Bone = transform.Find(HandsAnimator.LeftIndexFinger1Name);
-            Transform leftIndexFinger2Bone = transform.Find(HandsAnimator.LeftIndexFinger2Name);
-            Transform leftIndexFinger3Bone = transform.Find(HandsAnimator.LeftIndexFinger3Name);
+            Transform leftIndexFinger1Bone = transform.Find(HandsAnimator.LeftIndexFinger1);
+            Transform leftIndexFinger2Bone = transform.Find(HandsAnimator.LeftIndexFinger2);
+            Transform leftIndexFinger3Bone = transform.Find(HandsAnimator.LeftIndexFinger3);
             leftIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.x);
             leftIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.y);
             leftIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, leftIndexFingerRotations.Value.z);
 
-            Transform leftRingFinger1Bone = transform.Find(HandsAnimator.LeftRingFinger1Name);
-            Transform leftRingFinger2Bone = transform.Find(HandsAnimator.LeftRingFinger2Name);
-            Transform leftRingFinger3Bone = transform.Find(HandsAnimator.LeftRingFinger3Name);
+            Transform leftRingFinger1Bone = transform.Find(HandsAnimator.LeftRingFinger1);
+            Transform leftRingFinger2Bone = transform.Find(HandsAnimator.LeftRingFinger2);
+            Transform leftRingFinger3Bone = transform.Find(HandsAnimator.LeftRingFinger3);
             leftRingFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.x);
             leftRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.y);
             leftRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftRingFingerRotations.Value.z);
 
-            Transform leftPinkyFinger1Bone = transform.Find(HandsAnimator.LeftPinkyFinger1Name);
-            Transform leftPinkyFinger2Bone = transform.Find(HandsAnimator.LeftPinkyFinger2Name);
-            Transform leftPinkyFinger3Bone = transform.Find(HandsAnimator.LeftPinkyFinger3Name);
+            Transform leftPinkyFinger1Bone = transform.Find(HandsAnimator.LeftPinkyFinger1);
+            Transform leftPinkyFinger2Bone = transform.Find(HandsAnimator.LeftPinkyFinger2);
+            Transform leftPinkyFinger3Bone = transform.Find(HandsAnimator.LeftPinkyFinger3);
             leftPinkyFinger1Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.x);
             leftPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.y);
             leftPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, leftPinkyFingerRotations.Value.z);
 
-            Transform leftThumb1Bone = transform.Find(HandsAnimator.LeftThumb1Name);
-            Transform leftThumb2Bone = transform.Find(HandsAnimator.LeftThumb2Name);
-            Transform leftThumb3Bone = transform.Find(HandsAnimator.LeftThumb3Name);
+            Transform leftThumb1Bone = transform.Find(HandsAnimator.LeftThumb1);
+            Transform leftThumb2Bone = transform.Find(HandsAnimator.LeftThumb2);
+            Transform leftThumb3Bone = transform.Find(HandsAnimator.LeftThumb3);
             leftThumb1Bone.localRotation = leftThumb1Rotations.Value;
             leftThumb2Bone.localRotation = leftThumb2Rotations.Value;
             leftThumb3Bone.localRotation = leftThumb3Rotations.Value;
@@ -250,37 +250,37 @@ namespace SEE.Game.Avatars
             ik.solver.rightHandEffector.positionWeight = 1f;
             ik.solver.rightHandEffector.rotationWeight = rightHandRotationWeight.Value;
 
-            Transform rightMidFinger3Bone = transform.Find(HandsAnimator.RightMidFinger3Name);
-            Transform rightMidFinger2Bone = transform.Find(HandsAnimator.RightMidFinger2Name);
-            Transform rightMidFinger1Bone = transform.Find(HandsAnimator.RightMidFinger1Name);
+            Transform rightMidFinger3Bone = transform.Find(HandsAnimator.RightMidFinger3);
+            Transform rightMidFinger2Bone = transform.Find(HandsAnimator.RightMidFinger2);
+            Transform rightMidFinger1Bone = transform.Find(HandsAnimator.RightMidFinger1);
             rightMidFinger1Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.x);
             rightMidFinger2Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.y);
             rightMidFinger3Bone.localRotation = Quaternion.Euler(0,0,rightMiddleFingerRotations.Value.z);
 
-            Transform rightIndexFinger1Bone = transform.Find(HandsAnimator.RightIndexFinger1Name);
-            Transform rightIndexFinger2Bone = transform.Find(HandsAnimator.RightIndexFinger2Name);
-            Transform rightIndexFinger3Bone = transform.Find(HandsAnimator.RightIndexFinger3Name);
+            Transform rightIndexFinger1Bone = transform.Find(HandsAnimator.RightIndexFinger1);
+            Transform rightIndexFinger2Bone = transform.Find(HandsAnimator.RightIndexFinger2);
+            Transform rightIndexFinger3Bone = transform.Find(HandsAnimator.RightIndexFinger3);
             rightIndexFinger1Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.x);
             rightIndexFinger2Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.y);
             rightIndexFinger3Bone.localRotation = Quaternion.Euler(0,0, rightIndexFingerRotations.Value.z);
 
-            Transform rightRingFinger1Bone = transform.Find(HandsAnimator.RightRingFinger1Name);
-            Transform rightRingFinger2Bone = transform.Find(HandsAnimator.RightRingFinger2Name);
-            Transform rightRingFinger3Bone = transform.Find(HandsAnimator.RightRingFinger3Name);
+            Transform rightRingFinger1Bone = transform.Find(HandsAnimator.RightRingFinger1);
+            Transform rightRingFinger2Bone = transform.Find(HandsAnimator.RightRingFinger2);
+            Transform rightRingFinger3Bone = transform.Find(HandsAnimator.RightRingFinger3);
             rightRingFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.x);
             rightRingFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.y);
             rightRingFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightRingFingerRotations.Value.z);
 
-            Transform rightPinkyFinger1Bone = transform.Find(HandsAnimator.RightPinkyFinger1Name);
-            Transform rightPinkyFinger2Bone = transform.Find(HandsAnimator.RightPinkyFinger2Name);
-            Transform rightPinkyFinger3Bone = transform.Find(HandsAnimator.RightPinkyFinger3Name);
+            Transform rightPinkyFinger1Bone = transform.Find(HandsAnimator.RightPinkyFinger1);
+            Transform rightPinkyFinger2Bone = transform.Find(HandsAnimator.RightPinkyFinger2);
+            Transform rightPinkyFinger3Bone = transform.Find(HandsAnimator.RightPinkyFinger3);
             rightPinkyFinger1Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.x);
             rightPinkyFinger2Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.y);
             rightPinkyFinger3Bone.localRotation = Quaternion.Euler(0, 0, rightPinkyFingerRotations.Value.z);
 
-            Transform rightThumb1Bone = transform.Find(HandsAnimator.RightThumb1Name);
-            Transform rightThumb2Bone = transform.Find(HandsAnimator.RightThumb2Name);
-            Transform rightThumb3Bone = transform.Find(HandsAnimator.RightThumb3Name);
+            Transform rightThumb1Bone = transform.Find(HandsAnimator.RightThumb1);
+            Transform rightThumb2Bone = transform.Find(HandsAnimator.RightThumb2);
+            Transform rightThumb3Bone = transform.Find(HandsAnimator.RightThumb3);
             rightThumb1Bone.localRotation = rightThumb1Rotations.Value;
             rightThumb2Bone.localRotation = rightThumb2Rotations.Value;
             rightThumb3Bone.localRotation = rightThumb3Rotations.Value;
