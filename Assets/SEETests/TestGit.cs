@@ -1,6 +1,5 @@
 ﻿using LibGit2Sharp;
 using NUnit.Framework;
-using SEE.Utils;
 using System.IO;
 using System.Linq;
 using UnityEngine;
@@ -13,7 +12,7 @@ namespace SEE.VCS
     /// <remarks>These are not really tests, but rather a playground to
     /// explore the API of <see cref="LibGit2Sharp"/>.</remarks>
     [Category("SkipOnCI")]
-    internal class TestGit
+    internal class TestGit : TestGitRepository
     {
         // For more examples of using LibGit2Sharp, see:
         //   https://github.com/libgit2/libgit2sharp/blob/master/LibGit2Sharp.Tests/
@@ -43,8 +42,19 @@ namespace SEE.VCS
         /// A private repository on GitHub used for testing purposes.
         /// </summary>
         private static readonly RepositoryInfo TestRepo =
-            new("https://github.com/koschke/TestProjectForSEE.git",
-                ""); // ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
+            new(testRepositoryUrl, testRepositoryAccessToken);
+
+        /// <summary>
+        /// Make sure that an access token for <see cref="TestRepo"/> has been provided.
+        /// </summary>
+        [SetUp]
+        public static void Setup()
+        {
+            if (string.IsNullOrWhiteSpace(TestRepo.AccessToken))
+            {
+                Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(TestRepo)} definition in {nameof(TestGit)} to run the tests.");
+            }
+        }
 
         /// <summary>
         /// This test shows how to set up a credential provider for LibGit2Sharp.
@@ -198,44 +208,6 @@ namespace SEE.VCS
 
             // If the count is greater than zero, there are changes to pull.
             return aheadBy > 0;
-        }
-
-        /// <summary>
-        /// Yields the local temporary directory path where the repository
-        /// at <paramref name="repositoryUrl"/> can be checked out. It will
-        /// a subdirectory of the system's temporary directory named after
-        /// the last part of the repository URL.
-        ///
-        /// For instance, LocalPath("https://github.com/koschke/TestProjectForSEE.git")
-        /// yields something like "C:\Users\koschke\AppData\Local\Temp\TestProjectForSEE.git"
-        /// on a Windows machine.
-        /// </summary>
-        /// <param name="repositoryUrl">the URL to the repository</param>
-        /// <returns>local temporary directory path</returns>
-        private static string LocalPath(string repositoryUrl)
-        {
-            return Path.Combine(Path.GetTempPath(), Filenames.Basename(repositoryUrl, '/'));
-        }
-
-        /// <summary>
-        /// Deletes the directory at <paramref name="path"/> if it exists.
-        /// </summary>
-        /// <param name="path"></param>
-        private static void DeleteDirectoryIfItExists(string path)
-        {
-            if (Directory.Exists(path))
-            {
-                // Remove read-only attribute from directory and all its contents
-                // so that we can delete everything.
-                DirectoryInfo directory = new(path) { Attributes = FileAttributes.Normal };
-
-                foreach (FileSystemInfo info in directory.GetFileSystemInfos("*", SearchOption.AllDirectories))
-                {
-                    info.Attributes = FileAttributes.Normal;
-                }
-
-                directory.Delete(true);
-            }
         }
     }
 }

@@ -12,6 +12,17 @@ namespace SEE.VCS
     internal class TestGitRepository
     {
         /// <summary>
+        /// URL for the test project on GitHub.
+        /// </summary>
+        protected const string testRepositoryUrl = "https://github.com/koschke/TestProjectForSEE.git";
+
+        /// <summary>
+        /// The access token for the test repository at <see cref="testRepositoryUrl"/>.
+        /// </summary>
+        /// <remarks>DO NOT CHECK IN YOUR TOKEN!</remarks>
+        protected const string testRepositoryAccessToken = "";
+
+        /// <summary>
         /// Yields the local temporary directory path where the repository
         /// at <paramref name="repositoryUrl"/> can be checked out. It will
         /// a subdirectory of the system's temporary directory named after

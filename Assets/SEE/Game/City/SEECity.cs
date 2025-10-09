@@ -424,7 +424,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
+        /// Precondition: The graph data have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]

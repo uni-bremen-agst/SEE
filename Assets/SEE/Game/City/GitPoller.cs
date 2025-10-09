@@ -1,19 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.DataModel.DG;
-using SEE.GO;
 using SEE.GraphProviders;
-using SEE.UI.Notification;
+using SEE.Utils;
 using SEE.VCS;
+using System.Timers;
 using UnityEngine;
 
 namespace SEE.Game.City
 {
     /// <summary>
-    /// <see cref="GitPoller"/> is used to regularly fetch for new changes in the
-    /// git repositories specified im <see cref="WatchedRepositories"/>.
+    /// <see cref="GitPoller"/> is used to regularly fetch for new changes in a given
+    /// <see cref="Repository"/>.
     ///
     /// When a new commit was detected on any branch, a refresh of the CodeCity is initiated.
     /// Newly added or changed nodes will be marked after the refresh.
@@ -21,30 +17,8 @@ namespace SEE.Game.City
     /// This component will be added automatically by <see cref="GitBranchesGraphProvider"/>
     /// if <see cref="GitBranchesGraphProvider.AutoFetch"/> is set to true.
     /// </summary>
-    public class GitPoller : MonoBehaviour
+    public class GitPoller : PollerBase
     {
-        /// <summary>
-        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
-        /// was executed and which should be updated when a new commit is detected.
-        /// </summary>
-        public BranchCity CodeCity;
-
-        /// <summary>
-        /// The interval in seconds in which git should be polled.
-        /// </summary>
-        public int PollingInterval = 5;
-
-        /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly
-        /// added or modified nodes.
-        /// </summary>
-        public int MarkerTime = 10;
-
-        /// <summary>
-        /// MarkerFactory for generating node markers.
-        /// </summary>
-        private MarkerFactory markerFactory;
-
         /// <summary>
         /// Specifies that the poller should currently not run.
         /// This is set to true when git fetch is in progress.
@@ -52,38 +26,82 @@ namespace SEE.Game.City
         private bool doNotPoll = false;
 
         /// <summary>
-        /// The <see cref="GitRepository"/> to poll.
+        /// Constructor.
         /// </summary>
-        public GitRepository Repository { set; private get; }
+        /// <param name="pollingInterval">time in seconds for the polling period</param>
+        /// <param name="gitRepository">repository to be polled</param>
+        public GitPoller(int pollingInterval, GitRepository gitRepository)
+        {
+            PollingInterval = pollingInterval;
+            Repository = gitRepository;
+        }
 
         /// <summary>
-        /// Starts the actual poller.
+        /// Releases the reference to the <see cref="Repository"/>.
         /// </summary>
-        private void Start()
+        ~GitPoller()
         {
+            Stop();
+            Repository = null;
+        }
+
+        /// <summary>
+        /// The <see cref="GitRepository"/> to poll.
+        /// </summary>
+        private GitRepository Repository { set; get; }
+
+        /// <summary>
+        /// Starts the actual poller. Observers on <see cref="OnChangeDetected"/> will be
+        /// notified when a change is detected. The repository will be fetched periodically
+        /// every <see cref="PollingInterval"/> seconds.
+        /// </summary>
+        public override void Start()
+        {
+            base.Start();
+
+            Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
             if (Repository == null)
             {
                 Debug.Log("No watched repositories.\n");
                 return;
             }
 
-            markerFactory = new MarkerFactory(CodeCity.MarkerAttributes);
-
-            InvokeRepeating(nameof(PollReposAsync), PollingInterval, PollingInterval);
+            timer.Elapsed += OnTimedEvent;
         }
 
         /// <summary>
-        /// Shows a message to the user that a new commit was detected.
+        /// Stops the poller. Observers on <see cref="OnChangeDetected"/> will no longer be
+        /// notified.
         /// </summary>
-        private void ShowNewCommitsMessage()
+        public override void Stop()
         {
-            ShowNotification.Info("New commits detected", "Refreshing code city.");
+            if (timer != null)
+            {
+                Debug.Log($"Stopping GitPoller on {Repository.RepositoryPath.Path}...\n");
+                timer.Elapsed -= OnTimedEvent;
+            }
+            base.Stop();
         }
 
         /// <summary>
-        /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
+        /// Delegate to be called when a change was detected in the repository.
         /// </summary>
-        private static readonly NodeEqualityComparer nodeEqualityComparer = new();
+        public delegate void ChangeDetected();
+
+        /// <summary>
+        /// Occurs when a change is detected in the monitored <see cref="Repository"/>.
+        /// </summary>
+        /// <remarks>Subscribe to this event to handle changes as they occur. The event is triggered
+        /// whenever the poller detects a relevant change, and the associated event handler will be invoked.</remarks>
+        public event ChangeDetected OnChangeDetected;
+
+        /// <summary>
+        /// Executed on every timer event. Runs the <see cref="PollReposAsync"/> method.
+        /// </summary>
+        private void OnTimedEvent(object source, ElapsedEventArgs events)
+        {
+            PollReposAsync().Forget();
+        }
 
         /// <summary>
         /// Is called in every <see cref="PollingInterval"/> seconds.
@@ -95,6 +113,7 @@ namespace SEE.Game.City
         {
             if (!doNotPoll)
             {
+                Debug.Log($"Fetching repository {Repository.RepositoryPath.Path}...\n");
                 doNotPoll = true;
                 bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
@@ -103,67 +122,12 @@ namespace SEE.Game.City
 
                 if (needsUpdate)
                 {
-                    ShowNewCommitsMessage();
-
-                    // Backup old graph
-                    Graph oldGraph = CodeCity.LoadedGraph.Clone() as Graph;
-                    await CodeCity.LoadDataAsync();
-                    try
-                    {
-                        CodeCity.ReDrawGraph();
-                    }
-                    catch (Exception e)
-                    {
-                        Debug.LogError(e);
-                    }
-
-                    CodeCity.LoadedGraph.Diff(oldGraph,
-                        g => g.Nodes(),
-                        (g, id) => g.GetNode(id),
-                        GraphExtensions.AttributeDiff(CodeCity.LoadedGraph, oldGraph),
-                        nodeEqualityComparer,
-                        out ISet<Node> addedNodes,
-                        out ISet<Node> removedNodes,
-                        out ISet<Node> changedNodes,
-                        out _);
-
-                    foreach (Node changedNode in changedNodes)
-                    {
-                        markerFactory.MarkChanged(GraphElementIDMap.Find(changedNode.ID, true));
-                    }
-
-                    foreach (Node addedNode in addedNodes)
-                    {
-                        markerFactory.MarkBorn(GraphElementIDMap.Find(addedNode.ID, true));
-                    }
-
-                    ShowRemovedNodes(removedNodes);
-
-                    // Removed nodes are not marked, because they are not in the graph anymore.
-                    // But we may want animate their removal.
-
-                    Invoke(nameof(RemoveMarker), MarkerTime);
+                    Debug.Log($"Change detected in repository {Repository.RepositoryPath.Path}...\n");
+                    OnChangeDetected?.Invoke();
                 }
 
                 doNotPoll = false;
             }
         }
-
-        /// <summary>
-        /// Notifies the user about removed files in the repository.
-        /// </summary>
-        /// <param name="removedNodes">The list of removed nodes.</param>
-        private void ShowRemovedNodes(ISet<Node> removedNodes)
-        {
-            foreach (Node removedNode in removedNodes)
-            {
-                ShowNotification.Info("File removed", $"File {removedNode.ID} was removed from the repository {Repository.RepositoryPath.Path}.");
-            }
-        }
-
-        /// <summary>
-        /// Removes all markers.
-        /// </summary>
-        private void RemoveMarker() => markerFactory.Clear();
     }
 }

@@ -1082,7 +1082,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -1214,7 +1214,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -1247,13 +1247,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.VCS.Churn
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 1
       Data: Metric.VCS.Number_Of_Developers
     - Name: 
       Entry: 1
-      Data: Metric.VCS.Churn
+      Data: Metric.Lines.LOC
     - Name: 
       Entry: 13
       Data: 
@@ -1298,7 +1298,7 @@ MonoBehaviour:
       Data: 0.001
     - Name: MaximalBlockLength
       Entry: 4
-      Data: 1
+      Data: 0.1
     - Name: AntennaSettings
       Entry: 7
       Data: 20|SEE.Game.City.AntennaAttributes, SEE
@@ -1352,7 +1352,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -1484,7 +1484,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: false
+      Data: true
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -1640,7 +1640,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.VCS.Lines_Added
+      Data: Metric.VCS.Lines_Removed
     - Name: $v
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1649,13 +1649,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.7851293
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 0.9811321
+      Data: 0.4901961
     - Name: 
       Entry: 4
-      Data: 0.5229619
+      Data: 0
     - Name: 
       Entry: 4
       Data: 1
@@ -1667,10 +1667,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
       Data: 0
@@ -1694,7 +1694,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: Metric.VCS.Lines_Removed
+      Data: Metric.VCS.Lines_Added
     - Name: $v
       Entry: 7
       Data: SEE.Game.ColorRange, SEE
@@ -1703,13 +1703,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.9056604
+      Data: 0.5854396
     - Name: 
       Entry: 4
-      Data: 0.564295352
+      Data: 0.8679245
     - Name: 
       Entry: 4
-      Data: 0.516909957
+      Data: 0.5854396
     - Name: 
       Entry: 4
       Data: 1
@@ -1721,10 +1721,10 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 1
     - Name: 
       Entry: 4
       Data: 0
@@ -1773,13 +1773,13 @@ MonoBehaviour:
       Data: 36|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 1
+      Data: 0
     - Name: RelativePath
       Entry: 1
       Data: 
     - Name: AbsolutePath
       Entry: 1
-      Data: 
+      Data: C:/Users/koschke/develop/dream-shops/clone
     - Name: 
       Entry: 8
       Data: 
@@ -1800,7 +1800,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: '**/*.cs'
+      Data: '**/*.java'
     - Name: $v
       Entry: 5
       Data: true
@@ -1818,10 +1818,7 @@ MonoBehaviour:
       Data: 39|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 1
-      Data: Assets/SEE/GraphProviders
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -1846,6 +1843,9 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
+    - Name: AccessToken
+      Entry: 1
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -1854,7 +1854,7 @@ MonoBehaviour:
       Data: true
     - Name: CombineAuthors
       Entry: 5
-      Data: true
+      Data: false
     - Name: AuthorAliasMap
       Entry: 7
       Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
@@ -1867,40 +1867,7 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 
-    - Name: $k
-      Entry: 7
-      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: Rainer Koschke
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: $v
-      Entry: 7
-      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
-    - Name: 
-      Entry: 12
-      Data: 1
-    - Name: 
-      Entry: 7
-      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
-    - Name: Name
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: Email
-      Entry: 1
-      Data: koschke@uni-bremen.de
-    - Name: 
-      Entry: 8
-      Data: 
+      Data: 0
     - Name: 
       Entry: 13
       Data: 
@@ -1916,32 +1883,20 @@ MonoBehaviour:
     - Name: 
       Entry: 8
       Data: 
-    - Name: AutoFetch
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: showAuthorEdges
+      Entry: 3
+      Data: 2
+    - Name: autoFetch
       Entry: 5
       Data: false
-    - Name: PollingInterval
-      Entry: 3
-      Data: 5
-    - Name: MarkerTime
-      Entry: 3
-      Data: 10
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 13
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
-    - Name: 
-      Entry: 8
-      Data: 
   LODCulling: 0.001
   ConfigurationPath:
-    Root: 3
-    RelativePath: /SEE/BranchCity.cfg
-    AbsolutePath: 
+    Root: 0
+    RelativePath: /LocalRepos.cfg
+    AbsolutePath: C:/Users/koschke/develop/dream-shops/dream-shops.cfg
   sourceCodeDirectory:
     Root: 2
     RelativePath: 
@@ -1978,7 +1933,7 @@ MonoBehaviour:
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
     Kind: 0
-    AnimationKind: 0
+    AnimationKind: 1
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
@@ -24376,7 +24331,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1914333879
 Transform:
   m_ObjectHideFlags: 0
@@ -25242,7 +25197,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: 849-encapsulate-all-vcs-queries
+      Data: master
     - Name: 
       Entry: 13
       Data: 
@@ -25251,6 +25206,9 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 8
+      Data: 
+    - Name: AccessToken
+      Entry: 1
       Data: 
     - Name: 
       Entry: 8
@@ -25262,7 +25220,23 @@ MonoBehaviour:
       Entry: 5
       Data: false
     - Name: AuthorAliasMap
-      Entry: 6
+      Entry: 7
+      Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
+    - Name: comparer
+      Entry: 7
+      Data: 42|System.Collections.Generic.GenericEqualityComparer`1[[SEE.GraphProviders.VCS.FileAuthor,
+        SEE]], mscorlib
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 12
+      Data: 0
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
       Data: 
     - Name: CommitID
       Entry: 1

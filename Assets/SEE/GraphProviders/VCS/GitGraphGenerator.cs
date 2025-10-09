@@ -144,13 +144,14 @@ namespace SEE.GraphProviders.VCS
             graph.SetCommitID(commitID);
             graph.SetRepositoryPath(repositoryPath);
 
-            float percentage = 0.05f;
-            changePercentage?.Invoke(percentage);
-
+            /// Note: The following code is very similar to
+            /// <see cref="AddNodesAfterDate(Graph, bool, GitRepository, string, DateTime, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// The difference is that we consider only the files present at <paramref name="commitID"/>
+            /// and the commits between <paramref name="baselineCommitID"/> and <paramref name="commitID"/>.
             // Get all files using "git ls-tree -r <CommitID> --name-only".
             HashSet<string> files = repository.AllFiles(commitID, token);
-            percentage = 0.2f;
-            changePercentage?.Invoke(percentage);
+
+            changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
@@ -158,30 +159,26 @@ namespace SEE.GraphProviders.VCS
             {
                 throw new OperationCanceledException(token);
             }
+            changePercentage?.Invoke(0.6f);
+
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
-            IEnumerable<Commit> commitList = repository.CommitsBetween(baselineCommitID, commitID);
-            percentage = 0.3f;
-            changePercentage?.Invoke(percentage);
 
-            int commitCount = commitList.Count();
-            int currentCommitIndex = 0;
+            repository.ForEachCommitBetween(baselineCommitID, commitID, Apply);
 
-            foreach (Commit commit in commitList)
+            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+
+            changePercentage?.Invoke(1f);
+            return graph;
+
+            void Apply(Repository repository, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
                 UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
-                currentCommitIndex++;
-                changePercentage?.Invoke(Mathf.Clamp((float)currentCommitIndex / commitCount, percentage, 0.98f));
             }
-
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
-
-            changePercentage?.Invoke(1f);
-            return graph;
         }
 
         /// <summary>
@@ -250,24 +247,33 @@ namespace SEE.GraphProviders.VCS
              Action<float> changePercentage,
              CancellationToken token)
         {
-            IList<Commit> commitList = repository.CommitsAfter(startDate);
+            /// Note: The following code is very similar to
+            /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
+            /// The difference is that we consider all relevant files passing the repository
+            /// filter and all commits after <paramref name="startDate"/>.
             HashSet<string> files = repository.AllFiles(token);
-            FileToMetrics fileToMetrics = Prepare(graph, files);
+            changePercentage?.Invoke(0.3f);
 
-            int counter = 0;
-            int commitLength = commitList.Count();
-            foreach (Commit commit in commitList)
+            FileToMetrics fileToMetrics = Prepare(graph, files);
+            if (token.IsCancellationRequested)
+            {
+                throw new OperationCanceledException(token);
+            }
+
+            repository.ForEachCommitAfter(startDate, Apply);
+            changePercentage?.Invoke(0.6f);
+
+            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
+            changePercentage?.Invoke(1f);
+
+            void Apply(Repository repo, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
-                UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
-                changePercentage?.Invoke(Mathf.Clamp((float)counter / commitLength, 0, 0.98f));
-                counter++;
+                UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
             }
-            Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
-            changePercentage?.Invoke(1f);
         }
 
         /// <summary>
@@ -388,14 +394,14 @@ namespace SEE.GraphProviders.VCS
         /// very first commit in the version history, which is perfectly okay.
         /// </summary>
         /// <param name="fileToMetrics">Metrics will be calculated for the files therein and added to this map</param>
-        /// <param name="gitRepository">The diff will be retrieved from this repository.</param>
-        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="gitRepository"/></param>
+        /// <param name="repository">The diff will be retrieved from this repository.</param>
+        /// <param name="commit">The commit that should be processed assumed to belong to <paramref name="repository"/></param>
         /// <param name="consultAliasMap">If <paramref name="authorAliasMap"/> should be consulted at all.</param>
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         private static void UpdateMetricsForCommit
             (FileToMetrics fileToMetrics,
-             GitRepository gitRepository,
+             Repository repository,
              Commit commit,
              bool consultAliasMap,
              AuthorMapping authorAliasMap)
@@ -408,12 +414,12 @@ namespace SEE.GraphProviders.VCS
             {
                 foreach (Commit parent in commit.Parents)
                 {
-                    UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(parent, commit), consultAliasMap, authorAliasMap);
+                    UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
                 }
             }
             else
             {
-                UpdateMetricsForPatch(fileToMetrics, commit, gitRepository.Diff(null, commit), consultAliasMap, authorAliasMap);
+                UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
             }
         }
 
@@ -436,7 +442,7 @@ namespace SEE.GraphProviders.VCS
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}");
+                Debug.LogError($"Error retrieving file content for {repositoryFilePath}: {e.Message}\n");
                 return new List<AntlrToken>();
             }
         }
@@ -518,7 +524,7 @@ namespace SEE.GraphProviders.VCS
                 n.SetInt(DataModel.DG.VCS.TruckNumber, file.Value.TruckFactor);
                 if (file.Value.Authors.Any())
                 {
-                    n.SetString(DataModel.DG.VCS.AuthorAttributeName, String.Join(',', file.Value.Authors));
+                    n.SetString(DataModel.DG.VCS.AuthorsAttributeName, String.Join(',', file.Value.Authors));
                 }
 
                 foreach (KeyValuePair<FileAuthor, int> authorChurn in file.Value.AuthorsChurn)

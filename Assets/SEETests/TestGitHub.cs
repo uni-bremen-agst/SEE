@@ -4,15 +4,10 @@ using SEE.Utils.Paths;
 namespace SEE.VCS
 {
     /// <summary>
-    /// Tests for <see cref="VCS.GitRepository"/> using a GitHub repository.
+    /// Tests for <see cref="GitRepository"/> using a GitHub repository.
     /// </summary>
     internal class TestGitHub : TestGitRepository
     {
-        /// <summary>
-        /// URL for the test project on GitHub.
-        /// </summary>
-        private const string repositoryUrl = "https://github.com/koschke/TestProjectForSEE.git";
-
         /// <summary>
         /// Test for <see cref="GitRepository.Clone(string, string)"/>.
         /// </summary>
@@ -23,21 +18,27 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Access token for the GitHub repository at <see cref="repositoryUrl"/>.
-        /// ADD YOUR TOKEN HERE TO RUN THE TESTS. DO NOT CHECK IN YOUR TOKEN!
+        /// Make sure that an access token for <see cref="TestGitHub"/> has been provided.
         /// </summary>
-        private const string accessToken = "";
+        [SetUp]
+        public static void Setup()
+        {
+            if (string.IsNullOrWhiteSpace(testRepositoryAccessToken))
+            {
+                Assert.Inconclusive($"No access token provided. Please add your GitHub access token to the {nameof(testRepositoryAccessToken)} definition in {nameof(TestGitHub)} to run the tests.");
+            }
+        }
 
         /// <summary>
         /// Clones the repository at <see cref="repositoryUrl"/> into a temporary directory.
         /// </summary>
         private static void CloneGitHub()
         {
-            string localPath = LocalPath(repositoryUrl);
+            string localPath = LocalPath(testRepositoryUrl);
             DeleteDirectoryIfItExists(localPath);
 
-            using GitRepository repo = new(new DataPath(localPath), null, accessToken);
-            repo.Clone(repositoryUrl);
+            GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
+            repo.Clone(testRepositoryUrl);
         }
 
         /// <summary>
@@ -50,12 +51,12 @@ namespace SEE.VCS
         {
             CloneGitHub();
 
-            string localPath = LocalPath(repositoryUrl);
+            string localPath = LocalPath(testRepositoryUrl);
             {
                 // We need the using block to ensure that repo is disposed, otherwise
                 // the subsequent deletion of the directory may fail because the
                 // repo still has files open.
-                using GitRepository repo = new(new DataPath(localPath), null, accessToken);
+                GitRepository repo = new(new DataPath(localPath), null, testRepositoryAccessToken);
                 repo.FetchRemotes();
             }
             DeleteDirectoryIfItExists(localPath);

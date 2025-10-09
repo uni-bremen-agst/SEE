@@ -20,48 +20,8 @@ namespace SEE.VCS
     /// Represents the needed information about a git repository for a <see cref="SEECityEvolution"/>.
     /// </summary>
     [Serializable]
-    public class GitRepository: IDisposable
+    public class GitRepository
     {
-        /// <summary>
-        /// The underlying <see cref="Repository"/> object that provides access to
-        /// the Git repository.
-        /// </summary>
-        private Repository repository;
-
-        /// <summary>
-        /// Disposes the repository if it is not null.
-        /// </summary>
-        public void Dispose()
-        {
-            // Dispose of the repository if it is not null to release resources.
-            repository?.Dispose();
-            // Calling GC.SuppressFinalize(this) to improve efficiency by preventing unnecessary
-            // finalization when Dispose is called explicitly.
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Finalizer in case <see cref="Dispose"/> is not called explicitly
-        /// </summary>
-        ~GitRepository()
-        {
-            Dispose();
-        }
-
-        /// <summary>
-        /// Returns a string representation of the object, the repository path, more precisely.
-        /// </summary>
-        /// <returns>the repository path</returns>
-        public override string ToString()
-        {
-            return $"GitRepository: {RepositoryPath.Path}";
-        }
-
-        /// <summary>
-        /// Used for the tab name in runtime config menu.
-        /// </summary>
-        private const string graphProviderFoldoutGroup = "Data";
-
         /// <summary>
         /// The path to the git repository.
         /// </summary>
@@ -84,9 +44,23 @@ namespace SEE.VCS
         /// </summary>
         /// <remarks>This attribute is not saved into the configuration file
         /// because of security reasons.</remarks>
-        [Tooltip("Access token for accessing the repository, if needed."),
+        [Tooltip("Access token for accessing the repository, if needed. BE AWARE THAT THIS PROPERTY WILL BE SERIALIZED."),
          RuntimeTab(graphProviderFoldoutGroup)]
         public string AccessToken = "";
+
+        /// <summary>
+        /// Returns a string representation of the object, the repository path, more precisely.
+        /// </summary>
+        /// <returns>the repository path</returns>
+        public override string ToString()
+        {
+            return $"GitRepository: {RepositoryPath.Path}";
+        }
+
+        /// <summary>
+        /// Used for the tab name in runtime config menu.
+        /// </summary>
+        private const string graphProviderFoldoutGroup = "Data";
 
         /// <summary>
         /// Constructor setting default values for the fields.
@@ -141,20 +115,17 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Creates a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>
-        /// if none exists yet.
+        /// Returns a new <see cref="Repository"/> object for the given <see cref="RepositoryPath"/>.
         /// </summary>
+        /// <returns>new repository</returns>
         /// <exception cref="ArgumentException">thrown if <see cref="RepositoryPath"/> is null or empty</exception>
-        private void OpenRepository()
+        private Repository OpenRepository()
         {
-            if (repository == null)
+            if (RepositoryPath == null || string.IsNullOrWhiteSpace(RepositoryPath.Path))
             {
-                if (RepositoryPath == null || string.IsNullOrWhiteSpace(RepositoryPath.Path))
-                {
-                    throw new ArgumentException("Repository path must not be null or empty.", nameof(RepositoryPath));
-                }
-                repository = new(RepositoryPath.Path);
+                throw new ArgumentException("Repository path must not be null or empty.", nameof(RepositoryPath));
             }
+            return new(RepositoryPath.Path);
         }
 
         /// <summary>
@@ -164,7 +135,7 @@ namespace SEE.VCS
         /// <exception cref="Exception">Thrown if an error occurs while fetching the remotes.</exception>"
         public bool FetchRemotes()
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
 
             bool result = false;
 
@@ -272,9 +243,8 @@ namespace SEE.VCS
         /// <exception cref="ArgumentException">thrown if <paramref name="oldCommitId"/> or
         /// <paramref name="newCommitId"/> is null or empty or if they do not identify
         /// any commit in the repository.</exception>
-        public IEnumerable<Commit> CommitsBetween(string oldCommitId, string newCommitId)
+        private IList<Commit> CommitsBetween(Repository repository, string oldCommitId, string newCommitId)
         {
-            OpenRepository();
             if (string.IsNullOrWhiteSpace(oldCommitId) || string.IsNullOrWhiteSpace(newCommitId))
             {
                 throw new ArgumentException("Both commit IDs must be non-empty strings.");
@@ -285,9 +255,52 @@ namespace SEE.VCS
             return repository.Commits.QueryBy(new CommitFilter
             {
                 SortBy = CommitSortStrategies.Topological | CommitSortStrategies.Reverse,
-                IncludeReachableFrom = GetCheckedCommit(newCommitId),
-                ExcludeReachableFrom = GetCheckedCommit(oldCommitId)
-            }).Where(c => c.Parents.Count() <= 1); // ignore merge conflicts, i.e., commit with more than one parent
+                IncludeReachableFrom = GetCheckedCommit(repository, newCommitId),
+                ExcludeReachableFrom = GetCheckedCommit(repository,oldCommitId)
+            }).Where(c => c.Parents.Count() <= 1).ToList(); // ignore merge conflicts, i.e., commit with more than one parent
+        }
+
+        /// <summary>
+        /// Returns the SHAs of all non-merge commits between the two given commits in reverse order.
+        /// </summary>
+        /// <param name="baselineCommitID">older commit used as the baseline</param>
+        /// <param name="newCommitId">new commit</param>
+        /// <returns>the list of retrieved commits</returns>
+        internal IList<string> CommitsBetween(string baselineCommitID, string newCommitId)
+        {
+            using Repository repository = OpenRepository();
+            return CommitsBetween(repository, baselineCommitID, newCommitId).Select(c => c.Sha).ToList();
+        }
+
+        /// <summary>
+        /// Runs <paramref name="apply"/> for each non-merge commit between the two given commits.
+        ///
+        /// The callback <paramref name="apply"/> is called with the current repository and the
+        /// currently processed commit as parameters. A client can use the repository only
+        /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
+        /// </summary>
+        /// <param name="baselineCommitID">older commit used as the baseline</param>
+        /// <param name="newCommitId"></param>
+        /// <param name="apply">callback to be called for each commit</param>
+        internal void ForEachCommitBetween(string baselineCommitID, string newCommitId, Action<Repository, Commit> apply)
+        {
+            using Repository repository = OpenRepository();
+            foreach (Commit commit in CommitsBetween(repository, baselineCommitID, newCommitId))
+            {
+                apply(repository, commit);
+            }
+        }
+
+        /// <summary>
+        /// Yields the SHAs of all commits (excluding merge commits) after <paramref name="startDate"/>
+        /// until today across all branches.
+        /// </summary>
+        /// <param name="startDate">the date after which commits should be retrieved</param>
+        /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
+        public IList<string> CommitsAfter(DateTime startDate)
+        {
+            using Repository repository = OpenRepository();
+            return CommitsAfter(repository, startDate).Select(c => c.Sha).ToList();
         }
 
         /// <summary>
@@ -296,10 +309,8 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="startDate">the date after which commits should be retrieved</param>
         /// <returns>all commits (excluding merge commits) after <paramref name="startDate"/></returns>
-        public IList<Commit> CommitsAfter(DateTime startDate)
+        private static IList<Commit> CommitsAfter(Repository repository, DateTime startDate)
         {
-            OpenRepository();
-
             IEnumerable<Commit> commitList = repository.Commits
                 .QueryBy(new CommitFilter { IncludeReachableFrom = repository.Branches, SortBy = CommitSortStrategies.None })
                 // Commits after startDate
@@ -311,33 +322,40 @@ namespace SEE.VCS
         }
 
         /// <summary>
-        /// Returns the commit with the given <paramref name="commitId"/> from the repository
-        /// or null if there is no such <paramref name="commitId"/>.
+        /// Runs <paramref name="apply"/> for each non-merge commit after the given <paramref name="startDate"/>
+        /// until today.
+        ///
+        /// The callback <paramref name="apply"/> is called with the current repository and the
+        /// currently processed commit as parameters. A client can use the repository only
+        /// during the callback. The repository is disposed after the last call to <paramref name="apply"/>.
         /// </summary>
-        /// <param name="commitId">Commit ID</param>
-        /// <returns>The commit corresponding to <paramref name="commitId"/> or null.</returns>
-        /// <remarks>This method is similar to <see cref="GetCheckedCommit(string)"/>,
-        /// but returns null if the commit does not exist.</remarks>
-        internal Commit GetCommit(string commitId)
+        /// <param name = "startDate" > the date after which commits should be retrieved</param>
+        /// <param name="apply">callback to be called for each commit</param>
+        public void ForEachCommitAfter(DateTime startDate, Action<Repository, Commit> apply)
         {
-            OpenRepository();
-            return repository.Lookup<Commit>(commitId);
+            using Repository repository = OpenRepository();
+            foreach (Commit commit in CommitsAfter(repository, startDate))
+            {
+                apply(repository, commit);
+            }
         }
 
         /// <summary>
-        /// Returns the commit with the given <paramref name="commitId"/> from the repository.
-        /// If there is no such <paramref name="commitId"/>, an exception is thrown.
+        /// Returns the commit with the given <paramref name="commitID"/> from the repository.
+        /// If there is no such <paramref name="commitID"/>, an exception is thrown.
         /// </summary>
-        /// <param name="commitId">Commit ID</param>
-        /// <returns>The commit corresponding to <paramref name="commitId"/>.</returns>
-        /// <exception cref="ArgumentException">Thrown if the repository does not have a commit
-        /// with the given <paramref name="CommitID"/>.</exception>
-        /// <remarks>This method is similar to <see cref="GetCommit(string)"/>,
-        /// but throws an exception if the commit does not exist.</remarks>
-        internal Commit GetCheckedCommit(string CommitID)
+        /// <param name="commitID">Commit ID</param>
+        /// <returns>The commit corresponding to <paramref name="commitID"/>.</returns>
+        /// <exception cref="ArgumentException">Thrown if <paramref name="commitID"/> is null or
+        /// empty or if the repository does not have a commit with the given <paramref name="commitID"/>.</exception>
+        private Commit GetCheckedCommit(Repository repository, string commitID)
         {
-            Commit commit = repository.Lookup<Commit>(CommitID);
-            return commit ?? throw new ArgumentException($"SHA1 {CommitID} does not exist in the repository {RepositoryPath.Path}.");
+            if (string.IsNullOrWhiteSpace(commitID))
+            {
+                throw new ArgumentException("Commit ID must not be null or empty.", nameof(commitID));
+            }
+            Commit commit = repository.Lookup<Commit>(commitID);
+            return commit ?? throw new ArgumentException($"SHA1 {commitID} does not exist in the repository {RepositoryPath.Path}.");
         }
 
         /// <summary>
@@ -346,9 +364,9 @@ namespace SEE.VCS
         /// <param name="oldCommit">earlier commit ID</param>
         /// <param name="newCommit">later commit ID</param>
         /// <returns>commit log between the two given commits</returns>
-        internal ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
+        private ICommitLog CommitLog(Commit oldCommit, Commit newCommit)
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter
             {
                 IncludeReachableFrom = newCommit,
@@ -360,9 +378,9 @@ namespace SEE.VCS
         /// Returns the commit log of the repository, sorted topologically.
         /// </summary>
         /// <returns>commit log of the repository in topological order</returns>
-        internal ICommitLog CommitLog()
+        private ICommitLog CommitLog()
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
             return repository.Commits.QueryBy(new CommitFilter { SortBy = CommitSortStrategies.Topological });
         }
 
@@ -373,9 +391,24 @@ namespace SEE.VCS
         /// <param name="oldCommit">earlier commit ID; can be null</param>
         /// <param name="newCommit">later commit ID; must not be null</param>
         /// <returns>diff between the two given commits</returns>
-        internal Patch Diff(Commit oldCommit, Commit newCommit)
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="newCommit"/> is null</exception>"
+        private Patch Diff(Commit oldCommit, Commit newCommit)
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
+            return Diff(repository, oldCommit, newCommit);
+        }
+
+        /// <summary>
+        /// Returns the diff between the two given commits <paramref name="oldCommit"/>
+        /// and <paramref name="newCommit"/> as a <see cref="Patch"/>.
+        /// </summary>
+        /// <param name="repository">the repository containing the commits</param>
+        /// <param name="oldCommit">earlier commit ID; can be null</param>
+        /// <param name="newCommit">later commit ID; must not be null</param>
+        /// <returns>diff between the two given commits</returns>
+        /// <exception cref="ArgumentNullException">thrown if <paramref name="newCommit"/> is null</exception>"
+        public static Patch Diff(Repository repository, Commit oldCommit, Commit newCommit)
+        {
             if (newCommit == null)
             {
                 throw new ArgumentNullException(nameof(newCommit), "New commit must not be null.");
@@ -390,10 +423,10 @@ namespace SEE.VCS
         /// <param name="oldCommitID">The identifier of the older commit to compare.</param>
         /// <param name="newCommitID">The identifier of the newer commit to compare.</param>
         /// <returns>A <see cref="Patch"/> object containing the differences between the specified commits.</returns>
-        internal Patch Diff(string oldCommitID, string newCommitID)
+        private Patch Diff(string oldCommitID, string newCommitID)
         {
-            OpenRepository();
-            return Diff(GetCheckedCommit(oldCommitID), GetCheckedCommit(newCommitID));
+            using Repository repository = OpenRepository();
+            return Diff(repository, GetCheckedCommit(repository, oldCommitID), GetCheckedCommit(repository, newCommitID));
         }
 
         /// <summary>
@@ -406,9 +439,9 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="commit">The commit whose <see cref="Patch"/> is to be returned.</param>
         /// <returns>The <see cref="Patch"/> from the parent to <paramref name="commit"/></returns>
-        public Patch GetPatchRelativeToParent(Commit commit)
+        private Patch GetPatchRelativeToParent(Commit commit)
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
 
             if (commit.Parents.Any())
             {
@@ -424,9 +457,9 @@ namespace SEE.VCS
         /// <param name="parent">earlier commit ID</param>
         /// <param name="commit">later commit ID</param>
         /// <returns>diff between the two given commits</returns>
-        internal TreeChanges TreeDiff(Commit parent, Commit commit)
+        private TreeChanges TreeDiff(Commit parent, Commit commit)
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
             return repository.Diff.Compare<TreeChanges>(parent.Tree, commit.Tree);
         }
 
@@ -442,14 +475,14 @@ namespace SEE.VCS
         /// <exception cref="Exception">thrown if the file does not exist</exception>
         public string GetFileContent(string repositoryFilePath)
         {
-            OpenRepository();
-
             if (string.IsNullOrWhiteSpace(repositoryFilePath))
             {
                 throw new ArgumentException("Repository file path must not be null or empty.", nameof(repositoryFilePath));
             }
 
-            foreach (Branch branch in RelevantBranches())
+            using Repository repository = OpenRepository();
+
+            foreach (Branch branch in RelevantBranches(repository))
             {
                 Blob blob = branch.Tip.Tree[repositoryFilePath]?.Target as Blob;
                 if (blob != null)
@@ -465,20 +498,20 @@ namespace SEE.VCS
         /// Yields the canonical name of all branches in <paramref name="repository"/>.
         /// </summary>
         /// <returns>canonical name of all branches</returns>
-        public IEnumerable<string> AllBranchNames()
+        public IList<string> AllBranchNames()
         {
-            OpenRepository();
-            return repository.Branches.Select(b => b.CanonicalName);
+            using Repository repository = OpenRepository();
+            return repository.Branches.Select(b => b.CanonicalName).ToList();
         }
 
         /// <summary>
-        /// Returns the hashes of all tip commits from all relevant branches in this <see cref="GitRepository"/>.
+        /// Returns the hashes of all tip SHA commits from all relevant branches in this <see cref="GitRepository"/>.
         /// </summary>
-        /// <returns>The hashes of the tip commits of all branches.</returns>
+        /// <returns>The hashes of the tip SHA commits of all branches.</returns>
         public IList<string> GetTipHashes()
         {
-            OpenRepository();
-            return RelevantBranches().Select(x => x.Tip.Sha).ToList();
+            using Repository repository = OpenRepository();
+            return RelevantBranches(repository).Select(x => x.Tip.Sha).ToList();
         }
 
         /// <summary>
@@ -486,13 +519,13 @@ namespace SEE.VCS
         /// returned. Otherwise, yields all branches passing <see cref="VCSFilter"/>.
         /// </summary>
         /// <returns>all relevant branches of the <see cref="repository"/></returns>
-        private IEnumerable<Branch> RelevantBranches()
+        private IList<Branch> RelevantBranches(Repository repository)
         {
             if (VCSFilter == null)
             {
-                return repository.Branches;
+                return repository.Branches.ToList();
             }
-            return repository.Branches.Where(branch => VCSFilter.Matches(branch));
+            return repository.Branches.Where(branch => VCSFilter.Matches(branch)).ToList();
         }
 
         /// <summary>
@@ -523,9 +556,9 @@ namespace SEE.VCS
         /// <returns>all distinct file paths</returns>
         public HashSet<string> AllFiles(CancellationToken token = default)
         {
-            OpenRepository();
+            using Repository repository = OpenRepository();
             HashSet<string> result = new();
-            foreach (Branch branch in RelevantBranches())
+            foreach (Branch branch in RelevantBranches(repository))
             {
                 AllFiles(branch.Tip.Tree, result, token);
             }
@@ -550,10 +583,10 @@ namespace SEE.VCS
         /// <see cref="Filter.Matcher"/>.
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
-        /// <param name="filter">the filter to be used to retrieve the files</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>all distinct file paths</returns>
         /// <exception cref="ArgumentNullException">thrown if <paramref name="tree"/> is null</exception>
-        internal HashSet<string> AllFiles(LibGit2Sharp.Tree tree, CancellationToken token = default)
+        private HashSet<string> AllFiles(LibGit2Sharp.Tree tree, CancellationToken token = default)
         {
             if (tree == null)
             {
@@ -570,17 +603,18 @@ namespace SEE.VCS
         /// Analogous to <see cref="AllFiles(LibGit2Sharp.Tree)"/>, where the tree for the commit is passed.
         /// </summary>
         /// <param name="commitID">The unique identifier of the commit. Must not be null, empty, or consist only of whitespace.</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>A collection of file paths representing all files in the specified commit.</returns>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="commitID"/> is null, empty,
         /// or consists only of whitespace.</exception>
-        internal HashSet<string> AllFiles(string commitID, CancellationToken token = default)
+        public HashSet<string> AllFiles(string commitID, CancellationToken token = default)
         {
             if (string.IsNullOrWhiteSpace(commitID))
             {
                 throw new ArgumentNullException(nameof(commitID), "Commit ID must neither be null nor empty.");
             }
-            OpenRepository();
-            return AllFiles(GetCheckedCommit(commitID).Tree, token);
+            using Repository repository = OpenRepository();
+            return AllFiles(GetCheckedCommit(repository, commitID).Tree, token);
         }
 
         /// <summary>
@@ -595,6 +629,7 @@ namespace SEE.VCS
         /// </summary>
         /// <param name="tree">the tree for which to retrieve the files</param>
         /// <param name="paths">where the passing files are to be added</param>
+        /// <param name="token">For cancelling this operation.</param>
         private void AllFiles(LibGit2Sharp.Tree tree, HashSet<string> paths, CancellationToken token = default)
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
@@ -670,6 +705,7 @@ namespace SEE.VCS
         /// <param name="tree">The tree whose files are requested.</param>
         /// <param name="matcher">the inclusion/exclusion path globbings</param>
         /// <param name="paths">the set of paths to which the paths are to be added</param>
+        /// <param name="token">For cancelling this operation.</param>
         /// <returns>the set of distinct paths.</returns>
         private static void CollectFiles(LibGit2Sharp.Tree tree, Matcher matcher, HashSet<string> paths, CancellationToken token)
         {
@@ -690,7 +726,6 @@ namespace SEE.VCS
             }
         }
 
-        #region Author Aliasing
         /// <summary>
         /// If <paramref name="consultAliasMap"/> is false, the original <paramref name="author"/>
         /// will be returned.
@@ -722,7 +757,6 @@ namespace SEE.VCS
                                                                && String.Equals(x.Name, author.Name, StringComparison.OrdinalIgnoreCase))).Key;
             }
         }
-        #endregion Author Aliasing
 
         #region Config I/O
 
@@ -747,6 +781,7 @@ namespace SEE.VCS
             writer.BeginGroup(label);
             RepositoryPath.Save(writer, repositoryPathLabel);
             VCSFilter.Save(writer, vcsFilterLabel);
+            // Note: We do not save the access token for security reasons.
             writer.EndGroup();
         }
 

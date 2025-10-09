@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using DG.Tweening;
-using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
@@ -476,31 +475,16 @@ namespace SEE.Game.Operator
                 {
                     // If we are moving the root node, the whole graph will be moved,
                     // hence, the layout of the edges does not need to be updated.
-                    if (updateEdges && City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+                    if (updateEdges)
                     {
-                        // The edge layout needs to be updated only if we actually have an edge layout.
-                        UpdateEdgeLayout(duration);
-
-                        // If the operator was invoked in a BranchCity, the author-sphere edges should be moved, too.
-                        if (City is BranchCity)
+                        if (City.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
                         {
-                            if (gameObject.TryGetComponent(out AuthorRef authorRef))
-                            {
-                                foreach ((GameObject, int) edge in authorRef.Edges)
-                                {
-                                    SEESpline seeSpline = edge.Item1.GetComponent<SEESpline>();
-                                    seeSpline.UpdateEndPosition(gameObject.transform.position);
-                                }
-                            }
-                            else
-                            {
-                                foreach (AuthorRef child in gameObject.GetComponentsInChildren<AuthorRef>())
-                                {
-                                    child.Edges.ForEach(x =>
-                                        x.Item1.GetComponent<SEESpline>()
-                                            .UpdateEndPosition(child.gameObject.transform.position));
-                                }
-                            }
+                            // The edge layout needs to be updated only if we actually have an edge layout.
+                            UpdateEdgeLayout(duration);
+                        }
+                        if (TryGetComponent(out AuthorRef author))
+                        {
+                            author.UpdateLayout();
                         }
                     }
                 }
