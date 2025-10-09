@@ -4,7 +4,6 @@ using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.Game.Evolution
