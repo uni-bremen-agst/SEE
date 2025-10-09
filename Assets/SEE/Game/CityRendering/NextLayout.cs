@@ -1,5 +1,4 @@
 ﻿using SEE.DataModel.DG;
-using SEE.GO;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using System;
@@ -9,6 +8,9 @@ using UnityEngine;
 
 namespace SEE.Game.CityRendering
 {
+    /// <summary>
+    /// Calculates the next layout for a given graph based on an already rendered code city.
+    /// </summary>
     internal static class NextLayout
     {
         /// <summary>
