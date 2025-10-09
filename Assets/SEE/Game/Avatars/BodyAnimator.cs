@@ -123,7 +123,7 @@ namespace SEE.Game.Avatars
 
             // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
             stopwatch.Start();
-            textureFrame = new Mediapipe.Unity.Experimental.TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+            textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
 
             if (!gameObject.TryGetComponentOrLog(out ik))
             {
