@@ -277,12 +277,12 @@ namespace SEE.Game.Avatars
                 return;
             }
 
-            //Save information about the current position and rotation of the hand.
+            // Save information about the current position and rotation of the hand.
             LeftHandTransformState.HandPosition = leftHandBone.position;
             LeftHandTransformState.HandRotation = leftHandBone.rotation;
             startLeftHandRotation = leftHandBone.localRotation;
 
-            //Save information about the current position and rotation of the hand.
+            // Save information about the current position and rotation of the hand.
             RightHandTransformState.HandPosition = rightHandBone.position;
             RightHandTransformState.HandRotation = rightHandBone.rotation;
             startRightHandRotation = rightHandBone.localRotation;
@@ -297,7 +297,7 @@ namespace SEE.Game.Avatars
             ik.solver.rightHandEffector.rotationWeight = weight;
             RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
 
-            //Add bend goals for the elbows so they bend downwards.
+            // Add bend goals for the elbows so they bend downwards.
             GameObject leftElbowBendGoal = new("LeftElbowBendGoal");
             leftElbowBendGoal.transform.SetParent(mainTrasform, false);
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftElbowBendGoal.transform;
@@ -336,12 +336,12 @@ namespace SEE.Game.Avatars
 
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
 
-            //If the start position has not yet been reached.
+            // If the start position has not yet been reached.
             if (!startHandsPositionReached
                 && (Vector3.Distance(LeftHandTransformState.HandPosition, leftHandTargetPos) >= arrivalThreshold
                     || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
             {
-                //Turn and move the hands slightly to get closer to the starting position.
+                // Turn and move the hands slightly to get closer to the starting position.
                 LeftHandTransformState.HandPosition = Vector3.Lerp(LeftHandTransformState.HandPosition, leftHandTargetPos, Time.deltaTime * moveSpeed * 4);
                 LeftHandTransformState.HandRotation = Quaternion.Slerp(LeftHandTransformState.HandRotation, leftHandTargetRotation, Time.deltaTime * moveSpeed * 4);
                 ik.solver.leftHandEffector.rotation = LeftHandTransformState.HandRotation;
@@ -366,7 +366,7 @@ namespace SEE.Game.Avatars
                 RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
                 RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
 
-                //Save the thumbs rotations values ​​to control their animation in the future.
+                // Save the thumbs rotations values ​​to control their animation in the future.
                 Transform leftThumb1Bone = transform.Find(LeftThumb1);
                 Transform leftThumb2Bone = transform.Find(LeftThumb2);
                 Transform leftThumb3Bone = transform.Find(LeftThumb3);
@@ -649,7 +649,7 @@ namespace SEE.Game.Avatars
                                   GestureRecognizerResult resultGestureRecognizer,
                                   PoseLandmarkerResult resultPoseLandmarker)
         {
-            //Index of values ​​for the left hand in the list of coordinates from hand landmarker model.
+            // Index of values ​​for the left hand in the list of coordinates from hand landmarker model.
             int leftHandResultIndex
                 = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Left"));
 
@@ -660,13 +660,13 @@ namespace SEE.Game.Avatars
                 leftHandInTheGesturesList
                     = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Left"));
             }
-            String leftHandGesture = "None";
+            string leftHandGesture = "None";
             if (leftHandInTheGesturesList != -1)
             {
                 leftHandGesture = resultGestureRecognizer.gestures[leftHandInTheGesturesList].categories[0].categoryName;
             }
 
-            //If the left hand was detected, get world coordinates of the keypoints.
+            // If the left hand was detected, get world coordinates of the keypoints.
             if (leftHandResultIndex >= 0)
             {
                 List<Landmark> leftHandLandmarks = resultHandLandmarker.handWorldLandmarks[leftHandResultIndex].landmarks;
@@ -928,13 +928,13 @@ namespace SEE.Game.Avatars
              GestureRecognizerResult resultGestureRecognizer,
              PoseLandmarkerResult resultPoseLandmarker)
         {
-            //Index of values ​​for the right hand in the list of coordinates from hand landmarker model.
+            // Index of values ​​for the right hand in the list of coordinates from hand landmarker model.
             int rightHandResultIndex = resultHandLandmarker.handedness.IndexOf(resultHandLandmarker.handedness.Find(x => x.categories[0].categoryName == "Right"));
 
             int rightHandInTheGesturesList = -1;
             if (resultGestureRecognizer.handedness != null)
             {
-                //Index of values ​​for the right hand in the output from gesture recognizer model.
+                // Index of values ​​for the right hand in the output from gesture recognizer model.
                 rightHandInTheGesturesList = resultGestureRecognizer.handedness.IndexOf(resultGestureRecognizer.handedness.Find(x => x.categories[0].categoryName == "Right"));
             }
             String rightHandGesture = "None";
@@ -943,7 +943,7 @@ namespace SEE.Game.Avatars
                 rightHandGesture = resultGestureRecognizer.gestures[rightHandInTheGesturesList].categories[0].categoryName;
             }
 
-            //If the right hand was detected, get world coordinates of the keypoints.
+            // If the right hand was detected, get world coordinates of the keypoints.
             if (rightHandResultIndex >= 0)
             {
                 List<Landmark> rightHandLandmarks = resultHandLandmarker.handWorldLandmarks[rightHandResultIndex].landmarks;
@@ -1176,7 +1176,7 @@ namespace SEE.Game.Avatars
                         }
                     }
                 }
-                //Save information about current hand and finger rotations.
+                // Save information about current hand and finger rotations.
                 RightHandTransformState.HandIKEffectorPosition = ik.solver.rightHandEffector.position;
                 RightHandTransformState.HandIKEffectorRotation = ik.solver.rightHandEffector.rotation;
                 RightHandTransformState.IndexFingerRotations = new Vector3(rightIndexFinger1Bone.localRotation.eulerAngles.z,
