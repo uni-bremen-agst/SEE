@@ -9,6 +9,7 @@ using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -107,12 +108,23 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> changedNodes, // nodes belong to LoadedGraph
                 out ISet<Node> equalNodes);  // nodes belong to LoadedGraph
 
-            // Before we can calculate the new layout, we must ensure that all game nodes
-            // representing nodes that are still present in the new graph are reattached
-            // so that their metrics are up to date. These are needed to determine the
-            // dimensions of the nodes in the new layout.
+            branchCity.LoadedGraph.Diff(oldGraph,
+                g => g.Edges(),
+                (g, id) => g.GetEdge(id),
+                GraphExtensions.AttributeDiff(branchCity.LoadedGraph, oldGraph),
+                edgeEqualityComparer,
+                out ISet<Edge> addedEdges,   // edges belong to LoadedGraph
+                out ISet<Edge> removedEdges, // edges belong to oldGraph
+                out ISet<Edge> changedEdges, // edges belong to LoadedGraph
+                out ISet<Edge> equalEdges);  // edges belong to LoadedGraph
+
+            // Before we can calculate the new layout, we must ensure that all game objects
+            // representing nodes or edges that are still present in the new graph are reattached.
             equalNodes.UnionWith(changedNodes);
-            ReattachNodes(equalNodes);
+            Reattach(equalNodes);
+
+            equalEdges.UnionWith(changedEdges);
+            Reattach(equalEdges);
 
             NextLayout.Calculate(branchCity.LoadedGraph,
                                  GetGameNode,
@@ -131,9 +143,13 @@ namespace SEE.Game.CityRendering
             // and equalNodes.
 
             ShowRemovedNodes(removedNodes);
-            Debug.Log($"Phase 1: Removing {removedNodes.Count} nodes.\n");
-            await AnimateNodeDeathAsync(removedNodes, markerFactory);
-            Debug.Log($"Phase 1: Finished.\n");
+            Debug.Log($"Phase 1a: Removing {removedNodes.Count} nodes.\n");
+            await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
+            Debug.Log($"Phase 1a: Finished.\n");
+
+            Debug.Log($"Phase 1b: Removing {removedEdges.Count} edges.\n");
+            await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
+            Debug.Log($"Phase 1b: Finished.\n");
 
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
             await AnimateNodeMoveAsync(equalNodes, newNodelayout, branchCity.transform);
@@ -157,6 +173,18 @@ namespace SEE.Game.CityRendering
 
             MarkNodes(addedNodes, changedNodes);
             // FIXME: Update all author references.
+
+            IOperationCallback<Action> AnimateNodeDeath(GameObject go)
+            {
+                markerFactory.MarkDead(go);
+                return go.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel, updateEdges: false);
+            }
+
+            IOperationCallback<Action> AnimateEdgeDeath(GameObject go)
+            {
+                return go.EdgeOperator().Blink(3);
+            }
+
         }
 
         /// <summary>
@@ -193,23 +221,24 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Renders <paramref name="removedNodes"/> and destroys their game objects.
+        /// Animates the death of <paramref name="toBeRemoved"/> and destroys their game objects
+        /// after the animation has finished.
         /// </summary>
-        /// <param name="removedNodes">nodes to be removed</param>
-        /// <param name="markerFactory">factory used to mark nodes as dead</param>
+        /// <param name="toBeRemoved">nodes to be removed</param>
+        /// <param name="AnimateDeath">method to animate the death of a game object</param>
         /// <returns>task</returns>
-        private async UniTask AnimateNodeDeathAsync(ISet<Node> removedNodes, MarkerFactory markerFactory)
+        private async UniTask AnimateDeathAsync<T>(ISet<T> toBeRemoved, Func<GameObject, IOperationCallback<Action>> AnimateDeath)
+            where T : GraphElement
         {
             HashSet<GameObject> deads = new();
 
-            foreach (Node node in removedNodes)
+            foreach (T element in toBeRemoved)
             {
-                GameObject go = GraphElementIDMap.Find(node.ID, true);
+                GameObject go = GraphElementIDMap.Find(element.ID, true);
                 if (go != null)
                 {
                     deads.Add(go);
-                    markerFactory.MarkDead(go);
-                    IOperationCallback<System.Action> animation = go.NodeOperator().MoveYTo(AbstractSEECity.SkyLevel);
+                    IOperationCallback<Action> animation = AnimateDeath(go);
                     animation.OnComplete(() => OnComplete(go));
                     animation.OnKill(() => OnComplete(go));
                 }
@@ -317,19 +346,19 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Reattaches the given <paramref name="nodes"/> to their corresponding game nodes.
-        /// The nodes belong to the new graph but have corresponding game nodes still representing
-        /// the same nodes (according to the ID) of the former graph.
+        /// Reattaches the given <paramref name="elements"/> to their corresponding game objects.
+        /// The graph elements belong to the new graph but have corresponding game objects still representing
+        /// the same graph elements (according to the ID) of the former graph.
         /// </summary>
-        /// <param name="nodes">graph nodes of the new graph to be reattached</param>
-        private void ReattachNodes(ISet<Node> nodes)
+        /// <param name="elements">graph elements of the new graph to be reattached</param>
+        private void Reattach<T>(ISet<T> elements) where T : GraphElement
         {
-            foreach (Node node in nodes)
+            foreach (GraphElement element in elements)
             {
-                GameObject go = GraphElementIDMap.Find(node.ID, true);
+                GameObject go = GraphElementIDMap.Find(element.ID, true);
                 if (go != null)
                 {
-                    GraphElementReattacher.ReattachNode(go, node);
+                    GraphElementReattacher.Reattach(go, element);
                 }
             }
         }
@@ -372,7 +401,7 @@ namespace SEE.Game.CityRendering
                             moved.Add(go);
                             // Move the node to its new position.
                             IOperationCallback<System.Action> animation = go.NodeOperator()
-                              .MoveTo(layoutNode.CenterPosition, updateEdges: false);
+                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
                             animation.OnComplete(() => OnComplete(go));
                             animation.OnKill(() => OnComplete(go));
                         }
@@ -493,6 +522,11 @@ namespace SEE.Game.CityRendering
         /// Allows the comparison of two instances of <see cref="Node"/> from different graphs.
         /// </summary>
         private static readonly NodeEqualityComparer nodeEqualityComparer = new();
+
+        /// <summary>
+        /// Allows the comparison of two instances of <see cref="Edge"/> from different graphs.
+        /// </summary>
+        private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
         /// Notifies the user about removed files in the repository.
