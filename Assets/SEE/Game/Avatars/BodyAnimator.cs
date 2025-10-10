@@ -23,6 +23,7 @@ using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
+using SEE.Controls;
 
 namespace SEE.Game.Avatars
 {
@@ -82,7 +83,28 @@ namespace SEE.Game.Avatars
         public bool IsLocallyControlled = true;
 
         /// <summary>
-        /// Initializes the MediaPipe models and the instance of <see cref="HandsAnimator"/>.
+        /// If true, hand animations with MediaPipe are to be used.
+        /// </summary>
+        private bool isUsingHandAnimations = false;
+
+        /// <summary>
+        /// If true, the user enabled hand animations using MediaPipe for the first time.
+        /// </summary>
+        public bool IsFirtActivationOfHandHanimations = true;
+
+        /// <summary>
+        /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
+        /// </summary>
+        /// <remarks>Start negative so first error can appear immediatly.</remarks>
+        private float lastHandLandmarksErrorTime = -5f;
+
+        /// <summary>
+        /// Time interval (in seconds) between error messages.
+        /// </summary>
+        private readonly float handLandmarksErrorCooldown = 5f;
+
+        /// <summary>
+        /// Initializes the MediaPipe models.
         /// </summary>
         private void Awake()
         {
@@ -130,58 +152,105 @@ namespace SEE.Game.Avatars
                 enabled = false;
                 return;
             }
-            else if (IsLocallyControlled)
+        }
+
+        /// <summary>
+        /// Initializes the the instance of <see cref="HandsAnimator"/>,
+        /// receives the results from the MediaPipe models and calls the <see cref="HandsAnimator"/> class functions for animation.
+        /// </summary>
+        private void LateUpdate()
+        {
+            if (SEEInput.ToggleHandAnimations())
             {
-                HandsAnimator.Initialize(transform, ik);
+                ToggleHandAnimations();
+            }
+
+            if (SEEInput.TogglePointing())
+            {
+                HandsAnimator.IsPointing = !HandsAnimator.IsPointing;
+            }
+
+            // Animate only if the avatar is locally controlled.
+            if (IsLocallyControlled)
+            {
+                // Animate only if the user wishes to use hand animations.
+                if (isUsingHandAnimations)
+                {
+                    // If it's the first time the user enabled the animations, initialize the HandsAnimator.
+                    if (IsFirtActivationOfHandHanimations)
+                    {
+                        HandsAnimator.Initialize(transform, ik);
+                        IsFirtActivationOfHandHanimations = false;
+                    }
+
+                    // If the avatar's hands are already in the starting position and ready for animation.
+                    if (HandsAnimator.BringHandsToStartPositions())
+                    {
+                        // Needed to flip the image since MediaPipe and Unity handle pixel data differently.
+                        textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
+                        Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
+
+                        PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
+
+                        if (resultPoseLandmarker.poseWorldLandmarks == null)
+                        {
+                            Debug.Log("No pose landmarks found.\n");
+                        }
+                        else
+                        {
+                            // Changing positions of the hands.
+                            HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
+
+                            Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
+                            HandLandmarkerResult resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
+
+                            textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
+                            Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
+                            GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
+
+                            if (resultHandLandmarker.handLandmarks?.Count > 0)
+                            {
+                                // Rotate hands and fingers.
+                                HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                                HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
+                            }
+                            else
+                            {
+                                if (Time.time - lastHandLandmarksErrorTime >= handLandmarksErrorCooldown)
+                                {
+                                    Debug.Log("No hand landmarks found.\n");
+                                    lastHandLandmarksErrorTime = Time.time;
+                                }
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    ik.solver.leftHandEffector.positionWeight = 0f;
+                    ik.solver.rightHandEffector.positionWeight = 0f;
+                    ik.solver.leftHandEffector.rotationWeight = 0f;
+                    ik.solver.rightHandEffector.rotationWeight = 0f;
+                }
             }
         }
 
         /// <summary>
-        /// Receives the results from the MediaPipe models and calls the <see cref="HandsAnimator"/> class functions for animation.
+        /// Toggles between using hand animations with MediaPipe and not using them.
         /// </summary>
-        private void LateUpdate()
+        private void ToggleHandAnimations()
         {
-            // Animate only if the avatar is locally controlled.
-            if (IsLocallyControlled)
-            {
-                // If the avatar's hands are already in the starting position and ready for animation.
-                if (HandsAnimator.BringHandsToStartPositions())
-                {
-                    // Needed to flip the image since MediaPipe and Unity handle pixel data differently.
-                    textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: true, flipVertically: false);
-                    Mediapipe.Image poseLandmarkerImage = textureFrame.BuildCPUImage();
+            SetHandAnimations(!isUsingHandAnimations);
+        }
 
-                    PoseLandmarkerResult resultPoseLandmarker = poseLandmarker.DetectForVideo(poseLandmarkerImage, stopwatch.ElapsedMilliseconds);
-
-                    if (resultPoseLandmarker.poseWorldLandmarks == null)
-                    {
-                        Debug.Log("No pose landmarks found.\n");
-                    }
-                    else
-                    {
-                        // Changing positions of the hands.
-                        HandsAnimator.SolveHandsPositions(resultPoseLandmarker);
-
-                        Mediapipe.Image imageForHandLandmarker = textureFrame.BuildCPUImage();
-                        HandLandmarkerResult resultHandLandmarker = handLandmarker.DetectForVideo(imageForHandLandmarker, stopwatch.ElapsedMilliseconds);
-
-                        textureFrame.ReadTextureOnCPU(webCamTexture, flipHorizontally: false, flipVertically: true);
-                        Mediapipe.Image imageForGestureRecognizer = textureFrame.BuildCPUImage();
-                        GestureRecognizerResult resultGestureRecognizer = gestureRecognizer.RecognizeForVideo(imageForGestureRecognizer, stopwatch.ElapsedMilliseconds);
-
-                        if (resultHandLandmarker.handLandmarks?.Count > 0)
-                        {
-                            // Rotate hands and fingers.
-                            HandsAnimator.SolveLeftHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                            HandsAnimator.SolveRightHand(resultHandLandmarker, resultGestureRecognizer, resultPoseLandmarker);
-                        }
-                        else
-                        {
-                            Debug.Log("No hand landmarks found.\n");
-                        }
-                    }
-                }
-            }
+        /// <summary>
+        /// If <paramref name="activate"/> is true, the hand animations with MediaPipe will be turned on;
+        /// otherwise turned off.
+        /// </summary>
+        /// <param name="activate">Whether hand animations are to be activated.</param>
+        public void SetHandAnimations(bool activate)
+        {
+            isUsingHandAnimations = activate;
         }
     }
 }

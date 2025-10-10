@@ -165,7 +165,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the avatar's laser pointer is enabled.
         /// </summary>
-        private bool isPointing = true;
+        public bool IsPointing = true;
 
         /// <summary>
         /// The weight that determines the level of influence of changes in the IK effectors of the hands on other bones in the chain.
@@ -323,17 +323,31 @@ namespace SEE.Game.Avatars
             headPosition = transform.InverseTransformPoint(headBone.position);
 
             Transform leftHand = transform.Find(LeftHand);
-            leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
-            leftHandTargetRotation = leftHand.rotation;
-            leftHand.localRotation = startLeftHandRotation;
+            Transform rightHand = transform.Find(RightHand);
+
+            // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
+            if (IsPointing)
+            {
+                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
+                leftHandTargetRotation = leftHand.rotation;
+                leftHand.localRotation = startLeftHandRotation;
+
+                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
+                rightHandTargetRotation = rightHand.rotation;
+                rightHand.localRotation = startRightHandRotation;
+            }
+            else
+            {
+                leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset * Quaternion.Euler(0, 15f, 0);
+                leftHandTargetRotation = leftHand.rotation;
+                leftHand.localRotation = startLeftHandRotation;
+
+                rightHand.localRotation = startRightHandRotation * rightHandRotationOffset * Quaternion.Euler(70f, 0, 130f);
+                rightHandTargetRotation = rightHand.rotation;
+                rightHand.localRotation = startRightHandRotation;
+            }
 
             leftHandTargetPos = transform.TransformPoint(leftHandPositionOffset);
-
-            Transform rightHand = transform.Find(RightHand);
-            rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
-            rightHandTargetRotation = rightHand.rotation;
-            rightHand.localRotation = startRightHandRotation;
-
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
 
             // If the start position has not yet been reached.
@@ -399,14 +413,8 @@ namespace SEE.Game.Avatars
             Transform leftHand = transform.Find(LeftHand);
             Transform rightHand = transform.Find(RightHand);
 
-            // Whether the laser pointer was toggled
-            if (SEEInput.TogglePointing())
-            {
-                isPointing = !isPointing;
-            }
-
             // Depending on whether the avatar's laser pointer is turned on or not, the animation needs to be adjusted slightly.
-            if (isPointing)
+            if (IsPointing)
             {
                 leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                 leftHandTargetRotation = leftHand.rotation;
@@ -428,9 +436,15 @@ namespace SEE.Game.Avatars
             }
 
             ik.solver.leftHandEffector.position = leftHandTargetPos;
+            ik.solver.leftHandEffector.positionWeight = weight;
             ik.solver.rightHandEffector.position = rightHandTargetPos;
+            ik.solver.rightHandEffector.positionWeight = weight;
             ik.solver.leftHandEffector.rotation = leftHandTargetRotation;
+            ik.solver.leftHandEffector.rotationWeight = weight;
+            LeftHandTransformState.HandIKRotationWeight = ik.solver.leftHandEffector.rotationWeight;
             ik.solver.rightHandEffector.rotation = rightHandTargetRotation;
+            ik.solver.rightHandEffector.rotationWeight = weight;
+            RightHandTransformState.HandIKRotationWeight = ik.solver.rightHandEffector.rotationWeight;
 
             List<Landmark> poseLandmarks = resultPoseLandmarker.poseWorldLandmarks[0].landmarks;
             Landmark mediapipeLeftHandPosition = poseLandmarks[15];
@@ -490,7 +504,7 @@ namespace SEE.Game.Avatars
                 if (LeftHandTransformState.HandToHeadCoordinateDifference.x < handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                     && LeftHandTransformState.HandToHeadCoordinateDifference.x > handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if (isPointing)
+                    if (IsPointing)
                     {
                         leftHand.localRotation = startLeftHandRotation * leftHandRotationOffset;
                     }
@@ -568,7 +582,7 @@ namespace SEE.Game.Avatars
                 if (RightHandTransformState.HandToHeadCoordinateDifference.x > -handXCoordinatesDiffIntervalToFaceTheCamera.Item2
                     && RightHandTransformState.HandToHeadCoordinateDifference.x < -handXCoordinatesDiffIntervalToFaceTheCamera.Item1)
                 {
-                    if (isPointing)
+                    if (IsPointing)
                     {
                         rightHand.localRotation = startRightHandRotation * rightHandRotationOffset;
                     }

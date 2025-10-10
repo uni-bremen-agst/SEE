@@ -99,6 +99,10 @@
         /// </summary>
         Pointing,
         /// <summary>
+        /// Toglles the hand animations on and off.
+        /// </summary>
+        HandAnimations,
+        /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
         /// </summary>
         BoostCameraSpeed,
