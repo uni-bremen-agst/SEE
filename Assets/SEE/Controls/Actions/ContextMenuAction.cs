@@ -285,7 +285,7 @@ namespace SEE.Controls.Actions
                 
                 foreach (InteractableObject iO in selectedObjects)
                 {
-
+                   // ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     var refComponent = iO.gameObject.MustGetComponent<GraphElementRef>();
                     var window = ShowIssueAction.ShowIssues(refComponent);
@@ -493,12 +493,10 @@ namespace SEE.Controls.Actions
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
                 }
-                ShowNotification.Error("Show Notification Issue Contextmenu subMenuEntries Issuesx.", "Notify", 2, true);
-                subMenuEntries.Add(new PopupMenuAction("Show Issuesx", ShowIssue, Icons.Bars));
+                subMenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssue, Icons.Bars));
 
                 if (graphElement.Filename != null)
                 {
-                    subMenuEntries.Add(new PopupMenuAction("Show Issuesx", ShowIssue, Icons.Code));
 
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                     if (gameObject.ContainingCity<VCSCity>() != null)
@@ -556,7 +554,6 @@ namespace SEE.Controls.Actions
 
             void ShowIssue()
             {
-                ShowNotification.Error("ShowIssues() called", "DEBUG", 5, true);
                 ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
             }
             void ShowCode()
