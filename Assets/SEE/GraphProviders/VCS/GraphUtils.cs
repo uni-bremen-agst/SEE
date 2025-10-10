@@ -5,35 +5,32 @@ using SEE.Utils;
 namespace SEE.GraphProviders.VCS
 {
     /// <summary>
-    /// This utility class can be used to work more easily with graphs.
+    /// Simplifies the creation of file and directory nodes in a graph.
     /// </summary>
-    /// <example>
-    /// <para>Filling a graph with nodes representing files</para>
-    /// <code>
-    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph);
-    /// </code>
-    /// <para>adding a suffix to each node</para>
-    /// <code>
-    ///  Node n = GraphUtils.GetOrAddNode("/path/to/file", rootNode, initialGraph, "-mySuffix");
-    /// </code>
-    /// In this case, "-mySuffix" will be added to the ids of all nodes including those representing directories.
-    /// </example>
     public static class GraphUtils
     {
         /// <summary>
         /// Creates and returns a new node to <paramref name="graph"/>.
+        /// Sets the node's <see cref="Node.ID"/> to <paramref name="path"/>,
+        /// its <see cref="GraphElement.Type"/> to <paramref name="type"/>,
+        /// its <see cref="GraphElement.Filename"/> and <see cref="Node.SourceName"/>
+        /// to the basename of <paramref name="path"/>,
+        /// and its <see cref="GraphElement.Filename"/> to the directory part of <paramref name="path"/>.
         /// </summary>
         /// <param name="graph">Where to add the node.</param>
-        /// <param name="id">Unique ID of the new node.</param>
+        /// <param name="path">path of the file-system entity, also used as the unique ID of the new node.</param>
         /// <param name="type">Type of the new node.</param>
-        /// <param name="name">The source name of the node.</param>
+        /// <param name="separator">Separates directories in <paramref name="path"/>.</param>
         /// <returns>a new node added to <paramref name="graph"/>.</returns>
-        public static Node NewNode(Graph graph, string id, string type, string name = null)
+        private static Node NewNode(Graph graph, string path, string type, char separator)
         {
+            string filename = Filenames.Basename(path, separator);
             Node result = new()
             {
-                SourceName = name,
-                ID = id,
+                SourceName = filename,
+                Filename = filename,
+                Directory = Filenames.GetDirectoryName(path, separator),
+                ID = path,
                 Type = type,
             };
 
@@ -75,7 +72,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                Node result = NewNode(graph, path, DataModel.DG.VCS.FileType, Filenames.Basename(path, separator));
+                Node result = NewNode(graph, path, DataModel.DG.VCS.FileType, separator);
                 Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
                 parent?.AddChild(result);
                 return result;
@@ -94,7 +91,7 @@ namespace SEE.GraphProviders.VCS
                 {
                     return node;
                 }
-                return NewNode(graph, path, DataModel.DG.VCS.DirectoryType, Filenames.Basename(path, separator));
+                return NewNode(graph, path, DataModel.DG.VCS.DirectoryType, separator);
             }
         }
     }
