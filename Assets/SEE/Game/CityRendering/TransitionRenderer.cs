@@ -182,7 +182,7 @@ namespace SEE.Game.CityRendering
 
             IOperationCallback<Action> AnimateEdgeDeath(GameObject go)
             {
-                return go.EdgeOperator().Blink(3);
+                return go.EdgeOperator().Blink(5);
             }
 
         }
@@ -400,7 +400,7 @@ namespace SEE.Game.CityRendering
 
                             moved.Add(go);
                             // Move the node to its new position.
-                            IOperationCallback<System.Action> animation = go.NodeOperator()
+                            IOperationCallback<Action> animation = go.NodeOperator()
                               .MoveTo(layoutNode.CenterPosition, updateEdges: true);
                             animation.OnComplete(() => OnComplete(go));
                             animation.OnKill(() => OnComplete(go));
