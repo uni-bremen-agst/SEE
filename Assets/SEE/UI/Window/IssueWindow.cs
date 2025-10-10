@@ -14,6 +14,7 @@ using UnityEngine.UI;
 using LibGit2Sharp;
 using UnityEngine.UIElements;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
 
 namespace SEE.UI.Window
 {
@@ -44,11 +45,11 @@ namespace SEE.UI.Window
         protected override void StartDesktop()
         {
             ShowNotification.Error("Show Notification Issue StartDesktop.", "Notify", 10, true);
-            Title = "Issue Window";
+           // Title = "Issue Window abc";
             base.StartDesktop();
             CreateUIInstance();
         }
-        public void CreateUIInstance()
+        public async Task CreateUIInstance()
         {
             if (Window == null)
             {
@@ -83,14 +84,20 @@ namespace SEE.UI.Window
             //contentIT.text = "content";
             // GameObject itemPrefab = .; // Dein TMP Text UI Prefab
             //  GameObject textRowPrefab; // Drag dein TextPrefab hier rein im Inspector
-            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
-            JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
-            issuesList = jiraReceiver.getIssues(settings);
+            //IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
+            //JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
+            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?filter=all" };
+            GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
+            JArray jArray=  await gitHUbReceiver.getIssues(settings);
 
-            if (jiraReceiver.issuesJ != null)
+            //issuesList = gitHUbReceiver.issuesJ;
+            if(issuesList!=null)
+               ShowNotification.Error($"issuesList {gitHUbReceiver.issuesJ}", "Error", 5, true);
+            if (jArray.Count > 0)
             {
                 //  issueList = new List<RootIssue>(); // TODO: Load real data
-                DisplayAttributes(jiraReceiver.issuesJ, issueWindow);
+                ShowNotification.Error("issuesJ Is DisplayAttributes", "Status", 5, true);
+                DisplayAttributes(jArray, issueWindow);
             }
             else
             {
@@ -166,26 +173,27 @@ namespace SEE.UI.Window
 
             //foreach (RootIssue issue in issues)
             //{
-            //foreach (JObject issue in issues)
-            //{
-            //    foreach (JProperty property in issue.Properties())
-            //    {
-            for (int i = 0; i < 15; i++)
+            foreach (JObject issue in issues)
             {
+                //foreach (JProperty property in issue.Properties())
+                //{
+                //    for (int i = 0; i < 15; i++)
+                //{
                 //string keyV = property.Name;
                 // J//Token value = property.Value;
                 // outputFile.WriteLine($"{keyV}: {property.Value}");
                 // Console.WriteLine($"{keyV}: {value}");
                 // oder UnityEngine.Debug.Log($"{key}: {value}");
-
+              //  Debug.Log(" Issue: " + issue["title"]);
                 GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-                TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
-                TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
-                if (parameterText != null && valueText != null)
-                {
-                    parameterText.text = $"Parameter{i}";//property.Name;
-                    valueText.text = $"Value{i}";  //property.Value.ToString();
+                    TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
+                    TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                    if (parameterText != null && valueText != null)
+                    {
+                        parameterText.text = $"Titel";//;
+                        valueText.text = $"{issue["title"]}";  //; {issue["title"]}
                 }
+               // }
             }
             //  text.va = "Test-Zeile";
             // Prefab erzeugen
