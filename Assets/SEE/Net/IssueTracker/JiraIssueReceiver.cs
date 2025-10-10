@@ -11,6 +11,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using static IssueReceiverInterface;
@@ -1305,14 +1306,14 @@ public class JiraIssueReceiver : IssueReceiverInterface
         }
         
     }
-    public List<RootIssue> getIssues(Settings settings)
+    public async Task<JArray> getIssues(Settings settings)
     {
         issuesJ = new JArray();
         issues = null;
         downloadDone = false;
         restAPI(settings);
         
-        return issues;
+        return issuesJ;
     }
 
 }

@@ -1,10 +1,12 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using static IssueReceiverInterface;
@@ -13,6 +15,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
 {
 
     public List<RootIssue> issues;
+    public JArray issuesJ;
     //Github / giblab Issue Classes
     #region "IssueClasses Github/Gitlab" 
     public class Issue
@@ -177,7 +180,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
     }
     #endregion
 
-
+       
     public bool createIssue()
     {
         return false;
@@ -186,7 +189,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
     {
         return false;
     }
-    private async void restAPI(Settings settings)
+    private async  Task restAPI(Settings settings)
     {
         int maxPage = 0;
         int currentPage = -1;
@@ -204,7 +207,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             }
 
             Debug.Log($"IssueLogURL: {settings.preUrl + settings.searchUrl}");
-        UnityWebRequest request = UnityWebRequest.Get(settings.preUrl+ settings.searchUrl);
+        UnityWebRequest request = UnityWebRequest.Get($"{settings.preUrl}{settings.searchUrl}" );
 
         request.SetRequestHeader("Accept", "application/json");
             //  request.SetRequestHeader("Authorization", $"AxToken {pke}");
@@ -216,7 +219,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
 #pragma warning restore CS4014
         await UniTask.WaitUntil(() => request.isDone);
 
-            if (request.result != UnityWebRequest.Result.Success)
+            if (request.result == UnityWebRequest.Result.Success)
             {
                 Debug.Log("IssueSuccess");
                 Debug.Log(request.result);
@@ -225,9 +228,20 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             }
             else
             {
-                Debug.Log("Result not sucessfull");
+                Debug.Log($"Result not sucessfull {request.result}");
                 return;
             }
+            Debug.Log(request.downloadHandler.text.StartsWith("["));
+           // issuesJ = JsonConvert.DeserializeObject(request.downloadHandler.text);
+             issuesJ = JArray.Parse(request.downloadHandler.text);
+
+            //Debug.Log("Anzahl Issues: " + issuesJ.Count);
+
+            //foreach (var issue in issuesJ)
+            //{
+            //    Debug.Log(" Issue: " + issue["title"]);
+            //}
+            return;
 
             if (maxPage ==0)
             {
@@ -254,26 +268,47 @@ public class GitHubIssueReceiver : IssueReceiverInterface
 
                 outputFile.Write(request.downloadHandler.text);
                 }
-                //DeserializeObject der Json response
-                List<Issue> issueList = JsonConvert.DeserializeObject<List<Issue>>(request.downloadHandler.text);
+
+
+
+            Dictionary<string, System.Object> dic = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
+
+            //total = Convert.ToInt32(dic["total"]);
+
+            //UnityEngine.Debug.Log($"IssueConvert:{total}");
+            // total = (int)dic["total"];
+
+            // UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
+           // startAT = Convert.ToInt32(dic["startAt"]) + Convert.ToInt32(dic["maxResults"]);// rootobject.startAt + rootobject.maxResults;
+                                                                                           //total = rootobject.total;
+                                                                                           //// -1 da die 0 mit zählt
+                                                                                           //startAT = rootobject.startAt + rootobject.maxResults;
+
+            //// gibt den descriptions aller Issues in der Console aus.
+            ///   
+            //Dictionary<string, System.Object> issuesDictionary = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>( dic["issues"].ToString());
+           
+    
+            //DeserializeObject der Json response
+            //List<Issue> issueList = JsonConvert.DeserializeObject<List<Issue>>(request.downloadHandler.text);
 
         // gibt den Titel aller Issues in der Console aus.
-        foreach (Issue issue in issueList)
-        {
-            UnityEngine.Debug.Log("title:" + issue.title + "/n");
-        }
+        //foreach (Issue issue in issueList)
+        //{
+        //    UnityEngine.Debug.Log("title:" + issue.title + "/n");
+        //}
             currentPage += 50;
         }
 
 
     }
-    public List<RootIssue> getIssues(Settings settings)
+    public async Task<JArray> getIssues(Settings settings)
     {
         //ResetIssues
         issues = null;
 
-        restAPI(settings);
-        return issues;
+      await  restAPI(settings);
+        return issuesJ;
     }
 
    

@@ -1,16 +1,12 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-
-
 using Cysharp.Threading.Tasks;
-
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using OmniSharp.Extensions.LanguageServer.Protocol.Models;
-
-
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using UnityEngine;
 using UnityEngine.Networking;
 public interface IssueReceiverInterface
 {
@@ -63,7 +59,7 @@ public interface IssueReceiverInterface
 
     //Eigene implementation für jede Issue-Tracker
     // Diese Funktion muss Implementiert werden!
-    public List<RootIssue> getIssues(Settings settings);
+    public  Task<JArray> getIssues(Settings settings);
 
     public bool createIssue();
     public bool updateIssue();
