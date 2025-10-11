@@ -428,5 +428,24 @@ namespace SEE.Layout.NodeLayouts
       }
       return covrec;
     }
+    // Creates a new ILayoutNode instance of the same runtime type as the given node, if possible.
+    // If the type does not have a parameterless constructor, falls back to using MemberwiseClone.
+    private static ILayoutNode CreateNewNodeOfSameType(ILayoutNode node)
+    {
+      var type = node.GetType();
+      // Try to find a parameterless constructor
+      var ctor = type.GetConstructor(Type.EmptyTypes);
+      if (ctor != null)
+      {
+        return (ILayoutNode)ctor.Invoke(null);
+      }
+      // Fallback: try to use MemberwiseClone (protected, so use reflection)
+      var memberwiseClone = type.GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+      if (memberwiseClone != null)
+      {
+        return (ILayoutNode)memberwiseClone.Invoke(node, null);
+      }
+      throw new InvalidOperationException($"Cannot create a new instance of {type.FullName} because it does not have a parameterless constructor and MemberwiseClone is not available.");
+    }
   }
 }
