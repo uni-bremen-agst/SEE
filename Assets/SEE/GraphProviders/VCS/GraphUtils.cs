@@ -16,6 +16,8 @@ namespace SEE.GraphProviders.VCS
         /// its <see cref="GraphElement.Filename"/> and <see cref="Node.SourceName"/>
         /// to the basename of <paramref name="path"/>,
         /// and its <see cref="GraphElement.Filename"/> to the directory part of <paramref name="path"/>.
+        /// <see cref="GraphElement.SourceLine"/> and <see cref="GraphElement.SourceColumn"/> are
+        /// both set to 1.
         /// </summary>
         /// <param name="graph">Where to add the node.</param>
         /// <param name="path">path of the file-system entity, also used as the unique ID of the new node.</param>
@@ -30,6 +32,8 @@ namespace SEE.GraphProviders.VCS
                 SourceName = filename,
                 Filename = filename,
                 Directory = Filenames.GetDirectoryName(path, separator),
+                SourceLine = 1,
+                SourceColumn = 1,
                 ID = path,
                 Type = type,
             };
