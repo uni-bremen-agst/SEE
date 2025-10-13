@@ -200,6 +200,8 @@ namespace SEE.Controls.KeyActions
                      KeyActionCategory.Browsing, "Toggles between the locked and free camera mode.");
             Register(KeyAction.Pointing, KeyCode.P, "Point",
                      KeyActionCategory.Browsing, "Toggles between Pointing.");
+            Register(KeyAction.HandAnimations, KeyCode.F6, "Hand animations",
+                KeyActionCategory.Browsing, "Switches the hand animations with MediaPipe on and off.");
 
             // Evolution
             Register(KeyAction.SetMarker, KeyCode.Insert, "Set marker",
