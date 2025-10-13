@@ -99,7 +99,7 @@
         /// </summary>
         Pointing,
         /// <summary>
-        /// Toglles the hand animations on and off.
+        /// Toggles the hand animations on and off.
         /// </summary>
         HandAnimations,
         /// <summary>
