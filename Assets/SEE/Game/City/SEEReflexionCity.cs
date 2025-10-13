@@ -94,6 +94,7 @@ namespace SEE.Game.City
         public override void LoadConfiguration()
         {
             base.LoadConfiguration();
+            ResetGraphIfNeeded();
             initialReflexionCity = false;
             initialCityStateLoaded = false;
         }
