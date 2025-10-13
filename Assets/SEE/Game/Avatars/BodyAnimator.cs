@@ -90,7 +90,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the user enabled hand animations using MediaPipe for the first time.
         /// </summary>
-        public bool IsFirtActivationOfHandHanimations = true;
+        public bool IsFirstActivationOfHandHanimations = true;
 
         /// <summary>
         /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
@@ -101,7 +101,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Time interval (in seconds) between error messages.
         /// </summary>
-        private readonly float handLandmarksErrorCooldown = 5f;
+        private const float handLandmarksErrorCooldown = 5f;
 
         /// <summary>
         /// Initializes the MediaPipe models.
@@ -177,10 +177,10 @@ namespace SEE.Game.Avatars
                 if (isUsingHandAnimations)
                 {
                     // If it's the first time the user enabled the animations, initialize the HandsAnimator.
-                    if (IsFirtActivationOfHandHanimations)
+                    if (IsFirstActivationOfHandHanimations)
                     {
                         HandsAnimator.Initialize(transform, ik);
-                        IsFirtActivationOfHandHanimations = false;
+                        IsFirstActivationOfHandHanimations = false;
                     }
 
                     // If the avatar's hands are already in the starting position and ready for animation.
@@ -240,17 +240,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void ToggleHandAnimations()
         {
-            SetHandAnimations(!isUsingHandAnimations);
-        }
-
-        /// <summary>
-        /// If <paramref name="activate"/> is true, the hand animations with MediaPipe will be turned on;
-        /// otherwise turned off.
-        /// </summary>
-        /// <param name="activate">Whether hand animations are to be activated.</param>
-        public void SetHandAnimations(bool activate)
-        {
-            isUsingHandAnimations = activate;
+            isUsingHandAnimations = !isUsingHandAnimations;
         }
     }
 }
