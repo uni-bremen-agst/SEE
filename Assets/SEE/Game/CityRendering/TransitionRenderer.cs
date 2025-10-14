@@ -77,6 +77,43 @@ namespace SEE.Game.CityRendering
         private readonly MarkerFactory markerFactory;
 
         /// <summary>
+        /// The set of edges marked as added or changed in the last rendering.
+        /// </summary>
+        private readonly ISet<Edge> markedEdges = new HashSet<Edge>();
+
+        private void DeleteEdgeMarking()
+        {
+            foreach (Edge edge in markedEdges)
+            {
+                GameObject go = GraphElementIDMap.Find(edge.ID, false);
+                if (go != null)
+                {
+                    go.EdgeOperator().GlowOut();
+                }
+            }
+            markedEdges.Clear();
+        }
+
+        private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
+        {
+            GlowIn(addedEdges);
+            GlowIn(changedEdges);
+
+            void GlowIn(ISet<Edge> addedEdges)
+            {
+                foreach (Edge edge in addedEdges)
+                {
+                    GameObject go = GraphElementIDMap.Find(edge.ID, true);
+                    if (go != null)
+                    {
+                        go.EdgeOperator().GlowIn();
+                        markedEdges.Add(edge);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
         /// The last calculated <see cref="NodeLayout"/> (needed for incremental layouts).
         /// </summary>
         private NodeLayout oldLayout = null;
@@ -92,6 +129,7 @@ namespace SEE.Game.CityRendering
 
             // Remove markers from previous rendering.
             markerFactory.Clear();
+            DeleteEdgeMarking();
 
             // Backup old graph
             Graph oldGraph = branchCity.LoadedGraph.Clone() as Graph;
@@ -216,11 +254,6 @@ namespace SEE.Game.CityRendering
             {
                 markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
             }
-        }
-
-        private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
