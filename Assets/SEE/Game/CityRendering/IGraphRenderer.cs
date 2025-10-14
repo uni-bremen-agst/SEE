@@ -46,8 +46,8 @@ namespace SEE.Game.CityRendering
         /// node reference or be <c>null</c>. The corresponding graph nodes must be in the same graph.
         /// </summary>
         /// <param name="edge">the edge to be drawn</param>
-        /// <param name="sourceNode">GameObject of source of the new edge</param>
-        /// <param name="targetNode">GameObject of target of the new edge</param>
+        /// <param name="source">GameObject of source of the new edge</param>
+        /// <param name="target">GameObject of target of the new edge</param>
         /// <returns>The new game object representing the given edge.</returns>
         GameObject DrawEdge(Edge edge, GameObject source = null, GameObject target = null);
 
