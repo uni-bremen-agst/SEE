@@ -278,15 +278,16 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // If this is the current city tab but the menu is not open,
             // hide any small editor that are currently shown
-            if (isCurrentCity && !cityMenus[currentCity].ShowMenu)
+            if (isCurrentCity && !cityMenus[currentCity].ShowMenu && cityMenus[currentCity].IsSmallEditorWindowOpen)
             {
-                List<RuntimeSmallEditorButton> smallButtons = cityMenus[currentCity].SmallEditorButtons
-                    .Where(smallEditorButton => smallEditorButton.ShowMenu).ToList();
+                cityMenus[currentCity].SmallEditorOpener.ShowMenu = false;
+                //List<RuntimeSmallEditorButton> smallButtons = cityMenus[currentCity].SmallEditorButtons
+                //    .Where(smallEditorButton => smallEditorButton.ShowMenu).ToList();
 
-                foreach (RuntimeSmallEditorButton button in smallButtons)
-                {
-                    button.ShowMenu = false;
-                }
+                //foreach (RuntimeSmallEditorButton button in smallButtons)
+                //{
+                //    button.ShowMenu = false;
+                //}
             }
 
             // Capture the current tab state if it's active
@@ -346,6 +347,19 @@ namespace SEE.UI.RuntimeConfigMenu
                 return;
             }
             cityMenus[index].ImmediateUpdate();
+            CheckSmallWindow(index).Forget();
+
+            async UniTask CheckSmallWindow(int index)
+            {
+                await UniTask.DelayFrame(1);
+                if (currentCity == index
+                    && cityMenus[index].IsSmallEditorWindowOpen
+                    && cityMenus[index].SmallEditorOpener == null)
+                {
+                    Destroyer.Destroy(cityMenus[index].SmallEditorGO);
+                    cityMenus[index].ShowMenu = true;
+                }
+            }
         }
     }
 }

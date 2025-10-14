@@ -171,10 +171,26 @@ namespace SEE.UI.RuntimeConfigMenu
         private readonly List<(MemberInfo, GameObject, object)> controlConditions = new();
 
         /// <summary>
+        /// The component responsible for the opening the small editor window.
+        /// </summary>
+        public RuntimeSmallEditorButton SmallEditorOpener;
+
+        /// <summary>
+        /// The GameObject representing the small editor window.
+        /// </summary>
+        public GameObject SmallEditorGO;
+
+        /// <summary>
+        /// Indicates whether a small editor window is currently open.
+        /// </summary>
+        public bool IsSmallEditorWindowOpen => SmallEditorGO != null;
+
+        /// <summary>
         /// A list of all the small editor buttons included in this menu.
         /// </summary>
-        public readonly List<RuntimeSmallEditorButton> SmallEditorButtons = new();
+        //public readonly List<RuntimeSmallEditorButton> SmallEditorButtons = new();
 
+        #region Prefabs & Paths
         /// <summary>
         /// Prefab for the menu
         /// </summary>
@@ -214,6 +230,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Path to game object containing the <see cref="citySwitcher"/>.
         /// </summary>
         private const string citySwitcherPath = "City Switcher";
+        #endregion
 
         protected override void StartDesktop()
         {
@@ -1377,6 +1394,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1390,7 +1408,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
 
-                SmallEditorButtons.Add(smallEditorButton);
+                //SmallEditorButtons.Add(smallEditorButton);
             }
             return sliderGameObject;
 
@@ -1598,6 +1616,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1611,7 +1630,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
 
-                SmallEditorButtons.Add(smallEditorButton);
+                //SmallEditorButtons.Add(smallEditorButton);
             }
             return switchGameObject;
         }
@@ -1684,6 +1703,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                    //TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1697,7 +1717,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
 
-                SmallEditorButtons.Add(smallEditorButton);
+                //SmallEditorButtons.Add(smallEditorButton);
             }
             return stringGameObject;
         }
@@ -1851,6 +1871,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
+                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1864,7 +1885,7 @@ namespace SEE.UI.RuntimeConfigMenu
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
 
-                SmallEditorButtons.Add(smallEditorButton);
+                //SmallEditorButtons.Add(smallEditorButton);
             }
             return dropDownGameObject;
         }
@@ -1977,6 +1998,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1987,13 +2010,15 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateColorPicker(settingName, smallEditor, setter, getter, true, getWidgetName);
 
-                SmallEditorButtons.Add(smallEditorButton);
+                //SmallEditorButtons.Add(smallEditorButton);
             }
         }
 
