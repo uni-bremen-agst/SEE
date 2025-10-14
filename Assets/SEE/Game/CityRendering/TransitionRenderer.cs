@@ -125,10 +125,12 @@ namespace SEE.Game.CityRendering
             equalEdges.UnionWith(changedEdges);
             Reattach(equalEdges);
 
+            bool edgesAreDrawn = branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+
             NextLayout.Calculate(branchCity.LoadedGraph,
                                  GetGameNode,
                                  branchCity.Renderer,
-                                 branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None,
+                                 false, // the edge layout will be calculated on demand only for new edges
                                  branchCity.gameObject,
                                  out Dictionary<string, ILayoutNode> newNodelayout,
                                  out _,
@@ -173,12 +175,19 @@ namespace SEE.Game.CityRendering
 
             GameNodeHierarchy.Update(branchCity.gameObject);
 
-            ShowAddedEdges(addedEdges);
-            Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
-            //await AnimateEdgeBirthAsync(addedEdges);
-            Debug.Log($"Phase 4b: Finished.\n");
+            if (edgesAreDrawn)
+            {
+                ShowAddedEdges(addedEdges);
+                Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
+                await AnimateEdgeBirthAsync(addedEdges);
+                Debug.Log($"Phase 4b: Finished.\n");
+            }
 
             MarkNodes(addedNodes, changedNodes);
+            if (edgesAreDrawn)
+            {
+                MarkEdges(addedEdges, changedEdges);
+            }
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -197,7 +206,7 @@ namespace SEE.Game.CityRendering
         /// Marks all <paramref name="addedNodes"/> as born and all <paramref name="changedNodes"/>
         /// as changed using <see cref="markerFactory"/>.
         /// </summary>
-        void MarkNodes(ISet<Node> addedNodes, ISet<Node> changedNodes)
+        private void MarkNodes(ISet<Node> addedNodes, ISet<Node> changedNodes)
         {
             foreach (Node node in addedNodes)
             {
@@ -207,6 +216,11 @@ namespace SEE.Game.CityRendering
             {
                 markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
             }
+        }
+
+        private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -344,11 +358,57 @@ namespace SEE.Game.CityRendering
                 Assert.IsNotNull(parent);
                 gameNode.transform.SetParent(parent.transform);
 
-                IOperationCallback<System.Action> animation = gameNode.NodeOperator()
+                IOperationCallback<Action> animation = gameNode.NodeOperator()
                         .MoveTo(layoutNode.CenterPosition, updateEdges: false);
                 animation.OnComplete(() => OnComplete(gameNode));
                 animation.OnKill(() => OnComplete(gameNode));
             }
+        }
+
+        /// <summary>
+        /// Creates, adds, and animates new game objects for <paramref name="addedEdges"/>.
+        /// </summary>
+        /// <param name="addedEdges">the new edges</param>
+        /// <returns>task</returns>
+        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges)
+        {
+            // The set of edges whose birth is still being animated.
+            HashSet<GameObject> births = new();
+
+            EdgeAnimationKind animationKind = branchCity.EdgeLayoutSettings.AnimationKind;
+            foreach (Edge edge in addedEdges)
+            {
+                // The new edge will be created with the correct layout.
+                GameObject edgeObject = GetNewEdge(edge);
+                births.Add(edgeObject);
+
+                IOperationCallback<Action> animation
+                    = edgeObject.EdgeOperator().Show(animationKind);
+                animation.OnComplete(() => OnComplete(edgeObject));
+                animation.OnKill(() => OnComplete(edgeObject));
+            }
+
+            await UniTask.WaitUntil(() => births.Count == 0);
+
+            void OnComplete(GameObject go)
+            {
+                births.Remove(go);
+            }
+        }
+
+        /// <summary>
+        /// Creates a new game edge for the given <paramref name="edge"/>.
+        /// It is assumed that the source and target game objects exist already.
+        /// The new edge will be created according to the current settings
+        /// including the edge layout.
+        /// </summary>
+        /// <param name="edge">graph edge for which to create a game edge</param>
+        /// <returns>new game edge</returns>
+        private GameObject GetNewEdge(Edge edge)
+        {
+            // Source and target game objects of the new edge will be looked up
+            // in the GraphElementIDMap by DrawEdge.
+            return branchCity.Renderer.DrawEdge(edge);
         }
 
         /// <summary>
