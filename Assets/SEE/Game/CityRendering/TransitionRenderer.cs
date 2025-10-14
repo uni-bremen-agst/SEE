@@ -11,7 +11,6 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -142,18 +141,21 @@ namespace SEE.Game.CityRendering
             // Yet, we need to update the game nodes with NodeRefs to all changedNodes
             // and equalNodes.
 
-            ShowRemovedNodes(removedNodes);
-            Debug.Log($"Phase 1a: Removing {removedNodes.Count} nodes.\n");
-            await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
+            ShowRemovedEdges(removedEdges);
+            Debug.Log($"Phase 1a: Removing {removedEdges.Count} edges.\n");
+            await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
             Debug.Log($"Phase 1a: Finished.\n");
 
-            Debug.Log($"Phase 1b: Removing {removedEdges.Count} edges.\n");
-            await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
+            ShowRemovedNodes(removedNodes);
+            Debug.Log($"Phase 1b: Removing {removedNodes.Count} nodes.\n");
+            await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
             Debug.Log($"Phase 1b: Finished.\n");
 
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
             await AnimateNodeMoveAsync(equalNodes, newNodelayout, branchCity.transform);
             Debug.Log($"Phase 2: Finished.\n");
+
+            ShowChangedEdges(changedEdges);
 
             ShowChangedNodes(changedNodes);
             // Even the equal nodes need adjustments because the layout could have
@@ -165,14 +167,18 @@ namespace SEE.Game.CityRendering
             Debug.Log($"Phase 3: Finished.\n");
 
             ShowAddedNodes(addedNodes);
-            Debug.Log($"Phase 4: Adding {addedNodes.Count} nodes.\n");
+            Debug.Log($"Phase 4a: Adding {addedNodes.Count} nodes.\n");
             await AnimateNodeBirthAsync(addedNodes, newNodelayout);
-            Debug.Log($"Phase 4: Finished.\n");
+            Debug.Log($"Phase 4a: Finished.\n");
 
             GameNodeHierarchy.Update(branchCity.gameObject);
 
+            ShowAddedEdges(addedEdges);
+            Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
+            //await AnimateEdgeBirthAsync(addedEdges);
+            Debug.Log($"Phase 4b: Finished.\n");
+
             MarkNodes(addedNodes, changedNodes);
-            // FIXME: Update all author references.
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -529,39 +535,97 @@ namespace SEE.Game.CityRendering
         private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
         /// <summary>
-        /// Notifies the user about removed files in the repository.
+        /// Verb used to indicate to the user that an existing graph element was removed.
+        /// </summary>
+        private const string removed = "removed";
+        /// <summary>
+        /// Verb used to indicate to the user that a new graph element was added.
+        /// </summary>
+        private const string added = "added";
+        /// <summary>
+        /// Verb used to indicate to the user that an existing graph element was changed.
+        /// </summary>
+        private const string changed = "changed";
+        /// <summary>
+        /// Term used to indicate to the user that a graph element is an edge.
+        /// We use "Relation" instead of "Edge" because "Edge" may be confusing
+        /// to non-technical users.
+        /// </summary>
+        private const string edgeKind = "Relation";
+        /// <summary>
+        /// Term used to indicate to the user that a graph element is a node.
+        /// We use "Entity" instead of "Node" because "Node" may be confusing
+        /// to non-technical users.
+        /// </summary>
+        private const string nodeKind = "Entity";
+
+        /// <summary>
+        /// Notifies the user about added, changed, or removed graph elements.
+        /// </summary>
+        /// <param name="elements">the graph elements that have been updated</param>
+        /// <param name="kind">a Relation (edge) or an Entity (node)</param>
+        /// <param name="change">the kind of change</param>
+        private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
+        {
+            foreach (GraphElement element in elements)
+            {
+                ShowNotification.Info($"{kind} {change}", $"{kind} {element.ID} was {change}.");
+            }
+        }
+
+        /// <summary>
+        /// Notifies the user about removed edges.
+        /// </summary>
+        /// <param name="edges">The list of removed edges.</param>
+        private static void ShowRemovedEdges(ISet<Edge> edges)
+        {
+            ShowUpdated(edges, edgeKind, removed);
+        }
+
+        /// <summary>
+        /// Notifies the user about added edges.
+        /// </summary>
+        /// <param name="edges">The list of added edges.</param>
+        private static void ShowAddedEdges(ISet<Edge> edges)
+        {
+            ShowUpdated(edges, edgeKind, added);
+        }
+
+        /// <summary>
+        /// Notifies the user about changed edges.
+        /// </summary>
+        /// <param name="edges">The list of changed edges.</param>
+        private static void ShowChangedEdges(ISet<Edge> edges)
+        {
+            ShowUpdated(edges, edgeKind, changed);
+        }
+
+        /// <summary>
+        /// Notifies the user about removed nodes.
         /// </summary>
         /// <param name="nodes">The list of removed nodes.</param>
         private static void ShowRemovedNodes(ISet<Node> nodes)
         {
-            foreach (Node node in nodes)
-            {
-                ShowNotification.Info("File removed", $"File {node.ID} was removed from the repository.");
-            }
+            ShowUpdated(nodes, nodeKind, removed);
         }
 
         /// <summary>
-        /// Notifies the user about added files in the repository.
+        /// Notifies the user about added nodes.
         /// </summary>
         /// <param name="nodes">The list of added nodes.</param>
         private static void ShowAddedNodes(ISet<Node> nodes)
         {
-            foreach (Node node in nodes)
-            {
-                ShowNotification.Info("File added", $"File {node.ID} was added to the repository.");
-            }
+            ShowUpdated(nodes, nodeKind, added);
         }
 
+
         /// <summary>
-        /// Notifies the user about changed files in the repository.
+        /// Notifies the user about changed nodes.
         /// </summary>
         /// <param name="nodes">The list of changed nodes.</param>
         private void ShowChangedNodes(ISet<Node> nodes)
         {
-            foreach (Node node in nodes)
-            {
-                ShowNotification.Info("File changed", $"File {node.ID} was changed.");
-            }
+            ShowUpdated(nodes, nodeKind, changed);
         }
 
         /// <summary>
