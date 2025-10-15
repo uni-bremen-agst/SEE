@@ -164,16 +164,24 @@ namespace SEE.Game.SceneManipulation
 
             async UniTask RemoveTypesAfterDeletion()
             {
-                GameObject firstChild = root.Children().First()?.GameObject();
-                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
-                typesDifference.ForEach(type =>
+                await city.GetRedrawLock().WaitAsync();
+                try
                 {
-                    city.NodeTypes.Remove(type);
-                });
-                /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    GameObject firstChild = root.Children().First()?.GameObject();
+                    await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
+                    typesDifference.ForEach(type =>
+                    {
+                        city.NodeTypes.Remove(type);
+                    });
+                    /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.PerformUpdate(city);
+                    }
+                }
+                finally
                 {
-                    runtimeConfigMenu.PerformUpdate(city);
+                    city.GetRedrawLock().Release();
                 }
             }
 

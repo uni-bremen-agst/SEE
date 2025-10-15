@@ -14,6 +14,7 @@ using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -65,6 +66,17 @@ namespace SEE.Game.City
         /// Used as a backup to restore the original data path if needed.
         /// </summary>
         private DataPath backupConfigurationPath;
+
+        /// <summary>
+        /// Lock for <see cref="ReDrawGraph"/>.
+        /// </summary>
+        private readonly SemaphoreSlim redrawLock = new(1, 1);
+
+        /// <summary>
+        /// The lock that synchronizes access to <see cref="ReDrawGraph"/>.
+        /// </summary>
+        /// <returns>The <see cref="SemaphoreSlim"/> instance for this city.</returns>
+        internal SemaphoreSlim GetRedrawLock() => redrawLock;
 
         /// <summary>
         /// Checks whether the city is in its initial configuration state.
@@ -255,34 +267,42 @@ namespace SEE.Game.City
             return;
             async UniTask ReDrawGraphAsync()
             {
-                // Gather the previous node layouts.
-                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
-                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
-                // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
-                Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
-                Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
-
-                // Restore the original implementation graph.
-                (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
-                if (mapped.EdgeCount > 0)
+                await redrawLock.WaitAsync();
+                try
                 {
-                    await RestoreImplementation(impl);
-                    mapped.Edges().ForEach(edge =>
-                        ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
-                }
+                    // Gather the previous node layouts.
+                    (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
+                        = GatherNodeLayouts(AllNodeDescendants(gameObject));
+                    // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
+                    Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
+                    Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
-                // Delete the previous city and draw the new one.
-                DeleteGraphGameObjects();
-                await UniTask.DelayFrame(2);
-                DrawGraph();
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
-                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
-                // Restores the previous architecture layout.
-                RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
-                // Restores the previous mapping.
-                RestoreMapping(layoutGraphNodes, mapped);
-                visualization.InitializeEdges();
-                graphRenderer = null;
+                    // Restore the original implementation graph.
+                    (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
+                    if (mapped.EdgeCount > 0)
+                    {
+                        await RestoreImplementation(impl);
+                        mapped.Edges().ForEach(edge =>
+                            ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
+                    }
+
+                    // Delete the previous city and draw the new one.
+                    DeleteGraphGameObjects();
+                    await UniTask.DelayFrame(2);
+                    DrawGraph();
+                    await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
+                        .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
+                                                                    // Restores the previous architecture layout.
+                    RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
+                    // Restores the previous mapping.
+                    RestoreMapping(layoutGraphNodes, mapped);
+                    visualization.InitializeEdges();
+                    graphRenderer = null;
+                }
+                finally
+                {
+                    redrawLock.Release();
+                }
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)

@@ -6,7 +6,6 @@ using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.Utils;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -281,13 +280,6 @@ namespace SEE.UI.RuntimeConfigMenu
             if (isCurrentCity && !cityMenus[currentCity].ShowMenu && cityMenus[currentCity].IsSmallEditorWindowOpen)
             {
                 cityMenus[currentCity].SmallEditorOpener.ShowMenu = false;
-                //List<RuntimeSmallEditorButton> smallButtons = cityMenus[currentCity].SmallEditorButtons
-                //    .Where(smallEditorButton => smallEditorButton.ShowMenu).ToList();
-
-                //foreach (RuntimeSmallEditorButton button in smallButtons)
-                //{
-                //    button.ShowMenu = false;
-                //}
             }
 
             // Capture the current tab state if it's active
@@ -336,7 +328,9 @@ namespace SEE.UI.RuntimeConfigMenu
 
         /// <summary>
         /// Performs an immediate update for the specified <paramref name="city"/>,
-        /// if it exists whithin the vailid index range.
+        /// if it exists within the valid index range.
+        /// If a small editor window is currently open for this city, it is temporarily closed
+        /// and reopened after the update, but only if the corresponding object still exists.
         /// </summary>
         /// <param name="city">The city for which the update should be performed.</param>
         public void PerformUpdate(AbstractSEECity city)
@@ -346,18 +340,25 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-            cityMenus[index].ImmediateUpdate();
-            CheckSmallWindow(index).Forget();
 
-            async UniTask CheckSmallWindow(int index)
+            RuntimeSmallEditorButton smallEditorToReopen = null;
+            if (index == currentCity && cityMenus[index].IsSmallEditorWindowOpen)
+            {
+                smallEditorToReopen = cityMenus[index].SmallEditorOpener;
+                cityMenus[index].SmallEditorOpener.ShowMenu = false;
+            }
+            cityMenus[index].ImmediateUpdate();
+            if (smallEditorToReopen != null)
+            {
+                TryReopenSmallEditor(smallEditorToReopen).Forget();
+            }
+
+            static async UniTask TryReopenSmallEditor(RuntimeSmallEditorButton smallBtn)
             {
                 await UniTask.DelayFrame(1);
-                if (currentCity == index
-                    && cityMenus[index].IsSmallEditorWindowOpen
-                    && cityMenus[index].SmallEditorOpener == null)
+                if (smallBtn != null)
                 {
-                    Destroyer.Destroy(cityMenus[index].SmallEditorGO);
-                    cityMenus[index].ShowMenu = true;
+                    smallBtn.ShowMenu = true;
                 }
             }
         }
