@@ -251,7 +251,6 @@ namespace SEE.Game.City
             else
             {
                 ReDrawGraphAsync().Forget();
-
             }
             return;
             async UniTask ReDrawGraphAsync()
