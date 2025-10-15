@@ -173,22 +173,17 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The component responsible for the opening the small editor window.
         /// </summary>
-        public RuntimeSmallEditorButton SmallEditorOpener;
+        public RuntimeSmallEditorButton SmallEditorOpener { get; private set; }
 
         /// <summary>
         /// The GameObject representing the small editor window.
         /// </summary>
-        public GameObject SmallEditorGO;
+        public GameObject SmallEditorGO { get; private set; }
 
         /// <summary>
         /// Indicates whether a small editor window is currently open.
         /// </summary>
         public bool IsSmallEditorWindowOpen => SmallEditorGO != null;
-
-        /// <summary>
-        /// A list of all the small editor buttons included in this menu.
-        /// </summary>
-        //public readonly List<RuntimeSmallEditorButton> SmallEditorButtons = new();
 
         #region Prefabs & Paths
         /// <summary>
