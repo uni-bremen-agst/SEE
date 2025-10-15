@@ -1386,10 +1386,11 @@ namespace SEE.UI.RuntimeConfigMenu
                 RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
-                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1397,13 +1398,13 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSlider(settingName, range, setter, getter, useRoundValue, smallEditor, true, getWidgetName);
-
-                //SmallEditorButtons.Add(smallEditorButton);
             }
             return sliderGameObject;
 
@@ -1608,10 +1609,11 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
-                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1619,13 +1621,13 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateSwitch(settingName, setter, getter, smallEditor, true, getWidgetName);
-
-                //SmallEditorButtons.Add(smallEditorButton);
             }
             return switchGameObject;
         }
@@ -1695,10 +1697,11 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
-                    //TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1706,13 +1709,13 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateStringField(settingName, setter, getter, smallEditor, true, getWidgetName);
-
-                //SmallEditorButtons.Add(smallEditorButton);
             }
             return stringGameObject;
         }
@@ -1863,10 +1866,11 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
-                    // TODO
                 };
 
                 OnShowMenuChanged += () =>
@@ -1874,13 +1878,13 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateDropDown(settingName, setter, valueArray, getter, smallEditor, true, getWidgetName);
-
-                //SmallEditorButtons.Add(smallEditorButton);
             }
             return dropDownGameObject;
         }
@@ -2012,8 +2016,6 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.CreateWidget = smallEditor =>
                     CreateColorPicker(settingName, smallEditor, setter, getter, true, getWidgetName);
-
-                //SmallEditorButtons.Add(smallEditorButton);
             }
         }
 
