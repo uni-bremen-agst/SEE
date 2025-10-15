@@ -22,7 +22,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The editor window.
         /// </summary>
-        public GameObject SmallEditor;
+        public GameObject SmallEditor { get; private set; }
 
         /// <summary>
         /// The button for opening the editor window.
