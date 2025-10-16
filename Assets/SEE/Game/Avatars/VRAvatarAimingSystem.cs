@@ -80,6 +80,7 @@ namespace SEE.Game.Avatars
 
         private GameObject lastLaserTarget;
         private float laserTargetStartTime;
+        private readonly float hoverThreshold = 5.0f; 
 
         /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
@@ -115,7 +116,7 @@ namespace SEE.Game.Avatars
                                 if (lastLaserTarget != null)
                                 {
                                     float duration = Time.time - laserTargetStartTime;
-                                    TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+                                    TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
                                 }
 
                                 lastLaserTarget = currentHit;
@@ -126,7 +127,7 @@ namespace SEE.Game.Avatars
                         {
                             // Laser moved away from previous valid object
                             float duration = Time.time - laserTargetStartTime;
-                            TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+                            TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
 
                             lastLaserTarget = null;
                         }
@@ -134,7 +135,7 @@ namespace SEE.Game.Avatars
                     else if (lastLaserTarget != null)
                     {
                         float duration = Time.time - laserTargetStartTime;
-                        TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration);
+                        TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
 
                         lastLaserTarget = null;
                     }

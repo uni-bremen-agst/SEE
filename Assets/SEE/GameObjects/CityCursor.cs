@@ -68,7 +68,7 @@ namespace SEE.GO
 
         private readonly Dictionary<InteractableObject, float> hoverStartTimes = new();
         private readonly HashSet<InteractableObject> hoverThresholdReached = new();
-        private readonly float hoverThreshold = 5.0f; // Sekunden
+        private readonly float hoverThreshold = 0.5f; 
 
         /// <summary>
         /// Makes <paramref name="interactableObject"/> the <see cref="Cursor"/> focus when
@@ -111,7 +111,7 @@ namespace SEE.GO
                     hoverThresholdReached.Contains(interactableObject))
                 {
                     float duration = Time.time - startTime;
-                    TracingHelperService.Instance?.TrackHoverDuration(interactableObject.gameObject, duration);
+                    TracingHelperService.Instance?.TrackHoverDuration(interactableObject.gameObject, duration, hoverThreshold);
                 }
 
                 hoverStartTimes.Remove(interactableObject);

@@ -266,7 +266,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <param name="hoveredObject">The GameObject that was hovered over. Must not be null.</param>
         /// <param name="duration">The duration of the hover in seconds.</param>
         /// <param name="minimumDuration">The minimum duration required to track the hover. Default is 5.0s.</param>
-        public void TrackHoverDuration(GameObject hoveredObject, float duration, float minimumDuration = 5.0f)
+        public void TrackHoverDuration(GameObject hoveredObject, float duration, float minimumDuration )
         {
             if (hoveredObject == null)
             {
