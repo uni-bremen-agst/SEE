@@ -131,19 +131,60 @@ namespace SEE.Controls.Actions
         private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
 
         /// <summary>
+        /// Indicates whether node types should be deleted as part of this delete action.
+        /// </summary>
+        private bool deleteNodeTypes = false;
+
+        /// <summary>
+        /// Represents the life cycle of a delete action.
+        /// </summary>
+        private enum ProgressState
+        {
+            Input,
+            Validation,
+            Deletion
+        }
+
+        /// <summary>
+        /// The current state of the delete process.
+        /// </summary>
+        private ProgressState progress = ProgressState.Input;
+
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // FIXME: Needs adaptation for VR where no mouse is available.
+            switch (progress)
+            {
+                case ProgressState.Input:
+                    HandleInputSelection();
+                    break;
+                case ProgressState.Validation:
+                    HandleValidation().Forget();
+                    break;
+                case ProgressState.Deletion:
+                    return Delete();
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Handles the input phase of the delete action.
+        /// Detects user interactions (mouse click, XR selection, or context menu)
+        /// and transitions to the <see cref="ProgressState.Validation"/> phase
+        /// once a valid deletion target has been selected.
+        /// </summary>
+        private void HandleInputSelection()
+        {
             if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(raycastHit.collider.gameObject);
                 hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
-                return Delete(); // the selected objects are deleted and this action is done now
+                progress = ProgressState.Validation;
             }
             else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected)
             {
@@ -151,17 +192,26 @@ namespace SEE.Controls.Actions
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
                 hitGraphElementIDs.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject.name);
                 XRSEEActions.Selected = false;
-                return Delete(); // the selected objects are deleted and this action is done now
+                progress = ProgressState.Validation;
             }
             else if (ExecuteViaContextMenu)
             {
                 ExecuteViaContextMenu = false;
-                return Delete();
+                progress = ProgressState.Validation;
             }
-            else
-            {
-                return false;
-            }
+        }
+
+        /// <summary>
+        /// Handles the validation phase of the delete action.
+        /// Checks the selected deletion targets and shows a confirmation dialog
+        /// asking whether node types should be deleted,
+        /// but only if one of the selected objects is a architecture or implementation root node.
+        /// Transitions to the <see cref="ProgressState.Deletion"/> phase
+        /// once validation is complete.
+        /// </summary>
+        private async UniTask HandleValidation()
+        {
+
         }
 
         /// <summary>
