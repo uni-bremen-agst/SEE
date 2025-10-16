@@ -223,7 +223,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
-            string message = "Should the unused node types also be removed?";
+            string message = "Should the unused node types also be deleted?";
             deleteNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(message));
             progress = ProgressState.Deletion;
         }
