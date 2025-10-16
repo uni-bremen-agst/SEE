@@ -8,6 +8,7 @@ using SEE.Game.CityRendering;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.UI.Menu;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
@@ -151,6 +152,13 @@ namespace SEE.Controls.Actions
         private ProgressState progress = ProgressState.Input;
 
         /// <summary>
+        /// Indicates whether the validation phase has already been started.
+        /// Prevents multiple instances of <see cref="HandleValidationAsync"/>
+        /// from being triggered in consecutive Update calls.
+        /// </summary>
+        private bool validationStartet = false;
+
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
@@ -162,7 +170,11 @@ namespace SEE.Controls.Actions
                     HandleInputSelection();
                     break;
                 case ProgressState.Validation:
-                    HandleValidation().Forget();
+                    if (!validationStartet)
+                    {
+                        validationStartet = true;
+                        HandleValidationAsync().Forget();
+                    }
                     break;
                 case ProgressState.Deletion:
                     return Delete();
@@ -209,9 +221,11 @@ namespace SEE.Controls.Actions
         /// Transitions to the <see cref="ProgressState.Deletion"/> phase
         /// once validation is complete.
         /// </summary>
-        private async UniTask HandleValidation()
+        private async UniTask HandleValidationAsync()
         {
-
+            string message = "Should the unused node types also be removed?";
+            deleteNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.Delete(message));
+            progress = ProgressState.Deletion;
         }
 
         /// <summary>
