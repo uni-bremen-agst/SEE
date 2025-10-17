@@ -4,7 +4,6 @@ using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.CityRendering;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -223,8 +222,12 @@ namespace SEE.Controls.Actions
         /// </summary>
         private async UniTask HandleValidationAsync()
         {
-            string message = "Should the unused node types also be removed?";
-            deleteNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+            if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
+                && ele.GetNode().IsArchitectureOrImplementationRoot()))
+            {
+                string message = "Should the unused node types also be removed?";
+                deleteNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+            }
             progress = ProgressState.Deletion;
         }
 
