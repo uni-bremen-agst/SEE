@@ -131,9 +131,9 @@ namespace SEE.Controls.Actions
         private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
 
         /// <summary>
-        /// Indicates whether node types should be deleted as part of this delete action.
+        /// Indicates whether node types should be removed as part of this delete action.
         /// </summary>
-        private bool deleteNodeTypes = false;
+        private bool removeNodeTypes = false;
 
         /// <summary>
         /// Represents the life cycle of a delete action.
@@ -226,7 +226,7 @@ namespace SEE.Controls.Actions
                 && ele.GetNode().IsArchitectureOrImplementationRoot()))
             {
                 string message = "Should the unused node types also be removed?";
-                deleteNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
+                removeNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
             }
             progress = ProgressState.Deletion;
         }
@@ -248,10 +248,10 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 
-                new DeleteNetAction(go.name).Execute();
+                new DeleteNetAction(go.name, removeNodeTypes).Execute();
                 (GraphElementsMemento mem,
                     ISet<GameObject> deleted,
-                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go, removeNodeTypes);
 
                 if (deleted == null)
                 {
@@ -362,8 +362,8 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 #pragma warning disable VSTHRD110
-                new DeleteNetAction(go.name).Execute();
-                GameElementDeleter.Delete(go);
+                new DeleteNetAction(go.name, removeNodeTypes).Execute();
+                GameElementDeleter.Delete(go, removeNodeTypes);
 #pragma warning restore VSTHRD110
             }
         }

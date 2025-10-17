@@ -49,13 +49,15 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="deletedObject">the game object that along with its descendants and
         /// their edges should be removed</param>
+        /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
+        /// Only applicable for the clear variant.</param>
         /// <returns>the graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
         /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
         /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
         /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
         /// neither a node nor an edge</exception>
-        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject)
+        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject, bool removeNodeTypes = false)
         {
             Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
             if (deletedObject.CompareTag(Tags.Edge))
@@ -94,14 +96,19 @@ namespace SEE.Game.SceneManipulation
                             ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
                             return (null, null, deletedNodeTypes);
                         }
-                        Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
-                        deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
-                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        if (removeNodeTypes)
+                        {
+                            Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
+                            deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        }
                         ISet<GameObject> deletedGameObjects = new HashSet<GameObject>();
                         SubgraphMemento subgraphMemento = new(deletedNode.ItsGraph);
                         foreach (Node child in deletedNode.Children().ToList())
                         {
-                            (GraphElementsMemento mem, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
+                            (GraphElementsMemento mem,
+                                ISet<GameObject> deleted,
+                                Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject(), removeNodeTypes);
                             deletedGameObjects.UnionWith(deleted);
                             deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
