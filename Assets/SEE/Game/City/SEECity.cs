@@ -52,7 +52,7 @@ namespace SEE.Game.City
         /// </summary>
         [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
         [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
-        [PropertyTooltip("File path where a graph snapshot (data + layout) will be saved to.")]
+        [PropertyTooltip("File path where a graph snapshot will be saved to.")]
         [HideReferenceObjectPicker]
         public DataPath GraphSnapshotPath = new();
 
@@ -613,7 +613,7 @@ namespace SEE.Game.City
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
         [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
-        public async UniTask LoadSnapshotAsync()
+        public virtual async UniTask LoadSnapshotAsync()
         {
             Reset();
             Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");

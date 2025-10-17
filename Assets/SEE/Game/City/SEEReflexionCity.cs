@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -64,6 +66,26 @@ namespace SEE.Game.City
         /// </summary>
         /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
         private bool IsInitialState() => initialCityStateLoaded;
+
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the architecture graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath ArchitectureSnapshotPath = new();
+
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the mapping graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath MappingSnapshotPath = new();
 
         /// <summary>
         /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
@@ -139,6 +161,62 @@ namespace SEE.Game.City
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
             return needMenuAdjustments;
+        }
+
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Saves the current city (as GXL).")]
+        public override void SaveData()
+        {
+            // Assumes that the LoadedGraph is a ReflexionGraph.
+            ReflexionGraph reflexionGraph = LoadedGraph as ReflexionGraph;
+            (Graph implementation, Graph architecture, Graph mapping) = reflexionGraph.Disassemble();
+
+            GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
+            Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
+
+            GraphWriter.Save(ArchitectureSnapshotPath.Path, architecture, HierarchicalEdges.First());
+            Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
+
+            GraphWriter.Save(MappingSnapshotPath.Path, mapping, HierarchicalEdges.First());
+            Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
+        }
+
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
+        public override async UniTask LoadSnapshotAsync()
+        {
+            Reset();
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            // Use a single GXL provider to load the graph.
+            GXLSingleGraphProvider implementationGxlProvider = new()
+            {
+                Path = GraphSnapshotPath
+            };
+            Graph implementationGraph = await implementationGxlProvider.ProvideAsync(new Graph(""), this);
+
+            GXLSingleGraphProvider architectureGxlProvider = new()
+            {
+                Path = ArchitectureSnapshotPath
+            };
+            Graph architectureGraph = await architectureGxlProvider.ProvideAsync(new Graph(""), this);
+
+            GXLSingleGraphProvider mappingGxlProvider = new()
+            {
+                Path = MappingSnapshotPath
+            };
+            Graph mappingGraph = await mappingGxlProvider.ProvideAsync(new Graph(""), this);
+
+            LoadedGraph = new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph);
+            visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+            visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+
+            await DrawGraphAsync(LoadedGraph);
+            LoadLayout();
         }
 
         /// <summary>
