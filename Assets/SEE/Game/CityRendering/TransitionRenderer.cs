@@ -4,7 +4,6 @@ using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GameObjects;
 using SEE.GO;
-using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;
@@ -24,64 +23,16 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="branchCity">the city to be re-drawn</param>
-        /// <param name="poller">the poller notifying when there are changes</param>
+        /// <param name="markerAttributes">attributes for rendering the node markers</param>
         /// <param name="markerTime">the time in seconds the new markers should be drawn for;
         /// after that they will be removed again</param>
-        public TransitionRenderer(BranchCity branchCity, GitPoller poller, int markerTime)
+        public TransitionRenderer(MarkerAttributes markerAttributes, int markerTime)
         {
-            this.branchCity = branchCity;
             MarkerTime = markerTime;
-            this.poller = poller;
-            markerFactory = new MarkerFactory(this.branchCity.MarkerAttributes);
-            poller.OnChangeDetected += Render;
+            markerFactory = new MarkerFactory(markerAttributes);
         }
 
-        /// <summary>
-        /// Finalizer to unsubscribe from the poller event.
-        /// </summary>
-        ~TransitionRenderer()
-        {
-            poller.OnChangeDetected -= Render;
-        }
-
-        /// <summary>
-        /// Renders the transition when new commits were detected.
-        /// This method is used as a delegate for <see cref="GitPoller.OnChangeDetected"/>.
-        /// </summary>
-        private void Render()
-        {
-            RenderAsync().Forget();
-        }
-
-        /// <summary>
-        /// Renders the transition when new commits were detected.
-        /// This method implements the actual rendering.
-        /// </summary>
-        /// <returns>task</returns>
-        private async UniTask RenderAsync()
-        {
-            // Backup old graph
-            Graph oldGraph = branchCity.LoadedGraph.Clone() as Graph;
-            await branchCity.LoadDataAsync();
-            Graph newGraph = branchCity.LoadedGraph;
-            bool edgesAreDrawn = branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
-            GameObject codeCity = branchCity.gameObject;
-            IGraphRenderer renderer = branchCity.Renderer;
-            await RenderAsync(oldGraph, newGraph, edgesAreDrawn, branchCity.EdgeLayoutSettings.AnimationKind, codeCity, renderer);
-        }
-
-        /// <summary>
-        /// The poller notifying when there are changes.
-        /// </summary>
-        private readonly GitPoller poller;
-
-        /// <summary>
-        /// The code city where the <see cref="GitBranchesGraphProvider"/> graph provider
-        /// was executed and which should be updated when a new commit is detected.
-        /// </summary>
-        private readonly BranchCity branchCity;
-
+        #region Node Marking
         /// <summary>
         /// The time in seconds for how long the node markers should be shown for newly
         /// added or modified nodes.
@@ -92,6 +43,26 @@ namespace SEE.Game.CityRendering
         /// <see cref="MarkerFactory"> for generating node markers.
         /// </summary>
         private readonly MarkerFactory markerFactory;
+
+        /// <summary>
+        /// Marks all <paramref name="addedNodes"/> as born and all <paramref name="changedNodes"/>
+        /// as changed using <see cref="markerFactory"/>.
+        /// </summary>
+        private void MarkNodes(ISet<Node> addedNodes, ISet<Node> changedNodes)
+        {
+            foreach (Node node in addedNodes)
+            {
+                markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
+            }
+            foreach (Node node in changedNodes)
+            {
+                markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
+            }
+        }
+
+        #endregion Node Marking
+
+        #region Edge Marking
 
         /// <summary>
         /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
@@ -123,7 +94,6 @@ namespace SEE.Game.CityRendering
         /// <param name="changedEdges">changed edges</param>
         private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
         {
-            Debug.Log($"Marking {addedEdges.Count + changedEdges.Count} edges\n");
             GlowIn(addedEdges);
             GlowIn(changedEdges);
 
@@ -142,6 +112,7 @@ namespace SEE.Game.CityRendering
                 }
             }
         }
+        #endregion Edge Marking
 
         /// <summary>
         /// The last calculated <see cref="NodeLayout"/> (needed for incremental layouts).
@@ -159,7 +130,7 @@ namespace SEE.Game.CityRendering
         /// for the new graph</param>
         /// <param name="renderer">the graph renderer to obtain the layouts from</param>
         /// <returns>task</returns>
-        private async UniTask RenderAsync
+        internal async UniTask RenderAsync
             (Graph oldGraph,
             Graph newGraph,
             bool edgesAreDrawn,
@@ -268,10 +239,6 @@ namespace SEE.Game.CityRendering
             {
                 MarkEdges(addedEdges, changedEdges);
             }
-            else
-            {
-                Debug.Log($"No edge layout enabled. No edges to mark.\n");
-            }
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -299,22 +266,6 @@ namespace SEE.Game.CityRendering
                     return go;
                 }
                 return renderer.DrawNode(node, codeCity);
-            }
-        }
-
-        /// <summary>
-        /// Marks all <paramref name="addedNodes"/> as born and all <paramref name="changedNodes"/>
-        /// as changed using <see cref="markerFactory"/>.
-        /// </summary>
-        private void MarkNodes(ISet<Node> addedNodes, ISet<Node> changedNodes)
-        {
-            foreach (Node node in addedNodes)
-            {
-                markerFactory.MarkBorn(GraphElementIDMap.Find(node.ID, true));
-            }
-            foreach (Node node in changedNodes)
-            {
-                markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
             }
         }
 
@@ -356,6 +307,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="addedNodes">nodes to be added</param>
         /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
+        /// <param name="getGameNode">method to get or create the game object for a given node</param>
+        /// <param name="parent">the temporary parent object for the new nodes (should be the code city)</param>
         /// <returns>task</returns>
         private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
@@ -443,6 +396,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="addedEdges">the new edges</param>
         /// <param name="renderer">the graph renderer to draw the new edges</param>
+        /// <param name="animationKind">the kind of animation to be used for the edge birth</param>
         /// <returns>task</returns>
         private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges, IGraphRenderer renderer, EdgeAnimationKind animationKind)
         {
@@ -590,6 +544,7 @@ namespace SEE.Game.CityRendering
         /// <param name="changedNodes">nodes to be marked for a change</param>
         /// <param name="newNodelayout">new layout determining the new scale</param>
         /// <param name="markerFactory">factory for marking as changed</param>
+        /// <param name="renderer">the graph renderer to adjust node styles and antennas</param>
         /// <returns>task</returns>
         private static async UniTask AnimateNodeChangeAsync
             (ISet<Node> nodesToAdjust,
@@ -678,6 +633,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         private static readonly EdgeEqualityComparer edgeEqualityComparer = new();
 
+        #region User Notifications
+
         /// <summary>
         /// Verb used to indicate to the user that an existing graph element was removed.
         /// </summary>
@@ -762,7 +719,6 @@ namespace SEE.Game.CityRendering
             ShowUpdated(nodes, nodeKind, added);
         }
 
-
         /// <summary>
         /// Notifies the user about changed nodes.
         /// </summary>
@@ -779,5 +735,7 @@ namespace SEE.Game.CityRendering
         {
             ShowNotification.Info("New commits detected", "Refreshing code city.");
         }
+
+        #endregion User Notifications
     }
 }

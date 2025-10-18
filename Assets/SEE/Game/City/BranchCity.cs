@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -257,8 +259,9 @@ namespace SEE.Game.City
                     GitBranchesGraphProvider provider = GetGitBranchesGraphProvider(DataProvider);
                     poller = new GitPoller(PollingInterval, provider.GitRepository);
                     // We can create the transitionRenderer only now that we know the city.
-                    transitionRenderer = new(this, poller, MarkerTime);
+                    transitionRenderer = new(MarkerAttributes, MarkerTime);
                 }
+                poller.OnChangeDetected += RenderTransition;
                 poller.Start();
             }
         }
@@ -268,7 +271,36 @@ namespace SEE.Game.City
         /// </summary>
         private void StopPoller()
         {
-            poller?.Stop();
+            if (poller != null)
+            {
+                poller.OnChangeDetected -= RenderTransition;
+                poller.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Runs an asynchronous rendering of the transition from the old graph to the new graph.
+        /// </summary>
+        void RenderTransition()
+        {
+            RenderTransitionAsync().Forget();
+        }
+
+        /// <summary>
+        /// Renders the transition from the old graph to the new graph asynchronously.
+        /// </summary>
+        /// <returns>task</returns>
+        async UniTask RenderTransitionAsync()
+        {
+            // Backup old graph
+            Graph oldGraph = LoadedGraph.Clone() as Graph;
+            await LoadDataAsync();
+            Graph newGraph = LoadedGraph;
+            bool edgesAreDrawn = EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+            await transitionRenderer.RenderAsync(oldGraph, newGraph, edgesAreDrawn, EdgeLayoutSettings.AnimationKind, gameObject, Renderer);
+            /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
+            /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
+            InitializeAfterDrawn(false);
         }
 
         /// <summary>
