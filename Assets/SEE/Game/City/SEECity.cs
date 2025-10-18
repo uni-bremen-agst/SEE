@@ -186,6 +186,9 @@ namespace SEE.Game.City
         /// and <see cref="VisualizedSubGraph"/> co-exist and the latter may only be a subgraph
         /// of the former.
         ///
+        /// In addition, <see cref="GraphElementIDMap"/> will be updated with all graph elements
+        /// in rendered graph elements using method <see cref="UpdateGraphElementIDMap(GameObject)"/>.
+        ///
         /// Note that this method may only be called after the code city has been drawn.
         /// </summary>
         protected virtual void InitializeAfterDrawn()
