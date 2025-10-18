@@ -166,9 +166,9 @@ namespace SEE.Game.City
             MarkerAttributes = new();
         }
 
-        protected override void InitializeAfterDrawn()
+        protected override void InitializeAfterDrawn(bool updateGraphElementRefs)
         {
-            base.InitializeAfterDrawn();
+            base.InitializeAfterDrawn(updateGraphElementRefs);
 
             // We also need to have the ReflexionVisualization apply the correct edge
             // visualization, but we have to wait until all edges have become meshes.
