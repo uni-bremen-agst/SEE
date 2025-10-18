@@ -68,7 +68,7 @@ namespace SEE.Game.CityRendering
             bool edgesAreDrawn = branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
             GameObject codeCity = branchCity.gameObject;
             IGraphRenderer renderer = branchCity.Renderer;
-            await RenderAsync(oldGraph, newGraph, edgesAreDrawn, codeCity, renderer);
+            await RenderAsync(oldGraph, newGraph, edgesAreDrawn, branchCity.EdgeLayoutSettings.AnimationKind, codeCity, renderer);
         }
 
         /// <summary>
@@ -163,6 +163,7 @@ namespace SEE.Game.CityRendering
             (Graph oldGraph,
             Graph newGraph,
             bool edgesAreDrawn,
+            EdgeAnimationKind animationKind,
             GameObject codeCity,
             IGraphRenderer renderer)
         {
@@ -238,12 +239,18 @@ namespace SEE.Game.CityRendering
             // Note that equalNodes is the union of the really equal nodes passed initially
             // as a parameter and the changedNodes.
             Debug.Log($"Phase 3: Changing {changedNodes.Count} nodes.\n");
-            await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory);
+            await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
             Debug.Log($"Phase 3: Finished.\n");
 
             ShowAddedNodes(addedNodes);
             Debug.Log($"Phase 4a: Adding {addedNodes.Count} nodes.\n");
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode);
+            // The temporary parent object for the new nodes. A new node must have
+            // a parent object with a Portal component; otherwise the NodeOperator
+            // will not work. Later, we will set the correct parent of the new node.
+            // At this time, the code city should have at least the (unique) root game
+            // node.
+            GameObject parent = codeCity.FirstChildNode();
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
             Debug.Log($"Phase 4a: Finished.\n");
 
             GameNodeHierarchy.Update(codeCity);
@@ -252,7 +259,7 @@ namespace SEE.Game.CityRendering
             {
                 ShowAddedEdges(addedEdges);
                 Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
-                await AnimateEdgeBirthAsync(addedEdges);
+                await AnimateEdgeBirthAsync(addedEdges, renderer, animationKind);
                 Debug.Log($"Phase 4b: Finished.\n");
             }
 
@@ -291,7 +298,7 @@ namespace SEE.Game.CityRendering
                 {
                     return go;
                 }
-                return branchCity.Renderer.DrawNode(node, branchCity.gameObject);
+                return renderer.DrawNode(node, codeCity);
             }
         }
 
@@ -350,20 +357,14 @@ namespace SEE.Game.CityRendering
         /// <param name="addedNodes">nodes to be added</param>
         /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
         /// <returns>task</returns>
-        private async UniTask AnimateNodeBirthAsync
+        private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
-             Func<Node, GameObject> getGameNode)
+             Func<Node, GameObject> getGameNode,
+             GameObject parent)
         {
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
-
-            // The temporary parent object for the new nodes. A new node must have
-            // a parent object with a Portal component; otherwise the NodeOperator
-            // will not work. Later, we will set the correct parent of the new node.
-            // At this time, the code city should have at least the (unique) root game
-            // node.
-            GameObject parent = branchCity.gameObject.FirstChildNode();
 
             // First create new game objects for the new nodes, mark them as born,
             // and add the NodeOperator component to them. The NodeOperator will
@@ -441,8 +442,9 @@ namespace SEE.Game.CityRendering
         /// Creates, adds, and animates new game objects for <paramref name="addedEdges"/>.
         /// </summary>
         /// <param name="addedEdges">the new edges</param>
+        /// <param name="renderer">the graph renderer to draw the new edges</param>
         /// <returns>task</returns>
-        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges)
+        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges, IGraphRenderer renderer, EdgeAnimationKind animationKind)
         {
             // The set of edges whose birth is still being animated.
             HashSet<GameObject> births = new();
@@ -460,7 +462,6 @@ namespace SEE.Game.CityRendering
             await UniTask.Yield();
 
             return; // FIXME. TEMPORARY DISABLE EDGE ANIMATION
-            EdgeAnimationKind animationKind = branchCity.EdgeLayoutSettings.AnimationKind;
             foreach (GameObject edgeObject in births)
             {
                 IOperationCallback<Action> animation = edgeObject.EdgeOperator().Show(animationKind);
@@ -476,21 +477,21 @@ namespace SEE.Game.CityRendering
             {
                 births.Remove(go);
             }
-        }
 
-        /// <summary>
-        /// Creates a new game edge for the given <paramref name="edge"/>.
-        /// It is assumed that the source and target game objects exist already.
-        /// The new edge will be created according to the current settings
-        /// including the edge layout.
-        /// </summary>
-        /// <param name="edge">graph edge for which to create a game edge</param>
-        /// <returns>new game edge</returns>
-        private GameObject GetNewEdge(Edge edge)
-        {
-            // Source and target game objects of the new edge will be looked up
-            // in the GraphElementIDMap by DrawEdge.
-            return branchCity.Renderer.DrawEdge(edge);
+            /// <summary>
+            /// Creates a new game edge for the given <paramref name="edge"/>.
+            /// It is assumed that the source and target game objects exist already.
+            /// The new edge will be created according to the current settings
+            /// including the edge layout.
+            /// </summary>
+            /// <param name="edge">graph edge for which to create a game edge</param>
+            /// <returns>new game edge</returns>
+            GameObject GetNewEdge(Edge edge)
+            {
+                // Source and target game objects of the new edge will be looked up
+                // in the GraphElementIDMap by DrawEdge.
+                return renderer.DrawEdge(edge);
+            }
         }
 
         /// <summary>
@@ -522,7 +523,7 @@ namespace SEE.Game.CityRendering
         /// <param name="cityTransform">temporary parent representing the code city
         /// as a whole</param>
         /// <returns>task</returns>
-        private async UniTask AnimateNodeMoveAsync
+        private static async UniTask AnimateNodeMoveAsync
                                 (ISet<Node> movedNodes,
                                  Dictionary<string, ILayoutNode> newNodelayout,
                                  Transform cityTransform)
@@ -590,11 +591,12 @@ namespace SEE.Game.CityRendering
         /// <param name="newNodelayout">new layout determining the new scale</param>
         /// <param name="markerFactory">factory for marking as changed</param>
         /// <returns>task</returns>
-        private async UniTask AnimateNodeChangeAsync
+        private static async UniTask AnimateNodeChangeAsync
             (ISet<Node> nodesToAdjust,
              ISet<Node> changedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
-             MarkerFactory markerFactory)
+             MarkerFactory markerFactory,
+             IGraphRenderer renderer)
         {
             HashSet<GameObject> changed = new();
 
@@ -617,7 +619,7 @@ namespace SEE.Game.CityRendering
                             // and the new graph node are the same. A style may include color, material,
                             // and other visual properties of the node itself, exluding size and decorations
                             // such as antenna and marker.
-                            branchCity.Renderer.AdjustStyle(go);
+                            renderer.AdjustStyle(go);
                         }
                         changed.Add(go);
                         ScaleTo(go, layoutNode);
@@ -659,7 +661,7 @@ namespace SEE.Game.CityRendering
                     // The adjustment of the antenna is needed only if the node has changed.
                     // Similarly to the adjustment of the style, we do not check whether
                     // the metrics determining the antenna have changed or not.
-                    branchCity.Renderer.AdjustAntenna(go);
+                    renderer.AdjustAntenna(go);
                 }
                 markerFactory.AdjustMarkerY(go);
                 changed.Remove(go);
