@@ -17,16 +17,10 @@ using UnityEngine.Assertions;
 namespace SEE.Game.CityRendering
 {
     /// <summary>
-    /// Renders transitions in a <see cref="BranchCity"/> when new commits are detected.
+    /// Renders a transition between an old and a new graph.
     /// </summary>
     public class TransitionRenderer
     {
-        /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly
-        /// added or modified nodes.
-        /// </summary>
-        public int MarkerTime = 10;
-
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -37,7 +31,7 @@ namespace SEE.Game.CityRendering
         public TransitionRenderer(BranchCity branchCity, GitPoller poller, int markerTime)
         {
             this.branchCity = branchCity;
-            this.MarkerTime = markerTime;
+            MarkerTime = markerTime;
             this.poller = poller;
             markerFactory = new MarkerFactory(this.branchCity.MarkerAttributes);
             poller.OnChangeDetected += Render;
@@ -61,6 +55,23 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Renders the transition when new commits were detected.
+        /// This method implements the actual rendering.
+        /// </summary>
+        /// <returns>task</returns>
+        private async UniTask RenderAsync()
+        {
+            // Backup old graph
+            Graph oldGraph = branchCity.LoadedGraph.Clone() as Graph;
+            await branchCity.LoadDataAsync();
+            Graph newGraph = branchCity.LoadedGraph;
+            bool edgesAreDrawn = branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+            GameObject codeCity = branchCity.gameObject;
+            IGraphRenderer renderer = branchCity.Renderer;
+            await RenderAsync(oldGraph, newGraph, edgesAreDrawn, codeCity, renderer);
+        }
+
+        /// <summary>
         /// The poller notifying when there are changes.
         /// </summary>
         private readonly GitPoller poller;
@@ -72,42 +83,61 @@ namespace SEE.Game.CityRendering
         private readonly BranchCity branchCity;
 
         /// <summary>
+        /// The time in seconds for how long the node markers should be shown for newly
+        /// added or modified nodes.
+        /// </summary>
+        public int MarkerTime = 10;
+
+        /// <summary>
         /// <see cref="MarkerFactory"> for generating node markers.
         /// </summary>
         private readonly MarkerFactory markerFactory;
 
         /// <summary>
-        /// The set of edges marked as added or changed in the last rendering.
+        /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
+        /// edges which have changed compared to the previous rendering.
         /// </summary>
-        private readonly ISet<Edge> markedEdges = new HashSet<Edge>();
+        private readonly Queue<EdgeOperator> highlightedEdgeOperators = new();
 
+        /// <summary>
+        /// Fade out the highlights for each previously marked edge in <see cref="highlightedEdgeOperators"/>.
+        /// </summary>
         private void DeleteEdgeMarking()
         {
-            foreach (Edge edge in markedEdges)
+            while (highlightedEdgeOperators.Count > 0)
             {
-                GameObject go = GraphElementIDMap.Find(edge.ID, false);
-                if (go != null)
+                // Fade out the highlights for each previously marked edge.
+                EdgeOperator edgeOperator = highlightedEdgeOperators.Dequeue();
+                if (edgeOperator != null)
                 {
-                    go.EdgeOperator().GlowOut();
+                    edgeOperator.GlowOut();
                 }
             }
-            markedEdges.Clear();
         }
 
+        /// <summary>
+        /// Marks all <paramref name="addedEdges"/> as born and all <paramref name="changedEdges"/>
+        /// as changed using glow effects. Every marked edge is added to <see cref="highlightedEdgeOperators"/>.
+        /// </summary>
+        /// <param name="addedEdges">added edges</param>
+        /// <param name="changedEdges">changed edges</param>
         private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
         {
+            Debug.Log($"Marking {addedEdges.Count + changedEdges.Count} edges\n");
             GlowIn(addedEdges);
             GlowIn(changedEdges);
 
-            void GlowIn(ISet<Edge> addedEdges)
+            void GlowIn(ISet<Edge> edges)
             {
-                foreach (Edge edge in addedEdges)
+                foreach (Edge edge in edges)
                 {
                     GameObject go = GraphElementIDMap.Find(edge.ID, true);
                     if (go != null)
                     {
-                        go.EdgeOperator().GlowIn();
-                        markedEdges.Add(edge);
+                        EdgeOperator edgeOperator = go.EdgeOperator();
+                        edgeOperator.GlowIn();
+                        edgeOperator.HitEffect();
+                        highlightedEdgeOperators.Enqueue(edgeOperator);
                     }
                 }
             }
@@ -119,11 +149,22 @@ namespace SEE.Game.CityRendering
         private NodeLayout oldLayout = null;
 
         /// <summary>
-        /// Renders the transition when new commits were detected.
-        /// This method implements the actual rendering.
+        /// Renders the transition from <paramref name="oldGraph"/> to <paramref name="newGraph"/>.
+        /// If <paramref name="edgesAreDrawn"/> is true, edges will be rendered as well.
         /// </summary>
+        /// <param name="oldGraph">the previously rendered graph</param>
+        /// <param name="newGraph">the new graph to be rendered anew</param>
+        /// <param name="edgesAreDrawn">whether edges should be drawn</param>
+        /// <param name="codeCity">the game object under which to place the nodes and edges
+        /// for the new graph</param>
+        /// <param name="renderer">the graph renderer to obtain the layouts from</param>
         /// <returns>task</returns>
-        private async UniTask RenderAsync()
+        private async UniTask RenderAsync
+            (Graph oldGraph,
+            Graph newGraph,
+            bool edgesAreDrawn,
+            GameObject codeCity,
+            IGraphRenderer renderer)
         {
             ShowNewCommitsMessage();
 
@@ -131,45 +172,39 @@ namespace SEE.Game.CityRendering
             markerFactory.Clear();
             DeleteEdgeMarking();
 
-            // Backup old graph
-            Graph oldGraph = branchCity.LoadedGraph.Clone() as Graph;
-            await branchCity.LoadDataAsync();
-
-            branchCity.LoadedGraph.Diff(oldGraph,
+            newGraph.Diff(oldGraph,
                 g => g.Nodes(),
                 (g, id) => g.GetNode(id),
-                GraphExtensions.AttributeDiff(branchCity.LoadedGraph, oldGraph),
+                GraphExtensions.AttributeDiff(newGraph, oldGraph),
                 nodeEqualityComparer,
-                out ISet<Node> addedNodes,   // nodes belong to LoadedGraph
+                out ISet<Node> addedNodes,   // nodes belong to newGraph
                 out ISet<Node> removedNodes, // nodes belong to oldGraph
-                out ISet<Node> changedNodes, // nodes belong to LoadedGraph
-                out ISet<Node> equalNodes);  // nodes belong to LoadedGraph
+                out ISet<Node> changedNodes, // nodes belong to newGraph
+                out ISet<Node> equalNodes);  // nodes belong to newGraph
 
-            branchCity.LoadedGraph.Diff(oldGraph,
+            newGraph.Diff(oldGraph,
                 g => g.Edges(),
                 (g, id) => g.GetEdge(id),
-                GraphExtensions.AttributeDiff(branchCity.LoadedGraph, oldGraph),
+                GraphExtensions.AttributeDiff(newGraph, oldGraph),
                 edgeEqualityComparer,
-                out ISet<Edge> addedEdges,   // edges belong to LoadedGraph
+                out ISet<Edge> addedEdges,   // edges belong to newGraph
                 out ISet<Edge> removedEdges, // edges belong to oldGraph
-                out ISet<Edge> changedEdges, // edges belong to LoadedGraph
-                out ISet<Edge> equalEdges);  // edges belong to LoadedGraph
+                out ISet<Edge> changedEdges, // edges belong to newGraph
+                out ISet<Edge> equalEdges);  // edges belong to newGraph
 
             // Before we can calculate the new layout, we must ensure that all game objects
-            // representing nodes or edges that are still present in the new graph are reattached.
+            // representing nodes or edges that are still present in the newGraph are reattached.
             equalNodes.UnionWith(changedNodes);
             Reattach(equalNodes);
 
             equalEdges.UnionWith(changedEdges);
             Reattach(equalEdges);
 
-            bool edgesAreDrawn = branchCity.EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
-
-            NextLayout.Calculate(branchCity.LoadedGraph,
+            NextLayout.Calculate(newGraph,
                                  GetGameNode,
-                                 branchCity.Renderer,
+                                 renderer,
                                  false, // the edge layout will be calculated on demand only for new edges
-                                 branchCity.gameObject,
+                                 codeCity,
                                  out Dictionary<string, ILayoutNode> newNodelayout,
                                  out _,
                                  ref oldLayout);
@@ -192,7 +227,7 @@ namespace SEE.Game.CityRendering
             Debug.Log($"Phase 1b: Finished.\n");
 
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
-            await AnimateNodeMoveAsync(equalNodes, newNodelayout, branchCity.transform);
+            await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
             Debug.Log($"Phase 2: Finished.\n");
 
             ShowChangedEdges(changedEdges);
@@ -208,10 +243,10 @@ namespace SEE.Game.CityRendering
 
             ShowAddedNodes(addedNodes);
             Debug.Log($"Phase 4a: Adding {addedNodes.Count} nodes.\n");
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout);
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode);
             Debug.Log($"Phase 4a: Finished.\n");
 
-            GameNodeHierarchy.Update(branchCity.gameObject);
+            GameNodeHierarchy.Update(codeCity);
 
             if (edgesAreDrawn)
             {
@@ -226,6 +261,10 @@ namespace SEE.Game.CityRendering
             {
                 MarkEdges(addedEdges, changedEdges);
             }
+            else
+            {
+                Debug.Log($"No edge layout enabled. No edges to mark.\n");
+            }
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -238,6 +277,22 @@ namespace SEE.Game.CityRendering
                 return go.EdgeOperator().Blink(5);
             }
 
+            /// <summary>
+            /// If a game node with the ID of the given <paramref name="node"/> exists, it is returned.
+            /// Otherwise, a new game node is created and returned with the given <paramref name="node"/>
+            /// attached to it.
+            /// </summary>
+            /// <param name="node">node for which a game node is requested</param>
+            /// <returns>existing or new game node</returns>
+            GameObject GetGameNode(Node node)
+            {
+                GameObject go = GraphElementIDMap.Find(node.ID, false);
+                if (go != null)
+                {
+                    return go;
+                }
+                return branchCity.Renderer.DrawNode(node, branchCity.gameObject);
+            }
         }
 
         /// <summary>
@@ -254,23 +309,6 @@ namespace SEE.Game.CityRendering
             {
                 markerFactory.MarkChanged(GraphElementIDMap.Find(node.ID, true));
             }
-        }
-
-        /// <summary>
-        /// If a game node with the ID of the given <paramref name="node"/> exists, it is returned.
-        /// Otherwise, a new game node is created and returned with the given <paramref name="node"/>
-        /// attached to it.
-        /// </summary>
-        /// <param name="node">node for which a game node is requested</param>
-        /// <returns>existing or new game node</returns>
-        private GameObject GetGameNode(Node node)
-        {
-            GameObject go = GraphElementIDMap.Find(node.ID, false);
-            if (go != null)
-            {
-                return go;
-            }
-            return branchCity.Renderer.DrawNode(node, branchCity.gameObject);
         }
 
         /// <summary>
@@ -314,7 +352,8 @@ namespace SEE.Game.CityRendering
         /// <returns>task</returns>
         private async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
-             Dictionary<string, ILayoutNode> newNodelayout)
+             Dictionary<string, ILayoutNode> newNodelayout,
+             Func<Node, GameObject> getGameNode)
         {
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
@@ -332,15 +371,15 @@ namespace SEE.Game.CityRendering
             // earlier.
             foreach (Node node in addedNodes)
             {
-                GameObject go = GetGameNode(node);
+                GameObject go = getGameNode(node);
                 go.transform.SetParent(parent.transform);
                 // We need the NodeOperator component to animate the birth of the node.
                 go.AddOrGetComponent<NodeOperator>();
                 births.Add(go);
             }
 
-            // Let the frame be finished so that the node is really added to the scene
-            // and its NodeOperator component is enabled.
+            // Let the frame be finished so that all game nodes are really added to the scene
+            // and their NodeOperator component is enabled.
             // Note: UniTask.Yield() works only while the game is playing.
             await UniTask.Yield();
 
@@ -408,15 +447,25 @@ namespace SEE.Game.CityRendering
             // The set of edges whose birth is still being animated.
             HashSet<GameObject> births = new();
 
-            EdgeAnimationKind animationKind = branchCity.EdgeLayoutSettings.AnimationKind;
             foreach (Edge edge in addedEdges)
             {
                 // The new edge will be created with the correct layout.
                 GameObject edgeObject = GetNewEdge(edge);
                 births.Add(edgeObject);
+            }
 
-                IOperationCallback<Action> animation
-                    = edgeObject.EdgeOperator().Show(animationKind);
+            // Let the frame be finished so that all game edges are really added to the scene
+            // and their EdgeOperator component is enabled.
+            // Note: UniTask.Yield() works only while the game is playing.
+            await UniTask.Yield();
+
+            return; // FIXME. TEMPORARY DISABLE EDGE ANIMATION
+            EdgeAnimationKind animationKind = branchCity.EdgeLayoutSettings.AnimationKind;
+            foreach (GameObject edgeObject in births)
+            {
+                IOperationCallback<Action> animation = edgeObject.EdgeOperator().Show(animationKind);
+                // FIXME: Diese beiden Callbacks werden nicht aufgerufen, wenn die AnimationKind None ist.
+                // Oder wenn die Kante noch ein LineRenderer-Objekt ist und keine Spline?
                 animation.OnComplete(() => OnComplete(edgeObject));
                 animation.OnKill(() => OnComplete(edgeObject));
             }
