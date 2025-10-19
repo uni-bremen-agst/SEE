@@ -198,7 +198,6 @@ namespace SEE.UI
             NetworkPropertyDialog dialog = new(network, Reactivate);
             dialog.Open();
         }
-        
         private TelemetryPropertyDialog telemetryDialog;
 
         /// <summary>
