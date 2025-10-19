@@ -141,7 +141,6 @@ namespace SEE.Tools.OpenTelemetry
             {
                 TracingHelperService.Instance?.TrackSessionEnd();
             }
-            
             if (tracerProvider == null)
             {
                 Debug.LogWarning("OpenTelemetry is not initialized.");
