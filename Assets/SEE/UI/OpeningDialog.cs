@@ -77,7 +77,7 @@ namespace SEE.UI
                     Title: "Telemetry Mode",
                     Description: $"Currently: {SceneSettings.telemetryMode}",
                     EntryColor: NextColor(),
-                    Icon: Icons.Export), 
+                    Icon: Icons.Export),
 
 #endif
                 new(SelectAction: NetworkSettings,
