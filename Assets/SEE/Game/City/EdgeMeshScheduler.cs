@@ -192,6 +192,8 @@ namespace SEE.Game.City
                 {
                     spline.SubsplineEndT = 0;
                 }
+                // FIXME: Is this necessary? What about the other animations (e.g., Blink)?
+                gameEdge.EdgeOperator().RefreshGlowAsync().Forget();
             }
         }
 
