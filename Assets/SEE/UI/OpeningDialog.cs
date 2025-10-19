@@ -201,7 +201,6 @@ namespace SEE.UI
         
         private TelemetryPropertyDialog telemetryDialog;
 
-        
         /// <summary>
         /// Opens the telemetry settings dialog and disables the main menu while the dialog is active.
         /// When the dialog is closed, the <see cref="Reactivate"/> method will be called to show the menu again.
