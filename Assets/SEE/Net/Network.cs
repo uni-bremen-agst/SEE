@@ -993,7 +993,6 @@ namespace SEE.Net
         private void OnApplicationQuit()
         {
             TracingHelperService.Shutdown(true);
-            
             switch (VoiceChat)
             {
                 case VoiceChatSystems.None:
