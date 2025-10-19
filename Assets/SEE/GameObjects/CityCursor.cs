@@ -68,7 +68,7 @@ namespace SEE.GO
 
         private readonly Dictionary<InteractableObject, float> hoverStartTimes = new();
         private readonly HashSet<InteractableObject> hoverThresholdReached = new();
-        private readonly float hoverThreshold = 0.5f; 
+        private readonly float hoverThreshold = 0.5f;
 
         /// <summary>
         /// Makes <paramref name="interactableObject"/> the <see cref="Cursor"/> focus when
