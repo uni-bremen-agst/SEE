@@ -580,7 +580,6 @@ namespace SEE.Net
             }
         }
 
-                
         /// <summary>
         /// Initializes the game.
         /// </summary>
