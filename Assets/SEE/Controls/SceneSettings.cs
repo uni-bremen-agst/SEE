@@ -33,7 +33,6 @@ namespace SEE.Controls
         [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
         [ShowInInspector]
         public static PlayerInputType InputType = PlayerInputType.DesktopPlayer;
-        
         [Tooltip("The current telemetry mode.")]
         [ShowInInspector]
         public static TelemetryMode telemetryMode = TelemetryMode.Local;
