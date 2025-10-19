@@ -589,7 +589,6 @@ namespace SEE.Net
             {
                 TracingHelperService.Initialize(PlayerName);
             }
-            
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
             if (HostServer)
