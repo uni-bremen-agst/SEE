@@ -310,7 +310,6 @@ namespace SEE.UI
                 };
             }
         }
-        
         /// <summary>
         /// Delegates the Unity frame-based update call to the telemetry dialog,
         /// so that changes in the dropdown selection can be polled and handled.
