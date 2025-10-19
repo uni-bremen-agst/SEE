@@ -865,7 +865,6 @@ namespace SEE.Net
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
             TracingHelperService.Initialize(PlayerName);
-            
         }
 
         /// <summary>
