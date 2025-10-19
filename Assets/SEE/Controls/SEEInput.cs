@@ -563,7 +563,6 @@ namespace SEE.Controls
 
         private static bool wasBoosting = false;
 
-        
         /// <summary>
         /// Boosts the speed of the player movement. While pressed, movement is faster.
         /// </summary>
