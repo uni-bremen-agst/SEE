@@ -301,6 +301,7 @@ namespace SEE.Game.City
             /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
             /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
             InitializeAfterDrawn(false);
+            transitionRenderer.ShowMarking();
         }
 
         /// <summary>

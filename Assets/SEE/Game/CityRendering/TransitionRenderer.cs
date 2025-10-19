@@ -112,6 +112,15 @@ namespace SEE.Game.CityRendering
                 }
             }
         }
+
+        private ISet<Edge> addedEdges;
+        private ISet<Edge> changedEdges;
+
+        internal void ShowMarking()
+        {
+            MarkEdges(addedEdges, changedEdges);
+        }
+
         #endregion Edge Marking
 
         /// <summary>
@@ -175,10 +184,10 @@ namespace SEE.Game.CityRendering
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
                                  renderer,
-                                 false, // the edge layout will be calculated on demand only for new edges
+                                 edgesAreDrawn,
                                  codeCity,
                                  out Dictionary<string, ILayoutNode> newNodelayout,
-                                 out _,
+                                 out Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
                                  ref oldLayout);
             // Note: At this point, game nodes for new nodes have been created already.
             // Their NodeRefs refer to nodes in the newly loaded graph.
@@ -197,6 +206,8 @@ namespace SEE.Game.CityRendering
             Debug.Log($"Phase 1b: Removing {removedNodes.Count} nodes.\n");
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
             Debug.Log($"Phase 1b: Finished.\n");
+
+            // TODO: Fade out edges.
 
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
             await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
@@ -230,14 +241,19 @@ namespace SEE.Game.CityRendering
             {
                 ShowAddedEdges(addedEdges);
                 Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
-                await AnimateEdgeBirthAsync(addedEdges, renderer, animationKind);
+                await AnimateEdgeBirthAsync(addedEdges, newEdgeLayout, renderer, animationKind);
+
+                // TODO: Fade in changedEdges and equalEdges with newEdgeLayout.
                 Debug.Log($"Phase 4b: Finished.\n");
             }
 
             MarkNodes(addedNodes, changedNodes);
+            // FIXME
+            this.addedEdges = addedEdges;
+            this.changedEdges = changedEdges;
             if (edgesAreDrawn)
             {
-                MarkEdges(addedEdges, changedEdges);
+                //MarkEdges(addedEdges, changedEdges);
             }
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
@@ -398,7 +414,7 @@ namespace SEE.Game.CityRendering
         /// <param name="renderer">the graph renderer to draw the new edges</param>
         /// <param name="animationKind">the kind of animation to be used for the edge birth</param>
         /// <returns>task</returns>
-        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges, IGraphRenderer renderer, EdgeAnimationKind animationKind)
+        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges, Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout, IGraphRenderer renderer, EdgeAnimationKind animationKind)
         {
             // The set of edges whose birth is still being animated.
             HashSet<GameObject> births = new();
@@ -414,18 +430,22 @@ namespace SEE.Game.CityRendering
             // and their EdgeOperator component is enabled.
             // Note: UniTask.Yield() works only while the game is playing.
             await UniTask.Yield();
+            await UniTask.WaitForEndOfFrame();
 
-            return; // FIXME. TEMPORARY DISABLE EDGE ANIMATION
+            // The animation of edges works only if they have been migrated from
+            // a LineRenderer into a Mesh. That is done by EdgeMeshScheduler.
             foreach (GameObject edgeObject in births)
             {
-                IOperationCallback<Action> animation = edgeObject.EdgeOperator().Show(animationKind);
+                //IOperationCallback<Action> animation = edgeObject.EdgeOperator().Show(animationKind);
+                //edgeObject.EdgeOperator().GlowIn();
+                //edgeObject.EdgeOperator().HitEffect();
                 // FIXME: Diese beiden Callbacks werden nicht aufgerufen, wenn die AnimationKind None ist.
                 // Oder wenn die Kante noch ein LineRenderer-Objekt ist und keine Spline?
-                animation.OnComplete(() => OnComplete(edgeObject));
-                animation.OnKill(() => OnComplete(edgeObject));
+                //animation.OnComplete(() => OnComplete(edgeObject));
+                //animation.OnKill(() => OnComplete(edgeObject));
             }
 
-            await UniTask.WaitUntil(() => births.Count == 0);
+            //await UniTask.WaitUntil(() => births.Count == 0);
 
             void OnComplete(GameObject go)
             {
@@ -502,9 +522,12 @@ namespace SEE.Game.CityRendering
                             go.transform.SetParent(cityTransform);
 
                             moved.Add(go);
-                            // Move the node to its new position.
+                            // Move the node to its new position. The edge layout will not be
+                            // be updated because we just set the node's parent to cityTransform.
+                            // As a consequence, the node hierarchy is temporarily flat, which
+                            // will distort hierarchical edge layouts, such as edge bundling.
                             IOperationCallback<Action> animation = go.NodeOperator()
-                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
+                              .MoveTo(layoutNode.CenterPosition, updateEdges: false);
                             animation.OnComplete(() => OnComplete(go));
                             animation.OnKill(() => OnComplete(go));
                         }
@@ -735,7 +758,6 @@ namespace SEE.Game.CityRendering
         {
             ShowNotification.Info("New commits detected", "Refreshing code city.");
         }
-
         #endregion User Notifications
     }
 }
