@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -23,7 +24,7 @@ namespace SEE.Game.City
         /// The color used to represent the type of a node.
         /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
         /// </summary>
-        [ShowIf("Property", PropertyKind.Type)]
+        [ShowIf("Property", PropertyKind.Type), RuntimeShowIf("Property", PropertyKind.Type)]
         public Color TypeColor = Color.white;
 
         /// <summary>
@@ -31,7 +32,7 @@ namespace SEE.Game.City
         /// in the node hierarchy.
         /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Type"/>.
         /// </summary>
-        [ShowIf("Property", PropertyKind.Type)]
+        [ShowIf("Property", PropertyKind.Type), RuntimeShowIf("Property", PropertyKind.Type)]
         public bool ByLevel = true;
 
         /// <summary>
@@ -39,7 +40,7 @@ namespace SEE.Game.City
         /// actual color is found in a <see cref="ColorMap"/> for the metrics.
         /// Used only if <see cref="Property"/> is <see cref="PropertyKind.Metric"/>.
         /// </summary>
-        [ShowIf("Property", PropertyKind.Metric)]
+        [ShowIf("Property", PropertyKind.Metric), RuntimeShowIf("Property", PropertyKind.Metric)]
         public string ColorMetric = string.Empty;
 
         /// <summary>

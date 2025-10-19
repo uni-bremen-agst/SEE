@@ -6,6 +6,7 @@ using SEE.GameObjects;
 using SEE.GO;
 using SEE.Net.Actions;
 using SEE.Net.Actions.City;
+using SEE.Net.Actions.Table;
 using SEE.Net.Util;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,8 +51,13 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Sends an action to all clients in the recipients list, or to all connected clients (except the sender) if <c>recipients</c> is <c>null</c>.
+        /// Sends an action to all clients in the recipients list, or to all connected clients
+        /// (except the sender) if <c>recipients</c> is <c>null</c>.
         /// </summary>
+        /// <param name="serializedAction">The serialized action to be broadcasted.</param>
+        /// <param name="recipientIds">The list of recipients of the action; if null, all
+        /// connected clients will be notified</param>
+        /// <param name="rpcParams">The additional RPC parameters</param>
         [Rpc(SendTo.Server)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipientIds = null, RpcParams rpcParams = default)
         {
@@ -71,7 +77,8 @@ namespace SEE.Net
             }
             deserializedAction.ExecuteOnServer();
 
-            if (recipientIds == null) {
+            if (recipientIds == null)
+            {
                 ulong senderId = rpcParams.Receive.SenderClientId;
                 ExecuteActionClientRpc(serializedAction, RpcTarget.Not(senderId, RpcTargetUse.Temp));
             }
@@ -149,7 +156,7 @@ namespace SEE.Net
                 }
                 else
                 {
-                    using NativeArray<ulong> targetClientIds = new NativeArray<ulong>(recipientIds, Allocator.Temp);
+                    using NativeArray<ulong> targetClientIds = new(recipientIds, Allocator.Temp);
                     foreach (Fragment fragment in fragments)
                     {
                         ReceiveFragmentActionClientRpc(fragment.PacketID, fragment.PacketSize,
@@ -164,6 +171,7 @@ namespace SEE.Net
         /// Requests client synchronization.
         /// This RPC is called by the client to initiate the synchronization process.
         /// </summary>
+        /// <param name="rpcParams">The additional RPC parameters</param>
         [Rpc(SendTo.Server)]
         public void RequestSynchronizationServerRpc(RpcParams rpcParams = default)
         {
@@ -179,6 +187,7 @@ namespace SEE.Net
         /// <summary>
         /// Syncs the current state of the server with the connecting client.
         /// </summary>
+        /// <param name="clientId">The ID of the receiving client</param>
         [Rpc(SendTo.Server)]
         internal void SyncClientServerRpc(ulong clientId)
         {
@@ -189,12 +198,14 @@ namespace SEE.Net
                 foreach (string serializedAction in Network.NetworkActionList.ToList())
                 {
                     AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
-                    if (action is AddCityNetAction)
+                    if (action is AddCityNetAction || action is SpawnTableNetAction)
                     {
                         blockedForSynchronization = true;
-                        ExecuteActionUnsafeForCityCreationClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
-                        await UniTask.WaitUntil(()=> !blockedForSynchronization);
-                    } else
+                        ExecuteCityOrTableCreationUnsafeWithResponseClientRpc
+                            (serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
+                        await UniTask.WaitUntil(() => !blockedForSynchronization);
+                    }
+                    else
                     {
                         ExecuteActionUnsafeClientRpc(serializedAction, RpcTarget.Single(clientId, RpcTargetUse.Temp));
                     }
@@ -206,8 +217,9 @@ namespace SEE.Net
         /// <summary>
         /// Releases the synchronization lock on the server side.
         /// </summary>
+        /// <param name="rpcParams">The additional RPC parameters (not actually used)</param>
         [Rpc(SendTo.Server)]
-        private void ResponseCityCreationActionExeceutionToServerRpc(RpcParams rpcParams = default)
+        private void ClientResponseActionExecutionToServerRpc(RpcParams rpcParams = default)
         {
             if (!IsServer && !IsHost)
             {
@@ -217,40 +229,90 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Performs the synchronization of a city creation on the client side and then sends a response to the server.
+        /// Determines whether the unsafe action execution should be skipped.
+        /// This is the case if the executor is the host or server,
+        /// or if the sender is not the server.
         /// </summary>
-        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
-        private void ExecuteActionUnsafeForCityCreationClientRpc(string serializedAction, RpcParams rpcParams = default)
+        /// <param name="rpcParams">The RPC parameters</param>
+        /// <returns>True if the execution should be skipped; otherwise, false.</returns>
+        private bool ShouldSkipUnsafeRpcExecution(RpcParams rpcParams)
         {
             if (IsHost || IsServer)
             {
-                return;
+                return true;
             }
 
             if (rpcParams.Receive.SenderClientId != ServerClientId)
             {
-                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                Debug.LogWarning($"Received an ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Performs an unsafe creation of either a code city or table
+        /// on the client side and then sends a response to the server.
+        /// If <paramref name="cityCreation"/> is true, a city is assumed
+        /// to be created; otherwise, a table is assumed to be created.
+        ///
+        /// Precondition: The action must be an <see cref="AddCityNetAction"/>
+        /// or a <see cref="SpawnTableNetAction"/>.
+        /// </summary>
+        /// <param name="serializedAction">The serialized action to be broadcasted.</param>
+        /// <param name="rpcParams">The additional RPC parameters</param>
+        [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
+        private void ExecuteCityOrTableCreationUnsafeWithResponseClientRpc
+            (string serializedAction,
+            RpcParams rpcParams = default)
+        {
+            if (ShouldSkipUnsafeRpcExecution(rpcParams))
+            {
                 return;
             }
-            ExecuteAndWait().Forget();
 
-            async UniTask ExecuteAndWait()
+            AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+
+            if (action is AddCityNetAction)
             {
-                AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
+                ExecuteAndWaitForCityCreation().Forget();
+            }
+            else if (action is SpawnTableNetAction)
+            {
+                ExecuteAndWaitForTableCreation().Forget();
+            }
+            else
+            {
+                throw new System.Exception($"The action must be an {nameof(AddCityNetAction)} or a {nameof(SpawnTableNetAction)}.");
+            }
+
+            return;
+
+            async UniTask ExecuteAndWaitForCityCreation()
+            {
                 AddCityNetAction cityAction = (AddCityNetAction)action;
                 cityAction.ExecuteOnClient();
                 if (LocalPlayer.TryGetCitiesHolder(out CitiesHolder citiesHolder))
                 {
                     GameObject city = citiesHolder.Find(cityAction.TableID);
                     await UniTask.WaitUntil(() => city.GetComponent<AbstractSEECity>() != null && city.IsCodeCityDrawnAndActive());
-                    ResponseCityCreationActionExeceutionToServerRpc();
+                    ClientResponseActionExecutionToServerRpc();
                 }
                 else
                 {
                     // This case should not actually occur, but it serves as a backup.
                     await UniTask.Delay(2000);
-                    ResponseCityCreationActionExeceutionToServerRpc();
+                    ClientResponseActionExecutionToServerRpc();
                 }
+            }
+
+            async UniTask ExecuteAndWaitForTableCreation()
+            {
+                SpawnTableNetAction spawnAction = (SpawnTableNetAction)action;
+                spawnAction.ExecuteOnClient();
+                await UniTask.Yield();
+                ClientResponseActionExecutionToServerRpc();
             }
         }
 
@@ -258,17 +320,13 @@ namespace SEE.Net
         /// Executes an action, even if the sender and this client are the same. This is used
         /// for synchronizing server state.
         /// </summary>
+        /// <param name="serializedAction">The serialized action to be broadcasted.</param>
+        /// <param name="rpcParams">The additional RPC parameters</param>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
         private void ExecuteActionUnsafeClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
+            if (ShouldSkipUnsafeRpcExecution(rpcParams))
             {
-                return;
-            }
-
-            if (rpcParams.Receive.SenderClientId != ServerClientId)
-            {
-                Debug.LogWarning($"Received a ExecuteActionUnsafeClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -279,17 +337,13 @@ namespace SEE.Net
         /// <summary>
         /// Executes an action on the client.
         /// </summary>
+        /// <param name="serializedAction">The serialized action to be broadcasted.</param>
+        /// <param name="rpcParams">The additional RPC parameters</param>
         [Rpc(SendTo.NotServer, AllowTargetOverride = true)]
         private void ExecuteActionClientRpc(string serializedAction, RpcParams rpcParams = default)
         {
-            if (IsHost || IsServer)
+            if (ShouldSkipUnsafeRpcExecution(rpcParams))
             {
-                return;
-            }
-
-            if (rpcParams.Receive.SenderClientId != ServerClientId)
-            {
-                Debug.LogWarning($"Received a ExecuteActionClientRpc from client ID {rpcParams.Receive.SenderClientId}!\n");
                 return;
             }
 
@@ -359,6 +413,9 @@ namespace SEE.Net
         /// Initiates the synchronization process with the backend and game server.
         /// This RPC is called by the game server after the client has registered itself.
         /// </summary>
+        /// <param name="backendServerId">The network id of the backend server.</param>
+        /// <param name="backendDomain">The domain of the backend .</param>
+        /// <param name="rpcParams">The additional RPC parameters.</param>
         [Rpc(SendTo.SpecifiedInParams)]
         private void SyncFilesClientRpc(string backendServerId, string backendDomain, RpcParams rpcParams = default)
         {

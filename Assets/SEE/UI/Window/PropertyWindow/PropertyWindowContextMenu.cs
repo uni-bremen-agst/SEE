@@ -1,16 +1,14 @@
-﻿using Assets.SEE.UI.Window.PropertyWindow;
-using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.UI.PopupMenu;
 using SEE.UI.Window.DrawableManagerWindow;
 using SEE.Utils;
+using SEE.XR;
 using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
-using SEE.XR;
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -55,11 +53,10 @@ namespace SEE.UI.Window.PropertyWindow
         public readonly GameObjectSorter Sorter;
 
         /// <summary>
-        /// Status of whether the grouper is active.
-        /// If it is active, grouping is done by the names of the metrics.
-        /// Otherwise, grouping is done by the type of attributes.
+        /// If true, grouping is done by the names of the attributes.
+        /// Otherwise, grouping is done by the type of the attributes.
         /// </summary>
-        public bool Grouper;
+        public bool GroupByName = true;
 
         /// <summary>
         /// Construcotr.
@@ -84,7 +81,7 @@ namespace SEE.UI.Window.PropertyWindow
 
             ResetFilter();
             ResetSort();
-            ResetGroup();
+            GroupByName = true;
 
             this.filterButton.clickEvent.AddListener(ShowFilterMenu);
             this.filterButton.clickEvent.AddListener(() => {
@@ -129,25 +126,25 @@ namespace SEE.UI.Window.PropertyWindow
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeHeader), CloseAfterClick: false),
-                new PopupMenuAction("Toggle Attributes", () =>
+                new PopupMenuAction(PropertyTypes.ToggleAttributes, () =>
                 {
                     Filter.IncludeToggleAttributes = !Filter.IncludeToggleAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeToggleAttributes), CloseAfterClick: false),
-                new PopupMenuAction("String Attributes", () =>
+                new PopupMenuAction(PropertyTypes.StringAttributes, () =>
                 {
                     Filter.IncludeStringAttributes = !Filter.IncludeStringAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeStringAttributes), CloseAfterClick: false),
-                new PopupMenuAction("Int Attributes", () =>
+                new PopupMenuAction(PropertyTypes.IntAttributes, () =>
                 {
                     Filter.IncludeIntAttributes = !Filter.IncludeIntAttributes;
                     UpdateFilterMenuEntries();
                     rebuild.Invoke();
                 }, Checkbox(Filter.IncludeIntAttributes), CloseAfterClick: false),
-                new PopupMenuAction("Float Attributes", () =>
+                new PopupMenuAction(PropertyTypes.FloatAttributes, () =>
                 {
                     Filter.IncludeFloatAttributes = !Filter.IncludeFloatAttributes;
                     UpdateFilterMenuEntries();
@@ -202,23 +199,17 @@ namespace SEE.UI.Window.PropertyWindow
 
                 new PopupMenuAction("Attribute Name", () =>
                 {
-                    ToggleSortAction("Name", x => GameFinder.FindChild(x, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
+                    ToggleSortAction("Name", x => x.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text);
                 }, SortIcon(false, Sorter.IsAttributeDescending("Name")), CloseAfterClick: false),
 
                 new PopupMenuAction("Attribute Value", () =>
                 {
                     ToggleSortAction("Value", x =>
                     {
-                        string text = GameFinder.FindChild(x, "ValueLine").MustGetComponent<TextMeshProUGUI>().text;
+                        string text = x.FindDescendant("ValueLine").MustGetComponent<TextMeshProUGUI>().text;
                         if (int.TryParse(text, out int intValue))
                         {
-                            if (!Grouper) {
-                                return intValue;
-                            }
-                            else
-                            {
-                                return (float)intValue;
-                            }
+                            return GroupByName ? (float)intValue : intValue;
                         }
                         else if (float.TryParse(text, out float floatValue))
                         {
@@ -305,16 +296,16 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 new PopupMenuAction("Value Type", () =>
                 {
-                    ResetGroup();
+                    GroupByName = false;
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
-                }, Radio(!Grouper), CloseAfterClick: false),
+                }, Radio(!GroupByName), CloseAfterClick: false),
                 new PopupMenuAction("Name Type", () =>
                 {
-                    Grouper = true;
+                    GroupByName = true;
                     UpdateGroupMenuEntries();
                     rebuild.Invoke();
-                }, Radio(Grouper), CloseAfterClick: false)
+                }, Radio(GroupByName), CloseAfterClick: false, Priority: 1)
             };
             contextMenu.ClearEntries();
             contextMenu.AddEntries(entries);
@@ -328,14 +319,6 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="value">Whether the radio button is checked.</param>
         /// <returns>A radio button icon for the given <paramref name="value"/>.</returns>
         private static char Radio(bool value) => value ? Icons.CheckedRadio : Icons.EmptyRadio;
-
-        /// <summary>
-        /// Resets the grouper to its default state.
-        /// </summary>
-        private void ResetGroup()
-        {
-            Grouper = false;
-        }
         #endregion
     }
 }

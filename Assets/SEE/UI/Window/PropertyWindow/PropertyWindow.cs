@@ -1,10 +1,8 @@
-using DG.Tweening;
+﻿using DG.Tweening;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
 using SEE.Controls;
 using SEE.DataModel.DG;
-using SEE.DataModel.DG.IO;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -18,21 +16,15 @@ using UnityEngine.Events;
 namespace SEE.UI.Window.PropertyWindow
 {
     /// <summary>
-    /// Represents a movable, scrollable window containing properties of a <see cref="GraphElement"/>.
-    /// It consists of a search field and a list of properties, where each property is represented by a row
-    /// holding the attribute name and its value.
+    /// Base class for windows showing properties of selected elements.
     /// </summary>
-    public class PropertyWindow : BaseWindow
+    public abstract class PropertyWindow : BaseWindow
     {
         #region Attributes
-        /// <summary>
-        /// GraphElement whose properties are to be shown.
-        /// </summary>
-        public GraphElement GraphElement;
 
         #region Prefabs
         /// <summary>
-        /// Prefab for the <see cref="PropertyWindow"/>.
+        /// Prefab for the <see cref="GraphElementPropertyWindow"/>.
         /// </summary>
         private readonly string WindowPrefab = UIPrefabFolder + "PropertyWindow";
 
@@ -60,7 +52,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The context menu that is displayed when the user uses the filter, gorup or sort buttons.
         /// </summary>
-        private PropertyWindowContextMenu contextMenu;
+        protected PropertyWindowContextMenu contextMenu;
 
         /// <summary>
         /// Transform of the object containing the items of the property window.
@@ -80,14 +72,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// The dictionary that holds the items for a group.
         /// </summary>
-        private readonly Dictionary<string, List<GameObject>> groupHolder = new();
+        protected readonly Dictionary<string, List<GameObject>> groupHolder = new();
 
         /// <summary>
         /// A set of all items that have been expanded.
         /// Note that this may contain items that are not currently visible due to collapsed parents.
         /// Such items will be expanded when they become visible again.
         /// </summary>
-        private readonly ISet<string> expandedItems = new HashSet<string>();
+        protected readonly ISet<string> expandedItems = new HashSet<string>();
         #endregion
 
         /// <summary>
@@ -273,7 +265,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Applies the search if <see cref="searchField.text"/> isn't empty.
         /// </summary>
-        private void ApplySearch()
+        protected void ApplySearch()
         {
             if (!string.IsNullOrEmpty(searchField.text) && !string.IsNullOrWhiteSpace(searchField.text))
             {
@@ -299,7 +291,7 @@ namespace SEE.UI.Window.PropertyWindow
                 }
                 else
                 {
-                    if (GameFinder.FindChild(go, "Expand Icon") != null)
+                    if (go.FindDescendant("Expand Icon") != null)
                     {
                         RotateExpandIcon(go, false);
                     }
@@ -374,153 +366,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// Creates the items (rows) for the attributes.
         /// It populates the window.
         /// </summary>
-        private void CreateItems()
-        {
-            if (contextMenu.Filter.IncludeHeader)
-            {
-                Dictionary<string, string> header = new()
-                {
-                    { "Kind", GraphElement is Node ? "Node" : "Edge" },
-                };
-                if (GraphElement is Edge edge)
-                {
-                    header.Add("ID", edge.ID);
-                    header.Add("Source", edge.Source.ID);
-                    header.Add("Target", edge.Target.ID);
-                }
-                header.Add("Type", GraphElement.Type);
-
-                // Data Attributes
-                Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
-                groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
-                expandedItems.Add("Header");
-            }
-            if (!contextMenu.Grouper)
-            {
-                GroupByValueType();
-            }
-            else
-            {
-                GroupByNameType();
-            }
-
-            // Sorts the properties
-            Sort();
-
-            // Applies the search
-            ApplySearch();
-            return;
-
-            // Creates the items for the value type group.
-            void GroupByValueType()
-            {
-                // Toggle Attributes
-                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
-                {
-                    DisplayGroup("Toggle Attributes", GraphElement.ToggleAttributes.ToDictionary(item => item, item => true));
-                }
-
-                // String Attributes
-                if (GraphElement.StringAttributes.Count > 0 && contextMenu.Filter.IncludeStringAttributes)
-                {
-                    DisplayGroup("String Attributes", GraphElement.StringAttributes);
-                }
-
-                // Int Attributes
-                if (GraphElement.IntAttributes.Count > 0 && contextMenu.Filter.IncludeIntAttributes)
-                {
-                    DisplayGroup("Int Attributes", GraphElement.IntAttributes);
-                }
-
-                // Float Attributes
-                if (GraphElement.FloatAttributes.Count > 0 && contextMenu.Filter.IncludeFloatAttributes)
-                {
-                    DisplayGroup("Float Attributes", GraphElement.FloatAttributes);
-                }
-            }
-
-            // Creates the items for the name type group.
-            void GroupByNameType()
-            {
-                if (GraphElement.ToggleAttributes.Count > 0 && contextMenu.Filter.IncludeToggleAttributes)
-                {
-                    Dictionary<string, bool> toggleDict = GraphElement.ToggleAttributes.ToDictionary(item => item, item => true);
-                    if (groupHolder.ContainsKey("Header"))
-                    {
-                        DisplayAttributes(toggleDict, group: "Header");
-                    }
-                    else
-                    {
-                        Dictionary<string, (string, GameObject gameObject)> toggleItems = DisplayAttributes(toggleDict);
-                        groupHolder.Add("Header", toggleItems.Values.Select(x => x.gameObject).ToList());
-                        expandedItems.Add("Header");
-                    }
-                }
-                Dictionary<string, object> attributes = new();
-                if (GraphElement.StringAttributes.Count > 0 & contextMenu.Filter.IncludeStringAttributes)
-                {
-                    foreach (KeyValuePair<string, string> pair in GraphElement.StringAttributes)
-                    {
-                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
-                    }
-                }
-                if (GraphElement.IntAttributes.Count > 0 & contextMenu.Filter.IncludeIntAttributes)
-                {
-                    foreach (KeyValuePair<string, int> pair in GraphElement.IntAttributes)
-                    {
-                        string key = pair.Key;
-                        // Block for old gxl files.
-                        if (key.Contains("SelectionRange") && !key.Contains("Source"))
-                        {
-                            key = "Source." + key;
-                        }
-                        key = InsertDotInFirstPascalCase(pair.Key);
-                        /// To remove duplicates it is needed to remove the old one. <see cref="GraphWriter.AppendAttributes"/>
-                        if (attributes.ContainsKey(key) && key.Contains("Source.Range"))
-                        {
-                            attributes.Remove(key);
-                        }
-                        attributes.Add(key, pair.Value);
-                    }
-                }
-                if (GraphElement.FloatAttributes.Count > 0 & contextMenu.Filter.IncludeFloatAttributes)
-                {
-                    foreach (KeyValuePair<string, float> pair in GraphElement.FloatAttributes)
-                    {
-                        attributes.Add(InsertDotInFirstPascalCase(pair.Key), pair.Value);
-                    }
-                }
-                SplitInAttributeGroup(attributes);
-
-                return;
-                string InsertDotInFirstPascalCase(string input)
-                {
-                    // Regular Expression Pattern
-                    string pattern = @"^([A-Z][a-z]+)([A-Z][a-z]+)(_.*)$";
-
-                    Regex regex = new(pattern);
-                    Match match = regex.Match(input);
-
-                    if (match.Success)
-                    {
-                        // Build the new string by inserting a period between the matched groups
-                        return $"{match.Groups[1].Value}.{match.Groups[2].Value}{match.Groups[3].Value}";
-                    }
-                    else
-                    {
-                        // Return the original input if it doesn't match the pattern
-                        return input;
-                    }
-                }
-            }
-        }
+        protected abstract void CreateItems();
 
         #region Grouping Name Type
         /// <summary>
         /// Divides the attributes into groups and subgroups.
         /// </summary>
         /// <param name="attributes">The attributes to divide.</param>
-        private void SplitInAttributeGroup(Dictionary<string, object> attributes)
+        protected void SplitInAttributeGroup(Dictionary<string, object> attributes)
         {
             Dictionary<string, object> nestedDict = new();
             foreach (KeyValuePair<string, object> pair in attributes)
@@ -576,18 +429,14 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Sorts the properties within the group.
         /// </summary>
-        private void Sort()
+        protected void Sort()
         {
             if (contextMenu.Sorter.IsActive())
             {
                 foreach (IEnumerable<GameObject> values in groupHolder.Values)
                 {
                     List<GameObject> list = values.Where(x => x.name.Contains("RowLine")).ToList();
-                    if (!contextMenu.Grouper)
-                    {
-                        ChangeOrder(list);
-                    }
-                    else
+                    if (contextMenu.GroupByName)
                     {
                         List<GameObject> texts = new();
                         List<GameObject> numbers = new();
@@ -612,6 +461,10 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             ChangeOrder(texts);
                         }
+                    }
+                    else
+                    {
+                        ChangeOrder(list);
                     }
                 }
             }
@@ -641,11 +494,11 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="attributes">A dictionary containing attribute names (keys) and their corresponding values (values).</param>
         /// <param name="level">The level for the group.</param>
         /// <param name="parentGroup">The parent group of this group, if none exists, null is used.</param>
-        private void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
+        protected void DisplayGroup<T>(string name, Dictionary<string, T> attributes, int level = 0, string parentGroup = null)
         {
             GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
             group.name = name;
-            GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+            group.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
             Dictionary<string, (string, GameObject gameObject)> dict = DisplayAttributes(attributes, level + 1, expandedItems.Contains(group.name));
             OrderGroup();
             RotateExpandIcon(group, expandedItems.Contains(group.name), 0.01f);
@@ -715,7 +568,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="expanded">Whether the group should be expanded or not.</param>
         private void RotateExpandIcon(GameObject group, bool expanded, float duration = 0.5f)
         {
-            if (GameFinder.FindChild(group, "Expand Icon").TryGetComponentOrLog(out RectTransform transform))
+            if (group.FindDescendant("Expand Icon").TryGetComponentOrLog(out RectTransform transform))
             {
                 Vector3 endValue = expanded ? new Vector3(0, 0, -180) : new Vector3(0, 0, -90);
                 transform.DORotate(endValue, duration: duration);
@@ -731,7 +584,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <param name="active">Whether the attributes should be active.</param>
         /// <param name="group">The group to which this attribute is to be assigned.
         /// Used only if the attribute is to be added to the group later.</param>
-        private Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
+        protected Dictionary<string, (string, GameObject)> DisplayAttributes<T>(Dictionary<string, T> attributes,
             int level = 0, bool active = true, string group = null)
         {
             Dictionary<string, (string, GameObject)> dict = new();
@@ -789,7 +642,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>the TMP holding the attribute name</returns>
         private TextMeshProUGUI Attribute(GameObject propertyRow)
         {
-            return GameFinder.FindChild(propertyRow, "AttributeLine").MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>();
         }
 
         /// <summary>
@@ -811,7 +664,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <returns>the TMP holding the attribute value</returns>
         private TextMeshProUGUI Value(GameObject propertyRow)
         {
-            return GameFinder.FindChild(propertyRow, "ValueLine")?.MustGetComponent<TextMeshProUGUI>();
+            return propertyRow.FindDescendant("ValueLine")?.MustGetComponent<TextMeshProUGUI>();
         }
         #endregion
 

@@ -1,8 +1,7 @@
-﻿using System;
-using Michsky.UI.ModernUIPack;
-using SEE.Game.Drawable;
+﻿using Michsky.UI.ModernUIPack;
 using SEE.GO;
 using SEE.Utils;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -118,7 +117,7 @@ namespace SEE.UI.PropertyDialog
                 {
                     if (showValidationFailedMessage)
                     {
-                        GameFinder.FindChild(inputField, "Validation Area").SetActive(false);
+                        inputField.FindDescendant("Validation Area").SetActive(false);
                         ChangeColorOfValidation(Color.white);
                         showValidationFailedMessage = false;
                     }
@@ -191,7 +190,7 @@ namespace SEE.UI.PropertyDialog
         /// <param name="errorMessage">The error message which should be displayed.</param>
         public void ChangeToValidationFailed(string errorMessage)
         {
-            GameObject validationArea = GameFinder.FindChild(inputField, "Validation Area");
+            GameObject validationArea = inputField.FindDescendant("Validation Area");
             validationArea.SetActive(true);
             validationArea.GetComponentInChildren<TextMeshProUGUI>().text = errorMessage;
             showValidationFailedMessage = true;
@@ -218,9 +217,9 @@ namespace SEE.UI.PropertyDialog
                 fadeDuration = 0.1f
             };
             // Change the color of the input text and of the placeholder text.
-            TextMeshProUGUI textTMP = GameFinder.FindChild(inputField, "Text Area").GetComponentInChildren<TextMeshProUGUI>();
+            TextMeshProUGUI textTMP = inputField.FindDescendant("Text Area").GetComponentInChildren<TextMeshProUGUI>();
             textTMP.faceColor = color;
-            GameFinder.FindChild(inputField, "Placeholder").GetComponent<TextMeshProUGUI>().color = color;
+            inputField.FindDescendant("Placeholder").GetComponent<TextMeshProUGUI>().color = color;
 
             // Change the color of the input field background (the underlaying line).
             UIManagerInputField managerInputField = inputField.GetComponentInChildren<UIManagerInputField>();

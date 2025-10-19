@@ -403,7 +403,7 @@ namespace SEE.Game.CityRendering
                 GraphElementIDMap.Add(resultingEdges);
             }
 
-            resultingEdges.ForEach(InteractionDecorator.PrepareForInteraction);
+            resultingEdges.ForEach(InteractionDecorator.PrepareGraphElementForInteraction);
             AddLOD(resultingEdges);
             return resultingEdges;
         }

@@ -75,6 +75,10 @@ namespace SEE.Controls.Actions
             /// </summary>
             public string EdgeType;
             /// <summary>
+            /// The created edge ID.
+            /// </summary>
+            public string EdgeID;
+            /// <summary>
             /// Constructor.
             /// </summary>
             /// <param name="from">the source of the edge</param>
@@ -87,6 +91,7 @@ namespace SEE.Controls.Actions
                 this.To = to;
                 this.ToID = to.name;
                 this.EdgeType = edgeType;
+                this.EdgeID = null;
             }
         }
 
@@ -139,7 +144,9 @@ namespace SEE.Controls.Actions
             // actually nodes.
             if (SceneSettings.InputType == PlayerInputType.VRPlayer)
             {
-                if (XRSEEActions.Selected && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
+                if (XRSEEActions.Selected
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
+                    && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef())
                 {
                     if (from == null)
                     {
@@ -155,7 +162,10 @@ namespace SEE.Controls.Actions
             }
             else
             {
-                if (HoveredObject != null && Input.GetMouseButtonDown(0) && !Raycasting.IsMouseOverGUI() && HoveredObject.HasNodeRef())
+                if (HoveredObject != null
+                    && Input.GetMouseButtonDown(0)
+                    && !Raycasting.IsMouseOverGUI()
+                    && HoveredObject.HasNodeRef())
                 {
                     if (from == null)
                     {
@@ -176,6 +186,7 @@ namespace SEE.Controls.Actions
                 // FIXME: In the future, we need to query the edge type from the user.
                 memento = new Memento(from, to, defaultEdgeType);
                 createdEdge = CreateEdge(memento);
+                memento.EdgeID = createdEdge.name;
 
                 // action is completed (successfully or not; it does not matter)
                 from = null;
@@ -210,6 +221,10 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            if (createdEdge == null)
+            {
+                createdEdge = GraphElementIDMap.Find(memento.EdgeID);
+            }
             GameEdgeAdder.Remove(createdEdge);
             new DeleteNetAction(createdEdge.name).Execute();
             Destroyer.Destroy(createdEdge);
@@ -285,9 +300,9 @@ namespace SEE.Controls.Actions
         {
             return new HashSet<string>
             {
-                memento.From.name,
-                memento.To.name,
-                createdEdge.name
+                memento.FromID,
+                memento.ToID,
+                memento.EdgeID
             };
         }
     }

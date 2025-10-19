@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using SEE.Controls;
+using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.Tools.OpenTelemetry;
@@ -49,8 +50,7 @@ namespace SEE.GO
             }
             else
             {
-                Debug.LogWarning(
-                    $"{name} has no {nameof(AbstractSEECity)} component attached to it. {nameof(CityCursor)} will be disabled.\n");
+                Debug.LogWarning($"{name} has no {nameof(AbstractSEECity)} component attached to it. {nameof(CityCursor)} will be disabled.\n");
                 enabled = false;
             }
         }
@@ -75,48 +75,61 @@ namespace SEE.GO
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is selected.
         /// </summary>
+        /// <param name="interactableObject">the selected object</param>
         private async void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph != null && city.LoadedGraph != null
-                                      && selectedGraph.Equals(city.LoadedGraph))
+            if (interactableObject is InteractableGraphElement graphElement)
             {
-                Cursor.AddFocus(interactableObject);
-                hoverStartTimes[interactableObject] = Time.time;
-
-                float start = Time.time;
-                await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
-
-                if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime) &&
-                    Math.Abs(hoverTime - start) < 0.1f)
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
+                if (selectedGraph != null && city.LoadedGraph != null
+                                          && selectedGraph.Equals(city.LoadedGraph))
                 {
-                    hoverThresholdReached.Add(interactableObject);
+                    Cursor.AddFocus(interactableObject);
+                    hoverStartTimes[interactableObject] = Time.time;
+
+                    float start = Time.time;
+                    await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
+
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime) &&
+                        Math.Abs(hoverTime - start) < 0.1f)
+                    {
+                        hoverThresholdReached.Add(interactableObject);
+                    }
                 }
             }
         }
+
 
         /// <summary>
         /// Removes <paramref name="interactableObject"/> from the <see cref="Cursor"/> focus when
         /// it belongs to <see cref="city"/>.
         /// Called whenever an <see cref="InteractableObject"/> is unselected.
         /// </summary>
+        /// <param name="interactableObject">the unselected object</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
-            Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
-            if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
+            if (interactableObject is InteractableGraphElement graphElement)
             {
-                Cursor.RemoveFocus(interactableObject);
-
-                if (hoverStartTimes.TryGetValue(interactableObject, out float startTime) &&
-                    hoverThresholdReached.Contains(interactableObject))
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
+                if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
                 {
-                    float duration = Time.time - startTime;
-                    TracingHelperService.Instance?.TrackHoverDuration(interactableObject.gameObject, duration, hoverThreshold);
-                }
+                    Cursor.RemoveFocus(interactableObject);
 
-                hoverStartTimes.Remove(interactableObject);
-                hoverThresholdReached.Remove(interactableObject);
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float startTime) &&
+                        hoverThresholdReached.Contains(interactableObject))
+                    {
+                        float duration = Time.time - startTime;
+                        TracingHelperService.Instance?.TrackHoverDuration(
+                            interactableObject.gameObject,
+                            duration,
+                            hoverThreshold);
+                    }
+
+                    hoverStartTimes.Remove(interactableObject);
+                    hoverThresholdReached.Remove(interactableObject);
+                }
             }
         }
+
     }
 }

@@ -1,16 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
+using SEE.Controls;
 using SEE.DataModel.DG;
+using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using SEE.Utils;
-using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
+using SEE.Utils;
 using Sirenix.Utilities;
-using SEE.DataModel.Drawable;
-using SEE.Controls;
 
 namespace SEE.GO
 {
@@ -43,6 +43,26 @@ namespace SEE.GO
                 }
             }
             return nodeRef.Value.ID;
+        }
+
+        /// <summary>
+        /// Returns the first immediate child of <paramref name="gameObject"/> that
+        /// is a graph node, i.e., has a <see cref="NodeRef"/> attached to it
+        /// (checked by predicate <see cref="IsNode(GameObject)"/>) or null if there
+        /// is none.
+        /// </summary>
+        /// <param name="gameObject">The game object whose child is to be retrieved</param>
+        /// <returns>first immediate child representing a node or null if there is none</returns>
+        public static GameObject FirstChildNode(this GameObject gameObject)
+        {
+            foreach (Transform child in gameObject.transform)
+            {
+                if (child.gameObject.IsNode())
+                {
+                    return child.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -79,25 +99,25 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represents a graph node or edge, the city this
-        /// object is contained in will be returned. Otherwise null is returned.
+        /// Returns the city this <paramref name="gameObject"/> is contained in.
+        /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">graph node or edge whose containing city is requested</param>
+        /// <param name="gameObject">object whose containing city is requested</param>
         /// <returns>the containing city of <paramref name="gameObject"/> or null</returns>
         public static AbstractSEECity ContainingCity(this GameObject gameObject) => ContainingCity<AbstractSEECity>(gameObject);
 
         /// <summary>
-        /// If <paramref name="gameObject"/> represents a graph node or edge, the city of type <typeparamref name="T"/>
-        /// this object is contained in will be returned. Otherwise null is returned.
+        /// Returns the city of type <typeparamref name="T"/> this <paramref name="gameObject"/> is contained.
+        /// If <paramref name="gameObject"/> is null or if it is not contained in a city of type, null is returned.
         /// </summary>
-        /// <param name="gameObject">graph node or edge whose containing city of type <typeparamref name="T"/>
+        /// <param name="gameObject">object whose containing city of type <typeparamref name="T"/>
         /// is requested</param>
         /// <returns>the containing city of type <typeparamref name="T"/> of <paramref name="gameObject"/>
         /// or null</returns>
         /// <typeparam name="T">Type of the code city that shall be returned</typeparam>
         public static T ContainingCity<T>(this GameObject gameObject) where T : AbstractSEECity
         {
-            if (gameObject == null || (!gameObject.HasNodeRef() && !gameObject.HasEdgeRef()))
+            if (gameObject == null)
             {
                 return null;
             }
@@ -538,8 +558,7 @@ namespace SEE.GO
             }
 
             // No renderer, so we use lossyScale as a fallback.
-            // Note: This should not happen. If the object has no renderer, it has no size at all.
-            Debug.LogWarning($"GameObject has no Renderer component, using lossyScale as fallback: {gameObject.name}");
+            // Note: This may happen for container objects that have no mesh.
             size = gameObject.transform.lossyScale;
             position = gameObject.transform.position;
             return false;
@@ -1320,19 +1339,137 @@ namespace SEE.GO
         /// <summary>
         /// Searches for the first child that starts with the <paramref name="prefix"/>.
         /// </summary>
-        /// <param name="gameObject">The game object whose chidlren should be examined.</param>
+        /// <param name="gameObject">The game object whose children should be examined.</param>
         /// <param name="prefix">The prefix to search for.</param>
         /// <returns>the found child or null.</returns>
-        public static Transform FindChildWithPrefix(this GameObject gameObject, string prefix)
+        public static GameObject FindChildWithPrefix(this GameObject gameObject, string prefix)
         {
             foreach (Transform child in gameObject.transform)
             {
                 if (child.name.StartsWith(prefix))
                 {
-                    return child;
+                    return child.gameObject;
                 }
             }
             return null;
+        }
+
+        /// <summary>
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="descendantName">The name of the descendant to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search wil include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The frist matching descendant <see cref="GameObject"/> with the specified <paramref name="descendantName"/>,
+        /// or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendant(this GameObject gameObject, string descendantName, bool includeInactive = true)
+        {
+            return gameObject
+                    .GetComponentsInChildren<Transform>(includeInactive)
+                    .FirstOrDefault(t => t.gameObject.name == descendantName)?
+                    .gameObject;
+        }
+
+        /// <summary>
+        /// Searches for the first descendant <see cref="GameObject"/> with the specified <paramref name="tag"/>
+        /// within the hierarchy of the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object whose descendants will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <param name="includeInactive">If set to <c>true</c>, the search will include inactive <see cref="GameObject"/>s.
+        /// Otherwise, only active ones will be considered.</param>
+        /// <returns>The first matching descendant <see cref="GameObject"/> with the specified tag, or <c>null</c> if none is found.</returns>
+        public static GameObject FindDescendantWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .FirstOrDefault(t => t.gameObject.CompareTag(tag))?
+                .gameObject;
+        }
+
+        /// <summary>
+        /// QDetermines whether the <paramref name="gameObject"/> has any descendant
+        /// with the specified <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a descendant with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasDescendantWithTag(this GameObject gameObject, string tag)
+        {
+            return gameObject.FindDescendantWithTag(tag) != null;
+        }
+
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s of the given <paramref name="gameObject"/>
+        /// that have the specified tag.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to start the search from.</param>
+        /// <param name="tag">The tag that matching descendants must have.</param>
+        /// <param name="includeInactive">Whether to include inactive <see cref="GameObject"/>s in the search.</param>
+        /// <returns>A list of all descendant <see cref="GameObject"/>s with the specified tag.</returns>
+        public static IList<GameObject> FindAllDescendantsWithTag(this GameObject gameObject, string tag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .Where(t => t.CompareTag(tag))
+                .Select(t => t.gameObject)
+                .ToList();
+        }
+        /// <summary>
+        /// Finds all descendant <see cref="GameObject"/>s with the specified <paramref name="descendantTag"/>,
+        /// exluding those whose immediate parent has the specified <paramref name="immediateParentTag"/>.
+        /// </summary>
+        /// <param name="gameObject">The root <see cref="GameObject"/> to search from.</param>
+        /// <param name="descendantTag">The tag that matching descendants must have.</param>
+        /// <param name="immediateParentTag">If the immediate parent has this tag, the child will be excluded from the result.</param>
+        /// <param name="includeInactive">Whether inactive <see cref="GameObject"/>s should be included in the search.</param>
+        /// <returns>A list of matching descendant <see cref="GameObject"/>s, excluding those whose parent has the specified tag.</returns>
+        public static List<GameObject> FindAllDescendantsWithTagExcludingSpecificParentTag(this GameObject gameObject,
+            string descendantTag, string immediateParentTag, bool includeInactive = true)
+        {
+            return gameObject
+                .GetComponentsInChildren<Transform>(includeInactive)
+                .Where(t => t.CompareTag(descendantTag) &&
+                            t.parent != null &&
+                            !t.parent.CompareTag(immediateParentTag))
+                .Select(t => t.gameObject)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="gameObject"/> has any ancestor
+        /// with the given <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> whose parent hierarhcy will be searched.</param>
+        /// <param name="tag">The tag to search for.</param>
+        /// <returns><c>true</c> if a parent or ancestor with the specified tag is found; otherwise, <c>false</c>.</returns>
+        public static bool HasParentWithTag(this GameObject gameObject, string tag)
+        {
+            Transform transform = gameObject.transform;
+            while (transform.parent != null)
+            {
+                if (transform.parent.gameObject.CompareTag(tag))
+                {
+                    return true;
+                }
+                transform = transform.parent;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Traverses up the hierachy from the given <paramref name="gameObject"/>
+        /// and returns the highest parent.
+        /// </summary>
+        /// <param name="gameObject">The starting <see cref="GameObject"/> in the hierarchy.</param>
+        /// <returns>The root <see cref="GameObject"/> at the top of the hierarchy.
+        /// If the given object has no parent, it is returned itself.</returns>
+        public static GameObject GetRootParent(this GameObject gameObject)
+        {
+            Transform parent = gameObject.transform.parent;
+            return parent != null ? GetRootParent(parent.gameObject) : gameObject;
         }
 
         /// <summary>

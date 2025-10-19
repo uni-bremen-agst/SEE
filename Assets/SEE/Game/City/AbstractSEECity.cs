@@ -13,6 +13,7 @@ using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
+using SEE.UI.Notification;
 
 namespace SEE.Game.City
 {
@@ -70,6 +71,7 @@ namespace SEE.Game.City
         /// The path where the settings (the attributes of this class) are stored.
         /// </summary>
         [Tooltip("Path of configuration file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(ConfigurationPathOrder)]
         public DataPath ConfigurationPath = new();
 
         /// <summary>
@@ -84,6 +86,7 @@ namespace SEE.Game.City
         /// is needed to show the source code of nodes and edges.
         /// </summary>
         [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
         [PropertyTooltip("Directory where the source code is located")]
         [HideReferenceObjectPicker]
         public DataPath SourceCodeDirectory
@@ -111,6 +114,7 @@ namespace SEE.Game.City
         /// this is the VS solution file.
         /// </summary>
         [Tooltip("Path of Visual Studio solution file."), TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup)]
+        [RuntimeGroupOrder(SolutionPathOrder)]
         public DataPath SolutionPath = new();
 
         /// <summary>
@@ -180,7 +184,7 @@ namespace SEE.Game.City
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
         [PropertyOrder(999)]
-        [ShowIf(nameof(ShowProgressBar))]
+        [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
         public float ProgressBar;
@@ -339,7 +343,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
         [PropertyOrder(ConfigurationButtonsGroupLoad)]
-        public void LoadConfiguration()
+        public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
         }
@@ -360,8 +364,15 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
-            Restore(stream.Read());
+            try
+            {
+                using ConfigReader stream = new(filename);
+                Restore(stream.Read());
+            }
+            catch (Exception e)
+            {
+               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+            }
         }
 
         /// <summary>
@@ -693,7 +704,7 @@ namespace SEE.Game.City
         /// Adds the initial root node type to the <see cref="NodeTypes"/>.
         /// By default it is assigned the royal blue color and <see cref="ShowNames"/> is false.
         /// </summary>
-        private void AddRootNodeType()
+        protected void AddRootNodeType()
         {
             if (!NodeTypes.TryGetValue(Graph.RootType, out VisualNodeAttributes _))
             {
@@ -753,7 +764,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of <see cref="Reset"/> in the button group <see cref="ResetButtonsGroup"/>.
         /// </summary>
-        protected const float ResetButtonsGroupOrderReset = 1;
+        protected const float ResetButtonsGroupOrderReset = 2;
 
         /// <summary>
         /// The name of the group for the Inspector buttons managing the configuration file.
@@ -763,7 +774,7 @@ namespace SEE.Game.City
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
-        protected const float ConfigurationButtonsGroupLoad = 1;
+        protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
         /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
@@ -790,6 +801,25 @@ namespace SEE.Game.City
         /// </summary>
         protected const string ErosionFoldoutGroup = "Erosion";
 
+        /// <summary>
+        /// The order of the configuration path.
+        /// </summary>
+        protected const int ConfigurationPathOrder = 0;
+
+        /// <summary>
+        /// The order of the solution path.
+        /// </summary>
+        protected const int SolutionPathOrder = ConfigurationPathOrder + 1;
+
+        /// <summary>
+        /// The order of the data provider.
+        /// </summary>
+        protected const int DataProviderOrder = SolutionPathOrder + 1;
+
+        /// <summary>
+        /// The order of the source code directory.
+        /// </summary>
+        protected const int SourceCodeDirectoryOrder = DataProviderOrder + 1;
         #endregion
     }
 }

@@ -1,6 +1,4 @@
-﻿using DG.Tweening;
-using SEE.DataModel.DG;
-using SEE.Game.Operator;
+﻿using SEE.DataModel.DG;
 using SEE.GO;
 using SEE.Layout;
 using Sirenix.Utilities;
@@ -114,13 +112,29 @@ namespace SEE.Game.Evolution
             Assert.IsTrue(gameNode.HasNodeRef());
             Assert.IsNotNull(formerGraphNode);
 
-            // We want the animator to move each node separately, which is why we
-            // remove each from the hierarchy; later the node hierarchy will be
-            // re-established. It still needs to be a child of the code city,
-            // however, because methods called in the course of the animation
-            // will try to retrieve the code city from the game node.
-            gameNode.transform.SetParent(gameObject.transform);
-            MoveTo(gameNode, layoutNode);
+            if (PositionHasChanged(gameNode, layoutNode))
+            {
+                // We want the animator to move each node separately, which is why we
+                // remove each from the hierarchy; later the node hierarchy will be
+                // re-established. It still needs to be a child of the code city,
+                // however, because methods called in the course of the animation
+                // will try to retrieve the code city from the game node.
+                gameNode.transform.SetParent(gameObject.transform);
+                MoveTo(gameNode, layoutNode);
+            }
+            else
+            {
+                animationWatchDog.Finished();
+            }
+
+            // True if the position of the given game object has actually changed
+            // by a relevant margin.
+            bool PositionHasChanged(GameObject go, ILayoutNode layoutNode)
+            {
+                Vector3 currentPosition = go.transform.position;
+                Vector3 newPosition = layoutNode.CenterPosition;
+                return Vector3.Distance(currentPosition, newPosition) > 0.001f;
+            }
 
             void MoveTo(GameObject gameNode, ILayoutNode layoutNode)
             {

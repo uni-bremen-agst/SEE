@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions
                     }
 
                     nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false, true);
-                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true).Execute();
+                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true, AnimationFactor).Execute();
                 }
             }
         }
