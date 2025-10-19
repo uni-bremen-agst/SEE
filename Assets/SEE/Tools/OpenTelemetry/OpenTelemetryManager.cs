@@ -14,7 +14,7 @@ namespace SEE.Tools.OpenTelemetry
     /// <summary>
     /// Handles the setup, management, and shutdown of OpenTelemetry tracing for Unity applications.
     /// </summary>
-    public class OpenTelemetryManager 
+    public class OpenTelemetryManager
     {
         /// <summary>
         /// The OpenTelemetry tracer provider instance.
