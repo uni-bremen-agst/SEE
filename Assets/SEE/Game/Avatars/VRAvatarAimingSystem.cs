@@ -80,7 +80,7 @@ namespace SEE.Game.Avatars
 
         private GameObject lastLaserTarget;
         private float laserTargetStartTime;
-        private readonly float hoverThreshold = 5.0f; 
+        private readonly float hoverThreshold = 5.0f;
 
         /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
