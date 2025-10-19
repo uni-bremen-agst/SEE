@@ -336,7 +336,6 @@ namespace SEE.Controls
         /// The mouse position of the last frame.
         /// </summary>
         private Vector2 lastAxis;
-        
         private bool wasRotating = false;
         private float rotationStartYaw;
 
