@@ -31,7 +31,6 @@ namespace SEE.Tools.OpenTelemetry
             manager.Initialize();
             Instance = new TracingHelper("SEE.Tracing", playerName);
         }
-        
         /// <summary>
         /// Shuts down the tracing service and exporter cleanly.
         /// Should be called before application exit.
