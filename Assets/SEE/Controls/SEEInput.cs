@@ -441,6 +441,15 @@ namespace SEE.Controls
             return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.Pointing);
         }
 
+        /// <summary>
+        /// True if the hand animations with MediaPipe should be activated.
+        /// </summary>
+        /// <returns>True, if the user wishes to use hand animations with MediaPipe</returns>
+        public static bool ToggleHandAnimations()
+        {
+            return KeyboardShortcutsEnabled && KeyBindings.IsDown(KeyAction.HandAnimations);
+        }
+
         #endregion
 
         //--------------------------

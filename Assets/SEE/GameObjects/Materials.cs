@@ -293,5 +293,65 @@ namespace SEE.GO
 
             return New(name, color, texture, renderQueueOffset);
         }
+
+        /// <summary>
+        /// Dumps all properties of the given <paramref name="material"/> as well as
+        /// those of its shader to the debug log. Can be used for debugging.
+        /// </summary>
+        /// <param name="material">Materials whose properties are to be dumped.</param>
+        private static void DumpProperties(Material material)
+        {
+            Debug.Log($"Dumping properties for Material: {material.name}\n");
+
+            foreach (string propertyName in material.GetPropertyNames(MaterialPropertyType.Vector))
+            {
+                Debug.Log($"Material Property: {propertyName}\n");
+            }
+
+            Shader shader = material.shader;
+            if (shader == null)
+            {
+                Debug.LogError("Material has no shader.\n");
+                return;
+            }
+
+            int propertyCount = shader.GetPropertyCount();
+            Debug.Log($"Shader '{shader.name}' has {propertyCount} properties.\n");
+
+            for (int i = 0; i < propertyCount; i++)
+            {
+                string propertyName = shader.GetPropertyName(i);
+                UnityEngine.Rendering.ShaderPropertyType propertyType = shader.GetPropertyType(i);
+
+                string propertyValue = "N/A";
+
+                // Get the value based on the property type
+                switch (propertyType)
+                {
+                    case UnityEngine.Rendering.ShaderPropertyType.Color:
+                        propertyValue = material.GetColor(propertyName).ToString();
+                        break;
+                    case UnityEngine.Rendering.ShaderPropertyType.Vector:
+                        propertyValue = material.GetVector(propertyName).ToString();
+                        break;
+                    case UnityEngine.Rendering.ShaderPropertyType.Float:
+                    case UnityEngine.Rendering.ShaderPropertyType.Range:
+                        propertyValue = material.GetFloat(propertyName).ToString();
+                        break;
+                    case UnityEngine.Rendering.ShaderPropertyType.Int:
+                        propertyValue = material.GetInt(propertyName).ToString();
+                        break;
+                    case UnityEngine.Rendering.ShaderPropertyType.Texture:
+                        Texture texture = material.GetTexture(propertyName);
+                        propertyValue = (texture != null) ? texture.name : "None";
+                        break;
+                    default:
+                        Debug.LogWarning($"Unhandled property type: {propertyType}\n");
+                        break;
+                }
+
+                Debug.Log($" Shader Property {i}: Name='{propertyName}', Type='{propertyType}', Value='{propertyValue}'\n");
+            }
+        }
     }
 }

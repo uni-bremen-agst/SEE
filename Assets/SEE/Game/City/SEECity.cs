@@ -277,6 +277,11 @@ namespace SEE.Game.City
             foreach (Transform childTransform in parent.transform)
             {
                 GameObject child = childTransform.gameObject;
+                if (child.TryGetComponent(out AuthorSphere _))
+                {
+                    // Do not set NodeRef/EdgeRef for AuthorSpheres.
+                    continue;
+                }
                 if (child.TryGetComponent(out NodeRef nodeRef))
                 {
                     nodeRef.Value = graph.GetNode(child.name);
@@ -380,9 +385,9 @@ namespace SEE.Game.City
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
-            string outputFile = Application.streamingAssetsPath + "/output.gxl";
             if (LoadedGraph != null)
             {
+                string outputFile = Application.streamingAssetsPath + "/output.gxl";
                 GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
@@ -395,7 +400,7 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
+        /// Precondition: The graph data have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
@@ -542,11 +547,6 @@ namespace SEE.Game.City
         {
             base.Reset();
             ResetGraphData();
-            // Remove the poller.
-            if (TryGetComponent(out GitPoller poller))
-            {
-                Destroyer.Destroy(poller);
-            }
             if (TryGetComponent(out CitySelectionManager csm))
             {
                 csm.enabled = true;

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -11,9 +12,14 @@ namespace SEE.Game
     public static class Portal
     {
         /// <summary>
+        /// The name of the shader property that holds the portal information.
+        /// </summary>
+        private const string portalPropertyName = "_Portal";
+
+        /// <summary>
         /// Cached property index for the <c>_Portal</c> shader property.
         /// </summary>
-        private static readonly int portalProp = Shader.PropertyToID("_Portal");
+        private static readonly int portalProp = Shader.PropertyToID(portalPropertyName);
 
         /// <summary>
         /// Sets the culling area (portal) of all children of <paramref name="parent"/> to the
@@ -87,7 +93,7 @@ namespace SEE.Game
         /// <returns><c>true</c> iff the material has a portal.</returns>
         private static bool GetPortal(Material material, out Vector2 leftFront, out Vector2 rightBack)
         {
-            if (material.HasProperty(portalProp))
+            if (HasPortal(material))
             {
                 // The _Portal property contains both the min and the max position of the portal plane
                 // that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
@@ -101,6 +107,24 @@ namespace SEE.Game
             leftFront = Vector2.zero;
             rightBack = Vector2.zero;
             return false;
+        }
+
+        /// <summary>
+        /// True iff the shader of <paramref name="material"/> has a property named <see cref="portalPropertyName"/>.
+        /// </summary>
+        /// <param name="material">Material whose shader should be checked.</param>
+        /// <returns>True iff the shader of <paramref name="material"/> has a property named <see cref="portalPropertyName"/>.</returns>
+        /// <remarks>A material itself may have this property but that is not relevant
+        /// if its shader does not actually use it.</remarks>
+        private static bool HasPortal(Material material)
+        {
+            Shader shader = material.shader;
+            if (shader == null)
+            {
+                Debug.LogError($"Material {material.name} has no shader.\n");
+                return false;
+            }
+            return shader.FindPropertyIndex(portalPropertyName) != -1;
         }
 
         /// <summary>

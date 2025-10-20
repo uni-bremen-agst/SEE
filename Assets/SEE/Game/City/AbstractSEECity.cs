@@ -13,6 +13,7 @@ using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
+using SEE.UI.Notification;
 
 namespace SEE.Game.City
 {
@@ -363,8 +364,15 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
-            Restore(stream.Read());
+            try
+            {
+                using ConfigReader stream = new(filename);
+                Restore(stream.Read());
+            }
+            catch (Exception e)
+            {
+               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+            }
         }
 
         /// <summary>

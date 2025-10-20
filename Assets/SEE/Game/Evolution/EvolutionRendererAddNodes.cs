@@ -1,8 +1,6 @@
 ﻿using SEE.DataModel.DG;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.Layout;
-using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Assertions;

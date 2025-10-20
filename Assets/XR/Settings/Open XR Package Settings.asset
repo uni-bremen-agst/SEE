@@ -312,11 +312,11 @@ MonoBehaviour:
   m_Name: DPadInteraction Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR:UnityEngine.XR.OpenXR.Features.Interactions:DPadInteraction
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: D-Pad Binding
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.dpadinteraction
+  openxrExtensionStrings: XR_KHR_binding_modification XR_EXT_dpad_binding
+  company: Unity
   priority: 0
   required: 0
   forceThresholdLeft: 0.5
@@ -482,7 +482,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   features:
   - {fileID: 3659132584355106210}
-  - {fileID: -4877541845259041400}
+  - {fileID: -9183767700453206409}
   - {fileID: 8813224991119622085}
   - {fileID: 6352007622941683982}
   - {fileID: -3509102339466431376}
@@ -501,6 +501,7 @@ MonoBehaviour:
   - {fileID: 7242976004462796141}
   - {fileID: 3038467894708909782}
   m_renderMode: 0
+  m_latencyOptimization: 0
   m_autoColorSubmissionMode: 1
   m_colorSubmissionModes:
     m_List: 00000000
@@ -742,6 +743,7 @@ MonoBehaviour:
   features:
   - {fileID: -7736765889205497078}
   m_renderMode: 1
+  m_latencyOptimization: 0
   m_autoColorSubmissionMode: 1
   m_colorSubmissionModes:
     m_List: 00000000

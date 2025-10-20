@@ -1,7 +1,10 @@
 ﻿using NUnit.Framework;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.City;
+using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.VCS;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -137,8 +140,6 @@ namespace SEE.GraphProviders
             List<string> expectedPaths = new()
             {
                 projectName,
-                "Assets",
-                "Assets/SEE",
                 "Assets/SEE/GraphProviders",
                 "Assets/SEE/GraphProviders/CSVGraphProvider.cs",
                 "Assets/SEE/GraphProviders/DashboardGraphProvider.cs",
@@ -154,16 +155,18 @@ namespace SEE.GraphProviders
                 "Assets/SEE/GraphProviders/ReflexionGraphProvider.cs",
                 "Assets/SEE/GraphProviders/VCSGraphProvider.cs"
             };
+            expectedPaths.Sort();
 
-            Graph graph = await GetVCSGraphAsync();
+            Graph graph = await GetVCSGraphAsync(false);
 
+            // Node IDs are unique, so we can use a list.
             List<string> pathsFromGraph = new();
-            foreach (GraphElement elem in graph.Elements())
+            foreach (Node node in graph.Nodes())
             {
-                pathsFromGraph.Add(elem.ID);
+                pathsFromGraph.Add(node.ID);
             }
-            Assert.AreEqual(expectedPaths.Count, pathsFromGraph.Count());
-            Assert.IsTrue(expectedPaths.OrderByDescending(x => x).ToList().SequenceEqual(pathsFromGraph.OrderByDescending(x => x).ToList()));
+            pathsFromGraph.Sort();
+            Assert.AreEqual(expectedPaths, pathsFromGraph);
         }
 
         /// <summary>
@@ -171,19 +174,18 @@ namespace SEE.GraphProviders
         /// Note that we do not evaluate their values. This kind of test is
         /// is done in the test case <see cref="SEE.Scanner.TestTokenMetrics"/>.
         /// </summary>
-        /// <returns></returns>
         [Test]
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == "File");
+            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.VCS.FileType);
             AssertTokenMetricsExist(fileNode);
         }
 
         private static void AssertTokenMetricsExist(Node node)
         {
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "LOC", out int _));
-            Assert.IsTrue(node.TryGetInt(Metrics.Prefix + "McCabe_Complexity", out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.LOC, out int _));
+            Assert.IsTrue(node.TryGetInt(Metrics.McCabe, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperators, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.DistinctOperands, out int _));
             Assert.IsTrue(node.TryGetInt(Halstead.TotalOperators, out int _));
@@ -200,49 +202,68 @@ namespace SEE.GraphProviders
 
         [Test]
         [Category("SkipOnCI")]  // We do a checkout with fetch-depth 1 in CI, so we cannot get all VCS metrics.
-        public async Task TestVCSMetricsAsync()
+        // Is not equivalent to:
+        //   git diff --shortstat a5fe5e6a2692f41aeb8448d5114000e6f82e605e 0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs
+        // because the latter compares only the first commit to the second commit,
+        // but does not include the commits in between. Our churn metrics, however,
+        // are based on all commits between the two.
+        [TestCase(DataModel.DG.VCS.LinesAdded, 284)]
+        [TestCase(DataModel.DG.VCS.LinesRemoved, 320)]
+        // Should be equivalent to:
+        // git log 0878f91f900dc90d89c594c521ac1d3b9edd7097 ^a5fe5e6a2692f41aeb8448d5114000e6f82e605e -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|grep ^Author|sort -u|wc -l
+        [TestCase(DataModel.DG.VCS.NumberOfDevelopers, 3)]
+        // Should be equivalent to:
+        // git log 0878f91f900dc90d89c594c521ac1d3b9edd7097 ^a5fe5e6a2692f41aeb8448d5114000e6f82e605e --name-status| grep VCSGraphProvider.cs | wc -l
+        // git rev-list --topo-order --reverse --no-merges a5fe5e6a2692f41aeb8448d5114000e6f82e605e..0878f91f900dc90d89c594c521ac1d3b9edd7097 -- Assets/SEE/GraphProviders/VCSGraphProvider.cs|wc -l
+        [TestCase(DataModel.DG.VCS.NumberOfCommits, 11)]
+        public async Task TestVCSMetricsAsync(string metric, int expected)
         {
             Graph graph = await GetVCSGraphAsync();
             Assert.IsNotNull(graph);
             Assert.IsTrue(graph.NodeCount > 0);
-
             Assert.IsTrue(graph.TryGetNode("Assets/SEE/GraphProviders/VCSGraphProvider.cs", out Node node));
-
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesAdded, out int value));
-                Assert.AreEqual(157, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.LinesDeleted, out int value));
-                Assert.AreEqual(193, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.NumberOfDevelopers, out int value));
-                Assert.AreEqual(4, value);
-            }
-            {
-                Assert.IsTrue(node.TryGetInt(DataModel.DG.VCS.CommitFrequency, out int value));
-                Assert.AreEqual(12, value);
-            }
+            Assert.IsTrue(node.TryGetInt(metric, out int value));
+            Assert.AreEqual(expected, value);
         }
 
         /// <summary>
-        /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders.
+        /// Saves the given <paramref name="graph"/> to a temporary file.
+        /// Can be used to debug the graph provider.
         /// </summary>
-        /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
-        private static async Task<Graph> GetVCSGraphAsync()
+        /// <param name="graph">Graph to be saved.</param>
+        private void Save(Graph graph)
         {
-            Dictionary<string, bool> pathGlobbing = new()
+            string filename = Path.GetTempFileName();
+            GraphWriter.Save(filename, graph, "Part_Of");
+            Debug.Log($"Graph saved to {filename}.\n");
+        }
+
+        /// <summary>
+        /// The graph consisting of all C# files in folder Assets/SEE/GraphProviders in
+        /// any of the branches of our SEE repository between two specific commits.
+        /// </summary>
+        /// <param name="simplifyGraph">if true, the graph will be simplified</param>
+        /// <returns>graph consisting of all C# files in folder Assets/SEE/GraphProviders</returns>
+        private static async Task<Graph> GetVCSGraphAsync(bool simplifyGraph = false)
+        {
+            Globbing pathGlobbing = new()
                 {
-                    { "Assets/SEE/GraphProviders/**/*.cs", true }
+                    { "**/*.cs", true }
                 };
 
-            VCSGraphProvider provider = new()
+            IEnumerable<string> repositoryPaths = new[]
             {
-                RepositoryPath = new DataPath(Path.GetDirectoryName(Application.dataPath)),
-                BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e",
-                CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",
-                PathGlobbing = pathGlobbing
+                "Assets/SEE/GraphProviders",
+            };
+
+            BetweenCommitsGraphProvider provider = new()
+            {
+                GitRepository = new GitRepository
+                                     (new DataPath(Path.GetDirectoryName(Application.dataPath)),
+                                      new Filter(globbing: pathGlobbing, repositoryPaths: repositoryPaths, branches: null)),
+                BaselineCommitID = "a5fe5e6a2692f41aeb8448d5114000e6f82e605e", // May 10 11:50:16 2024
+                CommitID = "0878f91f900dc90d89c594c521ac1d3b9edd7097",         // May 19 18:16:08 2024
+                SimplifyGraph = simplifyGraph,
             };
 
             return await provider.ProvideAsync(new Graph(""), NewCity());
@@ -254,9 +275,7 @@ namespace SEE.GraphProviders
         /// <returns></returns>
         private static SEECity NewCity()
         {
-            GameObject go = new();
-            SEECity city = go.AddComponent<SEECity>();
-            return city;
+            return new GameObject().AddComponent<SEECity>();
         }
     }
 }

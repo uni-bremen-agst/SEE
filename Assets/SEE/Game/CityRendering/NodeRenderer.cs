@@ -4,12 +4,9 @@ using System.Linq;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.Game.Operator;
 using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.NodeFactories;
-using SEE.Layout;
-using SEE.Layout.NodeLayouts;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -77,7 +74,7 @@ namespace SEE.Game.CityRendering
         private void FinishGameNode(GameObject gameNode, GameObject city = null)
         {
             AddLOD(gameNode);
-            InteractionDecorator.PrepareForInteraction(gameNode);
+            InteractionDecorator.PrepareGraphElementForInteraction(gameNode);
             if (city != null)
             {
                 Portal.SetPortal(city, gameNode, Portal.IncludeDescendants.AllDescendants);

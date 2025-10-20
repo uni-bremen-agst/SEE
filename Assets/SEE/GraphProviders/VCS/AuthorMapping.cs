@@ -57,8 +57,8 @@ namespace SEE.GraphProviders.VCS
             foreach (var item in this)
             {
                 writer.BeginGroup();
-                item.Key.Save(writer, authorLabel);
-                item.Value.Save(writer, aliasesLabel);
+                item.Key.Save(writer, authorLabel);    // FileAuthor
+                item.Value.Save(writer, aliasesLabel); // FileAuthorList
                 writer.EndGroup();
             }
             writer.EndList();
