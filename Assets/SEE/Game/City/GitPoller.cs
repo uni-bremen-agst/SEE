@@ -118,7 +118,6 @@ namespace SEE.Game.City
         {
             if (!doNotPoll)
             {
-                Debug.Log($"Fetching repository {Repository.RepositoryPath.Path}...\n");
                 doNotPoll = true;
                 bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {
