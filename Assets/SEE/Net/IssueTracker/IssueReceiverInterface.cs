@@ -62,6 +62,7 @@ public interface IssueReceiverInterface
     public  Task<JArray> getIssues(Settings settings);
 
     public bool createIssue();
+
     public bool updateIssue();
  
 

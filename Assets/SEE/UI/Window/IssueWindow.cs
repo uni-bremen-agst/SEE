@@ -15,6 +15,9 @@ using LibGit2Sharp;
 using UnityEngine.UIElements;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
+//using UnityEditor.ShaderKeywordFilter;
+using System.Linq;
+using SEE.Game.Drawable;
 
 namespace SEE.UI.Window
 {
@@ -29,6 +32,7 @@ namespace SEE.UI.Window
         /// </summary>
         public GraphElement GraphElement;
         private const string issueWindowPrefab = "Prefabs/UI/IssueWindow";
+        private readonly string GroupPrefab = UIPrefabFolder + "PropertyGroupItem";
         private List<RootIssue> issuesList;
         private JArray jArray;
         private static string WindowPrefab => UIPrefabFolder + "Window";
@@ -162,7 +166,7 @@ namespace SEE.UI.Window
 
 
 
-        private static void DisplayAttributes(JArray issues, GameObject issueWindowObject)
+        private  void DisplayAttributes(JArray issues, GameObject issueWindowObject)
         {
             Transform scrollViewContent = issueWindowObject.transform.Find("Content/Items");
             if (scrollViewContent == null)
@@ -175,49 +179,69 @@ namespace SEE.UI.Window
             //{
             foreach (JObject issue in issues)
             {
-                //foreach (JProperty property in issue.Properties())
-                //{
-                //    for (int i = 0; i < 15; i++)
-                //{
-                //string keyV = property.Name;
-                // J//Token value = property.Value;
-                // outputFile.WriteLine($"{keyV}: {property.Value}");
-                // Console.WriteLine($"{keyV}: {value}");
-                // oder UnityEngine.Debug.Log($"{key}: {value}");
-              //  Debug.Log(" Issue: " + issue["title"]);
-                GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-                    TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
-                    TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
-                    if (parameterText != null && valueText != null)
-                    {
-                        parameterText.text = $"Titel";//;
-                        valueText.text = $"{issue["title"]}";  //; {issue["title"]}
-                }
-               // }
-            }
-            //  text.va = "Test-Zeile";
-            // Prefab erzeugen
-            //GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-        
-    
-            //}
-            // Text setzen
-            //TextMeshProUGUI label = Attribute(issueRow);  // Annahme: erster Child ist der Text
-            //  label.text = "sdsd"; //issue.title;
-            //}
 
-            //foreach (RootIssue issue in issues)
-            //{
-            //    // Create GameObject
-            //    GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-            //    // Attribute Name
-            //    Attribute(issueRow).text = issue.title;
-            //    // Value Name
-            ////   Value(issueRow).text = value.ToString();
-            //}
-            //GameObject issueRow2 = PrefabInstantiator.InstantiatePrefab(ItemPrefabIssue, scrollViewContent, false);
-            //// Attribute Name
-            //Attribute(issueRow2).text = "Test 1234";
+                GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, scrollViewContent, false);
+                group.name = "Test";
+                GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = "Test";
+                GameObject issueRowTitle = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+                TextMeshProUGUI parameterTextTitle = issueRowTitle.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI valueTextTitle = issueRowTitle.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                if (parameterTextTitle != null && valueTextTitle != null)
+                {
+                    parameterTextTitle.text = $"Issue1";//;issue.GetValue("title")
+                    valueTextTitle.text = $"Attributes";  //; {issue["title"]}
+                }
+
+                foreach (JProperty property in issue.Properties())
+                {
+                    Debug.LogWarning($"{property.HasValues} -> ");
+                    List<GameObject> list= null;
+                    //if (property.HasValues)
+                    //{
+                    //    continue;
+                    //    list = new List<GameObject>();
+                    //    foreach (JProperty value in property.Values())
+                    //    {
+                    //        GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+                    //        TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
+                    //        TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                    //        if (parameterText != null && valueText != null)
+                    //        {
+                    //            parameterText.text = $"{value.Name}";//;
+                    //            valueText.text = $"{value.Value}";  //; {issue["title"]}
+                    //        }
+                    //        list.Add(issueRow);
+                    //    }
+
+
+                    //}
+                    //else
+                    //{
+                    //
+                    //Transform scrollViewContenta = issueRowTitle.transform.Find("Content/Items");
+                    //if (scrollViewContenta == null)
+                    //{
+                    //    ShowNotification.Error("scrollViewContenta is null.", "Error", 10, true);
+                    //    return;
+                    //}
+                    //GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, items, false);
+                    //group.name = name;
+                    //GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = name;
+
+                    GameObject issueRow = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
+                        TextMeshProUGUI parameterText = issueRow.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
+                        TextMeshProUGUI valueText = issueRow.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
+                        if (parameterText != null && valueText != null)
+                        {
+                            parameterText.text = $"{property.Name}";//;
+                            valueText.text = $"{property.Value}";  //; {issue["title"]}
+                        }
+                    //}
+                }
+             // Zeigt das erste Issue in der GUI
+                return;
+            }
+         
         }
         private static TextMeshProUGUI Attribute(GameObject issueRow)
         {
