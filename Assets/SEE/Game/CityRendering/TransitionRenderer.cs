@@ -99,6 +99,10 @@ namespace SEE.Game.CityRendering
 
             void GlowIn(ISet<Edge> edges)
             {
+                if (edges == null)
+                {
+                    return;
+                }
                 foreach (Edge edge in edges)
                 {
                     GameObject go = GraphElementIDMap.Find(edge.ID, true);
@@ -163,23 +167,31 @@ namespace SEE.Game.CityRendering
                 out ISet<Node> changedNodes, // nodes belong to newGraph
                 out ISet<Node> equalNodes);  // nodes belong to newGraph
 
-            newGraph.Diff(oldGraph,
-                g => g.Edges(),
-                (g, id) => g.GetEdge(id),
-                GraphExtensions.AttributeDiff(newGraph, oldGraph),
-                edgeEqualityComparer,
-                out ISet<Edge> addedEdges,   // edges belong to newGraph
-                out ISet<Edge> removedEdges, // edges belong to oldGraph
-                out ISet<Edge> changedEdges, // edges belong to newGraph
-                out ISet<Edge> equalEdges);  // edges belong to newGraph
-
             // Before we can calculate the new layout, we must ensure that all game objects
             // representing nodes or edges that are still present in the newGraph are reattached.
             equalNodes.UnionWith(changedNodes);
             Reattach(equalNodes);
 
-            equalEdges.UnionWith(changedEdges);
-            Reattach(equalEdges);
+            ISet<Edge> addedEdges = null;   // edges belong to newGraph
+            ISet<Edge> removedEdges = null; // edges belong to oldGraph
+            ISet<Edge> changedEdges = null; // edges belong to newGraph
+            ISet<Edge> equalEdges = null;   // edges belong to newGraph
+
+            if (edgesAreDrawn)
+            {
+                newGraph.Diff(oldGraph,
+                g => g.Edges(),
+                (g, id) => g.GetEdge(id),
+                GraphExtensions.AttributeDiff(newGraph, oldGraph),
+                edgeEqualityComparer,
+                out addedEdges,   // edges belong to newGraph
+                out removedEdges, // edges belong to oldGraph
+                out changedEdges, // edges belong to newGraph
+                out equalEdges);  // edges belong to newGraph
+
+                equalEdges.UnionWith(changedEdges);
+                Reattach(equalEdges);
+            }
 
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
@@ -197,10 +209,13 @@ namespace SEE.Game.CityRendering
             // Yet, we need to update the game nodes with NodeRefs to all changedNodes
             // and equalNodes.
 
-            ShowRemovedEdges(removedEdges);
-            Debug.Log($"Phase 1a: Removing {removedEdges.Count} edges.\n");
-            await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
-            Debug.Log($"Phase 1a: Finished.\n");
+            if (edgesAreDrawn)
+            {
+                ShowRemovedEdges(removedEdges);
+                Debug.Log($"Phase 1a: Removing {removedEdges.Count} edges.\n");
+                await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
+                Debug.Log($"Phase 1a: Finished.\n");
+            }
 
             ShowRemovedNodes(removedNodes);
             Debug.Log($"Phase 1b: Removing {removedNodes.Count} nodes.\n");
@@ -213,7 +228,10 @@ namespace SEE.Game.CityRendering
             await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
             Debug.Log($"Phase 2: Finished.\n");
 
-            ShowChangedEdges(changedEdges);
+            if (edgesAreDrawn)
+            {
+                ShowChangedEdges(changedEdges);
+            }
 
             ShowChangedNodes(changedNodes);
             // Even the equal nodes need adjustments because the layout could have
@@ -235,7 +253,7 @@ namespace SEE.Game.CityRendering
             await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
             Debug.Log($"Phase 4a: Finished.\n");
 
-            GameNodeHierarchy.Update(codeCity);
+            //GameNodeHierarchy.Update(codeCity);
 
             if (edgesAreDrawn)
             {
@@ -519,7 +537,7 @@ namespace SEE.Game.CityRendering
                             // re-established. It still needs to be a child of the code city,
                             // however, because methods called in the course of the animation
                             // will try to retrieve the code city from the game node.
-                            go.transform.SetParent(cityTransform);
+                            //go.transform.SetParent(cityTransform);
 
                             moved.Add(go);
                             // Move the node to its new position. The edge layout will not be
@@ -527,7 +545,7 @@ namespace SEE.Game.CityRendering
                             // As a consequence, the node hierarchy is temporarily flat, which
                             // will distort hierarchical edge layouts, such as edge bundling.
                             IOperationCallback<Action> animation = go.NodeOperator()
-                              .MoveTo(layoutNode.CenterPosition, updateEdges: false);
+                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
                             animation.OnComplete(() => OnComplete(go));
                             animation.OnKill(() => OnComplete(go));
                         }
