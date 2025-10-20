@@ -1,24 +1,26 @@
-﻿using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using SEE.UI.Window;
-using SEE.UI.Notification;
+﻿using Cysharp.Threading.Tasks;
+using DG.Tweening.Plugins.Core.PathCore;
+using SEE.DataModel.DG;
+using SEE.Game;
+using SEE.Game.City;
 using SEE.GO;
 using SEE.Net.Actions;
-using SEE.Utils;
-using UnityEngine;
-using SEE.DataModel.DG;
-using System;
-using Cysharp.Threading.Tasks;
+using SEE.UI.Notification;
 using SEE.UI.Window;
+using SEE.UI.Window;
+using SEE.UI.Window.TreeWindow;
+using SEE.Utils;
 using SEE.Utils.History;
-using SEE.Game.City;
 using SEE.VCS;
 using SEE.XR;
-
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+//using UnityEditor.Experimental.GraphView;
+using UnityEngine;
 using GraphElementRef = SEE.GO.GraphElementRef;
 using Range = SEE.DataModel.DG.Range;
-using DG.Tweening.Plugins.Core.PathCore;
 
 namespace SEE.Controls.Actions
 {
@@ -68,17 +70,134 @@ namespace SEE.Controls.Actions
 
 
             //Erstellen des IssueWindows und GetIssues
-            GameObject go = new GameObject("IssueWindow");
-            IssueWindow issueWindow = go.AddComponent<IssueWindow>();
-            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
-            JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
-            jiraReceiver.getIssues(settings);
+            //GameObject go = new GameObject("IssueWindow");
+            //IssueWindow issueWindow = go.AddComponent<IssueWindow>();
+
+            GameObject goa = new GameObject("TreeWindow");
+            GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+            if (cities.Length == 0)
+            {
+                Debug.LogWarning("No code city found. Tree view will be empty.");
+                return;
+            } 
+            
+            TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
+            // We will create a tree view for each code city.
+            foreach (GameObject cityObject in cities)
+            {
+                if (cityObject.TryGetComponent(out AbstractSEECity city))
+                {
+                    if (city.LoadedGraph == null) //|| treeWindows.ContainsKey(city.name)
+                    {
+                        ShowNotification.Error($"Show Notification Issue TreeWindow: TreeWindow nooo", "Notify", 10, true);
+
+                        continue;
+                    }
+                    if (!cityObject.TryGetComponent(out TreeWindow window))
+                    {
+                        ShowNotification.Error($"Show Notification Issue TreeWindow: TreeWindow !!!!!!", "Notify", 10, true);
+
+                        window = cityObject.AddComponent<TreeWindow>();
+                        window.Graph = city.LoadedGraph;
+                    }
+                   // treeWindow.Add();
+                }
+            }
+           
+            //IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
+            //JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
+            //jiraReceiver.getIssues(settings);
+
+            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?filter=all" };
+            GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
+            gitHUbReceiver.getIssues(settings);
 
             //ShowNotification.Error($"Show Notification Issue Rows: {jiraReceiver.issuesJ.Count()}.", "Notify", 10, true);
             //issueWindow.Title = "Issues"; 
 
             syncAction = new SyncWindowSpaceAction();
         }
+
+        /// <summary>
+        /// If the gameObject associated with graphElementRef has already a CodeWindow
+        /// attached to it, that CodeWindow will be returned. Otherwise a new CodeWindow
+        /// will be attached to the gameObject associated with graphElementRef and returned.
+        /// The title for the newly created CodeWindow will be GetName(graphElement).
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to get the CodeWindow for</param>
+        /// <param name="filename">The filename to use for the CodeWindow title</param>
+        private static TreeWindow GetOrCreateTreeViewWindow(GraphElementRef graphElementRef, string filename)
+        {
+
+
+            GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
+            if (cities.Length == 0)
+            {
+                Debug.LogWarning("No code city found. Tree view will be empty.");
+              
+            }
+
+         //   TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
+            // We will create a tree view for each code city.
+            foreach (GameObject cityObject in cities)
+            {
+                if (cityObject.TryGetComponent(out AbstractSEECity city))
+                {
+                    //if (city.LoadedGraph == null) //|| treeWindows.ContainsKey(city.name)
+                    //{
+                    //    ShowNotification.Error($"Show Notification Issue TreeWindow: TreeWindow nooo", "Notify", 10, true);
+
+                    //    continue;
+                    //}
+                    if (!cityObject.TryGetComponent(out TreeWindow window))
+                    {
+                        ShowNotification.Error($"Show Notification Issue TreeWindow: TreeWindow !!!!!!", "Notify", 10, true);
+                        Graph graph = new Graph();
+
+
+
+
+                        Node node = new Node { ID = "Test", SourceName = "Test", Type = "JsonClass" };
+                        Node nodeValue = new Node() { ID = "Value", SourceName = "Value", Type = "JsonAttribute" };
+                        Edge result = new Edge(node, nodeValue, "Attribute Zuweisung");
+                        node.AddOutgoing(result);
+
+
+
+                      //  node.AddOutgoing(result);
+                      //  graph.AddEdge(i1, a1);
+                       // node.AddChild(new Node { ID = "Value", SourceName = "Test", Type = "JsonNode"  });
+                        graph.AddNode(node);
+
+              
+                   
+                     
+
+
+                        window = cityObject.AddComponent<TreeWindow>();
+                        window.Graph = graph; //city.LoadedGraph;
+                        return window;
+                    }
+                //    treeWindow.Add();
+                }
+            }
+
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out TreeWindow treeWindow))
+            {
+                treeWindow = graphElementRef.gameObject.AddComponent<TreeWindow>();
+
+                treeWindow.Title = "Issues TreeViewss";
+                // If SourceName differs from Source.File (except for its file extension), display both
+                //if (!codeWindow.Title.Replace(".", "").Equals(filename.Split('.').Reverse().Skip(1)
+                //                                                      .Aggregate("", (acc, s) => s + acc)))
+                //{
+                //    codeWindow.Title += $" ({filename})";
+                //}
+            }
+            return treeWindow;
+        }
+
 
         /// <summary>
         /// If the gameObject associated with graphElementRef has already a CodeWindow
@@ -95,7 +214,7 @@ namespace SEE.Controls.Actions
             {
                 codeWindow = graphElementRef.gameObject.AddComponent<IssueWindow>();
 
-                codeWindow.Title = "Issues";
+                codeWindow.Title = "Issues as";
                 // If SourceName differs from Source.File (except for its file extension), display both
                 //if (!codeWindow.Title.Replace(".", "").Equals(filename.Split('.').Reverse().Skip(1)
                 //                                                      .Aggregate("", (acc, s) => s + acc)))
@@ -131,13 +250,14 @@ namespace SEE.Controls.Actions
         public static IssueWindow ShowIssues(GraphElementRef graphElementRef, Action<IssueWindow> ContentTextEntered = null)
         {
             ShowNotification.Error("IssueWindow ShowIssues(GraphElementRef","fs",10);
-            GraphElement graphElement = graphElementRef.Elem;
-            IssueWindow codeWindow = GetOrCreateIssueWindow(graphElementRef, graphElement.Filename);
-           // EnterWindowContent().Forget();
-          // EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
+            //GraphElement graphElement = graphElementRef.Elem;
+            IssueWindow issueWindow = GetOrCreateIssueWindow(graphElementRef, "Issue win");
+            //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
+            //EnterWindowContent().Forget();
+            //EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
 
 
-            return codeWindow;
+            return issueWindow;
             //async UniTask EnterWindowContent()
             //{
             //    // We have to differentiate between a file-based and a VCS-based code city.
@@ -207,6 +327,15 @@ Debug.Log($"IssueWindow transform position: {issueWindow.transform.position}");
                     manager.AddWindow(issueWindow);
                 }
                 manager.ActiveWindow = issueWindow;
+
+
+                //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
+                //manager = spaceManager[WindowSpaceManager.LocalPlayer];
+                //if (!manager.Windows.Contains(issueWindow))
+                //{
+                //    manager.AddWindow(treeWindow);
+                //}
+                //manager.ActiveWindow = treeWindow;
                 // TODO (#669): Set font size etc in settings (maybe, or maybe that's too much)
             }
         }
