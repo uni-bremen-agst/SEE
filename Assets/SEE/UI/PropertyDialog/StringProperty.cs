@@ -153,9 +153,8 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         public GameObject InputFieldObject
         {
-            get { return inputField; }
+            get => inputField;
         }
-
 
         /// <summary>
         /// The buffered value of the <see cref="textField"/>. Because <see cref="Value"/>
