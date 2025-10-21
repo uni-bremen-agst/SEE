@@ -78,9 +78,20 @@ namespace SEE.Game.Avatars
             }
         }
 
+        /// <summary>
+        /// Represents the last GameObject that was targeted by the laser.
+        /// </summary>
+        /// <remarks>This field stores a reference to the most recent GameObject that the laser interacted
+        /// with. It will be used to track or process the target of the laser in subsequent operations.</remarks>
         private GameObject lastLaserTarget;
+        /// <summary>
+        /// The time when the laser started targeting the current object. Used for tracking.
+        /// </summary>
         private float laserTargetStartTime;
-        private readonly float hoverThreshold = 5.0f;
+        /// <summary>
+        /// The threshold duration (in seconds) for hover tracking.
+        /// </summary>
+        private const float hoverThreshold = 5.0f;
 
         /// <summary>
         /// Retrieves the direction from the pointing device and aims the laser beam
@@ -90,8 +101,8 @@ namespace SEE.Game.Avatars
         /// If it's the remote player, <see cref="Laser.Draw(Vector3)"/> is called directly.
         ///
         /// In addition, for local players, this method tracks how long the laser pointer is
-        /// directed at <see cref="InteractableObject"/>s. If the pointing duration exceeds a
-        /// configurable threshold, the object is traced using OpenTelemetry for behavioral analysis.
+        /// directed at <see cref="InteractableObject"/>s. If the pointing duration exceeds
+        /// <see cref="hoverThreshold"/>, the object is traced using OpenTelemetry for behavioral analysis.
         /// </summary>
         private void Update()
         {
@@ -104,46 +115,54 @@ namespace SEE.Game.Avatars
                     Target.position = Laser.PointTowards(direction);
 
                     // --- Laser Hover Tracking ---
-                    if (Physics.Raycast(HandBone.position, direction, out RaycastHit hitInfo))
+                    if (TracingHelperService.Instance != null)
                     {
-                        GameObject currentHit = hitInfo.collider.gameObject;
-
-                        // Only track interactable objects
-                        if (currentHit.GetComponent<InteractableObject>() != null)
-                        {
-                            if (currentHit != lastLaserTarget)
-                            {
-                                if (lastLaserTarget != null)
-                                {
-                                    float duration = Time.time - laserTargetStartTime;
-                                    TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
-                                }
-
-                                lastLaserTarget = currentHit;
-                                laserTargetStartTime = Time.time;
-                            }
-                        }
-                        else if (lastLaserTarget != null)
-                        {
-                            // Laser moved away from previous valid object
-                            float duration = Time.time - laserTargetStartTime;
-                            TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
-
-                            lastLaserTarget = null;
-                        }
-                    }
-                    else if (lastLaserTarget != null)
-                    {
-                        float duration = Time.time - laserTargetStartTime;
-                        TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration,hoverThreshold);
-
-                        lastLaserTarget = null;
+                        Trace(direction);
                     }
                 }
             }
             else
             {
                 Laser.Draw(Target.position);
+            }
+
+            void Trace(Vector3 direction)
+            {
+                if (Physics.Raycast(HandBone.position, direction, out RaycastHit hitInfo))
+                {
+                    GameObject currentHit = hitInfo.collider.gameObject;
+
+                    // Only track interactable objects
+                    if (currentHit.GetComponent<InteractableObject>() != null)
+                    {
+                        if (currentHit != lastLaserTarget)
+                        {
+                            if (lastLaserTarget != null)
+                            {
+                                float duration = Time.time - laserTargetStartTime;
+                                TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration, hoverThreshold);
+                            }
+
+                            lastLaserTarget = currentHit;
+                            laserTargetStartTime = Time.time;
+                        }
+                    }
+                    else if (lastLaserTarget != null)
+                    {
+                        // Laser moved away from previous valid object
+                        float duration = Time.time - laserTargetStartTime;
+                        TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration, hoverThreshold);
+
+                        lastLaserTarget = null;
+                    }
+                }
+                else if (lastLaserTarget != null)
+                {
+                    float duration = Time.time - laserTargetStartTime;
+                    TracingHelperService.Instance?.TrackHoverDuration(lastLaserTarget, duration, hoverThreshold);
+
+                    lastLaserTarget = null;
+                }
             }
         }
     }
