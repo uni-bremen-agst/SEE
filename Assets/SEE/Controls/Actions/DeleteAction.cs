@@ -155,7 +155,7 @@ namespace SEE.Controls.Actions
         /// Prevents multiple instances of <see cref="HandleValidationAsync"/>
         /// from being triggered in consecutive Update calls.
         /// </summary>
-        private bool validationStartet = false;
+        private bool validationStarted = false;
 
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
@@ -169,9 +169,9 @@ namespace SEE.Controls.Actions
                     HandleInputSelection();
                     break;
                 case ProgressState.Validation:
-                    if (!validationStartet)
+                    if (!validationStarted)
                     {
-                        validationStartet = true;
+                        validationStarted = true;
                         HandleValidationAsync().Forget();
                     }
                     break;
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions
         /// Handles the validation phase of the delete action.
         /// Checks the selected deletion targets and shows a confirmation dialog
         /// asking whether node types should be deleted,
-        /// but only if one of the selected objects is a architecture or implementation root node.
+        /// but only if one of the selected objects is an architecture or implementation root node.
         /// Transitions to the <see cref="ProgressState.Deletion"/> phase
         /// once validation is complete.
         /// </summary>
