@@ -10,23 +10,30 @@ namespace SEE.Utils
     /// </summary>
     public class DelayedUIAction : MonoBehaviour
     {
+        /// <summary>
+        /// The action to be executed after the delay.
+        /// </summary>
         private Action action;
 
         /// <summary>
         /// Starts delayed execution of the provided action.
         /// </summary>
-        /// <param name="a">The action to invoke after one frame.</param>
-        public void Run(Action a)
+        /// <param name="action">The action to invoke after one frame.</param>
+        public void Run(Action action)
         {
-            action = a;
+            this.action = action;
             StartCoroutine(ExecuteAfterFrame());
         }
 
+        /// <summary>
+        /// Runs the <see cref="action"/> after waiting for one frame.
+        /// </summary>
+        /// <returns>enumerator to continue</returns>
         private IEnumerator ExecuteAfterFrame()
         {
             yield return null; // wait one frame
             action?.Invoke();
-            Destroy(this); // remove this component after use
+            Destroyer.Destroy(this); // remove this component after use
         }
     }
 }
