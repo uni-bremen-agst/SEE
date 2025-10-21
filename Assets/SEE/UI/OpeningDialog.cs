@@ -75,7 +75,7 @@ namespace SEE.UI
                 new(
                     SelectAction: TelemetrySettings,
                     Title: "Telemetry Mode",
-                    Description: $"Currently: {SceneSettings.telemetryMode}",
+                    Description: $"Currently: {SceneSettings.TelemetryMode}",
                     EntryColor: NextColor(),
                     Icon: Icons.Export),
 
@@ -219,7 +219,7 @@ namespace SEE.UI
         /// <param name="mode">The telemetry mode to apply.</param>
         private void SetTelemetryMode(TelemetryMode mode)
         {
-            SceneSettings.telemetryMode = mode;
+            SceneSettings.TelemetryMode = mode;
             SceneSettings.SaveTelemetrySettings();
             ShowNotification.Info("Telemetry Mode", $"Mode set to {mode}");
         }

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using OpenTelemetry;
 using OpenTelemetry.Exporter;
@@ -55,7 +54,7 @@ namespace SEE.Tools.OpenTelemetry
                 return;
             }
 
-            switch (SceneSettings.telemetryMode)
+            switch (SceneSettings.TelemetryMode)
             {
                 case TelemetryMode.Disabled:
                     Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.");
