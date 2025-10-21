@@ -464,14 +464,14 @@ namespace SEE.UI.RuntimeConfigMenu
 
             bool IsLoadMethod(MethodInfo methodInfo)
             {
-                return methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
-                    || methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync));
+                return methodInfo.Name == nameof(AbstractSEECity.LoadConfiguration)
+                    || methodInfo.Name == nameof(SEECity.LoadDataAsync);
             }
 
             async UniTask ExecuteLoadAsyncWithoutNetwork()
             {
                 object result = methodInfo.Invoke(city, null);
-                bool doRebuild = methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration));
+                bool doRebuild = methodInfo.Name == nameof(AbstractSEECity.LoadConfiguration);
                 if (result is UniTask task)
                 {
                     await task;
