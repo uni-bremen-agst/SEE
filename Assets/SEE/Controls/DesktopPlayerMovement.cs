@@ -30,7 +30,8 @@ namespace SEE.Controls
         /// has initiated the movement. We will start slower and then gradually increase
         /// the speed until <see cref="Speed"/> has been reached. This phase takes
         /// <see cref="timeToReachSpeed"/> seconds.</remarks>
-        [Tooltip("Speed of movements")] public float Speed = 2f;
+        [Tooltip("Speed of movements")]
+        public float Speed = 2f;
 
         /// <summary>
         /// The time (in seconds) past since the player has initiated a movement.
@@ -88,8 +89,6 @@ namespace SEE.Controls
         [Tooltip("The code city which the player is focusing on.")]
         public Plane FocusedObject;
 
-        private Vector3 lastPosition; // For tracking the player's previous position
-
         /// <summary>
         /// Sets up the <see cref="CharacterController"/> and the <see cref="cameraState"/>.
         /// </summary>
@@ -106,8 +105,6 @@ namespace SEE.Controls
             controller.center = new Vector3(0.0f, 1.55f, 0.0f);
             controller.radius = 0.4f;
             controller.height = 0.0f;
-
-            lastPosition = transform.position; // Initialize last position
 
             if (FocusedObject != null)
             {
@@ -128,31 +125,24 @@ namespace SEE.Controls
             }
 
             lastAxis = new Vector2(Input.mousePosition.x, Input.mousePosition.y);
-
-            // Returns the radius of the player's head.
-            float HeadRadius()
-            {
-                //const string headName = "Root/Global/Position/Hips/LowerBack/Spine/Spine1/Neck/Head/HeadAdjust";
-                const string headName =
-                    "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head/HeadAdjust";
-                Transform head = transform.Find(headName);
-                if (head == null)
-                {
-                    Debug.LogError($"Player {gameObject.name} does not have a child {headName}.\n");
-                    return 1.0f;
-                }
-
-                // We want to fit the head completely into the CharacterController collider, so we use the maximum value
-                // to calculate the radius
-                return Mathf.Max(head.transform.localScale.x, head.transform.localScale.y,
-                    head.transform.localScale.z) / 2;
-            }
         }
 
-        bool moved; // Flag to track if there was any movement
-        bool keyReleased = false; // Flag to track if a key was just released
-        private float movementStartTime; // Tracks start time
-        private Vector3 movementStartPosition; // Tracks position at the start of a movement
+        /// <summary>
+        /// Indicates whether any movement has occurred.
+        /// </summary>
+        private bool moved;
+        /// <summary>
+        /// True if a movement key was just released in the last frame.
+        /// </summary>
+        private bool keyReleased = false;
+        /// <summary>
+        /// The time when the current movement started in seconds.
+        /// </summary>
+        private float movementStartTime;
+        /// <summary>
+        /// Tracks the position at the start of a movement.
+        /// </summary>
+        private Vector3 movementStartPosition;
 
         /// <summary>
         /// Initializes movement tracking if it hasn't started yet.
@@ -167,7 +157,6 @@ namespace SEE.Controls
                 keyReleased = false;
             }
         }
-
 
         /// <summary>
         /// Reacts to the user input.
@@ -313,7 +302,7 @@ namespace SEE.Controls
         }
 
         /// <summary>
-        /// Checks whether any movement input is currently being held down by the player.
+        /// Checks whether any movement input key is currently being held down by the player.
         /// This includes inputs for moving forward, backward, right, left, up, or down.
         ///
         /// It returns a boolean value indicating if any of the movement inputs are active.
@@ -326,19 +315,27 @@ namespace SEE.Controls
         /// </returns>
         private bool AnyMovementInput()
         {
-            bool anyInput = SEEInput.MoveForward() || SEEInput.MoveBackward() || SEEInput.MoveRight() ||
-                            SEEInput.MoveLeft() ||
-                            SEEInput.MoveUp() || SEEInput.MoveDown();
-            return anyInput;
+            return SEEInput.MoveForward() || SEEInput.MoveBackward()
+                   || SEEInput.MoveRight() || SEEInput.MoveLeft()
+                   || SEEInput.MoveUp() || SEEInput.MoveDown();
         }
 
         /// <summary>
         /// The mouse position of the last frame.
         /// </summary>
         private Vector2 lastAxis;
+        /// <summary>
+        /// True if the user was rotating the camera in the last frame.
+        /// </summary>
         private bool wasRotating = false;
+        /// <summary>
+        /// Represents the initial yaw angle of the rotation, measured in degrees.
+        /// </summary>
+        /// <remarks>This field is used to store the starting yaw angle for
+        /// a rotation operation. The value is typically set when the rotation
+        /// begins and may be used to calculate  relative changes in yaw during
+        /// the operation.</remarks>
         private float rotationStartYaw;
-
 
         /// <summary>
         /// If the user wants us, we rotate the gameobject according to mouse input.
