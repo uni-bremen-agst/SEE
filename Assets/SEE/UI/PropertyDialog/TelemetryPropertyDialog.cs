@@ -6,6 +6,7 @@ using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
+using SEE.Tools.OpenTelemetry;
 
 namespace SEE.UI.PropertyDialog
 {
@@ -96,15 +97,8 @@ namespace SEE.UI.PropertyDialog
         /// A string representation of the telemetry mode: "Disabled", "Local", or "Remote".
         /// </returns>
         private string GetInitialSelectionName()
-
         {
-            return SceneSettings.telemetryMode switch
-            {
-                TelemetryMode.Disabled => "Disabled",
-                TelemetryMode.Local    => "Local",
-                TelemetryMode.Remote   => "Remote",
-                _                      => "Disabled"
-            };
+            return SceneSettings.TelemetryMode.ToString();
         }
 
         /// <summary>
@@ -114,33 +108,28 @@ namespace SEE.UI.PropertyDialog
         /// and the callback is invoked.
         /// </summary>
         private void ConfirmPressed()
-
         {
-            switch (telemetryModeSelection.Value)
+            if (Enum.TryParse(telemetryModeSelection.Value, out TelemetryMode selectedMode))
             {
-                case "Disabled":
-                    SceneSettings.telemetryMode = TelemetryMode.Disabled;
-                    break;
-
-                case "Local":
-                    SceneSettings.telemetryMode = TelemetryMode.Local;
-                    break;
-
-                case "Remote":
-                    if (!string.IsNullOrWhiteSpace(urlField.Value))
-                    {
-                        SceneSettings.telemetryMode       = TelemetryMode.Remote;
-                        SceneSettings.CustomTelemetryServerURL = urlField.Value.Trim();
-                    }
-                    else
-                    {
-                        ShowNotification.Error("URL missing",
-                            "Please enter a valid URL for remote telemetry.");
-                        return;
-                    }
-                    break;
+                SceneSettings.TelemetryMode = selectedMode;
             }
-
+            else
+            {
+                ShowNotification.Error("Invalid Selection", "The selected telemetry mode is not recognized.");
+                return;
+            }
+            if (SceneSettings.TelemetryMode == TelemetryMode.Remote)
+            {
+                if (!string.IsNullOrWhiteSpace(urlField.Value))
+                {
+                    SceneSettings.CustomTelemetryServerURL = urlField.Value.Trim();
+                }
+                else
+                {
+                    ShowNotification.Error("URL missing", "Please enter a valid URL for remote telemetry.");
+                    return;
+                }
+            }
             SceneSettings.SaveTelemetrySettings();
             Close();
             callback?.Invoke();
@@ -152,7 +141,6 @@ namespace SEE.UI.PropertyDialog
         /// The dialog is closed and the optional callback is invoked.
         /// </summary>
         private void CancelPressed()
-
         {
             Close();
             callback?.Invoke();
@@ -163,7 +151,6 @@ namespace SEE.UI.PropertyDialog
         /// Destroys the root GameObject of the dialog and resets internal references.
         /// </summary>
         private void Close()
-
         {
             Destroyer.Destroy(dialog);
             dialog = null;
@@ -178,10 +165,15 @@ namespace SEE.UI.PropertyDialog
         /// <param name="selectedMode">The currently selected telemetry mode (e.g., "Disabled", "Local", or "Remote").</param>
         private void UpdateURLFieldVisibility(string selectedMode)
         {
-            bool showURL = selectedMode == "Remote";
-
-            if (urlField.InputFieldObject != null)
+            if (urlField.InputFieldObject == null)
             {
+                return;
+            }
+
+            if (Enum.TryParse(selectedMode, out TelemetryMode mode))
+            {
+                bool showURL = mode == TelemetryMode.Remote;
+
                 urlField.InputFieldObject.SetActive(showURL);
 
                 if (showURL)
@@ -193,7 +185,11 @@ namespace SEE.UI.PropertyDialog
                     }
                 }
             }
+            else
+            {
+                ShowNotification.Error("Invalid Selection", "The selected telemetry mode is not recognized.");
+                return;
+            }
         }
-
     }
 }
