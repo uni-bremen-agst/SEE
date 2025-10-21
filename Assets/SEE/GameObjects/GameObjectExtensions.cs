@@ -1477,14 +1477,9 @@ namespace SEE.GO
             }
             else
             {
-                if (gameObject.transform.parent.name.Equals(name))
-                {
-                    return gameObject.transform.parent.gameObject;
-                }
-                else
-                {
-                    return FindParentWithName(gameObject.transform.parent.gameObject, name);
-                }
+                return gameObject.transform.parent.name == name ?
+                          gameObject.transform.parent.gameObject
+                        : FindParentWithName(gameObject.transform.parent.gameObject, name);
             }
         }
 
@@ -1506,14 +1501,8 @@ namespace SEE.GO
             }
             else
             {
-                if (gameObject.transform.parent.gameObject.layer.Equals(layer))
-                {
-                    return true;
-                }
-                else
-                {
-                    return HasParentWithLayer(gameObject.transform.parent.gameObject, layer);
-                }
+                return gameObject.transform.parent.gameObject.layer == layer
+                       || HasParentWithLayer(gameObject.transform.parent.gameObject, layer);
             }
         }
 
