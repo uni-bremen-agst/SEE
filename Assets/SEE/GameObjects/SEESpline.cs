@@ -279,11 +279,6 @@ namespace SEE.GO
         private MeshRenderer meshRenderer;
 
         /// <summary>
-        /// The line renderer behind this spline. May be null if this spline uses a mesh renderer.
-        /// </summary>
-        private LineRenderer lineRenderer;
-
-        /// <summary>
         /// The default material to be used for splines whose
         /// <see cref="Mesh"/> has just been created (used by
         /// <see cref="UpdateMaterial"/>).
@@ -438,11 +433,7 @@ namespace SEE.GO
         /// </summary>
         private void UpdateLineRenderer()
         {
-            if (gameObject.TryGetComponent(out LineRenderer lr))
-            {
-                lineRenderer = lr;
-            }
-            if (lineRenderer != null)
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 Vector3[] polyLine = GenerateVertices();
 
@@ -473,7 +464,7 @@ namespace SEE.GO
         /// </summary>
         private void UpdateColor()
         {
-            if (lineRenderer != null)
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 lineRenderer.startColor = gradientColors.start;
                 lineRenderer.endColor = gradientColors.end;
@@ -531,7 +522,7 @@ namespace SEE.GO
             {
                 material = meshRenderer.sharedMaterial;
             }
-            else if (lineRenderer != null)
+            else if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 material = lineRenderer.sharedMaterial;
             }
@@ -693,10 +684,9 @@ namespace SEE.GO
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             UpdateMaterial();
 
-            if (lineRenderer != null)
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 Destroyer.Destroy(lineRenderer);
-                lineRenderer = null;
             }
 
             return mesh;
