@@ -1,7 +1,4 @@
-﻿using System.Net.Http;
-using UnityEngine;
-
-namespace SEE.Tools.OpenTelemetry
+﻿namespace SEE.Tools.OpenTelemetry
 {
     /// <summary>
     /// Provides a centralized service for tracing user and system actions.
@@ -12,6 +9,8 @@ namespace SEE.Tools.OpenTelemetry
         /// <summary>
         /// The tracing helper instance for the local player.
         /// Must be initialized once at application start.
+        ///
+        /// If tracing was not enabled, this property will be null.
         /// </summary>
         public static TracingHelper Instance { get; private set; }
 
@@ -42,7 +41,6 @@ namespace SEE.Tools.OpenTelemetry
                 manager.Shutdown(Instance,host);
                 manager = null;
             }
-
             Instance = null;
         }
     }
