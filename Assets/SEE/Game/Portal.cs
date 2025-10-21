@@ -1,6 +1,5 @@
 ﻿using System;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game
 {
@@ -143,7 +142,7 @@ namespace SEE.Game
             if (gameObject.TryGetComponent(out GO.Plane cullingPlane))
             {
                 // Apply a minimal offset to slightly expand the bounds.
-                // Without this, floatin-point precision issues can cause objects
+                // Without this, floating-point precision issues can cause objects
                 // that lie exactly on the portal border to be incorrectly classified
                 // as being outside the portal.
                 float offset = 0.00001f;
