@@ -74,7 +74,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
         /// <summary>
         /// Rebuild the menu based on the current list of available cities.
-        /// Only tabs for new cities will be created; existing ones are preserved ans reused.
+        /// Only tabs for new cities will be created; existing ones are preserved and reused.
         /// After reconstruction, the city switcher in each tab is updated.
         /// </summary>
         public async UniTask RebuildMenuAsync()
@@ -276,7 +276,7 @@ namespace SEE.UI.RuntimeConfigMenu
             bool isCurrentCity = index == currentCity;
 
             // If this is the current city tab but the menu is not open,
-            // hide any small editor that are currently shown
+            // hide any small editor that is currently shown.
             if (isCurrentCity && !cityMenus[currentCity].ShowMenu && cityMenus[currentCity].IsSmallEditorWindowOpen)
             {
                 cityMenus[currentCity].SmallEditorOpener.ShowMenu = false;
