@@ -391,8 +391,7 @@ namespace SEE.Game.Avatars
                     {
                         if (teleportationArea.colliders[0] != null)
                         {
-                            Debug.LogWarning(
-                                $"The teleport area {teleportArea.name} already has a collider assigned.\n");
+                            Debug.LogWarning($"The teleport area {teleportArea.name} already has a collider assigned.\n");
                         }
 
                         teleportationArea.colliders[0] = collider;
