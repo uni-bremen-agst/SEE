@@ -46,9 +46,9 @@ namespace SEE.UI.RuntimeConfigMenu
         private Scrollbar scrollbar;
 
         /// <summary>
-        /// Constant for city configuration.
+        /// The name of the game object representing the city configuration tab.
         /// </summary>
-        public const string CityConfiguration = "City Configuration";
+        private const string cityConfiguration = "City Configuration";
 
         /// <summary>
         /// Initializes references to the content, viewport, and scrollbar.
@@ -109,23 +109,27 @@ namespace SEE.UI.RuntimeConfigMenu
 
         /// <summary>
         /// Recursively searches the hierarchy upwards to find the runtime tab GameObject.
-        /// The tab is identified by the name "City Configuration".
+        /// The tab is identified by the name <see cref="cityConfiguration"/>.
         /// </summary>
         /// <param name="go">The starting GameObject.</param>
         /// <returns>The runtime tab GameObject, or null if not found.</returns>
         public static GameObject GetRuntimeTabGameObject(GameObject go)
         {
-            return go.FindParentWithName(CityConfiguration);
+            return go.FindParentWithName(cityConfiguration);
         }
 
         /// <summary>
         /// Restores the previous scrollbar position based on the last known scroll value
         /// and the current content and viewport sizes. Should be used when the layout is
         /// reloaded but no content height change occurred.
+        ///
+        /// If a specific <paramref name="scrollValue"/> (one different from -1) is provided,
+        /// it will be used instead of the stored one. Otherwise, the stored value is used.
         /// </summary>
+        /// <param name="scrollValue">scroll position</param>
         public async UniTask ApplyPreviousScrollPositionAsync(float scrollValue = -1f)
         {
-            float value = scrollValue != -1f? scrollValue: oldScrollValue;
+            float value = scrollValue == -1f? oldScrollValue : scrollValue;
             await UniTask.DelayFrame(3);
             scrollbar.value = value;
         }
