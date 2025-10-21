@@ -438,6 +438,10 @@ namespace SEE.GO
         /// </summary>
         private void UpdateLineRenderer()
         {
+            if (gameObject.TryGetComponent(out LineRenderer lr))
+            {
+                lineRenderer = lr;
+            }
             if (lineRenderer != null)
             {
                 Vector3[] polyLine = GenerateVertices();
