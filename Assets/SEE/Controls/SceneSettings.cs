@@ -3,21 +3,12 @@ using System.IO;
 using DG.Tweening;
 using SEE.Game;
 using SEE.GO;
+using SEE.Tools.OpenTelemetry;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
 namespace SEE.Controls
 {
-    /// <summary>
-    /// Enumeration for the different telemetry modes.
-    /// </summary>
-    public enum TelemetryMode
-    {
-        Disabled,
-        Local,
-        Remote
-    }
-
     /// <summary>
     /// Manages the kind of environment (desktop or VR).
     /// </summary>
@@ -35,7 +26,7 @@ namespace SEE.Controls
         public static PlayerInputType InputType = PlayerInputType.DesktopPlayer;
         [Tooltip("The current telemetry mode.")]
         [ShowInInspector]
-        public static TelemetryMode telemetryMode = TelemetryMode.Local;
+        public static TelemetryMode TelemetryMode = TelemetryMode.Local;
 
         [Tooltip("Custom endpoint for telemetry export (used in remote mode).")]
         [ShowInInspector]
@@ -46,7 +37,7 @@ namespace SEE.Controls
         /// </summary>
         public static void SaveTelemetrySettings()
         {
-            File.WriteAllText(Application.persistentDataPath + "/TelemetryMode.cfg", telemetryMode.ToString());
+            File.WriteAllText(Application.persistentDataPath + "/TelemetryMode.cfg", TelemetryMode.ToString());
             File.WriteAllText(Application.persistentDataPath + "/TelemetryServerURL.cfg", CustomTelemetryServerURL);
         }
 
@@ -59,7 +50,7 @@ namespace SEE.Controls
             if (File.Exists(modePath) &&
                 Enum.TryParse(File.ReadAllText(modePath).Trim(), out TelemetryMode mode))
             {
-                telemetryMode = mode;
+                TelemetryMode = mode;
             }
 
             string urlPath = Application.persistentDataPath + "/TelemetryServerURL.cfg";
