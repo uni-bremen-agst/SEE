@@ -109,6 +109,10 @@ class EchoFaceClient:
                 else:
                     self._display_paused_frame()
                     time.sleep(1)  # Reduce CPU usage when paused
+        except StopIteration:
+            logger.info("Stream ended or failed. Breaking main loop.")
+        except KeyboardInterrupt:  # Handle Ctrl+C for headless operation
+            logger.info("Keyboard interrupt received. Exiting...")
         finally:
             self._cleanup()
 
@@ -116,10 +120,8 @@ class EchoFaceClient:
         """Reads a frame from the source, runs face detection, and displays the result."""
         ret, frame_bgr = self.video_source.read_frame()
         if not ret:
-            logger.warning("Failed to grab frame. Exiting...")
-            if not isinstance(self.video_source, VideoStream):
-                raise RuntimeError("Stream frame read failed")
-            return
+            logger.warning("Failed to grab frame.")
+            raise StopIteration("Stream read failed or video end reached.")
 
         self.last_frame = frame_bgr
         self.paused_frame_displayed = False

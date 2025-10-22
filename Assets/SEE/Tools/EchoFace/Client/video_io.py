@@ -142,7 +142,9 @@ class VideoStream(BaseStream):
 
     def read_frame(self) -> tuple[bool, np.ndarray | None]:
         """
-        Reads a single frame, and loops the video if the end is reached.
+        Reads a single frame from the video file.
+
+        The method will NOT loop and will return (False, None) after the last frame.
 
         Returns:
             tuple[bool, np.ndarray | None]: (Success flag, Frame data in BGR format)
@@ -150,12 +152,15 @@ class VideoStream(BaseStream):
         if not self.is_running or self.cap is None:
             return False, None
 
+        # Attempt to read the next frame
         ret, frame = self.cap.read()
 
         if not ret:
-            logger.info("End of video file reached. Looping...")
-            self.cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
-            ret, frame = self.cap.read()
+            # If 'ret' is False, the end of the video file has been reached.
+            # We log the event and stop the stream.
+            logger.info("End of video file reached. Stopping stream.")
+            self.release()  # Call the release method to clean up resources
+            return False, None
 
         return ret, frame
 
