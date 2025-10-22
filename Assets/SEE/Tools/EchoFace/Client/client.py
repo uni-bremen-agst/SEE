@@ -4,7 +4,7 @@ import argparse
 import logging
 import cv2
 
-from face_analysis_engine import FaceAnalysisEngine
+from face_analyzer import FaceAnalyzer
 from face_data_sender import FaceDataSender
 from video_io import BaseStream, WebcamStream, VideoStream, FrameViewer
 from helpers import draw_landmarks_on_image, draw_centered_text
@@ -70,7 +70,7 @@ class EchoFaceClient:
             stream_fps=self.video_source.get_actual_fps()
         )
 
-        self.engine = FaceAnalysisEngine(on_new_result_callback=self.face_data_sender.send_face_data)
+        self.face_analyzer = FaceAnalyzer(on_new_result_callback=self.face_data_sender.send_face_data)
 
         # Pause-related state
         self.paused = False
@@ -92,7 +92,7 @@ class EchoFaceClient:
         """
 
         self.face_data_sender.start()
-        self.engine.start()
+        self.face_analyzer.start()
         logger.info("Press 'q' to quit, 'p' to pause/resume...")
 
         try:
@@ -130,12 +130,12 @@ class EchoFaceClient:
         rgb_frame = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
         mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=rgb_frame)
         frame_timestamp_ms = time.time_ns() // 1_000_000
-        self.engine.detect_async(mp_image, frame_timestamp_ms)
+        self.face_analyzer.detect_async(mp_image, frame_timestamp_ms)
 
         # Display Logic
         frame_to_display = frame_bgr
-        if self.show_landmarks and self.engine.latest_detection_result:
-            annotated_rgb_frame = draw_landmarks_on_image(rgb_frame, self.engine.latest_detection_result)
+        if self.show_landmarks and self.face_analyzer.latest_detection_result:
+            annotated_rgb_frame = draw_landmarks_on_image(rgb_frame, self.face_analyzer.latest_detection_result)
             frame_to_display = cv2.cvtColor(annotated_rgb_frame, cv2.COLOR_RGB2BGR)
 
         self.frame_viewer.display_frame(frame_to_display)
@@ -152,9 +152,9 @@ class EchoFaceClient:
             self.paused_frame_displayed = True
 
     def _cleanup(self):
-        """Releases all resources cleanly, including the stream, engine, sender, and display window."""
+        """Releases all resources cleanly, including the stream, face_analyzer, sender, and display window."""
         self.video_source.release()
-        self.engine.stop()
+        self.face_analyzer.stop()
         self.face_data_sender.close()
         self.frame_viewer.cleanup()
         logger.info("Client application closed cleanly.")

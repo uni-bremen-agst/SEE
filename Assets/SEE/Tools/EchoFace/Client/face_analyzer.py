@@ -13,7 +13,7 @@ FaceLandmarkerResult = mp.tasks.vision.FaceLandmarkerResult
 VisionRunningMode = mp.tasks.vision.RunningMode
 
 
-class FaceAnalysisEngine:
+class FaceAnalyzer:
     """
     Manages MediaPipe's Face Landmarker detection.
 
@@ -24,7 +24,7 @@ class FaceAnalysisEngine:
 
     def __init__(self, on_new_result_callback: Optional[Callable[[Dict[str, float], Dict[int, Any]], None]] = None):
         """
-        Initializes the FaceAnalysisEngine.
+        Initializes the FaceAnalyzer.
 
         Args:
             on_new_result_callback:
@@ -97,9 +97,9 @@ class FaceAnalysisEngine:
                 output_facial_transformation_matrixes=False,
             )
             self._landmarker = FaceLandmarker.create_from_options(options)
-            logger.info("FaceAnalysisEngine started.")
+            logger.info("FaceAnalyzer started.")
         except Exception as e:
-            logger.error(f"Failed to start FaceAnalysisEngine: {e}")
+            logger.error(f"Failed to start FaceAnalyzer: {e}")
             self._landmarker = None
 
     def detect_async(self, mp_image: mp.Image, timestamp_ms: int):
@@ -116,4 +116,4 @@ class FaceAnalysisEngine:
         if self._landmarker:
             self._landmarker.close()
             self._landmarker = None
-        logger.info("FaceAnalysisEngine stopped.")
+        logger.info("FaceAnalyzer stopped.")
