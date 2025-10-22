@@ -1,11 +1,9 @@
 ﻿using System;
 using SEE.Controls;
 using SEE.UI.Notification;
-using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.UI;
-using TMPro;
 using SEE.Tools.OpenTelemetry;
 
 namespace SEE.UI.PropertyDialog
@@ -49,7 +47,6 @@ namespace SEE.UI.PropertyDialog
         /// The dialog is shown immediately and blocks closing until the user confirms or cancels.
         /// </summary>
         public void Open()
-
         {
             dialog = new GameObject("Telemetry Settings");
 
