@@ -35,7 +35,7 @@
         "GUID:e0cd26848372d4e5c891c569017e11f1",
         "GUID:13e34609dade4964e97712dc04b1cc6a",
         "GUID:702f733b4deb246808c6ce84d93b5c9c",
-	"Mediapipe.Runtime"
+        "GUID:04c4d86a70aa56c55a78c61f1ab1a56d"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],
@@ -71,12 +71,8 @@
         "MediatR.dll",
         "OpenTelemetry.dll",
         "OpenTelemetry.Api.dll",
-        "OpenTelemetry.Exporter.Console.dll",
         "OpenTelemetry.Exporter.OpenTelemetryProtocol.dll",
-        "OpenTelemetry.Exporter.dll",
-        "System.Diagnostics.DiagnosticSource.dll",
-        "System.Diagnostics.dll"
-
+        "System.Diagnostics.DiagnosticSource.dll"
     ],
     "autoReferenced": false,
     "defineConstraints": [],
