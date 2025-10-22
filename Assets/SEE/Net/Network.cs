@@ -5,9 +5,7 @@ using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
-using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
-using Sirenix.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -21,7 +19,6 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEngine;
-using UnityEngine.Assertions;
 using UnityEngine.SceneManagement;
 
 namespace SEE.Net
@@ -30,7 +27,7 @@ namespace SEE.Net
     /// Handles the most general parts of networking.
     /// </summary>
     [Serializable]
-    public class Network : MonoBehaviour
+    public class Network
     {
         /// <summary>
         /// The single unique instance of the network.
@@ -231,48 +228,9 @@ namespace SEE.Net
         public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
 
         /// <summary>
-        /// The Unity main thread. Note that we cannot initialize its value here
-        /// because the elaboration code initializing static attributes may be
-        /// executed by a thread different from Unity's main thread. This attribute
-        /// will be initialized in <see cref="Awake"/> for this reason.
-        /// </summary>
-        private static Thread mainThread = null;
-        /// <summary>
-        /// Contains the Unity main thread of the application.
-        /// </summary>
-        public static Thread MainThread
-        {
-            get
-            {
-                Assert.IsNotNull(mainThread, "The main Unity thread must not have been determined as of now!");
-                return mainThread;
-            }
-            private set
-            {
-                Assert.IsNotNull(value, "The main Unity thread must not be null!");
-                if (mainThread != value)
-                {
-                    Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
-                    mainThread = value;
-                }
-            }
-        }
-
-        /// <summary>
         /// Stores every executed Action to be synced with new connecting clients
         /// </summary>
         public static List<string> NetworkActionList = new();
-
-        private void Awake()
-        {
-            /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
-            /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
-            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
-            /// main thread here.
-            MainThread = Thread.CurrentThread;
-
-            Load();
-        }
 
         /// <summary>
         /// Name of the command-line argument containing the room password (<see cref="RoomPassword"/>).
@@ -316,7 +274,7 @@ namespace SEE.Net
         /// Makes sure that we have only one <see cref="Instance"/> and checks
         /// command-line arguments.
         /// </summary>
-        private void Start()
+        public void Start()
         {
             if (Instance)
             {
@@ -583,7 +541,7 @@ namespace SEE.Net
         /// <summary>
         /// Shuts down the voice chat system.
         /// </summary>
-        private void EndVoiceChat()
+        public void EndVoiceChat()
         {
             switch (VoiceChat)
             {
@@ -605,7 +563,7 @@ namespace SEE.Net
         private static void EnableDissonance(bool enable)
         {
             // The DissonanceComms is initially active and the local player is not muted and not deafened.
-            DissonanceComms dissonanceComms = FindObjectOfType<DissonanceComms>(includeInactive: true);
+            DissonanceComms dissonanceComms = UnityEngine.FindObjectOfType<DissonanceComms>(includeInactive: true);
             if (dissonanceComms != null)
             {
                 dissonanceComms.IsMuted = !enable;
@@ -1004,15 +962,6 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Shuts down the voice-chat system and opentelemetry.
-        /// </summary>
-        private void OnApplicationQuit()
-        {
-            TracingHelperService.Shutdown(true);
-            EndVoiceChat();
-        }
-
-        /// <summary>
         /// Represents an IP address along with its IP address family.
         /// This is used only for informational purposes in <see cref="AddressesInfo"/>.
         /// </summary>
@@ -1057,47 +1006,6 @@ namespace SEE.Net
             }
         }
 
-        /// <summary>
-        /// The name of the group for the fold-out group of the configuration file.
-        /// </summary>
-        private const string configurationFoldoutGroup = "Configuration File";
-
-        /// <summary>
-        /// The name of the group for the Inspector buttons loading and saving the configuration file.
-        /// </summary>
-        private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
-
-        /// <summary>
-        /// Default path of the configuration file (path and filename).
-        /// </summary>
-        [PropertyTooltip("Path of the file containing the network configuration.")]
-        [OdinSerialize, HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
-        public DataPath ConfigPath = new();
-
-        /// <summary>
-        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
-        /// If the configuration file exists already, it will be overridden.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [PropertyTooltip("Saves the network settings in a configuration file.")]
-        [ButtonGroup(configurationButtonsGroup)]
-        public void Save()
-        {
-            Save(ConfigPath.Path);
-        }
-
-        /// <summary>
-        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
-        /// if it exists. If it does not exist, nothing happens.
-        /// </summary>
-        [Button(ButtonSizes.Small)]
-        [PropertyTooltip("Loads the network configuration file.")]
-        [ButtonGroup(configurationButtonsGroup)]
-        public void Load()
-        {
-            Load(ConfigPath.Path);
-        }
-
         #region ConfigIO
 
         //--------------------------------
@@ -1134,38 +1042,10 @@ namespace SEE.Net
         private const string avatarIndexLabel = "avatarIndex";
 
         /// <summary>
-        /// Saves the settings of this network configuration to <paramref name="filename"/>.
-        /// </summary>
-        /// <param name="filename">name of the file in which the settings are stored</param>
-        public void Save(string filename)
-        {
-            using ConfigWriter writer = new(filename);
-            Save(writer);
-        }
-
-        /// <summary>
-        /// Reads the settings of this network configuration from <paramref name="filename"/>.
-        /// </summary>
-        /// <param name="filename">name of the file from which the settings are restored</param>
-        public void Load(string filename)
-        {
-            if (File.Exists(filename))
-            {
-                Debug.Log($"Loading network configuration file from {filename}.\n");
-                using ConfigReader stream = new(filename);
-                Restore(stream.Read());
-            }
-            else
-            {
-                Debug.LogError($"Network configuration file {filename} does not exist.\n");
-            }
-        }
-
-        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
-        protected virtual void Save(ConfigWriter writer)
+        public virtual void Save(ConfigWriter writer)
         {
             writer.Save(GameScene, gameSceneLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
@@ -1182,7 +1062,7 @@ namespace SEE.Net
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
         /// <param name="attributes">the attributes from which to restore the settings</param>
-        protected virtual void Restore(Dictionary<string, object> attributes)
+        public virtual void Restore(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
@@ -1209,7 +1089,6 @@ namespace SEE.Net
                     AvatarIndex = (uint)value;
                 }
             }
-
         }
 
 #endregion
