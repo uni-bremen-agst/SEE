@@ -11,7 +11,6 @@ using Sirenix.Serialization;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -544,10 +543,6 @@ namespace SEE.Net
         {
             switch (VoiceChat)
             {
-                case VoiceChatSystems.Vivox:
-                    EnableDissonance(false);
-                    VivoxInitialize();
-                    break;
                 case VoiceChatSystems.Dissonance:
                     EnableDissonance(true);
                     break;
@@ -971,7 +966,6 @@ namespace SEE.Net
         {
             None = 0,       // no voice chat
             Dissonance = 1, // Dissonance voice chat
-            Vivox = 2       // Vivox voice chat
         }
 
         /// <summary>
@@ -1000,9 +994,6 @@ namespace SEE.Net
                     break;
                 case VoiceChatSystems.Dissonance:
                     // nothing to be done
-                    break;
-                case VoiceChatSystems.Vivox:
-                    VivoxClient?.Uninitialize();
                     break;
                 default:
                     throw new NotImplementedException();
@@ -1207,142 +1198,6 @@ namespace SEE.Net
                 }
             }
 
-        }
-
-#endregion
-
-#region Vivox
-
-        public const string VivoxIssuer = "torben9605-se19-dev";
-        public const string VivoxDomain = "vdx5.vivox.com";
-        public const string VivoxSecretKey = "kick271";
-        public static readonly TimeSpan VivoxExpirationDuration = new TimeSpan(365, 0, 0, 0);
-
-        public static VivoxUnity.Client VivoxClient { get; private set; } = null;
-        public static VivoxUnity.AccountId VivoxAccountID { get; private set; } = null;
-        public static VivoxUnity.ILoginSession VivoxLoginSession { get; private set; } = null;
-        public static VivoxUnity.IChannelSession VivoxChannelSession { get; private set; } = null;
-
-        [SerializeField]
-        [Tooltip("The channel name for Vivox."), FoldoutGroup(voiceChatFoldoutGroup)]
-        [ShowIf("VoiceChat", VoiceChatSystems.Vivox)]
-        private string vivoxChannelName = string.Empty;
-        public static string VivoxChannelName { get => Instance ? Instance.vivoxChannelName : string.Empty; }
-
-        private static void VivoxInitialize()
-        {
-            VivoxUnity.VivoxConfig config = new VivoxUnity.VivoxConfig { InitialLogLevel = vx_log_level.log_debug };
-            VivoxClient = new VivoxUnity.Client();
-            VivoxClient.Initialize(config);
-
-            string userName = "u-" + NetworkManager.Singleton.LocalClientId.ToString().Replace(':', '.');
-            VivoxAccountID = new VivoxUnity.AccountId(VivoxIssuer, userName, VivoxDomain);
-            VivoxLoginSession = VivoxClient.GetLoginSession(VivoxAccountID);
-            VivoxLoginSession.PropertyChanged += VivoxOnLoginSessionPropertyChanged;
-            VivoxLoginSession.BeginLogin(new Uri("https://vdx5.www.vivox.com/api2"), VivoxLoginSession.GetLoginToken(VivoxSecretKey, VivoxExpirationDuration), ar0 =>
-            {
-                VivoxLoginSession.EndLogin(ar0);
-
-                string channelName = channelName = "c-" + VivoxChannelName;
-                VivoxUnity.ChannelId channelID = new VivoxUnity.ChannelId(VivoxIssuer, channelName, VivoxDomain, VivoxUnity.ChannelType.NonPositional);
-
-                // NOTE(torben): GetChannelSession() creates a new channel, if it does
-                // not exist yet. Thus, a client, that is not the server could
-                // potentially create the voice channel. To make sure this does not
-                // happen, VivoxInitialize() must always be called AFTER the server
-                // and client were initialized, because if this client tries to connect
-                // to a server and can not connect, it will go to offline mode and not
-                // initialize Vivox.
-                VivoxChannelSession = VivoxLoginSession.GetChannelSession(channelID);
-                VivoxChannelSession.PropertyChanged += VivoxOnChannelPropertyChanged;
-                VivoxChannelSession.MessageLog.AfterItemAdded += VivoxOnChannelMessageReceived;
-                VivoxChannelSession.BeginConnect(true, true, true, VivoxChannelSession.GetConnectToken(VivoxSecretKey, VivoxExpirationDuration), ar1 =>
-                {
-                    VivoxChannelSession.EndConnect(ar1);
-                    if (HostServer && VivoxChannelSession.Participants.Count != 0)
-                    {
-                        // TODO: this channel already exists and the name is unavailable!
-                        Util.Logger.Log("Channel with given name already exists. Select a differend name!");
-                        VivoxChannelSession.Disconnect();
-                        VivoxLoginSession.DeleteChannelSession(channelID);
-                    }
-                });
-            });
-        }
-
-        private static void SendGroupMessage()
-        {
-            string channelName = VivoxChannelSession.Channel.Name;
-            string senderName = VivoxAccountID.Name;
-            string message = "Hello World!";
-
-            VivoxChannelSession.BeginSendText(message, ar =>
-            {
-                try
-                {
-                    VivoxChannelSession.EndSendText(ar);
-                }
-                catch (Exception e)
-                {
-                    Util.Logger.LogException(e);
-                }
-            });
-        }
-
-        private static void VivoxOnLoginSessionPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
-        {
-            if (propertyChangedEventArgs.PropertyName == "State")
-            {
-                switch ((sender as VivoxUnity.ILoginSession).State)
-                {
-                    case VivoxUnity.LoginState.LoggingIn:
-                        break;
-
-                    case VivoxUnity.LoginState.LoggedIn:
-                        break;
-
-                    case VivoxUnity.LoginState.LoggedOut:
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
-
-        private static void VivoxOnChannelPropertyChanged(object sender, PropertyChangedEventArgs propertyChangedEventArgs)
-        {
-            VivoxUnity.IChannelSession channelSession = (VivoxUnity.IChannelSession)sender;
-
-            if (propertyChangedEventArgs.PropertyName == "AudioState")
-            {
-                switch (channelSession.AudioState)
-                {
-                    case VivoxUnity.ConnectionState.Connected: Util.Logger.Log("Audio chat connected in " + channelSession.Key.Name + " channel."); break;
-                    case VivoxUnity.ConnectionState.Disconnected: Util.Logger.Log("Audio chat disconnected in " + channelSession.Key.Name + " channel."); break;
-                }
-            }
-            else if (propertyChangedEventArgs.PropertyName == "TextState")
-            {
-                switch (channelSession.TextState)
-                {
-                    case VivoxUnity.ConnectionState.Connected:
-                        Util.Logger.Log("Text chat connected in " + channelSession.Key.Name + " channel.");
-                        SendGroupMessage();
-                        break;
-                    case VivoxUnity.ConnectionState.Disconnected:
-                        Util.Logger.Log("Text chat disconnected in " + channelSession.Key.Name + " channel.");
-                        break;
-                }
-            }
-        }
-
-        private static void VivoxOnChannelMessageReceived(object sender, VivoxUnity.QueueItemAddedEventArgs<VivoxUnity.IChannelTextMessage> queueItemAddedEventArgs)
-        {
-            string channelName = queueItemAddedEventArgs.Value.ChannelSession.Channel.Name;
-            string senderName = queueItemAddedEventArgs.Value.Sender.Name;
-            string message = queueItemAddedEventArgs.Value.Message;
-
-            Util.Logger.Log(channelName + ": " + senderName + ": " + message + "\n");
         }
 
 #endregion
