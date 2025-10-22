@@ -19,8 +19,13 @@ namespace SEE.Net.Actions
         public string GameObjectID;
 
         /// <summary>
-        /// Indicates whether node types should be removed.
+        /// Indicates whether unused node types should be removed.
         /// Only applicable for the clear variant.
+        /// The clear variant refers to cleaning an architecture or implementation root node.
+        /// Architecture and implementation subroot nodes must not be deleted, as they
+        /// cannot be added again at runtime. If the deletion action is applied to one of
+        /// these subroot nodes, only their child nodes are removed.
+        /// The subroot node itself remains intact.
         /// </summary>
         public bool RemoveNodeTypes;
 
