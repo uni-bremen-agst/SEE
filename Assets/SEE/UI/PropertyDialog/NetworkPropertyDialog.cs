@@ -159,7 +159,7 @@ namespace SEE.UI.PropertyDialog
             propertyDialog.AddGroup(group);
 
             // Because we will validate the input, we do not want the propertyDialog
-            // to be closed until the input valid. That is why we will handle the
+            // to be closed until the input is valid. That is why we will handle the
             // closing ourselves.
             propertyDialog.AllowClosing(false);
 
