@@ -536,6 +536,31 @@ namespace SEE.Net
             return fragments;
         }
 
+        #region Voice Chat System
+
+        /// <summary>
+        /// The voice chat system as selected by the user. Note: This attribute
+        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
+        /// as at the start up in the <see cref="OpeningDialog"/>.
+        /// </summary>
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+
+        /// <summary>
+        /// The kinds of voice-chats system we support. None means no voice
+        /// chat whatsoever.
+        /// </summary>
+        public enum VoiceChatSystems
+        {
+            None = 0,       // no voice chat
+            Dissonance = 1, // Dissonance voice chat
+        }
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the logging setttings.
+        /// </summary>
+        private const string voiceChatFoldoutGroup = "Voice Chat";
+
         /// <summary>
         /// Starts the selected voice chat system according to <see cref="VoiceChat"/>.
         /// </summary>
@@ -551,6 +576,24 @@ namespace SEE.Net
                     break;
                 default:
                     EnableDissonance(false);
+                    throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
+            }
+        }
+
+        /// <summary>
+        /// Shuts down the voice chat system.
+        /// </summary>
+        private void EndVoiceChat()
+        {
+            switch (VoiceChat)
+            {
+                case VoiceChatSystems.None:
+                    // nothing to be done
+                    break;
+                case VoiceChatSystems.Dissonance:
+                    // nothing to be done
+                    break;
+                default:
                     throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
             }
         }
@@ -574,6 +617,8 @@ namespace SEE.Net
                 Debug.LogError($"There is no {typeof(DissonanceComms)} in the current scene.\n");
             }
         }
+
+        #endregion Voice Chat System
 
         /// <summary>
         /// Initializes the game.
@@ -959,45 +1004,12 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// The kinds of voice-chats system we support. None means no voice
-        /// chat whatsoever.
-        /// </summary>
-        public enum VoiceChatSystems
-        {
-            None = 0,       // no voice chat
-            Dissonance = 1, // Dissonance voice chat
-        }
-
-        /// <summary>
-        /// Name of the Inspector foldout group for the logging setttings.
-        /// </summary>
-        private const string voiceChatFoldoutGroup = "Voice Chat";
-
-        /// <summary>
-        /// The voice chat system as selected by the user. Note: This attribute
-        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
-        /// as at the start up in the <see cref="OpeningDialog"/>.
-        /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
-        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
-
-        /// <summary>
         /// Shuts down the voice-chat system and opentelemetry.
         /// </summary>
         private void OnApplicationQuit()
         {
             TracingHelperService.Shutdown(true);
-            switch (VoiceChat)
-            {
-                case VoiceChatSystems.None:
-                    // nothing to be done
-                    break;
-                case VoiceChatSystems.Dissonance:
-                    // nothing to be done
-                    break;
-                default:
-                    throw new NotImplementedException();
-            }
+            EndVoiceChat();
         }
 
         /// <summary>
