@@ -402,8 +402,8 @@ public class EchoFace : MonoBehaviour
         // Estimate and apply head pose
         if (enableHeadRotation && headTransform != null && _latestFaceData.landmarks != null && _latestFaceData.landmarks.Count >= 3)
         {
-            Quaternion targetRotation = EstimateHeadPose(_latestFaceData.landmarks);
-            ApplyHeadPose(targetRotation);
+            Quaternion targetRotation = EstimateHeadRotation(_latestFaceData.landmarks);
+            ApplyHeadRotation(targetRotation);
         }
 
         // Apply eye rotation
@@ -538,7 +538,7 @@ public class EchoFace : MonoBehaviour
         }
     }
 
-    private Quaternion EstimateHeadPose(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
+    private Quaternion EstimateHeadRotation(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
     {
         // Ensure the required landmarks exist using named constants.
         if (!landmarks.ContainsKey(Landmarks.Chin) ||
@@ -622,8 +622,8 @@ public class EchoFace : MonoBehaviour
     /// <summary>
     /// Applies the calculated head pose to the head bone with smoothing.
     /// </summary>
-    /// <param name="targetRotation">The target rotation calculated by EstimateHeadPose.</param>
-    private void ApplyHeadPose(Quaternion targetRotation)
+    /// <param name="targetRotation">The target rotation calculated by EstimateHeadRotation.</param>
+    private void ApplyHeadRotation(Quaternion targetRotation)
     {
         if (headTransform == null) return;
 
