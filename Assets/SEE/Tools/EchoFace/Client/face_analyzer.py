@@ -62,16 +62,16 @@ class FaceAnalyzer:
             # 1. Process blendshapes
             current_face_blendshapes = result.face_blendshapes[0]
             blendshape_data = {
-                bs.category_name: bs.score for bs in current_face_blendshapes
+                bs.category_name: round(bs.score, 4) for bs in current_face_blendshapes
             }
 
             # 2. Extract only the required landmarks
             if result.face_landmarks and result.face_landmarks[0]:
                 for i in self._selected_landmark_indices:
                     selected_landmarks[i] = {  # Use index as the key
-                        "x": result.face_landmarks[0][i].x,
-                        "y": result.face_landmarks[0][i].y,
-                        "z": result.face_landmarks[0][i].z
+                        "x": round(result.face_landmarks[0][i].x, 4),
+                        "y": round(result.face_landmarks[0][i].y, 4),
+                        "z": round(result.face_landmarks[0][i].z, 4)
                     }
 
         # 3. Invoke the combined callback with the processed data
