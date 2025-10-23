@@ -1,4 +1,5 @@
-﻿using SEE.Net;
+﻿using SEE.GO;
+using SEE.Net;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -9,12 +10,19 @@ using System.IO;
 using System.Threading;
 using UnityEngine;
 using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
 
-namespace SEE.UserSettings
+namespace SEE.User
 {
 
     internal class UserSettings : MonoBehaviour
     {
+        /// <summary>
+        /// The single unique instance of the user settings.
+        /// There can be only one.
+        /// </summary>
+        public static UserSettings Instance { get; private set; }
+
         private void Awake()
         {
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
@@ -28,7 +36,49 @@ namespace SEE.UserSettings
 
         private void Start()
         {
-            Network.Start();
+            if (Instance)
+            {
+                if (Instance != this)
+                {
+                    Debug.LogWarning("There must not be more than one Network component! "
+                        + $"The component {typeof(UserSettings)} in {Instance.gameObject.FullName()} will be destroyed!\n");
+                }
+            }
+            Instance = this;
+
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            Network.SetUp();
+        }
+
+        /// <summary>
+        /// The voice chat system as selected by the user. Note: This attribute
+        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
+        /// as at the start up in the <see cref="OpeningDialog"/>.
+        /// </summary>
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+
+        /// <summary>
+        /// Name of the Inspector foldout group for the logging setttings.
+        /// </summary>
+        private const string voiceChatFoldoutGroup = "Voice Chat";
+
+        /// <summary>
+        /// Starts the voice-chat system selected. Unregisters itself from
+        /// <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        /// <param name="mode">the mode in which the scene was loaded</param>
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Now we have loaded the scene that is supposed to contain settings for the voice chat
+            // system. We can now turn on the voice chat system.
+            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            User.VoiceChat.StartVoiceChat(VoiceChat);
         }
 
         /// <summary>
@@ -37,10 +87,12 @@ namespace SEE.UserSettings
         private void OnApplicationQuit()
         {
             TracingHelperService.Shutdown(true);
-            Network.EndVoiceChat();
+            User.VoiceChat.EndVoiceChat(VoiceChat);
         }
 
         public Network Network = new();
+
+        public Player Player = new();
 
         /// <summary>
         /// The Unity main thread. Note that we cannot initialize its value here
@@ -140,12 +192,18 @@ namespace SEE.UserSettings
         }
 
         /// <summary>
+        /// Label of attribute <see cref="User.VoiceChat"/> in the configuration file.
+        /// </summary>
+        private const string voiceChatLabel = "voiceChat";
+
+        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
             Network.Save(writer);
+            writer.Save(VoiceChat.ToString(), voiceChatLabel);
         }
 
         /// <summary>
@@ -155,6 +213,7 @@ namespace SEE.UserSettings
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             Network.Restore(attributes);
+            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
         }
     }
 }

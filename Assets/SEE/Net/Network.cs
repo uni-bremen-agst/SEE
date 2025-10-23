@@ -1,20 +1,18 @@
 ﻿using Cysharp.Threading.Tasks;
-using Dissonance;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.Tools.OpenTelemetry;
 using SEE.UI.Notification;
 using SEE.Utils;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading;
-using SEE.Tools.OpenTelemetry;
 using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using UnityEditor;
@@ -29,11 +27,6 @@ namespace SEE.Net
     [Serializable]
     public class Network
     {
-        /// <summary>
-        /// The single unique instance of the network.
-        /// </summary>
-        public static Network Instance { get; private set; }
-
         /// <summary>
         /// The <see cref="ActionNetwork"/> instance for communication between the clients and the server.
         /// </summary>
@@ -98,18 +91,6 @@ namespace SEE.Net
         /// Used to tell the caller whether the routine has been completed.
         /// </summary>
         private CallBack callbackToMenu = null;
-
-        /// <summary>
-        /// Name of the local player; used for the text chat and the avatar badge.
-        /// </summary>
-        [Tooltip("The name of the player."), ShowInInspector]
-        public string PlayerName { get; set; } = "Me";
-
-        /// <summary>
-        /// The index of the player's avatar.
-        /// </summary>
-        [Tooltip("The index of the player's avatar"), ShowInInspector]
-        public uint AvatarIndex { get; set; } = 0;
 
         /// <summary>
         /// Returns the underlying <see cref="UnityTransport"/> of the <see cref="NetworkManager"/>.
@@ -207,12 +188,14 @@ namespace SEE.Net
         /// </summary>
         [SerializeField, FoldoutGroup(loggingFoldoutGroup)]
         [PropertyTooltip("Whether the network logging should be enabled.")]
-        private bool internalLoggingEnabled = true;
-
-        /// <summary>
-        /// <see cref="internalLoggingEnabled"/>
-        /// </summary>
-        public static bool InternalLoggingEnabled => Instance && Instance.internalLoggingEnabled;
+        public bool InternalLoggingEnabled
+        {
+            get => SEE.Net.Util.Logger.InternalLoggingEnabled;
+            set
+            {
+                SEE.Net.Util.Logger.InternalLoggingEnabled = value;
+            }
+        }
 
 #endif
         /// <summary>
@@ -271,21 +254,14 @@ namespace SEE.Net
         private const string launchAsServerArgumentName = "--launch-as-server";
 
         /// <summary>
-        /// Makes sure that we have only one <see cref="Instance"/> and checks
-        /// command-line arguments.
+        /// Sets up the network manager, collects environment variables and processes
+        /// the command-line arguments (if not running in the editor mode).
+        ///
+        /// This method does not really start any server or client. Use <see cref="StartClient(CallBack)"/>,
+        /// <see cref="StartServer(CallBack)"/>, or <see cref="StartHost(CallBack)/> instead.
         /// </summary>
-        public void Start()
+        public void SetUp()
         {
-            if (Instance)
-            {
-                if (Instance != this)
-                {
-                    Util.Logger.LogWarning("There must not be more than one Network component! "
-                        + $"The component {typeof(Network)} in {Instance.gameObject.FullName()} will be destroyed!\n");
-                }
-            }
-            Instance = this;
-
             NetworkManager.Singleton.OnServerStarted += OnServerStarted;
             NetworkManager.Singleton.NetworkConfig.ConnectionApproval = true;
             CollectEnvironmentVariables();
@@ -494,90 +470,6 @@ namespace SEE.Net
             return fragments;
         }
 
-        #region Voice Chat System
-
-        /// <summary>
-        /// The voice chat system as selected by the user. Note: This attribute
-        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
-        /// as at the start up in the <see cref="OpeningDialog"/>.
-        /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
-        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
-
-        /// <summary>
-        /// The kinds of voice-chats system we support. None means no voice
-        /// chat whatsoever.
-        /// </summary>
-        public enum VoiceChatSystems
-        {
-            None = 0,       // no voice chat
-            Dissonance = 1, // Dissonance voice chat
-        }
-
-        /// <summary>
-        /// Name of the Inspector foldout group for the logging setttings.
-        /// </summary>
-        private const string voiceChatFoldoutGroup = "Voice Chat";
-
-        /// <summary>
-        /// Starts the selected voice chat system according to <see cref="VoiceChat"/>.
-        /// </summary>
-        private void StartVoiceChat()
-        {
-            switch (VoiceChat)
-            {
-                case VoiceChatSystems.Dissonance:
-                    EnableDissonance(true);
-                    break;
-                case VoiceChatSystems.None:
-                    EnableDissonance(false);
-                    break;
-                default:
-                    EnableDissonance(false);
-                    throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
-            }
-        }
-
-        /// <summary>
-        /// Shuts down the voice chat system.
-        /// </summary>
-        public void EndVoiceChat()
-        {
-            switch (VoiceChat)
-            {
-                case VoiceChatSystems.None:
-                    // nothing to be done
-                    break;
-                case VoiceChatSystems.Dissonance:
-                    // nothing to be done
-                    break;
-                default:
-                    throw new NotImplementedException($"Unhanded voice chat option {VoiceChat}.");
-            }
-        }
-
-        /// <summary>
-        /// Enables/disables Dissonance as the voice chat system.
-        /// </summary>
-        /// <param name="enable">whether to enable Dissonance</param>
-        private static void EnableDissonance(bool enable)
-        {
-            // The DissonanceComms is initially active and the local player is not muted and not deafened.
-            DissonanceComms dissonanceComms = UnityEngine.FindObjectOfType<DissonanceComms>(includeInactive: true);
-            if (dissonanceComms != null)
-            {
-                dissonanceComms.IsMuted = !enable;
-                dissonanceComms.IsDeafened = !enable;
-                dissonanceComms.enabled = enable;
-            }
-            else
-            {
-                Debug.LogError($"There is no {typeof(DissonanceComms)} in the current scene.\n");
-            }
-        }
-
-        #endregion Voice Chat System
-
         /// <summary>
         /// Initializes the game.
         /// </summary>
@@ -591,7 +483,7 @@ namespace SEE.Net
 
             if (HostServer)
             {
-                foreach (AbstractSEECity city in FindObjectsOfType<AbstractSEECity>())
+                foreach (AbstractSEECity city in UnityEngine.Object.FindObjectsByType<AbstractSEECity>(FindObjectsSortMode.None))
                 {
                     if (city is SEECity seeCity)
                     {
@@ -612,19 +504,18 @@ namespace SEE.Net
         /// </summary>
         private void OnDestroy()
         {
-            ShutdownNetwork();
+            DeleteNetworkLoggingFiles();
         }
 
         /// <summary>
-        /// Shuts down the network (server and clients).
+        /// Deletes all networking logging files.
         /// </summary>
-        private void ShutdownNetwork()
+        private void DeleteNetworkLoggingFiles()
         {
             // FIXME there must be a better way to stop the logging spam!
-            string currentDirectory = Directory.GetCurrentDirectory();
-            DirectoryInfo directoryInfo = new(currentDirectory);
-            FileInfo[] fileInfos = directoryInfo.GetFiles();
-            foreach (FileInfo fileInfo in fileInfos)
+            // FIXME Is this really still necessary?
+            DirectoryInfo directoryInfo = new(Directory.GetCurrentDirectory());
+            foreach (FileInfo fileInfo in directoryInfo.GetFiles())
             {
                 string fileName = fileInfo.Name;
                 string[] prefixes = {
@@ -645,8 +536,7 @@ namespace SEE.Net
                     }
                 }
             }
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            Debug.Log("Network is shut down.\n");
+            // SceneManager.sceneLoaded -= OnSceneLoaded; FIXME
         }
 
         /// <summary>
@@ -667,27 +557,9 @@ namespace SEE.Net
         /// </summary>
         private void OnServerStarted()
         {
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            SceneManager.sceneLoaded += OnSceneLoaded;
             SceneManager.sceneUnloaded -= OnSceneUnloaded;
             SceneManager.sceneUnloaded += OnSceneUnloaded;
             NetworkManager.Singleton.SceneManager.LoadScene(GameScene, LoadSceneMode.Single);
-        }
-
-        /// <summary>
-        /// Starts the voice-chat system selected. Unregisters itself from
-        /// <see cref="SceneManager.sceneLoaded"/>.
-        /// Note: This method is assumed to be called when the new scene is fully loaded.
-        /// </summary>
-        /// <param name="scene">scene that was loaded</param>
-        /// <param name="mode">the mode in which the scene was loaded</param>
-        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
-        {
-            // Now we have loaded the scene that is supposed to contain settings for the voice chat
-            // system. We can now turn on the voice chat system.
-            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
-            SceneManager.sceneLoaded -= OnSceneLoaded;
-            StartVoiceChat();
         }
 
         /// <summary>
@@ -701,8 +573,8 @@ namespace SEE.Net
             if (scene.name == GameScene)
             {
                 SceneManager.sceneUnloaded -= OnSceneUnloaded;
-                ShutdownNetwork();
-                Destroyer.Destroy(Instance);
+                DeleteNetworkLoggingFiles();
+                // Destroyer.Destroy(Instance);
             }
         }
 
@@ -726,7 +598,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartServer(CallBack callBack)
         {
-            StartCoroutine(ShutdownNetwork(InternalStartServer));
+            ShutdownNetworkAsync(InternalStartServer).Forget();
 
             void InternalStartServer()
             {
@@ -798,7 +670,7 @@ namespace SEE.Net
         /// in case of success or otherwise false</param>
         public void StartHost(CallBack callBack)
         {
-            StartCoroutine(ShutdownNetwork(InternalStartHost));
+            ShutdownNetworkAsync(InternalStartHost).Forget();
 
             void InternalStartHost()
             {
@@ -898,7 +770,7 @@ namespace SEE.Net
             // Set the address of the server to connect to.
             UnityTransport netTransport = GetNetworkTransport();
             netTransport.ConnectionData.Address = ServerIP4Address;
-            StartCoroutine(ShutdownNetwork(InternalStartClient));
+            ShutdownNetworkAsync(InternalStartClient).Forget();
 
             void InternalStartClient()
             {
@@ -922,7 +794,7 @@ namespace SEE.Net
         private const float maxWaitingTimeInSeconds = 5 * 60;
 
         /// <summary>
-        /// A delegate that will be called in <see cref="ShutdownNetwork(OnShutdownFinished)"/> when
+        /// A delegate that will be called in <see cref="ShutdownNetworkAsync(OnShutdownFinished)"/> when
         /// the network has been shut down (if needed at all), for instance, to (re-)start the network.
         /// </summary>
         delegate void OnShutdownFinished();
@@ -936,7 +808,7 @@ namespace SEE.Net
         /// </summary>
         /// <param name="onShutdownFinished">function to be called at the end of the shutdown</param>
         /// <returns>whether to continue this co-routine</returns>
-        private IEnumerator ShutdownNetwork(OnShutdownFinished onShutdownFinished)
+        private async UniTask ShutdownNetworkAsync(OnShutdownFinished onShutdownFinished)
         {
             // In case we are connected, we will first disconnect.
             if (NetworkManager.Singleton.IsClient || NetworkManager.Singleton.IsServer)
@@ -950,15 +822,13 @@ namespace SEE.Net
 
                 // The shutdown is not immediate. We will need to wait until this process has
                 // finished, i.e., until NetworkManager.Singleton.ShutdownInProgress becomes false.
-                while (NetworkManager.Singleton.ShutdownInProgress)
-                {
-                    yield return null;
-                }
+                await UniTask.WaitUntil(() => !NetworkManager.Singleton.ShutdownInProgress);
             }
 
-            ShutdownNetwork();
+            DeleteNetworkLoggingFiles();
 
             onShutdownFinished();
+            Debug.Log("Network is shut down.\n");
         }
 
         /// <summary>
@@ -1017,10 +887,6 @@ namespace SEE.Net
         /// </summary>
         private const string gameSceneLabel = "gameScene";
         /// <summary>
-        /// Label of attribute <see cref="VoiceChat"/> in the configuration file.
-        /// </summary>
-        private const string voiceChatLabel = "voiceChat";
-        /// <summary>
         /// Label of attribute <see cref="ServerPort"/> in the configuration file.
         /// </summary>
         private const string serverPortLabel = "serverPort";
@@ -1032,14 +898,6 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
-        /// <summary>
-        /// Label of attribute <see cref="PlayerName"/> in the configuration file.
-        /// </summary>
-        private const string playernameLabel = "playername";
-        /// <summary>
-        /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
-        /// </summary>
-        private const string avatarIndexLabel = "avatarIndex";
 
         /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
@@ -1048,14 +906,10 @@ namespace SEE.Net
         public virtual void Save(ConfigWriter writer)
         {
             writer.Save(GameScene, gameSceneLabel);
-            writer.Save(VoiceChat.ToString(), voiceChatLabel);
+
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
-            writer.Save(PlayerName, playernameLabel);
-            // The following cast from uint to int is necessary because otherwise the value
-            // would be saved as a float.
-            writer.Save((int)AvatarIndex, avatarIndexLabel);
         }
 
         /// <summary>
@@ -1065,7 +919,6 @@ namespace SEE.Net
         public virtual void Restore(Dictionary<string, object> attributes)
         {
             ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
-            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             ConfigIO.Restore(attributes, roomPasswordLabel, ref RoomPassword);
             {
                 int value = ServerPort;
@@ -1076,18 +929,6 @@ namespace SEE.Net
                 string value = ServerIP4Address;
                 ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
                 ServerIP4Address = value;
-            }
-            {
-                string value = PlayerName;
-                ConfigIO.Restore(attributes, playernameLabel, ref value);
-                PlayerName = value;
-            }
-            {
-                int value = (int)AvatarIndex;
-                if (ConfigIO.Restore(attributes, avatarIndexLabel, ref value))
-                {
-                    AvatarIndex = (uint)value;
-                }
             }
         }
 

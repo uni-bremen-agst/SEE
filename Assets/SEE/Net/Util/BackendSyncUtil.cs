@@ -281,7 +281,7 @@ namespace SEE.Net.Util
         private static async UniTask<bool> LogInAsync()
         {
             string url = Network.ClientRestAPI + "user/signin";
-            string postBody = new LoginData(Network.ServerId, Network.Instance.RoomPassword);
+            string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
             UnityWebRequestAsyncOperation asyncOp = signinRequest.SendWebRequest();
