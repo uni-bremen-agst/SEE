@@ -4,6 +4,7 @@ using System.Linq;
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Tools.RandomGraphs;
+using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using UnityEngine;
@@ -96,11 +97,11 @@ namespace SEE.Game.City
         /// <returns>True if the menus need to be adjusted; otherwise, false.</returns>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override UniTask<bool> LoadDataAsync()
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
+        public override UniTask LoadDataAsync()
         {
             LoadedGraph = RandomGraphs.Create(LeafConstraint, InnerNodeConstraint, LeafAttributes, true);
-            return UniTask.FromResult(false);
+            return UniTask.CompletedTask;
         }
 
         //----------------------------------------------------------------------------

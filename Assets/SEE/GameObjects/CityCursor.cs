@@ -1,4 +1,5 @@
 using SEE.Controls;
+using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.UI3D;
@@ -56,7 +57,7 @@ namespace SEE.GO
         /// </summary>
         private void OnDestroy()
         {
-            InteractableObject.AnyHoverIn  -= AnyHoverIn;
+            InteractableObject.AnyHoverIn -= AnyHoverIn;
             InteractableObject.AnyHoverOut -= AnyHoverOut;
             Destroyer.Destroy(Cursor);
         }
@@ -69,9 +70,10 @@ namespace SEE.GO
         /// <param name="interactableObject">the selected object</param>
         private void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
-            if (AnyHoverIsDoable(interactableObject))
+            if (AnyHoverIsDoable(interactableObject)
+                && interactableObject is InteractableGraphElement graphElement)
             {
-                Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
                 if (selectedGraph != null && city.LoadedGraph != null
                     && selectedGraph.Equals(city.LoadedGraph))
                 {
@@ -88,9 +90,10 @@ namespace SEE.GO
         /// <param name="interactableObject">the unselected object</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
-            if (AnyHoverIsDoable(interactableObject))
+            if (AnyHoverIsDoable(interactableObject)
+                && interactableObject is InteractableGraphElement graphElement)
             {
-                Graph selectedGraph = interactableObject.GraphElemRef.Elem.ItsGraph;
+                Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
                 if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
                 {
                     Cursor.RemoveFocus(interactableObject);
@@ -113,20 +116,23 @@ namespace SEE.GO
                 Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(InteractableObject)}.\n");
                 return false;
             }
-            if (interactableObject.GraphElemRef == null)
+            if (interactableObject is InteractableGraphElement graphElement)
             {
-                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElementRef)}.\n");
-                return false;
-            }
-            if (interactableObject.GraphElemRef.Elem == null)
-            {
-                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElement)}.\n");
-                return false;
-            }
-            if (interactableObject.GraphElemRef.Elem.ItsGraph == null)
-            {
-                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(Graph)}.\n");
-                return false;
+                if (graphElement.GraphElemRef == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElementRef)}.\n");
+                    return false;
+                }
+                if (graphElement.GraphElemRef.Elem == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElement)}.\n");
+                    return false;
+                }
+                if (graphElement.GraphElemRef.Elem.ItsGraph == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(Graph)}.\n");
+                    return false;
+                }
             }
             return true;
         }
