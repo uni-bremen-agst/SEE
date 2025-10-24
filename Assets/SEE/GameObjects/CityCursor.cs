@@ -57,7 +57,7 @@ namespace SEE.GO
         /// </summary>
         private void OnDestroy()
         {
-            InteractableObject.AnyHoverIn  -= AnyHoverIn;
+            InteractableObject.AnyHoverIn -= AnyHoverIn;
             InteractableObject.AnyHoverOut -= AnyHoverOut;
             Destroyer.Destroy(Cursor);
         }
@@ -70,7 +70,8 @@ namespace SEE.GO
         /// <param name="interactableObject">the selected object</param>
         private void AnyHoverIn(InteractableObject interactableObject, bool _)
         {
-            if (interactableObject is InteractableGraphElement graphElement)
+            if (AnyHoverIsDoable(interactableObject)
+                && interactableObject is InteractableGraphElement graphElement)
             {
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
                 if (selectedGraph != null && city.LoadedGraph != null
@@ -89,7 +90,8 @@ namespace SEE.GO
         /// <param name="interactableObject">the unselected object</param>
         private void AnyHoverOut(InteractableObject interactableObject, bool _)
         {
-            if (interactableObject is InteractableGraphElement graphElement)
+            if (AnyHoverIsDoable(interactableObject)
+                && interactableObject is InteractableGraphElement graphElement)
             {
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
                 if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
@@ -97,6 +99,42 @@ namespace SEE.GO
                     Cursor.RemoveFocus(interactableObject);
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> if the given <paramref name="interactableObject"/> is valid,
+        /// that is, if it is not null, has a non-null <see cref="GraphElementRef"/>,
+        /// which references a non-null <see cref="GraphElement"/>, which in turn
+        /// is contained in a non-null <see cref="Graph"/>.
+        /// </summary>
+        /// <param name="interactableObject">the selected object to be checked</param>
+        /// <returns>true if <paramref name="interactableObject"/> is valid</returns>
+        private static bool AnyHoverIsDoable(InteractableObject interactableObject)
+        {
+            if (interactableObject == null)
+            {
+                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(InteractableObject)}.\n");
+                return false;
+            }
+            if (interactableObject is InteractableGraphElement graphElement)
+            {
+                if (graphElement.GraphElemRef == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElementRef)}.\n");
+                    return false;
+                }
+                if (graphElement.GraphElemRef.Elem == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElement)}.\n");
+                    return false;
+                }
+                if (graphElement.GraphElemRef.Elem.ItsGraph == null)
+                {
+                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(Graph)}.\n");
+                    return false;
+                }
+            }
+            return true;
         }
     }
 }
