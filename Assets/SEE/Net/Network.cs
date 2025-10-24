@@ -477,7 +477,7 @@ namespace SEE.Net
         {
             if (NetworkManager.Singleton.IsHost && NetworkManager.Singleton.IsClient)
             {
-                TracingHelperService.Initialize(PlayerName);
+                TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
             }
             AsyncUtils.MainThreadId = Thread.CurrentThread.ManagedThreadId;
 
@@ -734,7 +734,7 @@ namespace SEE.Net
         {
             callbackToMenu?.Invoke(true, $"You are connected to {ServerAddress}.");
             callbackToMenu = null;
-            TracingHelperService.Initialize(PlayerName);
+            TracingHelperService.Initialize(SEE.User.UserSettings.Instance.Player.PlayerName);
         }
 
         /// <summary>
