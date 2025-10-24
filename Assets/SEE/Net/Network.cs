@@ -174,7 +174,7 @@ namespace SEE.Net
         /// The name of the scene to be loaded when the game starts.
         /// </summary>
         [Tooltip("The name of the game scene.")]
-        public string GameScene = "SEEWorld";
+        public string GameScene = "SEENewWorld";
 
 #if UNITY_EDITOR
 
@@ -190,10 +190,10 @@ namespace SEE.Net
         [PropertyTooltip("Whether the network logging should be enabled.")]
         public bool InternalLoggingEnabled
         {
-            get => SEE.Net.Util.Logger.InternalLoggingEnabled;
+            get => Util.Logger.InternalLoggingEnabled;
             set
             {
-                SEE.Net.Util.Logger.InternalLoggingEnabled = value;
+                Util.Logger.InternalLoggingEnabled = value;
             }
         }
 
@@ -208,7 +208,8 @@ namespace SEE.Net
         /// The IP address of the host or server, respectively; the empty string
         /// if none is set.
         /// </summary>
-        public static string RemoteServerIPAddress => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
+        public static string RemoteServerIPAddress
+            => NetworkManager.Singleton.GetComponent<UnityTransport>().ConnectionData.ServerListenAddress;
 
         /// <summary>
         /// Stores every executed Action to be synced with new connecting clients
