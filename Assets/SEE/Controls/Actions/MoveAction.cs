@@ -398,7 +398,7 @@ namespace SEE.Controls.Actions
                 return wasMoved;
             }
 
-            ///<summary>
+            /// <summary>
             /// Checks if <see cref="grabbedObject"/> can be placed.
             /// <para>
             /// It can be placed if:
@@ -407,7 +407,7 @@ namespace SEE.Controls.Actions
             /// <item><description><see cref="grabbedObject"/> does not overlap with its new siblings in <see cref="NewParent"/></description></item>
             /// </list>
             /// </para>
-            ///</summary>
+            /// </summary>
             /// <returns><c>true</c> if <see cref="grabbedObject"/> can be placed</returns>
             public readonly bool CanBePlaced()
             {
