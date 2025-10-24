@@ -14,7 +14,10 @@ using UnityEngine.SceneManagement;
 
 namespace SEE.User
 {
-
+    /// <summary>
+    /// Represents the user settings for the SEE application. These are attributes
+    /// that are generally set by the user at the start of the application.
+    /// </summary>
     internal class UserSettings : MonoBehaviour
     {
         /// <summary>
