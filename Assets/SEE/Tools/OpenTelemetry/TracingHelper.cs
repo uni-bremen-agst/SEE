@@ -377,9 +377,7 @@ namespace SEE.Tools.OpenTelemetry
 
             lastHeadTrackingTime = now;
 
-            Vector3 position = headTransform.position;
-            Quaternion rotation = headTransform.rotation;
-
+            headTransform.GetPositionAndRotation(out Vector3 position, out Quaternion rotation);
             Dictionary<string, object> tags = new Dictionary<string, object>
             {
                 { "action.type", "HeadTransformTracking" },
