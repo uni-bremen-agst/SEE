@@ -56,7 +56,7 @@ class FaceDataSender:
         }
 
         try:
-            json_data = json.dumps(combined_data)
+            json_data = json.dumps(combined_data, separators=(',', ':'))
             self.sock.sendto(json_data.encode('utf-8'), (self.target_ip, self.target_port))
         except Exception as e:
             logger.error(f"Failed to send UDP packet: {e}")
