@@ -21,10 +21,31 @@ namespace SEE.User
     internal class UserSettings : MonoBehaviour
     {
         /// <summary>
+        /// Backing field of <see cref="Instance"/>.
+        /// </summary>
+        private static UserSettings instance;
+
+        /// <summary>
         /// The single unique instance of the user settings.
         /// There can be only one.
         /// </summary>
-        public static UserSettings Instance { get; private set; }
+        public static UserSettings Instance
+        {
+            get
+            {
+                if (instance != null)
+                {
+                    return instance;
+                }
+                instance = FindAnyObjectByType<UserSettings>();
+                if (instance == null)
+                {
+                    Debug.LogError($"There is no {typeof(UserSettings)} component in the current scene!\n");
+                }
+                return instance;
+            }
+            private set { instance = value; }
+        }
 
         private void Awake()
         {
@@ -39,16 +60,6 @@ namespace SEE.User
 
         private void Start()
         {
-            if (Instance)
-            {
-                if (Instance != this)
-                {
-                    Debug.LogWarning("There must not be more than one Network component! "
-                        + $"The component {typeof(UserSettings)} in {Instance.gameObject.FullName()} will be destroyed!\n");
-                }
-            }
-            Instance = this;
-
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
 
