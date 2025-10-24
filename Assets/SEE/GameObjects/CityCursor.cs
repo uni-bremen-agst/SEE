@@ -66,8 +66,20 @@ namespace SEE.GO
             Destroyer.Destroy(Cursor);
         }
 
+        /// <summary>
+        /// Tracks the hover start times for each hovered <see cref="InteractableObject"/>.
+        /// </summary>
         private readonly Dictionary<InteractableObject, float> hoverStartTimes = new();
+        /// <summary>
+        /// Represents a collection of interactable objects that have reached the hover threshold.
+        /// </summary>
+        /// <remarks>This collection is used to track objects that meet the hover threshold criteria.</remarks>
         private readonly HashSet<InteractableObject> hoverThresholdReached = new();
+        /// <summary>
+        /// The threshold duration (in seconds) for hovering over an object to be tracked.
+        /// All objects hovered over for less than this duration will not be considered
+        /// for tracking.
+        /// </summary>
         private readonly float hoverThreshold = 0.5f;
 
         /// <summary>
@@ -82,8 +94,9 @@ namespace SEE.GO
                 && interactableObject is InteractableGraphElement graphElement)
             {
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
-                if (selectedGraph != null && city.LoadedGraph != null
-                                          && selectedGraph.Equals(city.LoadedGraph))
+                if (selectedGraph != null
+                    && city.LoadedGraph != null
+                    && selectedGraph.Equals(city.LoadedGraph))
                 {
                     Cursor.AddFocus(interactableObject);
                     hoverStartTimes[interactableObject] = Time.time;
@@ -91,8 +104,8 @@ namespace SEE.GO
                     float start = Time.time;
                     await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
 
-                    if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime) &&
-                        Math.Abs(hoverTime - start) < 0.1f)
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime)
+                        && Math.Abs(hoverTime - start) < 0.1f)
                     {
                         hoverThresholdReached.Add(interactableObject);
                     }
@@ -116,8 +129,8 @@ namespace SEE.GO
                 {
                     Cursor.RemoveFocus(interactableObject);
 
-                    if (hoverStartTimes.TryGetValue(interactableObject, out float startTime) &&
-                        hoverThresholdReached.Contains(interactableObject))
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float startTime)
+                        && hoverThresholdReached.Contains(interactableObject))
                     {
                         float duration = Time.time - startTime;
                         TracingHelperService.Instance?.TrackHoverDuration(
