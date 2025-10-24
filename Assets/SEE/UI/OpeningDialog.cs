@@ -9,7 +9,6 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
-using Network = SEE.Net.Network;
 
 namespace SEE.UI
 {
@@ -96,11 +95,6 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The <see cref="Net.Network"/> component configured by this dialog.
-        /// </summary>
-        private Network network;
-
-        /// <summary>
         /// Starts a host (= server + local client) on this machine.
         /// </summary>
         private void StartHost()
@@ -113,7 +107,7 @@ namespace SEE.UI
                 // process has come to an end.
                 menu.ShowMenu = false;
                 SceneSettings.InputType = inputType;
-                network.StartHost(NetworkCallBack);
+                User.UserSettings.Instance?.Network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -136,7 +130,7 @@ namespace SEE.UI
                 // process has come to an end.
                 menu.ShowMenu = false;
                 SceneSettings.InputType = inputType;
-                network.StartClient(NetworkCallBack);
+                User.UserSettings.Instance?.Network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -159,7 +153,7 @@ namespace SEE.UI
                 // process has come to an end.
                 menu.ShowMenu = false;
                 SceneSettings.InputType = PlayerInputType.None;
-                network.StartServer(NetworkCallBack);
+                User.UserSettings.Instance?.Network.StartServer(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -195,7 +189,7 @@ namespace SEE.UI
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            NetworkPropertyDialog dialog = new(network, Reactivate);
+            NetworkPropertyDialog dialog = new(User.UserSettings.Instance?.Network, Reactivate);
             dialog.Open();
         }
 
@@ -241,9 +235,13 @@ namespace SEE.UI
         /// </summary>
         private void Awake()
         {
-            if (!gameObject.TryGetComponentOrLog(out network))
+            if (User.UserSettings.Instance == null)
             {
+                Debug.LogWarning($"No {typeof(User.UserSettings)} component exists in the scene! "
+                    + $"{typeof(OpeningDialog)} requires a {typeof(User.UserSettings)} component to be present. "
+                    + "Disabling this component.\n");
                 enabled = false;
+                return;
             }
         }
 
