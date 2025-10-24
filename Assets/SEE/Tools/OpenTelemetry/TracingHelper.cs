@@ -416,7 +416,7 @@ namespace SEE.Tools.OpenTelemetry
                 activity.SetTag("message", "Trace Export Session Ended. Tracer shut down cleanly.");
             }
 
-            Debug.Log("SessionEnd span sent.");
+            Debug.Log("SessionEnd span sent.\n");
         }
     }
 }
