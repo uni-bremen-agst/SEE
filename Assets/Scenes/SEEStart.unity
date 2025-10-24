@@ -252,10 +252,10 @@ GameObject:
   m_Component:
   - component: {fileID: 831127267}
   - component: {fileID: 831127266}
-  - component: {fileID: 831127268}
   - component: {fileID: 831127264}
   - component: {fileID: 831127269}
   - component: {fileID: 831127270}
+  - component: {fileID: 831127271}
   m_Layer: 0
   m_Name: NetworkManager
   m_TagString: Untagged
@@ -332,27 +332,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &831127268
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 831127263}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 68cd993404524eb45918638d10b68356, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  RoomPassword: 
-  GameScene: SEENewWorld
-  internalLoggingEnabled: 1
-  VoiceChat: 1
-  ConfigPath:
-    Root: 3
-    RelativePath: /network.cfg
-    AbsolutePath: 
-  vivoxChannelName: 
 --- !u!114 &831127269
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -380,11 +359,6 @@ MonoBehaviour:
     type: 3}
   HoverSoundEffect: {fileID: 8300000, guid: fbca3b733b1a185428e80440e005d872, type: 3}
   PlayerObject: {fileID: 831127263}
-  DefaultMusicVolume: 0.4
-  DefaultSoundEffectVolume: 1
-  MusicVolume: 0
-  SoundEffectVolume: 0
-  RemoteSoundEffectsMuted: 0
 --- !u!114 &831127270
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -414,6 +388,26 @@ MonoBehaviour:
     PacketDelayMS: 0
     PacketJitterMS: 0
     PacketDropRate: 0
+--- !u!114 &831127271
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 831127263}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eccf4ad3f8d39cc46bd0331d97b4c692, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  VoiceChat: 1
+  Network:
+    RoomPassword: 
+    GameScene: SEENewWorld
+  ConfigPath:
+    Root: 3
+    RelativePath: /UserSettings.cfg
+    AbsolutePath: 
 --- !u!1 &1909299425
 GameObject:
   m_ObjectHideFlags: 0
