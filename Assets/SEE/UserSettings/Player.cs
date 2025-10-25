@@ -21,6 +21,8 @@ namespace SEE.User
         [Tooltip("The index of the player's avatar"), ShowInInspector]
         public uint AvatarIndex { get; set; } = 0;
 
+        #region Configuration I/O
+
         /// <summary>
         /// Label of attribute <see cref="PlayerName"/> in the configuration file.
         /// </summary>
@@ -69,5 +71,7 @@ namespace SEE.User
                 }
             }
         }
+
+        #endregion Configuration I/O
     }
 }
