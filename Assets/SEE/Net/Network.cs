@@ -904,32 +904,40 @@ namespace SEE.Net
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
-        public virtual void Save(ConfigWriter writer)
+        /// <param name="label">the label under which to group the settings</param>
+        public virtual void Save(ConfigWriter writer, string label)
         {
+            writer.BeginGroup(label);
             writer.Save(GameScene, gameSceneLabel);
-
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
+            writer.EndGroup();
         }
 
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
         /// <param name="attributes">the attributes from which to restore the settings</param>
-        public virtual void Restore(Dictionary<string, object> attributes)
+        /// <param name="label">the label under which to look up the settings in <paramref name="attributes"/></param>
+        public virtual void Restore(Dictionary<string, object> attributes, string label)
         {
-            ConfigIO.Restore(attributes, gameSceneLabel, ref GameScene);
-            ConfigIO.Restore(attributes, roomPasswordLabel, ref RoomPassword);
+            if (attributes.TryGetValue(label, out object dictionary))
             {
-                int value = ServerPort;
-                ConfigIO.Restore(attributes, serverPortLabel, ref value);
-                ServerPort = value;
-            }
-            {
-                string value = ServerIP4Address;
-                ConfigIO.Restore(attributes, serverIP4AddressLabel, ref value);
-                ServerIP4Address = value;
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.Restore(values, gameSceneLabel, ref GameScene);
+                ConfigIO.Restore(values, roomPasswordLabel, ref RoomPassword);
+                {
+                    int value = ServerPort;
+                    ConfigIO.Restore(values, serverPortLabel, ref value);
+                    ServerPort = value;
+                }
+                {
+                    string value = ServerIP4Address;
+                    ConfigIO.Restore(values, serverIP4AddressLabel, ref value);
+                    ServerIP4Address = value;
+                }
             }
         }
 

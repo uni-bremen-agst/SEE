@@ -24,39 +24,48 @@ namespace SEE.User
         /// <summary>
         /// Label of attribute <see cref="PlayerName"/> in the configuration file.
         /// </summary>
-        private const string playernameLabel = "playername";
+        private const string playernameLabel = "PlayerName";
         /// <summary>
         /// Label of attribute <see cref="AvatarIndex"/> in the configuration file.
         /// </summary>
-        private const string avatarIndexLabel = "avatarIndex";
+        private const string avatarIndexLabel = "AvatarIndex";
+
         /// <summary>
         /// Saves the settings of this <see cref="Player"/> using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
-        public virtual void Save(ConfigWriter writer)
+        /// <param name="label">the label under which to group the settings</param>
+        public virtual void Save(ConfigWriter writer, string label)
         {
+            writer.BeginGroup(label);
             writer.Save(PlayerName, playernameLabel);
             // The following cast from uint to int is necessary because otherwise the value
             // would be saved as a float.
             writer.Save((int)AvatarIndex, avatarIndexLabel);
+            writer.EndGroup();
         }
 
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
         /// <param name="attributes">the attributes from which to restore the settings</param>
-        public virtual void Restore(Dictionary<string, object> attributes)
+        /// <param name="label">the label under which to look up the settings in <paramref name="attributes"/></param>
+        public virtual void Restore(Dictionary<string, object> attributes, string label)
         {
+            if (attributes.TryGetValue(label, out object dictionary))
             {
-                string value = PlayerName;
-                ConfigIO.Restore(attributes, playernameLabel, ref value);
-                PlayerName = value;
-            }
-            {
-                int value = (int)AvatarIndex;
-                if (ConfigIO.Restore(attributes, avatarIndexLabel, ref value))
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
                 {
-                    AvatarIndex = (uint)value;
+                    string value = PlayerName;
+                    ConfigIO.Restore(values, playernameLabel, ref value);
+                    PlayerName = value;
+                }
+                {
+                    int value = (int)AvatarIndex;
+                    if (ConfigIO.Restore(values, avatarIndexLabel, ref value))
+                    {
+                        AvatarIndex = (uint)value;
+                    }
                 }
             }
         }
