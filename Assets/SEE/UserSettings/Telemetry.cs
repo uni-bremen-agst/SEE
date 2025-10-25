@@ -24,10 +24,12 @@ namespace SEE.User
         [ShowInInspector]
         public string ServerURL = "http://stvr2.informatik.uni-bremen:4318/v1/traces";
 
+        #region Configuration I/O
+
         /// <summary>
         /// Represents the label for the <see cref="Mode"/> attribute in the configuration file.
         /// </summary>
-        private const string telemetryModeLabel = "TelemetryMode";
+        private const string modeLabel = "Mode";
 
         /// <summary>
         /// Represents the label for the <see cref="ServerURL"/> attribute in the configuration file.
@@ -42,7 +44,7 @@ namespace SEE.User
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(Mode.ToString(), telemetryModeLabel);
+            writer.Save(Mode.ToString(), modeLabel);
             writer.Save(ServerURL, serverURL);
             writer.EndGroup();
         }
@@ -58,9 +60,11 @@ namespace SEE.User
             {
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
-                ConfigIO.RestoreEnum(values, telemetryModeLabel, ref Mode);
+                ConfigIO.RestoreEnum(values, modeLabel, ref Mode);
                 ConfigIO.Restore(values, serverURL, ref ServerURL);
             }
         }
+
+        #endregion Configuration I/O
     }
 }
