@@ -69,15 +69,15 @@ public class EchoFace : MonoBehaviour
     [Tooltip("Enable all face animation based on blendshapes.")]
     public bool enableFaceAnimation = true;
 
-    [Tooltip("Smoothing factor for general blendshapes. Lower is smoother.")]
+    [Tooltip("Smoothing rate for general blendshapes. Lower is smoother.")]
     [Range(0.01f, 1.0f)]
     [SerializeField]
-    private float smoothingFactor = 0.5f;
+    private float smoothingRate = 0.5f;
 
-    [Tooltip("Smoothing factor specifically for viseme blendshapes.")]
+    [Tooltip("Smoothing rate specifically for viseme blendshapes.")]
     [Range(0.01f, 1.0f)]
     [SerializeField]
-    private float visemeSmoothingFactor = 0.9f;
+    private float visemeSmoothingRate = 0.9f;
 
     [Tooltip("Power curve for eye squint expression, to make it more pronounced.")]
     [Range(0f, 12f)]
@@ -92,10 +92,10 @@ public class EchoFace : MonoBehaviour
     [SerializeField]
     private Transform headTransform;
 
-    [Tooltip("The smoothing factor for head rotation.")]
+    [Tooltip("The smoothing rate for head rotation.")]
     [Range(0.01f, 1.0f)]
     [SerializeField]
-    private float rotationSmoothingFactor = 0.5f;
+    private float rotationSmoothingRate = 0.5f;
 
     [Tooltip("Manual pitch correction to align the avatar with the webcam feed.")]
     [Range(-50f, 50f)]
@@ -117,7 +117,7 @@ public class EchoFace : MonoBehaviour
     [Tooltip("The smoothing factor for eye rotation.")]
     [Range(0.01f, 1.0f)]
     [SerializeField]
-    private float eyeRotationSmoothingFactor = 0.5f;
+    private float eyeRotationSmoothingRate = 0.5f;
 
     [Tooltip("The unified scaling factor for all eye movements (up, down, side-to-side).")]
     [Range(1f, 100f)]
@@ -527,10 +527,10 @@ public class EchoFace : MonoBehaviour
                 targetValue *= individualScale;
             }
 
-            float smoothingFactorToUse = _visemeSynthesisMap.ContainsKey(kvp.Key)
-                ? visemeSmoothingFactor
-                : smoothingFactor;
-            float alpha = 1f - Mathf.Exp(-smoothingFactorToUse * Time.deltaTime * 60f);
+            float smoothingRateToUse = _visemeSynthesisMap.ContainsKey(kvp.Key)
+                ? visemeSmoothingRate
+                : smoothingRate;
+            float alpha = 1f - Mathf.Exp(-smoothingRateToUse * Time.deltaTime * 60f);
             float smoothedValue = Mathf.Lerp(currentValue, targetValue, alpha);
 
             skinnedMeshRenderer.SetBlendShapeWeight(index, smoothedValue * 100f);
@@ -610,7 +610,7 @@ public class EchoFace : MonoBehaviour
         Quaternion targetRightRotation = Quaternion.Euler(pitchRight, 0, yawRight);
 
         // Smooth interpolation
-        float alpha = 1f - Mathf.Exp(-eyeRotationSmoothingFactor * Time.deltaTime * 60f);
+        float alpha = 1f - Mathf.Exp(-eyeRotationSmoothingRate * Time.deltaTime * 60f);
         _currentLeftEyeRotation = Quaternion.Slerp(_currentLeftEyeRotation, targetLeftRotation, alpha);
         _currentRightEyeRotation = Quaternion.Slerp(_currentRightEyeRotation, targetRightRotation, alpha);
 
@@ -627,7 +627,7 @@ public class EchoFace : MonoBehaviour
     {
         if (headTransform == null) return;
 
-        float alpha = 1f - Mathf.Exp(-rotationSmoothingFactor * Time.deltaTime * 60f);
+        float alpha = 1f - Mathf.Exp(-rotationSmoothingRate * Time.deltaTime * 60f);
         _currentHeadRotation = Quaternion.Slerp(_currentHeadRotation, targetRotation, alpha);
 
         // Apply the smoothed rotation to the head transform.
