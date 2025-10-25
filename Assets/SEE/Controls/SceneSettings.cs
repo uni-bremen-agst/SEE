@@ -3,7 +3,6 @@ using System.IO;
 using DG.Tweening;
 using SEE.Game;
 using SEE.GO;
-using SEE.Tools.OpenTelemetry;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -24,41 +23,6 @@ namespace SEE.Controls
         [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
         [ShowInInspector]
         public static PlayerInputType InputType = PlayerInputType.DesktopPlayer;
-        [Tooltip("The current telemetry mode.")]
-        [ShowInInspector]
-        public static TelemetryMode TelemetryMode = TelemetryMode.Local;
-
-        [Tooltip("Custom endpoint for telemetry export (used in remote mode).")]
-        [ShowInInspector]
-        public static string CustomTelemetryServerURL = "http://stvr2.informatik.uni-bremen:4318/v1/traces";
-
-        /// <summary>
-        /// Saves the current telemetry configuration (mode, remote URL, and local path)
-        /// </summary>
-        public static void SaveTelemetrySettings()
-        {
-            File.WriteAllText(Application.persistentDataPath + "/TelemetryMode.cfg", TelemetryMode.ToString());
-            File.WriteAllText(Application.persistentDataPath + "/TelemetryServerURL.cfg", CustomTelemetryServerURL);
-        }
-
-        /// <summary>
-        /// Loads the telemetry configuration (mode, remote URL, and local path)
-        /// </summary>
-        public static void LoadTelemetrySettings()
-        {
-            string modePath = Application.persistentDataPath + "/TelemetryMode.cfg";
-            if (File.Exists(modePath) &&
-                Enum.TryParse(File.ReadAllText(modePath).Trim(), out TelemetryMode mode))
-            {
-                TelemetryMode = mode;
-            }
-
-            string urlPath = Application.persistentDataPath + "/TelemetryServerURL.cfg";
-            if (File.Exists(urlPath))
-            {
-                CustomTelemetryServerURL = File.ReadAllText(urlPath).Trim();
-            }
-        }
 
         /// <summary>
         /// The path of the configuration file in which to store the selected <see cref="InputType"/>.

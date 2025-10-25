@@ -75,7 +75,7 @@ namespace SEE.UI
                 new(
                     SelectAction: TelemetrySettings,
                     Title: "Telemetry Mode",
-                    Description: $"Currently: {SceneSettings.TelemetryMode}",
+                    Description: $"Currently: {User.UserSettings.Instance ?.Telemetry.Mode}",
                     EntryColor: NextColor(),
                     Icon: Icons.Export),
 
@@ -207,18 +207,6 @@ namespace SEE.UI
             telemetryDialog = new TelemetryPropertyDialog(Reactivate);
             telemetryDialog.Open();
             menu.ShowMenu = false;
-        }
-
-        /// <summary>
-        /// Sets the telemetry mode in the scene settings, persists the change,
-        /// and displays an informational notification to the user.
-        /// </summary>
-        /// <param name="mode">The telemetry mode to apply.</param>
-        private void SetTelemetryMode(TelemetryMode mode)
-        {
-            SceneSettings.TelemetryMode = mode;
-            SceneSettings.SaveTelemetrySettings();
-            ShowNotification.Info("Telemetry Mode", $"Mode set to {mode}");
         }
 
         /// <summary>

@@ -1,5 +1,4 @@
-﻿using SEE.GO;
-using SEE.Net;
+﻿using SEE.Net;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -18,6 +17,9 @@ namespace SEE.User
     /// Represents the user settings for the SEE application. These are attributes
     /// that are generally set by the user at the start of the application.
     /// </summary>
+    /// <remarks>This component is assumed to be attached to a game object in the
+    /// main scene. The user can select the environment in the Unity editor.
+    /// The selection can also be made during run-time.</remarks>
     internal class UserSettings : MonoBehaviour
     {
         /// <summary>
@@ -104,9 +106,22 @@ namespace SEE.User
             User.VoiceChat.EndVoiceChat(VoiceChat);
         }
 
+        /// <summary>
+        /// Settings of the network.
+        /// </summary>
+        [Tooltip("Settings of the network."), FoldoutGroup("Network")]
         public Network Network = new();
 
+        /// <summary>
+        /// Settings of the player.
+        /// </summary>
+        [Tooltip("Settings of the player."), FoldoutGroup("Player")]
         public Player Player = new();
+
+        /// <summary>
+        /// </summary>
+        [Tooltip("Telemetry settings."), FoldoutGroup("Telemetry")]
+        public Telemetry Telemetry = new();
 
         /// <summary>
         /// The Unity main thread. Note that we cannot initialize its value here
@@ -206,9 +221,19 @@ namespace SEE.User
         }
 
         /// <summary>
+        /// Label of attribute <see cref="Network"/> in the configuration file.
+        /// </summary>
+        private const string networkLabel = "Network";
+
+        /// <summary>
         /// Label of attribute <see cref="User.VoiceChat"/> in the configuration file.
         /// </summary>
-        private const string voiceChatLabel = "voiceChat";
+        private const string voiceChatLabel = "VoiceChat";
+
+        /// <summary>
+        /// Label of attribute <see cref="Telemetry"/> in the configuration file.
+        /// </summary>
+        private const string telemetryLabel = "Telemetry";
 
         /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
@@ -216,8 +241,9 @@ namespace SEE.User
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
-            Network.Save(writer);
+            Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
+            Telemetry.Save(writer, telemetryLabel);
         }
 
         /// <summary>
@@ -226,8 +252,9 @@ namespace SEE.User
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
-            Network.Restore(attributes);
+            Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
+            Telemetry.Restore(attributes, telemetryLabel);
         }
     }
 }

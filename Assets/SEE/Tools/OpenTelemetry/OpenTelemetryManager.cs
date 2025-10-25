@@ -54,7 +54,7 @@ namespace SEE.Tools.OpenTelemetry
                 return;
             }
 
-            switch (SceneSettings.TelemetryMode)
+            switch (User.UserSettings.Instance?.Telemetry.Mode)
             {
                 case TelemetryMode.Disabled:
                     Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.");
@@ -65,7 +65,7 @@ namespace SEE.Tools.OpenTelemetry
                     break;
 
                 case TelemetryMode.Remote:
-                    InitializeRemoteExporter(SceneSettings.CustomTelemetryServerURL);
+                    InitializeRemoteExporter(User.UserSettings.Instance?.Telemetry.ServerURL);
                     break;
             }
         }
