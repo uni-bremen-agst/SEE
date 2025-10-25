@@ -1,16 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.DataModel.Drawable;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.Operator;
-using static SEE.Game.Portal.IncludeDescendants;
 using SEE.Utils;
 using Sirenix.Utilities;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Xml.Linq;
+using UnityEngine;
+using static SEE.Game.Portal.IncludeDescendants;
 
 namespace SEE.GO
 {
@@ -1459,6 +1460,52 @@ namespace SEE.GO
                 transform = transform.parent;
             }
             return false;
+        }
+
+        /// <summary>
+        /// Searches upward through the transform hierarchy to find the first parent GameObject
+        /// with the specified name.
+        /// </summary>
+        /// <param name="gameObject">The starting GameObject from which the search begins.</param>
+        /// <param name="name">The exact name of the parent GameObject to look for.</param>
+        /// <returns>
+        /// The first matching parent GameObject, or <c>null</c> if no parent with the given name is found.
+        /// </returns>
+        public static GameObject FindParentWithName(this GameObject gameObject, string name)
+        {
+            if (gameObject.transform.parent == null)
+            {
+                return null;
+            }
+            else
+            {
+                return gameObject.transform.parent.name == name ?
+                          gameObject.transform.parent.gameObject
+                        : FindParentWithName(gameObject.transform.parent.gameObject, name);
+            }
+        }
+
+        /// <summary>
+        /// Checks recursively whether the specified GameObject has any parent
+        /// with the given layer.
+        /// </summary>
+        /// <param name="gameObject">The starting GameObject from which the search begins.</param>
+        /// <param name="layer">The layer number to check against.</param>
+        /// <returns>
+        /// <c>true</c> if any parent GameObject has the specified layer;
+        /// otherwise, <c>false</c>.
+        /// </returns>
+        public static bool HasParentWithLayer(this GameObject gameObject, uint layer)
+        {
+            if (gameObject.transform.parent == null)
+            {
+                return false;
+            }
+            else
+            {
+                return gameObject.transform.parent.gameObject.layer == layer
+                       || HasParentWithLayer(gameObject.transform.parent.gameObject, layer);
+            }
         }
 
         /// <summary>

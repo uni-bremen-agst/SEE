@@ -344,8 +344,8 @@ namespace SEE.Game.City
         /// Required for <see cref="SEEReflexionCity"/>.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual async UniTask<bool> LoadDataAsync()
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
+        public virtual async UniTask LoadDataAsync()
         {
             if (DataProvider != null)
             {
@@ -385,7 +385,6 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
-            return false;
         }
 
         /// <summary>
@@ -393,7 +392,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
-        [PropertyOrder(DataButtonsGroupOrderSave)]
+        [PropertyOrder(DataButtonsGroupOrderSave), RuntimeGroupOrder(DataButtonsGroupOrderSave)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
@@ -416,7 +415,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
@@ -514,7 +513,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
@@ -554,7 +553,7 @@ namespace SEE.Game.City
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -631,8 +630,8 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider =
-                SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            DataProvider = SingleGraphProvider.Restore(attributes, dataProviderPathLabel)
+                            as SingleGraphPipelineProvider;
         }
 
         #endregion

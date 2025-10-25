@@ -141,8 +141,14 @@ namespace SEE.Game
         {
             if (gameObject.TryGetComponent(out GO.Plane cullingPlane))
             {
-                leftFrontCorner = cullingPlane.LeftFrontCorner;
-                rightBackCorner = cullingPlane.RightBackCorner;
+                // Apply a minimal offset to slightly expand the bounds.
+                // Without this, floating-point precision issues can cause objects
+                // that lie exactly on the portal border to be incorrectly classified
+                // as being outside the portal.
+                float offset = 0.00001f;
+                Vector2 offsetVector = new(offset, offset);
+                leftFrontCorner = cullingPlane.LeftFrontCorner - offsetVector;
+                rightBackCorner = cullingPlane.RightBackCorner + offsetVector;
             }
             else
             {

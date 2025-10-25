@@ -190,7 +190,7 @@ namespace SEE.Game.City
 
                 if (hideSplines && edge.HasToggle(Edge.IsHiddenToggle))
                 {
-                    spline.SubsplineEndT = 0;
+                    spline.VisibleSegmentEnd = 0;
                 }
                 // FIXME: Is this necessary? What about the other animations (e.g., Blink)?
                 gameEdge.EdgeOperator().RefreshGlowAsync().Forget();

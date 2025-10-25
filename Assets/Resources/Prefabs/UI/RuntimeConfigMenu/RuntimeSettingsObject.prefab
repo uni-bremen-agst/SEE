@@ -914,6 +914,7 @@ GameObject:
   - component: {fileID: 6492914946350113708}
   - component: {fileID: 9155637850249767115}
   - component: {fileID: 2425702356705578388}
+  - component: {fileID: 3435580530534653414}
   m_Layer: 5
   m_Name: RuntimeSettingsObject
   m_TagString: Untagged
@@ -1036,6 +1037,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   MainContentContainer: {fileID: 7725125712292814367}
   CollapseIcon: {fileID: 3883168754644485073}
+--- !u!114 &3435580530534653414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8279319979252572930}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76cfa86c4a31bc241b2894dffd5f673e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  contentRect: {fileID: 0}
+  viewportRect: {fileID: 0}
 --- !u!1 &8434431449910065122
 GameObject:
   m_ObjectHideFlags: 0
