@@ -1,4 +1,6 @@
-﻿using SEE.Net;
+﻿using DG.Tweening;
+using SEE.GO;
+using SEE.Net;
 using SEE.Tools.OpenTelemetry;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
@@ -65,6 +67,8 @@ namespace SEE.User
             SceneManager.sceneLoaded -= OnSceneLoaded;
             SceneManager.sceneLoaded += OnSceneLoaded;
 
+            DOTween.defaultEaseType = Ease.OutExpo;
+
             Network.SetUp();
         }
 
@@ -119,6 +123,14 @@ namespace SEE.User
         public Player Player = new();
 
         /// <summary>
+        /// The kind of environment the game is running (Desktop, VR, etc).
+        /// </summary>
+        [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
+        [ShowInInspector]
+        public PlayerInputType InputType = PlayerInputType.DesktopPlayer;
+
+        /// <summary>
+        /// Settings for telemetry.
         /// </summary>
         [Tooltip("Telemetry settings."), FoldoutGroup("Telemetry")]
         public Telemetry Telemetry = new();
@@ -150,6 +162,16 @@ namespace SEE.User
                 }
             }
         }
+
+        /// <summary>
+        /// True if the user is using a VR headset.
+        /// </summary>
+        public static bool IsVR => Instance.InputType == PlayerInputType.VRPlayer;
+
+        /// <summary>
+        /// True if the user is using a desktop computer.
+        /// </summary>
+        public static bool IsDesktop => Instance.InputType == PlayerInputType.DesktopPlayer;
 
         /// <summary>
         /// The name of the group for the fold-out group of the configuration file.
@@ -220,6 +242,7 @@ namespace SEE.User
             }
         }
 
+        #region Configuration I/O
         /// <summary>
         /// Label of attribute <see cref="Network"/> in the configuration file.
         /// </summary>
@@ -236,6 +259,11 @@ namespace SEE.User
         private const string telemetryLabel = "Telemetry";
 
         /// <summary>
+        /// Label of attribute <see cref="InputType"/> in the configuration file.
+        /// </summary>
+        private const string inputTypeLabel = "InputType";
+
+        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
@@ -244,6 +272,7 @@ namespace SEE.User
             Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
+            writer.Save(InputType.ToString(), inputTypeLabel);
         }
 
         /// <summary>
@@ -255,6 +284,9 @@ namespace SEE.User
             Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
+            ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
         }
+
+        #endregion Configuration I/O
     }
 }

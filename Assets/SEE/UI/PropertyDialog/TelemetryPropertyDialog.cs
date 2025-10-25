@@ -22,7 +22,9 @@ namespace SEE.UI.PropertyDialog
         private readonly Action callback;
         private readonly string defaultRemoteURL = "https://telemetry.see.uni-bremen.de";
 
-        // remembers last selection to detect changes
+        /// <summary>
+        /// Remembers last selection to detect changes.
+        /// </summary>
         private string lastSelection;
 
         public TelemetryPropertyDialog(Action callback = null)

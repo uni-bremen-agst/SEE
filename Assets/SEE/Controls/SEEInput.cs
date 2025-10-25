@@ -179,7 +179,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Undo()
         {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.UndoToggle)
+            if (User.UserSettings.IsVR && XRSEEActions.UndoToggle)
             {
                 bool undo = XRSEEActions.UndoToggle;
                 XRSEEActions.UndoToggle = false;
@@ -219,7 +219,7 @@ namespace SEE.Controls
         /// <returns>true if the user requests this action and <see cref="KeyboardShortcutsEnabled"/></returns>
         public static bool Redo()
         {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.RedoToggle)
+            if (User.UserSettings.IsVR && XRSEEActions.RedoToggle)
             {
                 bool redo = XRSEEActions.RedoToggle;
                 XRSEEActions.RedoToggle = false;

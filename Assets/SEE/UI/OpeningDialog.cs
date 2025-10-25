@@ -106,8 +106,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = inputType;
-                User.UserSettings.Instance?.Network.StartHost(NetworkCallBack);
+                User.UserSettings.Instance.InputType = inputType;
+                User.UserSettings.Instance.Network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -129,8 +129,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = inputType;
-                User.UserSettings.Instance?.Network.StartClient(NetworkCallBack);
+                User.UserSettings.Instance.InputType = inputType;
+                User.UserSettings.Instance.Network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -152,8 +152,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = PlayerInputType.None;
-                User.UserSettings.Instance?.Network.StartServer(NetworkCallBack);
+                User.UserSettings.Instance.InputType = PlayerInputType.None;
+                User.UserSettings.Instance.Network.StartServer(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -239,17 +239,17 @@ namespace SEE.UI
         private void Start()
         {
             menu = CreateMenu();
-            SceneSettings.Load();
-            inputType = SceneSettings.InputType;
+            User.UserSettings.Instance.Load();
+            inputType = User.UserSettings.Instance.InputType;
             // While this OpeningDialog is open, we want to run in a desktop environment,
             // because our GUI implementation is not yet complete for VR. The NetworkPropertyDialog
             // uses widgets that are not implemented for VR. Neither are ShowNotifications not
             // implemented for VR yet.
-            // We reset SceneSettings.InputType here to a desktop environment.
+            // We reset the InputType here to a desktop environment.
             // The loaded settings for the input type is kept in inputType. This field
             // will be toggled by request of the user and only when the host or client is
-            // actually started, we assign the value of inputType to SceneSettings.InputType.
-            SceneSettings.InputType = PlayerInputType.DesktopPlayer;
+            // actually started, we assign the value of inputType to User.UserSettings.Instance.InputType.
+            User.UserSettings.Instance.InputType = PlayerInputType.DesktopPlayer;
             menu.ShowMenu = true;
             ShowEnvironment();
         }
@@ -274,7 +274,7 @@ namespace SEE.UI
                 inputType = PlayerInputType.DesktopPlayer;
             }
 
-            SceneSettings.Save();
+            User.UserSettings.Instance.Save();
             ShowEnvironment();
         }
 

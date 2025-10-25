@@ -142,7 +142,7 @@ namespace SEE.Controls.Actions
             // Assigning the game objects to be connected.
             // Checking whether the two game objects are not null and whether they are
             // actually nodes.
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 if (XRSEEActions.Selected
                     && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
