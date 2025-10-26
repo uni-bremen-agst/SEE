@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
@@ -83,12 +84,22 @@ namespace SEE.GO
         private readonly float hoverThreshold = 0.5f;
 
         /// <summary>
+        /// Calls and forgets <see cref="AnyHoverInAsync(InteractableObject, bool)"/>.
+        /// </summary>
+        /// <param name="interactableObject">the hoverered object</param>
+        /// <param name="isInitiator">true if a local player initiated this call</param>
+        private void AnyHoverIn(InteractableObject interactableObject, bool isInitiator)
+        {
+            AnyHoverInAsync(interactableObject, isInitiator).Forget();
+        }
+
+        /// <summary>
         /// Makes <paramref name="interactableObject"/> the <see cref="Cursor"/> focus when
         /// it belongs to <see cref="city"/>.
-        /// Called whenever an <see cref="InteractableObject"/> is selected.
+        /// Called whenever an <see cref="InteractableObject"/> is hoverered.
         /// </summary>
-        /// <param name="interactableObject">the selected object</param>
-        private async void AnyHoverIn(InteractableObject interactableObject, bool _)
+        /// <param name="interactableObject">the hoverered object</param>
+        private async UniTask AnyHoverInAsync(InteractableObject interactableObject, bool _)
         {
             if (AnyHoverIsDoable(interactableObject)
                 && interactableObject is InteractableGraphElement graphElement)
@@ -157,24 +168,24 @@ namespace SEE.GO
         {
             if (interactableObject == null)
             {
-                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(InteractableObject)}.\n");
+                Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(InteractableObject)}.\n");
                 return false;
             }
             if (interactableObject is InteractableGraphElement graphElement)
             {
                 if (graphElement.GraphElemRef == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElementRef)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElementRef)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElement)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem.ItsGraph == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(Graph)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(Graph)}.\n");
                     return false;
                 }
             }
