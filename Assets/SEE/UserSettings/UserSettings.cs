@@ -20,7 +20,7 @@ namespace SEE.User
     /// that are generally set by the user at the start of the application.
     /// </summary>
     /// <remarks>This component is assumed to be attached to a game object in the
-    /// main scene. The user can select the environment in the Unity editor.
+    /// start scene. The user can select the environment in the Unity editor.
     /// The selection can also be made during run-time.</remarks>
     internal class UserSettings : MonoBehaviour
     {
@@ -48,7 +48,6 @@ namespace SEE.User
         /// The kind of environment the game is running (Desktop, VR, etc).
         /// </summary>
         [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
-        [ShowInInspector]
         public PlayerInputType InputType = PlayerInputType.DesktopPlayer;
 
         /// <summary>
