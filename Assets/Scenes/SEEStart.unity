@@ -400,10 +400,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eccf4ad3f8d39cc46bd0331d97b4c692, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  VoiceChat: 1
   Network:
+    BackendServerAPI: http://localhost:8080/api/v1/
     RoomPassword: 
     GameScene: SEENewWorld
+  VoiceChat: 1
+  InputType: 0
+  Telemetry:
+    Mode: 1
+    ServerURL: http://stvr2.informatik.uni-bremen:4318/v1/traces
   ConfigPath:
     Root: 3
     RelativePath: /UserSettings.cfg
