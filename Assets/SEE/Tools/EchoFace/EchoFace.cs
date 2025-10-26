@@ -69,6 +69,9 @@ public class EchoFace : MonoBehaviour
     [Tooltip("Enable all face animation based on blendshapes.")]
     public bool enableFaceAnimation = true;
 
+    [Tooltip("Enables synthesized visemes (V_*). Also activates specific scaling for viseme-related blendshapes such as Mouth_Funnel* and Mouth_Pucker*.")]
+    public bool enableVisemeSynthesis = true;
+
     [Tooltip("Smoothing rate for general blendshapes. Lower is smoother.")]
     [Range(0.01f, 1.0f)]
     [SerializeField]
@@ -324,19 +327,25 @@ public class EchoFace : MonoBehaviour
         { "noseSneerRight", new() { "Nose_Sneer_R" } }
         };
 
-    private readonly Dictionary<string, float> _residualBlendshapeFactors =
-    new()
+    // Base scaling factors that are always applied.
+    // Used for subtle shaping or expression tuning.
+    private readonly Dictionary<string, float> _baseBlendshapeScales = new()
     {
         { "Mouth_Up_Upper_L", 0.6f },
         { "Mouth_Up_Upper_R", 0.6f },
-        //{ "Mouth_Down_Lower_L", 0.5f },
-        //{ "Mouth_Down_Lower_R", 0.5f },
-        { "Mouth_Funnel_Up_L", 0.3f },
-        { "Mouth_Funnel_Up_R", 0.3f },
+    };
+
+    // Scaling factors that should only be applied when viseme synthesis is enabled.
+    // These primarily target phoneme-related blendshapes to avoid excessive deformation
+    // when the model is driven by procedural viseme data.
+    private readonly Dictionary<string, float> _visemeBlendshapeScales = new()
+    {
+        { "Mouth_Funnel_Up_L",   0.3f },
+        { "Mouth_Funnel_Up_R",   0.3f },
         { "Mouth_Funnel_Down_L", 0.3f },
         { "Mouth_Funnel_Down_R", 0.3f },
-        { "Mouth_Pucker_Up_L", 0.8f },
-        { "Mouth_Pucker_Up_R", 0.8f },
+        { "Mouth_Pucker_Up_L",   0.8f },
+        { "Mouth_Pucker_Up_R",   0.8f },
         { "Mouth_Pucker_Down_L", 0.8f },
         { "Mouth_Pucker_Down_R", 0.8f },
     };
@@ -502,9 +511,24 @@ public class EchoFace : MonoBehaviour
         );
 
         // 3. Synthesize and Apply Visemes
-        foreach (var visemeKvp in _visemeSynthesisMap)
+        if (enableVisemeSynthesis)
         {
-            targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(blendshapes);
+            foreach (var visemeKvp in _visemeSynthesisMap)
+            {
+                targetBlendshapeValues[visemeKvp.Key] = visemeKvp.Value(blendshapes);
+            }
+        }
+        else
+        {
+            // Zero out any viseme blendshapes if synthesis is disabled
+            foreach (var visemeKey in _visemeSynthesisMap.Keys)
+            {
+                if (_currentBlendshapeValues.TryGetValue(visemeKey, out float currentValue)
+                    && currentValue > 0.0001f)
+                {
+                    targetBlendshapeValues[visemeKey] = 0f;
+                }
+            }
         }
 
         // 4. Smooth and Set Blendshape Weights
@@ -517,19 +541,28 @@ public class EchoFace : MonoBehaviour
             }
 
             float targetValue = kvp.Value;
-
             // Get the current value to smooth from.
             _currentBlendshapeValues.TryGetValue(kvp.Key, out float currentValue);
 
-            // Check if the blendshape is in the new residual factors dictionary.
-            if (_residualBlendshapeFactors.TryGetValue(kvp.Key, out float individualScale))
+            // Apply base scaling
+            if (_baseBlendshapeScales.TryGetValue(kvp.Key, out float baseScale))
             {
-                targetValue *= individualScale;
+                targetValue *= baseScale;
             }
 
-            float smoothingRateToUse = _visemeSynthesisMap.ContainsKey(kvp.Key)
-                ? visemeSmoothingRate
-                : smoothingRate;
+            // Apply viseme-specific scaling only if viseme synthesis is enabled
+            if (enableVisemeSynthesis &&
+                _visemeBlendshapeScales.TryGetValue(kvp.Key, out float visemeScale))
+            {
+                targetValue *= visemeScale;
+            }
+
+            float smoothingRateToUse =
+                (enableVisemeSynthesis && _visemeSynthesisMap.ContainsKey(kvp.Key))
+                    ? visemeSmoothingRate
+                    : smoothingRate;
+
+            // Smooth transition using exponential smoothing
             float alpha = 1f - Mathf.Exp(-smoothingRateToUse * Time.deltaTime * 60f);
             float smoothedValue = Mathf.Lerp(currentValue, targetValue, alpha);
 
