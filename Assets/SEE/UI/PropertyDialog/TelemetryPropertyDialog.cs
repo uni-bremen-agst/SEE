@@ -15,11 +15,29 @@ namespace SEE.UI.PropertyDialog
     /// </summary>
     internal class TelemetryPropertyDialog
     {
+        /// <summary>
+        /// The root GameObject of the dialog.
+        /// </summary>
         private GameObject dialog;
+        /// <summary>
+        /// The <see cref="PropertyDialog"/> component managing the dialog UI.
+        /// </summary>
         private PropertyDialog propertyDialog;
+        /// <summary>
+        /// The selection property for telemetry mode (Disabled, Local, Remote).
+        /// </summary>
         private SelectionProperty telemetryModeSelection;
+        /// <summary>
+        /// The string property for the remote telemetry URL.
+        /// </summary>
         private StringProperty urlField;
+        /// <summary>
+        /// The callback to invoke after the dialog is closed.
+        /// </summary>
         private readonly Action callback;
+        /// <summary>
+        /// The default URL used if no user setting is available.
+        /// </summary>
         private readonly string defaultRemoteURL = "https://telemetry.see.uni-bremen.de";
 
         /// <summary>
@@ -27,12 +45,19 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         private string lastSelection;
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
+        /// <param name="callback">Action to be called when the dialog is closed.</param>
         public TelemetryPropertyDialog(Action callback = null)
         {
             this.callback = callback;
         }
 
-        /// <summary>Call this once per frame from außen, um Änderungen zu erkennen.</summary>
+        /// <summary>
+        /// Detects changes in the telemetry mode selection.
+        /// </summary>
+        /// <remarks>Is called once per frame.</remarks>
         public void Update()
         {
             string current = telemetryModeSelection.Value;
@@ -79,10 +104,9 @@ namespace SEE.UI.PropertyDialog
             SEEInput.KeyboardShortcutsEnabled = false;
             propertyDialog.DialogShouldBeShown = true;
 
-            // nach einem Frame UI gebaut -> Sichtbarkeit setzen
             dialog.AddComponent<DelayedUIAction>().Run(() =>
             {
-                lastSelection = telemetryModeSelection.Value;     // initial speichern
+                lastSelection = telemetryModeSelection.Value; // initial value needs to be remembered
                 UpdateURLFieldVisibility(lastSelection);
             });
         }
