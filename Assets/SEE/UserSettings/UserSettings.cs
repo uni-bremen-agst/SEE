@@ -25,6 +25,46 @@ namespace SEE.User
     internal class UserSettings : MonoBehaviour
     {
         /// <summary>
+        /// Settings of the player.
+        /// </summary>
+        [Tooltip("Settings of the player.")]
+        public Player Player = new();
+
+        /// <summary>
+        /// Settings of the network.
+        /// </summary>
+        [Tooltip("Settings of the network.")]
+        public Network Network = new();
+
+        /// <summary>
+        /// The voice chat system as selected by the user. Note: This attribute
+        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
+        /// as at the start up in the <see cref="OpeningDialog"/>.
+        /// </summary>
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+
+        /// <summary>
+        /// The kind of environment the game is running (Desktop, VR, etc).
+        /// </summary>
+        [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
+        [ShowInInspector]
+        public PlayerInputType InputType = PlayerInputType.DesktopPlayer;
+
+        /// <summary>
+        /// Settings for telemetry.
+        /// </summary>
+        [Tooltip("Telemetry settings.")]
+        public Telemetry Telemetry = new();
+
+        /// <summary>
+        /// Default path of the configuration file (path and filename).
+        /// </summary>
+        [PropertyTooltip("Path of the file containing the settings.")]
+        [OdinSerialize, HideReferenceObjectPicker]
+        public DataPath ConfigPath = new();
+
+        /// <summary>
         /// Backing field of <see cref="Instance"/>.
         /// </summary>
         private static UserSettings instance;
@@ -48,9 +88,12 @@ namespace SEE.User
                 }
                 return instance;
             }
-            private set { instance = value; }
         }
 
+        /// <summary>
+        /// Sets <see cref="MainThread"/> to the current thread and loads the user settings
+        /// from the configuration file.
+        /// </summary>
         private void Awake()
         {
             /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
@@ -62,6 +105,10 @@ namespace SEE.User
             Load();
         }
 
+        /// <summary>
+        /// Initializes the application by setting up scene loading callbacks, configuring default animation easing, and
+        /// initializing the network.
+        /// </summary>
         private void Start()
         {
             SceneManager.sceneLoaded -= OnSceneLoaded;
@@ -71,19 +118,6 @@ namespace SEE.User
 
             Network.SetUp();
         }
-
-        /// <summary>
-        /// The voice chat system as selected by the user. Note: This attribute
-        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
-        /// as at the start up in the <see cref="OpeningDialog"/>.
-        /// </summary>
-        [Tooltip("The voice chat system to be used. 'None' for no voice chat."), FoldoutGroup(voiceChatFoldoutGroup)]
-        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
-
-        /// <summary>
-        /// Name of the Inspector foldout group for the logging setttings.
-        /// </summary>
-        private const string voiceChatFoldoutGroup = "Voice Chat";
 
         /// <summary>
         /// Starts the voice-chat system selected. Unregisters itself from
@@ -109,31 +143,6 @@ namespace SEE.User
             TracingHelperService.Shutdown(true);
             User.VoiceChat.EndVoiceChat(VoiceChat);
         }
-
-        /// <summary>
-        /// Settings of the network.
-        /// </summary>
-        [Tooltip("Settings of the network."), FoldoutGroup("Network")]
-        public Network Network = new();
-
-        /// <summary>
-        /// Settings of the player.
-        /// </summary>
-        [Tooltip("Settings of the player."), FoldoutGroup("Player")]
-        public Player Player = new();
-
-        /// <summary>
-        /// The kind of environment the game is running (Desktop, VR, etc).
-        /// </summary>
-        [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
-        [ShowInInspector]
-        public PlayerInputType InputType = PlayerInputType.DesktopPlayer;
-
-        /// <summary>
-        /// Settings for telemetry.
-        /// </summary>
-        [Tooltip("Telemetry settings."), FoldoutGroup("Telemetry")]
-        public Telemetry Telemetry = new();
 
         /// <summary>
         /// The Unity main thread. Note that we cannot initialize its value here
@@ -174,21 +183,9 @@ namespace SEE.User
         public static bool IsDesktop => Instance.InputType == PlayerInputType.DesktopPlayer;
 
         /// <summary>
-        /// The name of the group for the fold-out group of the configuration file.
-        /// </summary>
-        private const string configurationFoldoutGroup = "Configuration File";
-
-        /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
         /// </summary>
         private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
-
-        /// <summary>
-        /// Default path of the configuration file (path and filename).
-        /// </summary>
-        [PropertyTooltip("Path of the file containing the network configuration.")]
-        [OdinSerialize, HideReferenceObjectPicker, FoldoutGroup(configurationFoldoutGroup)]
-        public DataPath ConfigPath = new();
 
         /// <summary>
         /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
@@ -228,7 +225,7 @@ namespace SEE.User
         /// Reads the settings of this network configuration from <paramref name="filename"/>.
         /// </summary>
         /// <param name="filename">name of the file from which the settings are restored</param>
-        public void Load(string filename)
+        private void Load(string filename)
         {
             if (File.Exists(filename))
             {
@@ -243,6 +240,11 @@ namespace SEE.User
         }
 
         #region Configuration I/O
+        /// <summary>
+        /// Label of attribute <see cref="Player"/> in the configuration file.
+        /// </summary>
+        private const string playerLabel = "Player";
+
         /// <summary>
         /// Label of attribute <see cref="Network"/> in the configuration file.
         /// </summary>
@@ -269,6 +271,7 @@ namespace SEE.User
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
+            Player.Save(writer, playerLabel);
             Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
@@ -281,6 +284,7 @@ namespace SEE.User
         /// <param name="attributes">the attributes from which to restore the settings</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
+            Player.Restore(attributes, playerLabel);
             Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
