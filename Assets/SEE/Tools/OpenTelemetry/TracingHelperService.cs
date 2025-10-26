@@ -34,11 +34,12 @@
         /// Shuts down the tracing service and exporter cleanly.
         /// Should be called before application exit.
         /// </summary>
+        /// <param name="host">Whether the initiator is the host.</param>
         public static void Shutdown(bool host)
         {
             if (manager != null)
             {
-                manager.Shutdown(Instance,host);
+                manager.Shutdown(host);
                 manager = null;
             }
             Instance = null;
