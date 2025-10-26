@@ -18,7 +18,7 @@ namespace SEE.User
     {
         [Tooltip("The current telemetry mode (Disabled: no telemetry, Local: data are stored locally, Remote: data are sent to server).")]
         [ShowInInspector]
-        public TelemetryMode Mode = TelemetryMode.Local;
+        public TelemetryMode Mode = TelemetryMode.Disabled;
 
         [Tooltip("Custom server endpoint for sending telemetry data (used in remote mode).")]
         [ShowInInspector]
