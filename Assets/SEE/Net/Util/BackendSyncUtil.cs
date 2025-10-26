@@ -151,7 +151,7 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {Network.ClientRestAPI}.\n");
+            Debug.Log($"Backend API URL is: {Network.BackendServerAPI}.\n");
 
             if (!await LogInAsync())
             {
@@ -252,7 +252,7 @@ namespace SEE.Net.Util
                 throw new IOException($"The file already exists: '{targetPath}'");
             }
 
-            string url = Network.ClientRestAPI + "file/download?id=" + id;
+            string url = Network.BackendServerAPI + "file/download?id=" + id;
             using UnityWebRequest getRequest = UnityWebRequest.Get(url);
             getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
             UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
@@ -280,7 +280,7 @@ namespace SEE.Net.Util
         /// </returns>
         private static async UniTask<bool> LogInAsync()
         {
-            string url = Network.ClientRestAPI + "user/signin";
+            string url = Network.BackendServerAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
@@ -306,7 +306,7 @@ namespace SEE.Net.Util
         /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
-            string url = Network.ClientRestAPI + "server/files?id=" + serverId;
+            string url = Network.BackendServerAPI + "server/files?id=" + serverId;
             using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
             UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
             await operation.ToUniTask();
