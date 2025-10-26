@@ -4,7 +4,6 @@ using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using SEE.Controls;
 using UnityEngine;
 using Debug = UnityEngine.Debug;
 
@@ -50,14 +49,14 @@ namespace SEE.Tools.OpenTelemetry
         {
             if (tracerProvider != null)
             {
-                Debug.LogWarning("OpenTelemetry is already initialized.");
+                Debug.LogWarning("OpenTelemetry is already initialized.\n");
                 return;
             }
 
             switch (User.UserSettings.Instance?.Telemetry.Mode)
             {
                 case TelemetryMode.Disabled:
-                    Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.");
+                    Debug.Log("Telemetry is disabled. Skipping OpenTelemetry initialization.\n");
                     return;
 
                 case TelemetryMode.Local:
@@ -99,11 +98,11 @@ namespace SEE.Tools.OpenTelemetry
                     })
                     .Build();
 
-                Debug.Log($"OpenTelemetry initialized for HTTP/Protobuf export to {serverUrl} (batching every ~5s).");
+                Debug.Log($"OpenTelemetry initialized for HTTP/Protobuf export to {serverUrl} (batching every ~5s).\n");
             }
             catch (Exception ex)
             {
-                Debug.LogError($"Failed to initialize remote OpenTelemetry exporter: {ex.Message}");
+                Debug.LogError($"Failed to initialize remote OpenTelemetry exporter: {ex.Message}\n");
             }
         }
 
@@ -122,11 +121,11 @@ namespace SEE.Tools.OpenTelemetry
                     .AddProcessor(new SimpleActivityExportProcessor(traceFileExporter))
                     .Build();
 
-                Debug.Log($"OpenTelemetry (local) initialized. Logs in: {exportDirectoryPath}");
+                Debug.Log($"OpenTelemetry (local) initialized. Logs in: {exportDirectoryPath}.\n");
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Local OpenTelemetry initialization failed: {exception.Message}");
+                Debug.LogError($"Local OpenTelemetry initialization failed: {exception.Message}\n");
             }
         }
 
@@ -134,7 +133,8 @@ namespace SEE.Tools.OpenTelemetry
         /// Properly shuts down the OpenTelemetry tracer provider and its associated exporter.
         /// Logs a warning if not previously initialized.
         /// </summary>
-        public void Shutdown(TracingHelper helper,bool host)
+        /// <param name="host">Whether the initiator is a host.</param>
+        public void Shutdown(bool host)
         {
             if (host)
             {
@@ -142,7 +142,7 @@ namespace SEE.Tools.OpenTelemetry
             }
             if (tracerProvider == null)
             {
-                Debug.LogWarning("OpenTelemetry is not initialized.");
+                Debug.LogWarning("OpenTelemetry is not initialized.\n");
                 return;
             }
 
@@ -152,7 +152,7 @@ namespace SEE.Tools.OpenTelemetry
             traceFileExporter?.CheckGracefulShutdown();
             traceFileExporter = null;
 
-            Debug.Log("OpenTelemetry shutdown complete.");
+            Debug.Log("OpenTelemetry shutdown complete.\n");
         }
     }
 }
