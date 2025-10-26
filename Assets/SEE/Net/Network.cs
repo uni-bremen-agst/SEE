@@ -42,14 +42,11 @@ namespace SEE.Net
         /// </summary>
         public static string ServerId;
 
-        /// <summary>
-        /// The protocol of the backend server. Either "http://" or "https://".
-        /// </summary>
-        public static string Protocol = "http://";
+        // FIXME: Must become instance fields. Must be stored in configuration files.
         /// <summary>
         /// Base URL of the backend server where the files are stored
         /// </summary>
-        public static string BackendDomain = "localhost:8080";
+        public static string BackendDomain = "http://localhost:8080";
         /// <summary>
         /// REST resource path, i.e., the URL part identifying the client REST API.
         /// </summary>
@@ -57,7 +54,7 @@ namespace SEE.Net
         /// <summary>
         /// The complete URL of the Client REST API.
         /// </summary>
-        public static string ClientRestAPI => Protocol + Network.BackendDomain + ClientAPI;
+        public static string BackendServerAPI => BackendDomain + ClientAPI;
 
         /// <summary>
         /// The UDP port where the server listens to NetCode and Dissonance traffic.
@@ -447,7 +444,7 @@ namespace SEE.Net
         }
 
         /// <summary>
-        /// Splitts a string after <paramref name="fragmentSize"/> chars.
+        /// Splits a string after <paramref name="fragmentSize"/> chars.
         /// </summary>
         /// <param name="str">The string to be split</param>
         /// <param name="fragmentSize">The size for the sub strings.</param>
@@ -787,12 +784,6 @@ namespace SEE.Net
                 }
             }
         }
-
-        /// <summary>
-        /// The maximal waiting time in seconds a client is willing to wait until a connection
-        /// can be established.
-        /// </summary>
-        private const float maxWaitingTimeInSeconds = 5 * 60;
 
         /// <summary>
         /// A delegate that will be called in <see cref="ShutdownNetworkAsync(OnShutdownFinished)"/> when
