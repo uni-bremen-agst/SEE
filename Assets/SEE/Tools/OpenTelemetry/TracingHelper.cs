@@ -26,7 +26,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <summary>
         /// Action types that should not be traced.
         /// </summary>
-        private readonly HashSet<Type> excludedActionTypes = new HashSet<Type>
+        private readonly HashSet<Type> excludedActionTypes = new()
         {
             typeof(MoveAction)
         };
@@ -34,8 +34,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <summary>
         /// Maps player names to the start time of boost actions.
         /// </summary>
-        private readonly Dictionary<string, DateTimeOffset> boostKeyStartTimes =
-            new Dictionary<string, DateTimeOffset>();
+        private readonly Dictionary<string, DateTimeOffset> boostKeyStartTimes = new();
 
         /// <summary>
         /// Last tracked timestamp for head transform in VR.
@@ -109,7 +108,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <param name="action">The action entry that was removed. Must not be null.</param>
         public void TrackRemoveFromHistory(ActionHistory.GlobalHistoryEntry action)
         {
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", action.GetType().FullName },
                 { "player.name", playerName },
@@ -154,7 +153,7 @@ namespace SEE.Tools.OpenTelemetry
                 throw new ArgumentNullException(nameof(grabbedObject));
             }
 
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", "MoveAction" },
                 { "player.name", playerName },
@@ -186,7 +185,7 @@ namespace SEE.Tools.OpenTelemetry
                 throw new ArgumentNullException(nameof(actionName));
             }
 
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", "KeyPress" },
                 { "player.name", playerName },
@@ -211,7 +210,7 @@ namespace SEE.Tools.OpenTelemetry
         /// <param name="durationSeconds">The duration of the movement in seconds.</param>
         public void TrackDesktopMovement(Vector3 start, Vector3 end, float durationSeconds)
         {
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", "PlayerDesktopMovement" },
                 { "player.name", playerName },
@@ -232,10 +231,7 @@ namespace SEE.Tools.OpenTelemetry
                 startTime
             );
 
-            if (activity != null)
-            {
-                activity.Stop();
-            }
+            activity?.Stop();
         }
 
         /// <summary>
@@ -265,8 +261,8 @@ namespace SEE.Tools.OpenTelemetry
         /// </summary>
         /// <param name="hoveredObject">The GameObject that was hovered over. Must not be null.</param>
         /// <param name="duration">The duration of the hover in seconds.</param>
-        /// <param name="minimumDuration">The minimum duration required to track the hover. Default is 5.0s.</param>
-        public void TrackHoverDuration(GameObject hoveredObject, float duration, float minimumDuration )
+        /// <param name="minimumDuration">The minimum duration required to track the hover (in seconds). Default is 5.0s.</param>
+        public void TrackHoverDuration(GameObject hoveredObject, float duration, float minimumDuration)
         {
             if (hoveredObject == null)
             {
@@ -278,7 +274,7 @@ namespace SEE.Tools.OpenTelemetry
                 return;
             }
 
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", "Hover" },
                 { "player.name", playerName },
@@ -327,7 +323,7 @@ namespace SEE.Tools.OpenTelemetry
                     DateTimeOffset endTime = DateTimeOffset.UtcNow;
                     double duration = (endTime - startTime).TotalSeconds;
 
-                    Dictionary<string, object> tags = new Dictionary<string, object>
+                    Dictionary<string, object> tags = new()
                     {
                         { "action.type", "BoostCamera" },
                         { "player.name", playerName },
@@ -345,10 +341,7 @@ namespace SEE.Tools.OpenTelemetry
                         startTime
                     );
 
-                    if (activity != null)
-                    {
-                        activity.Stop();
-                    }
+                    activity?.Stop();
 
                     boostKeyStartTimes.Remove(playerName);
                 }
@@ -378,7 +371,7 @@ namespace SEE.Tools.OpenTelemetry
             lastHeadTrackingTime = now;
 
             headTransform.GetPositionAndRotation(out Vector3 position, out Quaternion rotation);
-            Dictionary<string, object> tags = new Dictionary<string, object>
+            Dictionary<string, object> tags = new()
             {
                 { "action.type", "HeadTransformTracking" },
                 { "player.name", playerName },

@@ -4,7 +4,6 @@ using System.IO;
 using System.Text;
 using Newtonsoft.Json;
 using OpenTelemetry;
-using UnityEngine;
 using Debug = UnityEngine.Debug;
 
 namespace SEE.Tools.OpenTelemetry
@@ -36,13 +35,13 @@ namespace SEE.Tools.OpenTelemetry
 
             try
             {
-                StreamWriter writer = new StreamWriter(filePath, false, Encoding.UTF8);
+                StreamWriter writer = new(filePath, false, Encoding.UTF8);
                 writer.WriteLine("Trace Export Session Started...");
                 writer.Dispose();
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Failed to create trace file: {exception.Message}");
+                Debug.LogError($"Failed to create trace file: {exception.Message}.\n");
             }
         }
 
@@ -55,7 +54,7 @@ namespace SEE.Tools.OpenTelemetry
         {
             try
             {
-                StreamWriter writer = new StreamWriter(filePath, true, Encoding.UTF8);
+                StreamWriter writer = new(filePath, true, Encoding.UTF8);
 
                 foreach (Activity activity in batch)
                 {
@@ -77,7 +76,7 @@ namespace SEE.Tools.OpenTelemetry
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Failed to export traces: {exception.Message}");
+                Debug.LogError($"Failed to export traces: {exception.Message}\n");
                 return ExportResult.Failure;
             }
         }
@@ -100,7 +99,7 @@ namespace SEE.Tools.OpenTelemetry
             }
             catch (Exception exception)
             {
-                Debug.LogError($"Failed to write trace shutdown message: {exception.Message}");
+                Debug.LogError($"Failed to write trace shutdown message: {exception.Message}\n");
             }
 
             disposed = true;

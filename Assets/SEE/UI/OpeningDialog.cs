@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.GO;
-using SEE.Tools.OpenTelemetry;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.UI.PropertyDialog;
@@ -306,10 +304,7 @@ namespace SEE.UI
         /// </summary>
         private void Update()
         {
-            if (telemetryDialog != null)
-            {
-                telemetryDialog.Update();
-            }
+            telemetryDialog?.Update();
         }
     }
 }
