@@ -16,12 +16,16 @@ namespace SEE.User
     [System.Serializable]
     internal class Telemetry
     {
+        /// <summary>
+        /// The current telemetry mode.
+        /// </summary>
         [Tooltip("The current telemetry mode (Disabled: no telemetry, Local: data are stored locally, Remote: data are sent to server).")]
-        [ShowInInspector]
         public TelemetryMode Mode = TelemetryMode.Disabled;
 
+        /// <summary>
+        /// The custom server endpoint for sending telemetry data in remote mode.
+        /// </summary>
         [Tooltip("Custom server endpoint for sending telemetry data (used in remote mode).")]
-        [ShowInInspector]
         public string ServerURL = "http://stvr2.informatik.uni-bremen:4318/v1/traces";
 
         #region Configuration I/O
@@ -41,7 +45,7 @@ namespace SEE.User
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
         /// <param name="label">the label under which to group the settings</param>
-        public virtual void Save(ConfigWriter writer, string label)
+        public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(Mode.ToString(), modeLabel);
@@ -54,7 +58,7 @@ namespace SEE.User
         /// </summary>
         /// <param name="attributes">the attributes from which to restore the settings</param>
         /// <param name="label">the label under which to look up the settings in <paramref name="attributes"/></param>
-        public virtual void Restore(Dictionary<string, object> attributes, string label)
+        public void Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
