@@ -407,7 +407,7 @@ MonoBehaviour:
   VoiceChat: 1
   InputType: 0
   Telemetry:
-    Mode: 1
+    Mode: 0
     ServerURL: http://stvr2.informatik.uni-bremen:4318/v1/traces
   ConfigPath:
     Root: 3
