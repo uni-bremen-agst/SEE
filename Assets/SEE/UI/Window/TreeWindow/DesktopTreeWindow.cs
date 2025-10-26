@@ -393,7 +393,7 @@ namespace SEE.UI.Window.TreeWindow
             {
                 if (item.TryGetComponentOrLog(out PointerHelper pointerHelper))
                 {
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    if (User.UserSettings.IsVR)
                     {
                         pointerHelper.EnterEvent.AddListener(_ =>
                         {
@@ -739,7 +739,7 @@ namespace SEE.UI.Window.TreeWindow
                         expandItem: (_, _) => RevealElementAsync(node).Forget());
             }
 
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 items.position = items.position.WithXYZ(y: 0);
             }

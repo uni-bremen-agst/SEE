@@ -206,6 +206,11 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.rotationWeight = leftHandRotationWeight.Value;
 
             Transform leftHandBendGoal = transform.Find("LeftElbowBendGoal");
+            if (leftHandBendGoal == null)
+            {
+                Debug.LogError($"LeftElbowBendGoal not found in avatar transform {transform.name}.\n");
+                return;
+            }
             leftHandBendGoal.localPosition = leftBendGoalLocalPosition.Value;
             Transform rightHandBendGoal = transform.Find("RightElbowBendGoal");
             rightHandBendGoal.localPosition = rightBendGoalLocalPosition.Value;

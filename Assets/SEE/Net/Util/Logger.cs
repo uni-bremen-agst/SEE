@@ -9,6 +9,11 @@ namespace SEE.Net.Util
     public static class Logger
     {
         /// <summary>
+        /// Whether logging should be enabled.
+        /// </summary>
+        public static bool InternalLoggingEnabled = true;
+
+        /// <summary>
         /// Calls Debug.Log with networking prefix and given message.
         /// </summary>
         /// <param name="message">The message to be logged.</param>
@@ -16,7 +21,7 @@ namespace SEE.Net.Util
         public static void Log(string message)
         {
 #if UNITY_EDITOR
-            if (Network.InternalLoggingEnabled)
+            if (InternalLoggingEnabled)
             {
                 UnityEngine.Debug.Log($"<b>[SEE Net]</b> {message}\n");
             }
@@ -32,7 +37,7 @@ namespace SEE.Net.Util
         public static void LogException(Exception exception, string message = null)
         {
 #if UNITY_EDITOR
-            if (Network.InternalLoggingEnabled)
+            if (InternalLoggingEnabled)
             {
                 if (message != null)
                 {
@@ -54,7 +59,7 @@ namespace SEE.Net.Util
         public static void LogError(string message)
         {
 #if UNITY_EDITOR
-            if (Network.InternalLoggingEnabled)
+            if (InternalLoggingEnabled)
             {
                 UnityEngine.Debug.LogError($"<b>[SEE Net]</b> {message}\n");
             }
@@ -69,7 +74,7 @@ namespace SEE.Net.Util
         public static void LogWarning(string message)
         {
 #if UNITY_EDITOR
-            if (Network.InternalLoggingEnabled)
+            if (InternalLoggingEnabled)
             {
                 UnityEngine.Debug.LogWarning($"<b>[SEE Net]</b> {message}\n");
             }

@@ -9,6 +9,7 @@ using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.Tools.OpenTelemetry;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -125,7 +126,7 @@ namespace SEE.Controls.Actions
                         return false;
                     }
                 }
-                else if ((!mouseHeldDown || SceneSettings.InputType == PlayerInputType.VRPlayer) && ExecuteViaContextMenu)
+                else if ((!mouseHeldDown || User.UserSettings.IsVR) && ExecuteViaContextMenu)
                 {
                     // User starts dragging object selected via context menu.
                     // Override the initial cursorOffset based on new mouse position to reduce jump
@@ -152,8 +153,8 @@ namespace SEE.Controls.Actions
             }
             // Drag grabbed object
             else if (
-                    ((SceneSettings.InputType == PlayerInputType.DesktopPlayer && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
-                        || (SceneSettings.InputType == PlayerInputType.VRPlayer && !XRSEEActions.Selected))
+                    ((User.UserSettings.IsDesktop && (mouseHeldDown ^ ExecuteViaContextMenu)) // exclusive OR
+                        || (User.UserSettings.IsVR && !XRSEEActions.Selected))
                     && activeAction)
             {
                 Raycasting.RaycastLowestNode(out RaycastHit? targetObjectHit, out Node _, grabbedObject.Node, false);
@@ -183,6 +184,12 @@ namespace SEE.Controls.Actions
                 bool wasMoved = grabbedObject.UnGrab();
                 // Action is finished.
                 CurrentState = wasMoved ? IReversibleAction.Progress.Completed : IReversibleAction.Progress.NoEffect;
+                if (wasMoved && grabbedObject.GrabbedGameObject != null)
+                {
+                    TracingHelperService.Instance?.TrackMoveAction(grabbedObject.GrabbedGameObject,
+                        grabbedObject.GrabbedGameObject.transform.position, grabbedObject.NewParent);
+                }
+
                 return wasMoved;
             }
             return false;
@@ -314,7 +321,7 @@ namespace SEE.Controls.Actions
                 {
                     GrabbedGameObject = gameObject;
                     grabbedObjID = gameObject.name;
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                    if (User.UserSettings.IsVR)
                     {
                         originalParent = XRSEEActions.OldParent;
                     }
