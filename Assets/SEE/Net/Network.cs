@@ -42,19 +42,25 @@ namespace SEE.Net
         /// </summary>
         public static string ServerId;
 
-        // FIXME: Must become instance fields. Must be stored in configuration files.
         /// <summary>
-        /// Base URL of the backend server where the files are stored
+        /// Base URL of the backend server (specified by <see cref="BackendServerAPI"/>) where the files are stored.
         /// </summary>
-        public static string BackendDomain = "http://localhost:8080";
+        /// <example>If <see cref="BackendServerAPI"/> equals "http://localhost:8080/api/v1/,
+        /// then "http://localhost:8080" is returned.</example>
+        public static string BackendDomain
+        {
+           get
+            {
+                Uri uri = new(BackendServerAPI);
+                return uri.GetLeftPart(UriPartial.Authority);
+            }
+        }
+
+        // FIXME: Must become instance fields. Must be stored in configuration files. Must be editable in <see cref="OpenDialog"/>.
         /// <summary>
-        /// REST resource path, i.e., the URL part identifying the client REST API.
+        /// The complete URL of the Client REST API consisting of the backend domain and the API path.
         /// </summary>
-        public static string ClientAPI = "/api/v1/";
-        /// <summary>
-        /// The complete URL of the Client REST API.
-        /// </summary>
-        public static string BackendServerAPI => BackendDomain + ClientAPI;
+        public static string BackendServerAPI = "http://localhost:8080/api/v1/";
 
         /// <summary>
         /// The UDP port where the server listens to NetCode and Dissonance traffic.
@@ -296,10 +302,10 @@ namespace SEE.Net
                 RoomPassword = roomPassword;
             }
 
-            string backendDomain = Environment.GetEnvironmentVariable(domainVariableName);
-            if (!string.IsNullOrWhiteSpace(backendDomain))
+            string backendServerAPI = Environment.GetEnvironmentVariable(domainVariableName);
+            if (!string.IsNullOrWhiteSpace(backendServerAPI))
             {
-                BackendDomain = backendDomain;
+                BackendServerAPI = backendServerAPI;
             }
 
             string serverId = Environment.GetEnvironmentVariable(serverIdVariableName);
@@ -348,7 +354,7 @@ namespace SEE.Net
                     case domainArgumentName:
                         Debug.Log($"Found {domainArgumentName} as parameter {i}.\n");
                         CheckArgumentValue(arguments, i, domainArgumentName);
-                        BackendDomain = arguments[i + 1];
+                        BackendServerAPI = arguments[i + 1];
                         i++; // skip one parameter
                         break;
                     case serverIdArgumentName:

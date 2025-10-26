@@ -431,7 +431,7 @@ namespace SEE.Net
             }
 
             Network.ServerId = backendServerId;
-            Network.BackendDomain = backendDomain;
+            Network.BackendServerAPI = backendDomain;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
         }
