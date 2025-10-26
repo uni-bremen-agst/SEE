@@ -6,6 +6,9 @@ using UnityEngine;
 
 namespace SEE.User
 {
+    /// <summary>
+    /// Represents a local player in the SEE environment (player name and avatar).
+    /// </summary>
     [Serializable]
     internal class Player
     {
