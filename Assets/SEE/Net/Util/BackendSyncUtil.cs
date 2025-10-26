@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using SEE.Game.City;
+using SEE.User;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
@@ -123,7 +124,7 @@ namespace SEE.Net.Util
         /// </summary>
         internal static async UniTask InitializeCitiesAsync()
         {
-            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(Network.BackendDomain))
+            if (!string.IsNullOrWhiteSpace(Network.ServerId) && !string.IsNullOrWhiteSpace(UserSettings.BackendDomain))
             {
                 ClearMultiplayerData();
                 await DownloadAllFilesAsync();
@@ -151,7 +152,7 @@ namespace SEE.Net.Util
         /// </summary>
         private static async UniTask DownloadAllFilesAsync()
         {
-            Debug.Log($"Backend API URL is: {Network.BackendServerAPI}.\n");
+            Debug.Log($"Backend API URL is: {UserSettings.BackendServerAPI}.\n");
 
             if (!await LogInAsync())
             {
@@ -252,7 +253,7 @@ namespace SEE.Net.Util
                 throw new IOException($"The file already exists: '{targetPath}'");
             }
 
-            string url = Network.BackendServerAPI + "file/download?id=" + id;
+            string url = UserSettings.BackendServerAPI + "file/download?id=" + id;
             using UnityWebRequest getRequest = UnityWebRequest.Get(url);
             getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
             UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
@@ -280,7 +281,7 @@ namespace SEE.Net.Util
         /// </returns>
         private static async UniTask<bool> LogInAsync()
         {
-            string url = Network.BackendServerAPI + "user/signin";
+            string url = UserSettings.BackendServerAPI + "user/signin";
             string postBody = new LoginData(Network.ServerId, User.UserSettings.Instance.Network.RoomPassword);
             UnityWebRequest.ClearCookieCache(new Uri(url));
             using UnityWebRequest signinRequest = UnityWebRequest.Post(url, postBody, "application/json");
@@ -306,7 +307,7 @@ namespace SEE.Net.Util
         /// <returns>A list of file metadata objects if the request was successful, or <c>null</c> if not.</returns>
         private static async UniTask<List<FileData>> GetFilesAsync(string serverId)
         {
-            string url = Network.BackendServerAPI + "server/files?id=" + serverId;
+            string url = UserSettings.BackendServerAPI + "server/files?id=" + serverId;
             using UnityWebRequest fetchRequest = UnityWebRequest.Get(url);
             UnityWebRequestAsyncOperation operation = fetchRequest.SendWebRequest();
             await operation.ToUniTask();

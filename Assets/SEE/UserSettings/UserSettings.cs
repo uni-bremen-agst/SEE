@@ -183,6 +183,17 @@ namespace SEE.User
         public static bool IsDesktop => Instance.InputType == PlayerInputType.DesktopPlayer;
 
         /// <summary>
+        /// The backend domain to be used for network connections to the SEE backend.
+        /// </summary>
+        public static string BackendDomain => Instance.Network.BackendDomain;
+
+        /// <summary>
+        /// The complete backend server API endpoint to be used for network connections to
+        /// the SEE backend.
+        /// </summary>
+        public static string BackendServerAPI => Instance.Network.BackendServerAPI;
+
+        /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
         /// </summary>
         private const string configurationButtonsGroup = "ConfigurationButtonsGroup";

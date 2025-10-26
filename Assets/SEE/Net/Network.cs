@@ -43,11 +43,12 @@ namespace SEE.Net
         public static string ServerId;
 
         /// <summary>
-        /// Base URL of the backend server (specified by <see cref="BackendServerAPI"/>) where the files are stored.
+        /// Base URL of the backend server (specified by <see cref="BackendServerAPI"/>) where the
+        /// files are stored. Result does not end with a slash.
         /// </summary>
-        /// <example>If <see cref="BackendServerAPI"/> equals "http://localhost:8080/api/v1/,
+        /// <example>If <see cref="BackendServerAPI"/> equals "http://localhost:8080/api/v1/",
         /// then "http://localhost:8080" is returned.</example>
-        public static string BackendDomain
+        public string BackendDomain
         {
            get
             {
@@ -56,11 +57,11 @@ namespace SEE.Net
             }
         }
 
-        // FIXME: Must become instance fields. Must be stored in configuration files. Must be editable in <see cref="OpenDialog"/>.
         /// <summary>
         /// The complete URL of the Client REST API consisting of the backend domain and the API path.
         /// </summary>
-        public static string BackendServerAPI = "http://localhost:8080/api/v1/";
+        [Tooltip("The complete URL of the backend server API. Must end with a /.")]
+        public string BackendServerAPI = "http://localhost:8080/api/v1/";
 
         /// <summary>
         /// The UDP port where the server listens to NetCode and Dissonance traffic.
@@ -88,6 +89,7 @@ namespace SEE.Net
         /// <summary>
         /// The password used to enter a meeting room.
         /// </summary>
+        [Tooltip("The password used to enter a meeting room.")]
         public string RoomPassword = "";
 
         /// <summary>
@@ -896,6 +898,10 @@ namespace SEE.Net
         /// Label of attribute <see cref="ServerIP4Address"/> in the configuration file.
         /// </summary>
         private const string serverIP4AddressLabel = "serverIP4Address";
+        /// <summary>
+        /// Label of attribute <see cref="BackendServerAPI"/> in the configuration file.
+        /// </summary>
+        private const string backendServerAPILabel = "backendServerAPI";
 
         /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
@@ -909,6 +915,7 @@ namespace SEE.Net
             writer.Save(ServerPort, serverPortLabel);
             writer.Save(ServerIP4Address, serverIP4AddressLabel);
             writer.Save(RoomPassword, roomPasswordLabel);
+            writer.Save(BackendServerAPI, backendServerAPILabel);
             writer.EndGroup();
         }
 
@@ -935,6 +942,7 @@ namespace SEE.Net
                     ConfigIO.Restore(values, serverIP4AddressLabel, ref value);
                     ServerIP4Address = value;
                 }
+                ConfigIO.Restore(values, backendServerAPILabel, ref BackendServerAPI);
             }
         }
 

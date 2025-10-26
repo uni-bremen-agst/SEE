@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.User;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
@@ -236,7 +237,7 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(Network.BackendServerAPI);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSettings.BackendServerAPI);
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
@@ -295,11 +296,11 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    if (path.Contains(Network.BackendServerAPI))
+                    if (path.Contains(UserSettings.BackendServerAPI))
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        RelativePath = path.Replace(Network.BackendServerAPI, string.Empty);
+                        RelativePath = path.Replace(UserSettings.BackendServerAPI, string.Empty);
                     }
                     else
                     {

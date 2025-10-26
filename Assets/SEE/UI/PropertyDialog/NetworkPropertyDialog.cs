@@ -1,6 +1,5 @@
 ﻿using SEE.Controls;
 using SEE.UI.Notification;
-using SEE.GO;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +7,6 @@ using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Events;
-using static SEE.Net.Network;
 using SEE.Game.Worlds;
 
 namespace SEE.UI.PropertyDialog
@@ -77,6 +75,11 @@ namespace SEE.UI.PropertyDialog
         private StringProperty roomPassword;
 
         /// <summary>
+        /// The backend server API endpoint
+        /// </summary>
+        private StringProperty backendServerAPI;
+
+        /// <summary>
         /// The player name to be shown to others.
         /// </summary>
         private StringProperty playerName;
@@ -103,11 +106,11 @@ namespace SEE.UI.PropertyDialog
         {
             User.UserSettings.Instance.Load();
 
-            dialog = new GameObject("Network settings");
+            dialog = new GameObject("User settings");
 
             // Group for network properties (one group for all).
             PropertyGroup group = dialog.AddComponent<PropertyGroup>();
-            group.Name = "Network settings";
+            group.Name = "User settings";
             {
                 ipAddress = dialog.AddComponent<StringProperty>();
                 ipAddress.Name = "Server IPv4 Address";
@@ -152,10 +155,18 @@ namespace SEE.UI.PropertyDialog
                 voiceChatSelector.Value = SEE.User.UserSettings.Instance.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
+            {
+                // BackendServerAPI
+                backendServerAPI = dialog.AddComponent<StringProperty>();
+                backendServerAPI.Name = "Backend API";
+                backendServerAPI.Value = networkConfig.BackendServerAPI.ToString();
+                backendServerAPI.Description = "Backend server API endpoint";
+                group.AddProperty(backendServerAPI);
+            }
             // Dialog
             propertyDialog = dialog.AddComponent<PropertyDialog>();
-            propertyDialog.Title = "Network settings";
-            propertyDialog.Description = "Enter the network settings";
+            propertyDialog.Title = "User settings";
+            propertyDialog.Description = "Enter the user settings";
             propertyDialog.AddGroup(group);
 
             // Because we will validate the input, we do not want the propertyDialog
@@ -179,15 +190,6 @@ namespace SEE.UI.PropertyDialog
         private static IList<string> VoiceChatSystemsToStrings()
         {
             return Enum.GetNames(typeof(User.VoiceChatSystems)).ToList();
-        }
-
-        /// <summary>
-        /// Returns the enum values of <see cref="PlayerInputType"/> as a list of strings.
-        /// </summary>
-        /// <returns>enum values of <see cref="PlayerInputType"/> as a list of strings</returns>
-        private static IList<string> PlayerInputTypesToStrings()
-        {
-            return Enum.GetNames(typeof(PlayerInputType)).ToList();
         }
 
         /// <summary>
@@ -258,6 +260,27 @@ namespace SEE.UI.PropertyDialog
             {
                 // Room Password
                 networkConfig.RoomPassword = roomPassword.Value.ToString();
+            }
+            {
+                // Backend Server API
+                string value = backendServerAPI.Value.Trim();
+                if (value == "")
+                {
+                    networkConfig.BackendServerAPI = "";
+                }
+                else
+                {
+                    try
+                    {
+                        Uri uri = new(value);
+                        networkConfig.BackendServerAPI = uri.ToString();
+                    }
+                    catch (UriFormatException e)
+                    {
+                        ShowNotification.Error("Invalid Backend API", $"The backend API endpoint is not a valid URL. {e.Message}");
+                        errorOccurred = true;
+                    }
+                }
             }
             {
                 // Voice Chat
