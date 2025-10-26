@@ -10,6 +10,8 @@ using SEE.UI.Notification;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -225,7 +227,14 @@ namespace SEE.Game.CityRendering
             // TODO: Fade out edges.
 
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
-            await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
+            if (false)
+            {
+                await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
+            }
+            else
+            {
+                await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
+            }
             Debug.Log($"Phase 2: Finished.\n");
 
             if (edgesAreDrawn)
@@ -505,6 +514,71 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
+        /// Animates the movement of <paramref name="movedNodes"/> to their new positions
+        /// according to <paramref name="newNodelayout"/>.
+        /// </summary>
+        /// <param name="movedNodes">game nodes to be moved</param>
+        /// <param name="newNodelayout">new positions</param>
+        /// <returns>task</returns>
+        private static async UniTask AnimateNodeMoveByLevelAsync
+                                (ISet<Node> movedNodes,
+                                 Dictionary<string, ILayoutNode> newNodelayout)
+        {
+            if (movedNodes.Count == 0)
+            {
+                return;
+            }
+
+            UnionFind<Node, int> unionFind = new(movedNodes, n => n.Level);
+            unionFind.PartitionByValue();
+            IOrderedEnumerable<IList<Node>> partitions = unionFind.GetPartitions().ToList().OrderBy(l => l);
+            foreach (IList<Node> partition in partitions)
+            {
+                await MoveAsync(partition, newNodelayout);
+            }
+        }
+
+        private static async UniTask MoveAsync(IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
+        {
+            HashSet<GameObject> moved = new();
+
+            foreach (Node node in movedNodes)
+            {
+                GameObject go = GraphElementIDMap.Find(node.ID, true);
+                if (go != null)
+                {
+                    ILayoutNode layoutNode = newNodelayout[node.ID];
+                    if (layoutNode != null)
+                    {
+                        if (PositionHasChanged(go, layoutNode))
+                        {
+                            moved.Add(go);
+                            // Move the node to its new position. The edge layout will not be
+                            // be updated because we just set the node's parent to cityTransform.
+                            // As a consequence, the node hierarchy is temporarily flat, which
+                            // will distort hierarchical edge layouts, such as edge bundling.
+                            IOperationCallback<Action> animation = go.NodeOperator()
+                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
+                            animation.OnComplete(() => OnComplete(go));
+                            animation.OnKill(() => OnComplete(go));
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"No layout for node {node.ID}.\n");
+                    }
+                }
+            }
+
+            await UniTask.WaitUntil(() => moved.Count == 0);
+
+            void OnComplete(GameObject go)
+            {
+                moved.Remove(go);
+            }
+        }
+
+        /// <summary>
         /// Animates the move of <paramref name="movedNodes"/> to their new positions
         /// according to <paramref name="newNodelayout"/>. All moved nodes will be
         /// temporarily re-parented to <paramref name="cityTransform"/> so that
@@ -537,7 +611,7 @@ namespace SEE.Game.CityRendering
                             // re-established. It still needs to be a child of the code city,
                             // however, because methods called in the course of the animation
                             // will try to retrieve the code city from the game node.
-                            //go.transform.SetParent(cityTransform);
+                            go.transform.SetParent(cityTransform);
 
                             moved.Add(go);
                             // Move the node to its new position. The edge layout will not be
@@ -556,21 +630,34 @@ namespace SEE.Game.CityRendering
                     }
                 }
             }
-            await UniTask.WaitUntil(() => moved.Count == 0);
 
-            // True if the position of the given game object has actually changed
-            // by a relevant margin.
-            bool PositionHasChanged(GameObject go, ILayoutNode layoutNode)
-            {
-                Vector3 currentPosition = go.transform.position;
-                Vector3 newPosition = layoutNode.CenterPosition;
-                return Vector3.Distance(currentPosition, newPosition) > 0.001f;
-            }
+            await UniTask.WaitUntil(() => moved.Count == 0);
 
             void OnComplete(GameObject go)
             {
                 moved.Remove(go);
             }
+        }
+
+        /// <summary>
+        /// The distance between a current position and a new position of a game node
+        /// at which we consider that the position has actually changed.
+        /// </summary>
+        private const float relevantMovementMargin = 0.001f;
+
+        /// <summary>
+        /// True if the position of the given <paramref name="gameNode"/> has actually changed
+        /// by a relevant margin.
+        /// </summary>
+        /// <param name="gameNode">game node to be moved</param>
+        /// <param name="layoutNode">the intended new position of <paramref name="gameNode"/></param>
+        /// <returns>True if the position of the given <paramref name="gameNode"/> has actually changed
+        /// by a relevant margin.</returns>
+        private static bool PositionHasChanged(GameObject gameNode, ILayoutNode layoutNode)
+        {
+            Vector3 currentPosition = gameNode.transform.position;
+            Vector3 newPosition = layoutNode.CenterPosition;
+            return Vector3.Distance(currentPosition, newPosition) > relevantMovementMargin;
         }
 
         /// <summary>
