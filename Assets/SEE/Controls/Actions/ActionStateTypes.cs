@@ -100,7 +100,10 @@ namespace SEE.Controls.Actions
               new("Delete", "Delete a node or an edge",
                   Color.yellow.Darker(), Icons.Trash,
                   DeleteAction.CreateReversibleAction);
-
+            ShowIssues =
+            new("Show Issues", "Display the Issues from a project.",
+                Color.black, Icons.Text,
+                ShowIssueAction.CreateReversibleAction);
             ShowCode =
               new("Show Code", "Display the source code of a node.",
                   Color.black, Icons.Code,
@@ -314,6 +317,7 @@ namespace SEE.Controls.Actions
         public static readonly ActionStateType EditNode;
         public static readonly ActionStateType ResizeNode;
         public static readonly ActionStateType Delete;
+        public static readonly ActionStateType ShowIssues;
         public static readonly ActionStateType ShowCode;
         public static readonly ActionStateType AcceptDivergence;
 

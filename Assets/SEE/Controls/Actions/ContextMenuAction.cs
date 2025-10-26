@@ -146,6 +146,7 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
+              
                         // Note: as of now, multiselection only works for graph elements.
                         // We currently do not have multiselection options for authors.
                         IEnumerable<PopupMenuEntry> entries
@@ -210,10 +211,11 @@ namespace SEE.Controls.Actions
         private IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElementMultiselection
             (PopupMenu popupMenu, IEnumerable<InteractableGraphElement> selectedObjects)
         {
+           
             List<PopupMenuEntry> entries = new()
             {
-                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),
-
+                
+                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),            
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
                     List<PopupMenuEntry> submenuEntries = new()
@@ -223,11 +225,13 @@ namespace SEE.Controls.Actions
                             UpdateEntries(popupMenu, position, GetApplicableOptionsForGraphElementMultiselection(popupMenu, selectedObjects));
                         }, Icons.ArrowLeft, CloseAfterClick: false),
                         new PopupMenuAction("Properties", ShowProperties, Icons.Info),
-                        new PopupMenuAction("Show in City", Highlight, Icons.LightBulb)
+                        new PopupMenuAction("Show in City", Highlight, Icons.LightBulb),
+                       // new PopupMenuAction("Show Issues", Highlight, Icons.LightBulb),
                     };
-
+                           submenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssueTracker, Icons.Code));
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
+                      
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                         if (selectedObjects.Any(o => o.gameObject.ContainingCity<CommitCity>() != null))
                         {
@@ -281,6 +285,17 @@ namespace SEE.Controls.Actions
                     if (iO.gameObject != null)
                     {
                         ActivateWindow(CreateGraphElementPropertyWindow(iO.gameObject.MustGetComponent<GraphElementRef>()));
+                    }
+                }
+            }
+
+            void ShowIssueTracker()
+            {
+                foreach (InteractableObject iO in selectedObjects)
+                {
+                    if (iO.gameObject != null)
+                    {
+                        ActivateWindow(ShowIssueAction.ShowIssues(iO.gameObject.MustGetComponent<GraphElementRef>()));
                     }
                 }
             }
@@ -498,7 +513,7 @@ namespace SEE.Controls.Actions
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show in City", Highlight, Icons.LightBulb));
                 }
-
+                subMenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssue, Icons.Code));
                 if (graphElement.Filename != null)
                 {
                     subMenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
@@ -546,6 +561,11 @@ namespace SEE.Controls.Actions
             void ShowProperties()
             {
                 ActivateWindow(CreateGraphElementPropertyWindow(gameObject.MustGetComponent<GraphElementRef>()));
+            }
+
+            void ShowIssue()
+            {
+                ActivateWindow(ShowIssueAction.ShowIssues(gameObject.MustGetComponent<GraphElementRef>()));
             }
 
             void ShowCode()
@@ -880,6 +900,25 @@ namespace SEE.Controls.Actions
             manager.ActiveWindow = openWindow;
             return openWindow;
         }
+
+
+        /// <summary>
+        /// Returns a <see cref="GraphElementPropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
+        /// </summary>
+        /// <param name="graphElementRef">The graph element to activate the property window for</param>
+        /// <returns>The <see cref="GraphElementPropertyWindow"/> object showing the attributes of the specified graph element.</returns>
+        private static IssueWindow CreateIssueWindow(GraphElementRef graphElementRef)
+        {
+            // Create new window for active selection, or use existing one
+            if (!graphElementRef.TryGetComponent(out IssueWindow propertyMenu))
+            {
+                propertyMenu = graphElementRef.gameObject.AddComponent<IssueWindow>();
+                propertyMenu.Title = "Issues" + graphElementRef.Elem.ToShortString();
+                propertyMenu.GraphElement = graphElementRef.Elem;
+            }
+            return propertyMenu;
+        }
+
 
         /// <summary>
         /// Returns a <see cref="GraphElementPropertyWindow"/> showing the attributes of <paramref name="graphElementRef"/>.
