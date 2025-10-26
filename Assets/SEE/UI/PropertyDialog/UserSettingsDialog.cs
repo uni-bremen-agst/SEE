@@ -15,7 +15,7 @@ namespace SEE.UI.PropertyDialog
     /// A dialog to enter the network properties (<see cref="NetworkConfig"/>)
     /// and scene settings (<see cref="SceneSettings"/>).
     /// </summary>
-    internal class NetworkPropertyDialog
+    internal class UserSettingsDialog
     {
         /// <summary>
         /// Callback to be called when this dialog closes.
@@ -27,7 +27,7 @@ namespace SEE.UI.PropertyDialog
         /// </summary>
         /// <param name="networkConfig">the network configuration to be manipulated by this dialog</param>
         /// <param name="callBack">delegate to be called when this dialog is closed</param>
-        public NetworkPropertyDialog(Net.Network networkConfig, Action callBack = null)
+        public UserSettingsDialog(Net.Network networkConfig, Action callBack = null)
         {
             this.networkConfig = networkConfig;
             this.callBack = callBack;

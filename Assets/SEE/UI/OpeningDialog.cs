@@ -187,7 +187,7 @@ namespace SEE.UI
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            NetworkPropertyDialog dialog = new(User.UserSettings.Instance?.Network, Reactivate);
+            UserSettingsDialog dialog = new(User.UserSettings.Instance?.Network, Reactivate);
             dialog.Open();
         }
 
