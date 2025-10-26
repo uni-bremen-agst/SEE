@@ -208,7 +208,7 @@ namespace SEE.Game.Avatars
             Transform leftHandBendGoal = transform.Find("LeftElbowBendGoal");
             if (leftHandBendGoal == null)
             {
-                Debug.LogError($"LeftElbowBendGoal not found in avatar transform {transform.name}.");
+                Debug.LogError($"LeftElbowBendGoal not found in avatar transform {transform.name}.\n");
                 return;
             }
             leftHandBendGoal.localPosition = leftBendGoalLocalPosition.Value;
