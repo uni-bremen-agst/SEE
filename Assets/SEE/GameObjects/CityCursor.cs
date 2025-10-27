@@ -1,7 +1,12 @@
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using SEE.Controls;
 using SEE.Controls.Interactables;
 using SEE.DataModel.DG;
 using SEE.Game.City;
+using SEE.Tools.OpenTelemetry;
 using SEE.UI3D;
 using SEE.Utils;
 using UnityEngine;
@@ -63,21 +68,58 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Tracks the hover start times for each hovered <see cref="InteractableObject"/>.
+        /// </summary>
+        private readonly Dictionary<InteractableObject, float> hoverStartTimes = new();
+        /// <summary>
+        /// Represents a collection of interactable objects that have reached the hover threshold.
+        /// </summary>
+        /// <remarks>This collection is used to track objects that meet the hover threshold criteria.</remarks>
+        private readonly HashSet<InteractableObject> hoverThresholdReached = new();
+        /// <summary>
+        /// The threshold duration (in seconds) for hovering over an object to be tracked.
+        /// All objects hovered over for less than this duration will not be considered
+        /// for tracking.
+        /// </summary>
+        private readonly float hoverThreshold = 0.5f;
+
+        /// <summary>
+        /// Calls and forgets <see cref="AnyHoverInAsync(InteractableObject, bool)"/>.
+        /// </summary>
+        /// <param name="interactableObject">the hoverered object</param>
+        /// <param name="isInitiator">true if a local player initiated this call</param>
+        private void AnyHoverIn(InteractableObject interactableObject, bool isInitiator)
+        {
+            AnyHoverInAsync(interactableObject, isInitiator).Forget();
+        }
+
+        /// <summary>
         /// Makes <paramref name="interactableObject"/> the <see cref="Cursor"/> focus when
         /// it belongs to <see cref="city"/>.
-        /// Called whenever an <see cref="InteractableObject"/> is selected.
+        /// Called whenever an <see cref="InteractableObject"/> is hoverered.
         /// </summary>
-        /// <param name="interactableObject">the selected object</param>
-        private void AnyHoverIn(InteractableObject interactableObject, bool _)
+        /// <param name="interactableObject">the hoverered object</param>
+        private async UniTask AnyHoverInAsync(InteractableObject interactableObject, bool _)
         {
             if (AnyHoverIsDoable(interactableObject)
                 && interactableObject is InteractableGraphElement graphElement)
             {
                 Graph selectedGraph = graphElement.GraphElemRef.Elem.ItsGraph;
-                if (selectedGraph != null && city.LoadedGraph != null
+                if (selectedGraph != null
+                    && city.LoadedGraph != null
                     && selectedGraph.Equals(city.LoadedGraph))
                 {
                     Cursor.AddFocus(interactableObject);
+                    hoverStartTimes[interactableObject] = Time.time;
+
+                    float start = Time.time;
+                    await Task.Delay(TimeSpan.FromSeconds(hoverThreshold));
+
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float hoverTime)
+                        && Math.Abs(hoverTime - start) < 0.1f)
+                    {
+                        hoverThresholdReached.Add(interactableObject);
+                    }
                 }
             }
         }
@@ -97,6 +139,19 @@ namespace SEE.GO
                 if (selectedGraph != null && selectedGraph.Equals(city.LoadedGraph))
                 {
                     Cursor.RemoveFocus(interactableObject);
+
+                    if (hoverStartTimes.TryGetValue(interactableObject, out float startTime)
+                        && hoverThresholdReached.Contains(interactableObject))
+                    {
+                        float duration = Time.time - startTime;
+                        TracingHelperService.Instance?.TrackHoverDuration(
+                            interactableObject.gameObject,
+                            duration,
+                            hoverThreshold);
+                    }
+
+                    hoverStartTimes.Remove(interactableObject);
+                    hoverThresholdReached.Remove(interactableObject);
                 }
             }
         }
@@ -113,24 +168,24 @@ namespace SEE.GO
         {
             if (interactableObject == null)
             {
-                Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(InteractableObject)}.\n");
+                Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(InteractableObject)}.\n");
                 return false;
             }
             if (interactableObject is InteractableGraphElement graphElement)
             {
                 if (graphElement.GraphElemRef == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElementRef)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElementRef)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(GraphElement)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem.ItsGraph == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverIn)} called with null {nameof(Graph)}.\n");
+                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(Graph)}.\n");
                     return false;
                 }
             }

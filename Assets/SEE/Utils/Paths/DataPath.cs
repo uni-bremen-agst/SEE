@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using SEE.User;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
@@ -15,7 +16,7 @@ namespace SEE.Utils.Paths
     /// A representation of URLs or local disk paths of files and directories containing data.
     /// Files and directories can be set absolute in the file system or relative to one of
     /// Unity's standard folders such as Assets, Project, etc. URLs can be relative to
-    /// our server at <see cref="Network.ClientRestAPI"/> or relate to other servers.
+    /// our server at <see cref="Network.BackendServerAPI"/> or relate to other servers.
     /// </summary>
     [Serializable]
     public class DataPath
@@ -236,7 +237,7 @@ namespace SEE.Utils.Paths
                 // absolutePath is set only for foreign servers, in which case relativePath
                 // will be empty. If the absolutePath is empty, the relativePath is interpreted relative
                 // to our server.
-                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(Network.ClientRestAPI);
+                Uri baseUri = AbsolutePath.Length > 0 ? new(AbsolutePath) : new(UserSettings.BackendServerAPI);
                 Uri relativeUri = new(RelativePath, UriKind.Relative);
                 return new Uri(baseUri, relativeUri).ToString();
             }
@@ -266,8 +267,8 @@ namespace SEE.Utils.Paths
         /// Adjusts the root and path information of this data path based on the given <paramref name="path"/>.
         ///
         /// If the <see cref="Root"/> is a <see cref="RootKind.Url"/> and the URI prefix matches
-        /// <see cref="Network.ClientRestAPI"/>, the path will be stored as a relative path,
-        /// where <see cref="Network.ClientRestAPI"/> is removed from <paramref name="path"/>.
+        /// <see cref="Network.BackendServerAPI"/>, the path will be stored as a relative path,
+        /// where <see cref="Network.BackendServerAPI"/> is removed from <paramref name="path"/>.
         /// If the URI prefix does not match, <paramref name="path"/> will be stored as relative
         /// or absolute path, respectively, depending upon whether <paramref name="path"/>
         /// interpreted as a universal resource identifier is relative or absolute.
@@ -295,11 +296,11 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    if (path.Contains(Network.ClientRestAPI))
+                    if (path.Contains(UserSettings.BackendServerAPI))
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        RelativePath = path.Replace(Network.ClientRestAPI, string.Empty);
+                        RelativePath = path.Replace(UserSettings.BackendServerAPI, string.Empty);
                     }
                     else
                     {
