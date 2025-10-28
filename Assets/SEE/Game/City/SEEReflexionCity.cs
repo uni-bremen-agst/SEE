@@ -199,25 +199,30 @@ namespace SEE.Game.City
             Reset();
             Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
             // Use a single GXL provider to load the graph.
-            GXLSingleGraphProvider implementationGxlProvider = new()
-            {
-                Path = GraphSnapshotPath
-            };
-            Graph implementationGraph = await implementationGxlProvider.ProvideAsync(new Graph(""), this);
 
-            GXLSingleGraphProvider architectureGxlProvider = new()
+            if (initialReflexionCity)
             {
-                Path = ArchitectureSnapshotPath
-            };
-            Graph architectureGraph = await architectureGxlProvider.ProvideAsync(new Graph(""), this);
-
-            GXLSingleGraphProvider mappingGxlProvider = new()
+                ResetToInitial();
+                LoadInitial(gameObject.name);
+                return;
+            }
+            else if (IsInitialState())
             {
-                Path = MappingSnapshotPath
-            };
-            Graph mappingGraph = await mappingGxlProvider.ProvideAsync(new Graph(""), this);
+                LoadConfiguration();
+            }
 
-            LoadedGraph = new ReflexionGraph(implementationGraph, architectureGraph, mappingGraph);
+            // Makes the necessary changes for the initial types of a reflexion city.
+            AddInitialSubrootTypes();
+
+
+            ReflexionGraphProvider reflexionGraphProvider = new();
+
+            reflexionGraphProvider.Architecture = ArchitectureSnapshotPath;
+            reflexionGraphProvider.Implementation = GraphSnapshotPath;
+            reflexionGraphProvider.Mapping = MappingSnapshotPath;
+
+            LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
+            //LoadedGraph = ReflexionGraph.FromSnapshot(implementationGraph, architectureGraph, mappingGraph);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
 
