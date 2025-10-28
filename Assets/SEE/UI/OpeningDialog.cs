@@ -77,7 +77,7 @@ namespace SEE.UI
                     EntryColor: NextColor(),
                     Icon: Icons.Export),
 
-                new(SelectAction: NetworkSettings,
+                new(SelectAction: UserSettings,
                     Title: "Settings",
                     Description: "Allows to set additional network and user settings.",
                     EntryColor: Color.gray,
@@ -181,7 +181,7 @@ namespace SEE.UI
         /// <summary>
         /// Opens the dialog to configure the network settings.
         /// </summary>
-        private void NetworkSettings()
+        private void UserSettings()
         {
             /// Note: We arrive here because the user pressed one of the buttons of the
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
@@ -189,6 +189,7 @@ namespace SEE.UI
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
             UserSettingsDialog dialog = new(User.UserSettings.Instance?.Network, Reactivate);
             dialog.Open();
+            menu.ShowMenu = false;
         }
 
         /// <summary>
