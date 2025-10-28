@@ -292,6 +292,10 @@ namespace SEE.Game.City
         /// <returns>task</returns>
         async UniTask RenderTransitionAsync()
         {
+            if (LoadedGraph == null)
+            {
+                return;
+            }
             // Backup old graph
             Graph oldGraph = LoadedGraph.Clone() as Graph;
             await LoadDataAsync();
@@ -301,7 +305,10 @@ namespace SEE.Game.City
             /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
             /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
             InitializeAfterDrawn(false);
-            transitionRenderer.ShowMarking();
+            if (edgesAreDrawn)
+            {
+                transitionRenderer.ShowMarking();
+            }
         }
 
         /// <summary>
