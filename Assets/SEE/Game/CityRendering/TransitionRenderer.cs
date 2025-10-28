@@ -11,7 +11,6 @@ using SEE.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -105,8 +104,10 @@ namespace SEE.Game.CityRendering
                 {
                     return;
                 }
+
                 foreach (Edge edge in edges)
                 {
+                    Debug.Log($"Marking edge {edge.ID} \n");
                     GameObject go = GraphElementIDMap.Find(edge.ID, true);
                     if (go != null)
                     {
@@ -224,17 +225,8 @@ namespace SEE.Game.CityRendering
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
             Debug.Log($"Phase 1b: Finished.\n");
 
-            // TODO: Fade out edges.
-
             Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
-            if (false)
-            {
-                await AnimateNodeMoveAsync(equalNodes, newNodelayout, codeCity.transform);
-            }
-            else
-            {
-                await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
-            }
+            await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
             Debug.Log($"Phase 2: Finished.\n");
 
             if (edgesAreDrawn)
@@ -262,26 +254,18 @@ namespace SEE.Game.CityRendering
             await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
             Debug.Log($"Phase 4a: Finished.\n");
 
-            //GameNodeHierarchy.Update(codeCity);
-
             if (edgesAreDrawn)
             {
                 ShowAddedEdges(addedEdges);
                 Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
                 await AnimateEdgeBirthAsync(addedEdges, newEdgeLayout, renderer, animationKind);
-
-                // TODO: Fade in changedEdges and equalEdges with newEdgeLayout.
                 Debug.Log($"Phase 4b: Finished.\n");
             }
 
             MarkNodes(addedNodes, changedNodes);
-            // FIXME
+            // We save these edges so that they can later be marked by MarkEdges.
             this.addedEdges = addedEdges;
             this.changedEdges = changedEdges;
-            if (edgesAreDrawn)
-            {
-                //MarkEdges(addedEdges, changedEdges);
-            }
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {
@@ -319,7 +303,9 @@ namespace SEE.Game.CityRendering
         /// <param name="toBeRemoved">nodes to be removed</param>
         /// <param name="AnimateDeath">method to animate the death of a game object</param>
         /// <returns>task</returns>
-        private async UniTask AnimateDeathAsync<T>(ISet<T> toBeRemoved, Func<GameObject, IOperationCallback<Action>> AnimateDeath)
+        private async UniTask AnimateDeathAsync<T>
+            (ISet<T> toBeRemoved, Func<GameObject,
+             IOperationCallback<Action>> AnimateDeath)
             where T : GraphElement
         {
             HashSet<GameObject> deads = new();
@@ -441,7 +427,11 @@ namespace SEE.Game.CityRendering
         /// <param name="renderer">the graph renderer to draw the new edges</param>
         /// <param name="animationKind">the kind of animation to be used for the edge birth</param>
         /// <returns>task</returns>
-        private async UniTask AnimateEdgeBirthAsync(ISet<Edge> addedEdges, Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout, IGraphRenderer renderer, EdgeAnimationKind animationKind)
+        private async UniTask AnimateEdgeBirthAsync
+            (ISet<Edge> addedEdges,
+            Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
+            IGraphRenderer renderer,
+            EdgeAnimationKind animationKind)
         {
             // The set of edges whose birth is still being animated.
             HashSet<GameObject> births = new();
@@ -529,15 +519,29 @@ namespace SEE.Game.CityRendering
                 return;
             }
 
+            // Partition all at the same hierarchy level.
             UnionFind<Node, int> unionFind = new(movedNodes, n => n.Level);
             unionFind.PartitionByValue();
-            IOrderedEnumerable<IList<Node>> partitions = unionFind.GetPartitions().ToList().OrderBy(l => l);
-            foreach (IList<Node> partition in partitions)
+            // For each partition sorted ascendingly by the hierarchy level:
+            // move all the nodes in the same partition together.
+            // Note that a partition is a list of Nodes. For the sorting, we
+            // take the level of the first node of each list. Each list is
+            // guaranteed to have at least one node. The partitions were defined
+            // be the node levels.
+            foreach (IList<Node> partition in unionFind.GetPartitions().ToList().OrderBy(l => l.First().Level))
             {
                 await MoveAsync(partition, newNodelayout);
             }
         }
 
+        /// <summary>
+        /// Moves all <paramref name="movedNodes"/> to their target position looked up in
+        /// <paramref name="newNodelayout"/>. Incoming and outgoing edges are moved along
+        /// with the nodes.
+        /// </summary>
+        /// <param name="movedNodes">Nodes to be moved.</param>
+        /// <param name="newNodelayout">Target position of the nodes to be moved.</param>
+        /// <returns>task</returns>
         private static async UniTask MoveAsync(IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
         {
             HashSet<GameObject> moved = new();
