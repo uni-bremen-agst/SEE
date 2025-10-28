@@ -308,7 +308,7 @@ namespace SEE.Tools.Livekit
             webCamTexture?.Play();
 
             // Create a video source from the current webcam texture.
-            TextureVideoSource source = new(webCamTexture);
+            WebCameraSource source = new(webCamTexture);
 
             // Create a local video track with the video source.
             LocalVideoTrack track = LocalVideoTrack.CreateVideoTrack("my-video-track", source, room);
