@@ -11,6 +11,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
@@ -659,5 +660,41 @@ namespace SEE.Game.City
         }
 
         #endregion SEEReflexionCity creation during in play mode
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="ArchitectureSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string architectureSnapshotPathLabel = "ArchitectureSnapshotPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="MappingSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string mappingSnapshotPathLabel = "MappingSnapshotPath";
+
+        /// <summary>
+        /// Saves the attributes of this instance in a configuration file
+        /// </summary>
+        /// <param name="writer">Writer for the configuration file.</param>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            ArchitectureSnapshotPath?.Save(writer, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Save(writer, mappingSnapshotPathLabel);
+        }
+
+        /// <summary>
+        /// Restores the attributes from a given configuration <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The configuration to load the attributes from.</param>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            ArchitectureSnapshotPath.Restore(attributes, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Restore(attributes, mappingSnapshotPathLabel);
+        }
+
+        #endregion
     }
 }
