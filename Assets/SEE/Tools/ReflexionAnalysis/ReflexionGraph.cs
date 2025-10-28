@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using SEE.DataModel.DG;
 using UnityEngine;
@@ -150,6 +151,10 @@ namespace SEE.Tools.ReflexionAnalysis
             architectureGraph.AddSingleRoot(out architectureRoot, type: ArchitectureType);
             implementationGraph.AddSingleRoot(out implementationRoot, type: ImplementationType);
 
+            if (mappingGraph.Nodes().Any())
+            {
+                mappingGraph.AddSingleRoot(out Node _, type: "MAPPING", name: "MAPPING_ROOT");
+            }
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
             architectureGraph.MarkGraphNodesIn(Architecture);
@@ -201,7 +206,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(mappingGraph, suffix);
+            mappingGraph.CopyEdgesTo(mergedGraph);
             mergedGraph.AddSingleRoot(out Node _);
             return mergedGraph;
 
