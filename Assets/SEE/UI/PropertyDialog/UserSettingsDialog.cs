@@ -152,7 +152,7 @@ namespace SEE.UI.PropertyDialog
                 voiceChatSelector.Name = "Voice Chat";
                 voiceChatSelector.Description = "Select a voice chat system";
                 voiceChatSelector.AddOptions(VoiceChatSystemsToStrings());
-                voiceChatSelector.Value = SEE.User.UserSettings.Instance.VoiceChat.ToString();
+                voiceChatSelector.Value = User.UserSettings.Instance.VoiceChat.ToString();
                 group.AddProperty(voiceChatSelector);
             }
             {
