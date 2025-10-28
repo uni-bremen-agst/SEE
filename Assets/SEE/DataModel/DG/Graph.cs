@@ -335,7 +335,7 @@ namespace SEE.DataModel.DG
             {
                 type = RootType;
             }
-            if (roots.Any())
+            if (roots.Count > 1)
             {
                 root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
                 AddNode(root);
