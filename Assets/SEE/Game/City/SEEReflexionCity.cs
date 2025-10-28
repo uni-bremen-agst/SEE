@@ -170,6 +170,11 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public override void SaveData()
         {
+
+            foreach (Node node in LoadedGraph.Nodes())
+            {
+                node.IntAttributes.Remove("Linkage.PIR_Node");
+            }
             // Assumes that the LoadedGraph is a ReflexionGraph.
             ReflexionGraph reflexionGraph = LoadedGraph as ReflexionGraph;
             (Graph implementation, Graph architecture, Graph mapping) = reflexionGraph.Disassemble();
