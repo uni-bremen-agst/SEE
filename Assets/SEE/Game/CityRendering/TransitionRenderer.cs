@@ -228,13 +228,18 @@ namespace SEE.Game.CityRendering
                 Reattach(equalEdges);
             }
 
+            // Note: No matter what the value of edgesAreDrawn is, we do not
+            // calculate the edge layout here. Existing edges will be moved
+            // along with their nodes using the NodeOperators. Only the layout
+            // of new edges needs to be calculated, but that will be done
+            // by IGraphRenderer.DrawEdge called in AddNewEdges.
             NextLayout.Calculate(newGraph,
                                  GetGameNode,
                                  renderer,
-                                 edgesAreDrawn,
+                                 false, // We do not need to calculate the edge layout.
                                  codeCity,
                                  out Dictionary<string, ILayoutNode> newNodelayout,
-                                 out Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
+                                 out Dictionary<string, ILayoutEdge<ILayoutNode>> _,
                                  ref oldLayout);
             // Note: At this point, game nodes for new nodes have been created already.
             // Their NodeRefs refer to nodes in the newly loaded graph.
