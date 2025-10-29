@@ -90,6 +90,12 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Marks all <paramref name="addedEdges"/> as born and all <paramref name="changedEdges"/>
         /// as changed using glow effects. Every marked edge is added to <see cref="highlightedEdgeOperators"/>.
+        /// Marking is expressed by a glow effect.
+        ///
+        /// In case a game edge does not yet have a mesh (i.e., is currently rendered by
+        /// a <see cref="LineRenderer"/>, we cannot let it glow immediately because the
+        /// glow effect requires a mesh. In that case, we postpone the effect until the
+        /// <see cref="LineRenderer"/> has been turned into a mesh by the <see cref="EdgeMeshScheduler"/>.
         /// </summary>
         /// <param name="addedEdges">added edges</param>
         /// <param name="changedEdges">changed edges</param>
@@ -107,25 +113,51 @@ namespace SEE.Game.CityRendering
 
                 foreach (Edge edge in edges)
                 {
-                    Debug.Log($"Marking edge {edge.ID} \n");
-                    GameObject go = GraphElementIDMap.Find(edge.ID, true);
+                    GameObject go = GraphElementIDMap.Find(edge.ID, false);
+
                     if (go != null)
                     {
-                        EdgeOperator edgeOperator = go.EdgeOperator();
-                        edgeOperator.GlowIn();
-                        edgeOperator.HitEffect();
-                        highlightedEdgeOperators.Enqueue(edgeOperator);
+                        if (go.TryGetComponent(out LineRenderer _))
+                        {
+                            // We do not have a mesh yet. Glow effect will currently not work.
+                            if (go.TryGetComponentOrLog(out SEESpline spline))
+                            {
+                                // We need to wait until the mesh is created.
+                                spline.OnMeshCreated += OnMeshCreated;
+                            }
+                        }
+                        else
+                        {
+                            MarkEdge(go);
+                        }
+                    }
+                    else
+                    {
+                        Debug.LogError($"Edge {edge.ID} could not be found.\n");
                     }
                 }
             }
+
+            void OnMeshCreated(SEESpline spline)
+            {
+                spline.OnMeshCreated -= OnMeshCreated;
+                MarkEdge(spline.gameObject);
+            }
         }
 
-        private ISet<Edge> addedEdges;
-        private ISet<Edge> changedEdges;
-
-        internal void ShowMarking()
+        /// <summary>
+        /// Marks the <paramref name="gameEdge"/> as changed or new by
+        /// letting it glow. Adds its <see cref="EdgeOperator"/> to
+        /// <see cref="highlightedEdgeOperators"/> so that the glow effect
+        /// can be stopped when we move to the next graph.
+        /// </summary>
+        /// <param name="gameEdge">the game edge to be marked</param>
+        private void MarkEdge(GameObject gameEdge)
         {
-            MarkEdges(addedEdges, changedEdges);
+            EdgeOperator edgeOperator = gameEdge.EdgeOperator();
+            edgeOperator.GlowIn();
+            edgeOperator.HitEffect();
+            highlightedEdgeOperators.Enqueue(edgeOperator);
         }
 
         #endregion Edge Marking
@@ -263,9 +295,7 @@ namespace SEE.Game.CityRendering
             }
 
             MarkNodes(addedNodes, changedNodes);
-            // We save these edges so that they can later be marked by MarkEdges.
-            this.addedEdges = addedEdges;
-            this.changedEdges = changedEdges;
+            MarkEdges(addedEdges, changedEdges);
 
             IOperationCallback<Action> AnimateNodeDeath(GameObject go)
             {

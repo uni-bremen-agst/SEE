@@ -7,7 +7,6 @@ using SEE.Game.Operator;
 using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
-using UnityEngine.Rendering;
 using Frame = TinySpline.Frame;
 
 namespace SEE.GO
@@ -49,7 +48,13 @@ namespace SEE.GO
     public class SEESpline : SerializedMonoBehaviour
     {
         /// <summary>
-        /// What the name says.
+        /// Event that is triggered once a mesh for the spline was created
+        /// by <see cref="CreateMesh"/>.
+        /// </summary>
+        public event Action<SEESpline> OnMeshCreated;
+
+        /// <summary>
+        /// What the name says: two times the value of pi.
         /// </summary>
         [NonSerialized]
         private const float doublePi = Mathf.PI * 2f;
@@ -747,6 +752,7 @@ namespace SEE.GO
                 edgeOperator.RefreshGlowAsync(true).Forget();
             }
             needsCompleteUpdate = false;
+            OnMeshCreated?.Invoke(this);
             return mesh;
         }
 
