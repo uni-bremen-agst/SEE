@@ -243,6 +243,7 @@ namespace SEE.Game.CityRendering
             // That is no problem for removedNodes as these will be removed anyway.
             // Yet, we need to update the game nodes with NodeRefs to all changedNodes
             // and equalNodes.
+            // The same holds for game edges.
 
             if (edgesAreDrawn)
             {
@@ -290,7 +291,7 @@ namespace SEE.Game.CityRendering
             {
                 ShowAddedEdges(addedEdges);
                 Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
-                await AnimateEdgeBirthAsync(addedEdges, newEdgeLayout, renderer, animationKind);
+                AddNewEdges(addedEdges, renderer);
                 Debug.Log($"Phase 4b: Finished.\n");
             }
 
@@ -451,52 +452,20 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Creates, adds, and animates new game objects for <paramref name="addedEdges"/>.
+        /// Creates and adds new game objects for <paramref name="addedEdges"/>.
         /// </summary>
         /// <param name="addedEdges">the new edges</param>
         /// <param name="renderer">the graph renderer to draw the new edges</param>
-        /// <param name="animationKind">the kind of animation to be used for the edge birth</param>
         /// <returns>task</returns>
-        private async UniTask AnimateEdgeBirthAsync
+        private void AddNewEdges
             (ISet<Edge> addedEdges,
-            Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
-            IGraphRenderer renderer,
-            EdgeAnimationKind animationKind)
+            IGraphRenderer renderer)
         {
-            // The set of edges whose birth is still being animated.
-            HashSet<GameObject> births = new();
 
             foreach (Edge edge in addedEdges)
             {
                 // The new edge will be created with the correct layout.
-                GameObject edgeObject = GetNewEdge(edge);
-                births.Add(edgeObject);
-            }
-
-            // Let the frame be finished so that all game edges are really added to the scene
-            // and their EdgeOperator component is enabled.
-            // Note: UniTask.Yield() works only while the game is playing.
-            await UniTask.Yield();
-            await UniTask.WaitForEndOfFrame();
-
-            // The animation of edges works only if they have been migrated from
-            // a LineRenderer into a Mesh. That is done by EdgeMeshScheduler.
-            foreach (GameObject edgeObject in births)
-            {
-                //IOperationCallback<Action> animation = edgeObject.EdgeOperator().Show(animationKind);
-                //edgeObject.EdgeOperator().GlowIn();
-                //edgeObject.EdgeOperator().HitEffect();
-                // FIXME: Diese beiden Callbacks werden nicht aufgerufen, wenn die AnimationKind None ist.
-                // Oder wenn die Kante noch ein LineRenderer-Objekt ist und keine Spline?
-                //animation.OnComplete(() => OnComplete(edgeObject));
-                //animation.OnKill(() => OnComplete(edgeObject));
-            }
-
-            //await UniTask.WaitUntil(() => births.Count == 0);
-
-            void OnComplete(GameObject go)
-            {
-                births.Remove(go);
+                GetNewEdge(edge);
             }
 
             /// <summary>
