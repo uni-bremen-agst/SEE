@@ -582,67 +582,6 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Animates the move of <paramref name="movedNodes"/> to their new positions
-        /// according to <paramref name="newNodelayout"/>. All moved nodes will be
-        /// temporarily re-parented to <paramref name="cityTransform"/> so that
-        /// the <see cref="NodeOperator"/> can move them individually.
-        /// </summary>
-        /// <param name="movedNodes">game nodes to be moved</param>
-        /// <param name="newNodelayout">new positions</param>
-        /// <param name="cityTransform">temporary parent representing the code city
-        /// as a whole</param>
-        /// <returns>task</returns>
-        private static async UniTask AnimateNodeMoveAsync
-                                (ISet<Node> movedNodes,
-                                 Dictionary<string, ILayoutNode> newNodelayout,
-                                 Transform cityTransform)
-        {
-            HashSet<GameObject> moved = new();
-
-            foreach (Node node in movedNodes)
-            {
-                GameObject go = GraphElementIDMap.Find(node.ID, true);
-                if (go != null)
-                {
-                    ILayoutNode layoutNode = newNodelayout[node.ID];
-                    if (layoutNode != null)
-                    {
-                        if (PositionHasChanged(go, layoutNode))
-                        {
-                            // We want the animator to move each node separately, which is why we
-                            // remove each from the hierarchy; later the node hierarchy will be
-                            // re-established. It still needs to be a child of the code city,
-                            // however, because methods called in the course of the animation
-                            // will try to retrieve the code city from the game node.
-                            go.transform.SetParent(cityTransform);
-
-                            moved.Add(go);
-                            // Move the node to its new position. The edge layout will not be
-                            // be updated because we just set the node's parent to cityTransform.
-                            // As a consequence, the node hierarchy is temporarily flat, which
-                            // will distort hierarchical edge layouts, such as edge bundling.
-                            IOperationCallback<Action> animation = go.NodeOperator()
-                              .MoveTo(layoutNode.CenterPosition, updateEdges: true);
-                            animation.OnComplete(() => OnComplete(go));
-                            animation.OnKill(() => OnComplete(go));
-                        }
-                    }
-                    else
-                    {
-                        Debug.LogError($"No layout for node {node.ID}.\n");
-                    }
-                }
-            }
-
-            await UniTask.WaitUntil(() => moved.Count == 0);
-
-            void OnComplete(GameObject go)
-            {
-                moved.Remove(go);
-            }
-        }
-
-        /// <summary>
         /// The distance between a current position and a new position of a game node
         /// at which we consider that the position has actually changed.
         /// </summary>
@@ -732,8 +671,8 @@ namespace SEE.Game.CityRendering
                                          layoutNode.AbsoluteScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
 
-                IOperationCallback<System.Action> animation = gameNode.NodeOperator()
-                        .ScaleTo(localScale, updateEdges: false);
+                IOperationCallback<Action> animation = gameNode.NodeOperator()
+                        .ScaleTo(localScale, updateEdges: true);
                 animation.OnComplete(() => OnComplete(gameNode));
                 animation.OnKill(() => OnComplete(gameNode));
             }
