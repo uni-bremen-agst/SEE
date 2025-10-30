@@ -42,6 +42,8 @@ public class FaceData
 
     public Dictionary<string, float> blendshapes;
     public Dictionary<string, LandmarkCoordinates> landmarks;
+
+    public long ts;
 }
 
 /// <summary>
@@ -142,6 +144,9 @@ public class EchoFace : MonoBehaviour
     // Stores the latest face data to be used by LateUpdate
     private FaceData _latestFaceData;
 
+    // Stores the timestamp of the last processed packet to discard outdated packets
+    private long _lastTimestampMs = -1;
+
     // Stores the current blendshape values after smoothing, used for the next frame's smoothing calculation
     private readonly Dictionary<string, float> _currentBlendshapeValues = new();
 
@@ -159,8 +164,8 @@ public class EchoFace : MonoBehaviour
         string,
         Func<Dictionary<string, float>, float>
     > _visemeSynthesisMap =
-    new()
-    {
+        new()
+        {
         {
             "V_Open",
             arkit =>
@@ -420,6 +425,8 @@ public class EchoFace : MonoBehaviour
         {
             ApplyEyeRotation();
         }
+
+        _latestFaceData = null; // Clear after processing
     }
 
     private void OnApplicationQuit() => Shutdown();
@@ -709,7 +716,7 @@ public class EchoFace : MonoBehaviour
             if (found != null)
             {
                 return found;
-        }
+            }
         }
 
         // Not found in this branch
@@ -756,6 +763,15 @@ public class EchoFace : MonoBehaviour
                 var receivedData = JsonConvert.DeserializeObject<FaceData>(json);
                 if (receivedData != null)
                 {
+                    // Discard outdated or identical packets
+                    if (receivedData.ts <= _lastTimestampMs)
+                    {
+                        continue;
+                    }
+
+                    _lastTimestampMs = receivedData.ts;
+
+                    // Keep only the latest packet in the queue
                     while (_faceDataQueue.TryDequeue(out _)) { }
                     _faceDataQueue.Enqueue(receivedData);
                 }

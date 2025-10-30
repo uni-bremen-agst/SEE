@@ -1,11 +1,9 @@
 import mediapipe as mp
 import logging
-from typing import Callable, Optional, Dict, List, Any
-import collections.abc
+from typing import Callable, Optional, Dict, Any
 
 logger = logging.getLogger(__name__)
 
-# MediaPipe constants for easier access
 BaseOptions = mp.tasks.BaseOptions
 FaceLandmarker = mp.tasks.vision.FaceLandmarker
 FaceLandmarkerOptions = mp.tasks.vision.FaceLandmarkerOptions
@@ -22,14 +20,19 @@ class FaceAnalyzer:
     """
     MODEL_PATH = 'face_landmarker.task'
 
-    def __init__(self, on_new_result_callback: Optional[Callable[[Dict[str, float], Dict[int, Any]], None]] = None):
+    def __init__(
+        self,
+        on_new_result_callback: Optional[
+            Callable[[Dict[str, float], Dict[int, Any], int], None]
+        ] = None,
+    ):
         """
         Initializes the FaceAnalyzer.
 
         Args:
             on_new_result_callback:
-                A callback function to be invoked with the detected blendshape data (as a dict)
-                and a list of selected landmark coordinates.
+                A callback function to be invoked with the detected blendshape data (as a dict),
+                a dict of selected landmark coordinates, and the original timestamp in ms.
                 If `None`, no action is taken upon detection.
         """
         self._landmarker: FaceLandmarker | None = None
@@ -71,13 +74,17 @@ class FaceAnalyzer:
                     selected_landmarks[i] = {  # Use index as the key
                         "x": round(result.face_landmarks[0][i].x, 4),
                         "y": round(result.face_landmarks[0][i].y, 4),
-                        "z": round(result.face_landmarks[0][i].z, 4)
+                        "z": round(result.face_landmarks[0][i].z, 4),
                     }
 
         # 3. Invoke the combined callback with the processed data
         if self._on_new_result_callback:
             try:
-                self._on_new_result_callback(blendshape_data, selected_landmarks)
+                self._on_new_result_callback(
+                    blendshape_data,
+                    selected_landmarks,
+                    timestamp_ms,
+                )
             except Exception as e:
                 logger.error(f"Error executing combined callback: {e}")
 

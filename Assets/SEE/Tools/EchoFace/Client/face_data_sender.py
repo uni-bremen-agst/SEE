@@ -1,16 +1,16 @@
 import socket
 import json
 import logging
-from typing import List, Dict, Any
+from typing import Dict, Any, Optional
 
 logger = logging.getLogger(__name__)
 
 
 class FaceDataSender:
     """
-    Handles sending blendshape and landmark data over UDP.
+    Handles sending blendshape, landmark, and timestamp data over UDP.
 
-    Data is encoded as a JSON string containing both blendshapes and landmarks.
+    Data is encoded as a JSON string containing blendshapes, landmarks, and timestamp.
     """
 
     def __init__(self, target_ip: str, target_port: int):
@@ -34,13 +34,19 @@ class FaceDataSender:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             logger.info(f"UDP socket created for {self.target_ip}:{self.target_port}")
 
-    def send_face_data(self, blendshape_data: Dict[str, float], landmarks: Dict[int, Dict[str, float]]):
+    def send_face_data(
+        self,
+        blendshape_data: Dict[str, float],
+        landmarks: Dict[int, Dict[str, float]],
+        timestamp_ms: Optional[int] = None
+    ):
         """
-        Sends blendshape and landmark data as JSON over UDP.
+        Sends blendshape, landmark, and timestamp data as JSON over UDP.
 
         Args:
             blendshape_data: Dictionary of blendshape names to float scores.
             landmarks: Dictionary mapping landmark indices to their 'x', 'y', 'z' coordinates.
+            timestamp_ms: Optional Unix timestamp in milliseconds.
         """
         if self.sock is None:
             logger.warning("UDP socket not started; call start() before sending data.")
@@ -52,7 +58,8 @@ class FaceDataSender:
 
         combined_data = {
             "blendshapes": blendshape_data,
-            "landmarks": landmarks
+            "landmarks": landmarks,
+            "ts": timestamp_ms,
         }
 
         try:
