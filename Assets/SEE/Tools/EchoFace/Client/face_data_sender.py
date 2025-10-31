@@ -38,7 +38,7 @@ class FaceDataSender:
         self,
         blendshape_data: Dict[str, float],
         landmarks: Dict[int, Dict[str, float]],
-        timestamp_ms: Optional[int] = None
+        timestamp_ms: int,
     ):
         """
         Sends blendshape, landmark, and timestamp data as JSON over UDP.
@@ -46,7 +46,7 @@ class FaceDataSender:
         Args:
             blendshape_data: Dictionary of blendshape names to float scores.
             landmarks: Dictionary mapping landmark indices to their 'x', 'y', 'z' coordinates.
-            timestamp_ms: Optional Unix timestamp in milliseconds.
+            timestamp_ms: Unix timestamp in milliseconds.
         """
         if self.sock is None:
             logger.warning("UDP socket not started; call start() before sending data.")
