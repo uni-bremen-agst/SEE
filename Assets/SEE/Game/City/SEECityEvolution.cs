@@ -37,6 +37,13 @@ namespace SEE.Game.City
         public MultiGraphPipelineProvider DataProvider = new();
 
         /// <summary>
+        /// The delay in seconds before starting the auto-play transition to the next graph.
+        /// </summary>
+        [Tooltip("The delay in seconds before starting the auto-play transition to the next graph.")]
+        [Range(1f, 60f)]
+        public float AutoPlayDelay = 5f;
+
+        /// <summary>
         /// Error message that will be shown when the graph provider pipeline (<see cref="DataProvider"/>)
         /// didn't yield any graphs.
         /// </summary>
@@ -215,7 +222,7 @@ namespace SEE.Game.City
         /// Is intended to be used in the runtime configuration menu during play mode only,
         /// but not in the Unity Editor. Will call <see cref="LoadDataAsync"/>.
         /// Acts like Load and Draw in the Unity Editor, except that not only the first
-        /// graph will drawn, but the whole series subsequently.
+        /// graph will be drawn, but the whole series subsequently.
         /// </summary>
         [RuntimeButton(DataButtonsGroup, "Load and Draw")]
         [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
@@ -300,7 +307,7 @@ namespace SEE.Game.City
         {
             evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            evolutionRenderer.ShowGraphEvolution();
+            evolutionRenderer.ShowGraphEvolutionAsync().Forget();
         }
 
         /// <summary>
@@ -342,7 +349,7 @@ namespace SEE.Game.City
 
         #region Config I/O
         /// <summary>
-        /// The same as in <see cref="SEECity"/>
+        /// The same as in <see cref="SEECity"/>.
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
@@ -354,6 +361,7 @@ namespace SEE.Game.City
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
+            writer.Save(AutoPlayDelay, nameof(AutoPlayDelay));
         }
 
         /// <summary>
@@ -365,6 +373,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
+            ConfigIO.Restore(attributes, nameof(AutoPlayDelay), ref AutoPlayDelay);
         }
         #endregion
     }
