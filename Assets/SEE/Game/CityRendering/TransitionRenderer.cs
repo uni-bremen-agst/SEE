@@ -176,8 +176,6 @@ namespace SEE.Game.CityRendering
              GameObject codeCity,
              IGraphRenderer renderer)
         {
-            ShowNewCommitsMessage();
-
             // Remove markers from previous rendering.
             markerFactory.Clear();
             DeleteEdgeMarking();
@@ -243,20 +241,13 @@ namespace SEE.Game.CityRendering
             if (edgesAreDrawn)
             {
                 ShowRemovedEdges(removedEdges);
-                Debug.Log($"Phase 1a: Removing {removedEdges.Count} edges.\n");
                 await AnimateDeathAsync(removedEdges, AnimateEdgeDeath);
-                Debug.Log($"Phase 1a: Finished.\n");
             }
 
             ShowRemovedNodes(removedNodes);
-            Debug.Log($"Phase 1b: Removing {removedNodes.Count} nodes.\n");
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
-            Debug.Log($"Phase 1b: Finished.\n");
 
-            Debug.Log($"Phase 2: Moving {equalNodes.Count} nodes.\n");
             await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
-            Debug.Log($"Phase 2: Finished.\n");
-
             if (edgesAreDrawn)
             {
                 ShowChangedEdges(changedEdges);
@@ -267,27 +258,19 @@ namespace SEE.Game.CityRendering
             // changed their dimensions. The treemap layout, for instance, may do that.
             // Note that equalNodes is the union of the really equal nodes passed initially
             // as a parameter and the changedNodes.
-            Debug.Log($"Phase 3: Changing {changedNodes.Count} nodes.\n");
             await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
-            Debug.Log($"Phase 3: Finished.\n");
 
             ShowAddedNodes(addedNodes);
-            Debug.Log($"Phase 4a: Adding {addedNodes.Count} nodes.\n");
             // The temporary parent object for the new nodes. A new node must have
             // a parent object with a Portal component; otherwise the NodeOperator
             // will not work. Later, we will set the correct parent of the new node.
-            // At this time, the code city should have at least the (unique) root game
-            // node.
-            GameObject parent = codeCity; //.FirstChildNode();
+            GameObject parent = codeCity;
             await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
-            Debug.Log($"Phase 4a: Finished.\n");
 
             if (edgesAreDrawn)
             {
                 ShowAddedEdges(addedEdges);
-                Debug.Log($"Phase 4b: Adding {addedEdges.Count} edges.\n");
                 AddNewEdges(addedEdges, renderer);
-                Debug.Log($"Phase 4b: Finished.\n");
             }
 
             MarkNodes(addedNodes, changedNodes);
@@ -797,14 +780,6 @@ namespace SEE.Game.CityRendering
         private void ShowChangedNodes(ISet<Node> nodes)
         {
             ShowUpdated(nodes, nodeKind, changed);
-        }
-
-        /// <summary>
-        /// Shows a message to the user that a new commit was detected.
-        /// </summary>
-        private void ShowNewCommitsMessage()
-        {
-            ShowNotification.Info("New commits detected", "Refreshing code city.");
         }
         #endregion User Notifications
     }
