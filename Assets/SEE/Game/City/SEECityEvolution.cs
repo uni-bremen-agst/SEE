@@ -303,7 +303,6 @@ namespace SEE.Game.City
             evolutionRenderer.ShowGraphEvolution();
         }
 
-
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
         /// node types and the edges of these specific nodes of the graph evolution
