@@ -1,3 +1,6 @@
+import os
+os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
+
 from helpers import draw_landmarks_on_image, draw_centered_text
 from video_io import (
     BaseStream,
@@ -13,8 +16,6 @@ import logging
 import argparse
 import time
 import mediapipe as mp
-import os
-os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
 
 logging.basicConfig(
