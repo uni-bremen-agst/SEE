@@ -9415,6 +9415,7 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  AutoPlayDelay: 3
 --- !u!114 &551406257
 MonoBehaviour:
   m_ObjectHideFlags: 0
