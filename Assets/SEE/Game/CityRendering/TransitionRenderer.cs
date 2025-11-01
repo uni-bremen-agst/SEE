@@ -25,21 +25,12 @@ namespace SEE.Game.CityRendering
         /// Constructor.
         /// </summary>
         /// <param name="markerAttributes">attributes for rendering the node markers</param>
-        /// <param name="markerTime">the time in seconds the new markers should be drawn for;
-        /// after that they will be removed again</param>
-        public TransitionRenderer(MarkerAttributes markerAttributes, int markerTime)
+        public TransitionRenderer(MarkerAttributes markerAttributes)
         {
-            MarkerTime = markerTime;
             markerFactory = new MarkerFactory(markerAttributes);
         }
 
         #region Node Marking
-        /// <summary>
-        /// The time in seconds for how long the node markers should be shown for newly
-        /// added or modified nodes.
-        /// </summary>
-        public int MarkerTime = 10;
-
         /// <summary>
         /// <see cref="MarkerFactory"> for generating node markers.
         /// </summary>
@@ -287,7 +278,7 @@ namespace SEE.Game.CityRendering
             // will not work. Later, we will set the correct parent of the new node.
             // At this time, the code city should have at least the (unique) root game
             // node.
-            GameObject parent = codeCity.FirstChildNode();
+            GameObject parent = codeCity; //.FirstChildNode();
             await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
             Debug.Log($"Phase 4a: Finished.\n");
 
@@ -372,14 +363,15 @@ namespace SEE.Game.CityRendering
         /// <param name="addedNodes">nodes to be added</param>
         /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
         /// <param name="getGameNode">method to get or create the game object for a given node</param>
-        /// <param name="parent">the temporary parent object for the new nodes (should be the code city)</param>
+        /// <param name="codeCity">the temporary parent object for the new nodes (should be the code city)</param>
         /// <returns>task</returns>
         private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
              Func<Node, GameObject> getGameNode,
-             GameObject parent)
+             GameObject codeCity)
         {
+            Assert.IsNotNull(codeCity);
             // The set of nodes whose birth is still being animated.
             HashSet<GameObject> births = new();
 
@@ -390,7 +382,13 @@ namespace SEE.Game.CityRendering
             foreach (Node node in addedNodes)
             {
                 GameObject go = getGameNode(node);
-                go.transform.SetParent(parent.transform);
+                Assert.IsNotNull(go);
+                // The NodeOperator requires that the node has a parent with a Portal component.
+                // That is why we set the parent to the code city here. We cannot use
+                // the actual parent (the game node corresponding to the parent of the
+                // node in the graph) yet because the actual parent game object may not
+                // exist yet (it may be new, too). The real parent will be set later in OnComplete.
+                go.transform.SetParent(codeCity.transform);
                 // We need the NodeOperator component to animate the birth of the node.
                 go.AddOrGetComponent<NodeOperator>();
                 births.Add(go);
@@ -401,6 +399,8 @@ namespace SEE.Game.CityRendering
             // Note: UniTask.Yield() works only while the game is playing.
             await UniTask.Yield();
 
+            // Game nodes for all new nodes now exist.
+
             // Now we can animate the birth of the new nodes.
             foreach (GameObject go in births)
             {
@@ -408,7 +408,7 @@ namespace SEE.Game.CityRendering
                 ILayoutNode layoutNode = newNodelayout[go.name];
                 if (layoutNode != null)
                 {
-                    Add(go, layoutNode, parent);
+                    Add(go, layoutNode);
                 }
                 else
                 {
@@ -418,9 +418,26 @@ namespace SEE.Game.CityRendering
 
             await UniTask.WaitUntil(() => births.Count == 0);
 
+            void Add(GameObject gameNode, ILayoutNode layoutNode)
+            {
+                // A new node has no layout applied to it yet.
+                // If the node is new, we animate it by moving it out from the sky.
+                Vector3 initialPosition = layoutNode.CenterPosition;
+                initialPosition.y = AbstractSEECity.SkyLevel + layoutNode.AbsoluteScale.y;
+                gameNode.transform.position = initialPosition;
+                gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
+
+                // We know the NodeOperator component exists and is enabled because
+                // we added it before and waited at least one frame.
+                IOperationCallback<Action> animation = gameNode.NodeOperator()
+                        .MoveTo(layoutNode.CenterPosition, updateEdges: false);
+                animation.OnComplete(() => OnComplete(gameNode));
+                animation.OnKill(() => OnComplete(gameNode));
+            }
+
             void OnComplete(GameObject go)
             {
-                // Now set the correct parent of the new node.
+                // All nodes exist now. We can set the correct parent of the new node.
                 Node node = go.GetNode();
                 if (!node.IsRoot())
                 {
@@ -431,27 +448,6 @@ namespace SEE.Game.CityRendering
                     }
                 }
                 births.Remove(go);
-            }
-
-            void Add(GameObject gameNode, ILayoutNode layoutNode, GameObject parent)
-            {
-                // A new node has no layout applied to it yet.
-                // If the node is new, we animate it by moving it out from the sky.
-                Vector3 initialPosition = layoutNode.CenterPosition;
-                initialPosition.y = AbstractSEECity.SkyLevel + layoutNode.AbsoluteScale.y;
-                gameNode.transform.position = initialPosition;
-
-                gameNode.SetAbsoluteScale(layoutNode.AbsoluteScale, animate: false);
-
-                // The node is new. Hence, it has no parent yet. It must be contained
-                // in a code city though; otherwise the NodeOperator would not work.
-                Assert.IsNotNull(parent);
-                gameNode.transform.SetParent(parent.transform);
-
-                IOperationCallback<Action> animation = gameNode.NodeOperator()
-                        .MoveTo(layoutNode.CenterPosition, updateEdges: false);
-                animation.OnComplete(() => OnComplete(gameNode));
-                animation.OnKill(() => OnComplete(gameNode));
             }
         }
 
@@ -742,6 +738,7 @@ namespace SEE.Game.CityRendering
         /// <param name="change">the kind of change</param>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
+            return;
             foreach (GraphElement element in elements)
             {
                 ShowNotification.Info($"{kind} {change}", $"{kind} {element.ID} was {change}.");
