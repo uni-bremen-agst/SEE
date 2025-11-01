@@ -2,104 +2,155 @@ import cv2
 import logging
 import numpy as np
 from abc import ABC, abstractmethod
+from enum import Enum, auto
 
 logger = logging.getLogger(__name__)
 
 
 class BaseStream(ABC):
     """
-    Abstract Base Class for video and webcam stream I/O.
-    Responsible ONLY for capturing and reading frames.
-
-    This design ensures that the data source logic is separate from
-    the application's main loop and display/UI logic.
+    Abstract base class for webcam and video file input.
+    Handles initialization, frame reading, and cleanup.
     """
 
-    def __init__(self, target_fps: int):
+    def __init__(self, req_fps: int = 30, width: int = 640, height: int = 480):
         """
-        Initializes the base stream properties.
+        Initializes the base stream configuration.
 
         Args:
-            target_fps: The requested frame rate for the stream.
+            req_fps: Desired frame rate (FPS) for the stream.
+            width: Desired frame width in pixels.
+            height: Desired frame height in pixels.
         """
-        self.target_fps = target_fps
+        self.req_fps = req_fps
+        self.req_width = width
+        self.req_height = height
+
         self.cap: cv2.VideoCapture | None = None
         self.is_running: bool = False
-        self.actual_fps: float = 0.0
 
     @abstractmethod
     def start(self) -> bool:
-        """Initializes and opens the capture source (webcam or file)."""
+        """
+        Opens and initializes the video source (webcam or file).
+
+        Returns:
+            bool: True if the capture source was successfully opened,
+                  False otherwise.
+        """
         pass
 
     @abstractmethod
     def read_frame(self) -> tuple[bool, np.ndarray | None]:
-        """Reads a single frame from the source."""
+        """
+        Reads a single frame from the capture source.
+
+        Returns:
+            tuple[bool, np.ndarray | None]:
+                - True and a valid frame (as a NumPy array in BGR format)
+                  if reading succeeded.
+                - False and None if reading failed or the stream ended.
+        """
         pass
 
     def release(self):
-        """Releases the capture resource."""
+        """
+        Releases the video capture resource and marks the stream as stopped.
+        """
         if self.cap:
             self.cap.release()
-            logger.info("Capture source released.")
             self.cap = None
         self.is_running = False
 
-    def get_actual_fps(self) -> float:
+    def get_fps(self) -> float:
         """
-        Retrieves the actual FPS reported by the video source.
+        Returns the current FPS of the capture source, if available.
 
         Returns:
-            float: The actual measured or reported FPS, or the target_fps
-                   if the actual rate is unknown or zero.
+            float: The actual FPS reported by the source, or the
+                   requested req_fps if no FPS information is available.
         """
-        return self.actual_fps if self.actual_fps > 0 else self.target_fps
+        if not self.cap:
+            return float(self.req_fps)
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        return fps if fps and fps > 0 else float(self.req_fps)
+
+    def log_properties(self):
+        """
+        Logs the current capture properties (width, height, FPS) for debugging.
+
+        This method queries OpenCV capture parameters and prints them via
+        the logger, showing both actual and requested values.
+
+        Example output:
+            Capture properties: 640x480 @ 29.97 FPS
+            (requested 640x480, 30 FPS)
+        """
+        if not self.cap or not self.cap.isOpened():
+            logger.info("Capture not opened.")
+            return
+
+        width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+
+        logger.info(
+            f"Capture properties: {width}x{height} @ {fps:.2f} FPS "
+            f"(requested {self.req_width}x{self.req_height}, {self.req_fps} FPS)"
+        )
 
     def __del__(self):
+        """Ensures resources are released when the object is deleted."""
         self.release()
 
 
 class WebcamStream(BaseStream):
-    """Manages live webcam capture, implementing BaseStream."""
+    """
+    Video stream class for live webcam input.
+    """
 
-    def __init__(self, camera_index: int = 0, target_fps: int = 30):
+    def __init__(self, camera_index: int = 0, req_fps: int = 30, width: int = 640, height: int = 480):
         """
-        Initializes the webcam stream.
+        Initializes a webcam video stream.
 
         Args:
-            camera_index: The numerical index of the camera device (e.g., 0 for default).
-            target_fps: The requested frame rate for the webcam.
+            camera_index: Index of the webcam device (0 = default).
+            req_fps: Desired frame rate (FPS) to request from the device.
+            width: Desired capture width in pixels.
+            height: Desired capture height in pixels.
         """
-        super().__init__(target_fps)
+        super().__init__(req_fps, width, height)
         self.camera_index = camera_index
-        logger.info(f"WebcamStream initialized for index {self.camera_index}, target FPS: {self.target_fps}")
 
     def start(self) -> bool:
-        """Opens the webcam device and sets the requested FPS."""
+        """
+        Opens the webcam device and applies the requested FPS and resolution.
+
+        Returns:
+            bool: True if the webcam was successfully opened,
+                  False otherwise.
+        """
         self.cap = cv2.VideoCapture(self.camera_index)
         if not self.cap.isOpened():
-            logger.error(f"Could not open webcam with index {self.camera_index}. Check connection.")
+            logger.error(f"Failed to open webcam index {self.camera_index}")
             return False
 
-        self.cap.set(cv2.CAP_PROP_FPS, self.target_fps)
-        self.actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
-
-        if self.actual_fps <= 0:
-            logger.warning(f"Webcam did not report actual FPS. Falling back to requested FPS {self.target_fps}.")
-            self.actual_fps = self.target_fps
-        else:
-            logger.info(f"Webcam reports actual FPS: {self.actual_fps:.2f} (Requested: {self.target_fps})")
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.req_width)
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.req_height)
+        self.cap.set(cv2.CAP_PROP_FPS, self.req_fps)
 
         self.is_running = True
-        logger.info("Webcam stream started.")
+        self.log_properties()
         return True
 
     def read_frame(self) -> tuple[bool, np.ndarray | None]:
         """
-        Reads a single frame from the webcam.
+        Reads one frame from the webcam.
 
         Returns:
-            tuple[bool, np.ndarray | None]: (Success flag, Frame data in BGR format)
+            tuple[bool, np.ndarray | None]:
+                - True and a valid frame if successful.
+                - False and None if reading failed or the webcam stopped.
         """
         if not self.is_running or self.cap is None:
             return False, None
@@ -107,106 +158,299 @@ class WebcamStream(BaseStream):
 
 
 class VideoStream(BaseStream):
-    """Manages video file capture (with looping), implementing BaseStream."""
+    """
+    Video stream class for reading from video files.
+    """
 
-    def __init__(self, video_path: str, target_fps: int = 30):
+    def __init__(self, video_path: str, req_fps: int = 30, width: int = 640, height: int = 480):
         """
-        Initializes the video file stream.
+        Initializes a video file stream.
 
         Args:
-            video_path: The filesystem path to the video file.
-            target_fps: The requested frame rate. This is usually overridden by the file's native FPS.
+            video_path: Path to the video file to read.
+            req_fps: Desired fallback frame rate (used if file FPS is unknown).
+            width: Output width in pixels (manual resize applied if needed).
+            height: Output height in pixels (manual resize applied if needed).
         """
-        super().__init__(target_fps)
+        super().__init__(req_fps, width, height)
         self.video_path = video_path
-        logger.info(f"VideoStream initialized for file: {self.video_path}, requested FPS: {self.target_fps}")
 
     def start(self) -> bool:
-        """Opens the video file and reads its native FPS."""
+        """
+        Opens the video file for reading.
+
+        Returns:
+            bool: True if the file was successfully opened,
+                  False otherwise.
+        """
         self.cap = cv2.VideoCapture(self.video_path)
         if not self.cap.isOpened():
-            logger.error(f"Could not open video file: {self.video_path}. Check the path.")
+            logger.error(f"Failed to open video file: {self.video_path}")
             return False
 
-        self.actual_fps = self.cap.get(cv2.CAP_PROP_FPS)
-
-        if self.actual_fps <= 0:
-            logger.warning(f"Video file did not report a valid FPS. Falling back to requested FPS {self.target_fps}.")
-            self.actual_fps = self.target_fps
-        else:
-            logger.info(f"Video file FPS: {self.actual_fps:.2f}")
-
         self.is_running = True
-        logger.info("Video stream started.")
+        self.log_properties()
         return True
 
     def read_frame(self) -> tuple[bool, np.ndarray | None]:
         """
         Reads a single frame from the video file.
-
-        The method will NOT loop and will return (False, None) after the last frame.
+        Automatically resizes frames to the requested resolution.
 
         Returns:
-            tuple[bool, np.ndarray | None]: (Success flag, Frame data in BGR format)
+            tuple[bool, np.ndarray | None]:
+                - True and a resized frame (NumPy array, BGR format) if successful.
+                - False and None if the end of file is reached or reading fails.
         """
         if not self.is_running or self.cap is None:
             return False, None
 
-        # Attempt to read the next frame
         ret, frame = self.cap.read()
-
         if not ret:
-            # If 'ret' is False, the end of the video file has been reached.
-            # We log the event and stop the stream.
-            logger.info("End of video file reached. Stopping stream.")
-            self.release()  # Call the release method to clean up resources
+            self.release()
             return False, None
 
-        return ret, frame
+        if frame is not None:
+            h, w = frame.shape[:2]
+            if (w, h) != (self.req_width, self.req_height):
+                frame = cv2.resize(frame, (self.req_width, self.req_height), interpolation=cv2.INTER_AREA)
+
+        return True, frame
+
+
+class ToolbarButton(Enum):
+    PAUSE = auto()
+    LANDMARKS = auto()
+    QUIT = auto()
 
 
 class FrameViewer:
     """
-    Handles all visual presentation and user input management (UI and Control)
-    for displaying individual frames using OpenCV's windowing system.
-
-    It uses the stream's FPS to calculate the appropriate delay for smooth playback.
+    Displays frames in an OpenCV window with a minimal, auto-sized toolbar
+    rendered below the frame. All button behavior (labels, state, actions, colors)
+    is defined through internal mappings.
     """
 
-    def __init__(self, window_name: str, stream_fps: float):
+    def __init__(
+        self,
+        window_name: str,
+        on_pause=None,
+        on_landmarks=None,
+        on_quit=None,
+        paused_getter=None,
+        landmarks_getter=None,
+    ):
         """
-        Initializes the frame viewer.
+        Creates a viewer window and prepares the toolbar.
 
         Args:
-            window_name: The title for the OpenCV window.
-            stream_fps: The actual or target frame rate of the video source, used to calculate the display delay.
+            window_name: The title of the OpenCV window.
+            on_pause: Callback to invoke when the pause button is pressed.
+            on_landmarks: Callback to invoke when the landmarks button is pressed.
+            on_quit: Callback to invoke when the quit button is pressed.
+            paused_getter: Callable returning True if the client is currently paused.
+            landmarks_getter: Callable returning True if landmarks are currently enabled.
         """
         self.window_name = window_name
-        # Calculate delay (in ms) based on the actual/target FPS of the stream
-        self.display_delay_ms = max(1, int(1000 / stream_fps))
-        logger.info(f"FrameViewer initialized. Frame display delay: {self.display_delay_ms} ms.")
+        self.wait_delay_ms = 1
+
+        self._action_map = {
+            ToolbarButton.PAUSE: on_pause,
+            ToolbarButton.LANDMARKS: on_landmarks,
+            ToolbarButton.QUIT: on_quit,
+        }
+        self._state_getters = {
+            ToolbarButton.PAUSE: paused_getter,
+            ToolbarButton.LANDMARKS: landmarks_getter,
+        }
+        self._label_map = {
+            ToolbarButton.PAUSE: "Pause",
+            ToolbarButton.LANDMARKS: "Landmarks",
+            ToolbarButton.QUIT: "Quit",
+        }
+        self._color_map = {
+            ToolbarButton.QUIT: np.array([40, 40, 140]),
+        }
+
+        # visual parameters
+        self._font = cv2.FONT_HERSHEY_SIMPLEX
+        self._font_scale = 0.55
+        self._font_thickness = 1
+        self._padding_x = 16
+        self._padding_y = 8
+        self._button_gap = 12
+        self._toolbar_bg = (40, 35, 35)
+
+        # runtime layout
+        self._buttons: list[dict] = []
+        self._toolbar_height = 60
+        self._layout_computed = False
+        self._last_frame_width = 0
+        self._last_frame_height = 0
+
+        cv2.namedWindow(self.window_name)
+        cv2.setMouseCallback(self.window_name, self._on_mouse)
+
+        logger.info("FrameViewer initialized.")
 
     def display_frame(self, frame_bgr: np.ndarray):
         """
-        Displays the frame in the dedicated OpenCV window.
+        Renders the given frame and draws the toolbar below it.
 
         Args:
-            frame_bgr: The frame data in BGR format (NumPy array).
+            frame_bgr: The image (BGR) to be shown in the window.
         """
-        if frame_bgr is not None:
-            cv2.imshow(self.window_name, frame_bgr)
+        if frame_bgr is None:
+            return
 
-    def check_key(self) -> int:
-        """
-        Waits for a key press based on the calculated inter-frame delay.
+        h, w = frame_bgr.shape[:2]
+        self._last_frame_height = h
+        self._last_frame_width = w
 
-        Returns:
-            int: The ASCII value of the pressed key, or -1 if no key was pressed.
-        """
-        # The key check is tied to the delay calculated from the stream's FPS
-        return cv2.waitKey(self.display_delay_ms) & 0xFF
+        if not self._layout_computed:
+            self._compute_layout(w)
+            self._layout_computed = True
+
+        toolbar = np.zeros((self._toolbar_height, w, 3), dtype=np.uint8)
+        toolbar[:] = self._toolbar_bg
+
+        for btn in self._buttons:
+            btn_id = btn["id"]
+
+            getter = self._state_getters.get(btn_id)
+            is_active = bool(getter()) if getter else False
+
+            label = self._label_map[btn_id]
+            self._draw_button(toolbar, btn["rect"], label, is_active, btn_id)
+
+        combined = np.vstack([frame_bgr, toolbar])
+        cv2.imshow(self.window_name, combined)
+        cv2.waitKey(self.wait_delay_ms)
 
     def cleanup(self):
-        """Destroys all OpenCV windows."""
+        """
+        Closes the OpenCV window and releases window resources.
+        """
         cv2.destroyAllWindows()
         logger.info("OpenCV windows destroyed.")
+
+    def _compute_layout(self, width: int):
+        """
+        Calculates button sizes from the longest label (across all states)
+        and centers them horizontally.
+
+        Args:
+            width: The width of the current video frame.
+        """
+        all_labels = list(self._label_map.values())
+
+        max_text_w, max_text_h = 0, 0
+        for text in all_labels:
+            (tw, th), _ = cv2.getTextSize(
+                text, self._font, self._font_scale, self._font_thickness
+            )
+            max_text_w = max(max_text_w, tw)
+            max_text_h = max(max_text_h, th)
+
+        btn_w = max_text_w + 2 * self._padding_x
+        btn_h = max_text_h + 2 * self._padding_y
+
+        num_buttons = len(self._label_map)
+        total_buttons_w = btn_w * num_buttons
+        total_gaps_w = self._button_gap * (num_buttons - 1)
+        total_w = total_buttons_w + total_gaps_w
+
+        start_x = max(10, (width - total_w) // 2)
+
+        top_pad, bottom_pad = 10, 10
+        y1, y2 = top_pad, top_pad + btn_h
+        self._toolbar_height = btn_h + top_pad + bottom_pad
+
+        self._buttons = []
+        x = start_x
+        for btn_id in self._label_map.keys():
+            rect = (x, y1, x + btn_w, y2)
+            self._buttons.append(
+                {
+                    "id": btn_id,
+                    "rect": rect,
+                }
+            )
+            x += btn_w + self._button_gap
+
+    def _on_mouse(self, event, x, y, flags, param):
+        """
+        Mouse callback to detect clicks on toolbar buttons.
+
+        Args:
+            event: The OpenCV mouse event.
+            x: X coordinate of the mouse in the window.
+            y: Y coordinate of the mouse in the window.
+            flags: Event flags (unused).
+            param: Extra data (unused).
+        """
+        if event != cv2.EVENT_LBUTTONDOWN or y < self._last_frame_height:
+            return
+
+        toolbar_x = x
+        toolbar_y = y - self._last_frame_height
+
+        for btn in self._buttons:
+            x1, y1, x2, y2 = btn["rect"]
+            if x1 <= toolbar_x <= x2 and y1 <= toolbar_y <= y2:
+                self._trigger(btn["id"])
+                break
+
+    def _trigger(self, btn_id: ToolbarButton):
+        """
+        Dispatches a toolbar button click to the corresponding callback.
+
+        Args:
+            btn_id: The identifier of the pressed toolbar button.
+        """
+        action = self._action_map.get(btn_id)
+        if action:
+            action()
+
+    def _draw_button(
+        self,
+        panel: np.ndarray,
+        rect: tuple[int, int, int, int],
+        label: str,
+        active: bool,
+        btn_id: ToolbarButton,
+    ):
+        """Draws a single rectangular button."""
+        x1, y1, x2, y2 = rect
+        w, h = x2 - x1, y2 - y1
+
+        base_color = np.array([70, 70, 75])
+        active_color = np.array([0, 160, 0])
+        text_color = (230, 230, 230)
+
+        color = self._color_map.get(btn_id, active_color if active else base_color)
+
+        # shadow
+        # cv2.rectangle(panel, (x1 + 2, y1 + 2), (x2 + 2, y2 + 2), (20, 20, 20), -1)
+
+        # main rect
+        cv2.rectangle(panel, (x1, y1), (x2, y2), color.tolist(), -1)
+
+        # outline
+        cv2.rectangle(panel, (x1, y1), (x2, y2), (200, 200, 200), 1)
+
+        (tw, th), _ = cv2.getTextSize(
+            label, self._font, self._font_scale, self._font_thickness
+        )
+        tx = x1 + (w - tw) // 2
+        ty = y1 + (h + th) // 2
+        cv2.putText(
+            panel,
+            label,
+            (tx, ty),
+            self._font,
+            self._font_scale,
+            text_color,
+            self._font_thickness,
+            lineType=cv2.LINE_AA,
+        )
