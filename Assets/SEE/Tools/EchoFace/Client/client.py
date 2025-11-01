@@ -22,7 +22,7 @@ class EchoFaceClient:
     EchoFaceClient orchestrates stream capture, face analysis, data sending, and display.
     """
 
-    def __init__(self, ip: str, port: int, show_landmarks: bool = False,
+    def __init__(self, ip: str, port: int, headless_mode: bool = False,
                  camera_index: int = 0, video_path: str = None, target_fps: int = 30):
         """
         Initializes the client, sets up the network sender, selects the video source,
@@ -31,8 +31,7 @@ class EchoFaceClient:
         Args:
             ip: The UDP server IP address to send data to.
             port: The UDP server port.
-            show_landmarks: A flag to determine whether to overlay
-                            detected face landmarks on the stream display window.
+            headless_mode: If True, runs without any display window (no OpenCV output).
             camera_index: The numerical index of the webcam device to use (e.g., 0).
                           This is ignored if video_path is provided.
             video_path: The filesystem path to a video file to process. If provided,
@@ -42,9 +41,11 @@ class EchoFaceClient:
         Raises:
             RuntimeError: If the selected video source (webcam or file) fails to start.
         """
+        # Window and display settings
+        self.headless_mode = headless_mode
+        self.landmarks_enabled = False
 
         self.face_data_sender = FaceDataSender(ip, port)
-        self.show_landmarks = show_landmarks
 
         # 1. Initialize I/O Stream Source
         if video_path:
@@ -65,44 +66,60 @@ class EchoFaceClient:
             raise RuntimeError("Failed to start video source.")
 
         # 2. Initialize Display/UI Controller using the actual stream FPS
-        self.frame_viewer = FrameViewer(
-            window_name="Stream Feed (Client)",
-            stream_fps=self.video_source.get_actual_fps()
-        )
+        self.frame_viewer = None
+        if not self.headless_mode:
+            self.frame_viewer = FrameViewer(
+                window_name="Stream Feed (Client)",
+                stream_fps=self.video_source.get_actual_fps()
+            )
 
+        # 3. Initialize face analyzer
         self.face_analyzer = FaceAnalyzer(on_new_result_callback=self.face_data_sender.send_face_data)
 
         # Pause-related state
         self.paused = False
         self.last_frame = None
-        self.paused_frame_displayed = False
+        self.pause_shown = False
 
         logger.info(f"Stream running at {self.video_source.get_actual_fps():.2f} FPS.")
+        logger.info(f"Headless mode is {'ON' if self.headless_mode else 'OFF'}.")
+        logger.info("Landmarks start DISABLED (toggle with 'l').")
 
     def toggle_pause(self):
         """Toggles the paused state of the client."""
         self.paused = not self.paused
-        self.paused_frame_displayed = False
+        self.pause_shown = False
         logger.info(f"Application {'PAUSED' if self.paused else 'RESUMED'}")
+
+    def toggle_landmarks(self):
+        """Toggles the face landmark overlay during runtime."""
+        self.landmarks_enabled = not self.landmarks_enabled
+        logger.info(f"Landmarks {'ENABLED' if self.landmarks_enabled else 'DISABLED'}")
 
     def run(self):
         """
         The main execution loop of the client.
-        It reads frames, processes them, sends data, and manages the display until terminated.
         """
 
         self.face_data_sender.start()
         self.face_analyzer.start()
-        logger.info("Press 'q' to quit, 'p' to pause/resume...")
+
+        if not self.headless_mode:
+            logger.info("Press 'q' to quit, 'p' to pause/resume, 'l' to toggle landmarks...")
+        else:
+            logger.info("Running headless (no display window). Press Ctrl+C to exit.")
 
         try:
             while True:
-                key = self.frame_viewer.check_key()
-                if key == ord("q"):
-                    logger.info(" 'q' pressed. Exiting...")
-                    break
-                elif key == ord("p"):
-                    self.toggle_pause()
+                if not self.headless_mode:
+                    key = self.frame_viewer.check_key()
+                    if key == ord("q"):
+                        logger.info(" 'q' pressed. Exiting...")
+                        break
+                    elif key == ord("p"):
+                        self.toggle_pause()
+                    elif key == ord("l"):
+                        self.toggle_landmarks()
 
                 if not self.paused:
                     self._process_frame()
@@ -124,7 +141,7 @@ class EchoFaceClient:
             raise StopIteration("Stream read failed or video end reached.")
 
         self.last_frame = frame_bgr
-        self.paused_frame_displayed = False
+        self.pause_shown = False
 
         # Conversion and Detection
         rgb_frame = cv2.cvtColor(frame_bgr, cv2.COLOR_BGR2RGB)
@@ -133,30 +150,33 @@ class EchoFaceClient:
         self.face_analyzer.detect_async(mp_image, frame_timestamp_ms)
 
         # Display Logic
-        frame_to_display = frame_bgr
-        if self.show_landmarks and self.face_analyzer.latest_detection_result:
-            annotated_rgb_frame = draw_landmarks_on_image(rgb_frame, self.face_analyzer.latest_detection_result)
-            frame_to_display = cv2.cvtColor(annotated_rgb_frame, cv2.COLOR_RGB2BGR)
-
-        self.frame_viewer.display_frame(frame_to_display)
+        if not self.headless_mode:
+            frame_to_display = frame_bgr
+            if self.landmarks_enabled and self.face_analyzer.latest_detection_result:
+                annotated_rgb_frame = draw_landmarks_on_image(
+                    rgb_frame, self.face_analyzer.latest_detection_result
+                )
+                frame_to_display = cv2.cvtColor(annotated_rgb_frame, cv2.COLOR_RGB2BGR)
+            self.frame_viewer.display_frame(frame_to_display)
 
     def _display_paused_frame(self):
-        """Displays the last captured frame with a "PAUSED" overlay."""
-        if self.last_frame is None:
+        """Displays the last captured frame with a 'PAUSED' overlay."""
+        if self.last_frame is None or self.headless_mode:
             return
 
-        if not self.paused_frame_displayed:
+        if not self.pause_shown:
             frame_to_display = self.last_frame.copy()
             frame_to_display = draw_centered_text(frame_to_display, "PAUSED")
             self.frame_viewer.display_frame(frame_to_display)
-            self.paused_frame_displayed = True
+            self.pause_shown = True
 
     def _cleanup(self):
-        """Releases all resources cleanly, including the stream, face_analyzer, sender, and display window."""
+        """Releases all resources cleanly."""
         self.video_source.release()
         self.face_analyzer.stop()
         self.face_data_sender.close()
-        self.frame_viewer.cleanup()
+        if self.frame_viewer:
+            self.frame_viewer.cleanup()
         logger.info("Client application closed cleanly.")
 
 
@@ -181,9 +201,11 @@ def parse_arguments() -> argparse.Namespace:
     parser.add_argument("--video-path", type=str, default=None,
                         help="Path to a video file to process instead of a live webcam feed. The video will loop.")
 
-    # Display/Processing Arguments
-    parser.add_argument("--show-landmarks", action="store_true",
-                        help="If set, overlays the detected face landmarks on the stream display window.")
+    # Headless / Display mode
+    parser.add_argument("--headless", action="store_true",
+                        help="Run without showing the video window (no OpenCV display).")
+
+    # Frame rate
     parser.add_argument("--target-fps", type=int, default=30,
                         help="The target frame rate (FPS) for the stream and processing. Used as a fallback if the video source FPS is unknown.")
 
@@ -196,7 +218,7 @@ def main():
         client = EchoFaceClient(
             ip=args.ip,
             port=args.port,
-            show_landmarks=args.show_landmarks,
+            headless_mode=args.headless,
             camera_index=args.camera_index,
             video_path=args.video_path,
             target_fps=args.target_fps
