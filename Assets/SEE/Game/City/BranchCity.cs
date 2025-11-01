@@ -301,7 +301,7 @@ namespace SEE.Game.City
             await LoadDataAsync();
             Graph newGraph = LoadedGraph;
             bool edgesAreDrawn = EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
-            await transitionRenderer.RenderAsync(oldGraph, newGraph, edgesAreDrawn, EdgeLayoutSettings.AnimationKind, gameObject, Renderer);
+            await transitionRenderer.RenderAsync(oldGraph, newGraph, edgesAreDrawn, gameObject, Renderer);
             /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
             /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
             InitializeAfterDrawn(false);

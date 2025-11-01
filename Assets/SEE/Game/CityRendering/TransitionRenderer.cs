@@ -180,11 +180,10 @@ namespace SEE.Game.CityRendering
         /// <returns>task</returns>
         internal async UniTask RenderAsync
             (Graph oldGraph,
-            Graph newGraph,
-            bool edgesAreDrawn,
-            EdgeAnimationKind animationKind,
-            GameObject codeCity,
-            IGraphRenderer renderer)
+             Graph newGraph,
+             bool edgesAreDrawn,
+             GameObject codeCity,
+             IGraphRenderer renderer)
         {
             ShowNewCommitsMessage();
 
