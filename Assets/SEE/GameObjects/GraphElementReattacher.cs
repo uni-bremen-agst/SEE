@@ -38,13 +38,12 @@ namespace SEE.GameObjects
         /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>,
         /// that is, the <see cref="GraphElementRef"/> component of <paramref name="gameObject"/> will refer to
         /// <paramref name="graphElement"/> afterwards. Returns the graph element formerly attached to
-        /// <paramref name="gameObject"/> if there was one or null if there was none.
+        /// <paramref name="gameObject"/> if there was one, or null if there was none.
         /// </summary>
         /// <typeparam name="GE">subclass of <see cref="GraphElement"/></typeparam>
         /// <typeparam name="R">subclass of <see cref="GraphElementRef"/></typeparam>
         /// <param name="gameObject">the game object where the node is to be attached to</param>
         /// <param name="node">the node to be attached</param>
-        /// <returns>the node formerly attached to <paramref name="gameObject"/> or null</returns>
         /// <param name="getValue">yields the Value of a <see cref="GraphElementRef"/></param>
         /// <param name="setValue">sets the Value of a <see cref="GraphElementRef"/></param>
         /// <returns>the graph element formerly attached to <paramref name="gameObject"/> or null</returns>
@@ -97,12 +96,11 @@ namespace SEE.GameObjects
 
         /// <summary>
         /// Re-attaches the given <paramref name="graphElement"/> to the given <paramref name="gameObject"/>.
-        ///
         /// </summary>
         /// <param name="gameObject">the game object where the graph element is to be attached</param>
         /// <param name="graphElement">the graph element to be attached (either a <see cref="Node"/>
         /// or an <see cref="Edge"/></param>
-        /// <returns></returns>
+        /// <returns>the graph element formerly attached to <paramref name="gameObject"/> or null</returns>
         /// <exception cref="System.ArgumentException">thrown if <paramref name="graphElement"/>
         /// is neither a <see cref="Node"/> nor an <see cref="Edge"/></exception>
         public static GraphElement Reattach(GameObject gameObject, GraphElement graphElement)
