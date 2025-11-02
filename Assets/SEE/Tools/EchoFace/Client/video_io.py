@@ -13,21 +13,81 @@ class BaseStream(ABC):
     Handles initialization, frame reading, and cleanup.
     """
 
-    def __init__(self, req_fps: int = 30, width: int = 640, height: int = 480):
+    def __init__(self, fps: int = 30, resolution: tuple[int, int] = (640, 480)):
         """
         Initializes the base stream configuration.
 
         Args:
-            req_fps: Desired frame rate (FPS) for the stream.
-            width: Desired frame width in pixels.
-            height: Desired frame height in pixels.
+            fps: Desired frame rate (frames per second).
+            resolution: Desired frame resolution as (width, height).
         """
-        self.req_fps = req_fps
-        self.req_width = width
-        self.req_height = height
-
+        self.req_fps = fps
+        self.req_resolution = resolution
         self.cap: cv2.VideoCapture | None = None
         self.is_running: bool = False
+
+
+    def release(self):
+        """
+        Releases the video capture resource and marks the stream as stopped.
+        """
+        if self.cap:
+            self.cap.release()
+            self.cap = None
+        self.is_running = False
+
+    def get_fps(self) -> float:
+        """
+        Returns the current FPS of the capture source, if available.
+
+        Returns:
+            float: The actual FPS reported by the source, or the
+                   requested req_fps if no FPS information is available.
+        """
+        if not self.cap:
+            return float(self.req_fps)
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+        return fps if fps and fps > 0 else float(self.req_fps)
+
+    def get_resolution(self) -> tuple[int, int]:
+        """
+        Returns the current resolution (width, height).
+
+        Returns:
+            tuple[int, int]: The actual resolution reported by the source,
+                             or the requested resolution if not available.
+        """
+        if not self.cap:
+            return self.req_resolution
+        width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        if width > 0 and height > 0:
+            return (width, height)
+        return self.req_resolution
+
+    def log_properties(self):
+        """
+        Logs the current capture properties (width, height, FPS) for debugging.
+
+        This method queries OpenCV capture parameters and prints them via
+        the logger, showing both actual and requested values.
+
+        Example output:
+            Capture properties: 640x480 @ 29.97 FPS
+            (requested 640x480, 30 FPS)
+        """
+        if not self.cap or not self.cap.isOpened():
+            logger.info("Capture not opened.")
+            return
+
+        width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        fps = self.cap.get(cv2.CAP_PROP_FPS)
+
+        logger.info(
+            f"Capture properties: {width}x{height} @ {fps:.2f} FPS "
+            f"(requested {self.req_resolution[0]}x{self.req_resolution[1]}, {self.req_fps} FPS)"
+        )
 
     @abstractmethod
     def start(self) -> bool:
@@ -53,52 +113,6 @@ class BaseStream(ABC):
         """
         pass
 
-    def release(self):
-        """
-        Releases the video capture resource and marks the stream as stopped.
-        """
-        if self.cap:
-            self.cap.release()
-            self.cap = None
-        self.is_running = False
-
-    def get_fps(self) -> float:
-        """
-        Returns the current FPS of the capture source, if available.
-
-        Returns:
-            float: The actual FPS reported by the source, or the
-                   requested req_fps if no FPS information is available.
-        """
-        if not self.cap:
-            return float(self.req_fps)
-        fps = self.cap.get(cv2.CAP_PROP_FPS)
-        return fps if fps and fps > 0 else float(self.req_fps)
-
-    def log_properties(self):
-        """
-        Logs the current capture properties (width, height, FPS) for debugging.
-
-        This method queries OpenCV capture parameters and prints them via
-        the logger, showing both actual and requested values.
-
-        Example output:
-            Capture properties: 640x480 @ 29.97 FPS
-            (requested 640x480, 30 FPS)
-        """
-        if not self.cap or not self.cap.isOpened():
-            logger.info("Capture not opened.")
-            return
-
-        width = int(self.cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-        height = int(self.cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        fps = self.cap.get(cv2.CAP_PROP_FPS)
-
-        logger.info(
-            f"Capture properties: {width}x{height} @ {fps:.2f} FPS "
-            f"(requested {self.req_width}x{self.req_height}, {self.req_fps} FPS)"
-        )
-
     def __del__(self):
         """Ensures resources are released when the object is deleted."""
         self.release()
@@ -108,18 +122,16 @@ class WebcamStream(BaseStream):
     """
     Video stream class for live webcam input.
     """
-
-    def __init__(self, camera_index: int = 0, req_fps: int = 30, width: int = 640, height: int = 480):
+    def __init__(self, camera_index: int = 0, fps: int = 30, resolution: tuple[int, int] = (640, 480)):
         """
         Initializes a webcam video stream.
 
         Args:
             camera_index: Index of the webcam device (0 = default).
-            req_fps: Desired frame rate (FPS) to request from the device.
-            width: Desired capture width in pixels.
-            height: Desired capture height in pixels.
+            fps: Desired frame rate (FPS) to request from the device.
+            resolution: Desired frame resolution as (width, height).
         """
-        super().__init__(req_fps, width, height)
+        super().__init__(fps, resolution)
         self.camera_index = camera_index
 
     def start(self) -> bool:
@@ -135,8 +147,8 @@ class WebcamStream(BaseStream):
             logger.error(f"Failed to open webcam index {self.camera_index}")
             return False
 
-        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.req_width)
-        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.req_height)
+        self.cap.set(cv2.CAP_PROP_FRAME_WIDTH, self.req_resolution[0])
+        self.cap.set(cv2.CAP_PROP_FRAME_HEIGHT, self.req_resolution[1])
         self.cap.set(cv2.CAP_PROP_FPS, self.req_fps)
 
         self.is_running = True
@@ -162,17 +174,16 @@ class VideoStream(BaseStream):
     Video stream class for reading from video files.
     """
 
-    def __init__(self, video_path: str, req_fps: int = 30, width: int = 640, height: int = 480):
+    def __init__(self, video_path: str, fps: int = 30, resolution: tuple[int, int] = (640, 480)):
         """
         Initializes a video file stream.
 
         Args:
             video_path: Path to the video file to read.
-            req_fps: Desired fallback frame rate (used if file FPS is unknown).
-            width: Output width in pixels (manual resize applied if needed).
-            height: Output height in pixels (manual resize applied if needed).
+            fps: Desired frame rate (FPS) to request from the device.
+            resolution: Desired frame resolution as (width, height).
         """
-        super().__init__(req_fps, width, height)
+        super().__init__(fps, resolution)
         self.video_path = video_path
 
     def start(self) -> bool:
@@ -212,8 +223,8 @@ class VideoStream(BaseStream):
 
         if frame is not None:
             h, w = frame.shape[:2]
-            if (w, h) != (self.req_width, self.req_height):
-                frame = cv2.resize(frame, (self.req_width, self.req_height), interpolation=cv2.INTER_AREA)
+            if (w, h) != self.req_resolution:
+                frame = cv2.resize(frame, self.req_resolution, interpolation=cv2.INTER_AREA)
 
         return True, frame
 
