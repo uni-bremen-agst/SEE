@@ -97,7 +97,8 @@ namespace SEE.GraphProviders
 
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
 
-            // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
+            // We are assuming that CheckAttributes() was already executed so that the date string is
+            // neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
             GitGraphGenerator.AddNodesAfterDate
@@ -106,27 +107,7 @@ namespace SEE.GraphProviders
                  changePercentage, token);
             changePercentage(1f);
 
-            AddEdges(graph);
-
             return graph;
-        }
-
-        private void AddEdges(Graph graph)
-        {
-            UnionFind<Node, int> uf = new(graph.Nodes().Where(n => n.Type == DataModel.DG.VCS.FileType && n.GetInt(Metrics.LOC) > 3),
-                                          n => n.GetInt(Metrics.LOC));
-            uf.PartitionByValue();
-            foreach (IList<Node> partition in uf.GetPartitions())
-            {
-                IList<Node> nodes = partition.ToList();
-                for (int i = 0; i < nodes.Count; i++)
-                {
-                    for (int j = i + 1; j < nodes.Count; j++)
-                    {
-                        graph.AddEdge(nodes[i], nodes[j], "EqualSize");
-                    }
-                }
-            }
         }
 
         /// <summary>
