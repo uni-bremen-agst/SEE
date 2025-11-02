@@ -1,7 +1,7 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
-from helpers import draw_landmarks_on_image, draw_centered_text
+from helpers import draw_landmarks_on_image
 from video_io import (
     BaseStream,
     WebcamStream,
@@ -154,7 +154,7 @@ class EchoFaceClient:
 
     def _display_paused_frame(self):
         """
-        Displays the last captured frame with a 'PAUSED' overlay to keep the
+        Displays the last captured frame to keep the
         OpenCV window responsive while the stream is paused.
         """
         if self.headless_mode:
@@ -163,13 +163,10 @@ class EchoFaceClient:
         if self.last_frame is None:
             w, h = 640, 480
             frame = np.zeros((h, w, 3), dtype=np.uint8)
-            frame = draw_centered_text(frame, "PAUSED")
             self.frame_viewer.display_frame(frame)
             return
 
-        frame = self.last_frame.copy()
-        frame = draw_centered_text(frame, "PAUSED")
-        self.frame_viewer.display_frame(frame)
+        self.frame_viewer.display_frame(self.last_frame)
 
     def toggle_pause(self):
         """
