@@ -84,7 +84,8 @@ namespace SEE.GraphProviders.VCS
 
             // Returns the parent directory node for given path. If none exists,
             // the parent directory node will be created (including all its
-            // non-existing ancestors.
+            // non-existing ancestors. If the given path is null or empty,
+            // null is returned.
             Node GetOrAddDirectoryNode(string path)
             {
                 if (string.IsNullOrWhiteSpace(path))
