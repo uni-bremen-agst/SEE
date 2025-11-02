@@ -27,7 +27,7 @@ namespace SEE.Game.Evolution
     /// Assumption: This EvolutionRenderer is attached to a game object representing a code
     /// city that has another component of type <see cref="SEECityEvolution"/>.
     /// </summary>
-    public partial class EvolutionRenderer : MonoBehaviour, IGraphRenderer
+    public class EvolutionRenderer : MonoBehaviour, IGraphRenderer
     {
         /// <summary>
         /// The delay in seconds before starting the auto-play transition to the next graph.
