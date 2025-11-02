@@ -19,17 +19,19 @@ namespace SEE.Game.CityRendering
         /// given <paramref name="renderer"/>.
         /// </summary>
         /// <param name="graph">graph for which the laid out nodes and edges are to be calculated</param>
-        /// <param name="getNode">method to be called</param>
+        /// <param name="getNode">method to be called for getting a (new) <see cref="GameObject"/>
+        /// for a given <see cref="Node"/>; it may yield an existing game node for a graph node
+        /// if one was created before or a new one otherwise.</param>
         /// <param name="renderer">the graph renderer to obtain the layouts from</param>
-        /// <param name="edgesAreDrawn">whether edges should be drawn; if false, <paramref name="edgeLayout"/>
-        /// will be null</param>
+        /// <param name="edgesAreDrawn">whether an edge layout is requested; if false,
+        /// <paramref name="newEdgeLayout"/> will be null</param>
         /// <param name="city">the game object representing the code city; created game nodes
-        /// and edge will be descendants of it</param>
-        /// <param name="layout">the resulting node layout as a mapping of node Ids onto the layout information</param>
-        /// <param name="edgeLayout">the resulting edge layout as a mapping of edge Ids onto
+        /// and edges will be descendants of it</param>
+        /// <param name="newNodelayout">the resulting node layout as a mapping of node Ids onto the layout information</param>
+        /// <param name="newEdgeLayout">the resulting edge layout as a mapping of edge Ids onto
         /// the layout information if <paramref name="edgesAreDrawn"/> is true,
         /// otherwise null</param>
-        /// <param name="oldLayout">in case an incremental layout was used by the <paramref name="renderer"/>,
+        /// <param name="oldNodeLayout">in case an incremental layout was used by the <paramref name="renderer"/>,
         /// this parameter is expected to contain the previous layout that should be taken into account
         /// by the incremental layout; the resulting layout applied to the nodes of <paramref name="graph"/>
         /// will be stored in this parameter for later use (independent of whether or not an incremental layout
@@ -40,9 +42,9 @@ namespace SEE.Game.CityRendering
              IGraphRenderer renderer,
              bool edgesAreDrawn,
              GameObject city,
-             out Dictionary<string, ILayoutNode> layout,
-             out Dictionary<string, ILayoutEdge<ILayoutNode>> edgeLayout,
-             ref NodeLayout oldLayout)
+             out Dictionary<string, ILayoutNode> newNodelayout,
+             out Dictionary<string, ILayoutEdge<ILayoutNode>> newEdgeLayout,
+             ref NodeLayout oldNodeLayout)
         {
             // The following code assumes that a leaf node remains a leaf across all
             // graphs of the graph series and an inner node remains an inner node.
@@ -74,7 +76,7 @@ namespace SEE.Game.CityRendering
             // but are also bound to the function calls of NodeLayout,
             // we must hand over this argument here separately.
             if (nodeLayout is IIncrementalNodeLayout iNodeLayout
-                && oldLayout is IIncrementalNodeLayout iOldLayout)
+                && oldNodeLayout is IIncrementalNodeLayout iOldLayout)
             {
                 iNodeLayout.OldLayout = iOldLayout;
             }
@@ -97,23 +99,23 @@ namespace SEE.Game.CityRendering
             NodeLayout.Apply(nodeLayout.Create(layoutNodes, city.transform.position,
                                                new Vector2(city.transform.lossyScale.x,
                                                            city.transform.lossyScale.z)));
-            oldLayout = nodeLayout;
+            oldNodeLayout = nodeLayout;
 
             if (edgesAreDrawn)
             {
                 IList<LayoutGraphEdge<LayoutGraphNode>> layoutEdges = renderer.LayoutEdges(layoutNodes).ToList();
-                edgeLayout = new(layoutEdges.Count);
+                newEdgeLayout = new(layoutEdges.Count);
                 foreach (LayoutGraphEdge<LayoutGraphNode> le in layoutEdges)
                 {
-                    edgeLayout.Add(le.ItsEdge.ID, le);
+                    newEdgeLayout.Add(le.ItsEdge.ID, le);
                 }
             }
             else
             {
-                edgeLayout = null;
+                newEdgeLayout = null;
             }
 
-            layout = ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
+            newNodelayout = ToNodeIDLayout(layoutNodes.ToList<ILayoutNode>());
 
             // Note: The game objects for leaf nodes are already properly scaled by the calls to
             // GetNode() and AdjustScaleOfLeaf() above. Yet, inner nodes are generally not scaled by
