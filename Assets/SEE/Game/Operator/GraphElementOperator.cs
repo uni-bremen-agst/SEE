@@ -356,7 +356,8 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// If we can already determine the city this object belongs to, set the <see cref="City"/> property.
+        /// If we can already determine the city this object belongs to, sets the
+        /// <see cref="City"/> property. If not, does nothing.
         /// </summary>
         public void SetCityIfPossible()
         {
