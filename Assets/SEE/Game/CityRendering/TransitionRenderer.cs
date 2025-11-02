@@ -57,13 +57,14 @@ namespace SEE.Game.CityRendering
         #region Edge Marking
 
         /// <summary>
-        /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently highlighted, that is,
-        /// edges which have changed compared to the previous rendering.
+        /// A queue of <see cref="EdgeOperator"/>s associated with edges which are currently
+        /// highlighted, that is, edges which have changed compared to the previous rendering.
+        /// It will be used to revert the highlighting when rendering the next graph.
         /// </summary>
         private readonly Queue<EdgeOperator> highlightedEdgeOperators = new();
 
         /// <summary>
-        /// Fade out the highlights for each previously marked edge in <see cref="highlightedEdgeOperators"/>.
+        /// Glow out the highlights for each previously marked edge in <see cref="highlightedEdgeOperators"/>.
         /// </summary>
         private void DeleteEdgeMarking()
         {
@@ -238,6 +239,7 @@ namespace SEE.Game.CityRendering
             // and equalNodes.
             // The same holds for game edges.
 
+            // We first remove the edges and then the nodes. That looks better.
             if (edgesAreDrawn)
             {
                 ShowRemovedEdges(removedEdges);
@@ -247,13 +249,15 @@ namespace SEE.Game.CityRendering
             ShowRemovedNodes(removedNodes);
             await AnimateDeathAsync(removedNodes, AnimateNodeDeath);
 
+            // Now we move the nodes along with their edges to their new positions.
             await AnimateNodeMoveByLevelAsync(equalNodes, newNodelayout);
+
             if (edgesAreDrawn)
             {
                 ShowChangedEdges(changedEdges);
             }
-
             ShowChangedNodes(changedNodes);
+
             // Even the equal nodes need adjustments because the layout could have
             // changed their dimensions. The treemap layout, for instance, may do that.
             // Note that equalNodes is the union of the really equal nodes passed initially
@@ -261,11 +265,10 @@ namespace SEE.Game.CityRendering
             await AnimateNodeChangeAsync(equalNodes, changedNodes, newNodelayout, markerFactory, renderer);
 
             ShowAddedNodes(addedNodes);
-            // The temporary parent object for the new nodes. A new node must have
-            // a parent object with a Portal component; otherwise the NodeOperator
+            // The temporary parent object for the new nodes will be the codeCity. A new node
+            // must have a parent object with a Portal component; otherwise the NodeOperator
             // will not work. Later, we will set the correct parent of the new node.
-            GameObject parent = codeCity;
-            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, parent);
+            await AnimateNodeBirthAsync(addedNodes, newNodelayout, GetGameNode, codeCity);
 
             if (edgesAreDrawn)
             {
@@ -310,11 +313,11 @@ namespace SEE.Game.CityRendering
         /// after the animation has finished.
         /// </summary>
         /// <param name="toBeRemoved">nodes to be removed</param>
-        /// <param name="AnimateDeath">method to animate the death of a game object</param>
+        /// <param name="animateDeath">method to animate the death of a game object</param>
         /// <returns>task</returns>
         private async UniTask AnimateDeathAsync<T>
-            (ISet<T> toBeRemoved, Func<GameObject,
-             IOperationCallback<Action>> AnimateDeath)
+            (ISet<T> toBeRemoved,
+             Func<GameObject, IOperationCallback<Action>> animateDeath)
             where T : GraphElement
         {
             HashSet<GameObject> deads = new();
@@ -325,7 +328,7 @@ namespace SEE.Game.CityRendering
                 if (go != null)
                 {
                     deads.Add(go);
-                    IOperationCallback<Action> animation = AnimateDeath(go);
+                    IOperationCallback<Action> animation = animateDeath(go);
                     animation.OnComplete(() => OnComplete(go));
                     animation.OnKill(() => OnComplete(go));
                 }
@@ -345,8 +348,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="addedNodes">nodes to be added</param>
         /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
-        /// <param name="getGameNode">method to get or create the game object for a given node</param>
-        /// <param name="codeCity">the temporary parent object for the new nodes (should be the code city)</param>
+        /// <param name="getGameNode">method to get or create the game node for a given graph node</param>
+        /// <param name="codeCity">the temporary parent object for the new game nodes (should be the code city)</param>
         /// <returns>task</returns>
         private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
@@ -382,7 +385,7 @@ namespace SEE.Game.CityRendering
             // Note: UniTask.Yield() works only while the game is playing.
             await UniTask.Yield();
 
-            // Game nodes for all new nodes now exist.
+            // Game nodes for all new graph nodes now exist.
 
             // Now we can animate the birth of the new nodes.
             foreach (GameObject go in births)
@@ -435,16 +438,13 @@ namespace SEE.Game.CityRendering
         }
 
         /// <summary>
-        /// Creates and adds new game objects for <paramref name="addedEdges"/>.
+        /// Creates and adds new game edges for <paramref name="addedEdges"/>.
         /// </summary>
-        /// <param name="addedEdges">the new edges</param>
-        /// <param name="renderer">the graph renderer to draw the new edges</param>
+        /// <param name="addedEdges">the new graph edges</param>
+        /// <param name="renderer">the graph renderer to draw the new game edges</param>
         /// <returns>task</returns>
-        private void AddNewEdges
-            (ISet<Edge> addedEdges,
-            IGraphRenderer renderer)
+        private void AddNewEdges(ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
-
             foreach (Edge edge in addedEdges)
             {
                 // The new edge will be created with the correct layout.
@@ -470,7 +470,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Reattaches the given <paramref name="elements"/> to their corresponding game objects.
         /// The graph elements belong to the new graph but have corresponding game objects still representing
-        /// the same graph elements (according to the ID) of the former graph.
+        /// the same graph elements (according to the ID) of the former graph. That is why we
+        /// need to reattach them to <paramref name="elements"/>
         /// </summary>
         /// <param name="elements">graph elements of the new graph to be reattached</param>
         private void Reattach<T>(ISet<T> elements) where T : GraphElement
@@ -478,10 +479,9 @@ namespace SEE.Game.CityRendering
             foreach (GraphElement element in elements)
             {
                 GameObject go = GraphElementIDMap.Find(element.ID, true);
-                if (go != null)
-                {
-                    GraphElementReattacher.Reattach(go, element);
-                }
+                // No need to check for null because we must find the game object.
+                // If the game object cannot be found, an exception is thrown.
+                GraphElementReattacher.Reattach(go, element);
             }
         }
 
@@ -536,13 +536,11 @@ namespace SEE.Game.CityRendering
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
+                        // Move only if the position has changed by a relevant margin.
                         if (PositionHasChanged(go, layoutNode))
                         {
                             moved.Add(go);
-                            // Move the node to its new position. The edge layout will not be
-                            // be updated because we just set the node's parent to cityTransform.
-                            // As a consequence, the node hierarchy is temporarily flat, which
-                            // will distort hierarchical edge layouts, such as edge bundling.
+                            // Move the node to its new position. The edge layout will be updated.
                             IOperationCallback<Action> animation = go.NodeOperator()
                               .MoveTo(layoutNode.CenterPosition, updateEdges: true);
                             animation.OnComplete(() => OnComplete(go));
@@ -566,7 +564,8 @@ namespace SEE.Game.CityRendering
 
         /// <summary>
         /// The distance between a current position and a new position of a game node
-        /// at which we consider that the position has actually changed.
+        /// at which we consider that the position has actually changed. The unit is
+        /// Unity world units.
         /// </summary>
         private const float relevantMovementMargin = 0.001f;
 
@@ -591,8 +590,8 @@ namespace SEE.Game.CityRendering
         /// be marked as changed using <paramref name="markerFactory"/>.
         ///
         /// </summary>
-        /// <param name="nodesToAdjust">nodes whose dimensions, dimensions, and
-        /// markers need to be adjusted; we assume <paramref name="changedNodes"/>
+        /// <param name="nodesToAdjust">nodes whose dimensions and markers need to be
+        /// adjusted; we assume <paramref name="changedNodes"/>
         /// is a subset of <paramref name="nodesToAdjust"/></param>
         /// <param name="changedNodes">nodes to be marked for a change</param>
         /// <param name="newNodelayout">new layout determining the new scale</param>
@@ -616,7 +615,7 @@ namespace SEE.Game.CityRendering
                     ILayoutNode layoutNode = newNodelayout[node.ID];
                     if (layoutNode != null)
                     {
-                        // Apply MarkChanged only to the really changed nodes.
+                        // Apply the adjustment only to the really changedNodes.
                         // nodesToAdjust is the union of changedNodes and equalNodes.
                         if (changedNodes.Contains(node))
                         {
@@ -643,13 +642,13 @@ namespace SEE.Game.CityRendering
 
             void ScaleTo(GameObject gameNode, ILayoutNode layoutNode)
             {
+                Assert.IsNotNull(gameNode);
+                Assert.IsNotNull(layoutNode);
+
                 // layoutNode.AbsoluteScale is in world space, while the animation by iTween
                 // is in local space. Our game objects may be nested in other game objects,
                 // hence, the two spaces may be different.
                 // We may need to transform layoutNode.AbsoluteScale from world space to local space.
-                Assert.IsNotNull(gameNode);
-                Assert.IsNotNull(layoutNode);
-
                 Vector3 localScale = gameNode.transform.parent == null ?
                                          layoutNode.AbsoluteScale
                                        : gameNode.transform.parent.InverseTransformVector(layoutNode.AbsoluteScale);
@@ -668,7 +667,8 @@ namespace SEE.Game.CityRendering
                 {
                     // The adjustment of the antenna is needed only if the node has changed.
                     // Similarly to the adjustment of the style, we do not check whether
-                    // the metrics determining the antenna have changed or not.
+                    // the metrics determining the antenna have changed or not. Simply
+                    // because we do not know here.
                     renderer.AdjustAntenna(go);
                 }
                 markerFactory.AdjustMarkerY(go);
