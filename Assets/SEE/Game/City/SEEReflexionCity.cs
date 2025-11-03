@@ -222,7 +222,6 @@ namespace SEE.Game.City
             reflexionGraphProvider.Mapping = MappingSnapshotPath;
 
             LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
-            //LoadedGraph = ReflexionGraph.FromSnapshot(implementationGraph, architectureGraph, mappingGraph);
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
 
