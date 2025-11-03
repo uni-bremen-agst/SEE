@@ -411,6 +411,11 @@ namespace SEE.Game.City
             if (LoadedGraph != null)
             {
                 string outputFile = GraphSnapshotPath.Path;
+                if (string.IsNullOrEmpty(outputFile))
+                {
+                    ShowNotification.Error("Save Data", $"{nameof(GraphSnapshotPath)} must be set.");
+                    return;
+                }
                 GraphWriter.Save(outputFile, LoadedGraph, HierarchicalEdges.First());
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
@@ -615,6 +620,19 @@ namespace SEE.Game.City
         [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
         public virtual async UniTask LoadSnapshotAsync()
         {
+            string snapshotGraphPath = GraphSnapshotPath.Path;
+            if (string.IsNullOrEmpty(snapshotGraphPath))
+            {
+                ShowNotification.Error("Load Snapshot", $"{nameof(GraphSnapshotPath)} must be set.");
+                return;
+            }
+
+            if (!File.Exists(snapshotGraphPath))
+            {
+                ShowNotification.Error("Load Snapshot", $"The graph snapshot file {snapshotGraphPath} does not exist.");
+                return;
+            }
+
             Reset();
             Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
             // Use a single GXL provider to load the graph.
