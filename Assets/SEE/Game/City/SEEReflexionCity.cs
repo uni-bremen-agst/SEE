@@ -181,7 +181,7 @@ namespace SEE.Game.City
             (Graph implementation, Graph architecture, Graph mapping) = reflexionGraph.Disassemble();
 
             GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
-            Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
+            Debug.Log($"Saving implementation graph snapshot to {GraphSnapshotPath.Path}");
 
             GraphWriter.Save(ArchitectureSnapshotPath.Path, architecture, HierarchicalEdges.First());
             Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
