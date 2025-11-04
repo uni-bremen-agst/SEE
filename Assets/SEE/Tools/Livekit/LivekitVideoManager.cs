@@ -10,7 +10,7 @@ using Unity.Netcode;
 using SEE.Controls;
 using SEE.GO;
 using SEE.UI.Notification;
-using SEE.Game.Avatars;
+using SEE.Utils;
 
 namespace SEE.Tools.Livekit
 {

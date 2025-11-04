@@ -24,6 +24,7 @@ using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
 using SEE.Controls;
+using SEE.Utils;
 
 namespace SEE.Game.Avatars
 {

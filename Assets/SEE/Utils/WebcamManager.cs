@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace SEE.Game.Avatars
+namespace SEE.Utils
 {
     /// <summary>
     /// Controls the initialization and use of WebCamTexture, since this texture cannot
