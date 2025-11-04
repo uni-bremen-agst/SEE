@@ -164,6 +164,9 @@ namespace SEE.Game.City
             return needMenuAdjustments;
         }
 
+        /// <summary>
+        /// Saves the reflexion city as their individual graphs.
+        /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
         [PropertyOrder(DataButtonsGroupOrderSave)]
@@ -190,6 +193,11 @@ namespace SEE.Game.City
             Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
         }
 
+        /// <summary>
+        /// Loads a reflexion city from a snapshot.
+        ///
+        /// This method will load the graph and then apply the saved layout.
+        /// </summary>
         [Button(ButtonSizes.Small, Name = "Load Snapshot")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
         [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
