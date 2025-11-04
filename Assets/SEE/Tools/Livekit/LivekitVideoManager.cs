@@ -10,6 +10,7 @@ using Unity.Netcode;
 using SEE.Controls;
 using SEE.GO;
 using SEE.UI.Notification;
+using SEE.Game.Avatars;
 
 namespace SEE.Tools.Livekit
 {
@@ -100,13 +101,9 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void Start()
         {
-            // FIXME (#826): Rather than trying to obtain the token on Start, we should rather try that only
-            // if the user explicitly demands it (starts the face cam). Otherwise we might annoy
-            // the user with a failing request to the token server that is not needed.
             if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
             {
                 SetupCameraDropdown();
-                StartCoroutine(GetToken());
             }
             else
             {
@@ -136,7 +133,14 @@ namespace SEE.Tools.Livekit
             {
                 if (publishedTrack == null)
                 {
-                    StartCoroutine(PublishVideo());
+                    if (room == null || !room.IsConnected)
+                    {
+                        StartCoroutine(ConnectAndPublish());
+                    }
+                    else
+                    {
+                        StartCoroutine(PublishVideo());
+                    }
                 }
                 else
                 {
@@ -217,7 +221,10 @@ namespace SEE.Tools.Livekit
             PlayerPrefs.SetString("selectedCamera", selectedDeviceName);
 
             // Initialize a new WebCamTexture with the selected camera device.
-            webCamTexture = new WebCamTexture(selectedDeviceName);
+            webCamTexture = WebcamManager.WebCamTexture;//new WebCamTexture(selectedDeviceName);
+            Debug.Log($"WebcamManager Name: {WebcamManager.WebCamTexture.deviceName}");
+            Debug.Log($"Device Name: {selectedDeviceName}");
+            Debug.Log($"WebCamTextures equal?: {WebcamManager.WebCamTexture == new WebCamTexture(selectedDeviceName)}");
 
             if (publishedTrack != null)
             {
@@ -246,7 +253,7 @@ namespace SEE.Tools.Livekit
             if (www.result == UnityEngine.Networking.UnityWebRequest.Result.Success)
             {
                 // Token received, proceed to join the room using the received token.
-                StartCoroutine(JoinRoom(www.downloadHandler.text));
+                yield return StartCoroutine(JoinRoom(www.downloadHandler.text));
             }
             else
             {
@@ -360,6 +367,28 @@ namespace SEE.Tools.Livekit
 
                 LivekitStatusImage.color = Color.green;
                 LivekitStatusText.text = "Video live";
+            }
+        }
+
+        /// <summary>
+        /// Establishes a connection to the LiveKit room if not already connected
+        /// and publishes the local video track.
+        /// </summary>
+        /// <returns>
+        /// A coroutine that yields while the connection and publishing process is ongoing.
+        /// </returns>
+        private IEnumerator ConnectAndPublish()
+        {
+            if (room == null || !room.IsConnected)
+            {
+                yield return StartCoroutine(GetToken());
+                // wait one frame to allow room state update.
+                yield return null;
+            }
+
+            if (room != null && room.IsConnected)
+            {
+                yield return StartCoroutine(PublishVideo());
             }
         }
 
