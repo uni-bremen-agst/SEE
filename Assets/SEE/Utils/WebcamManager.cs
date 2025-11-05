@@ -9,10 +9,28 @@ namespace SEE.Utils
     public static class WebcamManager
     {
         /// <summary>
-        /// Gets the active <see cref="WebCamTexture"/> instance.
-        /// Will be null until <see cref="Initialize"/> is successfully called.
+        /// The currently active <see cref="WebCamTexture"/> instance.
         /// </summary>
-        public static WebCamTexture WebCamTexture { get; private set; }
+        private static WebCamTexture activeWebcam;
+
+        /// <summary>
+        /// Gets the active <see cref="WebCamTexture"/> instance.
+        /// If no webcam has been initialized yet, this property automatically calls
+        /// <see cref="Initialize"/> to create and start the first available webcam device.
+        /// If initialization fails (e.g., because no camera is available), this property will return null.
+        /// </summary>
+        public static WebCamTexture WebCamTexture
+        {
+            get
+            {
+                if (activeWebcam == null)
+                {
+                    Initialize();
+                }
+                return activeWebcam;
+            }
+            private set => activeWebcam = value;
+        }
 
         /// <summary>
         /// Initializes the webcam manager.
@@ -21,13 +39,8 @@ namespace SEE.Utils
         /// - If a webcam is available, the first detected device is selected, and a
         /// <see cref="webCamTexture"/> is created and started.
         /// </summary>
-        public static void Initialize()
+        private static void Initialize()
         {
-            if (WebCamTexture != null)
-            {
-                return;
-            }
-
             WebCamDevice[] devices = WebCamTexture.devices;
             Debug.Log($"Webcam devices count: {devices.Length}\n");
 
