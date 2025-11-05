@@ -1,13 +1,28 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace SEE.Utils
 {
     /// <summary>
-    /// Controls the initialization and use of WebCamTexture, since this texture cannot
-    /// be initialized more than once.
+    /// Manages multiple webcams with lazy initialization.
+    /// Only the active webcam is played to save resources.
+    ///
+    /// Note: A WebCamTexture cannot be initialized more than once per device.
+    /// Attempting to create multiple WebCamTextures for the same camera will fail,
+    /// so this manager ensures that each device has at most one WebCamTexture instance.
     /// </summary>
     public static class WebcamManager
     {
+        /// <summary>
+        ///
+        /// </summary>
+        private static Dictionary<string, WebCamTexture> webcams = new();
+
+        /// <summary>
+        ///
+        /// </summary>
+        private static WebCamDevice[] devices;
+
         /// <summary>
         /// The currently active <see cref="WebCamTexture"/> instance.
         /// </summary>
@@ -51,7 +66,7 @@ namespace SEE.Utils
             }
 
             WebCamDevice device = devices[0];
-            WebCamTexture = new WebCamTexture(device.name, 1240, 720, 30);
+            WebCamTexture = new WebCamTexture(device.name);
             WebCamTexture.Play();
             Debug.Log($"Webcam initialized: {device.name}\n");
         }
