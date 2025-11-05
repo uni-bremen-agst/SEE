@@ -634,7 +634,7 @@ namespace SEE.Game.City
             }
 
             Reset();
-            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            Debug.Log($"Loading snapshot graph from {snapshotGraphPath}.\n");
             // Use a single GXL provider to load the graph.
             GXLSingleGraphProvider gxlProvider = new()
             {
