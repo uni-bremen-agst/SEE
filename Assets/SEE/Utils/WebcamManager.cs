@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -23,6 +24,11 @@ namespace SEE.Utils
         /// Index of the currently active webcam in the <see cref="webcams"/> list.
         /// </summary>
         private static int activeIndex = 0;
+
+        /// <summary>
+        /// Occurs when the active webcam is changed via <see cref="SwitchCamera(int)"/>.
+        /// </summary>
+        public static event Action<WebCamTexture> OnActiveWebcamChanged;
 
         /// <summary>
         /// Gets the currently active <see cref="WebCamTexture"/>.
@@ -67,7 +73,7 @@ namespace SEE.Utils
                 if (i == 0)
                 {
                     activeIndex = i;
-                    webcams[i].Play();
+                    webcams[i].Play(); // TODO: Check if Play() is required for BodyAnimator?
                     Debug.Log($"[WebcamManager] Active webcam initialized: {device.name}\n");
                 }
             }
@@ -90,7 +96,8 @@ namespace SEE.Utils
             {
                 webcams[activeIndex].Stop();
                 activeIndex = index;
-                webcams[activeIndex].Play();
+                OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
+                webcams[activeIndex].Play(); // TODO: Check if Play() is required for BodyAnimator?
             }
         }
     }
