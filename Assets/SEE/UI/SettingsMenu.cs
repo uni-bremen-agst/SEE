@@ -79,6 +79,11 @@ namespace SEE.UI
         private Slider musicVolumeSlider;
 
         /// <summary>
+        /// The dropdown UI component used to select between different available cameras.
+        /// </summary>
+        private Dropdown cameraDropdown;
+
+        /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
@@ -90,6 +95,8 @@ namespace SEE.UI
             // adds the ExitGame method to the exit button
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
+
+            RegisterCameraDropdown();
 
             musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
             musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
@@ -260,6 +267,44 @@ namespace SEE.UI
 #else
             Application.Quit();
 #endif
+        }
+
+        /// <summary>
+        /// Registers and initializes the camera selection dropdown within the settings menu.
+        /// This method populates the dropdown with all available webcam devices, restores the
+        /// previously selected camera from <see cref="PlayerPrefs"/>, and connects the dropdown's
+        /// selection event to the <see cref="WebcamManager.SwitchCamera(int)"/> handler.
+        /// </summary>
+        /// <remarks>
+        /// - If no webcam devices are found, the dropdown remains uninitialized.
+        /// - The first available device is used as a fallback if no previous selection is stored.
+        /// - The dropdown is expected to be a child object named "CameraDropdown" within
+        ///   <see cref="settingsMenuGameObject"/>.
+        /// </remarks>
+        private void RegisterCameraDropdown()
+        {
+            cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
+            // Load available cameras and populate the dropdown.
+            WebCamDevice[] devices = WebCamTexture.devices;
+
+            if (devices.Length > 0)
+            {
+                cameraDropdown.options.Clear();
+                foreach (WebCamDevice device in devices)
+                {
+                    cameraDropdown.options.Add(new Dropdown.OptionData(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name));
+                }
+
+                // Get the saved camera or default to the first available camera.
+                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices[0].name);
+
+                // Set the dropdown value to the saved or default camera.
+                int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
+                cameraDropdown.value = selectedIndex >= 0 ? selectedIndex : 0;
+
+                // Add a listener for dropdown changes.
+                cameraDropdown.onValueChanged.AddListener(WebcamManager.SwitchCamera);
+            }
         }
     }
 }

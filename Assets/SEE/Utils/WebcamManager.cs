@@ -44,7 +44,7 @@ namespace SEE.Utils
                 {
                     Initialize();
                 }
-                return webcams.Count > 0? webcams[activeIndex] : null;
+                return webcams.Count > 0 ? webcams[activeIndex] : null;
             }
         }
 

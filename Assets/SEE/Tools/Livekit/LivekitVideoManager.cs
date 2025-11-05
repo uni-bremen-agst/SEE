@@ -57,17 +57,6 @@ namespace SEE.Tools.Livekit
         private WebCamTexture webCamTexture = null;
 
         /// <summary>
-        /// An array containing the available webcam devices.
-        /// </summary>
-        private WebCamDevice[] devices;
-
-        /// <summary>
-        /// The dropdown UI component used to select between different available cameras.
-        /// </summary>
-        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
-        public Dropdown CameraDropdown;
-
-        /// <summary>
         /// The image UI component that shows whether the video chat is active.
         /// </summary>
         /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
@@ -95,17 +84,12 @@ namespace SEE.Tools.Livekit
         private readonly List<VideoStream> videoStreams = new();
 
         /// <summary>
-        /// Initializes the video manager by obtaining a token and setting up the camera dropdown.
         /// If this code is executed in an environment different from <see cref="PlayerInputType.DesktopPlayer"/>,
         /// the object will be disabled.
         /// </summary>
         private void Start()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
-            {
-                SetupCameraDropdown();
-            }
-            else
+            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
             {
                 gameObject.SetActive(false);
             }
@@ -170,65 +154,59 @@ namespace SEE.Tools.Livekit
 
         #region Camera Methods
         /// <summary>
-        /// Initializes the camera dropdown menu with the list of available camera devices.
-        /// This method populates the dropdown with the names of all connected camera devices
-        /// and sets up a listener to handle camera selection changes.
+        /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
+        /// This ensures that the component reacts whenever the active webcam changes.
+        /// Additionally, if a webcam is already active when this component is enabled,
+        /// <see cref="HandleWebcamChanged"/> is called immediately to synchronize state.
         /// </summary>
-        private void SetupCameraDropdown()
+        private void OnEnable()
         {
-            // Load available cameras and populate the dropdown.
-            devices = WebCamTexture.devices;
-
-            if (devices.Length > 0)
+            WebcamManager.OnActiveWebcamChanged += HandleWebcamChanged;
+            // Request current state once when enabling
+            if (WebcamManager.WebCamTexture != null)
             {
-                CameraDropdown.options.Clear();
-                foreach (WebCamDevice device in devices)
-                {
-                    CameraDropdown.options.Add(new Dropdown.OptionData(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name));
-                }
-
-                // Get the saved camera or default to the first available camera.
-                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices[0].name);
-
-                // Set the dropdown value to the saved or default camera.
-                int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
-                CameraDropdown.value = selectedIndex >= 0 ? selectedIndex : 0;
-
-                // Add a listener for dropdown changes.
-                CameraDropdown.onValueChanged.AddListener(OpenSelectedCamera);
-
-                OpenSelectedCamera(selectedIndex);
-            }
-            else
-            {
-                Debug.LogError("[Livekit] No camera devices available");
+                HandleWebcamChanged(WebcamManager.WebCamTexture);
             }
         }
 
         /// <summary>
-        /// Opens and starts the selected camera device based on the provided index.
-        /// This method stops any currently active camera, initializes a new WebCamTexture with the selected
-        /// camera device, and starts capturing video from it. It also republishes the video stream.
+        /// Unsubscribes from the <see cref="WebcamManager.OnActiveWebcamChanged"/> event
+        /// to prevent memory leaks or invalid callbacks when the component is disabled.
         /// </summary>
-        /// <param name="index">The index of the selected camera device in the dropdown list.</param>
-        private void OpenSelectedCamera(int index)
+        private void OnDisable()
         {
-            webCamTexture?.Stop();
+            WebcamManager.OnActiveWebcamChanged -= HandleWebcamChanged;
+        }
 
-            string selectedDeviceName = devices[index].name;
+        /// <summary>
+        /// Handles updates when the active webcam changes.
+        /// Updates the currently published video stream, saves the selected camera,
+        /// and switches the <see cref="WebCamTexture"/> used by this component.
+        /// </summary>
+        /// <param name="newWebcam">
+        /// The newly active <see cref="WebCamTexture"/> provided by the <see cref="WebcamManager"/>.
+        /// Can be <c>null</c> if no webcam is available.
+        /// </param>
+        private void HandleWebcamChanged(WebCamTexture newWebcam)
+        {
+            if (newWebcam == null || webCamTexture == newWebcam)
+            {
+                return;
+            }
 
             // Saves the selected camera.
-            PlayerPrefs.SetString("selectedCamera", selectedDeviceName);
+            PlayerPrefs.SetString("selectedCamera", newWebcam.deviceName);
 
             // Initialize a new WebCamTexture with the selected camera device.
-            webCamTexture = WebcamManager.WebCamTexture;
+            webCamTexture = newWebcam;
 
             if (publishedTrack != null)
             {
                 StartCoroutine(UnpublishVideo());
             }
-            Debug.Log($"[Livekit] Switched to camera: {selectedDeviceName}");
+            Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
         }
+
         #endregion
 
         #region Connection Methods
