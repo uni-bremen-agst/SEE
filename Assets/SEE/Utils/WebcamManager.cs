@@ -52,7 +52,6 @@ namespace SEE.Utils
         private static void Initialize()
         {
             WebCamDevice[] devices = WebCamTexture.devices;
-            Debug.Log($"Webcam devices count: {devices.Length}\n");
 
             if (devices.Length == 0)
             {
@@ -69,11 +68,7 @@ namespace SEE.Utils
                 {
                     activeIndex = i;
                     webcams[i].Play();
-                    Debug.Log($"Active webcam initialized: {device.name}\n");
-                }
-                else
-                {
-                    Debug.Log($"Inactive webcam registered: {device.name}");
+                    Debug.Log($"[WebcamManager] Active webcam initialized: {device.name}\n");
                 }
             }
         }
@@ -87,7 +82,7 @@ namespace SEE.Utils
         {
             if (index < 0 || index >= webcams.Count)
             {
-                Debug.LogWarning($"Webcam index {index} is out of range.");
+                Debug.LogWarning($"[WebcamManager] Webcam index {index} is out of range.");
                 return;
             }
 
@@ -96,7 +91,6 @@ namespace SEE.Utils
                 webcams[activeIndex].Stop();
                 activeIndex = index;
                 webcams[activeIndex].Play();
-                Debug.Log($"Active webcam switched to: {webcams[activeIndex].deviceName}");
             }
         }
     }

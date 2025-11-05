@@ -221,10 +221,7 @@ namespace SEE.Tools.Livekit
             PlayerPrefs.SetString("selectedCamera", selectedDeviceName);
 
             // Initialize a new WebCamTexture with the selected camera device.
-            webCamTexture = WebcamManager.WebCamTexture;//new WebCamTexture(selectedDeviceName);
-            Debug.Log($"WebcamManager Name: {WebcamManager.WebCamTexture.deviceName}");
-            Debug.Log($"Device Name: {selectedDeviceName}");
-            Debug.Log($"WebCamTextures equal?: {WebcamManager.WebCamTexture == new WebCamTexture(selectedDeviceName)}");
+            webCamTexture = WebcamManager.WebCamTexture;
 
             if (publishedTrack != null)
             {
