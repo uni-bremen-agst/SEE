@@ -112,7 +112,6 @@ namespace SEE.Game.Avatars
             //Use local WebCamTexture.
             if (IsLocallyControlled)
             {
-                //WebcamManager.Initialize();
                 webCamTexture = WebcamManager.WebCamTexture;
             }
 
