@@ -374,6 +374,13 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine to handle the asynchronous unpublishing process.</returns>
         private IEnumerator UnpublishVideo()
         {
+            foreach (var source in rtcVideoSources)
+            {
+                source.Stop();
+            }
+            rtcVideoSources.Clear();
+            yield return null;
+
             // Stop camera device.
             webCamTexture?.Stop();
 
