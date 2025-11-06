@@ -189,9 +189,15 @@ namespace SEE.Tools.Livekit
         /// </param>
         private void HandleWebcamChanged(WebCamTexture newWebcam)
         {
+            //StartCoroutine(test(newWebcam));
             if (newWebcam == null || webCamTexture == newWebcam)
             {
                 return;
+            }
+
+            if (publishedTrack != null)
+            {
+                StartCoroutine(UnpublishVideo());
             }
 
             // Saves the selected camera.
@@ -200,10 +206,29 @@ namespace SEE.Tools.Livekit
             // Initialize a new WebCamTexture with the selected camera device.
             webCamTexture = newWebcam;
 
+            Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
+        }
+
+        private IEnumerator test(WebCamTexture newWebcam)
+        {
+            if (newWebcam == null || webCamTexture == newWebcam)
+            {
+                yield break;//return;
+            }
+
             if (publishedTrack != null)
             {
-                StartCoroutine(UnpublishVideo());
+                Debug.Log("Deaktiviere Übertragung");
+                yield return UnpublishVideo();
+                Debug.Log($"Erfolgreich deaktiviert");
             }
+
+            // Saves the selected camera.
+            PlayerPrefs.SetString("selectedCamera", newWebcam.deviceName);
+
+            // Initialize a new WebCamTexture with the selected camera device.
+            webCamTexture = newWebcam;
+
             Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
         }
 
@@ -380,9 +405,11 @@ namespace SEE.Tools.Livekit
             }
             rtcVideoSources.Clear();
             yield return null;
-
             // Stop camera device.
-            webCamTexture?.Stop();
+            if (webCamTexture.isPlaying)
+            {
+                webCamTexture?.Stop();
+            }
 
             // Unpublish the video track from the room.
             UnpublishTrackInstruction unpublish = room.LocalParticipant.UnpublishTrack(publishedTrack, true);

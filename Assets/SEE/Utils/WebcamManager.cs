@@ -1,5 +1,7 @@
+using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -94,10 +96,16 @@ namespace SEE.Utils
 
             if (activeIndex != index)
             {
-                webcams[activeIndex].Stop();
+                StopWebcamAsync(activeIndex).Forget();
                 activeIndex = index;
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
                 webcams[activeIndex].Play(); // TODO: Check if Play() is required for BodyAnimator?
+            }
+
+            static async UniTask StopWebcamAsync(int index)
+            {
+                await UniTask.Yield();
+                webcams[index].Stop();
             }
         }
     }
