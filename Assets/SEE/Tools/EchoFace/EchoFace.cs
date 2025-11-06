@@ -25,6 +25,7 @@ public static class Landmarks
 [Serializable]
 public class FaceData
 {
+    // A nested class to represent the 'x', 'y', 'z' landmark coordinates
     [Serializable]
     public class LandmarkCoordinates
     {
@@ -122,36 +123,10 @@ public class EchoFace : MonoBehaviour
     [SerializeField]
     private float eyeLookScale = 30f;
 
-    [Header("Debug / Monitoring")]
-    [SerializeField]
-    private bool discardOutdatedPackets = true; // Ebene 1 (UDP)
-
-    [SerializeField]
-    private bool discardLatencyOutliers = true; // Ebene 2 (Statistik)
-
 
     //-------------------------------------------------
     // Private Fields
     //-------------------------------------------------
-
-    // --- Monitoring ---
-    // wir messen jetzt NUR maximale Latenz, keinen Durchschnitt mehr
-    private double _maxLatencyObserved = 0.0;
-    private double _lastLatencyMs = 0.0;
-
-    private double _minLatencyObserved = double.MaxValue;
-    private double _latencyAccumulator = 0.0;
-    private int _latencyCount = 0;
-
-
-    private int _processedThisSecond = 0;
-    private float _fpsTimer = 0f;
-    private int _processedFps = 0;
-
-    // Zähler für verworfene Pakete
-    private int _discardedByTimestampCount = 0; // im Receive-Thread verworfen (älter / identisch)
-    private int _discardedByLatencyCount = 0;   // in der Latenz-Statistik verworfen (Outlier)
-    private int _discardedByQueueTrimCount = 0;      // beim "nur aktuelles behalten" rausgeworfen
 
     private UdpClient _udpClient;
     private Thread _receiveThread;
@@ -236,6 +211,7 @@ public class EchoFace : MonoBehaviour
             Mathf.Clamp01(
                 Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.7f
                 + arkit["mouthClose"] * 0.5f
+                //+ (1f - arkit["jawOpen"]) * 0.2f
                 + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
                 + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.15f
             )
@@ -258,6 +234,7 @@ public class EchoFace : MonoBehaviour
             Mathf.Clamp01(
                 arkit["mouthFunnel"] * 1.0f
                 + Mathf.Max(arkit["mouthPressLeft"], arkit["mouthPressRight"]) * 0.4f
+                //+ (1f - arkit["jawOpen"]) * 0.3f
                 + Mathf.Max(arkit["mouthRollUpper"], arkit["mouthRollLower"]) * 0.2f
                 + Mathf.Max(arkit["mouthFrownLeft"], arkit["mouthFrownRight"]) * 0.1f
             )
@@ -358,6 +335,8 @@ public class EchoFace : MonoBehaviour
     };
 
     // Scaling factors that should only be applied when viseme synthesis is enabled.
+    // These primarily target phoneme-related blendshapes to avoid excessive deformation
+    // when the model is driven by procedural viseme data.
     private readonly Dictionary<string, float> _visemeBlendshapeScales = new()
     {
         { "Mouth_Funnel_Up_L",   0.3f },
@@ -376,8 +355,6 @@ public class EchoFace : MonoBehaviour
 
     private void Start()
     {
-        Application.targetFrameRate = 800;
-
         // Attempt to auto-assign skinnedMeshRenderer if not set in Inspector
         if (skinnedMeshRenderer == null)
         {
@@ -407,89 +384,43 @@ public class EchoFace : MonoBehaviour
         StartUDPListener();
     }
 
-    double NowUnixSeconds()
-    {
-        return DateTimeOffset.UtcNow.ToUnixTimeMilliseconds() / 1000.0;
-    }
-
     private void Update()
     {
         // Dequeue data in Update. Store the latest data for LateUpdate.
         if (_faceDataQueue.TryDequeue(out var receivedData))
         {
             _latestFaceData = receivedData;
-            _processedThisSecond++; // zählt nur neue Pakete, nicht jede Frame
         }
     }
 
     private void LateUpdate()
     {
+        // Apply blendshapes and head/eye rotation in LateUpdate after all animations have been processed.
         if (_latestFaceData == null)
-            goto LOG_ONLY; // nichts zu tun, aber trotzdem jede Sekunde loggen
-
-        // 1) Latenz messen (jetzt – gesendet)
-        if (_latestFaceData.ts > 0)
         {
-            double nowMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-            double latencyMs = nowMs - _latestFaceData.ts;
-            _lastLatencyMs = latencyMs;
-
-            if (latencyMs < _minLatencyObserved)
-                _minLatencyObserved = latencyMs;
-
-            if (latencyMs > _maxLatencyObserved)
-                _maxLatencyObserved = latencyMs;
-
-            _latencyAccumulator += latencyMs;
-            _latencyCount++;
-
+            return;
         }
 
-        // 2) Face-Animation anwenden
+        // Apply blendshapes
         if (enableFaceAnimation && skinnedMeshRenderer != null && _latestFaceData.blendshapes != null)
         {
             ApplyBlendshapes(_latestFaceData.blendshapes);
         }
 
-        // 3) Head-Rotation
+        // Estimate and apply head pose
         if (enableHeadRotation && headTransform != null && _latestFaceData.landmarks != null && _latestFaceData.landmarks.Count >= 3)
         {
-            var targetRotation = EstimateHeadRotation(_latestFaceData.landmarks);
+            Quaternion targetRotation = EstimateHeadRotation(_latestFaceData.landmarks);
             ApplyHeadRotation(targetRotation);
         }
 
-        // 4) Eye-Rotation
+        // Apply eye rotation
         if (enableEyeRotation)
         {
             ApplyEyeRotation();
         }
 
-        // damit wir im nächsten Frame nicht versehentlich dasselbe Paket nochmal benutzen
-        _latestFaceData = null;
-
-    LOG_ONLY:
-
-        _fpsTimer += Time.deltaTime;
-        // 5) FPS + Monitoring jede Sekunde ausgeben
-        if (_fpsTimer >= 1f)
-        {
-            _processedFps = _processedThisSecond;
-            _processedThisSecond = 0;
-            _fpsTimer = 0f;
-            double avgLatency = _latencyCount > 0 ? _latencyAccumulator / _latencyCount : 0;
-            Debug.Log(
-                $"[EchoFace] FPS={_processedFps}, " +
-                $"latency min={_minLatencyObserved:F2} ms, " +
-                $"avg={avgLatency:F2} ms, " +
-                $"max={_maxLatencyObserved:F2} ms, " +
-                $"discarded (timestamp)={_discardedByTimestampCount}, " +
-                $"discarded (queue-trim)={_discardedByQueueTrimCount}"
-            );
-
-            // Reset Durchschnittszähler, damit du pro Sekunde Mittelwerte bekommst
-            _latencyAccumulator = 0.0;
-            _latencyCount = 0;
-        }
+        _latestFaceData = null; // Clear after processing
     }
 
     private void OnApplicationQuit() => Shutdown();
@@ -499,11 +430,20 @@ public class EchoFace : MonoBehaviour
     // Private Methods
     //-------------------------------------------------
 
+    /// <summary>
+    /// Converts MediaPipe landmark coordinates to a Unity Vector3.
+    /// MediaPipe's coordinate system is different from Unity's, so the axes are flipped.
+    /// </summary>
+    /// <param name="coords">The landmark coordinates from the JSON data.</param>
+    /// <returns>A new Vector3 suitable for use in Unity's world space.</returns>
     private Vector3 ToUnityVector3(FaceData.LandmarkCoordinates coords)
     {
         return new Vector3(-coords.x, -coords.y, -coords.z);
     }
 
+    /// <summary>
+    /// Applies blendshape weights with smoothing.
+    /// </summary>
     private void ApplyBlendshapes(Dictionary<string, float> blendshapes)
     {
         var targetBlendshapeValues = new Dictionary<string, float>();
@@ -529,8 +469,15 @@ public class EchoFace : MonoBehaviour
                     browDownValue = blendshapes["browDownRight"];
                 }
 
+                // Version 1 (more subtle):
+                // - Apply the eyeSquintPower to exaggerate stronger squints
+                // - Scale the browDown contribution linearly with the powered squint
                 value = Mathf.Pow(value, eyeSquintPower);
                 value = Mathf.Clamp01(value + value * browDownValue);
+
+                // Alternative Version (more expressive):
+                // float brow = Mathf.Pow(browDownValue * value, eyeSquintPower);
+                // value = Mathf.Clamp01(value + brow);
             }
 
             foreach (var name in customNames)
@@ -541,6 +488,9 @@ public class EchoFace : MonoBehaviour
         }
 
         // 2. Apply custom logic for specific blendshapes
+
+        // Multiply upper lip lift by the smile intensity to drive Mouth_Down,
+        // creating a counter-pull to hide the upper gums while smiling.
         targetBlendshapeValues["Mouth_Down"] = Mathf.Max(
             blendshapes.GetValueOrDefault("mouthUpperUpLeft", 0f),
             blendshapes.GetValueOrDefault("mouthUpperUpRight", 0f)
@@ -549,6 +499,8 @@ public class EchoFace : MonoBehaviour
             blendshapes.GetValueOrDefault("mouthSmileRight", 0f)
         );
 
+        // Damp the lower lip's downward movement proportionally to 'jawOpen' to prevent the lip
+        // from drooping and exposing the lower gums when the mouth is wide open.
         targetBlendshapeValues["Mouth_Down_Lower_L"] = Mathf.Clamp01(
             blendshapes.GetValueOrDefault("mouthLowerDownLeft", 0f)
             * (1 - blendshapes.GetValueOrDefault("jawOpen", 0f))
@@ -569,6 +521,7 @@ public class EchoFace : MonoBehaviour
         }
         else
         {
+            // Zero out any viseme blendshapes if synthesis is disabled
             foreach (var visemeKey in _visemeSynthesisMap.Keys)
             {
                 if (_currentBlendshapeValues.TryGetValue(visemeKey, out float currentValue)
@@ -582,19 +535,23 @@ public class EchoFace : MonoBehaviour
         // 4. Smooth and Set Blendshape Weights
         foreach (var kvp in targetBlendshapeValues)
         {
+            // Get the index from the cache. If it doesn't exist, we can't set the weight.
             if (!_blendshapeIndexCache.TryGetValue(kvp.Key, out int index))
             {
                 continue;
             }
 
             float targetValue = kvp.Value;
+            // Get the current value to smooth from.
             _currentBlendshapeValues.TryGetValue(kvp.Key, out float currentValue);
 
+            // Apply base scaling
             if (_baseBlendshapeScales.TryGetValue(kvp.Key, out float baseScale))
             {
                 targetValue *= baseScale;
             }
 
+            // Apply viseme-specific scaling only if viseme synthesis is enabled
             if (enableVisemeSynthesis &&
                 _visemeBlendshapeScales.TryGetValue(kvp.Key, out float visemeScale))
             {
@@ -606,6 +563,7 @@ public class EchoFace : MonoBehaviour
                     ? visemeSmoothingRate
                     : smoothingRate;
 
+            // Smooth transition using exponential smoothing
             float alpha = 1f - Mathf.Exp(-smoothingRateToUse * Time.deltaTime * 60f);
             float smoothedValue = Mathf.Lerp(currentValue, targetValue, alpha);
 
@@ -616,6 +574,7 @@ public class EchoFace : MonoBehaviour
 
     private Quaternion EstimateHeadRotation(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
     {
+        // Ensure the required landmarks exist using named constants.
         if (!landmarks.ContainsKey(Landmarks.Chin) ||
             !landmarks.ContainsKey(Landmarks.LeftUpperEyelid) ||
             !landmarks.ContainsKey(Landmarks.RightUpperEyelid))
@@ -628,18 +587,31 @@ public class EchoFace : MonoBehaviour
         Vector3 leftEyeInner = ToUnityVector3(landmarks[Landmarks.LeftUpperEyelid]);
         Vector3 rightEyeInner = ToUnityVector3(landmarks[Landmarks.RightUpperEyelid]);
 
+        // Calculate a vector representing the direction of the face's "up."
         Vector3 eyeMidpoint = (leftEyeInner + rightEyeInner) * 0.5f;
         Vector3 upVector = (eyeMidpoint - chin).normalized;
+
+        // Calculate a vector representing the direction of the face's "right."
+        // This vector points from the right eye to the left eye.
         Vector3 rightVector = (leftEyeInner - rightEyeInner).normalized;
+
+        // The "forward" vector is perpendicular to both "up" and "right".
+        // The cross product is ordered (up, right) for a right-handed coordinate system.
         Vector3 forwardVector = Vector3.Cross(upVector, rightVector).normalized;
 
+        // Create the final rotation from the calculated vectors.
         Quaternion targetRotation = Quaternion.LookRotation(forwardVector, upVector);
+
+        // Apply a manual pitch correction for the camera's tilt.
         Quaternion correction = Quaternion.Euler(tiltCorrection, 0, 0);
         targetRotation = targetRotation * correction;
 
         return targetRotation;
     }
 
+    /// <summary>
+    /// Rotates the eye bones based on blendshape-driven look directions.
+    /// </summary>
     private void ApplyEyeRotation()
     {
         if (leftEyeTransform == null || rightEyeTransform == null || _latestFaceData?.blendshapes == null)
@@ -651,6 +623,7 @@ public class EchoFace : MonoBehaviour
         float pitchRight = 0f;
         float yawRight = 0f;
 
+        // Pitch (up/down)
         pitchLeft -= blendshapes.GetValueOrDefault("eyeLookUpLeft") * eyeLookScale;
         pitchLeft += blendshapes.GetValueOrDefault("eyeLookDownLeft") * eyeLookScale;
         pitchLeft -= tiltCorrection * 0.5f;
@@ -659,36 +632,50 @@ public class EchoFace : MonoBehaviour
         pitchRight += blendshapes.GetValueOrDefault("eyeLookDownRight") * eyeLookScale;
         pitchRight -= tiltCorrection * 0.5f;
 
+        // Yaw (left/right)
         yawLeft -= blendshapes.GetValueOrDefault("eyeLookOutLeft") * eyeLookScale;
         yawLeft += blendshapes.GetValueOrDefault("eyeLookInLeft") * eyeLookScale;
 
         yawRight += blendshapes.GetValueOrDefault("eyeLookOutRight") * eyeLookScale;
         yawRight -= blendshapes.GetValueOrDefault("eyeLookInRight") * eyeLookScale;
 
+        // Target rotations, with Z-axis fixed at 0
         Quaternion targetLeftRotation = Quaternion.Euler(pitchLeft, 0, yawLeft);
         Quaternion targetRightRotation = Quaternion.Euler(pitchRight, 0, yawRight);
 
+        // Smooth interpolation
         float alpha = 1f - Mathf.Exp(-eyeRotationSmoothingRate * Time.deltaTime * 60f);
         _currentLeftEyeRotation = Quaternion.Slerp(_currentLeftEyeRotation, targetLeftRotation, alpha);
         _currentRightEyeRotation = Quaternion.Slerp(_currentRightEyeRotation, targetRightRotation, alpha);
 
+        // Apply relative to rest rotations
         leftEyeTransform.localRotation = _leftEyeRestRotation * _currentLeftEyeRotation;
         rightEyeTransform.localRotation = _rightEyeRestRotation * _currentRightEyeRotation;
     }
 
+    /// <summary>
+    /// Applies the calculated head pose to the head bone with smoothing.
+    /// </summary>
+    /// <param name="targetRotation">The target rotation calculated by EstimateHeadRotation.</param>
     private void ApplyHeadRotation(Quaternion targetRotation)
     {
         if (headTransform == null) return;
 
         float alpha = 1f - Mathf.Exp(-rotationSmoothingRate * Time.deltaTime * 60f);
         _currentHeadRotation = Quaternion.Slerp(_currentHeadRotation, targetRotation, alpha);
+
+        // Apply the smoothed rotation to the head transform.
         headTransform.localRotation = _currentHeadRotation;
     }
 
+    /// <summary>
+    /// Finds the left and right eye bones by recursively searching under the head transform.
+    /// </summary>
     private void FindEyeBones(Transform head)
     {
         if (head == null) return;
 
+        // Use the recursive search method to find the eyes
         leftEyeTransform = FindDeepChild(head, "CC_Base_L_Eye");
         rightEyeTransform = FindDeepChild(head, "CC_Base_R_Eye");
 
@@ -698,19 +685,25 @@ public class EchoFace : MonoBehaviour
         }
         else
         {
+            // Cache the initial local rotation of each eye bone
             _leftEyeRestRotation = leftEyeTransform.localRotation;
             _rightEyeRestRotation = rightEyeTransform.localRotation;
         }
     }
 
+    /// <summary>
+    /// Recursively finds a child transform by name.
+    /// </summary>
     private Transform FindDeepChild(Transform parent, string name)
     {
+        // First, check direct children
         var directChild = parent.Find(name);
         if (directChild != null)
         {
             return directChild;
         }
 
+        // If not found, recursively search grand-children and beyond
         foreach (Transform child in parent)
         {
             var found = FindDeepChild(child, name);
@@ -720,9 +713,13 @@ public class EchoFace : MonoBehaviour
             }
         }
 
+        // Not found in this branch
         return null;
     }
 
+    /// <summary>
+    /// Initializes the UDP client and starts the receive thread.
+    /// </summary>
     private void StartUDPListener()
     {
         try
@@ -743,6 +740,9 @@ public class EchoFace : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Threaded loop to receive data from the UDP client.
+    /// </summary>
     private void ReceiveLoop()
     {
         var remoteEP = new IPEndPoint(IPAddress.Any, port);
@@ -753,25 +753,20 @@ public class EchoFace : MonoBehaviour
                 byte[] data = _udpClient.Receive(ref remoteEP);
                 string json = Encoding.UTF8.GetString(data);
 
+                // Deserialize the JSON into the new FaceData class
                 var receivedData = JsonConvert.DeserializeObject<FaceData>(json);
                 if (receivedData != null)
                 {
-                    // hier werden "alten" Pakete wirklich verworfen -> zählen!
+                    // Discard outdated or identical packets
                     if (receivedData.ts <= _lastTimestampMs)
                     {
-                        _discardedByTimestampCount++;
                         continue;
                     }
-                    _lastTimestampMs = receivedData.ts;
-                    if (discardOutdatedPackets)
-                    {
 
-                        // nur aktuelles behalten
-                        while (_faceDataQueue.TryDequeue(out _))
-                        {
-                            _discardedByQueueTrimCount++;
-                        }
-                    }
+                    _lastTimestampMs = receivedData.ts;
+
+                    // Keep only the latest packet in the queue
+                    while (_faceDataQueue.TryDequeue(out _)) { }
                     _faceDataQueue.Enqueue(receivedData);
                 }
             }
@@ -793,6 +788,9 @@ public class EchoFace : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Caches blendshape name-to-index mappings for faster lookup.
+    /// </summary>
     private void CacheBlendshapeIndices()
     {
         _blendshapeIndexCache.Clear();
@@ -822,6 +820,9 @@ public class EchoFace : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Shuts down the UDP client and the receiving thread.
+    /// </summary>
     private void Shutdown()
     {
         if (!_isRunning)
@@ -832,7 +833,7 @@ public class EchoFace : MonoBehaviour
 
         if (_receiveThread != null && _receiveThread.IsAlive)
         {
-            _receiveThread.Join(500);
+            _receiveThread.Join(500); // Wait up to 500ms for the thread to exit
             if (_receiveThread.IsAlive)
             {
                 Debug.LogWarning("[EchoFace] UDP receive thread did not terminate gracefully.");
