@@ -42,6 +42,12 @@ class FaceAnalyzer:
         # A subset of landmarks to send for head rotation and eye tracking
         self._selected_landmark_indices = [
             152,    # Chin
+            #362,    # Left eye inner corner
+            #133,    # Right eye inner corner
+            #263,    # Left eye outer corner
+            #33,     # Right eye outer corner
+            #473,    # Left iris center
+            #468,    # Right iris center
             446,    # Left upper eyelid
             226,    # Right upper eyelid
         ]
