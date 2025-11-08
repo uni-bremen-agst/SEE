@@ -766,7 +766,7 @@ public class EchoFace : MonoBehaviour
                     _lastTimestampMs = receivedData.ts;
 
                     // Keep only the latest packet in the queue
-                    while (_faceDataQueue.TryDequeue(out _)) { }
+                    _faceDataQueue.Clear();
                     _faceDataQueue.Enqueue(receivedData);
                 }
             }
