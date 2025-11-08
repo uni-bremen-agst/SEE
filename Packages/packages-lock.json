@@ -363,7 +363,7 @@
       "url": "https://packages.unity.com"
     },
     "com.unity.xr.legacyinputhelpers": {
-      "version": "2.1.12",
+      "version": "2.1.13",
       "depth": 0,
       "source": "registry",
       "dependencies": {
