@@ -46,7 +46,7 @@ namespace SEE.Layout
     /// <summary>
     /// See <see cref="IHierarchyNode.Parent"/>.
     /// </summary>
-    public ILayoutNode Parent { get; protected set; }
+    public ILayoutNode Parent { get; set; }
 
     /// <summary>
     /// See <see cref="IHierarchyNode.Parent"/>.

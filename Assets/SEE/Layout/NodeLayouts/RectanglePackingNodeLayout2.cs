@@ -1,10 +1,11 @@
-﻿
+
 using SEE.Game.CityRendering;
 using SEE.Layout.NodeLayouts.RectanglePacking;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 namespace SEE.Layout.NodeLayouts
 {
@@ -14,33 +15,33 @@ namespace SEE.Layout.NodeLayouts
   /// "Software Systems as Cities" (2010); see page 35.
   /// https://www.inf.usi.ch/lanza/Downloads/PhD/Wett2010b.pdf
   /// </summary>
-  public class RectanglePackingNodeLayout : NodeLayout, IIncrementalNodeLayout
+  public class RectanglePackingNodeLayout2 : NodeLayout, IIncrementalNodeLayout
   {
-    static RectanglePackingNodeLayout()
+    static RectanglePackingNodeLayout2()
     {
-      Name = "Rectangle Packing";
+      Name = "Rectangle Packing2";
     }
 
     public Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
-    public RectanglePackingNodeLayout oldLayout;
+    public RectanglePackingNodeLayout2 oldLayout;
 
     public IIncrementalNodeLayout OldLayout
     {
       set
       {
-        if (value is RectanglePackingNodeLayout layout)
+        if (value is RectanglePackingNodeLayout2 layout)
         {
           oldLayout = layout;
         }
         else
         {
           throw new ArgumentException(
-              $"Predecessor of {nameof(RectanglePackingNodeLayout)} was not an {nameof(RectanglePackingNodeLayout)}.");
+              $"Predecessor of {nameof(RectanglePackingNodeLayout2)} was not an {nameof(RectanglePackingNodeLayout2)}.");
         }
       }
     }
-    
+
     public List<ILayoutNode> sameLeaves = null;
 
     public Dictionary<ILayoutNode, NodeTransform> toBeDeleted = null;
@@ -51,7 +52,7 @@ namespace SEE.Layout.NodeLayouts
 
     public static Vector2 covrec = Vector2.zero;
 
-    public static int globalCallCount = 0;
+    public int globalCallCount = 0;
 
     public List<ILayoutNode> allThisLayoutNodes = null;
 
@@ -72,8 +73,8 @@ namespace SEE.Layout.NodeLayouts
       newNodes = new List<ILayoutNode>();
       var layoutNodeIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
        */
-      globalCallCount++;
       allThisLayoutNodes = thisLayoutNodes.ToList();
+      
 
       /*
        
@@ -85,6 +86,7 @@ namespace SEE.Layout.NodeLayouts
 
       if (oldLayout == null)
       {
+        globalCallCount++;
         /*
         ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(allLayoutNodes);
         foreach (var root in roots)
@@ -102,6 +104,8 @@ namespace SEE.Layout.NodeLayouts
       }
       else
       {
+        globalCallCount = oldLayout.globalCallCount + 1;
+        layoutResult = oldLayout.layoutResult;
         var oldIds = new HashSet<string>(oldLayout.layoutResult.Keys.Select(n => n.ID));
         var newIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
 
@@ -109,18 +113,40 @@ namespace SEE.Layout.NodeLayouts
           .Where(node => !oldIds.Contains(node.ID))
           .ToList();
 
+        toBeDeleted = oldLayout.layoutResult
+          .Where(entry => !newIds.Contains(entry.Key.ID))
+          .ToDictionary(entry => entry.Key, entry => entry.Value);
+
+        if (toBeDeleted != null)
+        {
+          foreach (var entry in toBeDeleted)
+          {
+            if (entry.Value.fitNode != null)
+            {
+              layoutResult.Remove(entry.Key);
+              entry.Value.fitNode.Occupied = false;
+              tree.MergeFreeLeaves(entry.Value.fitNode);
+            }
+          }
+        }
+        /*
+        var productNodes = oldNodes.Concat(newNodes).ToList();
+         */
+
+
+        newNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); }); 
+        
+        /*
+        oldNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+        allThisLayoutNodes = oldNodes.Concat(newNodes).ToList();
         sameLeaves = oldLayout.allThisLayoutNodes
           .Where(node => newIds.Contains(node.ID))
           .ToList();
-        /*
-        sameLeaves.Sort(delegate (ILayoutNode left, ILayoutNode right)
-        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+
+
          */
-
-        newNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
-        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
-
-        var productNodes = sameLeaves.Concat(newNodes).ToList();
 
 
         /*
@@ -136,8 +162,12 @@ namespace SEE.Layout.NodeLayouts
           }
 
         }
+        foreach (var newNode in newNodes)
+        {
+          layoutResult.TryAdd(newNode, new NodeTransform(0, 0, newNode.AbsoluteScale));
+        }
          */
-        CreateLayout(productNodes, centerPosition, rectangle);
+        CreateLayout(newNodes, centerPosition, rectangle);
 
         /*
         sameNodes = thisLayoutNodes
@@ -175,18 +205,10 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
-    //***********************************************************************************
-    private void SortNodes()
-    {
-      allThisLayoutNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
-      { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
-    }
+    
 
     //***********************************************************************************
-    public void CreateLayout
-        (IEnumerable<ILayoutNode> layoutNodes,
-        Vector3 centerPosition,
-        Vector2 rectangle)
+    public void CreateLayout(IEnumerable<ILayoutNode> layoutNodes, Vector3 centerPosition,Vector2 rectangle)
     {
 
       IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
@@ -194,7 +216,7 @@ namespace SEE.Layout.NodeLayouts
       {
         ILayoutNode layoutNode = layoutNodeList.First();
         layoutResult[layoutNode] = new NodeTransform(0, 0, layoutNode.AbsoluteScale);
-        
+
       }
 
       int numberOfLeaves = 0;
@@ -225,7 +247,7 @@ namespace SEE.Layout.NodeLayouts
       }
       else if (roots.Count > 1)
       {
-        
+
         throw new System.Exception("Graph has more than one root node." + globalCallCount);
       }
       else
@@ -248,9 +270,7 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     /// <param name="layout">the layout to be adjusted</param>
     /// <param name="parent">the parent node whose children are to be adjusted</param>
-    public static void MakeContained
-        (Dictionary<ILayoutNode, NodeTransform> layout,
-         ILayoutNode parent)
+    public static void MakeContained(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode parent)
     {
       NodeTransform parentTransform = layout[parent];
       Vector3 parentExtent = parentTransform.Scale / 2.0f;
@@ -404,7 +424,7 @@ namespace SEE.Layout.NodeLayouts
     }
 
     //***********************************************************************************
-    private static Vector2 Sum(List<ILayoutNode> nodes)
+    private static Vector2 Sum1(List<ILayoutNode> nodes)
     {
       Vector2 result = Vector2.zero;
       foreach (var node in nodes)
@@ -415,7 +435,19 @@ namespace SEE.Layout.NodeLayouts
       return result;
     }
 
-
+    //***********************************************************************************
+    private static Vector2 Sum2(Dictionary<ILayoutNode, NodeTransform> layoutResult)
+    {
+      Vector2 result = Vector2.zero;
+      var nodes = layoutResult.Keys.ToList();
+      Assert.IsFalse(nodes.Count == 0, "No nodes in layoutResult!");
+      foreach (var node in nodes)
+      {
+        result.x += node.AbsoluteScale.x;
+        result.y += node.AbsoluteScale.z;
+      }
+      return result;
+    }
     /*
     private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
     {
@@ -473,16 +505,26 @@ namespace SEE.Layout.NodeLayouts
       // imprecisions of floating-point arithmetics.
        */
 
-      tree = new(Vector2.zero, 1.1f * worstCaseSize);
-      /*
       if (tree == null)
       {
-      }else
-      {
-        tree.Root.Rectangle.Position = Vector2.zero;
-        tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
-        tree.FreeLeavesAdjust();
+        tree = new(Vector2.zero, 1.1f * (worstCaseSize) );
+        covrec = Vector2.zero;
       }
+      else
+      {
+        Debug.Log("Parazitttttttttttttttttttttttttttttttttttttttt");
+        var summableList = layoutResult.Keys.ToList();
+        Assert.IsNotNull(summableList);
+        Debug.Log("summableList count: " + summableList.Count);
+        var newWorstCaseSize = Sum1(summableList);
+        tree.Root.Rectangle.Size = 1.1f * newWorstCaseSize;
+        tree.resetAllPNodes(1.1f * newWorstCaseSize);
+      }
+      /*
+        //tree.Print();
+        //var enlargementFactor = newWorstCaseSize - tree.Root.Rectangle.Size;
+        //tree.Root.Rectangle.Position = Vector2.zero;
+        //tree.FreeLeavesAdjust();
        */
       /*
       else
@@ -497,7 +539,7 @@ namespace SEE.Layout.NodeLayouts
       // Initially, there are no placed elements yet, and therefore the covered
       // area is initialized to (0, 0).
        */
-      covrec = Vector2.zero;
+      
       /*
       // All nodes in pnodes that preserve the size of coverec. The
       // value is the amount of remaining space if the node were split to
@@ -665,7 +707,7 @@ namespace SEE.Layout.NodeLayouts
         // Place el into targetNode.
         // The free leaf node that has the requested size allocated within targetNode.
 
-        if (targetNode == null) 
+        if (targetNode == null)
         {
           Debug.LogError("targetNode is null!");
           continue;
@@ -679,7 +721,7 @@ namespace SEE.Layout.NodeLayouts
         layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
                                        fitNode.Rectangle.Position.y + scale.z / 2.0f,
                                        scale, fitNode);
-        
+
 
         // If fitNode is a boundary expander, then we need to expand covrec to the
         // newly covered area.
@@ -696,6 +738,11 @@ namespace SEE.Layout.NodeLayouts
           }
         }
       }
+      /*
+      tree.Root.Rectangle.Size = 1.1f * covrec;
+      Vector2 dif = tree.Root.Rectangle.Size - covrec;
+      tree.enlargeAllPNodes(dif);
+       */
       return covrec;
     }
 
@@ -740,8 +787,10 @@ namespace SEE.Layout.NodeLayouts
 
     }
 
-    public bool AllAreLeaves(IEnumerable<ILayoutNode> layoutNodes) 
-    {       
+    //***********************************************************************************
+
+    public bool AllAreLeaves(IEnumerable<ILayoutNode> layoutNodes)
+    {
       foreach (ILayoutNode node in layoutNodes)
       {
         if (!node.IsLeaf)
@@ -751,7 +800,18 @@ namespace SEE.Layout.NodeLayouts
       }
       return true;
     }
+
+    //***********************************************************************************
+    private void SortNodes(ref List<ILayoutNode> list)
+    {
+      list.Sort(delegate (ILayoutNode left, ILayoutNode right)
+      { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+    }
+
+
+
   }
+
 
 
 }

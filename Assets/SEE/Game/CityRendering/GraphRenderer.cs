@@ -455,6 +455,7 @@ namespace SEE.Game.CityRendering
                                                                 GetImplementationLayout(Settings.NodeLayoutSettings),
                                                                 GetArchitectureLayout(Settings.NodeLayoutSettings)),
                 NodeLayoutKind.RectanglePacking => new RectanglePackingNodeLayout(),
+                NodeLayoutKind.RectanglePacking2 => new RectanglePackingNodeLayout2(),
                 NodeLayoutKind.ZamaLayout => new ZamaLayout(),
                 NodeLayoutKind.EvoStreets => new EvoStreetsNodeLayout(),
                 NodeLayoutKind.Treemap => new TreemapLayout(),

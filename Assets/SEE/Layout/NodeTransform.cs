@@ -1,4 +1,5 @@
 ﻿using OmniSharp.Extensions.LanguageServer.Protocol.Models;
+using SEE.Layout.NodeLayouts.RectanglePacking;
 using System;
 using UnityEngine;
 
@@ -69,6 +70,15 @@ namespace SEE.Layout
       Rotation = rotation;
     }
 
+    public NodeTransform(float x, float z, Vector3 scale, PNode fitNode)
+    {
+      centerPosition = new Vector3(x, scale.y, z);
+      Scale = scale;
+      Rotation = 0.0f;
+      this.fitNode = fitNode;
+    }
+
+    public PNode fitNode;
     /// <summary>
     /// The worldspace position along the x axis.
     /// </summary>
@@ -90,6 +100,7 @@ namespace SEE.Layout
 
     /// <summary>
     /// The roof (y axis) of this node transform.
+    /// centerPosition.y (Scale.y defined by the constructor)
     /// </summary>
     public float Roof => centerPosition.y + Scale.y / 2.0f;
 
@@ -193,7 +204,6 @@ namespace SEE.Layout
     }
 
     /*
-     
     public object Clone()
     {
       // Vector3 is a struct, so it's copied by value.
@@ -205,6 +215,7 @@ namespace SEE.Layout
           Rotation
       );
     }
+     
      */
   }
 }
