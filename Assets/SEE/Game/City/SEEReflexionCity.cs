@@ -692,7 +692,7 @@ namespace SEE.Game.City
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
-            ArchitectureSnapshotPath?.Save(writer, architectureSnapshotPathLabel);
+            ArchitectureSnapshotPath.Save(writer, architectureSnapshotPathLabel);
             MappingSnapshotPath.Save(writer, mappingSnapshotPathLabel);
         }
 
