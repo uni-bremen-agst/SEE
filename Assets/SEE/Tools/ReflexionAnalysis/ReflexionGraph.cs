@@ -151,10 +151,6 @@ namespace SEE.Tools.ReflexionAnalysis
             architectureGraph.AddSingleRoot(out architectureRoot, type: ArchitectureType);
             implementationGraph.AddSingleRoot(out implementationRoot, type: ImplementationType);
 
-            if (mappingGraph.Nodes().Any())
-            {
-                mappingGraph.AddSingleRoot(out Node _, type: "MAPPING", name: "MAPPING_ROOT");
-            }
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
             architectureGraph.MarkGraphNodesIn(Architecture);
