@@ -131,7 +131,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4079195}
-  - component: {fileID: 4079198}
   - component: {fileID: 4079197}
   - component: {fileID: 4079196}
   m_Layer: 0
@@ -205,18 +204,6 @@ MonoBehaviour:
   MetricViolationIssueColor: {r: 1, g: 0, b: 1, a: 1}
   StyleViolationIssueColor: {r: 0, g: 1, b: 1, a: 1}
   HideCopyrightedTexts: 0
---- !u!114 &4079198
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4079194}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b602d82765d7495448c374e301961df0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &8069605
 PrefabInstance:
   m_ObjectHideFlags: 0
