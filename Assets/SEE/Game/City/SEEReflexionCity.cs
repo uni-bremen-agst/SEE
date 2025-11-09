@@ -174,7 +174,6 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public override void SaveData()
         {
-
             foreach (Node node in LoadedGraph.Nodes())
             {
                 node.IntAttributes.Remove("Linkage.PIR_Node");
@@ -221,7 +220,6 @@ namespace SEE.Game.City
 
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
-
 
             ReflexionGraphProvider reflexionGraphProvider = new();
 

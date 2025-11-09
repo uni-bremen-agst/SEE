@@ -351,7 +351,6 @@ namespace SEE.DataModel.DG
                 root = roots.First();
                 return false;
             }
-
         }
 
         /// <summary>
