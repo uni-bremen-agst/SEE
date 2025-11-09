@@ -103,7 +103,7 @@ namespace SEE.Tools.Livekit
             // FIXME (#826): Rather than trying to obtain the token on Start, we should rather try that only
             // if the user explicitly demands it (starts the face cam). Otherwise we might annoy
             // the user with a failing request to the token server that is not needed.
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 SetupCameraDropdown();
                 StartCoroutine(GetToken());

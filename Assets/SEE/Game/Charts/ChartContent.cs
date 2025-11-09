@@ -48,12 +48,6 @@ namespace SEE.Game.Charts
         /// </summary>
         private const float scrollViewEntryHeight = 25;
 
-        // TODO(torben): this may need to be reintroduced
-        /// <summary>
-        /// The distance to another marker to recognize it as overlapping.
-        /// </summary>
-        private const float markerOverlapDistance = 22;
-
         /// <summary>
         /// This entry of the dropdown box represents not a metric but just the
         /// enumeration of nodes. This entry can be selected if one wants to have a
@@ -218,16 +212,16 @@ namespace SEE.Game.Charts
         protected List<ChartMarker> ActiveMarkers = new();
 
         /// <summary>
-        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects" />.
+        /// Contains all metric names contained in any <see cref="GameObject" /> of <see cref="listDataObjects"/>.
         /// </summary>
         public readonly SortedSet<string> AllMetricNames = new();
 
         // FIXME: all attributes need documentation no matter whether they are public or private.
 
-        private readonly Dictionary<string, bool> showInChartDict = new Dictionary<string, bool>();
+        private readonly Dictionary<string, bool> showInChartDict = new();
 
         public delegate void ShowInChartCallbackFn(bool value);
-        private readonly Dictionary<string, ShowInChartCallbackFn> callbackFnDict = new Dictionary<string, ShowInChartCallbackFn>();
+        private readonly Dictionary<string, ShowInChartCallbackFn> callbackFnDict = new();
 
         private bool scrollViewIsTree = false;
 

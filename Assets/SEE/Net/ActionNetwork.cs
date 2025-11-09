@@ -8,6 +8,7 @@ using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.Table;
 using SEE.Net.Util;
+using SEE.User;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -181,7 +182,7 @@ namespace SEE.Net
             }
 
             ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+            SyncFilesClientRpc(Network.ServerId, UserSettings.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -431,7 +432,7 @@ namespace SEE.Net
             }
 
             Network.ServerId = backendServerId;
-            Network.BackendDomain = backendDomain;
+            UserSettings.Instance.Network.BackendServerAPI = backendDomain;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
         }

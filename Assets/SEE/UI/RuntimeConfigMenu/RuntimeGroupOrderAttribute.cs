@@ -13,13 +13,13 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The order of the field within the group.
         /// </summary>
-        public readonly int Order;
+        public readonly float Order;
 
         /// <summary>
         /// The constructor.
         /// </summary>
         /// <param name="order">The position of the field within the group.</param>
-        public RuntimeGroupOrderAttribute(int order)
+        public RuntimeGroupOrderAttribute(float order)
         {
             Order = order;
         }

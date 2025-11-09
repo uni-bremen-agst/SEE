@@ -1,5 +1,4 @@
-﻿using SEE.Controls;
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine.TestTools;
 using UnityEditor.SceneManagement;
 using UnityEngine.SceneManagement;
@@ -34,7 +33,7 @@ namespace SEE.UI
         public IEnumerator SetUp()
         {
             LogAssert.ignoreFailingMessages = true;
-            SceneSettings.InputType = GO.PlayerInputType.DesktopPlayer;
+            User.UserSettings.Instance.InputType = GO.PlayerInputType.DesktopPlayer;
             yield return new EnterPlayMode();
         }
 

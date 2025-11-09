@@ -56,7 +56,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Start()
         {
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 try
                 {
@@ -99,7 +99,7 @@ namespace SEE.UI.ConfigMenu
 
         private void Update()
         {
-            switch (SceneSettings.InputType)
+            switch (User.UserSettings.Instance.InputType)
             {
                 case PlayerInputType.DesktopPlayer:
                     HandleDesktopUpdate();
@@ -108,7 +108,7 @@ namespace SEE.UI.ConfigMenu
                     HandleVRUpdate();
                     break;
                 default:
-                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {SceneSettings.InputType}.");
+                    throw new System.NotImplementedException($"ConfigMenuFactory.Update not implemented for {User.UserSettings.Instance.InputType}.");
             }
         }
 

@@ -22,7 +22,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// The editor window.
         /// </summary>
-        private static GameObject smallEditor;
+        public GameObject SmallEditor { get; private set; }
 
         /// <summary>
         /// The button for opening the editor window.
@@ -54,14 +54,14 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 if (value)
                 {
-                    smallEditor = PrefabInstantiator.InstantiatePrefab(smallWindowPrefab, Canvas.transform, false);
-                    smallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick
+                    SmallEditor = PrefabInstantiator.InstantiatePrefab(smallWindowPrefab, Canvas.transform, false);
+                    SmallEditor.transform.Find("CloseButton").GetComponent<Button>().onClick
                                .AddListener(() => ShowMenu = false);
-                    CreateWidget(smallEditor.transform.Find("Content").gameObject);
+                    CreateWidget(SmallEditor.transform.Find("Content").gameObject);
                 }
                 else
                 {
-                    Destroyer.Destroy(smallEditor);
+                    Destroyer.Destroy(SmallEditor);
                 }
 
                 showMenu = value;

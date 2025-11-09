@@ -588,6 +588,18 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 5907350534295900748}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 3681667387076553089}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2782809671534296890}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5445250016915220982}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -1134,6 +1146,93 @@ MonoBehaviour:
   Tongue_Bulge_L_Value: 0
   Neck_Tighten_L_Value: 0
   Neck_Tighten_R_Value: 0
+--- !u!114 &3681667387076553089
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0993c82ec46b3bf478cef956e67da192, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  poseLandmarkerModelAsset: {fileID: 4900000, guid: 996551d254a950675b263b1862d5273d,
+    type: 3}
+  handLandmarkerModelAsset: {fileID: 4900000, guid: b467f87f6b5d4d200974b3ca14f53987,
+    type: 3}
+  gestureRecognizerModelAsset: {fileID: 4900000, guid: 94802ed857ae0da9f8acbae261909318,
+    type: 3}
+  IsLocallyControlled: 1
+  IsUsingHandAnimations: 0
+--- !u!114 &2782809671534296890
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c2e9f3dd1f66e8e48b3cfc0255f7ba7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+--- !u!114 &5445250016915220982
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a70e525c82ce9413fa4d940ad7fcf1db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  fixTransforms: 1
+  references:
+    root: {fileID: 1242937920193830085}
+    pelvis: {fileID: 0}
+    leftThigh: {fileID: 0}
+    leftCalf: {fileID: 0}
+    leftFoot: {fileID: 0}
+    rightThigh: {fileID: 0}
+    rightCalf: {fileID: 0}
+    rightFoot: {fileID: 0}
+    leftUpperArm: {fileID: 0}
+    leftForearm: {fileID: 0}
+    leftHand: {fileID: 0}
+    rightUpperArm: {fileID: 0}
+    rightForearm: {fileID: 0}
+    rightHand: {fileID: 0}
+    head: {fileID: 0}
+    spine: []
+    eyes: []
+  solver:
+    executedInEditor: 0
+    IKPosition: {x: 0, y: 0, z: 0}
+    IKPositionWeight: 1
+    root: {fileID: 0}
+    iterations: 4
+    chain: []
+    effectors: []
+    spineMapping:
+      spineBones: []
+      leftUpperArmBone: {fileID: 0}
+      rightUpperArmBone: {fileID: 0}
+      leftThighBone: {fileID: 0}
+      rightThighBone: {fileID: 0}
+      iterations: 3
+      twistWeight: 1
+    boneMappings: []
+    limbMappings: []
+    FABRIKPass: 1
+    rootNode: {fileID: 0}
+    spineStiffness: 0.5
+    pullBodyVertical: 0.5
+    pullBodyHorizontal: 0
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
