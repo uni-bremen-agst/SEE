@@ -185,7 +185,7 @@ namespace SEE.Game.Operator
             base.OnEnable();
 
             morphism = new MorphismOperation(AnimateToMorphismAction, spline.Spline, null);
-            construction = new TweenOperation<bool>(ConstructAction, spline.SubsplineEndT >= 1);
+            construction = new TweenOperation<bool>(ConstructAction, spline.VisibleSegmentEnd >= 1);
             return;
 
             SplineMorphism AnimateToMorphismAction((BSpline targetSpline, GameObject temporaryGameObject) s, float d)
@@ -217,8 +217,8 @@ namespace SEE.Game.Operator
             {
                 return new Tween[]
                 {
-                    DOTween.To(() => spline.SubsplineEndT,
-                               u => spline.SubsplineEndT = u,
+                    DOTween.To(() => spline.VisibleSegmentEnd,
+                               u => spline.VisibleSegmentEnd = u,
                                extending ? 1.0f : 0.0f,
                                duration).SetEase(Ease.InOutCubic).Play()
                 };

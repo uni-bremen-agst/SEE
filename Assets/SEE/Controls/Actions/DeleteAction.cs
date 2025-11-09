@@ -4,10 +4,10 @@ using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.CityRendering;
 using SEE.Game.SceneManipulation;
 using SEE.GO;
 using SEE.Net.Actions;
+using SEE.UI.Menu;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
@@ -131,37 +131,104 @@ namespace SEE.Controls.Actions
         private Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
 
         /// <summary>
+        /// Indicates whether node types should be removed as part of this delete action.
+        /// </summary>
+        private bool removeNodeTypes = false;
+
+        /// <summary>
+        /// Represents the life cycle of a delete action.
+        /// </summary>
+        private enum ProgressState
+        {
+            Input,
+            Validation,
+            Deletion
+        }
+
+        /// <summary>
+        /// The current state of the delete process.
+        /// </summary>
+        private ProgressState progress = ProgressState.Input;
+
+        /// <summary>
+        /// Indicates whether the validation phase has already been started.
+        /// Prevents multiple instances of <see cref="HandleValidationAsync"/>
+        /// from being triggered in consecutive Update calls.
+        /// </summary>
+        private bool validationStarted = false;
+
+        /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            // FIXME: Needs adaptation for VR where no mouse is available.
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
+            switch (progress)
+            {
+                case ProgressState.Input:
+                    HandleInputSelection();
+                    break;
+                case ProgressState.Validation:
+                    if (!validationStarted)
+                    {
+                        validationStarted = true;
+                        HandleValidationAsync().Forget();
+                    }
+                    break;
+                case ProgressState.Deletion:
+                    return Delete();
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Handles the input phase of the delete action.
+        /// Detects user interactions (mouse click, XR selection, or context menu)
+        /// and transitions to the <see cref="ProgressState.Validation"/> phase
+        /// once a valid deletion target has been selected.
+        /// </summary>
+        private void HandleInputSelection()
+        {
+            if (User.UserSettings.IsDesktop && Input.GetMouseButtonDown(0)
                 && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef _) != HitGraphElement.None)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(raycastHit.collider.gameObject);
                 hitGraphElementIDs.Add(raycastHit.collider.gameObject.name);
-                return Delete(); // the selected objects are deleted and this action is done now
+                progress = ProgressState.Validation;
             }
-            else if (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.Selected)
+            else if (User.UserSettings.IsVR && XRSEEActions.Selected)
             {
                 // the hit object is the one to be deleted
                 hitGraphElements.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject);
                 hitGraphElementIDs.Add(InteractableObject.HoveredObjectWithWorldFlag.gameObject.name);
                 XRSEEActions.Selected = false;
-                return Delete(); // the selected objects are deleted and this action is done now
+                progress = ProgressState.Validation;
             }
             else if (ExecuteViaContextMenu)
             {
                 ExecuteViaContextMenu = false;
-                return Delete();
+                progress = ProgressState.Validation;
             }
-            else
+        }
+
+        /// <summary>
+        /// Handles the validation phase of the delete action.
+        /// Checks the selected deletion targets and shows a confirmation dialog
+        /// asking whether node types should be deleted,
+        /// but only if one of the selected objects is an architecture or implementation root node.
+        /// Transitions to the <see cref="ProgressState.Deletion"/> phase
+        /// once validation is complete.
+        /// </summary>
+        private async UniTask HandleValidationAsync()
+        {
+            if (hitGraphElements.Any(ele => ele.CompareTag(Tags.Node)
+                && ele.GetNode().IsArchitectureOrImplementationRoot()))
             {
-                return false;
+                string message = "Should the unused node types also be removed?";
+                removeNodeTypes = await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message));
             }
+            progress = ProgressState.Deletion;
         }
 
         /// <summary>
@@ -181,10 +248,10 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 
-                new DeleteNetAction(go.name).Execute();
+                new DeleteNetAction(go.name, removeNodeTypes).Execute();
                 (GraphElementsMemento mem,
                     ISet<GameObject> deleted,
-                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go);
+                    Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go, removeNodeTypes);
 
                 if (deleted == null)
                 {
@@ -295,8 +362,8 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 #pragma warning disable VSTHRD110
-                new DeleteNetAction(go.name).Execute();
-                GameElementDeleter.Delete(go);
+                new DeleteNetAction(go.name, removeNodeTypes).Execute();
+                GameElementDeleter.Delete(go, removeNodeTypes);
 #pragma warning restore VSTHRD110
             }
         }

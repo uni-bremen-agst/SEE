@@ -1,4 +1,4 @@
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
 using HSVPicker;
 using Michsky.UI.ModernUIPack;
 using MoreLinq;
@@ -171,6 +171,22 @@ namespace SEE.UI.RuntimeConfigMenu
         private readonly List<(MemberInfo, GameObject, object)> controlConditions = new();
 
         /// <summary>
+        /// The component responsible for the opening the small editor window.
+        /// </summary>
+        public RuntimeSmallEditorButton SmallEditorOpener { get; private set; }
+
+        /// <summary>
+        /// The GameObject representing the small editor window.
+        /// </summary>
+        public GameObject SmallEditorGO { get; private set; }
+
+        /// <summary>
+        /// Indicates whether a small editor window is currently open.
+        /// </summary>
+        public bool IsSmallEditorWindowOpen => SmallEditorGO != null;
+
+        #region Prefabs & Paths
+        /// <summary>
         /// Prefab for the menu
         /// </summary>
         protected override string MenuPrefab => RuntimeConfigPrefabFolder + "RuntimeConfigMenu";
@@ -209,6 +225,7 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Path to game object containing the <see cref="citySwitcher"/>.
         /// </summary>
         private const string citySwitcherPath = "City Switcher";
+        #endregion
 
         protected override void StartDesktop()
         {
@@ -257,7 +274,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             // creates the buttons for methods
             city.GetType().GetMethods().Where(IsCityAttribute)
-                .OrderBy(GetButtonGroup).ThenBy(GetOrderOfMemberInfo).ThenBy(GetButtonName)
+                .OrderBy(GetButtonGroup).ThenBy(SortGroupOrder).ThenBy(GetButtonName)
                 .ForEach(CreateButton);
             return;
 
@@ -279,18 +296,14 @@ namespace SEE.UI.RuntimeConfigMenu
             bool HasTabAttribute(MemberInfo memberInfo) =>
                 !memberInfo.GetCustomAttributes().Any(a => a is RuntimeTabAttribute);
 
-            float GetOrderOfMemberInfo(MemberInfo memberInfo) =>
-                (memberInfo.GetCustomAttributes().OfType<PropertyOrderAttribute>()
-                    .FirstOrDefault() ?? new PropertyOrderAttribute()).Order;
-
             string GetButtonGroup(MemberInfo memberInfo) =>
                 (memberInfo.GetCustomAttributes().OfType<RuntimeButtonAttribute>().FirstOrDefault()
                  ?? new RuntimeButtonAttribute(null, null)).Name;
 
-            int SortGroupOrder(MemberInfo memberInfo) =>
+            float SortGroupOrder(MemberInfo memberInfo) =>
                 memberInfo.GetCustomAttributes()
                     .OfType<RuntimeGroupOrderAttribute>().FirstOrDefault()?.Order
-                    ?? int.MaxValue;
+                    ?? float.MaxValue;
 
             // ordered depending on whether a setting is primitive or has nested settings
             bool SortIsNotNested(MemberInfo memberInfo)
@@ -344,6 +357,25 @@ namespace SEE.UI.RuntimeConfigMenu
         }
 
         /// <summary>
+        /// Updates the horizontal selector for switchting cities.
+        /// </summary>
+        public void UpdateCitySwitcher()
+        {
+            citySwitcher.itemList.Clear();
+            citySwitcher.defaultIndex = CityIndex;
+            RuntimeConfigMenu.GetCities().ForEach(c => citySwitcher.CreateNewItem(c.name));
+            citySwitcher.selectorEvent.RemoveAllListeners();
+            citySwitcher.SetupSelector();
+            citySwitcher.selectorEvent.AddListener(index =>
+            {
+                OnSwitchCity?.Invoke(index);
+                citySwitcher.index = CityIndex;
+                citySwitcher.UpdateUI();
+            });
+            citySwitcher.UpdateUI();
+        }
+
+        /// <summary>
         /// Creates a configuration button.
         ///
         /// Checks whether a method with no parameters has the <see cref="RuntimeButtonAttribute"/>.
@@ -377,8 +409,7 @@ namespace SEE.UI.RuntimeConfigMenu
             buttonManager.buttonText = methodInfo.GetCustomAttribute<RuntimeButtonAttribute>().Label;
 
             // add button listeners
-            if (methodInfo.Name.Equals(nameof(AbstractSEECity.LoadConfiguration))
-                ||methodInfo.Name.Equals(nameof(SEECity.LoadDataAsync)))
+            if (IsLoadMethod(methodInfo))
             {
                 buttonManager.clickEvent.AddListener(() => ExecuteLoadAsync().Forget());
             }
@@ -400,6 +431,7 @@ namespace SEE.UI.RuntimeConfigMenu
                     netAction.Execute();
                 });
                 buttonManager.clickEvent.AddListener(() => CheckControlConditionsWithDelay());
+                buttonManager.clickEvent.AddListener(() => RestorePreviousScrollPosition());
             }
 
             // add network listener
@@ -407,10 +439,19 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 if (methodName == methodInfo.Name)
                 {
-                    // calls the method and updates the menu
-                    methodInfo.Invoke(city, null);
-                    OnUpdateMenuValues?.Invoke();
-                    CheckControlConditionsWithDelay();
+                    if (IsLoadMethod(methodInfo))
+                    {
+                        ExecuteLoadAsyncWithoutNetwork().Forget();
+                    }
+                    else
+                    {
+                        // calls the method and updates the menu
+                        methodInfo.Invoke(city, null);
+                        OnUpdateMenuValues?.Invoke();
+                        CheckControlConditionsWithDelay();
+                        RestorePreviousScrollPosition();
+                    }
+
                 }
             };
 
@@ -421,33 +462,59 @@ namespace SEE.UI.RuntimeConfigMenu
             }
             controlConditions.Add((methodInfo, button, city));
 
-            async UniTask ExecuteLoadAsync()
+            bool IsLoadMethod(MethodInfo methodInfo)
+            {
+                return methodInfo.Name == nameof(AbstractSEECity.LoadConfiguration)
+                    || methodInfo.Name == nameof(SEECity.LoadDataAsync);
+            }
+
+            async UniTask ExecuteLoadAsyncWithoutNetwork()
             {
                 object result = methodInfo.Invoke(city, null);
-                bool doRebuild = true;
-                if (result is UniTask<bool> task)
+                bool doRebuild = methodInfo.Name == nameof(AbstractSEECity.LoadConfiguration);
+                if (result is UniTask task)
                 {
-                    doRebuild = await task;
+                    await task;
                 }
-                OnUpdateMenuValues?.Invoke();
-                UpdateCityMethodNetAction netAction = new()
-                {
-                    CityIndex = CityIndex,
-                    MethodName = methodInfo.Name
-                };
-                netAction.Execute();
                 CheckControlConditionsWithDelay();
                 if (doRebuild)
                 {
                     if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                     {
-                        runtimeConfigMenu.RebuildTabAsync(CityIndex).Forget();
+                        await runtimeConfigMenu.RebuildTabAsync(CityIndex);
                     }
                     else
                     {
                         throw new Exception($"There is no {nameof(RuntimeConfigMenu)} on that player.");
                     }
                 }
+                else
+                {
+                    OnUpdateMenuValues?.Invoke();
+                    RestorePreviousScrollPosition();
+                }
+            }
+
+            async UniTask ExecuteLoadAsync()
+            {
+                await ExecuteLoadAsyncWithoutNetwork();
+                UpdateCityMethodNetAction netAction = new()
+                {
+                    CityIndex = CityIndex,
+                    MethodName = methodInfo.Name
+                };
+                netAction.Execute();
+            }
+
+            ContentSizeWatcher GetContentSizeWatcher(GameObject go)
+            {
+                GameObject runtimeTabGO = ContentSizeWatcher.GetRuntimeTabGameObject(go);
+                return runtimeTabGO.GetComponentInChildren<ContentSizeWatcher>();
+            }
+
+            void RestorePreviousScrollPosition()
+            {
+                GetContentSizeWatcher(button).ApplyPreviousScrollPositionAsync().Forget();
             }
         }
 
@@ -923,7 +990,8 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 SetInteractableRecursive(createdObj, interactable);
             }
-            if (memberInfo != null && obj != null && createdObj != null)
+            if (memberInfo != null && obj != null && createdObj != null
+                && memberInfo.GetCustomAttribute<RuntimeIfAttribute>() != null)
             {
                 controlConditions.Add((memberInfo, createdObj, obj));
             }
@@ -1036,8 +1104,13 @@ namespace SEE.UI.RuntimeConfigMenu
             {
                 return;
             }
-            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions)
+            foreach ((MemberInfo m, GameObject go, object obj) in controlConditions.ToList())
             {
+                if (go == null)
+                {
+                    controlConditions.Remove((m, go, obj));
+                    continue;
+                }
                 go.SetActive(ValidateVisibilityAttributes(m, obj));
                 if (HasInteractableAttribute(m))
                 {
@@ -1205,7 +1278,7 @@ namespace SEE.UI.RuntimeConfigMenu
 
             /// Returns the desired type from a dictionary, depending on searchKeyType.
             /// First, it checks whether the dictionary being examined has generic arguments for keys and values.
-            /// If it�s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
+            /// If it’s an inheritance scenario, such as with the <see cref="VisualNodeAttributesMapping"> dictionary,
             /// the second case is used, where the base type is examined.
             /// If the types cannot be determined here either, it tries to extract the types directly from the first entry.
             /// However, this only works if the dictionary is not empty.
@@ -1313,6 +1386,8 @@ namespace SEE.UI.RuntimeConfigMenu
                 RuntimeSmallEditorButton smallEditorButton = sliderGameObject.AddComponent<RuntimeSmallEditorButton>();
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1323,6 +1398,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
@@ -1532,6 +1609,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1542,6 +1621,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
@@ -1616,6 +1697,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1626,6 +1709,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
@@ -1781,6 +1866,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1791,6 +1878,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
@@ -1908,6 +1997,8 @@ namespace SEE.UI.RuntimeConfigMenu
 
                 smallEditorButton.OnShowMenuChanged += () =>
                 {
+                    SmallEditorOpener = smallEditorButton;
+                    SmallEditorGO = smallEditorButton.SmallEditor;
                     immediateRedraw = smallEditorButton.ShowMenu;
                     ShowMenu = !smallEditorButton.ShowMenu;
                     OnUpdateMenuValues?.Invoke();
@@ -1918,6 +2009,8 @@ namespace SEE.UI.RuntimeConfigMenu
                     if (ShowMenu)
                     {
                         smallEditorButton.ShowMenu = false;
+                        SmallEditorOpener = null;
+                        SmallEditorGO = null;
                     }
                 };
 
@@ -1992,6 +2085,16 @@ namespace SEE.UI.RuntimeConfigMenu
                 if (widgetPath == GetWidgetName())
                 {
                     filePicker.SyncDropdown((int)newValue);
+                }
+            };
+
+            OnUpdateMenuValues += () =>
+            {
+                bool isAbsolute = dataPath.Root == DataPath.RootKind.Absolute;
+                if (filePicker != null && filePicker.didStart)
+                {
+                    filePicker.SyncPath(isAbsolute ? dataPath.AbsolutePath : dataPath.RelativePath, isAbsolute);
+                    filePicker.SyncDropdown((int)dataPath.Root);
                 }
             };
         }
@@ -2217,11 +2320,20 @@ namespace SEE.UI.RuntimeConfigMenu
         private void TriggerImmediateRedraw()
         {
             // does nothing if no graph is loaded
-            if (city.LoadedGraph == null)
+            if (city.LoadedGraph == null
+                || !city.gameObject.IsCodeCityDrawnAndActive())
             {
                 return;
             }
             city.Invoke(nameof(SEECity.ReDrawGraph), 0);
+        }
+
+        /// <summary>
+        /// Triggers the immediate update.
+        /// </summary>
+        public void ImmediateUpdate()
+        {
+            OnUpdateMenuValues?.Invoke();
         }
 
         /// <summary>

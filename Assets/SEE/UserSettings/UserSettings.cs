@@ -1,0 +1,306 @@
+﻿using DG.Tweening;
+using SEE.GO;
+using SEE.Net;
+using SEE.Tools.OpenTelemetry;
+using SEE.Utils.Config;
+using SEE.Utils.Paths;
+using Sirenix.OdinInspector;
+using Sirenix.Serialization;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using UnityEngine;
+using UnityEngine.Assertions;
+using UnityEngine.SceneManagement;
+
+namespace SEE.User
+{
+    /// <summary>
+    /// Represents the user settings for the SEE application. These are attributes
+    /// that are generally set by the user at the start of the application.
+    /// </summary>
+    /// <remarks>This component is assumed to be attached to a game object in the
+    /// start scene. The user can select the environment in the Unity editor.
+    /// The selection can also be made during run-time.</remarks>
+    internal class UserSettings : MonoBehaviour
+    {
+        /// <summary>
+        /// Settings of the player.
+        /// </summary>
+        [Tooltip("Settings of the player.")]
+        public Player Player = new();
+
+        /// <summary>
+        /// Settings of the network.
+        /// </summary>
+        [Tooltip("Settings of the network.")]
+        public Network Network = new();
+
+        /// <summary>
+        /// The voice chat system as selected by the user. Note: This attribute
+        /// can be changed in the editor via <see cref="NetworkEditor"/> as well
+        /// as at the start up in the <see cref="OpeningDialog"/>.
+        /// </summary>
+        [Tooltip("The voice chat system to be used. 'None' for no voice chat.")]
+        public VoiceChatSystems VoiceChat = VoiceChatSystems.None;
+
+        /// <summary>
+        /// The kind of environment the game is running (Desktop, VR, etc).
+        /// </summary>
+        [Tooltip("The kind of environment the game is running (Desktop, VR, etc).")]
+        public PlayerInputType InputType = PlayerInputType.DesktopPlayer;
+
+        /// <summary>
+        /// Settings for telemetry.
+        /// </summary>
+        [Tooltip("Telemetry settings.")]
+        public Telemetry Telemetry = new();
+
+        /// <summary>
+        /// Default path of the configuration file (path and filename).
+        /// </summary>
+        [PropertyTooltip("Path of the file containing the settings.")]
+        [OdinSerialize, HideReferenceObjectPicker]
+        public DataPath ConfigPath = new();
+
+        /// <summary>
+        /// Backing field of <see cref="Instance"/>.
+        /// </summary>
+        private static UserSettings instance;
+
+        /// <summary>
+        /// The single unique instance of the user settings.
+        /// There can be only one.
+        /// </summary>
+        public static UserSettings Instance
+        {
+            get
+            {
+                if (instance != null)
+                {
+                    return instance;
+                }
+                instance = FindAnyObjectByType<UserSettings>();
+                if (instance == null)
+                {
+                    Debug.LogError($"There is no {typeof(UserSettings)} component in the current scene!\n");
+                }
+                return instance;
+            }
+        }
+
+        /// <summary>
+        /// Sets <see cref="MainThread"/> to the current thread and loads the user settings
+        /// from the configuration file.
+        /// </summary>
+        private void Awake()
+        {
+            /// The field <see cref="MainThread"/> is supposed to denote Unity's main thread.
+            /// The <see cref="Awake"/> function is guaranteed to be executed by Unity's main
+            /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
+            /// main thread here.
+            MainThread = Thread.CurrentThread;
+
+            Load();
+        }
+
+        /// <summary>
+        /// Initializes the application by setting up scene loading callbacks, configuring default animation easing, and
+        /// initializing the network.
+        /// </summary>
+        private void Start()
+        {
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            SceneManager.sceneLoaded += OnSceneLoaded;
+
+            DOTween.defaultEaseType = Ease.OutExpo;
+
+            Network.SetUp();
+        }
+
+        /// <summary>
+        /// Starts the voice-chat system selected. Unregisters itself from
+        /// <see cref="SceneManager.sceneLoaded"/>.
+        /// Note: This method is assumed to be called when the new scene is fully loaded.
+        /// </summary>
+        /// <param name="scene">scene that was loaded</param>
+        /// <param name="mode">the mode in which the scene was loaded</param>
+        private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
+        {
+            // Now we have loaded the scene that is supposed to contain settings for the voice chat
+            // system. We can now turn on the voice chat system.
+            Debug.Log($"Loaded scene {scene.name} in mode {mode}.\n");
+            SceneManager.sceneLoaded -= OnSceneLoaded;
+            User.VoiceChat.StartVoiceChat(VoiceChat);
+        }
+
+        /// <summary>
+        /// Shuts down the voice-chat system and OpenTelemetry.
+        /// </summary>
+        private void OnApplicationQuit()
+        {
+            TracingHelperService.Shutdown(true);
+            User.VoiceChat.EndVoiceChat(VoiceChat);
+        }
+
+        /// <summary>
+        /// The Unity main thread. Note that we cannot initialize its value here
+        /// because the elaboration code initializing static attributes may be
+        /// executed by a thread different from Unity's main thread. This attribute
+        /// will be initialized in <see cref="Awake"/> for this reason.
+        /// </summary>
+        private static Thread mainThread = null;
+        /// <summary>
+        /// Contains the Unity main thread of the application.
+        /// </summary>
+        public static Thread MainThread
+        {
+            get
+            {
+                Assert.IsNotNull(mainThread, "The main Unity thread must not have been determined as of now!");
+                return mainThread;
+            }
+            private set
+            {
+                Assert.IsNotNull(value, "The main Unity thread must not be null!");
+                if (mainThread != value)
+                {
+                    Assert.IsNull(mainThread, "The main Unity thread has already been determined!");
+                    mainThread = value;
+                }
+            }
+        }
+
+        /// <summary>
+        /// True if the user is using a VR headset.
+        /// </summary>
+        public static bool IsVR => Instance.InputType == PlayerInputType.VRPlayer;
+
+        /// <summary>
+        /// True if the user is using a desktop computer.
+        /// </summary>
+        public static bool IsDesktop => Instance.InputType == PlayerInputType.DesktopPlayer;
+
+        /// <summary>
+        /// The backend domain to be used for network connections to the SEE backend.
+        /// </summary>
+        public static string BackendDomain => Instance.Network.BackendDomain;
+
+        /// <summary>
+        /// The complete backend server API endpoint to be used for network connections to
+        /// the SEE backend.
+        /// </summary>
+        public static string BackendServerAPI => Instance.Network.BackendServerAPI;
+
+        /// <summary>
+        /// The name of the group for the Inspector buttons loading and saving the configuration file.
+        /// </summary>
+        private const string configurationButtonsGroup = "ConfigurationButtonsGroup";
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <see cref="ConfigPath()"/>.
+        /// If the configuration file exists already, it will be overridden.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Saves the user settings in a configuration file.")]
+        [ButtonGroup(configurationButtonsGroup)]
+        public void Save()
+        {
+            Save(ConfigPath.Path);
+        }
+
+        /// <summary>
+        /// Loads the settings of this network configuration from <see cref="ConfigPath()"/>
+        /// if it exists. If it does not exist, nothing happens.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [PropertyTooltip("Loads the user configuration file.")]
+        [ButtonGroup(configurationButtonsGroup)]
+        public void Load()
+        {
+            Load(ConfigPath.Path);
+        }
+
+        /// <summary>
+        /// Saves the settings of this network configuration to <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file in which the settings are stored</param>
+        public void Save(string filename)
+        {
+            using ConfigWriter writer = new(filename);
+            Save(writer);
+        }
+
+        /// <summary>
+        /// Reads the settings of this network configuration from <paramref name="filename"/>.
+        /// </summary>
+        /// <param name="filename">name of the file from which the settings are restored</param>
+        private void Load(string filename)
+        {
+            if (File.Exists(filename))
+            {
+                Debug.Log($"Loading user settings from {filename}.\n");
+                using ConfigReader stream = new(filename);
+                Restore(stream.Read());
+            }
+            else
+            {
+                Debug.LogError($"User settings file {filename} does not exist.\n");
+            }
+        }
+
+        #region Configuration I/O
+        /// <summary>
+        /// Label of attribute <see cref="Player"/> in the configuration file.
+        /// </summary>
+        private const string playerLabel = "Player";
+
+        /// <summary>
+        /// Label of attribute <see cref="Network"/> in the configuration file.
+        /// </summary>
+        private const string networkLabel = "Network";
+
+        /// <summary>
+        /// Label of attribute <see cref="User.VoiceChat"/> in the configuration file.
+        /// </summary>
+        private const string voiceChatLabel = "VoiceChat";
+
+        /// <summary>
+        /// Label of attribute <see cref="Telemetry"/> in the configuration file.
+        /// </summary>
+        private const string telemetryLabel = "Telemetry";
+
+        /// <summary>
+        /// Label of attribute <see cref="InputType"/> in the configuration file.
+        /// </summary>
+        private const string inputTypeLabel = "InputType";
+
+        /// <summary>
+        /// Saves the settings of this network configuration using <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">the writer to be used to save the settings</param>
+        protected virtual void Save(ConfigWriter writer)
+        {
+            Player.Save(writer, playerLabel);
+            Network.Save(writer, networkLabel);
+            writer.Save(VoiceChat.ToString(), voiceChatLabel);
+            Telemetry.Save(writer, telemetryLabel);
+            writer.Save(InputType.ToString(), inputTypeLabel);
+        }
+
+        /// <summary>
+        /// Restores the settings from <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">the attributes from which to restore the settings</param>
+        protected virtual void Restore(Dictionary<string, object> attributes)
+        {
+            Player.Restore(attributes, playerLabel);
+            Network.Restore(attributes, networkLabel);
+            ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
+            Telemetry.Restore(attributes, telemetryLabel);
+            ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
+        }
+
+        #endregion Configuration I/O
+    }
+}

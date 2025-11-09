@@ -58,7 +58,7 @@ Properties {
 	_Cutoff				("Cutoff", Range(0, 1)) = 0.5
 
 	_Portal		("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
-	_PortalFade	("Portal Edge Fade (World Units)", Float) = 0.01
+	_PortalFadeWidth	("Portal Edge Fade Width (World Units)", Float) = 0.01
 }
 
 SubShader {
@@ -106,7 +106,7 @@ SubShader {
 		#include "TMPro_Properties.cginc"
 
 		float4 _Portal;
-		float _PortalFade;
+		float _PortalFadeWidth;
 
 		struct vertex_t {
 			UNITY_VERTEX_INPUT_INSTANCE_ID
@@ -240,8 +240,8 @@ SubShader {
 			float overhangTop    = max(input.worldPos.z - _Portal.w, 0.0);
 
 			// Discard coordinates if outside portal
-			if (overhangLeft > _PortalFade || overhangRight > _PortalFade ||
-				overhangBottom > _PortalFade || overhangTop > _PortalFade)
+			if (overhangLeft > _PortalFadeWidth || overhangRight > _PortalFadeWidth ||
+				overhangBottom > _PortalFadeWidth || overhangTop > _PortalFadeWidth)
 			{
 				discard;
 			}
@@ -282,9 +282,8 @@ SubShader {
 			#endif
 
 			// Portal fade effect
-			float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
-			c.a *= fade;
-			c.rgb *= fade;
+			float portalFade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom + overhangTop) / _PortalFadeWidth);
+			c *= portalFade;
 
 			return c;
 		}

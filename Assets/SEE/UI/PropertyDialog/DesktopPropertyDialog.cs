@@ -1,5 +1,4 @@
 ﻿using Michsky.UI.ModernUIPack;
-using SEE.Controls;
 using SEE.GO;
 using SEE.Utils;
 using System;
@@ -55,7 +54,7 @@ namespace SEE.UI.PropertyDialog
             try
             {
                 dialog = PrefabInstantiator.InstantiatePrefab(dialogPrefab, Canvas.transform, false);
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     dialog.transform.Find("Background").gameObject.transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 }

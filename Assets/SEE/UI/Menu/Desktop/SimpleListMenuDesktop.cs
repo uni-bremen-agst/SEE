@@ -42,7 +42,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The content game object.
         /// </summary>
-        protected GameObject Content { get; private set; }
+        public GameObject Content { get; private set; }
 
         /// <summary>
         /// The entry list game object.

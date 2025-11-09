@@ -148,6 +148,13 @@ namespace SEE.UI.PropertyDialog
                 parentOfInputField = parent;
             }
         }
+        /// <summary>
+        /// Returns the instantiated input field GameObject, or null if not yet created.
+        /// </summary>
+        public GameObject InputFieldObject
+        {
+            get => inputField;
+        }
 
         /// <summary>
         /// The buffered value of the <see cref="textField"/>. Because <see cref="Value"/>

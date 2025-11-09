@@ -9,6 +9,7 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using SEE.XR;
 using SEE.Game;
+using SEE.UI;
 using SEE.Controls.Interactables;
 
 namespace SEE.Utils
@@ -364,7 +365,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
             }
@@ -378,8 +379,13 @@ namespace SEE.Utils
             {
                 Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
-                return lastGameObject != null && lastGameObject.layer == uiLayer
-                                              && !ignoredUINames.Contains(lastGameObject.name);
+                /// Prevent wrong IsMouseOverGUI() state when a newly created child object (e.g.,
+                /// a ripple from ButtonManagerBasicIcon with useRipple enabled) does not have
+                /// the UI layer. In this case, also check parent objects for the UI layer or UI canvas name.
+                return lastGameObject != null && !ignoredUINames.Contains(lastGameObject.name)
+                    && (lastGameObject.layer == uiLayer
+                        || lastGameObject.HasParentWithLayer(uiLayer)
+                        || lastGameObject.FindParentWithName(UICanvas.Canvas.name) != null);
             }
         }
 
@@ -445,7 +451,7 @@ namespace SEE.Utils
         {
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 screenPoint = mainCamera.WorldToScreenPoint(hit.point);
