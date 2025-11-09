@@ -16,7 +16,7 @@ namespace SEE.Layout.IO
     internal static class LayoutReader
     {
         /// <summary>
-        /// Reads the layout information for all <paramref name="gameNodes"/>
+        /// Reads and applies the layout information for all <paramref name="gameNodes"/>
         /// from a file named <paramref name="filename"/>.
         ///
         /// The exact format is determined by the file extension: <see cref="Filenames.GVLExtension"/>
