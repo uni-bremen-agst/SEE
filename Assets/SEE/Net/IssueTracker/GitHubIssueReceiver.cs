@@ -2,15 +2,15 @@ using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
 using static IssueReceiverInterface;
-
 public class GitHubIssueReceiver : IssueReceiverInterface
 {
 
@@ -180,16 +180,60 @@ public class GitHubIssueReceiver : IssueReceiverInterface
     }
     #endregion
 
-       
-    public bool createIssue()
+
+    public async Task<bool> createIssue()
+    {
+
+        string token = "YOUR-TOKEN";
+        string owner = "lkuenzel";
+        string repo = "IssueTrackerRepository";
+
+        var issueData = new
+        {
+            title = "Found a bug",
+            body = "I'm having a problem with this.",
+            assignees = new[] { "User1" },
+            milestone = 1,
+            labels = new[] { "Report" }
+        };
+
+        using (var client = new HttpClient())
+        {
+            // GitHub API base URL
+            client.BaseAddress = new Uri("https://api.github.com/");
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("UnityApp/1.0");
+            // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+
+            string json = JsonConvert.SerializeObject(issueData);
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var response = await client.PostAsync($"repos/{owner}/{repo}/issues", content);
+            Debug.Log("Response:\n" + response);
+            Console.WriteLine("Response:\n" + response);
+            string result = await response.Content.ReadAsStringAsync();
+
+            if (response.IsSuccessStatusCode)
+            {
+                var responseBody = await response.Content.ReadAsStringAsync();
+                Console.WriteLine("Issue created successfully:\n" + responseBody);
+            }
+            else
+            {
+
+                var error = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Error:{response.StatusCode}\n{error}");
+                return false;
+            }
+        }
+
+        return true;
+    }
+    public async Task<bool> updateIssue()
     {
         return false;
     }
-    public bool updateIssue()
-    {
-        return false;
-    }
-    private async  Task restAPI(Settings settings)
+    private async Task restAPI(Settings settings)
     {
         int maxPage = 0;
         int currentPage = -1;
@@ -197,7 +241,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
         while (maxPage > currentPage)
         {
             // string requestUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues?state=all&per_page=50&Page=0;rel=last";// "https://api.github.com/repos/koschke/uni-bremen-agst/SEE/issues"; //"";
-            if(currentPage==-1)
+            if (currentPage == -1)
             {
                 pageingStr = $"&per_page=50&Page={0.ToString()}";
             }
@@ -207,17 +251,17 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             }
 
             Debug.Log($"IssueLogURL: {settings.preUrl + settings.searchUrl}");
-        UnityWebRequest request = UnityWebRequest.Get($"{settings.preUrl}{settings.searchUrl}" );
+            UnityWebRequest request = UnityWebRequest.Get($"{settings.preUrl}{settings.searchUrl}");
 
-        request.SetRequestHeader("Accept", "application/json");
+            request.SetRequestHeader("Accept", "application/json");
             //  request.SetRequestHeader("Authorization", $"AxToken {pke}");
-       
+
 
 
 #pragma warning disable CS4014
-        request.SendWebRequest();
+            request.SendWebRequest();
 #pragma warning restore CS4014
-        await UniTask.WaitUntil(() => request.isDone);
+            await UniTask.WaitUntil(() => request.isDone);
 
             if (request.result == UnityWebRequest.Result.Success)
             {
@@ -232,8 +276,8 @@ public class GitHubIssueReceiver : IssueReceiverInterface
                 return;
             }
             Debug.Log(request.downloadHandler.text.StartsWith("["));
-           // issuesJ = JsonConvert.DeserializeObject(request.downloadHandler.text);
-             issuesJ = JArray.Parse(request.downloadHandler.text);
+            // issuesJ = JsonConvert.DeserializeObject(request.downloadHandler.text);
+            issuesJ = JArray.Parse(request.downloadHandler.text);
 
             //Debug.Log("Anzahl Issues: " + issuesJ.Count);
 
@@ -243,21 +287,21 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             //}
             return;
 
-            if (maxPage ==0)
+            if (maxPage == 0)
             {
                 // Split des Linkes
 
                 string temp = null;
-                if(request.GetResponseHeader("Link").Split().Count() >=3)
-                temp =request.GetResponseHeader("Link").Split()[2];
+                if (request.GetResponseHeader("Link").Split().Count() >= 3)
+                    temp = request.GetResponseHeader("Link").Split()[2];
 
-        //index bevor sonderzeichen (">;")
-        int index = temp.Count() - 3;
-        //Dekrementiert den index bis dieser auf die erste Ziffer von der Maximalen Page Anzahl steht
-        while (char.IsNumber(temp[index - 1]))
-        {
-            index--;
-        }
+                //index bevor sonderzeichen (">;")
+                int index = temp.Count() - 3;
+                //Dekrementiert den index bis dieser auf die erste Ziffer von der Maximalen Page Anzahl steht
+                while (char.IsNumber(temp[index - 1]))
+                {
+                    index--;
+                }
 
                 maxPage = int.Parse(temp.Substring(index, (temp.Count() - 2) - index));
             }
@@ -267,7 +311,7 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             {
 
                 outputFile.Write(request.downloadHandler.text);
-                }
+            }
 
 
 
@@ -279,24 +323,24 @@ public class GitHubIssueReceiver : IssueReceiverInterface
             // total = (int)dic["total"];
 
             // UnityEngine.Debug.Log($"Start at: {rootobject.startAt.ToString()}");
-           // startAT = Convert.ToInt32(dic["startAt"]) + Convert.ToInt32(dic["maxResults"]);// rootobject.startAt + rootobject.maxResults;
-                                                                                           //total = rootobject.total;
-                                                                                           //// -1 da die 0 mit zählt
-                                                                                           //startAT = rootobject.startAt + rootobject.maxResults;
+            // startAT = Convert.ToInt32(dic["startAt"]) + Convert.ToInt32(dic["maxResults"]);// rootobject.startAt + rootobject.maxResults;
+            //total = rootobject.total;
+            //// -1 da die 0 mit zählt
+            //startAT = rootobject.startAt + rootobject.maxResults;
 
             //// gibt den descriptions aller Issues in der Console aus.
             ///   
             //Dictionary<string, System.Object> issuesDictionary = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>( dic["issues"].ToString());
-           
-    
+
+
             //DeserializeObject der Json response
             //List<Issue> issueList = JsonConvert.DeserializeObject<List<Issue>>(request.downloadHandler.text);
 
-        // gibt den Titel aller Issues in der Console aus.
-        //foreach (Issue issue in issueList)
-        //{
-        //    UnityEngine.Debug.Log("title:" + issue.title + "/n");
-        //}
+            // gibt den Titel aller Issues in der Console aus.
+            //foreach (Issue issue in issueList)
+            //{
+            //    UnityEngine.Debug.Log("title:" + issue.title + "/n");
+            //}
             currentPage += 50;
         }
 
@@ -307,9 +351,9 @@ public class GitHubIssueReceiver : IssueReceiverInterface
         //ResetIssues
         issues = null;
 
-      await  restAPI(settings);
+        await restAPI(settings);
         return issuesJ;
     }
 
-   
+
 }

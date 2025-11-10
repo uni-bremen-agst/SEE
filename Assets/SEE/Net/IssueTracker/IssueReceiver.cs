@@ -1,30 +1,14 @@
-using Antlr4.Runtime.Misc;
 using Cysharp.Threading.Tasks;
-using HtmlAgilityPack;
-using Microsoft.VisualStudio.Shared.VSCodeDebugProtocol.Messages;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using OmniSharp.Extensions.LanguageServer.Protocol.Models;
 using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.UI.Notification;
-using SEE.UI.PopupMenu;
 using SEE.UI.Window;
-using SEE.UI.Window.PropertyWindow;
-using SEE.Utils;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
 using UnityEngine;
 using UnityEngine.Networking;
-using static IssueReceiver;
-using static IssueReceiverInterface;
-public class IssueReceiver : MonoBehaviour 
+public class IssueReceiver : MonoBehaviour
 {
 
 
@@ -53,15 +37,15 @@ public class IssueReceiver : MonoBehaviour
         //IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?filter=all" };
         //GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
         //gitHUbReceiver.getIssues(settings);
-        ShowNotification.Error("Show Notification Issue Start.","Notify", 10,true);
+        ShowNotification.Error("Show Notification Issue Start.", "Notify", 10, true);
         // PopupMenuAction popup = new PopupMenuAction("test", , Icons.Code, false,1);
 
-      //  ShowIssueTrackerAction showIssueTrackerAction = new ShowIssueTrackerAction();
+        //  ShowIssueTrackerAction showIssueTrackerAction = new ShowIssueTrackerAction();
         //  GetIssuesJira("korusatix@gmail.com");
         IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
         JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
         jiraReceiver.getIssues(settings);
-       
+
         //UnityEngine.Debug.Log($"ListCount:{jiraReceiver.issues.Count}");
         // Create new window for active selection, or use existing one
         //if (!graphElementRef.TryGetComponent(out PropertyWindow propertyMenu))
@@ -72,20 +56,20 @@ public class IssueReceiver : MonoBehaviour
 
 
 
-     //   PropertyWindow pWindow = new PropertyWindow();
-     //   pWindow.Title = "test";
-     ////   pWindow.CreateUIInstance();
+        //   PropertyWindow pWindow = new PropertyWindow();
+        //   pWindow.Title = "test";
+        ////   pWindow.CreateUIInstance();
 
-     //   UnityEngine.Debug.Log("start GUIc");
-     //  // ActivateWindow(ShowIssueTrackerAction.ShowIssue()));
+        //   UnityEngine.Debug.Log("start GUIc");
+        //  // ActivateWindow(ShowIssueTrackerAction.ShowIssue()));
 
-     //   WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
-     //   if (!manager.Windows.Contains(pWindow))
-     //   {
-     //       manager.AddWindow(pWindow);
-     //   }
-     //   manager.ActiveWindow = pWindow;
-       // manager.
+        //   WindowSpace manager = WindowSpaceManager.ManagerInstance[WindowSpaceManager.LocalPlayer];
+        //   if (!manager.Windows.Contains(pWindow))
+        //   {
+        //       manager.AddWindow(pWindow);
+        //   }
+        //   manager.ActiveWindow = pWindow;
+        // manager.
     }
 
     // Update is called once per frame
@@ -768,12 +752,13 @@ public class IssueReceiver : MonoBehaviour
     #endregion
 
 
-        public class Settings {
+    public class Settings
+    {
         public String eMail { get; set; }
         public string preUrl { get; set; }
         public string searchUrl { get; set; }
         public string auth { get; set; }
-       // public GenericClass genericClass { get; set; }
+        // public GenericClass genericClass { get; set; }
 
 
 
@@ -785,21 +770,21 @@ public class IssueReceiver : MonoBehaviour
         //Gibt alle Issues zurück
         //  "https://ecosystem.atlassian.net/rest/api/2/search?jql=";
 
-        UnityWebRequest request = UnityWebRequest.Get(settings.preUrl+settings.searchUrl);
+        UnityWebRequest request = UnityWebRequest.Get(settings.preUrl + settings.searchUrl);
         request.SetRequestHeader("Accept", "application/json");
 
-    #pragma warning disable CS4014
-            request.SendWebRequest();
-    #pragma warning restore CS4014
-            await UniTask.WaitUntil(() => request.isDone);
-        
+#pragma warning disable CS4014
+        request.SendWebRequest();
+#pragma warning restore CS4014
+        await UniTask.WaitUntil(() => request.isDone);
+
         var rootobject = JsonConvert.DeserializeObject(request.downloadHandler.text);
 
 
 
 
-       // rootobject
-       // var rootobject = JsonConvert.DeserializeObject<T>(request.downloadHandler.text);
+        // rootobject
+        // var rootobject = JsonConvert.DeserializeObject<T>(request.downloadHandler.text);
     }
 
 
@@ -830,7 +815,7 @@ public class IssueReceiver : MonoBehaviour
 
         string docPath = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
-   
+
         using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJira.txt")))
         {
             outputFile.Write(request.downloadHandler.text);
@@ -879,7 +864,7 @@ public class IssueReceiver : MonoBehaviour
         UnityEngine.Debug.Log("test1startGithub");
         UnityEngine.Debug.Log(request.result);
 
-        
+
         //foreach (KeyValuePair<string, string> pair in request.GetResponseHeaders())
         //{
         //    UnityEngine.Debug.Log($"{pair.Key}:{pair.Value}");
@@ -904,7 +889,7 @@ public class IssueReceiver : MonoBehaviour
         //DeserializeObject der Json response
 
         List<Issue> issueList = JsonConvert.DeserializeObject<List<Issue>>(request.downloadHandler.text);
- 
+
 
 
 

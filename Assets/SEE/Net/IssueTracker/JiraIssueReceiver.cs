@@ -1,16 +1,9 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using OmniSharp.Extensions.LanguageServer.Protocol.Workspace;
-using SEE.UI.Notification;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Net;
-using System.Reflection;
 using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -20,7 +13,7 @@ using static IssueReceiverInterface;
 public class JiraIssueReceiver : IssueReceiverInterface
 {
     public List<RootIssue> issues;
-    public  JArray issuesJ;
+    public JArray issuesJ;
     //Github / giblab Issue Classes
     #region "IssueClasses Jira" 
 
@@ -1194,12 +1187,12 @@ public class JiraIssueReceiver : IssueReceiverInterface
 
 
     #endregion
-    public bool createIssue()
+    public async Task<bool> createIssue()
     {
         // Es konnte kein Issue erstelltwerden!
         return false;
     }
-    public bool updateIssue()
+    public async Task<bool> updateIssue()
     {
         // Es konnte kein Issue upgedatet werden!
         return false;
@@ -1210,48 +1203,48 @@ public class JiraIssueReceiver : IssueReceiverInterface
         int total = 50;
         int startAT = -1;
         string pagingString = "";
-  
-        while (startAT< total)
+
+        while (startAT < total)
         {
-            if(startAT != -1)
+            if (startAT != -1)
             {
                 pagingString = $"&startAt={startAT.ToString()}";
             }
 
             //Jira Query Language(JQL)
-            UnityWebRequest request = UnityWebRequest.Get(settings.preUrl + settings.searchUrl+ pagingString);
+            UnityWebRequest request = UnityWebRequest.Get(settings.preUrl + settings.searchUrl + pagingString);
 
 
 #pragma warning disable CS4014
-        request.SendWebRequest();
+            request.SendWebRequest();
 #pragma warning restore CS4014
-        await UniTask.WaitUntil(() => request.isDone);
- 
-        if (request.result != UnityWebRequest.Result.Success)
-        {
-            Debug.Log(request.result);
-            //Rückgabe
-            Debug.Log(request.downloadHandler.text);
-        }
+            await UniTask.WaitUntil(() => request.isDone);
+
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.Log(request.result);
+                //Rückgabe
+                Debug.Log(request.downloadHandler.text);
+            }
 
 
-        string docPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
+            string docPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyDocuments);
 
-        //// Write the string array to a new file named "WriteLines.txt".
-        using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJira.txt")))
-        {
-            outputFile.Write(request.downloadHandler.text);
-        }
+            //// Write the string array to a new file named "WriteLines.txt".
+            using (StreamWriter outputFile = new StreamWriter(Path.Combine(docPath, "IssueTestOutputJira.txt")))
+            {
+                outputFile.Write(request.downloadHandler.text);
+            }
 
 
 
-            
+
             //DeserializeObject der Json response
-          //  JsonConvert.DeserializeObject(request.downloadHandler.text);
+            //  JsonConvert.DeserializeObject(request.downloadHandler.text);
 
-            Dictionary<string,System.Object >  dic =  JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
+            Dictionary<string, System.Object> dic = JsonConvert.DeserializeObject<Dictionary<string, System.Object>>(request.downloadHandler.text);
 
-            total = Convert.ToInt32( dic["total"]);
+            total = Convert.ToInt32(dic["total"]);
 
             UnityEngine.Debug.Log($"IssueConvert:{total}");
             // total = (int)dic["total"];
@@ -1268,10 +1261,10 @@ public class JiraIssueReceiver : IssueReceiverInterface
             issuesJ = JArray.Parse(dic["issues"].ToString());
             //foreach (JToken item in JArray.Parse(dic["issues"].ToString()))
             //{
-               
+
             //        issuesJ.Add(item);
             //   Console.WriteLine($"Jap{issuesJ.Count()}: ");
-                
+
             //}
 
             //if (issuesJ != null)
@@ -1304,7 +1297,7 @@ public class JiraIssueReceiver : IssueReceiverInterface
             //    }
             //}
         }
-        
+
     }
     public async Task<JArray> getIssues(Settings settings)
     {
@@ -1312,7 +1305,7 @@ public class JiraIssueReceiver : IssueReceiverInterface
         issues = null;
         downloadDone = false;
         restAPI(settings);
-        
+
         return issuesJ;
     }
 

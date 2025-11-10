@@ -1,28 +1,23 @@
-
-using LibGit2Sharp;
-using Mediapipe;
-using Newtonsoft.Json;
+﻿using FuzzySharp;
+using FuzzySharp.Extractor;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Schema;
-using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.Game.Drawable;
 using SEE.GO;
 using SEE.UI.Notification;
-using SEE.Utils;
 using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
 //using UnityEditor.ShaderKeywordFilter;
 using System.Linq;
 using System.Threading.Tasks;
 using TMPro;
+//using UnityEditor.Search;
 using UnityEngine;
-using UnityEngine.UI;
-using UnityEngine.UIElements;
-using static IssueReceiverInterface;
+using Button = UnityEngine.UI.Button;
+using Color = UnityEngine.Color;
+using Image = UnityEngine.UI.Image;
+
 
 namespace SEE.UI.Window.PropertyWindow
 {
@@ -45,7 +40,8 @@ namespace SEE.UI.Window.PropertyWindow
         //private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
         //// private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
 
-
+        private int FuzzyScoreThreshold = 80;
+        private static int maxFuzzyResult = 5;
 
         public override void RebuildLayout()
         {
@@ -54,77 +50,293 @@ namespace SEE.UI.Window.PropertyWindow
         protected override void StartDesktop()
         {
             ShowNotification.Error("Show Notification Issue StartDesktop.", "Notify", 10, true);
-           // Title = "Issue Window abc";
+            // Title = "Issue Window abc";
             base.StartDesktop();
             CreateUIInstance();
         }
+        //public override void CreateUIInstance()
+        //{
+        //    base.CreateUIInstance();
 
-        void findCodeBlocksInIssue(String text)
+        //    //  Jetzt alle Gruppen suchen, die erstellt wurden
+        //    AddButtonsToAllGroups();
+        //}
+
+        private void AddHeaderButtons()
         {
+            if (Window == null)
+            {
+                Debug.LogError("Window ist null!");
+                return;
+            }
+
+            // Alle Kinder durchsuchen (inklusive inaktiver)
+            var rows = Window.GetComponentsInChildren<Transform>(true)
+                             .Where(t => t.name.Contains("AttributeLine") || t.name.Contains("AttributeRow"));
+
+
+            foreach (var row in rows)
+            {
+
+                var headerLabel = row.gameObject.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>();//row.Find("AttributeLine")?.GetComponent<TextMeshProUGUI>();
+                if (headerLabel != null)
+                {
+
+
+                    string groupName = headerLabel.text;
+                    if (groupName.StartsWith("Issue"))
+                        AddHeaderButton(row.parent.gameObject, groupName);
+                }
+            }
+        }
+
+        private void AddHeaderButton(GameObject group, string groupName)
+        {
+            // 🔹 Button-Objekt erstellen
+            GameObject buttonObj = new GameObject("HeaderButton", typeof(RectTransform), typeof(Button), typeof(Image));
+            buttonObj.transform.SetParent(group.transform, false);
+
+            // 🔹 Position und Größe
+            var rect = buttonObj.GetComponent<RectTransform>();
+            rect.anchorMin = new Vector2(1, 0.5f);
+            rect.anchorMax = new Vector2(1, 0.5f);
+            rect.pivot = new Vector2(1, 0.5f);
+            rect.anchoredPosition = new Vector2(-25, 0);
+            rect.sizeDelta = new Vector2(20, 20);
+
+            // 🔹 Optional: Farbe / Sprite
+            var img = buttonObj.GetComponent<Image>();
+            img.color = Color.white; // oder Sprite zuweisen
+
+            // 🔹 Click-Action
+            var button = buttonObj.GetComponent<Button>();
+            button.onClick.AddListener(() => OnHeaderButtonClicked(group, groupName));
+        }
+
+
+        //private string AttributeName(GameObject propertyRow) => Attribute(propertyRow).text;
+        //private string AttributeValue(GameObject propertyRow) => Value(propertyRow).text;
+
+        private string GetAttributeValue(String groupName, string attributeName)
+        {
+            if (!groupHolder.TryGetValue(groupName, out List<GameObject> groupObjects))
+            {
+                Debug.LogWarning($"Keine Gruppe {groupName} in groupHolder gefunden!");
+                return null;
+            }
+
+            Debug.LogWarning($"Groupcount:{groupObjects.Count()}");
+
+            foreach (var go in groupObjects)
+            {
+                // Überspringe die Hauptgruppe (die hat meist denselben Namen wie groupName)
+                if (go.name == groupName)
+                    continue;
+
+
+
+                var attributeText = go.FindDescendant("AttributeLine")?.GetComponent<TextMeshProUGUI>();
+
+                // Suche in Foreground → ValueLine
+                var valueText = go.FindDescendant("ValueLine")?.GetComponent<TextMeshProUGUI>();
+
+                if (attributeText != null && valueText != null && attributeText.text.Equals(attributeName))
+                {
+                    Debug.LogWarning($" {attributeText.text} = {valueText.text}");
+                    return valueText.text;
+                }
+
+                //foreach (Transform child in go.transform)
+                //{
+
+
+
+                //    Debug.LogWarning($" {child.name}");
+                //}
+                // Suche TextMeshPro-Felder
+                //var attributeText = go.FindDescendant("Attribute")?.GetComponent<TextMeshProUGUI>();
+                //var valueText = go.FindDescendant("Value")?.GetComponent<TextMeshProUGUI>();
+
+                //if (attributeText != null && valueText != null)
+                //{
+                //    Debug.LogWarning($"Subrow: {attributeText.text} = {valueText.text}");
+                //}
+                //else
+                //{
+                //    Debug.LogWarning($"Kein Attribute/Value in {go.name} {go.transform} gefunden");
+                //}
+            }
+            //foreach (var row in groupObjects)
+            //{
+
+            //    Debug.LogWarning($"Name:{row.name}");
+            //}
+            //return "";
+
+
+            //Debug.Log($"Groupcount: {groupObjects.Count}");
+
+            //groupObjects.First().
+
+            //foreach (var (attributeName, (value, row)) in groupDict)
+            //{
+            //    Debug.Log($"{attributeName}: {value}");
+            //}
+            //foreach (var row in groupObjects.Where(go => go.name != groupName))
+            //{
+            //    string currentAttrName = row.transform.Find("AttributeLine").GetComponent<TextMeshProUGUI>().text;
+            //    Debug.Log($"[{groupName}] {currentAttrName} ");
+            //    //if (currentAttrName.Equals(attributeName, StringComparison.OrdinalIgnoreCase))
+            //    //{
+            //    //    string currentValue = AttributeValue(row);
+            //    //    Debug.Log($"[{groupName}] {attributeName} = {currentValue}");
+            //    //    return currentValue;
+            //    //}
+            //}
+
+            //Debug.LogWarning($"Attribut '{attributeName}' in Gruppe '{groupName}' nicht gefunden!");
+            //Debug.LogWarning($"AttributeLine:{groupObjects.First().FindDescendant("RowLine").MustGetComponent<TextMeshProUGUI>().text}");
+            ////foreach (var row in groupObjects)
+            //foreach (var row in groupObjects)
+            //{
+
+            //    Debug.LogWarning($"Attribute:{Attribute(row)}");
+            //    // Suche alle Text-Komponenten im Row-Objekt
+            //    //var texts = row.GetComponentsInChildren<TextMeshProUGUI>(true);
+            //    //foreach (var text in texts)
+            //    //{
+            //    //    // Falls der Name des Objekts oder der Text mit dem Attributnamen übereinstimmt
+            //    //    if (text.name.Equals(attributeName, System.StringComparison.OrdinalIgnoreCase))
+            //    //    {
+            //    //        Debug.Log($"Gefunden: {attributeName} = {text.text}");
+            //    //        return text.text;
+            //    //    }
+            //    //}
+            //}
+
+            //Debug.LogWarning($"Kein Attribut '{attributeName}' in Gruppe '{groupName}' gefunden!");
+
+            //    // Suche innerhalb von Foreground nach Zeilen
+            //    var attributeRowsaa = foreground.GetComponentsInChildren<Transform>(true)
+            //    .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine"))
+            //    .ToList();
+
+            //Debug.Log($"attributeRowsForground;  {attributeRowsaa.Count()}");
+            //foreach (var t in headerRow.GetComponentsInChildren<Transform>(true))
+            //{
+            //    Debug.Log($"name: {t.name}");
+
+            //    if (t.name.StartsWith("Issue"))
+            //    {
+            //        var attributeRowsa = t.gameObject.GetComponentsInChildren<Transform>(true)
+            //                             .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine")); //
+
+            //        Debug.Log($"attributeRows; {t.name}  {attributeRowsa.Count()}");
+            //    }
+
+
+            //}
+
+            //// Alle direkten oder verschachtelten Children durchsuchen
+
+            //var attributeRows = headerRow.GetComponentsInChildren<Transform>(true)
+            //                             .Where(t => t.name.Contains("RowLine") || t.name.Contains("AttributeLine")); //
+
+
+            //Debug.Log($"attributeRows; {headerRow.name}  {attributeRows.Count()}");
+            //foreach (var row in attributeRows)
+            //{
+            //    var label = row.Find("AttributeName")?.GetComponent<TextMeshProUGUI>();
+            //    var value = row.Find("AttributeValue")?.GetComponent<TextMeshProUGUI>();
+
+            //    if (label != null && value != null && label.text.Equals(attributeName, StringComparison.OrdinalIgnoreCase))
+            //    {
+            //        return value.text;
+            //    }
+            //}
+
+            return null; // falls nicht gefunden
+        }
+        private async Task OnHeaderButtonClicked(GameObject headerRow, string groupName)
+        {
+            string bodyValue = GetAttributeValue(groupName, "body");
+            Debug.Log($"BodyValue: {bodyValue}");
+
+            if (bodyValue != null)
+                await findCodeBlocksInIssue(bodyValue);
+            Debug.Log($"Header button clicked: {groupName}");
+            // Deine gewünschte Aktion hier (z. B. Kontextmenü, Löschen, Fokus etc.)
+        }
+        private async Task findCodeBlocksInIssue(String text)
+        {
+            //   string aa = "";
+
+
             GameObject[] cities = GameObject.FindGameObjectsWithTag(Tags.CodeCity);
             if (cities.Length == 0)
             {
-                Debug.LogWarning("No code city found. Tree view will be empty.");
-
+                Debug.LogWarning("No code city found. The Issues in the Tree view  will be empty.");
             }
-
-            //   TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
-            // We will create a tree view for each code city.
+            Debug.LogWarning("Search text in cities");
+            List<String> codeBlocks = new List<String>();
+            // Durchsuchen der CodeCities
             foreach (GameObject cityObject in cities)
             {
                 if (cityObject.TryGetComponent(out AbstractSEECity city))
                 {
-                    if (city.LoadedGraph != null) //|| treeWindows.ContainsKey(city.name)
+                    if (city.LoadedGraph != null)
                     {
-                     //   city.
                         int index = 0;
-                     foreach(Node str in  city.LoadedGraph.Nodes().Where(x=> x.Type.Equals("Class")))
+                        foreach (Node str in city.LoadedGraph.Nodes().Where(x => x.Type.Equals("Class")))
                         {
-                            // gameObject.Operator()
-                            if(text.Contains(str.SourceName))
-                            { 
-                           // str.GameObject().Operator().Highlight(5, false);
-                                Debug.Log($" CityBlocknames: {str.SourceName} type:{str.Type} \n {text} ");
-                         
-                            //if (index >= 3)
-                            //    break;
-                            }
+
+                            codeBlocks.Add(str.SourceName);
+                            //  break;
+                            // Type 1 Clone
+                            // if (text.Contains(str.SourceName))
+                            // { 
+
+                            //     //Highleigt Node
+                            //// str.GameObject().Operator().Highlight(5, false);
+                            //     Debug.Log($" CityBlocknames: {str.SourceName} type:{str.Type} \n {text} ");
+
+
+                            // }
                             index++;
                         }
-                   
+
+                        var results = Process.ExtractAll(text, codeBlocks, (s) => s).ToList();
+                        Debug.Log($"Result >{FuzzyScoreThreshold}:{results.Where(x => x.Score > FuzzyScoreThreshold).Count()} ");
+                        int indexLoop = 0;
+                        foreach (ExtractedResult<string> a in results.OrderByDescending(x => x.Score))
+                        {
+
+                            //if(a.Score > FuzzyScoreThreshold)
+                            Debug.Log($"Index:{indexLoop}  CityBlocknames:  {a.Value} {a.Score} type:class \n {text}  ");
+                            indexLoop++;
+                            if (indexLoop >= maxFuzzyResult)
+                                break;
+                        }
+                        codeBlocks.Clear();
+
+
 
                     }
-                } 
-            
-            }
-        }
-        protected override async void   CreateItems()
-        {
-            //if (contextMenu.Filter.IncludeHeader)
-            //{
+                }
 
-          //test();
-            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?state=all",commentAttributeName="body" };
+            }
+
+        }
+
+        // Erstellen der Itemes(Issue)
+        protected override async void CreateItems()
+        {
+            //IssueReceiver auswählen
+            IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://api.github.com/repos/uni-bremen-agst/SEE/issues", searchUrl = "?state=all", commentAttributeName = "body" };
             GitHubIssueReceiver gitHUbReceiver = new GitHubIssueReceiver();
             JArray jArray = await gitHUbReceiver.getIssues(settings);
-            //while(gitHUbReceiver.issuesJ ==null)
-            //{
-
-            //}
-
-            //JArray jArr�ay = gitHUbReceiver.issuesJ;
-            ////if (issuesList != null)
-            ////    ShowNotification.Error($"issuesList {gitHUbReceiver.issuesJ}", "Error", 5, true);
-            //if (jArray.Count > 0)
-            //{
-            //    //  issueList = new List<RootIssue>(); // TODO: Load real data
-            //    ShowNotification.Error("issuesJ Is DisplayAttributes", "Status", 5, true);
-            //    // DisplayAttributes(jArray, issueWindow);
-            //}
-            //else
-            //{
-            //    ShowNotification.Error("issuesJ Is NUll", "Error", 5, true);
-            //}
+            if (jArray == null)
+                return;
 
 
             Dictionary<string, string> header = new()
@@ -132,12 +344,12 @@ namespace SEE.UI.Window.PropertyWindow
 
             };
             Dictionary<string, string> Attributes = new()
-         {
-     
-         };
+            {
+
+            };
 
             //Erstellen Dictionary mit Subgruppen
-            Dictionary<string, object> dicIssues= new Dictionary<string, object>();
+            Dictionary<string, object> dicIssues = new Dictionary<string, object>();
 
 
             int issueIndex = 1;
@@ -148,27 +360,18 @@ namespace SEE.UI.Window.PropertyWindow
 
                 Attributes.Clear();
                 header.Add($"Issue{issueIndex}", "");
-                //    // GameObject group = PrefabInstantiator.InstantiatePrefab(GroupPrefab, scrollViewContent, false);
-                //    // group.name = "Test";
-                //    // GameFinder.FindChild(group, "AttributeLine").MustGetComponent<TextMeshProUGUI>().text = "Test";
-                //    // GameObject issueRowTitle = PrefabInstantiator.InstantiatePrefab(ItemPrefab, scrollViewContent, false);
-                //    // TextMeshProUGUI parameterTextTitle = issueRowTitle.transform.Find("IssueLine")?.GetComponent<TextMeshProUGUI>();
-                //    //// TextMeshProUGUI valueTextTitle = issueRowTitle.transform.Find("Title")?.GetComponent<TextMeshProUGUI>();
-                //    // if (parameterTextTitle != null && valueTextTitle != null)
-                //    // {
-                //    //     parameterTextTitle.text = $"Issue1";//;issue.GetValue("title")
-                //    //     valueTextTitle.text = $"Attributes";  //; {issue["title"]}
-                //    // }
-                Dictionary<string, object> dicAttributes = new(){};
+
+                Dictionary<string, object> dicAttributes = new() { };
                 foreach (JProperty property in issue.Properties())
                 {
 
-                    if(property.Value.Type != JTokenType.Object)
+                    if (property.Value.Type != JTokenType.Object)
                     {
-                        if(property.Name.Equals(settings.commentAttributeName))
+                        if (property.Name.Equals(settings.commentAttributeName))
                         {
-                           // Debug.Log($"Nody:{property.Value.ToString()}");
-                            findCodeBlocksInIssue(property.Value.ToString());
+                            // Debug.Log($"Nody:{property.Value.ToString()}");
+                            //     findCodeBlocksInIssue(property.Value.ToString());
+
                         }
                         dicAttributes.Add(property.Name, property.Value.ToString());
                     }
@@ -182,7 +385,7 @@ namespace SEE.UI.Window.PropertyWindow
                         {
                             foreach (JProperty propertyIn in obj.Properties())
                             {
-                                
+
                                 string name = propertyIn.Name;         // Attribute name (key)
                                 JToken valueToken = propertyIn.Value;  // Raw JToken value
                                 object value = valueToken.ToObject<object>(); // Convert to .NET type
@@ -194,13 +397,11 @@ namespace SEE.UI.Window.PropertyWindow
                             }
                         }
                         //JsonConvert.DeserializeObject<Dictionary<string, object>>($"{"{"}{property.Name}:{property.Value.ToString()}{"}"}"))
-                        if(dicAttributesInner.Count()>0)
+                        if (dicAttributesInner.Count() > 0)
                             dicAttributes.Add($"{property.Name}{issueIndex}", dicAttributesInner);
-                      //  Attributes.Add(property.Name, "Values");
-
-
+                        //  Attributes.Add(property.Name, "Values");
                     }
-                
+
                 }
                 dicIssues[$"Issue{issueIndex}"] = dicAttributes;
                 //  DisplayGroup("Attribure", Attributes, 2, $"Issue{issueIndex}");
@@ -210,7 +411,7 @@ namespace SEE.UI.Window.PropertyWindow
                 // break;
             }
             // Data Attributes
-           // Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
+            // Dictionary<string, (string, GameObject gameObject)> headerItems = DisplayAttributes(header);
             //Dictionary<string, object> subsubsds = new()
             //             {
             //              { "abc", "23423s5" },
@@ -228,6 +429,7 @@ namespace SEE.UI.Window.PropertyWindow
 
 
             SplitInAttributeGroup(dicIssues);
+            AddHeaderButtons();
             // CreateNestedGroups(subsub, "Issue1");
             //  DisplayGroup("subAttri", subsub, 2, "Issue1");
 
@@ -303,7 +505,7 @@ namespace SEE.UI.Window.PropertyWindow
             // grouped by their name type.
             void GroupByName()
             {
-                Dictionary<string, object> attributes = new();
+                //  Dictionary<string, object> attributes = new();
 
                 /* Currently, there are no boolean attributes for authors.
                 if (contextMenu.Filter.IncludeToggleAttributes)
@@ -333,7 +535,7 @@ namespace SEE.UI.Window.PropertyWindow
         //{
         //    if (Window == null)
         //    {
-        //        ShowNotification.Error("Window is null � cannot build issue UI.", "Error", 10, true);
+        //        ShowNotification.Error("Window is null – cannot build issue UI.", "Error", 10, true);
         //        return;
         //    }
 
@@ -517,7 +719,7 @@ namespace SEE.UI.Window.PropertyWindow
         //     // Zeigt das erste Issue in der GUI
         //        return;
         //    }
-         
+
         //}
         private static TextMeshProUGUI Attribute(GameObject issueRow)
         {
@@ -537,6 +739,6 @@ namespace SEE.UI.Window.PropertyWindow
         {
             throw new NotImplementedException();
         }
-   
+
     }
 }
