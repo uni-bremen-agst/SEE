@@ -78,7 +78,7 @@ namespace SEE.Controls.Actions
                 {
                     Raycasting.RaycastInteractableObject(out _, out InteractableObject o);
                     startObject = o;
-                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                    if (User.UserSettings.IsDesktop)
                     {
                         startMousePosition = Input.mousePosition;
                     }
@@ -111,10 +111,10 @@ namespace SEE.Controls.Actions
                     {
                         return;
                     }
-                    if (SceneSettings.InputType == PlayerInputType.VRPlayer
+                    if (User.UserSettings.IsVR
                         || (hitObject == startObject && (Input.mousePosition - startMousePosition).magnitude < 1))
                     {
-                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        if (User.UserSettings.IsDesktop)
                         {
                             position = Input.mousePosition;
                         }
@@ -137,7 +137,7 @@ namespace SEE.Controls.Actions
                     }
                     if (InteractableObject.SelectedObjects.Contains(o))
                     {
-                        if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                        if (User.UserSettings.IsDesktop)
                         {
                             position = Input.mousePosition;
                         }

@@ -5,11 +5,11 @@ using Dissonance;
 using Dissonance.Audio.Playback;
 using SEE.Controls;
 using SEE.GO;
+using SEE.GO.Menu;
+using SEE.Tools.OpenTelemetry;
 using SEE.Utils;
 using Unity.Netcode;
 using UnityEngine;
-using SEE.GO.Menu;
-
 #if ENABLE_VR
 using UnityEngine.Assertions;
 using SEE.XR;
@@ -31,6 +31,12 @@ namespace SEE.Game.Avatars
     internal class AvatarAdapter : NetworkBehaviour
     {
         /// <summary>
+        /// The transform of the player's head that will be periodically tracked for position and rotation data.
+        /// This value is set during VR initialization and used for telemetry tracking.
+        /// </summary>
+        private Transform headTransformToTrack;
+
+        /// <summary>
         /// The distance from the top of the player's height to his eyes.
         /// </summary>
         private const float playerTopToEyeDistance = 0.14f;
@@ -51,13 +57,13 @@ namespace SEE.Game.Avatars
                     gameObject.AddComponent<WindowSpaceManager>();
                 }
 
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     gameObject.AddOrGetComponent<PlayerMenu>();
                     gameObject.AddOrGetComponent<DrawableSurfacesRef>();
                 }
 
-                switch (SceneSettings.InputType)
+                switch (User.UserSettings.Instance.InputType)
                 {
                     case PlayerInputType.DesktopPlayer:
                     case PlayerInputType.TouchGamepadPlayer:
@@ -67,7 +73,7 @@ namespace SEE.Game.Avatars
                         PrepareLocalPlayerForXR();
                         break;
                     default:
-                        throw new NotImplementedException($"Unhandled case {SceneSettings.InputType}");
+                        throw new NotImplementedException($"Unhandled case {User.UserSettings.Instance.InputType}");
                 }
 
                 gameObject.name = "Local " + gameObject.name;
@@ -81,7 +87,8 @@ namespace SEE.Game.Avatars
 
             if (gameObject.TryGetComponentOrLog(out NetworkObject net))
             {
-                Debug.Log($"Avatar {gameObject.name} is local player: {net.IsLocalPlayer}. Owner of avatar is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
+                Debug.Log(
+                    $"Avatar {gameObject.name} is local player: {net.IsLocalPlayer}. Owner of avatar is server: {net.IsOwnedByServer} or is local client: {net.IsOwner}\n");
             }
 
             EnableLocalControl(IsLocalPlayer);
@@ -362,6 +369,7 @@ namespace SEE.Game.Avatars
                     //    }
                     //}
                 }
+
                 PrefabInstantiator.InstantiatePrefab("Prefabs/UI/XRTabletCanvas");
             }
 
@@ -385,6 +393,7 @@ namespace SEE.Game.Avatars
                         {
                             Debug.LogWarning($"The teleport area {teleportArea.name} already has a collider assigned.\n");
                         }
+
                         teleportationArea.colliders[0] = collider;
                     }
 
@@ -405,7 +414,6 @@ namespace SEE.Game.Avatars
             // Set up FinalIK's VR IK on the avatar.
             void SetupVRIK()
             {
-
                 VRIK vrIK = gameObject.AddOrGetComponent<VRIK>();
 
                 vrIK.solver.spine.headTarget = rig.transform.Find(vrPlayerHeadForVRIK);
@@ -414,6 +422,8 @@ namespace SEE.Game.Avatars
                 Assert.IsNotNull(vrIK.solver.leftArm.target);
                 vrIK.solver.rightArm.target = rig.transform.Find(vrPlayerRightHandForVRIK);
                 Assert.IsNotNull(vrIK.solver.rightArm.target);
+
+                headTransformToTrack = vrIK.solver.spine.headTarget;
             }
 
             // Prepare HTC Facial Tracker
@@ -472,7 +482,23 @@ namespace SEE.Game.Avatars
                 Debug.Log("[HTC Facial Tracker] Initialisation complete.\n");
             }
         }
-#endif
-        #endregion ENABLE_VR
+
+        /// <summary>
+        /// Periodically tracks the head transform for local VR players by invoking telemetry logging.
+        /// This method ensures that head position and rotation are logged over time during gameplay.
+        /// </summary>
+        private void Update()
+        {
+            if (IsLocalPlayer && headTransformToTrack != null)
+            {
+                TracingHelperService.Instance?.TrackHeadTransformPeriodically(headTransformToTrack, Time.time);
+            }
+        }
     }
 }
+
+#endif
+
+#endregion ENABLE_VR
+
+

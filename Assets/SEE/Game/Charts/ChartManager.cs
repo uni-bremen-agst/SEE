@@ -170,7 +170,7 @@ namespace SEE.Game.Charts
         /// </summary>
         private void Start()
         {
-            isVirtualReality = SceneSettings.InputType == PlayerInputType.VRPlayer;
+            isVirtualReality = User.UserSettings.IsVR;
             if (!isVirtualReality)
             {
                 chartsOpen = GameObject.Find("ChartCanvas") != null
