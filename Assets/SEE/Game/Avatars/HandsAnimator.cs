@@ -166,7 +166,6 @@ namespace SEE.Game.Avatars
         /// If true, the avatar's laser pointer is enabled.
         /// </summary>
         public bool IsPointing = true;
-        
         /// <summary>
         /// If true, the owner of the avatar is using hand animations with MediaPipe.
         /// </summary>
