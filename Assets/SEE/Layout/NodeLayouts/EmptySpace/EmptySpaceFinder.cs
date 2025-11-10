@@ -5,21 +5,23 @@ using System.Linq;
 namespace SEE.Layout.NodeLayouts.EmptySpace
 {
     /// <summary>
-    /// Advanced Algorithm: Sweep-Line
+    /// Finds empty space in an outer object with nested other objects (obstacles)
+    /// using a sweep-line algorithm.
     ///
     /// Event Points: Consider all X- and Y-coordinates defined by the boundaries of the
-    /// main rectangle (R) and all obstacle rectangles (S). These coordinates define a grid.
+    /// main rectangle (outer) and all obstacle rectangles (inner). These coordinates define
+    /// a grid.
     ///
-    /// Sweep Line: Imagine a horizontal line sweeping from Ymin​ to Ymax​.
+    /// Sweep Line: Imagine a vertical line sweeping from Ymin​ to Ymax​.
     ///
     /// Active Intervals: At any point along the sweep, the line maintains a list of
-    /// horizontal free intervals (gaps) between the obstacles.
+    /// vertical free intervals (gaps) between the obstacles.
     ///
     /// Maximal Rectangles: When the sweep line passes an obstacle's top or bottom edge,
     /// the existing free intervals may be terminated. A maximal empty rectangle is reported
-    /// when a free interval is terminated by an obstacle boundary, or by the boundary of R,
-    /// as it's the largest possible rectangle that could be formed by that specific
-    /// horizontal gap.
+    /// when a free interval is terminated by an obstacle boundary, or by the boundary of the
+    /// outer rectangle, as it's the largest possible rectangle that could be formed by that
+    /// specific vertical gap.
     ///
     /// Implementing the full Sweep-Line Algorithm for the Maximal Empty Rectangle problem
     /// is substantially more complex than the recursive partitioning method, as it requires
@@ -34,11 +36,24 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
     /// correct but less performant for huge datasets.
     ///
     /// The algorithm proceeds by considering all unique X and Y coordinates
-    /// from the main rectangle R and the obstacles S. These coordinates form a grid.
-    /// The maximal empty rectangles must lie on this grid.
+    /// from the outer rectangle and the obstacles (inner rectangles). These coordinates
+    /// form a grid. The maximal empty rectangles must lie on this grid.
     /// </summary>
     internal static class EmptySpaceFinder
     {
+        /// <summary>
+        /// Returns the set of maximally large empty rectangles for given <paramref name="outerRectangle"/>
+        /// containing the <paramref name="innerRectangles"/>. None of the results will overlap with any
+        /// <paramref name="innerRectangles"/>. All of them will be completely contained in <paramref name="outerRectangle"/>.
+        /// Together they cover the complete empty space in <paramref name="outerRectangle"/>.
+        /// The elements of the results may overlap each other.
+        /// </summary>
+        /// <param name="outerRectangle">the outer rectangle (must not be null)</param>
+        /// <param name="innerRectangles">the nested inner rectangles (must not be null)</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException">thrown if one of the arguments is null</exception>
+        /// <exception cref="ArgumentException">thrown if any of the <paramref name="innerRectangles"/>
+        /// is not fully contained in <paramref name="outerRectangle"/></exception>
         public static IList<Rectangle> Find(Rectangle outerRectangle, IEnumerable<Rectangle> innerRectangles)
         {
             if (outerRectangle == null)
