@@ -90,7 +90,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the user enabled hand animations using MediaPipe for the first time.
         /// </summary>
-        public bool IsFirstActivationOfHandHanimations = true;
+        public bool IsFirstActivationOfHandAnimations = true;
 
         /// <summary>
         /// Time in seconds when the last error message indicating that no hand landmarks were found was shown.
@@ -177,10 +177,10 @@ namespace SEE.Game.Avatars
                 if (isUsingHandAnimations)
                 {
                     // If it's the first time the user enabled the animations, initialize the HandsAnimator.
-                    if (IsFirstActivationOfHandHanimations)
+                    if (IsFirstActivationOfHandAnimations)
                     {
                         HandsAnimator.Initialize(transform, ik);
-                        IsFirstActivationOfHandHanimations = false;
+                        IsFirstActivationOfHandAnimations = false;
                     }
 
                     // If the avatar's hands are already in the starting position and ready for animation.
@@ -241,6 +241,7 @@ namespace SEE.Game.Avatars
         private void ToggleHandAnimations()
         {
             isUsingHandAnimations = !isUsingHandAnimations;
+            HandsAnimator.isUsingHandAnimations = !HandsAnimator.isUsingHandAnimations;
         }
     }
 }
