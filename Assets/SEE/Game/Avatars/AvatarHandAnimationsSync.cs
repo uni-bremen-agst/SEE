@@ -158,7 +158,7 @@ namespace SEE.Game.Avatars
         {
             // The owner of the avatar needs to signal when the HandsAnimator component of the avatar is initialized.
             BodyAnimator bodyAnimator = GetComponent<BodyAnimator>();
-            if (IsOwner && !ifHandsAnimatorInitialized.Value && handsAnimator.isHandsAnimatorInitialized)
+            if (IsOwner && !ifHandsAnimatorInitialized.Value && handsAnimator.IsHandsAnimatorInitialized)
             {
                 handsAnimator = bodyAnimator.HandsAnimator;
                 ifHandsAnimatorInitialized.Value = true;
@@ -324,7 +324,7 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void ToggleHandAnimatios()
         {
-            isUsingHandAnimations.Value = handsAnimator.isUsingHandAnimations;
+            isUsingHandAnimations.Value = handsAnimator.IsUsingHandAnimations;
         }
     }
 }

@@ -241,7 +241,7 @@ namespace SEE.Game.Avatars
         private void ToggleHandAnimations()
         {
             isUsingHandAnimations = !isUsingHandAnimations;
-            HandsAnimator.isUsingHandAnimations = !HandsAnimator.isUsingHandAnimations;
+            HandsAnimator.IsUsingHandAnimations = !HandsAnimator.IsUsingHandAnimations;
         }
     }
 }

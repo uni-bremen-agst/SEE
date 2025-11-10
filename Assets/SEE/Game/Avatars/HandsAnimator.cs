@@ -18,7 +18,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// Main transform of the avatar.
         /// </summary>
-        public Transform transform;
+        private Transform transform;
 
         /// <summary>
         /// Name of the spine bone in the hierarchy (relative to the root of the avatar).
@@ -170,12 +170,12 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the owner of the avatar is using hand animations with MediaPipe.
         /// </summary>
-        public bool isUsingHandAnimations = false;
+        public bool IsUsingHandAnimations = false;
 
         /// <summary>
         /// If true, the HandsAnimator of the avatar is initialized.
         /// </summary>
-        public bool isHandsAnimatorInitialized = false;
+        public bool IsHandsAnimatorInitialized = false;
 
         /// <summary>
         /// The weight that determines the level of influence of changes in the IK effectors of the hands on other bones in the chain.
@@ -200,7 +200,7 @@ namespace SEE.Game.Avatars
         /// <summary>
         /// If true, the avatar's hands to have reached their start positions and are ready for live animation.
         /// </summary>
-        public bool StartHandsPositionReached = false;
+        private bool startHandsPositionReached = false;
 
         /// <summary>
         /// If true, no pose landmarks have been detected yet.
@@ -320,7 +320,7 @@ namespace SEE.Game.Avatars
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
             
-            isHandsAnimatorInitialized = true;
+            IsHandsAnimatorInitialized = true;
         }
 
         /// <summary>
@@ -363,7 +363,7 @@ namespace SEE.Game.Avatars
             rightHandTargetPos = transform.TransformPoint(rightHandPositionOffset);
 
             // If the start position has not yet been reached.
-            if (!StartHandsPositionReached
+            if (!startHandsPositionReached
                 && (Vector3.Distance(LeftHandTransformState.HandPosition, leftHandTargetPos) >= arrivalThreshold
                     || Vector3.Distance(RightHandTransformState.HandPosition, rightHandTargetPos) >= arrivalThreshold))
             {
@@ -411,7 +411,7 @@ namespace SEE.Game.Avatars
             }
             else
             {
-                StartHandsPositionReached = true;
+                startHandsPositionReached = true;
                 return true;
             }
         }
