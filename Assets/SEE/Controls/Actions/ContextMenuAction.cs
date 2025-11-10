@@ -146,7 +146,7 @@ namespace SEE.Controls.Actions
                             XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit res);
                             position = res.point;
                         }
-              
+
                         // Note: as of now, multiselection only works for graph elements.
                         // We currently do not have multiselection options for authors.
                         IEnumerable<PopupMenuEntry> entries
@@ -211,11 +211,11 @@ namespace SEE.Controls.Actions
         private IEnumerable<PopupMenuEntry> GetApplicableOptionsForGraphElementMultiselection
             (PopupMenu popupMenu, IEnumerable<InteractableGraphElement> selectedObjects)
         {
-           
+
             List<PopupMenuEntry> entries = new()
             {
-                
-                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),            
+
+                new PopupMenuHeading($"Multiple elements selected!", int.MaxValue),
                 new PopupMenuActionDoubleIcon("Inspect", () =>
                 {
                     List<PopupMenuEntry> submenuEntries = new()
@@ -231,7 +231,7 @@ namespace SEE.Controls.Actions
                            submenuEntries.Add(new PopupMenuAction("Show Issues", ShowIssueTracker, Icons.Code));
                     if (selectedObjects.Any(o => o.GraphElemRef.Elem.Filename != null))
                     {
-                      
+
                         submenuEntries.Add(new PopupMenuAction("Show Code", ShowCode, Icons.Code));
                         if (selectedObjects.Any(o => o.gameObject.ContainingCity<CommitCity>() != null))
                         {

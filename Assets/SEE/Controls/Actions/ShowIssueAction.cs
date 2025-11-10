@@ -1,9 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
-using DG.Tweening.Plugins.Core.PathCore;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO;
 using SEE.Net.Actions;
 using SEE.UI.Notification;
 using SEE.UI.Window;
@@ -11,16 +9,12 @@ using SEE.UI.Window.PropertyWindow;
 using SEE.UI.Window.TreeWindow;
 using SEE.Utils;
 using SEE.Utils.History;
-using SEE.VCS;
 using SEE.XR;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
 //using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using GraphElementRef = SEE.GO.GraphElementRef;
-using Range = SEE.DataModel.DG.Range;
 
 namespace SEE.Controls.Actions
 {
@@ -79,8 +73,8 @@ namespace SEE.Controls.Actions
             {
                 Debug.LogWarning("No code city found. Tree view will be empty.");
                 return;
-            } 
-            
+            }
+
             //TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
             //// We will create a tree view for each code city.
             //foreach (GameObject cityObject in cities)
@@ -103,7 +97,7 @@ namespace SEE.Controls.Actions
             //       // treeWindow.Add();
             //    }
             //}
-           
+
             //IssueReceiverInterface.Settings settings = new IssueReceiverInterface.Settings { preUrl = "https://ecosystem.atlassian.net/rest/api/3/search?jql=", searchUrl = "project=CACHE" };
             //JiraIssueReceiver jiraReceiver = new JiraIssueReceiver();
             //jiraReceiver.getIssues(settings);
@@ -134,10 +128,10 @@ namespace SEE.Controls.Actions
             if (cities.Length == 0)
             {
                 Debug.LogWarning("No code city found. Tree view will be empty.");
-              
+
             }
 
-         //   TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
+            //   TreeWindow treeWindow = goa.AddComponent<TreeWindow>();
             // We will create a tree view for each code city.
             foreach (GameObject cityObject in cities)
             {
@@ -164,21 +158,21 @@ namespace SEE.Controls.Actions
 
 
 
-                      //  node.AddOutgoing(result);
-                      //  graph.AddEdge(i1, a1);
-                       // node.AddChild(new Node { ID = "Value", SourceName = "Test", Type = "JsonNode"  });
+                        //  node.AddOutgoing(result);
+                        //  graph.AddEdge(i1, a1);
+                        // node.AddChild(new Node { ID = "Value", SourceName = "Test", Type = "JsonNode"  });
                         graph.AddNode(node);
 
-              
-                   
-                     
+
+
+
 
 
                         window = cityObject.AddComponent<TreeWindow>();
                         window.Graph = graph; //city.LoadedGraph;
                         return window;
                     }
-                //    treeWindow.Add();
+                    //    treeWindow.Add();
                 }
             }
 
@@ -225,7 +219,7 @@ namespace SEE.Controls.Actions
             return issueWindow;
         }
 
-      
+
 
         /// <summary>
         /// Returns a human-readable representation of given graphElement.
@@ -249,13 +243,13 @@ namespace SEE.Controls.Actions
         /// <returns>new CodeWindow showing the code range of the given graph element</returns>
         public static IssueWindow ShowIssues(GraphElementRef graphElementRef, Action<IssueWindow> ContentTextEntered = null)
         {
-            ShowNotification.Error("IssueWindow ShowIssues(GraphElementRef","fs",10);
+            ShowNotification.Error("IssueWindow ShowIssues(GraphElementRef", "fs", 10);
             //GraphElement graphElement = graphElementRef.Elem;
-           IssueWindow issueWindow = GetOrCreateIssueWindow(graphElementRef, "Issue win");
-           // //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
-           // //EnterWindowContent().Forget();
-           // //EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
-           //// EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(issueWindow));
+            IssueWindow issueWindow = GetOrCreateIssueWindow(graphElementRef, "Issue win");
+            // //TreeWindow treeWindow = GetOrCreateTreeViewWindow(graphElementRef, "test");
+            // //EnterWindowContent().Forget();
+            // //EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(codeWindow)).Forget();
+            //// EnterWindowContent().ContinueWith(() => ContentTextEntered?.Invoke(issueWindow));
             return issueWindow;
 
             async UniTask EnterWindowContent()
@@ -314,12 +308,12 @@ namespace SEE.Controls.Actions
                 // Edges of type Clone will be handled differently. For these, we will be
                 // showing a unified diff.
                 IssueWindow issueWindow = ShowIssues(graphElementRef);// graphElementRef is EdgeRef { Value: { Type: "Clone" } } edgeRef
-                  //  ? ShowIssues(graphElementRef)
-                  //  : ShowIssues(graphElementRef);
-                  Debug.Log($"IssueWindow instance: {issueWindow}");
-Debug.Log($"Window GameObject activeSelf: {issueWindow.Window?.activeSelf}");
-Debug.Log($"Window GameObject activeInHierarchy: {issueWindow.Window?.activeInHierarchy}");
-Debug.Log($"IssueWindow transform position: {issueWindow.transform.position}");
+                                                                      //  ? ShowIssues(graphElementRef)
+                                                                      //  : ShowIssues(graphElementRef);
+                Debug.Log($"IssueWindow instance: {issueWindow}");
+                Debug.Log($"Window GameObject activeSelf: {issueWindow.Window?.activeSelf}");
+                Debug.Log($"Window GameObject activeInHierarchy: {issueWindow.Window?.activeInHierarchy}");
+                Debug.Log($"IssueWindow transform position: {issueWindow.transform.position}");
                 // Add code window to our space of code window, if it isn't in there yet
                 WindowSpace manager = spaceManager[WindowSpaceManager.LocalPlayer];
                 if (!manager.Windows.Contains(issueWindow))
