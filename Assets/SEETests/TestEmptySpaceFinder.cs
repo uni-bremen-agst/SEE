@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
+using UnityEngine;
 
 namespace SEE.Layout.NodeLayouts.EmptySpace
 {
@@ -135,6 +136,7 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
             Assert.That(result.SetEquals(expected), Is.True);
         }
 
+        [Test]
         public void OneTopRight()
         {
             Rectangle outer = new(0, 0, 2, 2);
@@ -152,6 +154,7 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
             Assert.That(result.SetEquals(expected), Is.True);
         }
 
+        [Test]
         public void OneBottomLeft()
         {
             Rectangle outer = new(0, 0, 2, 2);
@@ -169,6 +172,7 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
             Assert.That(result.SetEquals(expected), Is.True);
         }
 
+        [Test]
         public void OneBottomRight()
         {
             Rectangle outer = new(0, 0, 2, 2);
@@ -183,6 +187,30 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
             };
             HashSet<Rectangle> result = new(EmptySpaceFinder.Find(outer, inner));
             HashSet<Rectangle> expected = new() { bottomRight };
+            Assert.That(result.SetEquals(expected), Is.True);
+        }
+
+        [Test]
+        public void Multiple()
+        {
+            Rectangle outer = new(0, 0, 10, 9);
+            List<Rectangle> inner = new() {
+                new Rectangle(5, 0, 5 ,1),
+                new Rectangle(1, 1, 3, 2),
+                new Rectangle(5, 2, 1, 7),
+                new Rectangle(6, 2, 3, 3),
+                new Rectangle(0, 4, 2, 2),
+                new Rectangle(3, 5, 3, 1),
+                new Rectangle(9, 7, 1, 1),
+                new Rectangle(8, 8, 1, 1),
+            };
+            HashSet<Rectangle> result = new(EmptySpaceFinder.Find(outer, inner));
+            HashSet<Rectangle> expected = new() { };
+
+            foreach (Rectangle r in result)
+            {
+                Debug.Log(r + "\n");
+            }
             Assert.That(result.SetEquals(expected), Is.True);
         }
 
