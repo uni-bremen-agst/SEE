@@ -318,7 +318,6 @@ namespace SEE.Game.Avatars
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightElbowBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
-            
             IsHandsAnimatorInitialized = true;
         }
 
