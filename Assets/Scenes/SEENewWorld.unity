@@ -12836,7 +12836,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -12968,7 +12968,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -13001,13 +13001,13 @@ MonoBehaviour:
       Data: 3
     - Name: 
       Entry: 1
-      Data: Metric.Lines.LOC
+      Data: Metric.VCS.Churn
     - Name: 
       Entry: 1
       Data: Metric.VCS.Number_Of_Developers
     - Name: 
       Entry: 1
-      Data: Metric.Lines.LOC
+      Data: Metric.VCS.Churn
     - Name: 
       Entry: 13
       Data: 
@@ -13052,7 +13052,7 @@ MonoBehaviour:
       Data: 0.001
     - Name: MaximalBlockLength
       Entry: 4
-      Data: 0.1
+      Data: 1
     - Name: AntennaSettings
       Entry: 7
       Data: 20|SEE.Game.City.AntennaAttributes, SEE
@@ -13106,7 +13106,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -13238,7 +13238,7 @@ MonoBehaviour:
       Data: false
     - Name: AllowManualResize
       Entry: 5
-      Data: true
+      Data: false
     - Name: AllowManualHeightResize
       Entry: 5
       Data: false
@@ -13403,13 +13403,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 1
+      Data: 0.9056604
     - Name: 
       Entry: 4
-      Data: 0.4901961
+      Data: 0.5642954
     - Name: 
       Entry: 4
-      Data: 0
+      Data: 0.51691
     - Name: 
       Entry: 4
       Data: 1
@@ -13457,13 +13457,13 @@ MonoBehaviour:
       Data: UnityEngine.Color, UnityEngine.CoreModule
     - Name: 
       Entry: 4
-      Data: 0.5854396
+      Data: 0.7851293
     - Name: 
       Entry: 4
-      Data: 0.8679245
+      Data: 0.9811321
     - Name: 
       Entry: 4
-      Data: 0.5854396
+      Data: 0.5229619
     - Name: 
       Entry: 4
       Data: 1
@@ -13527,13 +13527,13 @@ MonoBehaviour:
       Data: 36|SEE.Utils.Paths.DataPath, SEE
     - Name: Root
       Entry: 3
-      Data: 0
+      Data: 1
     - Name: RelativePath
       Entry: 1
       Data: 
     - Name: AbsolutePath
       Entry: 1
-      Data: C:/Users/koschke/develop/dream-shops/clone
+      Data: 
     - Name: 
       Entry: 8
       Data: 
@@ -13554,7 +13554,7 @@ MonoBehaviour:
       Data: 
     - Name: $k
       Entry: 1
-      Data: '**/*.java'
+      Data: '**/*.cs'
     - Name: $v
       Entry: 5
       Data: true
@@ -13572,7 +13572,10 @@ MonoBehaviour:
       Data: 39|System.String[], mscorlib
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 1
+      Data: Assets/SEE/GraphProviders
     - Name: 
       Entry: 13
       Data: 
@@ -13587,7 +13590,7 @@ MonoBehaviour:
       Data: 1
     - Name: 
       Entry: 1
-      Data: origin/*
+      Data: origin/875*
     - Name: 
       Entry: 13
       Data: 
@@ -13608,7 +13611,7 @@ MonoBehaviour:
       Data: true
     - Name: CombineAuthors
       Entry: 5
-      Data: false
+      Data: true
     - Name: AuthorAliasMap
       Entry: 7
       Data: 41|SEE.GraphProviders.VCS.AuthorMapping, SEE
@@ -13621,7 +13624,49 @@ MonoBehaviour:
       Data: 
     - Name: 
       Entry: 12
-      Data: 0
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 
+    - Name: $k
+      Entry: 7
+      Data: 43|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: Rainer Koschke
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: $v
+      Entry: 7
+      Data: 44|SEE.GraphProviders.VCS.FileAuthorList, SEE
+    - Name: 
+      Entry: 12
+      Data: 1
+    - Name: 
+      Entry: 7
+      Data: 45|SEE.GraphProviders.VCS.FileAuthor, SEE
+    - Name: Name
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: Email
+      Entry: 1
+      Data: koschke@uni-bremen.de
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 13
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
+    - Name: 
+      Entry: 8
+      Data: 
     - Name: 
       Entry: 13
       Data: 
@@ -13645,16 +13690,16 @@ MonoBehaviour:
       Data: 2
     - Name: autoFetch
       Entry: 5
-      Data: true
+      Data: false
   LODCulling: 0.001
   ConfigurationPath:
-    Root: 0
-    RelativePath: /LocalRepos.cfg
-    AbsolutePath: C:/Users/koschke/develop/dream-shops/dream-shops.cfg
+    Root: 3
+    RelativePath: /SEE/BranchCity.cfg
+    AbsolutePath: 
   sourceCodeDirectory:
-    Root: 0
+    Root: 1
     RelativePath: 
-    AbsolutePath: C:/Users/koschke/develop/dream-shops/clone
+    AbsolutePath: 
   SolutionPath:
     Root: 1
     RelativePath: /SEE.sln
@@ -13663,7 +13708,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
-  ProgressBar: 0
+  ProgressBar: 1
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -13686,8 +13731,8 @@ MonoBehaviour:
       AbsolutePath: 
     ArchitectureLayoutProportion: 0.6
   EdgeLayoutSettings:
-    Kind: 3
-    AnimationKind: 1
+    Kind: 0
+    AnimationKind: 0
     AnimateInnerEdges: 1
     AnimateTransitiveSourceEdges: 0
     AnimateTransitiveTargetEdges: 0
@@ -13728,7 +13773,7 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
-  Date: 2024/07/01
+  Date: 2025/01/01
 --- !u!114 &1011753829
 MonoBehaviour:
   m_ObjectHideFlags: 0
