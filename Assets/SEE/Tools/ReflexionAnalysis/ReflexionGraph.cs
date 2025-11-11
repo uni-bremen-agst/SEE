@@ -202,7 +202,7 @@ namespace SEE.Tools.ReflexionAnalysis
                                  + $"Offending elements: {string.Join(", ", edgesOverlap)}");
             }
 
-            mappingGraph.CopyEdgesTo(mergedGraph);
+            mergedGraph = mergedGraph.MergeWith<ReflexionGraph>(mappingGraph, suffix);
             mergedGraph.AddSingleRoot(out Node _);
             return mergedGraph;
 
