@@ -420,7 +420,7 @@ public class EchoFace : MonoBehaviour
             ApplyEyeRotation();
         }
 
-        _latestFaceData = null; // Clear after processing
+        // _latestFaceData = null; // IMPORTANT: Resetting the data will enable other components to manipulate the face causing jitter!
     }
 
     private void OnApplicationQuit() => Shutdown();
