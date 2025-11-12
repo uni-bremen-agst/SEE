@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SEE.UI.Notification;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -180,19 +181,18 @@ namespace SEE.Utils
                 if (webcams[activeIndex].isPlaying)
                 {
                     StopWebcamAsync(activeIndex).Forget();
+                    ShowNotification.Info("Video Systems Disabled",
+                        "All video-based systems have been temporarily disabled due to a webcam change.");
                 }
                 activeIndex = index;
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
-                if (usageCount > 0)
-                {
-                    webcams[activeIndex].Play();
-                }
             }
 
             static async UniTask StopWebcamAsync(int index)
             {
                 await UniTask.Yield();
                 webcams[index].Stop();
+                usageCount = 0;
             }
         }
     }
