@@ -113,6 +113,7 @@ namespace SEE.Game.Avatars
             if (IsLocallyControlled)
             {
                 webCamTexture = WebcamManager.WebCamTexture;
+                WebcamManager.Acquire();
             }
 
             // Generate the MediaPipe Tasks by setting options.

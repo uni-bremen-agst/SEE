@@ -101,7 +101,6 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void OnDestroy()
         {
-            webCamTexture?.Stop();
             room?.Disconnect();
             CleanUp();
             room = null;
@@ -208,30 +207,6 @@ namespace SEE.Tools.Livekit
 
             Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
         }
-
-        private IEnumerator test(WebCamTexture newWebcam)
-        {
-            if (newWebcam == null || webCamTexture == newWebcam)
-            {
-                yield break;//return;
-            }
-
-            if (publishedTrack != null)
-            {
-                Debug.Log("Deaktiviere Übertragung");
-                yield return UnpublishVideo();
-                Debug.Log($"Erfolgreich deaktiviert");
-            }
-
-            // Saves the selected camera.
-            PlayerPrefs.SetString("selectedCamera", newWebcam.deviceName);
-
-            // Initialize a new WebCamTexture with the selected camera device.
-            webCamTexture = newWebcam;
-
-            Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
-        }
-
         #endregion
 
         #region Connection Methods
@@ -311,8 +286,8 @@ namespace SEE.Tools.Livekit
                 ShowNotification.Error("Livekit", "Not connected.");
                 yield break;
             }
-            // Start camera device.
-            webCamTexture?.Play();
+            // Acquire camera device.
+            WebcamManager.Acquire();
 
             // Create a video source from the current webcam texture.
             WebCameraSource source = new(webCamTexture);
@@ -405,10 +380,10 @@ namespace SEE.Tools.Livekit
             }
             rtcVideoSources.Clear();
             yield return null;
-            // Stop camera device.
+            // Release camera device.
             if (webCamTexture.isPlaying)
             {
-                webCamTexture?.Stop();
+                WebcamManager.Release();
             }
 
             // Unpublish the video track from the room.

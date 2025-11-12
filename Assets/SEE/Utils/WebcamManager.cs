@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 
 namespace SEE.Utils
@@ -26,6 +25,22 @@ namespace SEE.Utils
         /// Index of the currently active webcam in the <see cref="webcams"/> list.
         /// </summary>
         private static int activeIndex = 0;
+
+        /// <summary>
+        /// Tracks how many active systems are currently using the active webcam.
+        ///
+        /// This acts as a simple reference counter:
+        /// - Each component or action that requires webcam access must call <see cref="Acquire"/>
+        ///   before using the webcam, and <see cref="Release"/> when finished.
+        /// - The webcam is automatically started when the first user acquires it
+        ///   (usageCount transitions from 0 -> 1),
+        ///   and automatically stopped when the last user releases it
+        ///   (usageCount transitions from 1 -> 0).
+        ///
+        /// This ensures that the webcam remains active only while it is actually in use,
+        /// preventing unnecessary resource usage or device locking issues.
+        /// </summary>
+        private static int usageCount = 0;
 
         /// <summary>
         /// Occurs when the active webcam is changed via <see cref="SwitchCamera(int)"/>.
@@ -75,17 +90,83 @@ namespace SEE.Utils
                 if (i == 0)
                 {
                     activeIndex = i;
-                    webcams[i].Play(); // TODO: Check if Play() is required for BodyAnimator?
                     Debug.Log($"[WebcamManager] Active webcam initialized: {device.name}\n");
                 }
             }
         }
 
         /// <summary>
-        /// Switches the active webcam by index.
-        /// Stops the previously active webcam and starts the newly selected one.
+        /// Indicates that a component or action intends to use the active webcam.
+        ///
+        /// This method increments the internal <see cref="usageCount"/> and ensures the webcam is running:
+        /// - If this is the first user (i.e., usageCount transitions from 0 -> 1),
+        ///   the webcam is automatically started via <see cref="WebCamTexture.Play"/>.
+        /// - If the webcam is already active, the method simply increases the counter without restarting it.
+        ///
+        /// Always call this method before accessing the webcam to guarantee that
+        /// the <see cref="WebCamTexture"/> is initialized and streaming frames.
         /// </summary>
-        /// <param name="index">Index of the webcam in the <see cref="webcams"/> list.</param>
+        public static void Acquire()
+        {
+            if (webcams.Count == 0)
+            {
+                Initialize();
+            }
+
+            if (webcams.Count == 0)
+            {
+                return;
+            }
+
+            usageCount++;
+
+            if (!webcams[activeIndex].isPlaying)
+            {
+                webcams[activeIndex].Play();
+            }
+        }
+
+        /// <summary>
+        /// Signals that a component or action has finished using the active webcam.
+        ///
+        /// This method decrements the internal <see cref="usageCount"/> and, if no other
+        /// users remain (i.e., usageCount transitions from 1 -> 0),
+        /// automatically stops the webcam via <see cref="WebCamTexture.Stop"/>.
+        ///
+        /// Always call this method when a system is done using the webcam to release resources properly.
+        ///
+        /// Calling this method more times than <see cref="Acquire"/> has been called
+        /// has no additional effect other than clamping the usage count to zero.
+        /// </summary>
+        public static void Release()
+        {
+            if (usageCount > 0)
+            {
+                usageCount--;
+            }
+
+            if (usageCount == 0 && webcams[activeIndex].isPlaying)
+            {
+                webcams[activeIndex].Stop();
+            }
+        }
+
+
+        /// <summary>
+        /// Switches the active webcam by index.
+        ///
+        /// This method stops the currently active webcam (if it is running)
+        /// and activates the selected one. If there are active users
+        /// (i.e., <see cref="usageCount"/> > 0), the newly selected webcam
+        /// is automatically started to ensure continuous streaming.
+        ///
+        /// The <see cref="OnActiveWebcamChanged"/> event is invoked after the switch,
+        /// allowing subscribers to update their references to the new webcam texture.
+        /// </summary>
+        /// <param name="index">
+        /// The index of the webcam in the <see cref="webcams"/> list.
+        /// Must be within the valid range of detected devices.
+        /// </param>
         public static void SwitchCamera(int index)
         {
             if (index < 0 || index >= webcams.Count)
@@ -96,10 +177,16 @@ namespace SEE.Utils
 
             if (activeIndex != index)
             {
-                StopWebcamAsync(activeIndex).Forget();
+                if (webcams[activeIndex].isPlaying)
+                {
+                    StopWebcamAsync(activeIndex).Forget();
+                }
                 activeIndex = index;
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
-                webcams[activeIndex].Play(); // TODO: Check if Play() is required for BodyAnimator?
+                if (usageCount > 0)
+                {
+                    webcams[activeIndex].Play();
+                }
             }
 
             static async UniTask StopWebcamAsync(int index)
