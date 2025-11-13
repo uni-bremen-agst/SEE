@@ -14,6 +14,8 @@
 using UnityEngine;
 using RootMotion.FinalIK;
 using SEE.GO;
+using SEE.Controls;
+using SEE.Utils;
 
 /// <summary>
 /// These namespaces are imported to be able to use MediaPipe solutions
@@ -23,8 +25,6 @@ using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
-using SEE.Controls;
-using SEE.Utils;
 
 namespace SEE.Game.Avatars
 {
@@ -103,6 +103,11 @@ namespace SEE.Game.Avatars
         /// Time interval (in seconds) between error messages.
         /// </summary>
         private const float handLandmarksErrorCooldown = 5f;
+
+        /// <summary>
+        /// Indicates whether the MediaPipe values are setted.
+        /// </summary>
+        private bool isMediaPipeInitialized = false;
 
         /// <summary>
         /// Initializes the MediaPipe models.
@@ -212,6 +217,18 @@ namespace SEE.Game.Avatars
             if (isUsingHandAnimations)
             {
                 WebcamManager.Acquire();
+                if (!isMediaPipeInitialized)
+                {
+                    SetupMediaPipe();
+                }
+            }
+            else
+            {
+                WebcamManager.Release();
+            }
+
+            void SetupMediaPipe()
+            {
                 // Generate the MediaPipe Tasks by setting options.
                 PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
                     baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
@@ -243,10 +260,7 @@ namespace SEE.Game.Avatars
                 // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
                 stopwatch.Start();
                 textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
-            }
-            else
-            {
-                WebcamManager.Release();
+                isMediaPipeInitialized = true;
             }
         }
     }
