@@ -588,7 +588,6 @@ namespace SEE.Game.CityRendering
         /// Animates the change of <paramref name="nodesToAdjust"/> to their new
         /// scale and style. The nodes in <paramref name="changedNodes"/> will
         /// be marked as changed using <paramref name="markerFactory"/>.
-        ///
         /// </summary>
         /// <param name="nodesToAdjust">nodes whose dimensions and markers need to be
         /// adjusted; we assume <paramref name="changedNodes"/>
