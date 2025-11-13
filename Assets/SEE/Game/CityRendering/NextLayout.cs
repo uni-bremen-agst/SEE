@@ -82,9 +82,6 @@ namespace SEE.Game.CityRendering
             }
 
             // Calculate and apply the node layout.
-            Debug.Log($"Calculating node layout {nodeLayout.GetType().Name} for {gameObjects.Count} nodes.\n");
-
-            // ICollection<LayoutGraphNode> layoutNodes = ToLayoutNodes(gameObjects);
             ICollection<LayoutGraphNode> layoutNodes
                 = GraphRenderer.ToLayoutNodes<LayoutGraphNode>
                     (gameObjects,
