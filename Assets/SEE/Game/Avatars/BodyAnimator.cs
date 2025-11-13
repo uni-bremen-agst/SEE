@@ -113,40 +113,7 @@ namespace SEE.Game.Avatars
             if (IsLocallyControlled)
             {
                 webCamTexture = WebcamManager.WebCamTexture;
-                WebcamManager.Acquire();
             }
-
-            // Generate the MediaPipe Tasks by setting options.
-            PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
-                baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                    modelAssetBuffer: poseLandmarkerModelAsset.bytes),
-                runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
-
-            poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
-
-            HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
-                baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                    modelAssetBuffer: handLandmarkerModelAsset.bytes),
-                runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-                numHands: 2);
-
-            handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
-
-            GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
-              baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
-                Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
-                modelAssetBuffer: gestureRecognizerModelAsset.bytes
-              ),
-              runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
-              numHands: 2);
-
-            gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
-
-            // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
-            stopwatch.Start();
-            textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
 
             if (!gameObject.TryGetComponentOrLog(out ik))
             {
@@ -242,6 +209,45 @@ namespace SEE.Game.Avatars
         private void ToggleHandAnimations()
         {
             isUsingHandAnimations = !isUsingHandAnimations;
+            if (isUsingHandAnimations)
+            {
+                WebcamManager.Acquire();
+                // Generate the MediaPipe Tasks by setting options.
+                PoseLandmarkerOptions poseLandmarkerOptions = new PoseLandmarkerOptions(
+                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                        modelAssetBuffer: poseLandmarkerModelAsset.bytes),
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO);
+
+                poseLandmarker = PoseLandmarker.CreateFromOptions(poseLandmarkerOptions);
+
+                HandLandmarkerOptions handLandmarkerOptions = new HandLandmarkerOptions(
+                    baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                        Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                        modelAssetBuffer: handLandmarkerModelAsset.bytes),
+                    runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                    numHands: 2);
+
+                handLandmarker = HandLandmarker.CreateFromOptions(handLandmarkerOptions);
+
+                GestureRecognizerOptions gestureRecognizerOptions = new GestureRecognizerOptions(
+                  baseOptions: new Mediapipe.Tasks.Core.BaseOptions(
+                    Mediapipe.Tasks.Core.BaseOptions.Delegate.CPU,
+                    modelAssetBuffer: gestureRecognizerModelAsset.bytes
+                  ),
+                  runningMode: Mediapipe.Tasks.Vision.Core.RunningMode.VIDEO,
+                  numHands: 2);
+
+                gestureRecognizer = GestureRecognizer.CreateFromOptions(gestureRecognizerOptions);
+
+                // Start the stopwatch to later calculate timestamps needed by MediaPipe calculators.
+                stopwatch.Start();
+                textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
+            }
+            else
+            {
+                WebcamManager.Release();
+            }
         }
     }
 }

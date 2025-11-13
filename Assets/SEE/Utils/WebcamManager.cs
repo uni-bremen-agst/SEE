@@ -182,7 +182,8 @@ namespace SEE.Utils
                 {
                     StopWebcamAsync(activeIndex).Forget();
                     ShowNotification.Info("Video Systems Disabled",
-                        "All video-based systems have been temporarily disabled due to a webcam change.");
+                        "All video-based systems have been temporarily disabled due to a webcam change. " +
+                        "If you still need them, please restart the corresponding systems.");
                 }
                 activeIndex = index;
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);

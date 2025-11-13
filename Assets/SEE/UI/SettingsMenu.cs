@@ -304,6 +304,9 @@ namespace SEE.UI
 
                 // Add a listener for dropdown changes.
                 cameraDropdown.onValueChanged.AddListener(WebcamManager.SwitchCamera);
+
+                // Updates the selected webcam index in the WebcamManager.
+                WebcamManager.SwitchCamera(selectedIndex);
             }
         }
     }

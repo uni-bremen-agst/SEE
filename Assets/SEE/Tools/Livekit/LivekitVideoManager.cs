@@ -188,7 +188,6 @@ namespace SEE.Tools.Livekit
         /// </param>
         private void HandleWebcamChanged(WebCamTexture newWebcam)
         {
-            //StartCoroutine(test(newWebcam));
             if (newWebcam == null || webCamTexture == newWebcam)
             {
                 return;
