@@ -110,6 +110,31 @@ namespace SEE.Game.Avatars
         private bool isMediaPipeInitialized = false;
 
         /// <summary>
+        /// Subscribes to the <see cref="WebcamManager.OnActiveWebcamChanged"/> event.
+        /// This ensures that the component reacts whenever the active webcam changes.
+        /// Additionally, if a webcam is already active when this component is enabled,
+        /// <see cref="HandleWebcamChanged"/> is called immediately to synchronize state.
+        /// </summary>
+        private void OnEnable()
+        {
+            WebcamManager.OnActiveWebcamChanged += HandleWebcamChanged;
+            // Request current state once when enabling
+            if (WebcamManager.WebCamTexture != null)
+            {
+                HandleWebcamChanged(WebcamManager.WebCamTexture);
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribes from the <see cref="WebcamManager.OnActiveWebcamChanged"/> event
+        /// to prevent memory leaks or invalid callbacks when the component is disabled.
+        /// </summary>
+        private void OnDisable()
+        {
+            WebcamManager.OnActiveWebcamChanged -= HandleWebcamChanged;
+        }
+
+        /// <summary>
         /// Initializes the MediaPipe models.
         /// </summary>
         private void Awake()
@@ -262,6 +287,31 @@ namespace SEE.Game.Avatars
                 textureFrame = new TextureFrame(webCamTexture.width, webCamTexture.height, TextureFormat.RGBA32);
                 isMediaPipeInitialized = true;
             }
+        }
+
+
+        /// <summary>
+        /// Handles the event of switching to a new webcam.
+        /// Resets all MediaPipe and hand animation-related states to ensure
+        /// a fresh start for the newly selected camera.
+        /// </summary>
+        /// <param name="newWebcam">The new <see cref="WebCamTexture"/> that has been selected.
+        /// If <c>null</c> or the same as the currently active webcam, no changes are made.
+        /// </param>
+        private void HandleWebcamChanged(WebCamTexture newWebcam)
+        {
+            if (newWebcam == null || webCamTexture == newWebcam)
+            {
+                return;
+            }
+            isUsingHandAnimations = false;
+            IsFirstActivationOfHandHanimations = true;
+            isMediaPipeInitialized = false;
+            if (stopwatch.IsRunning)
+            {
+                stopwatch.Stop();
+            }
+            webCamTexture = newWebcam;
         }
     }
 }
