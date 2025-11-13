@@ -27,7 +27,7 @@ namespace SEE.Game.CityRendering
         /// <paramref name="newEdgeLayout"/> will be null</param>
         /// <param name="city">the game object representing the code city; created game nodes
         /// and edges will be descendants of it</param>
-        /// <param name="newNodelayout">the resulting node layout as a mapping of node Ids onto the layout information</param>
+        /// <param name="newNodelayout">the resulting node layout as a mapping of node IDs onto the layout information</param>
         /// <param name="newEdgeLayout">the resulting edge layout as a mapping of edge Ids onto
         /// the layout information if <paramref name="edgesAreDrawn"/> is true,
         /// otherwise null</param>
