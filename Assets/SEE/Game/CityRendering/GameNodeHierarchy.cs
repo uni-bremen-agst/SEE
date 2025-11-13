@@ -22,7 +22,6 @@ namespace SEE.Game.CityRendering
         {
             Dictionary<Node, GameObject> nodeMap = new();
             CollectNodes(codeCity, nodeMap);
-            //Check(nodeMap);
             GraphRenderer.CreateGameNodeHierarchy(nodeMap, codeCity);
 
             /// <summary>
