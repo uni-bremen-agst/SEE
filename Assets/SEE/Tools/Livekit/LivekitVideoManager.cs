@@ -198,9 +198,6 @@ namespace SEE.Tools.Livekit
                 StartCoroutine(UnpublishVideo());
             }
 
-            // Saves the selected camera.
-            PlayerPrefs.SetString("selectedCamera", newWebcam.deviceName);
-
             // Initialize a new WebCamTexture with the selected camera device.
             webCamTexture = newWebcam;
 
