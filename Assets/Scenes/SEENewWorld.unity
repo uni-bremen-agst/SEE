@@ -13708,7 +13708,7 @@ MonoBehaviour:
   MaximalAntennaSegmentHeight: 0.5
   AntennaWidth: 0.01
   BaseAnimationDuration: 1
-  ProgressBar: 1
+  ProgressBar: 0
   ZScoreScale: 0
   ScaleOnlyLeafMetrics: 1
   NodeLayoutSettings:
@@ -13773,7 +13773,7 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
-  Date: 2025/01/01
+  Date: 2025/10/01
 --- !u!114 &1011753829
 MonoBehaviour:
   m_ObjectHideFlags: 0
