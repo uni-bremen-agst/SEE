@@ -6,9 +6,7 @@ using SEE.Utils;
 using SEE.VCS;
 using System;
 using System.IO;
-using System.Linq;
 using System.Threading;
-using System.Collections.Generic;
 
 namespace SEE.GraphProviders
 {
@@ -61,10 +59,8 @@ namespace SEE.GraphProviders
             }
 
             CheckAttributes(branchCity);
-
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
-
             return task;
         }
 
