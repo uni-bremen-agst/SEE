@@ -10,7 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using Unity.Profiling;
 
 namespace SEE.GraphProviders.VCS
 {
@@ -19,8 +18,6 @@ namespace SEE.GraphProviders.VCS
     /// </summary>
     public static class GitGraphGenerator
     {
-        private static readonly ProfilerMarker marker = new ProfilerMarker("GitGraphGenerator");
-
         /// <summary>
         /// A mapping of filenames (relative paths in a repository) onto their <see cref="GitFileMetrics"/>.
         /// </summary>
@@ -250,9 +247,6 @@ namespace SEE.GraphProviders.VCS
              Action<float> changePercentage,
              CancellationToken token)
         {
-            Debug.Log("Starting AddNodesAfterDate...\n");
-            marker.Begin();
-
             /// Note: The following code is very similar to
             /// <see cref="AddNodesForCommit(Graph, bool, GitRepository, string, string, bool, AuthorMapping, Action{float}, CancellationToken)"/>".
             /// The difference is that we consider all relevant files passing the repository
@@ -277,9 +271,6 @@ namespace SEE.GraphProviders.VCS
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
             changePercentage?.Invoke(1f);
-
-            marker.End();
-            Debug.Log("Ending AddNodesAfterDate...\n");
 
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
