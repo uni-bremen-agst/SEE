@@ -558,7 +558,13 @@ namespace SEE.VCS
         {
             using Repository repository = OpenRepository();
             HashSet<string> result = new();
-            foreach (Branch branch in RelevantBranches(repository))
+            IList<Branch> branches = RelevantBranches(repository);
+            if (branches.Count == 0)
+            {
+                Debug.LogWarning("There are no branches matching the branch filter.\n");
+                return result;
+            }
+            foreach (Branch branch in branches)
             {
                 AllFiles(branch.Tip.Tree, result, token);
             }
