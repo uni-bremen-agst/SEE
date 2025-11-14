@@ -59,10 +59,8 @@ namespace SEE.GraphProviders
             }
 
             CheckAttributes(branchCity);
-
             Graph task = await UniTask.RunOnThreadPool(() => GetGraph(graph, changePercentage, branchCity, token),
                                                        cancellationToken: token);
-
             return task;
         }
 
@@ -95,7 +93,8 @@ namespace SEE.GraphProviders
 
             string repositoryName = Filenames.InnermostDirectoryName(repositoryPath);
 
-            // Assuming that CheckAttributes() was already executed so that the date string is neither empty nor malformed.
+            // We are assuming that CheckAttributes() was already executed so that the date string is
+            // neither empty nor malformed.
             DateTime startDate = SEEDate.ToDate(branchCity.Date);
 
             GitGraphGenerator.AddNodesAfterDate

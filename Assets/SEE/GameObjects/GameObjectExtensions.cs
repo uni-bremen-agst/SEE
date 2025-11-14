@@ -1234,7 +1234,9 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Node))
             {
-                return gameObject.AddOrGetComponent<NodeOperator>();
+                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
+                nodeOperator.SetCityIfPossible();
+                return nodeOperator;
             }
             else
             {

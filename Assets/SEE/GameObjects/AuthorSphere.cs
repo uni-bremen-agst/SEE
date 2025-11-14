@@ -76,7 +76,7 @@ namespace SEE.GameObjects
         /// <summary>
         /// Creates and returns a new game object representing an author under the given <paramref name="parent"/>
         /// representing the <paramref name="author"/>. The game object will be positioned at the given
-        /// world-space <paramref name="positionOffset"/> above the world-position of <paramref name="parent"/>
+        /// world-space <paramref name="position"/> above the world-position of <paramref name="parent"/>
         /// and is rendered using the given <paramref name="material"/>.
         ///
         /// The new game object will also have a label (as a child game object) with the author's name
@@ -88,10 +88,9 @@ namespace SEE.GameObjects
         /// <param name="parent">Game object the new game object will be placed as a child.</param>
         /// <param name="author">The author that will be represented by this game object.</param>
         /// <param name="material"The material to be used for the new game object.</param>
-        /// <param name="positionOffset">The position offset of the new game object above
-        /// the world-space position of the <paramref name="parent"/>.</param>
+        /// <param name="position">The world-space position of the new game node.</param>
         /// <returns>New game object representing the author.</returns>
-        public static GameObject CreateAuthor(GameObject parent, FileAuthor author, Material material, Vector3 positionOffset)
+        public static GameObject CreateAuthor(GameObject parent, FileAuthor author, Material material, Vector3 position)
         {
             GameObject result = GameObject.CreatePrimitive(PrimitiveType.Sphere);
             result.transform.localScale *= 0.25f; // Standard size is too large.
@@ -111,7 +110,7 @@ namespace SEE.GameObjects
             material.shader = Shader.Find("Standard");
             renderer.sharedMaterial = material;
 
-            result.transform.position = positionOffset + parent.transform.position;
+            result.transform.position = position;
             return result;
         }
 

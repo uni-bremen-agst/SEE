@@ -13,10 +13,19 @@ namespace SEE.DataModel.DG
         /// <summary>
         /// Yields the differences of the graph elements of type <typeparamref name="T"/>
         /// in this <paramref name="newGraph"/> relative to <paramref name="oldGraph"/>.
+        ///
+        /// If both <paramref name="oldGraph"/> and <paramref name="newGraph"/> are null
+        /// or empty, the resulting sets are all empty.
+        ///
+        /// If <paramref name="oldGraph"/> is null or empty, all elements in <paramref name="newGraph"/>
+        /// end up in <paramref name="added"/>.
+        ///
+        /// If <paramref name="newGraph"/> is null or empty, all elements in <paramref name="oldGraph"/>
+        /// end up in <paramref name="removed"/>.
         /// </summary>
         /// <typeparam name="T">the type of graph elements (nodes or edges)</typeparam>
-        /// <param name="newGraph">the new graph to be compared against <paramref name="oldGraph"/></param>
-        /// <param name="oldGraph">the previous graph as a baseline</param>
+        /// <param name="newGraph">the new graph to be compared against <paramref name="oldGraph"/> (may be null)</param>
+        /// <param name="oldGraph">the previous graph as a baseline (may be null)</param>
         /// <param name="getElements">yields all graph elements of <paramref name="newGraph"/> and
         /// <paramref name="oldGraph"/> to be compared</param>
         /// <param name="getElement">yields a particular graph element for a given ID</param>
@@ -29,16 +38,16 @@ namespace SEE.DataModel.DG
         /// <param name="equal">the elements in both graphs that have no differences according
         /// to <paramref name="diff"/>; it belongs to <paramref name="newGraph"/></param>
         public static void Diff<T>
-        (this Graph newGraph,
-         Graph oldGraph,
-         Func<Graph, IEnumerable<T>> getElements,
-         Func<Graph, string, T> getElement,
-         IGraphElementDiff diff,
-         GraphElementEqualityComparer<T> comparer,
-         out ISet<T> added,
-         out ISet<T> removed,
-         out ISet<T> changed,
-         out ISet<T> equal)
+                            (this Graph newGraph,
+                             Graph oldGraph,
+                             Func<Graph, IEnumerable<T>> getElements,
+                             Func<Graph, string, T> getElement,
+                             IGraphElementDiff diff,
+                             GraphElementEqualityComparer<T> comparer,
+                             out ISet<T> added,
+                             out ISet<T> removed,
+                             out ISet<T> changed,
+                             out ISet<T> equal)
             where T : GraphElement
         {
             IEnumerable<T> oldElements = oldGraph != null ? getElements(oldGraph).ToList() : null;
