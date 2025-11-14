@@ -286,7 +286,7 @@ namespace SEE.Game.CityRendering
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
         /// <returns>The resulting layout informations of the rendering.</returns>
-        public async UniTask<GraphRenderResult> DrawGraphAsync
+        public async UniTask DrawGraphAsync
             (Graph graph,
              GameObject parent,
              Action<float> updateProgress = null,
@@ -296,7 +296,7 @@ namespace SEE.Game.CityRendering
             if (graph.NodeCount == 0)
             {
                 Debug.LogWarning("The graph has no nodes.\n");
-                return new GraphRenderResult();
+                return;
             }
 
             // all nodes of the graph
@@ -378,13 +378,6 @@ namespace SEE.Game.CityRendering
             }
 
             updateProgress?.Invoke(1.0f);
-            return new GraphRenderResult
-            {
-                Nodes = layoutNodes,
-                Edges = Settings.EdgeLayoutSettings.Kind == EdgeLayoutKind.None ?
-                                                                new List<ILayoutEdge<ILayoutNode>>()
-                                                              : LayoutEdges(edgeLayouts).Values
-            };
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {
@@ -547,7 +540,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s</returns>
-        private static IDictionary<Node, LayoutGameNode> ToLayoutNodes
+        public static IDictionary<Node, LayoutGameNode> ToLayoutNodes
             (ICollection<GameObject> gameNodes)
         {
             Dictionary<Node, LayoutGameNode> result = new();

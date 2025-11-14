@@ -136,13 +136,6 @@ namespace SEE.Game.City
         protected bool IsPipelineRunning;
 
         /// <summary>
-        /// The result of the last rendering of the graph.
-        ///
-        /// This will be used for applying a layout loaded from a file.
-        /// </summary>
-        private GraphRenderResult renderResult;
-
-        /// <summary>
         /// The graph to be visualized. It may be a subgraph of the loaded graph
         /// containing only nodes with relevant node types or the original <see cref="LoadedGraph"/>
         /// if all node types are relevant. It is null if no graph has been loaded yet
@@ -470,7 +463,7 @@ namespace SEE.Game.City
                         updateProgress(x);
                     }
 
-                    renderResult = await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
+                    await renderer.DrawGraphAsync(graph, gameObject, ReportProgress, cancellationTokenSource.Token);
                 }
             }
             catch (OperationCanceledException)
@@ -582,7 +575,7 @@ namespace SEE.Game.City
             Debug.Log($"Loading layout data from {path}.\n");
             using (LoadingSpinner.ShowIndeterminate($"Apply layout to city \"{gameObject.name}\""))
             {
-                LayoutReader.Read(path, renderResult.Nodes.Cast<IGameNode>().ToList());
+                LayoutReader.Read(path, GraphRenderer.ToLayoutNodes(AllNodeDescendants(gameObject)).Values.Cast<IGameNode>().ToList());
 
                 // Update the edge layout because the nodes may have moved.
                 foreach (Node node in loadedGraph.Nodes())
