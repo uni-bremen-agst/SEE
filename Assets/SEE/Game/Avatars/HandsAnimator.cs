@@ -166,6 +166,15 @@ namespace SEE.Game.Avatars
         /// If true, the avatar's laser pointer is enabled.
         /// </summary>
         public bool IsPointing = true;
+        /// <summary>
+        /// If true, the owner of the avatar is using hand animations with MediaPipe.
+        /// </summary>
+        public bool IsUsingHandAnimations = false;
+
+        /// <summary>
+        /// If true, the HandsAnimator of the avatar is initialized.
+        /// </summary>
+        public bool IsHandsAnimatorInitialized = false;
 
         /// <summary>
         /// The weight that determines the level of influence of changes in the IK effectors of the hands on other bones in the chain.
@@ -299,16 +308,17 @@ namespace SEE.Game.Avatars
 
             // Add bend goals for the elbows so they bend downwards.
             GameObject leftElbowBendGoal = new("LeftElbowBendGoal");
-            leftElbowBendGoal.transform.SetParent(mainTrasform, false);
+            leftElbowBendGoal.transform.SetParent(this.transform, false);
             ik.solver.leftArmChain.bendConstraint.bendGoal = leftElbowBendGoal.transform;
             ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition = new Vector3(-0.5f, 0.5f, 0);
             LeftHandTransformState.BendGoalLocalPosition = ik.solver.leftArmChain.bendConstraint.bendGoal.localPosition;
 
             GameObject rightElbowBendGoal = new("RightElbowBendGoal");
-            rightElbowBendGoal.transform.SetParent(mainTrasform, false);
+            rightElbowBendGoal.transform.SetParent(this.transform, false);
             ik.solver.rightArmChain.bendConstraint.bendGoal = rightElbowBendGoal.transform;
             ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition = new Vector3(0.5f, 0.5f, 0);
             RightHandTransformState.BendGoalLocalPosition = ik.solver.rightArmChain.bendConstraint.bendGoal.localPosition;
+            IsHandsAnimatorInitialized = true;
         }
 
         /// <summary>
