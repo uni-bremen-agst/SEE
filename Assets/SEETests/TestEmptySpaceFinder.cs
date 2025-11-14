@@ -217,14 +217,14 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
         [Test]
         public void SubtractInterval_RemovesAndSplitsGapsCorrectly()
         {
-            List<VerticalGap> gaps = new List<VerticalGap> { new VerticalGap { X1 = 0, X2 = 10 } };
+            List<VerticalGap> gaps = new List<VerticalGap> { new VerticalGap { Begin = 0, End = 10 } };
             MethodInfo mi = typeof(EmptySpaceFinder).GetMethod("SubtractInterval", BindingFlags.NonPublic | BindingFlags.Static)!;
             List<VerticalGap>? newGaps = mi.Invoke(null, new object[] { gaps, 3, 7 }) as List<VerticalGap>;
 
             Assert.That(newGaps, Is.Not.Null);
             Assert.That(newGaps!.Count, Is.EqualTo(2));
-            Assert.That(newGaps.Exists(g => g.X1 == 0 && g.X2 == 3), Is.True);
-            Assert.That(newGaps.Exists(g => g.X1 == 7 && g.X2 == 10), Is.True);
+            Assert.That(newGaps.Exists(g => g.Begin == 0 && g.End == 3), Is.True);
+            Assert.That(newGaps.Exists(g => g.Begin == 7 && g.End == 10), Is.True);
         }
 
         [Test]

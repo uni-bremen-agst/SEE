@@ -2,11 +2,20 @@
 {
     /// <summary>
     /// Represents a vertical strip of potential maximal empty space.
-    /// Invariant: 0 <= X1 < X2
+    /// Invariant: 0 <= <see cref="Begin"/> &lt; <see cref="End"/>.
     /// </summary>
     internal class VerticalGap
     {
-        public float X1 { get; set; }
-        public float X2 { get; set; }
+        /// <summary>
+        /// Begin of the gap.
+        /// </summary>
+        /// <remarks>Never negative.</remarks>
+        public float Begin { get; set; }
+
+        /// <summary>
+        /// End of the gap.
+        /// </summary>
+        /// <remarks>Always greater than <see cref="Begin"/>.</remarks>
+        public float End { get; set; }
     }
 }

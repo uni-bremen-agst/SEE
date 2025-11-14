@@ -108,8 +108,8 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                 List<Rectangle> activeObstacles = innerList.Where(o => o.Top < yEnd && o.Bottom > yStart).ToList();
 
                 // 2. Define the initial free interval (the full width of outerRectangle).
-                IList<VerticalGap> currentGaps = new List<VerticalGap> { new VerticalGap { X1 = outerRectangle.Left,
-                                                                                           X2 = outerRectangle.Right } };
+                IList<VerticalGap> currentGaps = new List<VerticalGap> { new VerticalGap { Begin = outerRectangle.Left,
+                                                                                           End = outerRectangle.Right } };
 
                 // 3. Subtract the horizontal projections (X-intervals) of active obstacles.
                 foreach (Rectangle obs in activeObstacles)
@@ -117,9 +117,9 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                     // FIXME: Because all inner rectangles are guaranteed to be within outerRectangle,
                     // obsX1 and obsX2 will always be co-ordinates of obs.
                     float obsX1 = Math.Max(outerRectangle.Left, obs.Left);
-                    // Should be obs.Left
+                    // Should always be obs.Left
                     float obsX2 = Math.Min(outerRectangle.Right, obs.Right);
-                    // Should be obs.Right
+                    // Should always be obs.Right
 
                     // If the obstacle is valid in the X-dimension.
                     if (obsX1 < obsX2)
@@ -131,9 +131,9 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                 // 4. Any remaining vertical gap, combined with the current height, forms an empty rectangle.
                 foreach (VerticalGap gap in currentGaps)
                 {
-                    if (gap.X1 < gap.X2)
+                    if (gap.Begin < gap.End)
                     {
-                        maximalRects.Add(new Rectangle(gap.X1, yStart, gap.X2 - gap.X1, height));
+                        maximalRects.Add(new Rectangle(gap.Begin, yStart, gap.End - gap.Begin, height));
                     }
                 }
             }
@@ -168,32 +168,32 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
             foreach (VerticalGap gap in gaps)
             {
                 // Case 1: Obstacle is entirely outside the gap (no change)
-                if (obsX2 <= gap.X1 || obsX1 >= gap.X2)
+                if (obsX2 <= gap.Begin || obsX1 >= gap.End)
                 {
                     // Existing gap remains the same.
                     newGaps.Add(gap);
                 }
                 // Case 2: Obstacle covers the entire gap (gap is eliminated).
                 // Covers also the case that obsX2 == gap.X1 && obsX1 == gap.X2.
-                else if (obsX1 <= gap.X1 && gap.X2 <= obsX2)
+                else if (obsX1 <= gap.Begin && gap.End <= obsX2)
                 {
                     // Do nothing (gap is removed)
                 }
                 // Case 3: Obstacle cuts the beginning of the gap (creates one smaller gap)
-                else if (obsX1 <= gap.X1 && obsX2 < gap.X2)
+                else if (obsX1 <= gap.Begin && obsX2 < gap.End)
                 {
-                    newGaps.Add(new VerticalGap { X1 = obsX2, X2 = gap.X2 });
+                    newGaps.Add(new VerticalGap { Begin = obsX2, End = gap.End });
                 }
                 // Case 4: Obstacle cuts the end of the gap (creates one smaller gap)
-                else if (gap.X1 < obsX1 && obsX2 >= gap.X2)
+                else if (gap.Begin < obsX1 && obsX2 >= gap.End)
                 {
-                    newGaps.Add(new VerticalGap { X1 = gap.X1, X2 = obsX1 });
+                    newGaps.Add(new VerticalGap { Begin = gap.Begin, End = obsX1 });
                 }
                 // Case 5: Obstacle cuts the middle of the gap (creates two smaller gaps)
-                else if (obsX1 > gap.X1 && obsX2 < gap.X2)
+                else if (obsX1 > gap.Begin && obsX2 < gap.End)
                 {
-                    newGaps.Add(new VerticalGap { X1 = gap.X1, X2 = obsX1 });
-                    newGaps.Add(new VerticalGap { X1 = obsX2, X2 = gap.X2 });
+                    newGaps.Add(new VerticalGap { Begin = gap.Begin, End = obsX1 });
+                    newGaps.Add(new VerticalGap { Begin = obsX2, End = gap.End });
                 }
                 else
                 {
