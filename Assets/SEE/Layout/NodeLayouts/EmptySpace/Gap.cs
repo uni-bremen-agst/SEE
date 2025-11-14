@@ -4,7 +4,7 @@
     /// Represents a vertical strip of potential maximal empty space.
     /// Invariant: 0 <= <see cref="Begin"/> &lt; <see cref="End"/>.
     /// </summary>
-    internal class VerticalGap
+    internal class Gap
     {
         /// <summary>
         /// Begin of the gap.

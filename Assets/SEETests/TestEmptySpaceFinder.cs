@@ -217,9 +217,9 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
         [Test]
         public void SubtractInterval_RemovesAndSplitsGapsCorrectly()
         {
-            List<VerticalGap> gaps = new List<VerticalGap> { new VerticalGap { Begin = 0, End = 10 } };
+            List<Gap> gaps = new List<Gap> { new Gap { Begin = 0, End = 10 } };
             MethodInfo mi = typeof(EmptySpaceFinder).GetMethod("SubtractInterval", BindingFlags.NonPublic | BindingFlags.Static)!;
-            List<VerticalGap>? newGaps = mi.Invoke(null, new object[] { gaps, 3, 7 }) as List<VerticalGap>;
+            List<Gap>? newGaps = mi.Invoke(null, new object[] { gaps, 3, 7 }) as List<Gap>;
 
             Assert.That(newGaps, Is.Not.Null);
             Assert.That(newGaps!.Count, Is.EqualTo(2));
