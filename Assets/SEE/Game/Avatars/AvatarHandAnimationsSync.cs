@@ -41,12 +41,14 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// The value for the weight of the left hand, that determines the level of influence of changes in the IK effector of the left hand on other bones in the chain.
+        /// The value for the weight of the left hand, that determines the level of influence of changes
+        /// in the IK effector of the left hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> leftHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// The value for the weight of the right hand, that determines the level of influence of changes in the IK effector of the right hand on other bones in the chain.
+        /// The value for the weight of the right hand, that determines the level of influence of changes
+        /// in the IK effector of the right hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
@@ -141,11 +143,16 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<bool> ifHandsAnimatorInitialized = new(false, writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
+        /// The <see cref="BodyAnimator"/> attached to this <see cref="gameObject"/>.
+        /// </summary>
+        private BodyAnimator bodyAnimator;
+
+        /// <summary>
         /// Initializes the BodyAnimator, HandsAnimator and FullBodyBipedIK components that this avatar uses.
         /// </summary>
         private void Awake()
         {
-            BodyAnimator bodyAnimator = GetComponent<BodyAnimator>();
+            bodyAnimator = GetComponent<BodyAnimator>();
             handsAnimator = bodyAnimator.HandsAnimator;
             gameObject.TryGetComponentOrLog(out ik);
         }
@@ -157,14 +164,14 @@ namespace SEE.Game.Avatars
         private void LateUpdate()
         {
             // The owner of the avatar needs to signal when the HandsAnimator component of the avatar is initialized.
-            BodyAnimator bodyAnimator = GetComponent<BodyAnimator>();
             if (IsOwner && !ifHandsAnimatorInitialized.Value && handsAnimator.IsHandsAnimatorInitialized)
             {
                 handsAnimator = bodyAnimator.HandsAnimator;
                 ifHandsAnimatorInitialized.Value = true;
             }
 
-            // Animate or store values only if the owner of the avatar has activated hand animations with MediaPipe and HandsAnimator component of the avatar was already initialized.
+            // Animate or store values only if the owner of the avatar has activated hand animations with
+            // MediaPipe and HandsAnimator component of the avatar was already initialized.
             if (ifHandsAnimatorInitialized.Value)
             {
                 if (IsOwner)
