@@ -72,68 +72,76 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                 throw new ArgumentException($"All {nameof(innerRectangles)} must be fully contained within {nameof(outerRectangle)}");
             }
 
-            // Collect all unique Y-coordinates that define horizontal strip boundaries.
-            // These are the Top and Bottom edges of outerRectangle and all inner rectangles.
+            // Collect all unique coordinates along the sweep-line direction that define strip boundaries.
+            // These are the Top and Bottom edges of outerRectangle and all inner rectangles if the
+            // sweep line moves along the Y axis or the Left and Right edges of outerRectangle if the
+            // sweep line moves along the X axis, respectively.
             // These are the sweep-line "event points".
-            HashSet<float> yCoords = new() { outerRectangle.Top, outerRectangle.Bottom };
+            HashSet<float> coords = new() { outerRectangle.Top, outerRectangle.Bottom };
             foreach (Rectangle obs in innerList)
             {
-                yCoords.Add(obs.Top);
-                yCoords.Add(obs.Bottom);
+                coords.Add(obs.Top);
+                coords.Add(obs.Bottom);
             }
-            // Sort the event points by their Y-coordinate.
-            List<float> sortedY = yCoords.Where(y => y >= outerRectangle.Top && y <= outerRectangle.Bottom).OrderBy(y => y).ToList();
+            // Sort the event points by their co-ordinate (Y co-ordinate if sweep lines moves along the Y axis
+            // or X co-ordinate if it moves along the X axis, respectively.
+            List<float> sorted = coords.Where(c => c >= outerRectangle.Top && c <= outerRectangle.Bottom).OrderBy(c => c).ToList();
 
             // List to hold the maximal empty rectangles found. This will be the result.
             // That result must later be filtered to ensure only MAXIMAL rectangles are returned.
             List<Rectangle> maximalRects = new();
 
-            // Sweep the plane vertically between consecutive Y-coordinates.
-            for (int i = 0; i < sortedY.Count - 1; i++)
+            // Sweep the plane between consecutive sorted co-ordinates (vertically if the sweep lines moves
+            // along the Y axis or horizontally if it moves along the X axis).
+            for (int i = 0; i < sorted.Count - 1; i++)
             {
-                // [yStart, yEnd] defines the current vertical strip.
-                float yStart = sortedY[i];
-                float yEnd = sortedY[i + 1];
+                // [start, end] defines the current strip.
+                float start = sorted[i];
+                float end = sorted[i + 1];
                 // Height of the current strip.
-                float height = yEnd - yStart;
+                float height = end - start;
 
                 if (height <= 0)
                 {
                     continue;
                 }
 
-                // 1. Identify active obstacles within this vertical strip [yStart, yEnd].
+                // 1. Identify active obstacles within this strip [start, end].
                 // An obstacle is active if it intersects the strip.
                 // Note: This is a rather expensive operation requiring O(n) where n is the number of obstacles.
-                List<Rectangle> activeObstacles = innerList.Where(o => o.Top < yEnd && o.Bottom > yStart).ToList();
+                List<Rectangle> activeObstacles = innerList.Where(o => o.Top < end && o.Bottom > start).ToList();
 
                 // 2. Define the initial free interval (the full width of outerRectangle).
-                IList<Gap> currentGaps = new List<Gap> { new Gap { Begin = outerRectangle.Left,
-                                                                                           End = outerRectangle.Right } };
+                IList<Gap> currentGaps = new List<Gap> { new() { Begin = outerRectangle.Left,
+                                                                 End = outerRectangle.Right } };
 
-                // 3. Subtract the horizontal projections (X-intervals) of active obstacles.
-                foreach (Rectangle obs in activeObstacles)
+                // 3. Subtract the projections of active obstacles.
+                // The projections are horizontal (X intervals) if the sweep lines moves
+                // along the Y axis or vertical (Y intervals) if it moves along the X axis.
+                foreach (Rectangle obstacle in activeObstacles)
                 {
                     // FIXME: Because all inner rectangles are guaranteed to be within outerRectangle,
-                    // obsX1 and obsX2 will always be co-ordinates of obs.
-                    float obsX1 = Math.Max(outerRectangle.Left, obs.Left);
+                    // obstacleBegin and obstacleEnd will always be co-ordinates of obstacle.
+                    float obstacleBegin = Math.Max(outerRectangle.Left, obstacle.Left);
                     // Should always be obs.Left
-                    float obsX2 = Math.Min(outerRectangle.Right, obs.Right);
+                    float obstacleEnd = Math.Min(outerRectangle.Right, obstacle.Right);
                     // Should always be obs.Right
 
-                    // If the obstacle is valid in the X-dimension.
-                    if (obsX1 < obsX2)
+                    // If the obstacle is valid in the dimension orthogonal to the sweep-line
+                    // direction (X-dimension if the sweep line moves along the Y axis or
+                    // Y-dimension if it moves along the X axis, respectively).
+                    if (obstacleBegin < obstacleEnd)
                     {
-                        currentGaps = SubtractInterval(currentGaps, obsX1, obsX2);
+                        currentGaps = SubtractInterval(currentGaps, obstacleBegin, obstacleEnd);
                     }
                 }
 
-                // 4. Any remaining vertical gap, combined with the current height, forms an empty rectangle.
+                // 4. Any remaining gap, combined with the current height, forms an empty rectangle.
                 foreach (Gap gap in currentGaps)
                 {
                     if (gap.Begin < gap.End)
                     {
-                        maximalRects.Add(new Rectangle(gap.Begin, yStart, gap.End - gap.Begin, height));
+                        maximalRects.Add(new Rectangle(gap.Begin, start, gap.End - gap.Begin, height));
                     }
                 }
             }
