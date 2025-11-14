@@ -197,9 +197,8 @@ namespace SEE.Game.City
             {
                 node.IntAttributes.Remove("Linkage.PIR_Node");
             }
-            // Assumes that the LoadedGraph is a ReflexionGraph.
-            ReflexionGraph reflexionGraph = LoadedGraph as ReflexionGraph;
-            (Graph implementation, Graph architecture, Graph mapping) = reflexionGraph.Disassemble();
+
+            (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
 
             GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
             Debug.Log($"Saving implementation graph snapshot to {GraphSnapshotPath.Path}");
