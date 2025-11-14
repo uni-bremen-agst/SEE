@@ -164,20 +164,20 @@ namespace SEE.GraphProviders.VCS
             // Includes all commits between the baseline commit and the commitID
             // including the commitID itself but excluding the baseline commit.
 
-            repository.ForEachCommitBetween(baselineCommitID, commitID, Apply);
+            repository.ForEachCommitBetween(baselineCommitID, commitID, UpdateMetricsForCommit);
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
 
             changePercentage?.Invoke(1f);
             return graph;
 
-            void Apply(Repository repository, Commit commit)
+            void UpdateMetricsForCommit(Repository repository, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
-                UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
+                GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
             }
         }
 
@@ -252,6 +252,12 @@ namespace SEE.GraphProviders.VCS
             /// The difference is that we consider all relevant files passing the repository
             /// filter and all commits after <paramref name="startDate"/>.
             HashSet<string> files = repository.AllFiles(token);
+            if (files.Count == 0)
+            {
+                Debug.LogWarning("No files were matched.\n");
+                changePercentage?.Invoke(1.0f);
+                return;
+            }
             changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
@@ -260,19 +266,20 @@ namespace SEE.GraphProviders.VCS
                 throw new OperationCanceledException(token);
             }
 
-            repository.ForEachCommitAfter(startDate, Apply);
+            repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
             changePercentage?.Invoke(0.6f);
 
             Finalize(graph, simplifyGraph, repository, repositoryName, fileToMetrics);
             changePercentage?.Invoke(1f);
 
-            void Apply(Repository repo, Commit commit)
+            void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
                 if (token.IsCancellationRequested)
                 {
                     throw new OperationCanceledException(token);
                 }
-                UpdateMetricsForCommit(fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
+                GitGraphGenerator.UpdateMetricsForCommit
+                    (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
             }
         }
 
@@ -412,6 +419,7 @@ namespace SEE.GraphProviders.VCS
             }
             if (commit.Parents.Any())
             {
+                // There may in fact be multiple parents.
                 foreach (Commit parent in commit.Parents)
                 {
                     UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, parent, commit), consultAliasMap, authorAliasMap);
@@ -419,6 +427,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
+                // It is the very first commit.
                 UpdateMetricsForPatch(fileToMetrics, commit, GitRepository.Diff(repository, null, commit), consultAliasMap, authorAliasMap);
             }
         }

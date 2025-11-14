@@ -31,7 +31,8 @@ namespace SEE.GO.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
+        /// <param name="shaderType">shader type to be used for rendering the materials
+        /// the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
         public NodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
         {
@@ -44,12 +45,6 @@ namespace SEE.GO.NodeFactories
         /// the subclasses. It can be used to specify a visual property of the
         /// objects such as the color. The allowed range of a style index depends
         /// upon the  subclasses, too, but must be in [0, NumberOfStyles()-1].
-        /// The <paramref name="renderQueueOffset"/> specifies the offset of the render
-        /// queue of the new block. The higher the value, the later the object
-        /// will be drawn. Objects drawn later will cover objects drawn earlier.
-        /// This parameter can be used for the rendering of transparent objects,
-        /// where the inner nodes must be rendered before the leaves to ensure
-        /// correct sorting.
         ///
         /// Parameter <paramref name="metrics"/> specifies the lengths of the returned
         /// object. If <c>null</c>, the default lengths are used. What a "length"
@@ -60,8 +55,9 @@ namespace SEE.GO.NodeFactories
         /// </summary>
         /// <param name="style">specifies an additional visual style parameter of
         /// the object</param>
+        /// <param name="metrics">the metric values determining the lengths
+        /// of the resulting game object</param>
         /// <returns>new node representation</returns>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
         public virtual GameObject NewBlock(int style = 0, float[] metrics = null)
         {
             GameObject result = CreateBlock(metrics);
@@ -151,8 +147,6 @@ namespace SEE.GO.NodeFactories
         {
             if (gameNode.TryGetComponent(out Renderer renderer))
             {
-                UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>());
-                UnityEngine.Assertions.Assert.IsNotNull(gameNode.GetComponent<NodeRef>().Value);
                 materials.SetSharedMaterial(renderer, index: style);
             }
         }

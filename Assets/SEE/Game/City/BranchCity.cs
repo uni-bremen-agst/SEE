@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -187,7 +189,8 @@ namespace SEE.Game.City
         /// The interval in seconds in which git fetch should be called.
         /// </summary>
         [Tooltip("The interval in seconds in which the repository should be polled. Used only if Auto Fetch is true."),
-            EnableIf(nameof(AutoFetch)), Range(5, 200),
+            EnableIf(nameof(AutoFetch)), RuntimeEnableIf(nameof(AutoFetch)),
+            Range(5, 200),
             TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup),
             ShowInInspector]
         public int PollingInterval
@@ -203,37 +206,6 @@ namespace SEE.Game.City
                 if (poller != null)
                 {
                     poller.PollingInterval = pollingInterval;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Backing field for <see cref="MarkerTime"/>.
-        /// </summary>
-        private int markerTime = 10;
-
-        /// <summary>
-        /// If file changes where picked up by the <see cref="GitPoller"/>, the affected files
-        /// will be marked. This field specifies for how long these markers should appear.
-        /// </summary>
-        [ShowInInspector,
-            Tooltip(
-             "The time in seconds for how long the node markers should be shown for newly added or modified nodes."),
-         EnableIf(nameof(AutoFetch)), Range(5, 200),
-            TabGroup(VCSFoldoutGroup), RuntimeTab(VCSFoldoutGroup)]
-        public int MarkerTime
-        {
-            get => markerTime;
-            set
-            {
-                if (value <= 0)
-                {
-                    throw new ArgumentOutOfRangeException("Marker time must be positive.");
-                }
-                markerTime = value;
-                if (transitionRenderer != null)
-                {
-                    transitionRenderer.MarkerTime = markerTime;
                 }
             }
         }
@@ -255,8 +227,9 @@ namespace SEE.Game.City
                     GitBranchesGraphProvider provider = GetGitBranchesGraphProvider(DataProvider);
                     poller = new GitPoller(PollingInterval, provider.GitRepository);
                     // We can create the transitionRenderer only now that we know the city.
-                    transitionRenderer = new(this, poller, MarkerTime);
+                    transitionRenderer = new(MarkerAttributes);
                 }
+                poller.OnChangeDetected += RenderTransition;
                 poller.Start();
             }
         }
@@ -266,7 +239,40 @@ namespace SEE.Game.City
         /// </summary>
         private void StopPoller()
         {
-            poller?.Stop();
+            if (poller != null)
+            {
+                poller.OnChangeDetected -= RenderTransition;
+                poller.Stop();
+            }
+        }
+
+        /// <summary>
+        /// Runs an asynchronous rendering of the transition from the old graph to the new graph.
+        /// </summary>
+        void RenderTransition()
+        {
+            RenderTransitionAsync().Forget();
+        }
+
+        /// <summary>
+        /// Renders the transition from the old graph to the new graph asynchronously.
+        /// </summary>
+        /// <returns>task</returns>
+        async UniTask RenderTransitionAsync()
+        {
+            if (LoadedGraph == null)
+            {
+                return;
+            }
+            // Backup old graph
+            Graph oldGraph = LoadedGraph.Clone() as Graph;
+            await LoadDataAsync();
+            Graph newGraph = LoadedGraph;
+            bool edgesAreDrawn = EdgeLayoutSettings.Kind != EdgeLayoutKind.None;
+            await transitionRenderer.RenderAsync(oldGraph, newGraph, edgesAreDrawn, gameObject, Renderer);
+            /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
+            /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
+            InitializeAfterDrawn(false);
         }
 
         /// <summary>
@@ -364,11 +370,6 @@ namespace SEE.Game.City
         /// </summary>
         private const string pollingIntervalLabel = "PollingInterval";
 
-        /// <summary>
-        /// Label for serializing the <see cref="MarkerTime"/> field.
-        /// </summary>
-        private const string markerTimeLabel = "MarkerTime";
-
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
@@ -377,7 +378,6 @@ namespace SEE.Game.City
             writer.Save(AuthorThreshold, authorThresholdLabel);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
-            writer.Save(MarkerTime, markerTimeLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -412,13 +412,6 @@ namespace SEE.Game.City
                 if (ConfigIO.Restore(attributes, pollingIntervalLabel, ref pollingInterval))
                 {
                     PollingInterval = pollingInterval;
-                }
-            }
-            {
-                int markerTime = MarkerTime;
-                if (ConfigIO.Restore(attributes, markerTimeLabel, ref markerTime))
-                {
-                    MarkerTime = markerTime;
                 }
             }
         }

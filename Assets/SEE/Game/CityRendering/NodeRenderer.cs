@@ -66,11 +66,11 @@ namespace SEE.Game.CityRendering
         /// Adds LOD to <paramref name="gameNode"/> and prepares it for interaction.
         /// If <paramref name="city"/> is different from null, <paramref name="gameNode"/>
         /// and all its descendants will respect the <paramref name="city"/> as portal.
+        /// In that case, <paramref name="city"/> must have a <see cref="Portal"/> component.
         /// </summary>
         /// <param name="gameNode">game node to be finished</param>
         /// <param name="city">the game object representing the city in which to draw this node;
-        /// it has the settings attached and the information about the scale, position, and
-        /// portal of the city</param>
+        /// it will be used to gather the <see cref="Portal"/> for <paramref name="gameNode"/></param>
         private void FinishGameNode(GameObject gameNode, GameObject city = null)
         {
             AddLOD(gameNode);
@@ -88,7 +88,8 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="node">graph node to be represented</param>
         /// <param name="city">the game object representing the city in which to draw this node;
-        /// it has the information about how to draw the node and portal of the city</param>
+        /// it has the information about the portal of the city; if different from null,
+        /// <paramref name="city"/> must have a <see cref="Portal"/> component.</param>
         /// <returns>game object representing given <paramref name="node"/></returns>
         /// <remarks>Implements <see cref="IGraphRenderer.DrawNode(Node, GameObject)"/>.</remarks>
         public GameObject DrawNode(Node node, GameObject city = null)
@@ -338,11 +339,8 @@ namespace SEE.Game.CityRendering
         /// and has the width, height, and depth metrics set and is a leaf.
         /// </summary>
         /// <param name="gameNode">the game object whose visual attributes are to be adjusted</param>
-        [Obsolete]
         public void AdjustScaleOfLeaf(GameObject gameNode)
         {
-            Assert.IsNull(gameNode.transform.parent);
-
             if (gameNode.TryGetComponent(out NodeRef nodeRef))
             {
                 Node node = nodeRef.Value;
