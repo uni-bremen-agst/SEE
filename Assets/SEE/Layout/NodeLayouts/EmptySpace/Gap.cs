@@ -1,7 +1,7 @@
 ﻿namespace SEE.Layout.NodeLayouts.EmptySpace
 {
     /// <summary>
-    /// Represents a vertical strip of potential maximal empty space.
+    /// Represents a strip of potential maximal empty space.
     /// Invariant: 0 <= <see cref="Begin"/> &lt; <see cref="End"/>.
     /// </summary>
     internal class Gap
