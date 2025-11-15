@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SEE.Layout.NodeLayouts.EmptySpace
 {
@@ -113,5 +115,17 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
         /// </summary>
         /// <returns>hash code</returns>
         public override int GetHashCode() => HashCode.Combine(Left, Top, Width, Height);
+
+        /// <summary>
+        /// Yields true if all inner <paramref name="innerRectangles"/> are within the bounds
+        /// of the <paramref name="outerRectangle"/>.
+        /// </summary>
+        /// <param name="outerRectangle">the outer rectangle</param>
+        /// <param name="innerRectangles">list of nested rectangles</param>
+        /// <returns>true if all inner rectangles are within the outer rectangle</returns>
+        public static bool AreAllNested(Rectangle outerRectangle, List<Rectangle> innerRectangles)
+        {
+            return !innerRectangles.Where(r => !outerRectangle.Contains(r)).Any();
+        }
     }
 }
