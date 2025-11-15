@@ -67,53 +67,70 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
 
             List<Rectangle> innerList = innerRectangles.ToList();
 
-            if (!AreAllNested(outerRectangle, innerList))
+            if (!Rectangle.AreAllNested(outerRectangle, innerList))
             {
                 throw new ArgumentException($"All {nameof(innerRectangles)} must be fully contained within {nameof(outerRectangle)}");
             }
-
-            // Collect all unique coordinates along the sweep-line direction that define strip boundaries.
-            // These are the Top and Bottom edges of outerRectangle and all inner rectangles if the
-            // sweep line moves along the Y axis or the Left and Right edges of outerRectangle if the
-            // sweep line moves along the X axis, respectively.
-            // These are the sweep-line "event points".
-            HashSet<float> coords = new() { outerRectangle.Top, outerRectangle.Bottom };
-            foreach (Rectangle obs in innerList)
-            {
-                coords.Add(obs.Top);
-                coords.Add(obs.Bottom);
-            }
-            // Sort the event points by their co-ordinate (Y co-ordinate if sweep lines moves along the Y axis
-            // or X co-ordinate if it moves along the X axis, respectively.
-            List<float> sorted = coords.Where(c => c >= outerRectangle.Top && c <= outerRectangle.Bottom).OrderBy(c => c).ToList();
 
             // List to hold the maximal empty rectangles found. This will be the result.
             // That result must later be filtered to ensure only MAXIMAL rectangles are returned.
             List<Rectangle> maximalRects = new();
 
+            Find(outerRectangle, innerList, maximalRects, r => r.Top, r => r.Bottom, r => r.Left, r => r.Right, (l, t, w, h) => new Rectangle(l, t, w, h));
+            Find(outerRectangle, innerList, maximalRects, r => r.Left, r => r.Right, r => r.Top, r => r.Bottom, (l, t, w, h) => new Rectangle(t, l, h, w));
+
+            // Final step: Filter to ensure only MAXIMAL rectangles are returned.
+            return PostProcessMaximalRectangles(maximalRects);
+        }
+
+        private static void Find
+            (Rectangle outerRectangle,
+            List<Rectangle> innerList,
+            List<Rectangle> maximalRects,
+            Func<Rectangle, float> start,
+            Func<Rectangle, float> end,
+            Func<Rectangle, float> startOtherEdge,
+            Func<Rectangle, float> endOtherEdge,
+            Func<float, float, float, float, Rectangle> newRectangle)
+        {
+            // Collect all unique coordinates along the sweep-line direction that define strip boundaries.
+            // These are the Top and Bottom edges of outerRectangle and all inner rectangles if the
+            // sweep line moves along the Y axis or the Left and Right edges of outerRectangle if the
+            // sweep line moves along the X axis, respectively.
+            // These are the sweep-line "event points".
+            HashSet<float> coords = new() { start(outerRectangle), end(outerRectangle) };
+            foreach (Rectangle obstacle in innerList)
+            {
+                coords.Add(start(obstacle));
+                coords.Add(end(obstacle));
+            }
+            // Sort the event points by their co-ordinate (Y co-ordinate if sweep lines moves along the Y axis
+            // or X co-ordinate if it moves along the X axis, respectively.
+            List<float> sorted = coords.Where(c => c >= start(outerRectangle) && c <= end(outerRectangle)).OrderBy(c => c).ToList();
+
             // Sweep the plane between consecutive sorted co-ordinates (vertically if the sweep lines moves
             // along the Y axis or horizontally if it moves along the X axis).
             for (int i = 0; i < sorted.Count - 1; i++)
             {
-                // [start, end] defines the current strip.
-                float start = sorted[i];
-                float end = sorted[i + 1];
-                // Height of the current strip.
-                float height = end - start;
+                // [stripStart, striptEnd] defines the current strip.
+                float stripStart = sorted[i];
+                float stripEnd = sorted[i + 1];
+                // Length of the current strip.
+                float stripLength = stripEnd - stripStart;
 
-                if (height <= 0)
+                if (stripLength <= 0)
                 {
                     continue;
                 }
 
-                // 1. Identify active obstacles within this strip [start, end].
+                // 1. Identify active obstacles within this strip [stripStart, striptEnd].
                 // An obstacle is active if it intersects the strip.
                 // Note: This is a rather expensive operation requiring O(n) where n is the number of obstacles.
-                List<Rectangle> activeObstacles = innerList.Where(o => o.Top < end && o.Bottom > start).ToList();
+                List<Rectangle> activeObstacles = innerList.Where(o => start(o) < stripEnd && end(o) > stripStart).ToList();
 
                 // 2. Define the initial free interval (the full width of outerRectangle).
-                IList<Gap> currentGaps = new List<Gap> { new() { Begin = outerRectangle.Left,
-                                                                 End = outerRectangle.Right } };
+                IList<Gap> currentGaps = new List<Gap> { new() { Begin = startOtherEdge(outerRectangle),
+                                                                 End = endOtherEdge(outerRectangle) } };
 
                 // 3. Subtract the projections of active obstacles.
                 // The projections are horizontal (X intervals) if the sweep lines moves
@@ -122,10 +139,10 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                 {
                     // FIXME: Because all inner rectangles are guaranteed to be within outerRectangle,
                     // obstacleBegin and obstacleEnd will always be co-ordinates of obstacle.
-                    float obstacleBegin = Math.Max(outerRectangle.Left, obstacle.Left);
-                    // Should always be obs.Left
-                    float obstacleEnd = Math.Min(outerRectangle.Right, obstacle.Right);
-                    // Should always be obs.Right
+                    float obstacleBegin = Math.Max(startOtherEdge(outerRectangle), startOtherEdge(obstacle));
+                    // Should always be startOtherEdge(obstacle).
+                    float obstacleEnd = Math.Min(endOtherEdge(outerRectangle), endOtherEdge(obstacle));
+                    // Should always be endOtherEdge(obstacle).
 
                     // If the obstacle is valid in the dimension orthogonal to the sweep-line
                     // direction (X-dimension if the sweep line moves along the Y axis or
@@ -141,67 +158,71 @@ namespace SEE.Layout.NodeLayouts.EmptySpace
                 {
                     if (gap.Begin < gap.End)
                     {
-                        maximalRects.Add(new Rectangle(gap.Begin, start, gap.End - gap.Begin, height));
+                        // If the sweep line moves along the Y axis, we need to assign as follows
+                        // (let R be the new rectangle):
+                        //  R.Left   = gap.Begin
+                        //  R.Top    = stripStart
+                        //  R.Width  = gap.End - gap.Begin
+                        //  R.Height = stripLength
+                        //
+                        // If the sweep line moves along the X axis, we need to assign as follows
+                        // (let R be the new rectangle):
+                        //  R.Left   = stripStart
+                        //  R.Top    = gap.Begin
+                        //  R.Width  = stripLength
+                        //  R.Height = gap.End - gap.Begin
+                        //
+                        // The delegate newRectangle must take care of that.
+                        maximalRects.Add(newRectangle(gap.Begin, stripStart, gap.End - gap.Begin, stripLength));
                     }
                 }
             }
-
-            // Final step: Filter to ensure only MAXIMAL rectangles are returned.
-            return PostProcessMaximalRectangles(maximalRects);
         }
 
         /// <summary>
-        /// Yields true if all inner <paramref name="innerRectangles"/> are within the bounds
-        /// of the <paramref name="outerRectangle"/>.
-        /// </summary>
-        /// <param name="outerRectangle">the outer rectangle</param>
-        /// <param name="innerRectangles">list of nested rectangles</param>
-        /// <returns>true if all inner rectangles are within the outer rectangle</returns>
-        private static bool AreAllNested(Rectangle outerRectangle, List<Rectangle> innerRectangles)
-        {
-            return !innerRectangles.Where(r => !outerRectangle.Contains(r)).Any();
-        }
-
-        /// <summary>
-        /// Returns a new list of gaps resulting from subtracting the interval [<paramref name="obsX1"/>, <paramref name="obsX2"/>].
+        /// Returns a new list of gaps resulting from subtracting the interval
+        /// [<paramref name="obstacleBegin"/>, <paramref name="obstacleEnd"/>].
         /// Will cut the existing gaps by removing the specified interval, potentially splitting gaps.
         /// </summary>
         /// <param name="gaps">the current gaps</param>
-        /// <param name="obsX1">left X co-ordinate of the obstacle</param>
-        /// <param name="obsX2">right X co-ordinate of the obstacle</param>
+        /// <param name="obstacleBegin">left X co-ordinate of the obstacle</param>
+        /// <param name="obstacleEnd">right X co-ordinate of the obstacle</param>
         /// <returns>gaps not containing the given interval</returns>
-        private static IList<Gap> SubtractInterval(IList<Gap> gaps, float obsX1, float obsX2)
+        private static IList<Gap> SubtractInterval
+            (IList<Gap> gaps,
+            float obstacleBegin,
+            float obstacleEnd)
         {
             List<Gap> newGaps = new();
             foreach (Gap gap in gaps)
             {
                 // Case 1: Obstacle is entirely outside the gap (no change)
-                if (obsX2 <= gap.Begin || obsX1 >= gap.End)
+                if (obstacleEnd <= gap.Begin || obstacleBegin >= gap.End)
                 {
                     // Existing gap remains the same.
                     newGaps.Add(gap);
                 }
                 // Case 2: Obstacle covers the entire gap (gap is eliminated).
                 // Covers also the case that obsX2 == gap.X1 && obsX1 == gap.X2.
-                else if (obsX1 <= gap.Begin && gap.End <= obsX2)
+                else if (obstacleBegin <= gap.Begin && gap.End <= obstacleEnd)
                 {
                     // Do nothing (gap is removed)
                 }
                 // Case 3: Obstacle cuts the beginning of the gap (creates one smaller gap)
-                else if (obsX1 <= gap.Begin && obsX2 < gap.End)
+                else if (obstacleBegin <= gap.Begin && obstacleEnd < gap.End)
                 {
-                    newGaps.Add(new Gap { Begin = obsX2, End = gap.End });
+                    newGaps.Add(new Gap { Begin = obstacleEnd, End = gap.End });
                 }
                 // Case 4: Obstacle cuts the end of the gap (creates one smaller gap)
-                else if (gap.Begin < obsX1 && obsX2 >= gap.End)
+                else if (gap.Begin < obstacleBegin && obstacleEnd >= gap.End)
                 {
-                    newGaps.Add(new Gap { Begin = gap.Begin, End = obsX1 });
+                    newGaps.Add(new Gap { Begin = gap.Begin, End = obstacleBegin });
                 }
                 // Case 5: Obstacle cuts the middle of the gap (creates two smaller gaps)
-                else if (obsX1 > gap.Begin && obsX2 < gap.End)
+                else if (obstacleBegin > gap.Begin && obstacleEnd < gap.End)
                 {
-                    newGaps.Add(new Gap { Begin = gap.Begin, End = obsX1 });
-                    newGaps.Add(new Gap { Begin = obsX2, End = gap.End });
+                    newGaps.Add(new Gap { Begin = gap.Begin, End = obstacleBegin });
+                    newGaps.Add(new Gap { Begin = obstacleEnd, End = gap.End });
                 }
                 else
                 {
