@@ -4,8 +4,6 @@
 //| License - http://www.vcskicks.com/license.html   |
 //====================================================
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace CSKicksCollection.Trees
 {

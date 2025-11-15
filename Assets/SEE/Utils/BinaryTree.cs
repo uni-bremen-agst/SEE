@@ -6,7 +6,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Text;
 
 namespace CSKicksCollection.Trees
 {
@@ -390,7 +389,7 @@ namespace CSKicksCollection.Trees
                 this.Remove(successorNode); //recursively remove the inorder predecessor
             }
 
-            
+
             return true;
         }
 
