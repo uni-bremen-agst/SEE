@@ -39,16 +39,18 @@ namespace SEE.Net
         /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
         /// </summary>
-        private void Start()
+        public override void OnNetworkSpawn()
         {
             if (!IsServer && !IsHost)
             {
                 Debug.Log("Starting client action network!\n");
                 RequestSynchronizationServerRpc();
-                return;
             }
-            Debug.Log("Starting server action network!\n");
-            BackendSyncUtil.InitializeCitiesAsync().Forget();
+            else
+            {
+                Debug.Log("Starting server action network!\n");
+                BackendSyncUtil.InitializeCitiesAsync().Forget();
+            }
         }
 
         /// <summary>
