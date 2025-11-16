@@ -10612,6 +10612,11 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3169402365225984986, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.head.axis.x
@@ -10672,10 +10677,30 @@ PrefabInstance:
       propertyPath: m_Avatar
       value: 
       objectReference: {fileID: 9000000, guid: 3250d9a6dd9cf1a43a44333cecaa9e0b, type: 3}
+    - target: {fileID: 5179106205997057727, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 9100000, guid: 831b46c503d9add42b15044ab2bac737, type: 2}
     - target: {fileID: 5673393830814623364, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2581488894
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831185425261647939, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: mouthDownValue
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 6831185425261647939, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: tiltCorrection
+      value: -5
+      objectReference: {fileID: 0}
+    - target: {fileID: 7822410647232718561, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: _triggerFaderSettings._fadeInTicks
+      value: 7000000
       objectReference: {fileID: 0}
     - target: {fileID: 8150961397566710157, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}

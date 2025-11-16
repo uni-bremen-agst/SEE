@@ -592,6 +592,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 6831185425261647939}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 9006327006082929411}
   m_SourcePrefab: {fileID: 100100000, guid: b93f96cf429b12342ac1893df03cdecb, type: 3}
 --- !u!4 &1242937920193830085 stripped
 Transform:
@@ -1155,8 +1159,7 @@ MonoBehaviour:
   enableFaceAnimation: 1
   smoothingFactor: 0.5
   visemeSmoothingFactor: 0.9
-  eyeSquintPower: 3
-  mouthDownValue: 0.7
+  eyeSquintPower: 12
   enableHeadRotation: 1
   headTransform: {fileID: 0}
   rotationSmoothingFactor: 0.5
@@ -1166,6 +1169,18 @@ MonoBehaviour:
   rightEyeTransform: {fileID: 0}
   eyeRotationSmoothingFactor: 0.5
   eyeLookScale: 30
+--- !u!114 &9006327006082929411
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf178efeebf7c34409aa52e5f299c91b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!95 &5179106205997057727 stripped
 Animator:
   m_CorrespondingSourceObject: {fileID: 5866666021909216657, guid: b93f96cf429b12342ac1893df03cdecb,
