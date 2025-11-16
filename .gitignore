@@ -160,3 +160,13 @@ Assets/StreamingAssets/KeyBindings.json.meta
 # Personal configurations
 Assets/StreamingAssets/audio.cfg
 Assets/StreamingAssets/audio.cfg.meta
+
+# Recordings
+Recordings/
+Recordings.meta
+*.mp4
+*.mp4.meta
+
+# Python cache
+__pycache__*
+*.pyc
