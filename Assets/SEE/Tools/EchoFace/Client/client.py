@@ -1,21 +1,22 @@
 import os
 os.environ["OPENCV_VIDEOIO_MSMF_ENABLE_HW_TRANSFORMS"] = "0"
 
-from helpers import draw_landmarks_on_image
+import mediapipe as mp
+import time
+import argparse
+import logging
+import cv2
+import numpy as np
+from face_analyzer import FaceAnalyzer
+from face_data_sender import FaceDataSender
 from video_io import (
     BaseStream,
     WebcamStream,
     VideoStream,
+    PlaybackClock,
     FrameViewer,
 )
-from face_data_sender import FaceDataSender
-from face_analyzer import FaceAnalyzer
-import numpy as np
-import cv2
-import logging
-import argparse
-import time
-import mediapipe as mp
+from helpers import draw_landmarks_on_image
 
 
 logging.basicConfig(
@@ -39,6 +40,7 @@ class EchoFaceClient:
         headless_mode: bool = False,
         camera_index: int = 0,
         video_path: str | None = None,
+        playback_fps: float | None = None,
     ):
         """
         Initializes the client, sets up the network sender, selects the video source,
@@ -52,6 +54,8 @@ class EchoFaceClient:
                           This is ignored if video_path is provided.
             video_path: The filesystem path to a video file to process. If provided,
                         it is used instead of the webcam.
+            playback_fps: Optional playback FPS override. If provided, this value is
+                used to drive the real-time playback clock instead of the source FPS.
 
         Raises:
             RuntimeError: If the selected video source (webcam or file) fails to start.
@@ -62,7 +66,12 @@ class EchoFaceClient:
         self._running = False
         self.last_frame = None
 
+        self.playback_clock = None
+        self.frame_viewer = None
         self.face_data_sender = FaceDataSender(ip, port)
+        self.face_analyzer = FaceAnalyzer(
+            on_new_result_callback=self.face_data_sender.send_face_data
+        )
 
         if video_path:
             logger.info(f"Initializing VideoStream for file: {video_path}")
@@ -74,7 +83,10 @@ class EchoFaceClient:
         if not self.video_source.start():
             raise RuntimeError("Failed to start video source.")
 
-        self.frame_viewer = None
+        if playback_fps is not None and playback_fps > 0:
+            logger.info(f"Overriding playback FPS to {playback_fps}")
+            self.playback_clock = PlaybackClock(playback_fps)
+
         if not self.headless_mode:
             self.frame_viewer = FrameViewer(
                 window_name="EchoFace Client",
@@ -84,10 +96,6 @@ class EchoFaceClient:
                 paused_getter=lambda: self.paused,
                 landmarks_getter=lambda: self.landmarks_enabled,
             )
-
-        self.face_analyzer = FaceAnalyzer(
-            on_new_result_callback=self.face_data_sender.send_face_data
-        )
 
         logger.info(f"Headless mode is {'ON' if self.headless_mode else 'OFF'}.")
 
@@ -108,6 +116,8 @@ class EchoFaceClient:
             while self._running:
                 if not self.paused:
                     self._process_frame()
+                    if self.playback_clock is not None:
+                        self.playback_clock.wait_for_next()
                 else:
                     self._display_paused_frame()
                     time.sleep(0.3)
@@ -161,7 +171,7 @@ class EchoFaceClient:
             return
 
         if self.last_frame is None:
-            w, h = 640, 480
+            w, h = self.video_source.get_resolution()
             frame = np.zeros((h, w, 3), dtype=np.uint8)
             self.frame_viewer.display_frame(frame)
             return
@@ -175,6 +185,9 @@ class EchoFaceClient:
         """
         self.paused = not self.paused
         logger.info(f"Stream {'PAUSED' if self.paused else 'RESUMED'}")
+
+        if not self.paused and self.playback_clock is not None:
+            self.playback_clock.reset()
 
     def toggle_landmarks(self):
         """
@@ -207,12 +220,17 @@ def parse_arguments() -> argparse.Namespace:
         description="Face Landmarker client streams blendshape and landmark data via UDP."
     )
 
-    parser.add_argument("--ip", type=str, default="127.0.0.1")
-    parser.add_argument("--port", type=int, default=12345)
-    parser.add_argument("--camera-index", type=int, default=0)
-    parser.add_argument("--video-path", type=str, default=None)
-    parser.add_argument("--headless", action="store_true")
-
+    parser.add_argument("--ip", type=str, default="127.0.0.1",
+                        help="IP address of the UDP server to send face landmarks/blendshape data to.")
+    parser.add_argument("--port", type=int, default=12345, help="Port number of the UDP server for sending face data.")
+    parser.add_argument("--camera-index", type=int, default=0,
+                        help="Index of the webcam to use as input (default is 0).")
+    parser.add_argument("--video-path", type=str, default=None,
+                        help="Path to a video file to use as input instead of a webcam.")
+    parser.add_argument("--headless", action="store_true",
+                        help="Run in headless mode (no display window); data is streamed but not rendered.")
+    parser.add_argument("--fps", type=float, default=None,
+                        help="Override playback FPS used for timing. Defaults to input source FPS if unset.")
     return parser.parse_args()
 
 
@@ -229,6 +247,7 @@ def main():
             headless_mode=args.headless,
             camera_index=args.camera_index,
             video_path=args.video_path,
+            playback_fps=args.fps,
         )
         client.run()
     except RuntimeError as e:

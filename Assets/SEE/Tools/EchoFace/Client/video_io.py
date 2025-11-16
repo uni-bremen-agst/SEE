@@ -3,6 +3,7 @@ import logging
 import numpy as np
 from abc import ABC, abstractmethod
 from enum import Enum, auto
+import time
 
 logger = logging.getLogger(__name__)
 
@@ -25,7 +26,6 @@ class BaseStream(ABC):
         self.req_resolution = resolution
         self.cap: cv2.VideoCapture | None = None
         self.is_running: bool = False
-
 
     def release(self):
         """
@@ -122,6 +122,7 @@ class WebcamStream(BaseStream):
     """
     Video stream class for live webcam input.
     """
+
     def __init__(self, camera_index: int = 0, fps: int = 30, resolution: tuple[int, int] = (640, 480)):
         """
         Initializes a webcam video stream.
@@ -227,6 +228,73 @@ class VideoStream(BaseStream):
                 frame = cv2.resize(frame, self.req_resolution, interpolation=cv2.INTER_AREA)
 
         return True, frame
+
+
+class PlaybackClock:
+    """
+    Maintains a real-time playback schedule for frame processing.
+
+    The clock tracks a start time and frame index and provides a method to
+    block until the presentation time of the next frame, based on a target FPS.
+    If the target FPS is not valid, the clock becomes a no-op.
+    """
+
+    def __init__(self, target_fps: float | None):
+        """
+        Initializes the playback clock.
+
+        Args:
+            target_fps: Desired playback rate in frames per second. If None
+                or non-positive, the clock will not enforce any timing.
+        """
+        if target_fps and target_fps > 0:
+            self._frame_duration = 1.0 / float(target_fps)
+        else:
+            self._frame_duration = None
+
+        self._playback_fps = target_fps
+        self._start_time: float | None = None
+        self._frame_index: int = 0
+
+    def reset(self):
+        """
+        Resets the internal time reference and frame index.
+
+        This is useful when restarting a stream or seeking to a new
+        position in the video source.
+        """
+        self._start_time = None
+        self._frame_index = 0
+
+    def wait_for_next(self):
+        """
+        Blocks until the presentation time of the next frame.
+
+        If no valid frame duration is configured, this method returns
+        immediately without sleeping.
+        """
+        if self._frame_duration is None:
+            return
+
+        now = time.perf_counter()
+
+        if self._start_time is None:
+            self._start_time = now
+            self._frame_index = 0
+            return
+
+        self._frame_index += 1
+        target = self._start_time + self._frame_index * self._frame_duration
+
+        now = time.perf_counter()
+        remaining = target - now
+
+        if remaining > 0.005:
+            time.sleep(remaining - 0.002)
+
+    def get_playback_fps(self) -> float | None:
+        """Returns the configured playback FPS, or None if disabled."""
+        return self._playback_fps
 
 
 class ToolbarButton(Enum):
