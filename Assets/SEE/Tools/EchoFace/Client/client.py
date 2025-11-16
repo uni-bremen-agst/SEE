@@ -83,6 +83,7 @@ class EchoFaceClient:
         if not self.video_source.start():
             raise RuntimeError("Failed to start video source.")
 
+        # TODO: First try to set playback FPS from source, then override if needed
         if playback_fps is not None and playback_fps > 0:
             logger.info(f"Overriding playback FPS to {playback_fps}")
             self.playback_clock = PlaybackClock(playback_fps)
