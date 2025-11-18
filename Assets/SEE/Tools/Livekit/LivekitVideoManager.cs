@@ -20,7 +20,7 @@ namespace SEE.Tools.Livekit
     /// Handles publishing/unpublishing local video, subscribing/unsubscribing to remote video,
     /// and switching between available camera devices.
     /// </summary>
-    /// <remarks>This component is attached to UI Canvas/SettingsMenu/LivekitVideoManager.
+    /// <remarks>This component is attached to the DesktopPlayer.
     /// See the prefabs SettingsMenu.prefab.</remarks>
     public class LivekitVideoManager : MonoBehaviour
     {
