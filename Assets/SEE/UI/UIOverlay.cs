@@ -1,5 +1,6 @@
 using SEE.GO;
 using SEE.Utils;
+using System.ComponentModel;
 using TMPro;
 using UnityEngine;
 
@@ -32,73 +33,93 @@ namespace SEE.UI
         private static readonly Color inactiveColor = Color.grey;
 
         /// <summary>
-        /// String constant representing the "active" status, used in tooltip messages.
-        /// Used for a tooltip.
+        /// Represents a generic UI status element consisting of:
+        /// - a container GameObject controlling visibility,
+        /// - a text label used as an indicator, and
+        /// - an optional tooltip.
+        ///
+        /// This struct provides utility logic to update the visual state
+        /// of the indicator and synchronize the tooltip message accordingly.
+        /// It is intended for lightweight status representations in persistent UI overlays.
         /// </summary>
-        private const string active = "active";
+        private struct StatusIndicator
+        {
+            /// <summary>
+            /// The GameObject that contains all UI elements belonging to this status indicator.
+            /// Toggling its active state controls the overall visibility of the indicator.
+            /// </summary>
+            public GameObject Container;
+
+            /// <summary>
+            /// The visual text element representing the status. The text's color indicates
+            /// whether the associated system is active or inactive.
+            /// </summary>
+            public TextMeshProUGUI Text;
+
+            /// <summary>
+            /// Optional tooltip shown when the user hovers over the indicator.
+            /// The tooltip text is automatically updated to reflect the current state.
+            /// </summary>
+            public UIHoverTooltip Tooltip;
+
+            /// <summary>
+            /// Display label used to construct the tooltip message.
+            /// For example: "Body Animator", "Livekit", or any other system name.
+            /// </summary>
+            public string Label;
+
+            /// <summary>
+            /// Updates the text color and tooltip message of the status indicator.
+            /// </summary>
+            /// <param name="active">If true, sets the indicator to the active state; otherwise to inactive.</param>
+            /// <param name="activeColor">The color used when the indicator is active.</param>
+            /// <param name="inactiveColor">The color used when the indicator is inactive.</param>
+            public void SetActive(bool active, Color activeColor, Color inactiveColor)
+            {
+                if (Text != null)
+                {
+                    Text.color = active ? activeColor : inactiveColor;
+                }
+                if (Tooltip != null)
+                {
+                    Tooltip.Message = $"{Label} {(active ? "active" : "inactive")}";
+                }
+            }
+
+            /// <summary>
+            /// Shows or hides the entire status indicator.
+            /// This affects the Container root object and therefore all of its child UI elements.
+            /// </summary>
+            /// <param name="visible">True to make the indicator visible, false to hide it.</param>
+            public void ShowContainer(bool visible)
+            {
+                if (Container != null)
+                {
+                    Container.SetActive(visible);
+                }
+            }
+        }
 
         /// <summary>
-        /// String constant representing the "inactive" status, used in tooltip messages.
+        /// Status indicator for the BodyAnimator.
         /// </summary>
-        private const string inactive = "inactive";
+        private static StatusIndicator bodyAnimator;
 
         /// <summary>
-        /// Indicator for the webcam status (contains an text with a fontawesome icon).
-        /// The color reflects the current state (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
+        /// Status indicator for the Livekit system.
+        /// </summary>
+        private static StatusIndicator livekit;
+
+        /// <summary>
+        /// The main webcam status icon. Its color reflects whether the webcam is active.
         /// </summary>
         private static TextMeshProUGUI webcamStatus;
 
         /// <summary>
-        /// Slash overlay placed over the webcam icon.
-        /// Visible when the webcam is deactivated, hidden when the webcam is active.
+        /// A slash overlay drawn across the webcam icon. Enabled when the webcam is inactive,
+        /// hidden when the webcam is active.
         /// </summary>
         private static GameObject webcamSlashOverlay;
-
-        /// <summary>
-        /// Container GameObject holding the BodyAnimator status UI elements.
-        /// Can be hidden or shown depending on overlay state.
-        /// </summary>
-        private static GameObject bodyAnimatorContainer;
-
-        /// <summary>
-        /// Indicator for the BodyAnimator status (contains an text with a fontawesome icon).
-        /// The color reflects the current state  (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
-        /// </summary>
-        private static TextMeshProUGUI bodyAnimatorText;
-
-        /// <summary>
-        /// Tooltip component for the BodyAnimator status indicator.
-        /// Displays additional information on hover.
-        /// </summary>
-        private static UIHoverTooltip bodyAnimatorTooltip;
-
-        /// <summary>
-        /// Represents the "Body Animator" string used by video system tooltips.
-        /// </summary>
-        private const string bodyanimator = "Body Animator";
-
-        /// <summary>
-        /// Container GameObject holding the Livekit status UI elements.
-        /// Can be hidden or shown depending on overlay state.
-        /// </summary>
-        private static GameObject livekitContainer;
-
-        /// <summary>
-        /// Indicator for the Livekit status (contains an text with a fontawesome icon).
-        /// The color reflects the current state  (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
-        /// </summary>
-        private static TextMeshProUGUI livekitText;
-
-        /// <summary>
-        /// Tooltip component for the Livekit status indicator.
-        /// Displays additional information on hover.
-        /// </summary>
-        private static UIHoverTooltip livekitTooltip;
-
-        /// <summary>
-        /// Represents the "Livekit" string used by video system tooltips.
-        /// </summary>
-        private const string livekit = "Livekit";
 
         /// <summary>
         /// Initializes the UI overlay for desktop platforms.
@@ -112,93 +133,82 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Finds and initializes all relevant UI elements inside the webcam overlay (WebcamUIOverlay).
-        /// Sets the slash overlay to inactiveColor, and initializes all status displays to inactive state.
+        /// Locates and initializes all UI elements inside the WebcamUIOverlay section of the prefab.
+        /// This includes the webcam indicator, its slash overlay, and the BodyAnimator and Livekit
+        /// status blocks including their tooltips.
+        ///
+        /// After initialization, all indicators are set to their inactive visual state.
         /// </summary>
         private void RegisterWebcamOverlay()
         {
             GameObject webcamOverlay = overlayGameObject.FindDescendant("WebcamUIOverlay");
+
             webcamStatus = webcamOverlay.FindDescendant("WebcamStatus").GetComponent<TextMeshProUGUI>();
             webcamSlashOverlay = webcamOverlay.FindDescendant("WebcamStatusSlash");
-            bodyAnimatorContainer = webcamOverlay.FindDescendant("BodyAnimatorStatus");
-            bodyAnimatorText = bodyAnimatorContainer.GetComponent<TextMeshProUGUI>();
-            bodyAnimatorTooltip = bodyAnimatorContainer.GetComponent<UIHoverTooltip>();
-            livekitContainer = webcamOverlay.FindDescendant("LivekitStatus");
-            livekitText = livekitContainer.GetComponent<TextMeshProUGUI>();
-            livekitTooltip = livekitContainer.GetComponent<UIHoverTooltip>();
+
+            GameObject bodyAnimatorObj = webcamOverlay.FindDescendant("BodyAnimatorStatus");
+            bodyAnimator = new StatusIndicator
+            {
+                Container = bodyAnimatorObj,
+                Text = bodyAnimatorObj.GetComponent<TextMeshProUGUI>(),
+                Tooltip = bodyAnimatorObj.GetComponent<UIHoverTooltip>(),
+                Label = "Body Animator"
+            };
+
+            GameObject livekitObj = webcamOverlay.FindDescendant("LivekitStatus");
+            livekit = new StatusIndicator
+            {
+                Container = livekitObj,
+                Text = livekitObj.GetComponent<TextMeshProUGUI>(),
+                Tooltip = livekitObj.GetComponent<UIHoverTooltip>(),
+                Label = "Livekit"
+            };
 
             webcamSlashOverlay.GetComponent<TextMeshProUGUI>().color = inactiveColor;
             DeactivateWebcam();
-            DeactivateBodyAnimator();
-            DeactivateLivekit();
+            SetBodyAnimatorActive(false);
+            SetLivekitActive(false);
         }
 
         /// <summary>
-        /// Deactivates the webcam UI indicator and updates the related status elements.
-        /// When the webcam is deactivated:
-        /// - The webcam text label is set to the inactive color.
-        /// - The slash overlay is shown to indicate that the webcam is off.
-        /// - The BodyAnimator and Livekit status objects are hidden,
-        ///   because they are only relevant when the webcam is active.
+        /// Sets the webcam indicator to its inactive state.
+        /// Hides the related system indicators, since they are only relevant
+        /// when the webcam is enabled.
         /// </summary>
         public static void DeactivateWebcam()
         {
             webcamStatus.color = inactiveColor;
             webcamSlashOverlay.SetActive(true);
-            bodyAnimatorContainer.SetActive(false);
-            livekitContainer.SetActive(false);
+            bodyAnimator.ShowContainer(false);
+            livekit.ShowContainer(false);
         }
 
         /// <summary>
-        /// Activates the webcam UI indicator and updates the related status elements.
-        /// When the webcam is activated:
-        /// - The webcam text label is set to the active color.
-        /// - The slash overlay is hidden.
-        /// - The BodyAnimator and Livekit status objects are made visible,
-        ///   allowing their respective text labels to show the current state via color.
+        /// Sets the webcam indicator to its active state.
+        /// Shows the related system indicators so that their status can be displayed.
         /// </summary>
         public static void ActivateWebcam()
         {
             webcamStatus.color = activeColor;
             webcamSlashOverlay.SetActive(false);
-            bodyAnimatorContainer.SetActive(true);
-            livekitContainer.SetActive(true);
+            bodyAnimator.ShowContainer(true);
+            livekit.ShowContainer(true);
         }
 
         /// <summary>
-        /// Updates the BodyAnimator status icon to the inactive state.
+        /// Updates the BodyAnimator status indicator and ensures its container is visible.
         /// </summary>
-        public static void DeactivateBodyAnimator()
+        public static void SetBodyAnimatorActive(bool active)
         {
-            bodyAnimatorText.color = inactiveColor;
-            bodyAnimatorTooltip.Message = bodyanimator + " " + inactive;
+            bodyAnimator.SetActive(active, activeColor, inactiveColor);
         }
 
         /// <summary>
-        /// Updates the BodyAnimator status icon to the active state.
+        /// Updates the Livekit status indicator and ensures its container is visible.
         /// </summary>
-        public static void ActivateBodyAnimator()
+        public static void SetLivekitActive(bool active)
         {
-            bodyAnimatorText.color = activeColor;
-            bodyAnimatorTooltip.Message = bodyanimator + " " + active;
-        }
-
-        /// <summary>
-        /// Updates the Livekit status icon to the inactive state.
-        /// </summary>
-        public static void DeactivateLivekit()
-        {
-            livekitText.color = inactiveColor;
-            livekitTooltip.Message = livekit + " " + inactive;
-        }
-
-        /// <summary>
-        /// Updates the Livekit status icon to the active state.
-        /// </summary>
-        public static void ActivateLivekit()
-        {
-            livekitText.color = activeColor;
-            livekitTooltip.Message = livekit + " " + active;
+            livekit.SetActive(active, activeColor, inactiveColor);
         }
     }
 }
