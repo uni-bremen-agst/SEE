@@ -125,7 +125,7 @@ namespace SEE.Utils
             if (!webcams[activeIndex].isPlaying)
             {
                 webcams[activeIndex].Play();
-                SettingsMenu.ActivateWebcam();
+                UIOverlay.ActivateWebcam();
             }
         }
 
@@ -151,7 +151,7 @@ namespace SEE.Utils
             if (usageCount == 0 && webcams[activeIndex].isPlaying)
             {
                 webcams[activeIndex].Stop();
-                SettingsMenu.DeactivateWebcam();
+                UIOverlay.DeactivateWebcam();
             }
         }
 
