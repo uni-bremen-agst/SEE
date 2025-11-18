@@ -100,6 +100,7 @@ namespace SEE.UI
             }
         }
 
+        #region Webcam Overlay Fields
         /// <summary>
         /// Status indicator for the BodyAnimator.
         /// </summary>
@@ -120,6 +121,7 @@ namespace SEE.UI
         /// hidden when the webcam is active.
         /// </summary>
         private static GameObject webcamSlashOverlay;
+        #endregion
 
         /// <summary>
         /// Initializes the UI overlay for desktop platforms.
@@ -132,6 +134,7 @@ namespace SEE.UI
             RegisterWebcamOverlay();
         }
 
+        #region Webcam Overlay Methods
         /// <summary>
         /// Locates and initializes all UI elements inside the WebcamUIOverlay section of the prefab.
         /// This includes the webcam indicator, its slash overlay, and the BodyAnimator and Livekit
@@ -232,5 +235,6 @@ namespace SEE.UI
             bool isActive = livekit.Text.color == activeColor;
             livekit.SetActive(!isActive, activeColor, inactiveColor);
         }
+        #endregion
     }
 }
