@@ -2795,6 +2795,7 @@ GameObject:
   - component: {fileID: 435794908006000009}
   - component: {fileID: 8529760511788830193}
   - component: {fileID: 2685722190497770616}
+  - component: {fileID: 1755091471885947194}
   m_Layer: 0
   m_Name: LivekitStatus
   m_TagString: Untagged
@@ -2921,6 +2922,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1755091471885947194
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2216003079355141786}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84a1b7a966579342ad761a15f87f36f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Message: Livekit
 --- !u!1 &2285682105058048593
 GameObject:
   m_ObjectHideFlags: 0
@@ -5261,6 +5275,7 @@ GameObject:
   - component: {fileID: 252334753695369248}
   - component: {fileID: 4984121457643616692}
   - component: {fileID: 6045802431857042513}
+  - component: {fileID: 7159699527930476713}
   m_Layer: 0
   m_Name: BodyAnimatorStatus
   m_TagString: Untagged
@@ -5387,6 +5402,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7159699527930476713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3849957886060753054}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84a1b7a966579342ad761a15f87f36f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Message: Body Animator
 --- !u!1 &3924145576610927543
 GameObject:
   m_ObjectHideFlags: 0
@@ -6025,6 +6053,7 @@ GameObject:
   - component: {fileID: 1871371856434260780}
   - component: {fileID: 7178614312302509389}
   - component: {fileID: 4208391424160374239}
+  - component: {fileID: 1983076402712994433}
   m_Layer: 0
   m_Name: WebcamStatusSlash
   m_TagString: Untagged
@@ -6151,6 +6180,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &1983076402712994433
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4174967802597652769}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84a1b7a966579342ad761a15f87f36f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Message: Webcam inactive
 --- !u!1 &4203783638187949228
 GameObject:
   m_ObjectHideFlags: 0
@@ -14308,6 +14350,7 @@ GameObject:
   - component: {fileID: 6126923514335596449}
   - component: {fileID: 4314459574921318925}
   - component: {fileID: 3800916688014220199}
+  - component: {fileID: 4016964509796514252}
   m_Layer: 0
   m_Name: WebcamStatus
   m_TagString: Untagged
@@ -14434,6 +14477,19 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &4016964509796514252
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8972942678063453141}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b84a1b7a966579342ad761a15f87f36f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Message: Webcam active
 --- !u!1 &8993272372927335101
 GameObject:
   m_ObjectHideFlags: 0
