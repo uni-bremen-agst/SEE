@@ -31,7 +31,7 @@ namespace SEE.UI.Window.PropertyWindow
         /// <summary>
         /// Prefab for the <see cref="PropertyRowLine"/>.
         /// </summary>
-        private readonly string ItemPrefab = UIPrefabFolder + "PropertyRowLine";
+        private readonly string ItemPrefab = UIPrefabFolder + "PropertyRowLineVertical"; //"PropertyRowLine";
 
         /// <summary>
         /// Prefab for the groups.
