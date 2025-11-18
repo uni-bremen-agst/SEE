@@ -84,6 +84,52 @@ namespace SEE.UI
         private Dropdown cameraDropdown;
 
         /// <summary>
+        /// Indicator for the webcam status (contains an text with a fontawesome icon).
+        /// The color reflects the current state (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
+        /// </summary>
+        private static TextMeshProUGUI webcamStatus;
+
+        /// <summary>
+        /// Slash overlay placed over the webcam icon.
+        /// Visible when the webcam is deactivated, hidden when the webcam is active.
+        /// </summary>
+        private static GameObject webcamSlash;
+
+        /// <summary>
+        /// GameObject containing the BodyAnimator status display.
+        /// This object is only visible when the webcam is active.
+        /// </summary>
+        private static GameObject bodyAnimatorStatus;
+
+        /// <summary>
+        /// Indicator for the BodyAnimator status (contains an text with a fontawesome icon).
+        /// The color reflects the current state  (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
+        /// </summary>
+        private static TextMeshProUGUI bodyAnimatorText;
+
+        /// <summary>
+        /// GameObject containing the Livekit status display.
+        /// This object is only visible when the webcam is active.
+        /// </summary>
+        private static GameObject livekitStatus;
+
+        /// <summary>
+        /// Indicator for the Livekit status (contains an text with a fontawesome icon).
+        /// The color reflects the current state  (<see cref="activeColor"/> / <see cref="inactiveColor"/>).
+        /// </summary>
+        private static TextMeshProUGUI livekitText;
+
+        /// <summary>
+        /// Color used for active states.
+        /// </summary>
+        private static readonly Color activeColor = Color.green;
+
+        /// <summary>
+        /// Color used for inactive states.
+        /// </summary>
+        private static readonly Color inactiveColor = Color.grey;
+
+        /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
         /// </summary>
@@ -97,6 +143,7 @@ namespace SEE.UI
                                   .onClick.AddListener(ExitGame);
 
             RegisterCameraDropdown();
+            RegisterWebcamOverlay();
 
             musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
             musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
@@ -116,11 +163,13 @@ namespace SEE.UI
 
             sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectsVolume = value; });
             musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
-            musicToggle.onValueChanged.AddListener((value) => {
+            musicToggle.onValueChanged.AddListener((value) =>
+            {
                 audioManager.MusicMuted = !value;
                 musicVolumeSlider.interactable = value;
             });
-            sfxToggle.onValueChanged.AddListener((value) => {
+            sfxToggle.onValueChanged.AddListener((value) =>
+            {
                 audioManager.SoundEffectsMuted = !value;
                 sfxVolumeSlider.interactable = value;
                 remoteSfxToggle.interactable = value;
@@ -183,7 +232,7 @@ namespace SEE.UI
                 GameObject settingsPanel = settingsMenuGameObject.transform.Find("SettingsPanel").gameObject;
                 GameObject keybindingsPanel = settingsMenuGameObject.transform.Find("KeybindingsPanel").gameObject;
                 GameObject audioSettingsPanel = settingsMenuGameObject.transform.Find("AudioSettingsPanel").gameObject;
-                GameObject videoChatPanel = settingsMenuGameObject.transform.Find("VideochatPanel").gameObject;
+                GameObject videoPanel = settingsMenuGameObject.transform.Find("VideoPanel").gameObject;
                 GameObject exitPanel = settingsMenuGameObject.transform.Find("ExitPanel").gameObject;
 
                 // Hide specific setting panels if they are active
@@ -195,9 +244,9 @@ namespace SEE.UI
                 {
                     audioSettingsPanel.SetActive(false);
                 }
-                else if (videoChatPanel.activeSelf)
+                else if (videoPanel.activeSelf)
                 {
-                    videoChatPanel.SetActive(false);
+                    videoPanel.SetActive(false);
                 }
                 else if (exitPanel.activeSelf)
                 {
@@ -308,6 +357,90 @@ namespace SEE.UI
                 // Updates the selected webcam index in the WebcamManager.
                 WebcamManager.SwitchCamera(selectedIndex);
             }
+        }
+
+        /// <summary>
+        /// Finds and initializes all relevant UI elements inside the webcam overlay (WebcamUIOverlay).
+        /// Sets the slash overlay to inactiveColor, and initializes all status displays to inactive state.
+        /// </summary>
+        private void RegisterWebcamOverlay()
+        {
+            GameObject webcamOverlay = settingsMenuGameObject.FindDescendant("WebcamUIOverlay");
+            webcamStatus = webcamOverlay.FindDescendant("WebcamStatus").GetComponent<TextMeshProUGUI>();
+            webcamSlash = webcamOverlay.FindDescendant("WebcamStatusSlash");
+            bodyAnimatorStatus = webcamOverlay.FindDescendant("BodyAnimatorStatus");
+            bodyAnimatorText = bodyAnimatorStatus.GetComponent<TextMeshProUGUI>();
+            livekitStatus = webcamOverlay.FindDescendant("LivekitStatus");
+            livekitText = livekitStatus.GetComponent<TextMeshProUGUI>();
+
+            webcamSlash.GetComponent<TextMeshProUGUI>().color = inactiveColor;
+            DeactivateWebcam();
+            DeactivateBodyAnimator();
+            DeactivateLivekit();
+        }
+
+        /// <summary>
+        /// Deactivates the webcam UI indicator and updates the related status elements.
+        /// When the webcam is deactivated:
+        /// - The webcam text label is set to the inactive color.
+        /// - The slash overlay is shown to indicate that the webcam is off.
+        /// - The BodyAnimator and Livekit status objects are hidden,
+        ///   because they are only relevant when the webcam is active.
+        /// </summary>
+        public static void DeactivateWebcam()
+        {
+            webcamStatus.color = inactiveColor;
+            webcamSlash.SetActive(true);
+            bodyAnimatorStatus.SetActive(false);
+            livekitStatus.SetActive(false);
+        }
+
+        /// <summary>
+        /// Activates the webcam UI indicator and updates the related status elements.
+        /// When the webcam is activated:
+        /// - The webcam text label is set to the active color.
+        /// - The slash overlay is hidden.
+        /// - The BodyAnimator and Livekit status objects are made visible,
+        ///   allowing their respective text labels to show the current state via color.
+        /// </summary>
+        public static void ActivateWebcam()
+        {
+            webcamStatus.color = activeColor;
+            webcamSlash.SetActive(false);
+            bodyAnimatorStatus.SetActive(true);
+            livekitStatus.SetActive(true);
+        }
+
+        /// <summary>
+        /// Updates the BodyAnimator status text to the inactive state.
+        /// </summary>
+        public static void DeactivateBodyAnimator()
+        {
+            bodyAnimatorText.color = inactiveColor;
+        }
+
+        /// <summary>
+        /// Updates the BodyAnimator status text to the active state.
+        /// </summary>
+        public static void ActivateBodyAnimator()
+        {
+            bodyAnimatorText.color = activeColor;
+        }
+
+        /// <summary>
+        /// Updates the Livekit status text to the inactive state.
+        /// </summary>
+        public static void DeactivateLivekit()
+        {
+            livekitText.color = inactiveColor;
+        }
+
+        /// <summary>
+        /// Updates the Livekit status text to the active state.
+        /// </summary>
+        public static void ActivateLivekit()
+        {
+            livekitText.color = activeColor;
         }
     }
 }

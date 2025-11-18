@@ -200,8 +200,6 @@ namespace SEE.Tools.Livekit
 
             // Initialize a new WebCamTexture with the selected camera device.
             webCamTexture = newWebcam;
-
-            Debug.Log($"[Livekit] Switched to camera: {newWebcam.deviceName}");
         }
         #endregion
 
