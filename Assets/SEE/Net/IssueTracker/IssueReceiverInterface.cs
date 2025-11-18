@@ -1,9 +1,24 @@
 using Newtonsoft.Json.Linq;
+using SEE.GraphProviders;
+using SEE.Utils.Config;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEngine;
+using UnityEngine.UIElements;
+
+enum IssueProvider
+{
+    None,
+    GitHubIssueReceiver,
+    JiraIssueReceiver
+}
 public interface IssueReceiverInterface
 {
+
+
     // Interface Class 
+
     public class Settings
     {
         public String eMail { get; set; }
@@ -11,7 +26,6 @@ public interface IssueReceiverInterface
         public string searchUrl { get; set; }
         public string auth { get; set; }
         public string commentAttributeName { get; set; }
-
     };
     public class RootIssue
     {
@@ -50,15 +64,22 @@ public interface IssueReceiverInterface
         public bool draft { get; set; }
 
     }
-
+    public void Save(ConfigWriter writer, String label);
+    public void SaveAttributes(ConfigWriter writer);
+    public Dictionary<string, string> getCreateIssueAttributes();
+    public void RestoreAttributes(Dictionary<string, object> attributes);
 
     //Eigene implementation für jede Issue-Tracker
     // Diese Funktion muss Implementiert werden!
     public Task<JArray> getIssues(Settings settings);
 
-    public Task<bool> createIssue();
+    public Task<bool> createIssue(Dictionary<string, string> attributes);
 
     public Task<bool> updateIssue();
+
+
+
+
 
 
 }

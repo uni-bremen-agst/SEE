@@ -1,11 +1,15 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SEE.GraphProviders;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -16,6 +20,10 @@ public class GitHubIssueReceiver : IssueReceiverInterface
 
     public List<RootIssue> issues;
     public JArray issuesJ;
+
+
+    //public string token = "";
+    //public string owner = "";
     //Github / giblab Issue Classes
     #region "IssueClasses Github/Gitlab" 
     public class Issue
@@ -179,55 +187,142 @@ public class GitHubIssueReceiver : IssueReceiverInterface
         public bool site_admin { get; set; }
     }
     #endregion
+    public string owner = "";//"lkuenzel";
+    public string repo = "";//"IssueTrackerRepository";
+    public string token = "";//"TestToken";
+    static private string label = "Data";
 
 
-    public async Task<bool> createIssue()
+
+ 
+
+
+
+    public Dictionary<string, string> getCreateIssueAttributes()
     {
+        return new Dictionary<string, string> {{ "Title", "" },
+                                                { "Description", "" },
+                                                   { "Assigne", "" }
+            };
+    }
+    
+    #region Config I/O
 
-        string token = "YOUR-TOKEN";
-        string owner = "lkuenzel";
-        string repo = "IssueTrackerRepository";
+    public void Save(ConfigWriter writer,String label)
+    {
+        SaveAttributes(writer);
+    }
 
+    protected internal static GitHubIssueReceiver RestoreProvider(Dictionary<string, object> values)
+    {
+        IssueProvider IssueProvider = IssueProvider.GitHubIssueReceiver;
+           
+
+        if (ConfigIO.RestoreEnum(values, "Type", ref IssueProvider))
+        {
+           // Debug.Log($"IssueRestoreProvider: {IssueProvider}" );
+          //  Debug.Log($"IssueRestore Owner: {values["Owner"]}");
+            GitHubIssueReceiver gitHubIssueReceiver =   new GitHubIssueReceiver();
+
+            gitHubIssueReceiver.RestoreAttributes(values);
+            return gitHubIssueReceiver;
+        }
+        else
+        {
+            throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
+        }
+    }
+
+    public static GitHubIssueReceiver Restore(Dictionary<string, object> attributes, string label)
+    {
+        if (attributes.TryGetValue(label, out object dictionary))
+        {
+            Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+            return RestoreProvider(values);
+        }
+        else
+        {
+            throw new Exception($"A graph provider could not be found under the label {label}.");
+        }
+    }
+
+    public void SaveAttributes(ConfigWriter writer)
+    {
+        writer.BeginGroup("Data");
+        writer.Save(this.GetType().ToString(), "Type");
+        writer.Save(owner, "Owner");
+        writer.Save(repo, "Repo");
+        writer.Save(token, "Token");
+        //SaveAttributes(writer);
+        writer.EndGroup();
+        //this.se
+        //writer.BeginList(pipelineLabel);
+        //foreach (CallConvThiscall.)
+        //{
+        //    provider.Save(writer, "");
+        //}
+        //writer.EndList();
+    }
+
+    public void RestoreAttributes(Dictionary<string, object> attributes)
+    {
+       owner = attributes["Owner"].ToString();
+       repo = attributes["Repo"].ToString();
+       token = attributes["Token"].ToString(); 
+    }
+
+    #endregion
+    public async Task<bool> createIssue(Dictionary<string, string> attributes)//string token, string owner
+    {
+        Debug.Log($"Start multiselect Createissue");
         var issueData = new
         {
-            title = "Found a bug",
-            body = "I'm having a problem with this.",
-            assignees = new[] { "User1" },
-            milestone = 1,
+            title = attributes["Title"],
+            body = attributes["Description"],
+            assignees = new[] { attributes["Assigne"] }, //"lkuenzel"
             labels = new[] { "Report" }
         };
-
+        return true;
         using (var client = new HttpClient())
         {
             // GitHub API base URL
             client.BaseAddress = new Uri("https://api.github.com/");
             client.DefaultRequestHeaders.UserAgent.ParseAdd("UnityApp/1.0");
-            // client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-            client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("token", token);
+            // client.DefaultRequestHeaders.Add("X-GitHub-Api-Version", "2022-11-28");
 
-            string json = JsonConvert.SerializeObject(issueData);
+            var json = JsonConvert.SerializeObject(issueData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await client.PostAsync($"repos/{owner}/{repo}/issues", content);
-            Debug.Log("Response:\n" + response);
-            Console.WriteLine("Response:\n" + response);
-            string result = await response.Content.ReadAsStringAsync();
-
-            if (response.IsSuccessStatusCode)
+            try
             {
-                var responseBody = await response.Content.ReadAsStringAsync();
-                Console.WriteLine("Issue created successfully:\n" + responseBody);
-            }
-            else
-            {
+                Debug.Log($"repos/{owner}/{repo}/issues");
 
-                var error = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"Error:{response.StatusCode}\n{error}");
-                return false;
+                var response = await client.PostAsync($"repos/{owner}/{repo}/issues", content);
+                //      Debug.Log("Response:\n" + response);
+                Console.WriteLine("Response:\n" + response);
+                string result = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseBody = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine("Issue created successfully:\n" + responseBody);
+                    return true;
+                }
+                else
+                {
+
+                    var error = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error:{response.StatusCode}\n{error}");
+                   
+                }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error:{ex}");
+            }
+
         }
-
-        return true;
+        return false;
     }
     public async Task<bool> updateIssue()
     {
@@ -258,9 +353,9 @@ public class GitHubIssueReceiver : IssueReceiverInterface
 
 
 
-#pragma warning disable CS4014
+            #pragma warning disable CS4014
             request.SendWebRequest();
-#pragma warning restore CS4014
+            #pragma warning restore CS4014
             await UniTask.WaitUntil(() => request.isDone);
 
             if (request.result == UnityWebRequest.Result.Success)

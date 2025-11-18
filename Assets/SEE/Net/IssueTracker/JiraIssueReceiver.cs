@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using SEE.GraphProviders;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,6 +16,13 @@ public class JiraIssueReceiver : IssueReceiverInterface
 {
     public List<RootIssue> issues;
     public JArray issuesJ;
+    static private string label = "Data";
+
+    public Dictionary<string, string> getCreateIssueAttributes()
+    {
+        return new Dictionary<string, string> { { "test", "test" } };
+    }
+
     //Github / giblab Issue Classes
     #region "IssueClasses Jira" 
 
@@ -1187,7 +1196,63 @@ public class JiraIssueReceiver : IssueReceiverInterface
 
 
     #endregion
-    public async Task<bool> createIssue()
+
+    public void Save(ConfigWriter writer, String label)
+    {
+        SaveAttributes(writer);
+    }
+
+    protected internal static JiraIssueReceiver RestoreProvider(Dictionary<string, object> values)
+    {
+        IssueProvider IssueProvider = IssueProvider.GitHubIssueReceiver;
+        if (ConfigIO.RestoreEnum(values, label, ref IssueProvider))
+        {
+            JiraIssueReceiver jiraIssueReceiver = new JiraIssueReceiver();
+            jiraIssueReceiver.RestoreAttributes(values);
+            return jiraIssueReceiver;
+        }
+        else
+        {
+            throw new Exception($"Specification of graph provider is malformed: label {IssueProvider} is missing.");
+        }
+    }
+
+    public static JiraIssueReceiver Restore(Dictionary<string, object> attributes, string label)
+    {
+        if (attributes.TryGetValue(label, out object dictionary))
+        {
+            Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+            return RestoreProvider(values);
+        }
+        else
+        {
+            throw new Exception($"A graph provider could not be found under the label {label}.");
+        }
+    }
+
+    public void SaveAttributes(ConfigWriter writer)
+    {
+
+        writer.BeginGroup("");
+        writer.Save(this.GetType().ToString(), "Type");
+
+        //SaveAttributes(writer);
+        writer.EndGroup();
+        //this.se
+        //writer.BeginList(pipelineLabel);
+        //foreach (CallConvThiscall.)
+        //{
+        //    provider.Save(writer, "");
+        //}
+        //writer.EndList();
+    }
+
+    public void RestoreAttributes(Dictionary<string, object> attributes)
+    {
+
+    }
+
+    public async Task<bool> createIssue(Dictionary<string, string> attributes)
     {
         // Es konnte kein Issue erstelltwerden!
         return false;
