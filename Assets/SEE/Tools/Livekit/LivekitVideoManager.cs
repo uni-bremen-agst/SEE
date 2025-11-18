@@ -11,6 +11,7 @@ using SEE.Controls;
 using SEE.GO;
 using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.UI;
 
 namespace SEE.Tools.Livekit
 {
@@ -55,18 +56,6 @@ namespace SEE.Tools.Livekit
         /// The WebCamTexture used to capture the video stream from the selected camera.
         /// </summary>
         private WebCamTexture webCamTexture = null;
-
-        /// <summary>
-        /// The image UI component that shows whether the video chat is active.
-        /// </summary>
-        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
-        public RawImage LivekitStatusImage;
-
-        /// <summary>
-        /// The text UI component that shows whether the video chat is active.
-        /// </summary>
-        /// <remarks>This field is public so that it can be set in the inspector for the prefab.</remarks>
-        public Text LivekitStatusText;
 
         /// <summary>
         /// A dictionary that maps participant identities to the GameObjects that represent their video streams.
@@ -333,9 +322,6 @@ namespace SEE.Tools.Livekit
                 source.Start();
                 StartCoroutine(source.Update());
                 rtcVideoSources.Add(source);
-
-                LivekitStatusImage.color = Color.green;
-                LivekitStatusText.text = "Video live";
             }
         }
 
@@ -403,9 +389,6 @@ namespace SEE.Tools.Livekit
 
                     // Remove the mesh object from the dictionary.
                     videoObjects.Remove(localClientId);
-
-                    LivekitStatusImage.color = Color.red;
-                    LivekitStatusText.text = "Video offline";
                 }
             }
         }
