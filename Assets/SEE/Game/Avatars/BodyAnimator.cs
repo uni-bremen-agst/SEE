@@ -243,7 +243,7 @@ namespace SEE.Game.Avatars
             if (isUsingHandAnimations)
             {
                 WebcamManager.Acquire();
-                UIOverlay.SetBodyAnimatorActive(true);
+                UIOverlay.ToggleBodyAnimator();
                 if (!isMediaPipeInitialized)
                 {
                     SetupMediaPipe();
@@ -252,7 +252,7 @@ namespace SEE.Game.Avatars
             else
             {
                 WebcamManager.Release();
-                UIOverlay.SetBodyAnimatorActive(false);
+                UIOverlay.ToggleBodyAnimator();
             }
 
             void SetupMediaPipe()

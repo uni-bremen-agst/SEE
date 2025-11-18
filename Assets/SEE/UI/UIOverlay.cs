@@ -198,7 +198,7 @@ namespace SEE.UI
         /// <summary>
         /// Updates the BodyAnimator status indicator and ensures its container is visible.
         /// </summary>
-        public static void SetBodyAnimatorActive(bool active)
+        private static void SetBodyAnimatorActive(bool active)
         {
             bodyAnimator.SetActive(active, activeColor, inactiveColor);
         }
@@ -206,9 +206,31 @@ namespace SEE.UI
         /// <summary>
         /// Updates the Livekit status indicator and ensures its container is visible.
         /// </summary>
-        public static void SetLivekitActive(bool active)
+        private static void SetLivekitActive(bool active)
         {
             livekit.SetActive(active, activeColor, inactiveColor);
+        }
+
+        /// <summary>
+        /// Toggles the BodyAnimator status indicator.
+        /// If the indicator is currently active, it will be set to inactive, and vice versa.
+        /// The text color and tooltip message are updated accordingly.
+        /// </summary>
+        public static void ToggleBodyAnimator()
+        {
+            bool isActive = bodyAnimator.Text.color == activeColor;
+            bodyAnimator.SetActive(!isActive, activeColor, inactiveColor);
+        }
+
+        /// <summary>
+        /// Toggles the Livekit status indicator.
+        /// If the indicator is currently active, it will be set to inactive, and vice versa.
+        /// The text color and tooltip message are updated accordingly.
+        /// </summary>
+        public static void ToggleLivekit()
+        {
+            bool isActive = livekit.Text.color == activeColor;
+            livekit.SetActive(!isActive, activeColor, inactiveColor);
         }
     }
 }

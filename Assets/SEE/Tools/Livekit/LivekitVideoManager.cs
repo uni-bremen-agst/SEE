@@ -322,7 +322,7 @@ namespace SEE.Tools.Livekit
                 StartCoroutine(source.Update());
                 rtcVideoSources.Add(source);
 
-                UIOverlay.SetLivekitActive(true);
+                UIOverlay.ToggleLivekit();
             }
         }
 
@@ -390,7 +390,7 @@ namespace SEE.Tools.Livekit
                     // Remove the mesh object from the dictionary.
                     videoObjects.Remove(localClientId);
 
-                    UIOverlay.SetLivekitActive(false);
+                    UIOverlay.ToggleLivekit();
                 }
             }
         }
