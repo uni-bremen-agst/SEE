@@ -1,11 +1,14 @@
 ﻿using FuzzySharp;
 using FuzzySharp.Extractor;
 using Newtonsoft.Json.Linq;
+using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.UI.Notification;
+using SEE.Utils;
+using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
 //using UnityEditor.ShaderKeywordFilter;
@@ -14,11 +17,11 @@ using System.Threading.Tasks;
 using TMPro;
 //using UnityEditor.Search;
 using UnityEngine;
+using UnityEngine.UI;
 using Button = UnityEngine.UI.Button;
 using Color = UnityEngine.Color;
 using Image = UnityEngine.UI.Image;
-
-
+using System;
 namespace SEE.UI.Window.PropertyWindow
 {
     /// <summary>
@@ -40,9 +43,11 @@ namespace SEE.UI.Window.PropertyWindow
         //private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
         //// private static string ItemPrefab => UIPrefabFolder + "IssueRowLine";
 
-        private int FuzzyScoreThreshold = 80;
+        private static int FuzzyScoreThreshold = 40;
         private static int maxFuzzyResult = 5;
-
+       
+        //Für das Tracking der Highlighted Blocks
+        // ConfigWriter configWriter = new ConfigWriter("StudieTracker");
         public override void RebuildLayout()
         {
             //
@@ -61,7 +66,57 @@ namespace SEE.UI.Window.PropertyWindow
         //    //  Jetzt alle Gruppen suchen, die erstellt wurden
         //    AddButtonsToAllGroups();
         //}
+        private void ApplyCustomRowLayout()
+        {
+          List<Transform> rows = Window.GetComponentsInChildren<Transform>(true)
+      .Where(t => t.name == "AttributeLine" && t.parent.name.Equals("Foreground"))
+      .ToList();
 
+            Debug.Log($"RowCount:{rows.Count()}");
+            foreach (Transform row in rows)
+            {
+                Transform foreground = row.Find("Foreground");
+                if (foreground == null)
+                    continue;
+                Debug.LogError("FOUND Foreground!!!");
+                TMP_Text attributeLine = foreground.Find("AttributeLine")?.GetComponent<TMP_Text>();
+                TMP_Text valueLine = foreground.Find("ValueLine")?.GetComponent<TMP_Text>();
+
+                if (attributeLine == null || valueLine == null)
+                    continue;
+                Debug.LogError("FOUND attributeLine!!!");
+                // "body" erkennen (case insensitive)
+                if (!attributeLine.text.Trim().Equals("body", StringComparison.OrdinalIgnoreCase))
+                    continue;
+
+                Debug.LogError("FOUND BODY!!!");
+
+
+                valueLine.overflowMode = TextOverflowModes.Overflow;
+
+                // Horizontal Layout entfernen
+                var hLayout = foreground.GetComponent<HorizontalLayoutGroup>();
+                if (hLayout != null)
+                    GameObject.Destroy(hLayout);
+
+                // Vertical Layout hinzufügen
+                var vLayout = foreground.GetComponent<VerticalLayoutGroup>();
+                if (vLayout == null)
+                    vLayout = foreground.gameObject.AddComponent<VerticalLayoutGroup>();
+
+                vLayout.childAlignment = TextAnchor.UpperLeft;
+                vLayout.childForceExpandHeight = true;
+                vLayout.childControlHeight = true;
+                vLayout.spacing = 3;
+
+                // Auto-height
+                var le = row.GetComponent<LayoutElement>();
+                if (le == null)
+                    le = row.gameObject.AddComponent<LayoutElement>();
+
+                le.preferredHeight = -1;
+            }
+        }
         private void AddHeaderButtons()
         {
             if (Window == null)
@@ -75,7 +130,7 @@ namespace SEE.UI.Window.PropertyWindow
                              .Where(t => t.name.Contains("AttributeLine") || t.name.Contains("AttributeRow"));
 
 
-            foreach (var row in rows)
+            foreach (Transform row in rows)
             {
 
                 var headerLabel = row.gameObject.FindDescendant("AttributeLine").MustGetComponent<TextMeshProUGUI>();//row.Find("AttributeLine")?.GetComponent<TextMeshProUGUI>();
@@ -92,11 +147,11 @@ namespace SEE.UI.Window.PropertyWindow
 
         private void AddHeaderButton(GameObject group, string groupName)
         {
-            // 🔹 Button-Objekt erstellen
+            //Button-Objekt erstellen
             GameObject buttonObj = new GameObject("HeaderButton", typeof(RectTransform), typeof(Button), typeof(Image));
             buttonObj.transform.SetParent(group.transform, false);
 
-            // 🔹 Position und Größe
+            //Position und Größe
             var rect = buttonObj.GetComponent<RectTransform>();
             rect.anchorMin = new Vector2(1, 0.5f);
             rect.anchorMax = new Vector2(1, 0.5f);
@@ -104,11 +159,11 @@ namespace SEE.UI.Window.PropertyWindow
             rect.anchoredPosition = new Vector2(-25, 0);
             rect.sizeDelta = new Vector2(20, 20);
 
-            // 🔹 Optional: Farbe / Sprite
+            //Optional: Farbe / Sprite
             var img = buttonObj.GetComponent<Image>();
             img.color = Color.white; // oder Sprite zuweisen
 
-            // 🔹 Click-Action
+            //Click-Action
             var button = buttonObj.GetComponent<Button>();
             button.onClick.AddListener(() => OnHeaderButtonClicked(group, groupName));
         }
@@ -134,11 +189,10 @@ namespace SEE.UI.Window.PropertyWindow
                     continue;
 
 
-
-                var attributeText = go.FindDescendant("AttributeLine")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI attributeText = go.FindDescendant("AttributeLine")?.GetComponent<TextMeshProUGUI>();
 
                 // Suche in Foreground → ValueLine
-                var valueText = go.FindDescendant("ValueLine")?.GetComponent<TextMeshProUGUI>();
+                TextMeshProUGUI valueText = go.FindDescendant("ValueLine")?.GetComponent<TextMeshProUGUI>();
 
                 if (attributeText != null && valueText != null && attributeText.text.Equals(attributeName))
                 {
@@ -267,6 +321,7 @@ namespace SEE.UI.Window.PropertyWindow
             Debug.Log($"Header button clicked: {groupName}");
             // Deine gewünschte Aktion hier (z. B. Kontextmenü, Löschen, Fokus etc.)
         }
+        static int indexBlockHighligbt = 0;
         private async Task findCodeBlocksInIssue(String text)
         {
             //   string aa = "";
@@ -277,17 +332,22 @@ namespace SEE.UI.Window.PropertyWindow
             {
                 Debug.LogWarning("No code city found. The Issues in the Tree view  will be empty.");
             }
+            //Reset der SelectedObjects
+            foreach (InteractableObject interactableObject in InteractableObject.SelectedObjects) {
+                interactableObject.SetSelect(false, false);
+            }
+         
             Debug.LogWarning("Search text in cities");
             List<String> codeBlocks = new List<String>();
             // Durchsuchen der CodeCities
             foreach (GameObject cityObject in cities)
             {
-                if (cityObject.TryGetComponent(out AbstractSEECity city))
+                if (cityObject.TryGetComponent(out SEECity city))
                 {
                     if (city.LoadedGraph != null)
                     {
                         int index = 0;
-                        foreach (Node str in city.LoadedGraph.Nodes().Where(x => x.Type.Equals("Class")))
+                        foreach (Node str in city.LoadedGraph.Nodes().Where(x =>  x.Type.Equals("Class")))
                         {
 
                             codeBlocks.Add(str.SourceName);
@@ -305,22 +365,31 @@ namespace SEE.UI.Window.PropertyWindow
                             index++;
                         }
 
-                        var results = Process.ExtractAll(text, codeBlocks, (s) => s).ToList();
+                        List<ExtractedResult<string>> results = Process.ExtractAll(text, codeBlocks, (s) => s).ToList();
                         Debug.Log($"Result >{FuzzyScoreThreshold}:{results.Where(x => x.Score > FuzzyScoreThreshold).Count()} ");
                         int indexLoop = 0;
-                        foreach (ExtractedResult<string> a in results.OrderByDescending(x => x.Score))
+                        List<StudyDataManager.StudyData> studyDataList = new List<StudyDataManager.StudyData>();
+                        foreach (ExtractedResult<string> a in results.Where(x => x.Score > FuzzyScoreThreshold).OrderByDescending(x => x.Score)) //Descending
                         {
 
                             //if(a.Score > FuzzyScoreThreshold)
                             Debug.Log($"Index:{indexLoop}  CityBlocknames:  {a.Value} {a.Score} type:class \n {text}  ");
+                            //     
+                            InteractableObject interactable = city.LoadedGraph.Nodes().Where(x => x.Type.Equals("Class") && x.SourceName.Equals(a.Value)).First().GameObject().GetComponent<InteractableObject>();
+                            if (interactable != null)
+                            {
+                                interactable.gameObject.Operator().Highlight(duration: 10);
+                                interactable.SetSelect(true, false); // wird automatisch zu SelectedObjects hinzugefügt
+                                studyDataList.Add(new StudyDataManager.StudyData() { date = DateTime.Now.ToString(), highlightedBlockName = a.Value, groupID = indexBlockHighligbt });
+
+                            }
                             indexLoop++;
                             if (indexLoop >= maxFuzzyResult)
                                 break;
                         }
+                        StudyDataManager.SaveAppend(studyDataList);
+                        indexBlockHighligbt++;
                         codeBlocks.Clear();
-
-
-
                     }
                 }
 
@@ -369,11 +438,17 @@ namespace SEE.UI.Window.PropertyWindow
                     {
                         if (property.Name.Equals(settings.commentAttributeName))
                         {
-                            // Debug.Log($"Nody:{property.Value.ToString()}");
-                            //     findCodeBlocksInIssue(property.Value.ToString());
-
+                            //Dictionary<string, object> body = new() { };
+                            //Debug.Log($"Nody:{property.Value.ToString()}");
+                            //// findCodeBlocksInIssue(property.Value.ToString());
+                            //body.Add(property.Name, property.Value.ToString());
+                            //dicAttributes.Add("->", body);
+                           // dicAttributes.Add(property.Value.ToString(), "");
+                            
                         }
+                     
                         dicAttributes.Add(property.Name, property.Value.ToString());
+                        
                     }
                     else
                     {
@@ -430,38 +505,40 @@ namespace SEE.UI.Window.PropertyWindow
 
             SplitInAttributeGroup(dicIssues);
             AddHeaderButtons();
-            // CreateNestedGroups(subsub, "Issue1");
-            //  DisplayGroup("subAttri", subsub, 2, "Issue1");
 
-            // 
-            // DisplayGroup("SubmenuSub", subsubGroup, 2, "Submenu");
+            ApplyCustomRowLayout();
+                // CreateNestedGroups(subsub, "Issue1");
+                //  DisplayGroup("subAttri", subsub, 2, "Issue1");
 
-            //groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
-            //// groupHolder.Add("Header5", headerItems.Values.Select(x => x.gameObject).ToList());
-            //expandedItems.Add("Header");
+                // 
+                // DisplayGroup("SubmenuSub", subsubGroup, 2, "Submenu");
 
-            /// There are two ways to group the attributes: by value type or by name type.
-            /// The first one creates groups like <see cref="PropertyTypes.ToggleAttributes"/>,
-            /// <see cref="PropertyTypes.StringAttributes"/>, etc. according to the kind of
-            /// graph element attribute kind.
-            /// The second one creates groups according to the qualified name of the graph element attribute,
-            /// for example "Source", "Metric", etc. The name is split at the first dot.
-            //if (contextMenu.GroupByName)
-            //{
-            //    GroupByName();
-            //}
-            //else
-            //{
-            //    GroupByType();
-            //}
+                //groupHolder.Add("Header", headerItems.Values.Select(x => x.gameObject).ToList());
+                //// groupHolder.Add("Header5", headerItems.Values.Select(x => x.gameObject).ToList());
+                //expandedItems.Add("Header");
 
-            //// Sorts the properties
-            //Sort();
+                /// There are two ways to group the attributes: by value type or by name type.
+                /// The first one creates groups like <see cref="PropertyTypes.ToggleAttributes"/>,
+                /// <see cref="PropertyTypes.StringAttributes"/>, etc. according to the kind of
+                /// graph element attribute kind.
+                /// The second one creates groups according to the qualified name of the graph element attribute,
+                /// for example "Source", "Metric", etc. The name is split at the first dot.
+                //if (contextMenu.GroupByName)
+                //{
+                //    GroupByName();
+                //}
+                //else
+                //{
+                //    GroupByType();
+                //}
 
-            //// Applies the search
-            //  ApplySearch();
+                //// Sorts the properties
+                //Sort();
 
-            return;
+                //// Applies the search
+                //  ApplySearch();
+
+                return;
 
             // Creates the items for the value type group, when attributes should be
             // grouped by their value type (i.e., boolean, string, int, float attributes).

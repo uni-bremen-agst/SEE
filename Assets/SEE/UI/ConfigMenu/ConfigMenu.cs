@@ -491,6 +491,25 @@ namespace SEE.UI.ConfigMenu
                 .SetOnChangeHandler(f => city.ErosionSettings.ErosionScalingFactor = f)
                 .SetRange((1, 10))
                 .Build();
+
+            // Issue Provider Dropdown
+            //string[] providerNames = Enum.GetNames(typeof(IssueProvider));
+
+
+            //ComboSelectBuilder.Init(controls.transform)
+            // .SetLabel("Issue Provider")
+            // .SetAllowedValues(EnumToStr<NodeLayoutKind>())
+            // .SetDefaultValue(NodeLayoutKind.Balloon.ToString()) // wichtig: String entspricht AllowedValues
+            // .SetOnChangeHandler(s =>
+            // {
+            //     if (Enum.TryParse<IssueProvider>(s, out var provider))
+            //     {
+            //         //city.SelectedProvider = provider;
+            //     }
+            // })
+            // .SetComboSelectMode(ComboSelectMode.Restricted)
+            // .Build();
+
         }
 
         private void SetupEdgesLayoutPage()
@@ -534,6 +553,8 @@ namespace SEE.UI.ConfigMenu
                 .Build();
 
             // TODO: rdp
+           
+
         }
 
         private void SetupMiscellaneousPage()
@@ -555,6 +576,7 @@ namespace SEE.UI.ConfigMenu
                 .SetRange((0f, 1f))
                 .SetDefaultValue(city.LODCulling)
                 .SetOnChangeHandler(f => city.LODCulling = f);
+
         }
 
         private GameObject CreateAndInsertPage(string headline)
