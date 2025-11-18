@@ -1,4 +1,5 @@
 using Cysharp.Threading.Tasks;
+using SEE.UI;
 using SEE.UI.Notification;
 using System;
 using System.Collections.Generic;
@@ -124,6 +125,7 @@ namespace SEE.Utils
             if (!webcams[activeIndex].isPlaying)
             {
                 webcams[activeIndex].Play();
+                SettingsMenu.ActivateWebcam();
             }
         }
 
@@ -149,6 +151,7 @@ namespace SEE.Utils
             if (usageCount == 0 && webcams[activeIndex].isPlaying)
             {
                 webcams[activeIndex].Stop();
+                SettingsMenu.DeactivateWebcam();
             }
         }
 

@@ -25,6 +25,7 @@ using Mediapipe.Tasks.Vision.PoseLandmarker;
 using Mediapipe.Tasks.Vision.HandLandmarker;
 using Mediapipe.Unity.Experimental;
 using Mediapipe.Tasks.Vision.GestureRecognizer;
+using SEE.UI;
 
 namespace SEE.Game.Avatars
 {
@@ -242,6 +243,7 @@ namespace SEE.Game.Avatars
             if (isUsingHandAnimations)
             {
                 WebcamManager.Acquire();
+                SettingsMenu.ActivateBodyAnimator();
                 if (!isMediaPipeInitialized)
                 {
                     SetupMediaPipe();
@@ -250,6 +252,7 @@ namespace SEE.Game.Avatars
             else
             {
                 WebcamManager.Release();
+                SettingsMenu.DeactivateBodyAnimator();
             }
 
             void SetupMediaPipe()

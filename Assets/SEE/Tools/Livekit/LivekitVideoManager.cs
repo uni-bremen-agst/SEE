@@ -301,7 +301,6 @@ namespace SEE.Tools.Livekit
             // Check if the publishing was successful.
             if (!publish.IsError)
             {
-                Debug.Log("[Livekit] Video track published!");
                 publishedTrack = track;
 
                 // Find and update the mesh object for the local client with the video.
@@ -322,6 +321,8 @@ namespace SEE.Tools.Livekit
                 source.Start();
                 StartCoroutine(source.Update());
                 rtcVideoSources.Add(source);
+
+                SettingsMenu.ActivateLivekit();
             }
         }
 
@@ -373,7 +374,6 @@ namespace SEE.Tools.Livekit
             // Check if the unpublishing was successful.
             if (!unpublish.IsError)
             {
-                Debug.Log("[Livekit] Video track unpublished.");
                 publishedTrack = null;
 
                 // Find and update the mesh object for the local client.
@@ -389,6 +389,8 @@ namespace SEE.Tools.Livekit
 
                     // Remove the mesh object from the dictionary.
                     videoObjects.Remove(localClientId);
+
+                    SettingsMenu.DeactivateLivekit();
                 }
             }
         }
