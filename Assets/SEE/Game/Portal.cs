@@ -130,7 +130,7 @@ namespace SEE.Game
         /// Yields the <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>
         /// of the plane attached to <paramref name="gameObject"/>.
         /// <para>
-        /// Precondition: <paramref name="gameObject"/> must have a plane component
+        /// Precondition: <paramref name="gameObject"/> must have a <see cref="GO.Plane"/> component
         /// attached to it.
         /// </para>
         /// </summary>

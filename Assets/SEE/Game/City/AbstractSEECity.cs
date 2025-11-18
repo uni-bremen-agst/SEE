@@ -44,6 +44,14 @@ namespace SEE.Game.City
             // Intentionally left blank
         }
 
+        /// <summary>
+        /// The level of the "sky" above code cities in world-space Unity units.
+        ///
+        /// It is used, for instance, to animate the birth of a node by moving it
+        /// down from the sky and also to position the authors above a branch city.
+        /// </summary>
+        public const float SkyLevel = 2.25f;
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
