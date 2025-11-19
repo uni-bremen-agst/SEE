@@ -28,13 +28,13 @@ namespace SEE.Tools.Livekit
         /// The URL of the LiveKit server to connect to. This is a websocket URL.
         /// </summary>
         [Tooltip("The URL of the LiveKit server to connect to. A websocket URL.")]
-        public string LiveKitUrl = "ws://localhost:7880";
+        private string LiveKitUrl = "ws://134.102.222.72:7880";//"ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
         /// </summary>
         [Tooltip("The URL used to fetch the access token required for authentication.")]
-        public string TokenUrl = "http://localhost:3000";
+        private string TokenUrl = "http://134.102.222.72:3000";//"http://localhost:3000";
 
         /// <summary>
         /// The room name to join in LiveKit.
@@ -236,15 +236,25 @@ namespace SEE.Tools.Livekit
 
             RoomOptions options = new();
 
-            // Attempt to connect to the room using the LiveKit server URL and the provided token.
-            Debug.Log($"[LiveKit] Connecting to room: \"{room.Name}\" at URL {LiveKitUrl}...\n");
+            // Attempt to connect to the room using the LiveKit server URL and the provided token.;
             ConnectInstruction connect = room.Connect(LiveKitUrl, token, options);
-            yield return connect;
+            float elapsed = 0f;
+            float timeoutSeconds = 10f;
+            while (!connect.IsDone)
+            {
+                if (elapsed >= timeoutSeconds)
+                {
+                    ShowNotification.Error("LiveKit", $"Connection to room \"{RoomName}\" timed out after {timeoutSeconds} seconds.");
+                    yield break;
+                }
+                elapsed += Time.deltaTime;
+                yield return null;
+            }
 
             // Check if the connection was successful.
             if (connect.IsError)
             {
-                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{room.Name}\" {connect}.");
+                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{RoomName}\" {connect}.");
             }
             else
             {
@@ -305,7 +315,7 @@ namespace SEE.Tools.Livekit
 
                 // Find and update the mesh object for the local client with the video.
                 string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                GameObject meshObject = GameObject.Find("LivekitVideo_" + localClientId);
+                GameObject meshObject = GameObject.Find("LiveKitVideo_" + localClientId);
 
                 if (meshObject != null && meshObject.TryGetComponent(out MeshRenderer renderer))
                 {
@@ -417,6 +427,7 @@ namespace SEE.Tools.Livekit
 
                 // Find the LiveKitVideo object to display the video stream.
                 GameObject meshObject = GameObject.Find("LiveKitVideo_" + participant.Identity);
+                Debug.Log($"<color=red>MeshObject != null {meshObject != null}</color>");
                 if (meshObject != null)
                 {
                     // Create a new VideoStream instance for the subscribed track.
