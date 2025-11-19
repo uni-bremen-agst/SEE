@@ -1,17 +1,16 @@
 // Code inspired by https://github.com/livekit-examples/unity-example/blob/main/LivekitUnitySampleApp/Assets/LivekitSamples.cs
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
 using LiveKit;
 using LiveKit.Proto;
-using RoomOptions = LiveKit.RoomOptions;
-using UnityEngine.UI;
-using Unity.Netcode;
 using SEE.Controls;
 using SEE.GO;
+using SEE.UI;
 using SEE.UI.Notification;
 using SEE.Utils;
-using SEE.UI;
+using System.Collections;
+using System.Collections.Generic;
+using Unity.Netcode;
+using UnityEngine;
+using RoomOptions = LiveKit.RoomOptions;
 
 namespace SEE.Tools.Livekit
 {
@@ -20,15 +19,16 @@ namespace SEE.Tools.Livekit
     /// Handles publishing/unpublishing local video, subscribing/unsubscribing to remote video,
     /// and switching between available camera devices.
     /// </summary>
-    /// <remarks>This component is attached to the DesktopPlayer.
-    /// See the prefabs SettingsMenu.prefab.</remarks>
-    public class LivekitVideoManager : MonoBehaviour
+    /// <remarks>
+    /// This component is attached to the DesktopPlayer.
+    /// /remarks>
+    public class LiveKitVideoManager : MonoBehaviour
     {
         /// <summary>
         /// The URL of the LiveKit server to connect to. This is a websocket URL.
         /// </summary>
         [Tooltip("The URL of the LiveKit server to connect to. A websocket URL.")]
-        public string LivekitUrl = "ws://localhost:7880";
+        public string LiveKitUrl = "ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
@@ -215,7 +215,7 @@ namespace SEE.Tools.Livekit
             }
             else
             {
-                ShowNotification.Error("Livekit", $"Failed to get token from {uri}: {www.error}.");
+                ShowNotification.Error("LiveKit", $"Failed to get token from {uri}: {www.error}.");
             }
         }
 
@@ -237,18 +237,18 @@ namespace SEE.Tools.Livekit
             RoomOptions options = new();
 
             // Attempt to connect to the room using the LiveKit server URL and the provided token.
-            Debug.Log($"[Livekit] Connecting to room: \"{room.Name}\" at URL {LivekitUrl}...\n");
-            ConnectInstruction connect = room.Connect(LivekitUrl, token, options);
+            Debug.Log($"[LiveKit] Connecting to room: \"{room.Name}\" at URL {LiveKitUrl}...\n");
+            ConnectInstruction connect = room.Connect(LiveKitUrl, token, options);
             yield return connect;
 
             // Check if the connection was successful.
             if (connect.IsError)
             {
-                ShowNotification.Error("Livekit", $"Failed to connect to room: \"{room.Name}\" {connect}.");
+                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{room.Name}\" {connect}.");
             }
             else
             {
-                Debug.Log($"[Livekit] Connected to \"{room.Name}\" \n");
+                Debug.Log($"[LiveKit] Connected to \"{room.Name}\" \n");
             }
         }
         #endregion
@@ -266,7 +266,7 @@ namespace SEE.Tools.Livekit
         {
             if (room == null || !room.IsConnected)
             {
-                ShowNotification.Error("Livekit", "Not connected.");
+                ShowNotification.Error("LiveKit", "Not connected.");
                 yield break;
             }
             // Acquire camera device.
@@ -403,7 +403,7 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// Callback method that is invoked when a remote track is subscribed.
         /// Handles the display of the remote video stream on a mesh object.
-        /// The Mesh object is provided by LivekitVideo.prefab,
+        /// The Mesh object is provided by <see cref="LiveKitVideo"/>,
         /// which is instantiated as an immediate child of the Player object.
         /// </summary>
         /// <param name="track">The remote track being subscribed to.</param>
@@ -413,10 +413,10 @@ namespace SEE.Tools.Livekit
         {
             if (track is RemoteVideoTrack videoTrack)
             {
-                Debug.Log("[Livekit] TrackSubscribed for " + participant.Identity);
+                Debug.Log("[LiveKit] TrackSubscribed for " + participant.Identity);
 
-                // Find the LivekitVideo object to display the video stream.
-                GameObject meshObject = GameObject.Find("LivekitVideo_" + participant.Identity);
+                // Find the LiveKitVideo object to display the video stream.
+                GameObject meshObject = GameObject.Find("LiveKitVideo_" + participant.Identity);
                 if (meshObject != null)
                 {
                     // Create a new VideoStream instance for the subscribed track.

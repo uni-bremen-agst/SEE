@@ -6,9 +6,12 @@ using SEE.Utils;
 namespace SEE.Tools.Livekit
 {
     /// <summary>
-    /// Handles the positioning of the Livekit video stream relative to the player's head.
+    /// Handles the positioning of the LiveKit video stream relative to the player's head.
     /// </summary>
-    public class LivekitVideo : NetworkBehaviour
+    /// <remarks>
+    /// The component is attached to Prefabs/Players/CC4/BaseAvatar.prefab.
+    /// </remarks>
+    public class LiveKitVideo : NetworkBehaviour
     {
         /// <summary>
         /// The Transform representing the player's head.
@@ -29,12 +32,12 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// Offset for positioning the video in front of the player's face.
         /// </summary>
-        private readonly Vector3 offsetInFrontOfFace = new Vector3(0, 0.065f, 0.15f);
+        private readonly Vector3 offsetInFrontOfFace = new(0, 0.065f, 0.15f);
 
         /// <summary>
         /// Offset for positioning the video above the player's head.
         /// </summary>
-        private readonly Vector3 offsetAboveHead = new Vector3(0, 0.35f, 0);
+        private readonly Vector3 offsetAboveHead = new(0, 0.35f, 0);
 
         /// <summary>
         /// Initializes the player head reference and names the object according to the owner ID.
@@ -42,13 +45,13 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void Start()
         {
-            gameObject.name = "LivekitVideo_" + OwnerClientId;
+            gameObject.name = "LiveKitVideo_" + OwnerClientId;
             // Localizes the player's head bone for the positioning of the video.
             playerHead = transform.parent.Find(FaceCamOrientationBone);
 
             if (playerHead == null)
             {
-                Debug.LogError($"Player head not found for client ID {OwnerClientId}. Disabling LivekitVideo component.");
+                Debug.LogError($"Player head not found for client ID {OwnerClientId}. Disabling LiveKitVideo component.");
                 enabled = false;
             }
         }
