@@ -645,7 +645,7 @@ namespace SEE.Game.City
             };
             LoadedGraph = await gxlProvider.ProvideAsync(new Graph(""), this);
 
-            await DrawGraphAsync(LoadedGraph);
+            await DrawGraphAsync(VisualizedSubGraph);
             LoadLayout();
         }
         #endregion Save/Load Snapshot
