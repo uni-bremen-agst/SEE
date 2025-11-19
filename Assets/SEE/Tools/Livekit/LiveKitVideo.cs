@@ -40,12 +40,18 @@ namespace SEE.Tools.Livekit
         private readonly Vector3 offsetAboveHead = new(0, 0.35f, 0);
 
         /// <summary>
+        /// Prefix used for naming LiveKit video GameObjects, combining with the client ID
+        /// to form a unique name, e.g., "LiveKitVideo_123".
+        /// </summary>
+        public const string Prefix = "LiveKitVideo_";
+
+        /// <summary>
         /// Initializes the player head reference and names the object according to the owner ID.
         /// Logs an error and disables the component if the player head cannot be found.
         /// </summary>
         private void Start()
         {
-            gameObject.name = "LiveKitVideo_" + OwnerClientId;
+            gameObject.name = Prefix + OwnerClientId;
             // Localizes the player's head bone for the positioning of the video.
             playerHead = transform.parent.Find(FaceCamOrientationBone);
 

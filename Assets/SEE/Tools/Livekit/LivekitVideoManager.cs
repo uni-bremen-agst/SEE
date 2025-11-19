@@ -315,7 +315,7 @@ namespace SEE.Tools.Livekit
 
                 // Find and update the mesh object for the local client with the video.
                 string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                GameObject meshObject = GameObject.Find("LiveKitVideo_" + localClientId);
+                GameObject meshObject = GameObject.Find(LiveKitVideo.Prefix + localClientId);
 
                 if (meshObject != null && meshObject.TryGetComponent(out MeshRenderer renderer))
                 {
@@ -426,8 +426,7 @@ namespace SEE.Tools.Livekit
                 Debug.Log("[LiveKit] TrackSubscribed for " + participant.Identity);
 
                 // Find the LiveKitVideo object to display the video stream.
-                GameObject meshObject = GameObject.Find("LiveKitVideo_" + participant.Identity);
-                Debug.Log($"<color=red>MeshObject != null {meshObject != null}</color>");
+                GameObject meshObject = GameObject.Find(LiveKitVideo.Prefix + participant.Identity);
                 if (meshObject != null)
                 {
                     // Create a new VideoStream instance for the subscribed track.
