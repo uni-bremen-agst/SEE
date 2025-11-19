@@ -276,10 +276,8 @@ class PlaybackClock:
         if self._frame_duration is None:
             return
 
-        now = time.perf_counter()
-
         if self._start_time is None:
-            self._start_time = now
+            self._start_time = time.perf_counter()
             self._frame_index = 0
             return
 
