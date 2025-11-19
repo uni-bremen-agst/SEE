@@ -335,16 +335,19 @@ namespace SEE.Tools.Livekit
         /// </returns>
         private IEnumerator ConnectAndPublish()
         {
-            if (room == null || !room.IsConnected)
+            using (LoadingSpinner.ShowIndeterminate("Establishing LiveKit connection..."))
             {
-                yield return StartCoroutine(GetToken());
-                // wait one frame to allow room state update.
-                yield return null;
-            }
+                if (room == null || !room.IsConnected)
+                {
+                    yield return StartCoroutine(GetToken());
+                    // wait one frame to allow room state update.
+                    yield return null;
+                }
 
-            if (room != null && room.IsConnected)
-            {
-                yield return StartCoroutine(PublishVideo());
+                if (room != null && room.IsConnected)
+                {
+                    yield return StartCoroutine(PublishVideo());
+                }
             }
         }
 
