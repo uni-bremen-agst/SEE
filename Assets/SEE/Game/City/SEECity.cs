@@ -358,7 +358,7 @@ namespace SEE.Game.City
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
         [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
-	[Tooltip("Loads the data (but does not draw them).")]
+        [Tooltip("Loads the data (but does not draw them).")]
         public virtual async UniTask LoadDataAsync()
         {
             if (DataProvider != null)
