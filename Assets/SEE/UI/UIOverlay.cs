@@ -107,9 +107,9 @@ namespace SEE.UI
         private static StatusIndicator bodyAnimator;
 
         /// <summary>
-        /// Status indicator for the Livekit system.
+        /// Status indicator for the LiveKit system.
         /// </summary>
-        private static StatusIndicator livekit;
+        private static StatusIndicator liveKit;
 
         /// <summary>
         /// The main webcam status icon. Its color reflects whether the webcam is active.
@@ -158,19 +158,19 @@ namespace SEE.UI
                 Label = "Body Animator"
             };
 
-            GameObject livekitObj = webcamOverlay.FindDescendant("LivekitStatus");
-            livekit = new StatusIndicator
+            GameObject livekitObj = webcamOverlay.FindDescendant("LiveKitStatus");
+            liveKit = new StatusIndicator
             {
                 Container = livekitObj,
                 Text = livekitObj.GetComponent<TextMeshProUGUI>(),
                 Tooltip = livekitObj.GetComponent<UIHoverTooltip>(),
-                Label = "Livekit"
+                Label = "LiveKit"
             };
 
             webcamSlashOverlay.GetComponent<TextMeshProUGUI>().color = inactiveColor;
             DeactivateWebcam();
             SetBodyAnimatorActive(false);
-            SetLivekitActive(false);
+            SetLiveKitActive(false);
         }
 
         /// <summary>
@@ -183,7 +183,7 @@ namespace SEE.UI
             webcamStatus.color = inactiveColor;
             webcamSlashOverlay.SetActive(true);
             bodyAnimator.ShowContainer(false);
-            livekit.ShowContainer(false);
+            liveKit.ShowContainer(false);
         }
 
         /// <summary>
@@ -195,7 +195,7 @@ namespace SEE.UI
             webcamStatus.color = activeColor;
             webcamSlashOverlay.SetActive(false);
             bodyAnimator.ShowContainer(true);
-            livekit.ShowContainer(true);
+            liveKit.ShowContainer(true);
         }
 
         /// <summary>
@@ -207,11 +207,11 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Updates the Livekit status indicator and ensures its container is visible.
+        /// Updates the LiveKit status indicator and ensures its container is visible.
         /// </summary>
-        private static void SetLivekitActive(bool active)
+        private static void SetLiveKitActive(bool active)
         {
-            livekit.SetActive(active, activeColor, inactiveColor);
+            liveKit.SetActive(active, activeColor, inactiveColor);
         }
 
         /// <summary>
@@ -226,14 +226,14 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Toggles the Livekit status indicator.
+        /// Toggles the LiveKit status indicator.
         /// If the indicator is currently active, it will be set to inactive, and vice versa.
         /// The text color and tooltip message are updated accordingly.
         /// </summary>
-        public static void ToggleLivekit()
+        public static void ToggleLiveKit()
         {
-            bool isActive = livekit.Text.color == activeColor;
-            livekit.SetActive(!isActive, activeColor, inactiveColor);
+            bool isActive = liveKit.Text.color == activeColor;
+            liveKit.SetActive(!isActive, activeColor, inactiveColor);
         }
         #endregion
     }

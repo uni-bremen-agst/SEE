@@ -58,7 +58,7 @@ GameObject:
   - component: {fileID: 2685722190497770616}
   - component: {fileID: 1755091471885947194}
   m_Layer: 0
-  m_Name: LivekitStatus
+  m_Name: LiveKitStatus
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -195,7 +195,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b84a1b7a966579342ad761a15f87f36f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Message: Livekit
+  Message: LiveKit
 --- !u!1 &3849957886060753054
 GameObject:
   m_ObjectHideFlags: 0
