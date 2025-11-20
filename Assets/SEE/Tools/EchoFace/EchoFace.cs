@@ -57,6 +57,10 @@ public class EchoFace : MonoBehaviour
     [SerializeField]
     private int port = 12345;
 
+    [SerializeField]
+    [Tooltip("If enabled, only the latest packet will be processed, discarding any stale packets (improves latency).")]
+    private bool discardStalePackets = true;
+
     [Header("Avatar Settings")]
     [SerializeField]
     private SkinnedMeshRenderer skinnedMeshRenderer;
@@ -765,8 +769,11 @@ public class EchoFace : MonoBehaviour
 
                     _lastTimestampMs = receivedData.ts;
 
-                    // Keep only the latest packet in the queue
-                    _faceDataQueue.Clear();
+                    if (discardStalePackets)
+                    {
+                        // Keep only the latest packet in the queue
+                        _faceDataQueue.Clear();
+                    }
                     _faceDataQueue.Enqueue(receivedData);
                 }
             }
