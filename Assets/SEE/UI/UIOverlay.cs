@@ -63,7 +63,7 @@ namespace SEE.UI
 
             /// <summary>
             /// Display label used to construct the tooltip message.
-            /// For example: "Body Animator", "Livekit", or any other system name.
+            /// For example: "Body Animator", "LiveKit", or any other system name.
             /// </summary>
             public string Label;
 

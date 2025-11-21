@@ -21,7 +21,9 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// The bone path leading to the player's head. Used to position the video.
         /// </summary>
-        private const string FaceCamOrientationBone = "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
+        private const string FaceCamOrientationBone =
+            "CC_Base_BoneRoot/CC_Base_Hip/CC_Base_Waist/CC_Base_Spine01/" +
+            "CC_Base_Spine02/CC_Base_NeckTwist01/CC_Base_NeckTwist02/CC_Base_Head";
 
         /// <summary>
         /// Determines whether the video is in front of the face or above the head.
@@ -44,6 +46,26 @@ namespace SEE.Tools.Livekit
         /// to form a unique name, e.g., "LiveKitVideo_123".
         /// </summary>
         public const string Prefix = "LiveKitVideo_";
+
+        /// <summary>
+        /// Called when the network object is spawned.
+        /// Registers this instance inside <see cref="LiveKitVideoRegistry"/>.
+        /// </summary>
+        public override void OnNetworkSpawn()
+        {
+            base.OnNetworkSpawn();
+            LiveKitVideoRegistry.Register(OwnerClientId, this);
+        }
+
+        /// <summary>
+        /// Called when the network object is despawned.
+        /// Unregisters this instance from <see cref="LiveKitVideoRegistry"/>.
+        /// </summary>
+        public override void OnNetworkDespawn()
+        {
+            LiveKitVideoRegistry.Unregister(OwnerClientId);
+            base.OnNetworkDespawn();
+        }
 
         /// <summary>
         /// Initializes the player head reference and names the object according to the owner ID.

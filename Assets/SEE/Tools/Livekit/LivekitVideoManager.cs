@@ -60,7 +60,7 @@ namespace SEE.Tools.Livekit
         /// <summary>
         /// A dictionary that maps participant identities to the GameObjects that represent their video streams.
         /// </summary>
-        private readonly Dictionary<string, GameObject> videoObjects = new();
+        private readonly Dictionary<ulong, GameObject> videoObjects = new();
 
         /// <summary>
         /// A list of video sources created from the local webcam that are currently being published to the room.
@@ -313,19 +313,19 @@ namespace SEE.Tools.Livekit
             {
                 publishedTrack = track;
 
-                // Find and update the mesh object for the local client with the video.
-                string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                GameObject meshObject = GameObject.Find(LiveKitVideo.Prefix + localClientId);
+                // Get the LiveKitVideo instance from the registry.
+                if (!LiveKitVideoRegistry.TryGet(NetworkManager.Singleton.LocalClientId, out LiveKitVideo liveKitVideo))
+                {
+                    Debug.LogError("LiveKitVideo object not found for local client!");
+                    yield break;
+                }
 
-                if (meshObject != null && meshObject.TryGetComponent(out MeshRenderer renderer))
+                if (liveKitVideo.TryGetComponent(out MeshRenderer renderer))
                 {
                     // Enable the renderer and set the texture.
                     renderer.material.mainTexture = webCamTexture;
                     renderer.enabled = true;
                 }
-
-                // Store the mesh object in the dictionary.
-                videoObjects[localClientId] = meshObject;
 
                 // Start capturing and updating the video source.
                 source.Start();
@@ -374,6 +374,7 @@ namespace SEE.Tools.Livekit
             }
             rtcVideoSources.Clear();
             yield return null;
+
             // Release camera device.
             if (webCamTexture.isPlaying)
             {
@@ -389,22 +390,15 @@ namespace SEE.Tools.Livekit
             {
                 publishedTrack = null;
 
-                // Find and update the mesh object for the local client.
-                string localClientId = NetworkManager.Singleton.LocalClientId.ToString();
-                if (videoObjects.TryGetValue(localClientId, out GameObject meshObject) && meshObject != null)
+                // Get the LiveKitVideo instance from the registry.
+                if (LiveKitVideoRegistry.TryGet(NetworkManager.Singleton.LocalClientId, out LiveKitVideo liveKitVideo)
+                    && liveKitVideo.TryGetComponent(out MeshRenderer renderer))
                 {
-                    if (meshObject.TryGetComponent(out MeshRenderer renderer))
-                    {
-                        // Disable the renderer and clear the texture.
-                        renderer.enabled = false;
-                        renderer.material.mainTexture = null;
-                    }
-
-                    // Remove the mesh object from the dictionary.
-                    videoObjects.Remove(localClientId);
-
-                    UIOverlay.ToggleLiveKit();
+                    renderer.enabled = false;
+                    renderer.material.mainTexture = null;
                 }
+
+                UIOverlay.ToggleLiveKit();
             }
         }
         #endregion
@@ -425,27 +419,31 @@ namespace SEE.Tools.Livekit
             {
                 Debug.Log("[LiveKit] TrackSubscribed for " + participant.Identity);
 
-                // Find the LiveKitVideo object to display the video stream.
-                GameObject meshObject = GameObject.Find(LiveKitVideo.Prefix + participant.Identity);
-                if (meshObject != null)
+                // Retrieve the LiveKitVideo instance from the registry
+                ulong clientId = ParseIdentity(participant);
+                if (!LiveKitVideoRegistry.TryGet(clientId, out LiveKitVideo liveKitVideo))
                 {
-                    // Create a new VideoStream instance for the subscribed track.
-                    VideoStream stream = new(videoTrack);
-                    stream.TextureReceived += texture =>
-                    {
-                        if (meshObject.TryGetComponent(out MeshRenderer renderer))
-                        {
-                            // Enable the renderer and set the texture.
-                            renderer.material.mainTexture = texture;
-                            renderer.enabled = true;
-                        }
-                    };
-
-                    videoObjects[participant.Identity] = meshObject; // Add the VideoStream to the list of video streams.
-                    stream.Start(); // Start the video stream.
-                    StartCoroutine(stream.Update()); // Continuously update the video stream.
-                    videoStreams.Add(stream); // Add the stream to the list of active video streams.
+                    Debug.LogError($"No LiveKitVideo registered for participant {participant.Identity}");
+                    return;
                 }
+
+                // Create a new VideoStream instance for the subscribed track.
+                VideoStream stream = new(videoTrack);
+
+                // Assign texture to the LiveKitVideo's renderer when received.
+                stream.TextureReceived += texture =>
+                {
+                    if (liveKitVideo.TryGetComponent(out MeshRenderer renderer))
+                    {
+                        // Enable the renderer and set the texture.
+                        renderer.material.mainTexture = texture;
+                        renderer.enabled = true;
+                    }
+                };
+
+                stream.Start(); // Start the video stream.
+                StartCoroutine(stream.Update()); // Continuously update the video stream.
+                videoStreams.Add(stream); // Add the stream to the list of active video streams.
             }
         }
 
@@ -458,19 +456,34 @@ namespace SEE.Tools.Livekit
         /// <param name="participant">The remote participant owning the track.</param>
         private void UnTrackSubscribed(IRemoteTrack track, RemoteTrackPublication publication, RemoteParticipant participant)
         {
-            if (track is RemoteVideoTrack videoTrack)
+            if (track is RemoteVideoTrack
+                && LiveKitVideoRegistry.TryGet(ParseIdentity(participant), out LiveKitVideo liveKitVideo)
+                && liveKitVideo.TryGetComponent(out MeshRenderer renderer))
             {
-                if (videoObjects.TryGetValue(participant.Identity, out GameObject meshObject)
-                    && meshObject != null
-                    && meshObject.TryGetComponent(out MeshRenderer renderer))
-                {
-                    // Disable the renderer and clear the texture.
-                    renderer.enabled = false;
-                    renderer.material.mainTexture = null;
-                }
+                renderer.enabled = false;
+                renderer.material.mainTexture = null;
+            }
+        }
 
-                // Remove the stream from the list of active video streams.
-                videoObjects.Remove(participant.Identity);
+        /// <summary>
+        /// Converts a <see cref="RemoteParticipant"/>.Identity string to a ulong client ID.
+        /// Throws an exception if the identity is not a valid ulong.
+        /// </summary>
+        /// <param name="participant">The LiveKit remote participant.</param>
+        /// <returns>The client ID as ulong.</returns>
+        /// <exception cref="System.FormatException">
+        /// Thrown if the Identity cannot be parsed to ulong.
+        /// </exception>
+        private ulong ParseIdentity(RemoteParticipant participant)
+        {
+            if (ulong.TryParse(participant.Identity, out ulong clientId))
+            {
+                return clientId;
+            }
+            else
+            {
+                throw new System.FormatException(
+                    $"Invalid RemoteParticipant.Identity: '{participant.Identity}' cannot be converted to ulong.");
             }
         }
         #endregion
@@ -481,20 +494,28 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void CleanUp()
         {
-            foreach (KeyValuePair<string, GameObject> videoObject in videoObjects)
+            // Stop all local RTC video sources
+            foreach (RtcVideoSource rtcVideoSource in rtcVideoSources)
             {
-                foreach (RtcVideoSource rtcVideoSource in rtcVideoSources)
-                {
-                    rtcVideoSource.Stop();
-                }
+                rtcVideoSource.Stop();
+            }
+            rtcVideoSources.Clear();
 
-                foreach (VideoStream videoStream in videoStreams)
-                {
-                    videoStream.Stop();
-                }
+            // Stop all remote video streams
+            foreach (VideoStream videoStream in videoStreams)
+            {
+                videoStream.Stop();
+            }
+            videoStreams.Clear();
 
-                rtcVideoSources.Clear();
-                videoStreams.Clear();
+            // Disable all LiveKitVideo renderers (local + remote) from the registry
+            foreach (LiveKitVideo liveKitVideo in LiveKitVideoRegistry.GetAll())
+            {
+                if (liveKitVideo != null && liveKitVideo.TryGetComponent(out MeshRenderer renderer))
+                {
+                    renderer.enabled = false;
+                    renderer.material.mainTexture = null;
+                }
             }
         }
     }
