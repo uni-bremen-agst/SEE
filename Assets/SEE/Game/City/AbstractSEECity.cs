@@ -14,6 +14,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
 using SEE.UI.Notification;
+using SEE.Game.Table;
 
 namespace SEE.Game.City
 {
@@ -74,6 +75,21 @@ namespace SEE.Game.City
         /// </summary>
         [Range(0.0f, 1.0f)]
         public float LODCulling = 0.001f;
+
+        /// <summary>
+        /// Gets or sets the table's world-space scale.
+        /// </summary>
+        /// <remarks>
+        /// The associated City GameObject is always a child of a table.
+        /// The getter returns the table's global scale via <c>lossyScale</c>.
+        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// to achieve the desired world-space scale.
+        /// </remarks>
+        public Vector3 TableWorldScale
+        {
+            get { return transform.parent.lossyScale; }
+            set { GameTableManager.Scale(transform.parent.gameObject, value);}
+        }
 
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
