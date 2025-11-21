@@ -193,11 +193,6 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public override void SaveData()
         {
-            foreach (Node node in LoadedGraph.Nodes())
-            {
-                node.IntAttributes.Remove("Linkage.PIR_Node");
-            }
-
             (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
 
             GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
