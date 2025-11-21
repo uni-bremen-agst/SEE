@@ -370,7 +370,7 @@ namespace SEE.Tools.RandomGraphs
                 SourceName = linkName,
                 Type = type
             };
-            result.SetString(Node.LinknameAttribute, linkName);
+            result.SetString(Linkage.Name, linkName);
             graph.AddNode(result);
             return result;
         }

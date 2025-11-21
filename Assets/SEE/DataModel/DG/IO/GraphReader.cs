@@ -230,9 +230,9 @@ namespace SEE.DataModel.DG.IO
                 {
                     // Now the current node should have a linkname and we can
                     // actually add it to the graph.
-                    if (node.TryGetString(Node.LinknameAttribute, out string linkname))
+                    if (node.TryGetString(Linkage.Name, out string linkname))
                     {
-                        // The attribute Linkage.Name is actually not unique. There are cases where multiple
+                        // The attribute Linkage.Name is actually not always unique. There are cases where multiple
                         // nodes may have the same value for Linkage.Name. They will differ in another attribute
                         // Linkage.PIR_Node. If we have a node with both attributes, we can combine them to
                         // make a unique ID. The attribute Linkage.PIR_Node is an integer attribute.
@@ -256,7 +256,7 @@ namespace SEE.DataModel.DG.IO
                     }
                     else
                     {
-                        LogError($"Node has no attribute {Node.LinknameAttribute}");
+                        LogError($"Node has no attribute {Linkage.Name}");
                         // let's try to use the Source.Name for the linkname instead, hoping it is unique
                         if (string.IsNullOrEmpty(node.SourceName))
                         {
