@@ -37,21 +37,48 @@ namespace SEE.Net
         private bool blockedForSynchronization = false;
 
         /// <summary>
+        /// Whether the a client has fetched the code cities from the server
+        /// or a server has initialized
+        /// </summary>
+        private bool networkIsSetUp = false;
+
+        private void Start()
+        {
+            FetchCities();
+        }
+
+        /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
         /// </summary>
         public override void OnNetworkSpawn()
         {
-            if (!IsServer && !IsHost)
+            FetchCities();
+        }
+
+        /// <summary>
+        /// Fetches the multiplayer city files from the backend on the server or host.
+        /// </summary>
+        private void FetchCities()
+        {
+            if (!networkIsSetUp)
             {
-                Debug.Log("Starting client action network!\n");
-                RequestSynchronizationServerRpc();
-            }
-            else
-            {
-                Debug.Log("Starting server action network!\n");
-                BackendSyncUtil.InitializeCitiesAsync().Forget();
+                if (IsServer || IsHost)
+                {
+                    // We are a server.
+                    Debug.Log("Starting server action network!\n");
+                    BackendSyncUtil.InitializeCitiesAsync().Forget();
+                    networkIsSetUp = true;
+                }
+                if (IsClient)
+                {
+                    // We are a client.
+                    Debug.Log("Starting client action network!\n");
+                    RequestSynchronizationServerRpc();
+                    networkIsSetUp = true;
+                }
             }
         }
+
 
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients
