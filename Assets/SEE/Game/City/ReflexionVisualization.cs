@@ -92,8 +92,9 @@ namespace SEE.Game.City
                 GameObject edgeObject = edge.GameObject();
                 if (edgeObject != null && edgeObject.TryGetComponent(out SEESpline spline))
                 {
-                    spline.GradientColors = GetEdgeGradient(edge.State());
-
+                    EdgeOperator edgeOp = edgeObject.EdgeOperator();
+                    (Color start, Color end) newColors = GetEdgeGradient(edge.State());
+                    edgeOp.ChangeColorsTo((newColors.start, newColors.end), useAlpha: false);
                     if (edge.HasToggle(Edge.IsHiddenToggle))
                     {
                         // We will instantly hide this edge. It should not show up yet.
