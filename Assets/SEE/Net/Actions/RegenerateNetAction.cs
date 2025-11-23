@@ -1,5 +1,6 @@
 ﻿using SEE.Game.City;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace SEE.Net.Actions
@@ -8,7 +9,7 @@ namespace SEE.Net.Actions
     /// This class regenerates objects previously deleted at all clients
     /// in the network.
     /// </summary>
-    public abstract class RegenerateNetAction : AbstractNetAction
+    public abstract class RegenerateNetAction : ConcurrentNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -20,14 +21,16 @@ namespace SEE.Net.Actions
         /// </summary>
         public string NodeTypeList;
 
+
         /// <summary>
         /// Constructor. Sets <see cref="NodeTypeList"/> to the serialization
         /// of the given <paramref name="nodeTypes"/>.
         /// </summary>
-        public RegenerateNetAction(Dictionary<string, VisualNodeAttributes> nodeTypes)
+        public RegenerateNetAction(Dictionary<string, VisualNodeAttributes> nodeTypes, Action undoAction) : base("REGENERATE")
         {
             NodeTypeList = nodeTypes != null && nodeTypes.Count > 0 ?
                 NodeTypesSerializer.Serialize(nodeTypes) : "";
+            UndoAction = undoAction;
         }
 
         /// <summary>
@@ -39,5 +42,20 @@ namespace SEE.Net.Actions
             return string.IsNullOrEmpty(NodeTypeList) ?
                 new() : NodeTypesSerializer.Unserialize(NodeTypeList);
         }
+
+        /// <summary>
+        /// Undos the DeleteAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            UndoAction.Invoke();
+            RollbackNotification();
+        }
+
+        /// <summary>
+        /// Creates a list for the concurrency check.
+        /// </summary>
+        /// <returns>List of GameObject-IDs.</returns>
+        public abstract List<string> GetRegenerateList();
     }
 }

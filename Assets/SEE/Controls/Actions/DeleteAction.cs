@@ -240,6 +240,8 @@ namespace SEE.Controls.Actions
             deletedGameObjects = new HashSet<GameObject>();
             deletedElements = new();
             InteractableObject.UnselectAll(true);
+            List<string> toDelete = new();  // List of objects to delete.
+            bool NetActionRemoveNodeTypes = false;
             foreach (GameObject go in hitGraphElements)
             {
                 if (!go.HasNodeRef() && !go.HasEdgeRef()
@@ -247,8 +249,8 @@ namespace SEE.Controls.Actions
                 {
                     continue;
                 }
-
-                new DeleteNetAction(go.name, removeNodeTypes).Execute();
+                toDelete.Add(go.name); // collect for later DeleteNetAction
+                NetActionRemoveNodeTypes = removeNodeTypes ? true : NetActionRemoveNodeTypes; // set flag
                 (GraphElementsMemento mem,
                     ISet<GameObject> deleted,
                     Dictionary<string, VisualNodeAttributes> deletedNTypes) = GameElementDeleter.Delete(go, removeNodeTypes);
@@ -277,6 +279,7 @@ namespace SEE.Controls.Actions
                 deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
             }
+            new DeleteNetAction(toDelete, () => RejectUndo(), NetActionRemoveNodeTypes).Execute(); // create actual NetAction 
             CurrentState = IReversibleAction.Progress.Completed;
             AudioManagerImpl.EnqueueSoundEffect(IAudioManager.SoundEffect.DropSound, true);
             return true;
@@ -335,13 +338,37 @@ namespace SEE.Controls.Actions
             if (deletedGameObjects.All(go => go != null))
             {
                 GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
-                new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes).Execute();
+                new ReviveNetAction((from go in deletedGameObjects select go.name).ToList(), deletedNodeTypes, () => RejectUndo()).Execute();
             }
             else
             /// Occurs if the corresponding <see cref="GameObject"/>s cannot be found. This typically happens after a redraw.
             {
                 GameElementDeleter.Restore(deletedElements, deletedNodeTypes);
-                new RestoreNetAction(deletedElements, deletedNodeTypes).Execute();
+                new RestoreNetAction(deletedElements, deletedNodeTypes, () => RejectUndo()).Execute();
+            }
+        }
+
+        /// <summary>
+        /// Undoes changes locally if the server rejected the <see cref="DeleteAction">.
+        /// </summary>
+        public void RejectUndo()
+        {
+            base.Undo();
+            /// First, try to find the corresponding <see cref="GameObject"/>s if the references in the set are <c>null</c>.
+            if (deletedGameObjects.All(go => go == null))
+            {
+                deletedGameObjects.Clear();
+                deletedGameObjects.UnionWith(deletedElements.Select(ele => GraphElementIDMap.Find(ele.ID)));
+            }
+            /// Revive the objects.
+            if (deletedGameObjects.All(go => go != null))
+            {
+                GameElementDeleter.Revive(deletedGameObjects, deletedNodeTypes);
+            }
+            else
+            /// Occurs if the corresponding <see cref="GameObject"/>s cannot be found. This typically happens after a redraw.
+            {
+                GameElementDeleter.Restore(deletedElements, deletedNodeTypes);
             }
         }
 
@@ -355,6 +382,8 @@ namespace SEE.Controls.Actions
             {
                 hitGraphElements = hitGraphElementIDs.Select(go => GraphElementIDMap.Find(go)).ToList();
             }
+            List<string> toDelete = new();  // List of objects to delete.
+            bool NetActionRemoveNodeTypes = false;
             foreach (GameObject go in hitGraphElements)
             {
                 if (go.IsRoot())
@@ -362,8 +391,32 @@ namespace SEE.Controls.Actions
                     continue;
                 }
 #pragma warning disable VSTHRD110
-                new DeleteNetAction(go.name, removeNodeTypes).Execute();
+                toDelete.Add(go.name); // collect for later DeleteNetAction
+                NetActionRemoveNodeTypes = removeNodeTypes ? true : NetActionRemoveNodeTypes; // set flag
                 GameElementDeleter.Delete(go, removeNodeTypes);
+#pragma warning restore VSTHRD110
+            }
+            new DeleteNetAction(toDelete, () => RejectUndo(), NetActionRemoveNodeTypes).Execute(); // create actual NetAction 
+        }
+
+        /// <summary>
+        /// Undoes changes locally if the server rejected the <see cref="ReviveNetAction">.
+        /// </summary>
+        public void RejectRedo()
+        {
+            base.Redo();
+            if (hitGraphElements.All(go => go == null))
+            {
+                hitGraphElements = hitGraphElementIDs.Select(go => GraphElementIDMap.Find(go)).ToList();
+            }
+            foreach (GameObject go in hitGraphElements)
+            {
+                if (go.IsRoot())
+                {
+                    continue;
+                }
+#pragma warning disable VSTHRD110
+                GameElementDeleter.Delete(go);
 #pragma warning restore VSTHRD110
             }
         }

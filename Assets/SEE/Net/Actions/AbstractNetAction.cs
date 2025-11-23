@@ -13,6 +13,8 @@ namespace SEE.Net.Actions
     ///     1. Every field MUST be public!
     ///     2. Deriving classes MUST NOT have fields of the type GameObjects or
     ///        MonoBehaviours.
+    ///     3. NEVER use a NetAction in a loop; if necessary:
+    ///        collect the actions and send them in ONE NetAction.
     ///
     ///   These rules are necessary, to allow (de)serialization of the classes for
     ///   networking.

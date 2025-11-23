@@ -119,7 +119,7 @@ namespace SEE.Controls.Actions
                     progress = ProgressState.NoNodeSelected;
                     result = true;
                     CurrentState = IReversibleAction.Progress.Completed;
-                    NotifyClients(memento.Node);
+                    NotifyClients(memento.Node, memento.OriginalName, memento.OriginalType);
                     break;
 
                 case ProgressState.EditIsCanceled:
@@ -150,9 +150,9 @@ namespace SEE.Controls.Actions
         /// ID, SourceName and Type.
         /// </summary>
         /// <param name="node">node whose changes should be propagated</param>
-        private static void NotifyClients(Node node)
+        private static void NotifyClients(Node node, string oldName, string oldType)
         {
-            new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
+            new EditNodeNetAction(node.ID, node.SourceName, node.Type, oldName, oldType).Execute();
         }
 
         /// <summary>
@@ -161,9 +161,11 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
+            string oldName = memento.Node.SourceName;
+            string oldType = memento.Node.Type;
             GameNodeEditor.ChangeName(memento.Node, memento.OriginalName);
             GameNodeEditor.ChangeType(memento.Node, memento.OriginalType);
-            NotifyClients(memento.Node);
+            NotifyClients(memento.Node, oldName, oldType);
         }
 
         /// <summary>
@@ -172,9 +174,11 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
+            string oldName = memento.Node.SourceName;
+            string oldType = memento.Node.Type;
             GameNodeEditor.ChangeName(memento.Node, memento.NewName);
             GameNodeEditor.ChangeType(memento.Node, memento.NewType);
-            NotifyClients(memento.Node);
+            NotifyClients(memento.Node, oldName, oldType);
         }
 
         /// <summary>

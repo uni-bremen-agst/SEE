@@ -1,4 +1,5 @@
 ﻿using SEE.Game.SceneManipulation;
+using System;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -7,7 +8,7 @@ namespace SEE.Net.Actions
     /// This class is responsible for adding a node via network from one client to all others and
     /// to the server.
     /// </summary>
-    public class AddNodeNetAction : AbstractNetAction
+    public class AddNodeNetAction : ConcurrentNetAction
     {
         // Note: All attributes are made public so that they will be serialized
         // for the network transfer.
@@ -32,6 +33,7 @@ namespace SEE.Net.Actions
         /// </summary>
         public Vector3 Scale;
 
+
         /// <summary>
         /// Constructor.
         /// </summary>
@@ -40,16 +42,17 @@ namespace SEE.Net.Actions
         /// <param name="position">the position for the new node</param>
         /// <param name="scale">the scale of the new node in world space</param>
         public AddNodeNetAction
-            (string parentID,
-             string newNodeID,
-             Vector3 position,
-             Vector3 scale)
-            : base()
+            (string parentID, string newNodeID, Vector3 position, Vector3 scale, Action undoAction) : base(newNodeID)
         {
-            this.ParentID = parentID;
-            this.NewNodeID = newNodeID;
-            this.Position = position;
-            this.Scale = scale;
+            ParentID = parentID;
+            NewNodeID = newNodeID;
+            Position = position;
+            Scale = scale;
+            UndoAction = undoAction;
+            // Initiate Creation-Versioning
+            OldVersion = 0;
+            NewVersion = 1;
+            UsesVersioning = true;
         }
 
         /// <summary>
@@ -67,6 +70,16 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             GameNodeAdder.AddChild(Find(ParentID), Position, Scale, NewNodeID);
+            SetVersion();
+        }
+
+        /// <summary>
+        /// Invokes the stored reversal of AddNodeAction.
+        /// </summary>
+        public override void Undo()
+        {
+            UndoAction.Invoke();
+            RollbackNotification();
         }
     }
 }

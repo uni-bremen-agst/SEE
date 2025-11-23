@@ -12,6 +12,7 @@ using SEE.XR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Collections;
 using UnityEngine;
 
 namespace SEE.Controls.Actions
@@ -267,7 +268,8 @@ namespace SEE.Controls.Actions
                 GameEdgeAdder.Remove(createdEdgeGO);
 
                 // propagate the new edge via network
-                new DeleteNetAction(edge.ID).Execute();
+
+                new DeleteNetAction(edge.ID, () => ConcurrentNetAction.ReSync()).Execute();
 
                 // ensure the edge's GameObject gets destroyed properly
                 Destroyer.Destroy(createdEdgeGO);

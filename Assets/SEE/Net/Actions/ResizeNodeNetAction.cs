@@ -9,12 +9,8 @@ namespace SEE.Net.Actions
     /// Children are not scaled or moved along with the resized node.
     /// </para>
     /// </summary>
-    public class ResizeNodeNetAction : AbstractNetAction
+    public class ResizeNodeNetAction : ConcurrentNetAction
     {
-        /// <summary>
-        /// The id of the gameObject that has to be resized.
-        /// </summary>
-        public string GameObjectID;
 
         /// <summary>
         /// The new local scale to transfer over the network.
@@ -25,6 +21,16 @@ namespace SEE.Net.Actions
         /// The new world-space position to transfer over the network.
         /// </summary>
         public Vector3 Position;
+
+        /// <summary>
+        /// The new local scale to transfer over the network.
+        /// </summary>
+        public Vector3 OldLocalScale;
+
+        /// <summary>
+        /// The new world-space position to transfer over the network.
+        /// </summary>
+        public Vector3 OldPosition;
 
         /// <summary>
         /// Should the edges be updated along with the targe node?
@@ -60,18 +66,22 @@ namespace SEE.Net.Actions
             string gameObjectID,
             Vector3 localScale,
             Vector3 position,
+            Vector3 oldLocalScale,
+            Vector3 oldPosition,
             bool updateEdges = true,
             bool reparentChildren = true,
             bool updateLayers = false,
-            float animationFactor = 1f)
+            float animationFactor = 1f) : base(gameObjectID)
         {
-            GameObjectID = gameObjectID;
             LocalScale = localScale;
             Position = position;
+            OldLocalScale = oldLocalScale;
+            OldPosition = oldPosition;
             UpdateEdges = updateEdges;
             ReparentChildren = reparentChildren;
             UpdateLayers = updateLayers;
             AnimationFactor = animationFactor;
+            UseObjectVersion(gameObjectID);
         }
 
         /// <summary>
@@ -88,6 +98,24 @@ namespace SEE.Net.Actions
             {
                 throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
             }
+            SetVersion();
+        }
+
+        /// <summary>
+        /// Undoes the ResizeNodeAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            GameObject go = Find(GameObjectID);
+            if (go != null)
+            {
+                go.NodeOperator().ResizeTo(OldLocalScale, OldPosition, AnimationFactor, UpdateEdges, ReparentChildren, UpdateLayers);
+            }
+            else
+            {
+                throw new System.Exception($"There is no game object with the ID {GameObjectID}.");
+            }
+            RollbackNotification();
         }
     }
 }

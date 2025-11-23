@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-﻿using SEE.Game;
+using SEE.Game;
 using SEE.UI.Notification;
 using SEE.GO;
 using SEE.Net.Actions;
@@ -226,7 +226,8 @@ namespace SEE.Controls.Actions
                 createdEdge = GraphElementIDMap.Find(memento.EdgeID);
             }
             GameEdgeAdder.Remove(createdEdge);
-            new DeleteNetAction(createdEdge.name).Execute();
+
+            new DeleteNetAction(createdEdge.name, () => RejectRedo()).Execute();
             Destroyer.Destroy(createdEdge);
             createdEdge = null;
         }
@@ -241,12 +242,21 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
+        /// Redoes this AddEdgeAction.
+        /// </summary>
+        public void RejectRedo()
+        {
+            base.Redo();
+            createdEdge = CreateEdge(memento, true);
+        }
+
+        /// <summary>
         /// Creates a new edge using the given <paramref name="memento"/>.
         /// In case of any error, null will be returned.
         /// </summary>
         /// <param name="memento">information needed to create the edge</param>
         /// <returns>a new edge or null</returns>
-        private static GameObject CreateEdge(Memento memento)
+        private GameObject CreateEdge(Memento memento, bool serverRejection = false)
         {
             // If we arrive here because Redo() call this method, it could happen
             // that the source or target in edgeMemento were replaced because their
@@ -264,15 +274,18 @@ namespace SEE.Controls.Actions
             }
             try
             {
-                /// If <see cref="CreateEdge(Memento)"/> was called from Update
+                /// If <see cref="CreateEdge(Memento, bool)"/> was called from Update
                 /// when the edge is created for the first time, <see cref="memento.edgeID"/>
                 /// will not be set. Then the creation process triggered by <see cref="GameEdgeAdder"/>
-                /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento)"/>
+                /// will create a new unique id for the edge. If <see cref="CreateEdge(Memento, bool)"/>
                 /// is called from <see cref="Redo"/>, <see cref="memento.edgeID"/> has
-                /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento)"/>.
+                /// a valid edge id (set by the previous call to <see cref="CreateEdge(Memento, bool)"/>.
                 GameObject result = GameEdgeAdder.Add(memento.From, memento.To, memento.EdgeType);
                 UnityEngine.Assertions.Assert.IsNotNull(result);
-                new AddEdgeNetAction(memento.From.name, memento.To.name, memento.EdgeType).Execute();
+                if (!serverRejection) // True if server rejected action -> no new NetAction!
+                {
+                    new AddEdgeNetAction(result.name, memento.From.name, memento.To.name, memento.EdgeType).Execute();
+                }
                 return result;
             }
             catch (Exception e)

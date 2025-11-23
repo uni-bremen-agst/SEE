@@ -677,10 +677,16 @@ namespace SEE.Controls.Actions
             /// <param name="targetPosition">the world-space position the grabbed object should be moved to</param>
             /// <param name="factor">the factor of the animation for moving the grabbed object</param>
             /// <remarks>This is only a movement, not a change to any hierarchy.</remarks>
-            private static void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
+            private readonly void MoveTo(GameObject grabbedObject, Vector3 targetPosition, float factor = 1)
             {
                 GameNodeMover.MoveTo(grabbedObject, targetPosition, factor);
-                new MoveNetAction(grabbedObject.name, targetPosition, factor).Execute();
+                if (originalWorldPosition.Equals(targetPosition))
+                {
+                    Vector3 currentPosition = currentPositionOfGrabbedObject;
+                    new MoveNetAction(grabbedObject.name, currentPosition, targetPosition, factor).Execute();
+                    return;
+                }
+                new MoveNetAction(grabbedObject.name, originalWorldPosition, targetPosition, factor).Execute();
             }
 
             /// <summary>
@@ -692,8 +698,9 @@ namespace SEE.Controls.Actions
             {
                 try
                 {
+                    var oldParent = child.transform.parent;
                     ReflexionMapper.SetParent(child, parent);
-                    new SetParentNetAction(child.name, parent.name, true).Execute();
+                    new SetParentNetAction(child.name, parent.name, oldParent.name, true).Execute();
                 }
                 catch (ArchitectureAnalysisException e)
                 {
@@ -714,8 +721,9 @@ namespace SEE.Controls.Actions
             {
                 try
                 {
+                    var oldParent = child.transform.parent;
                     GameNodeMover.SetParent(child, parent);
-                    new SetParentNetAction(child.name, parent.name, false).Execute();
+                    new SetParentNetAction(child.name, parent.name, oldParent.name, false).Execute();
                 }
                 catch (ArchitectureAnalysisException e)
                 {

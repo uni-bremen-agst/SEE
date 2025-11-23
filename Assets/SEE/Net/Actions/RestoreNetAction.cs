@@ -1,6 +1,7 @@
 ﻿using SEE.Game.City;
 using SEE.Game.SceneManipulation;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
 
 namespace SEE.Net.Actions
@@ -34,10 +35,29 @@ namespace SEE.Net.Actions
         /// <param name="nodeTypes">The deleted node types.</param>
         public RestoreNetAction
             (List<RestoreGraphElement> nodesOrEdges,
-             Dictionary<string, VisualNodeAttributes> nodeTypes)
-            : base(nodeTypes)
+             Dictionary<string, VisualNodeAttributes> nodeTypes,
+             Action undoAction)
+            : base(nodeTypes, undoAction)
         {
             NodesOrEdges = RestoreGraphElementListSerializer.Serialize(nodesOrEdges);
+        }
+
+        /// <summary>
+        /// This is used to update the local versioning in an intermediate step.
+        /// </summary>
+        /// <param name="recipients"></param>
+        public new void Execute(ulong[] recipients = null)
+        {
+            base.Execute(recipients);
+            SetVersions(true, out _);
+        }
+
+        /// <summary>
+        /// Only updates the versioning on the server.
+        /// </summary>
+        public override void ExecuteOnServer()
+        {
+            SetVersions(true, out _);
         }
 
         /// <summary>
@@ -45,8 +65,47 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            GameElementDeleter.Restore(RestoreGraphElementListSerializer.Unserialize(NodesOrEdges),
-                                       ToMap());
+            // First we need to restore the versioning.
+            SetVersions(true, out List<RestoreGraphElement> elementList);
+
+            GameElementDeleter.Restore(elementList, ToMap());
+        }
+
+        /// <summary>
+        /// Undoes the RestoreAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            UndoAction.Invoke();
+            // First we need to restore the delete-versioning.
+            SetVersions(false, out _);
+            RollbackNotification();
+        }
+
+        /// <summary>
+        /// Used to customize versioning locally.
+        /// </summary>
+        /// <param name="isRestored"><c>True</c> sets versions to 1<br></br>
+        /// <c>False</c> sets versions to -1</param>
+        public void SetVersions(bool isRestored, out List<RestoreGraphElement> elementList)
+        {
+            int version = isRestored ? 1 : -1;
+            elementList = RestoreGraphElementListSerializer.Unserialize(NodesOrEdges);
+            foreach (RestoreGraphElement elem in elementList)
+            {
+                Network.ActionNetworkInst.Value.SetObjectVersion(elem.ID, version);
+            }
+        }
+
+        /// <summary>
+        /// Creates a list for the concurrency check.
+        /// </summary>
+        /// <returns>List of GameObject-IDs.</returns>
+        public override List<string> GetRegenerateList()
+        {
+            return RestoreGraphElementListSerializer
+            .Unserialize(NodesOrEdges)
+            .ConvertAll(elem => elem.ID);
         }
     }
 }

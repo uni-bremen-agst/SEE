@@ -9,6 +9,8 @@ using SEE.Net.Actions.City;
 using SEE.Net.Actions.Table;
 using SEE.Net.Util;
 using SEE.User;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -37,48 +39,102 @@ namespace SEE.Net
         private bool blockedForSynchronization = false;
 
         /// <summary>
-        /// Whether the a client has fetched the code cities from the server
-        /// or a server has initialized
+        /// Stores all <see cref="ConcurrentNetAction"/>s that are to be accepted or rejected by the server.
         /// </summary>
-        private bool networkIsSetUp = false;
+        private List<ConcurrentNetAction> PendingActions;
 
-        private void Start()
+        /// <summary>
+        /// Stores ConcurrentNetActions if necessary.
+        /// </summary>
+        private Queue<ConcurrentNetAction> IncomingActions;
+
+        /// <summary>
+        /// Async coroutine to check for empty PendingActions and perform IncomingActions.
+        /// </summary>
+        private Coroutine ClientExecuteInOrder;
+
+        /// <summary>
+        /// Dictionary to organize the individual object versions of GameElements.
+        /// </summary>
+        private Dictionary<string, int> ObjectVersion = new();
+
+        /// <summary>
+        /// Boolean value for improved readability.
+        /// Masks the definition of the baseclass <see cref="NetworkBehaviour"/>.
+        /// </summary>
+        private new bool IsClient;
+
+        /// <summary>
+        ///  ID of the user whose last change was accepted.
+        ///  Is used von ConcurrentNetActions.
+        /// </summary>
+        private ulong LastChangeBy;
+
+        /// <summary>
+        /// Time to reset recent rejection mode.
+        /// We need realtime and set the cooldown to 2-5x the worst ping.
+        /// Approximately 60ms times five. (Unity recommends 200-500ms).
+        /// </summary>
+        private const float COOLDOWN_TIME = 0.3f;
+
+        /// <summary>
+        /// Time to waited for checking whether own NetActions can be executed.
+        /// FIXME: THIS SHOULD BE PING TO SERVER x 1.5 (maybe even dynamically)
+        /// </summary>
+        private const float PING_TO_SERVER = 0.09f;
+
+        /// <summary>
+        /// Unity Time since last rejection.
+        /// </summary>
+        private float LastRejection = 0f;
+
+        /// <summary>
+        /// Is used to be cautious in concurrency checking.
+        /// </summary>
+        private bool RecentRejection
         {
-            FetchCities();
+            get => (Time.realtimeSinceStartup - LastRejection < COOLDOWN_TIME);
+
+            set
+            {
+                if (value)
+                {
+                    LastRejection = Time.realtimeSinceStartup;
+                }
+            }
         }
+
+        /// <summary>
+        /// Stores the version number of the network.
+        /// Managed solely by the server and used to detect conflicts.
+        /// </summary>
+        private int NetworkVersion = 0;
+
+        /// <summary>
+        /// Used to keep track of missing NetActions in versioning.
+        /// </summary>
+        private HashSet<int> MissingNetworkVersions;
 
         /// <summary>
         /// Fetches the multiplayer city files from the backend on the server or host.
         /// </summary>
         public override void OnNetworkSpawn()
         {
-            FetchCities();
-        }
-
-        /// <summary>
-        /// Fetches the multiplayer city files from the backend on the server or host.
-        /// </summary>
-        private void FetchCities()
-        {
-            if (!networkIsSetUp)
+            IsClient = (!IsServer && !IsHost);
+            if (IsClient)
             {
-                if (IsServer || IsHost)
-                {
-                    // We are a server.
-                    Debug.Log("Starting server action network!\n");
-                    BackendSyncUtil.InitializeCitiesAsync().Forget();
-                    networkIsSetUp = true;
-                }
-                if (IsClient)
-                {
-                    // We are a client.
-                    Debug.Log("Starting client action network!\n");
-                    RequestSynchronizationServerRpc();
-                    networkIsSetUp = true;
-                }
+                Debug.Log("Starting client action network!\n");
+                RequestSynchronizationServerRpc();
+                PendingActions = new();
+                IncomingActions = new();
+                MissingNetworkVersions = new();
+            }
+            else
+            {
+                Debug.Log("Starting server action network!\n");
+                BackendSyncUtil.InitializeCitiesAsync().Forget();
             }
         }
-
 
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients
@@ -91,7 +147,7 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         public void BroadcastActionServerRpc(string serializedAction, ulong[] recipientIds = null, RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
+            if (IsClient)
             {
                 return;
             }
@@ -101,16 +157,22 @@ namespace SEE.Net
             }
 
             AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
+            if (deserializedAction is ConcurrentNetAction conAction)
+            {
+                if (ConcurrencyCheck(conAction)) { return; }
+            }
+
             if (deserializedAction.ShouldBeSentToNewClient)
             {
                 Network.NetworkActionList.Add(serializedAction);
             }
-            deserializedAction.ExecuteOnServer();
 
+            deserializedAction.ExecuteOnServer();
             if (recipientIds == null)
             {
-                ulong senderId = rpcParams.Receive.SenderClientId;
-                ExecuteActionClientRpc(serializedAction, RpcTarget.Not(senderId, RpcTargetUse.Temp));
+                // ulong senderId = rpcParams.Receive.SenderClientId;
+                // Alle erhalten die NetAction, der Sender nutzt sie als ACK
+                ExecuteActionClientRpc(serializedAction, RpcTarget.Everyone);
             }
             else
             {
@@ -157,7 +219,7 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         private void BroadcastFragmentedActionServerRpc(string key, ulong[] recipientIds, RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
+            if (IsClient)
             {
                 return;
             }
@@ -169,10 +231,17 @@ namespace SEE.Net
             {
                 string serializedAction = Fragment.CombineFragments(fragments);
                 AbstractNetAction deserializedAction = ActionSerializer.Deserialize(serializedAction);
+
+                if (deserializedAction is ConcurrentNetAction conAction)
+                {
+                    if (ConcurrencyCheck(conAction)) { return; }
+                }
+
                 if (deserializedAction.ShouldBeSentToNewClient)
                 {
                     Network.NetworkActionList.Add(serializedAction);
                 }
+
                 deserializedAction.ExecuteOnServer();
 
                 if (recipientIds == null)
@@ -205,7 +274,7 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         public void RequestSynchronizationServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
+            if (IsClient)
             {
                 return;
             }
@@ -251,7 +320,7 @@ namespace SEE.Net
         [Rpc(SendTo.Server)]
         private void ClientResponseActionExecutionToServerRpc(RpcParams rpcParams = default)
         {
-            if (!IsServer && !IsHost)
+            if (IsClient)
             {
                 return;
             }
@@ -347,6 +416,38 @@ namespace SEE.Net
         }
 
         /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Tries to send the requesting client the missing actions from the ActionHistory.
+        /// Otherwise a ReSync-Message.
+        /// </summary>
+        /// <param name="missingActions"> List of missing NetActions by the Client.</param>
+        public void SendRequestedMissingActionsServer(HashSet<int> missingActions, ulong requestingClient)
+        {
+            int oldActionCount = Network.NetworkActionList.Count - 1;
+            if (oldActionCount <= 0)
+            {
+                Debug.LogWarning($"Received a RequestMissingActions Message by client ID {requestingClient} while ActionHistory is empty!\n");
+                // Send ReSync NetAction to client.
+                return;
+            }
+            int limit = oldActionCount < 7 ? oldActionCount : 7;
+            AbstractNetAction tempAction;
+            for (int i = oldActionCount; i > oldActionCount - limit; i--)
+            {
+                tempAction = ActionSerializer.Deserialize(Network.NetworkActionList[i]);
+                if (tempAction is ConcurrentNetAction tempConAction &&
+                    missingActions.Contains(tempConAction.NetworkVersion))
+                {
+                    ExecuteActionUnsafeClientRpc(Network.NetworkActionList[i], RpcTarget.Single(requestingClient, RpcTargetUse.Temp));
+                }
+            }
+            if (missingActions.Count > 0)
+            {
+                // Send ReSync NetAction to client.
+            }
+        }
+
+        /// <summary>
         /// Executes an action, even if the sender and this client are the same. This is used
         /// for synchronizing server state.
         /// </summary>
@@ -380,7 +481,12 @@ namespace SEE.Net
             AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
             if (action.Requester != NetworkManager.Singleton.LocalClientId)
             {
-                action.ExecuteOnClient();
+                ExecuteNetAction(action);
+            }
+            else
+            {
+                // Remove from pending list.
+                RemovePendingAction((ConcurrentNetAction)action);
             }
         }
 
@@ -433,7 +539,12 @@ namespace SEE.Net
                 AbstractNetAction action = ActionSerializer.Deserialize(serializedAction);
                 if (action.Requester != NetworkManager.Singleton.LocalClientId)
                 {
-                    action.ExecuteOnClient();
+                    ExecuteNetAction(action);
+                }
+                else
+                {
+                    // Remove from pending list.
+                    RemovePendingAction((ConcurrentNetAction)action);
                 }
                 fragmentsGatherer.Remove(key);
             }
@@ -464,6 +575,430 @@ namespace SEE.Net
             UserSettings.Instance.Network.BackendServerAPI = backendDomain;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// Adds NetAction to the pending list, can be reversed later.
+        /// </summary>
+        /// <param name="netAction">NetAction to wait for acception/rejection.</param>
+        public void AddPendingAction(ConcurrentNetAction netAction)
+        {
+            PendingActions.Add(netAction);
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// Removes NetAction if it got accepted.
+        /// </summary>
+        /// <param name="netAction">Accepted NetAction to remove from pending list.</param>
+        private void RemovePendingAction(ConcurrentNetAction netAction)
+        {
+            for (int i = 0; i < PendingActions.Count; i++)
+            {
+                if (PendingActions[i].Equals(netAction))
+                {
+                    if (netAction.UsesVersioning)
+                    {
+                        ObjectVersion[netAction.GameObjectID] = (int)netAction.NewVersion;
+                    }
+                    if (netAction is DeleteNetAction deleteAction)
+                    {
+                        deleteAction.UpdateVersioning();
+                    }
+                    SetNetworkVersion(netAction.NewNetworkVersion);
+                    PendingActions.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// Removes NetAction if it got rejected.
+        /// </summary>
+        /// <param name="netAction">Rejected NetAction to remove from pending list.</param>
+        public void RemoveRejectedAction(RejectNetAction netAction)
+        {
+            for (int i = 0; i < PendingActions.Count; i++)
+            {
+                if (PendingActions[i].Equals(netAction))
+                {
+                    PendingActions[i].Undo();
+                    PendingActions.RemoveAt(i);
+                }
+            }
+        }
+
+        /// <summary>
+        /// If there are PendingAction the execution of incoming ConcurrentNetAction
+        /// has to wait its turn.
+        /// </summary>
+        /// <param name="action"></param>
+        private void ExecuteNetAction(AbstractNetAction action)
+        {
+            if (action is ConcurrentNetAction conAction)
+            {
+                if (conAction.NewNetworkVersion != NetworkVersion + 1 || PendingActions.Count > 0)
+                {
+                    IncomingActions.Enqueue(conAction);
+                    ClientExecuteInOrder ??= StartCoroutine(ExecuteInOrder());
+                }
+                else
+                {
+                    conAction.ExecuteOnClient();
+                    SetNetworkVersion(conAction.NewNetworkVersion);
+                }
+            }
+            else
+            {
+                action.ExecuteOnClient();
+            }
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// To keep the order of execution we keep new NetActions here
+        /// until PendingActions are all executed.
+        /// </summary>
+        /// <returns><c>Yields</c> for not-blocking exection.</returns>
+        private IEnumerator ExecuteInOrder()
+        {
+            float lastMissingRequest = 0f;
+            while (IncomingActions.Count > 0 || MissingNetworkVersions.Count > 0)
+            {
+                if (IncomingActions.Count > 0)
+                {
+                    ConcurrentNetAction nextAction = IncomingActions.Peek();
+
+                    if (PendingActions.Count == 0)
+                    {
+                        IncomingActions.Dequeue().ExecuteOnClient();
+                        SetNetworkVersion(nextAction.NewNetworkVersion);
+                    }
+                    else if (nextAction.UsesVersioning &&
+                             nextAction.OldVersion == GetObjectVersion(nextAction.GameObjectID))
+                    {
+                        IncomingActions.Dequeue().ExecuteOnClient();
+                        SetNetworkVersion(nextAction.NewNetworkVersion);
+                    }
+                    else
+                    {
+                        yield return new WaitForSeconds(PING_TO_SERVER);
+                    }
+                }
+                else if (MissingNetworkVersions.Count > 0 && IncomingActions.Count == 0)
+                {
+                    int smallestMissingVersion = MissingNetworkVersions.Min();
+                    if (NetworkVersion - smallestMissingVersion > 5) // FIXME: Magic Number
+                    {
+                        //ReSync();
+                        throw new NotImplementedException();
+                    }
+                    else
+                    {
+                        if (Time.realtimeSinceStartup - lastMissingRequest > 1.5f)
+                        {
+                            var missingList = MissingNetworkVersions.OrderBy(v => v).ToList();
+                            new RequestNetAction(missingList).Execute();
+                            lastMissingRequest = Time.realtimeSinceStartup;
+                        }
+                    }
+                    yield return new WaitForSeconds(PING_TO_SERVER);
+                }
+            }
+            // IMPORTANT! Destroy CoRoutine.
+            ClientExecuteInOrder = null;
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Determines whether the received NetAction can be performed safely.
+        /// 
+        /// </summary>
+        /// <param name="netAction">The NetAction in question.</param>
+        /// <returns><c>True</c> if it needs to be rejected,<br/>
+        /// <c>False</c> if the NetAction can be performed. </returns>
+        private bool ConcurrencyCheck(ConcurrentNetAction netAction)
+        {
+            int networkDifference = NetworkVersion - netAction.NetworkVersion;
+            // We have the matching network version and no recent rejection
+            // We can assume that the NetAction was made on the current state
+            if (networkDifference == 0 && !RecentRejection)
+            {
+                AcceptConcurrentAction(netAction);
+                return false;
+            }
+            // mismatch of network version or recent rejection -> maybe tied client action
+            // first we try to incorporate the change
+            else
+            {
+                if (netAction.UsesVersioning)   // Is an object versioning used?
+                {
+                    // We need a version match and do not accept self-incremented
+                    if (GetServerObjectVersion(netAction.GameObjectID) == netAction.OldVersion &&
+                        LastChangeBy == netAction.Requester)
+                    {
+                        AcceptConcurrentAction(netAction);
+                        return false;
+                    }
+                    // here we try to find out whether we can apply the change either way
+                    // this is complex, so we want to avoid this
+                    // First we want to know, if the object of our desire has been deleted
+                    else if (GetServerObjectVersion(netAction.GameObjectID) != -1 && IsSafeAction(netAction))
+                    {
+                        // the action seems to be safe to perform
+                        AcceptConcurrentAction(netAction);
+                        return false;
+                    }
+                    else // the change must not be accepted
+                    {
+                        RejectAction(netAction);
+                        return true;
+                    }
+                }
+                else // no versioned object -> deletion or delete-reversal or set-select
+                {
+                    if (netAction is SetSelectNetAction)
+                    {
+                        if (ObjectVersion.TryGetValue(netAction.GameObjectID, out int version) &&
+                            version != -1) // do we need to check whether the object version matches?
+                        {
+                            // the action seems to be safe to perform
+                            AcceptConcurrentAction(netAction);
+                            return false;
+                        }
+                    }
+                    else if (netAction is DeleteNetAction deleteAction &&
+                        deleteAction.GetVersionedObjects() is Dictionary<string, int> deleteObjectVersions)
+                    {
+                        // use LINQ to check whether all affected versions match
+                        bool actionAcceptable = deleteObjectVersions
+                                                .All(kv => GetServerObjectVersion(kv.Key) == kv.Value);
+
+                        // on a mismatch we have elements left and reject the DeleteNetAction
+                        if (actionAcceptable)
+                        {
+                            AcceptConcurrentAction(netAction);
+                            return false;
+                        }
+                    }
+                    else if (netAction is RegenerateNetAction regenerateAction)
+                    {
+                        // use LINQ to check whether there is ANY not deleted element
+                        bool actionAcceptable = regenerateAction
+                                                .GetRegenerateList()
+                                                .All(id => GetServerObjectVersion(id) == -1);
+
+                        if (actionAcceptable && NoRecentStructuralChanges(regenerateAction.Requester))
+                        {
+                            AcceptConcurrentAction(netAction);
+                            return false;
+                        }
+                    }
+                }
+            }
+            RejectAction(netAction);
+            return true;
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Routine to update network version and distribute new object version.
+        /// </summary>
+        /// <param name="netAction"> accepted NetAction.</param>
+        private void AcceptConcurrentAction(ConcurrentNetAction netAction)
+        {
+            NetworkVersion++;
+            netAction.NetworkVersion = NetworkVersion;
+            if (netAction.UsesVersioning)
+            {
+                netAction.NewVersion = IncrementObjectVersion(netAction.GameObjectID);
+                LastChangeBy = netAction.Requester;
+            }
+        }
+
+        /// <summary>
+        /// Use this before <see cref="RegenerateNetAction"/>,
+        /// there must be no structural changes after deletion.
+        /// CAUTION: This does not account for History-undone SetParents or Deletions!
+        /// Delete -> SetParent -> Undo SetParent ->X Regenerate: Does NOT work!
+        /// Delete #1 -> Delete #2 ->  Regenerate #2 ->X Regerate #1: Does NOT work!
+        /// </summary>
+        private bool NoRecentStructuralChanges(ulong requester)
+        {
+            AbstractNetAction tempAction;
+            for (int i = Network.NetworkActionList.Count - 1; i > 0; i--)
+            {
+                tempAction = ActionSerializer.Deserialize(Network.NetworkActionList[i]);
+
+                if (tempAction is not ConcurrentNetAction)
+                { continue; }
+
+                if (tempAction is DeleteNetAction && tempAction.Requester == requester)
+                { return true; }
+
+                if (tempAction is DeleteNetAction || tempAction is SetParentNetAction)
+                { return false; }
+
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Routine to send rejection.
+        /// </summary>
+        /// <param name="netAction"> accepted NetAction.</param>
+        private void RejectAction(ConcurrentNetAction netAction)
+        {
+            string serializedRejection = ActionSerializer.Serialize(netAction.GetRejection(ServerClientId));
+            RecentRejection = true;
+            // Must use "unsafe" because the server requests this
+            ExecuteActionUnsafeClientRpc(serializedRejection, RpcTarget.Single(netAction.Requester, RpcTargetUse.Temp));
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Checks whether the action is safe to perform despite the same object version.
+        /// To avoid masking, we do not allow to of the same actions.
+        /// THIS SEEMS TO BE EXPENSIVE
+        /// </summary>
+        /// <param name="action">The action whose executability is to be checked.</param>
+        /// <returns><c>True</c> if we can perform the action, <br/><c>False</c> otherwise.</returns>
+        private bool IsSafeAction(ConcurrentNetAction action)
+        {
+            int length = Network.NetworkActionList.Count - 1;
+            if (length > 2 && ConcurrentNetRules.IsSafeAction.Contains(action.GetType()))
+            {
+                AbstractNetAction tempAction;
+                for (int i = length; i > (length - 3); i--)
+                {
+                    tempAction = ActionSerializer.Deserialize(Network.NetworkActionList[i]);
+                    if (tempAction is ConcurrentNetAction tempConAction &&      // is it a ConcurrentAction?
+                        tempConAction.GameObjectID == action.GameObjectID &&    // are we looking at the same object?
+                        tempConAction.GetType() != action.GetType())            // would these actions mask each other?
+                    {
+                        return true;
+                    }
+                }
+
+            }
+            return false;
+        }
+
+
+        /// <summary>
+        ///  Calculates the network version for new NetActions.
+        /// </summary>
+        /// <returns>Usable network version as <c>int</c>.</returns>
+        public int GetCurrentClientNetworkVersion()
+        {
+            return NetworkVersion + PendingActions.Count;
+        }
+
+        /// <summary>
+        ///  Returns the actual network version without pending actions.
+        /// </summary>
+        /// <returns>Actual network version as <c>uint</c>.</returns>
+        public int GetActualNetworkVersion()
+        {
+            return NetworkVersion;
+        }
+
+        /// <summary>
+        /// Sets the received NetAction and 
+        /// </summary>
+        /// <param name="version"></param>
+        private void SetNetworkVersion(int newVersion)
+        {
+            if (newVersion < NetworkVersion)
+            {
+                MissingNetworkVersions.Remove(newVersion);
+                return;
+            }
+
+            if (newVersion > NetworkVersion + 1)
+            {
+                for (int i = NetworkVersion + 1; i < newVersion; i++)
+                {
+                    MissingNetworkVersions.Add(i);
+                }
+            }
+
+            NetworkVersion = newVersion;
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// Returns the server version of an object.<br/>
+        /// To use <see cref="ObjectVersion"/> in a lazy way.
+        /// </summary>
+        /// <param name="objectId">The ID of the versioned object.</param>
+        /// <returns><c>0</c> if there is no change<br/><c>-1</c> if the object was deleted<br/>
+        /// <c>int</c> of the version otherwise</returns>
+        public int GetServerObjectVersion(string objectId)
+        {
+            if (ObjectVersion.TryGetValue(objectId, out int serverVersion))
+            {
+                return serverVersion;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// Returns the current version of versioned objects.
+        /// </summary>
+        /// <param name="objectId"> The ID of the derserved versioned object.</param>
+        /// <returns>Current object version.</returns>
+        public int GetObjectVersion(string objectId)
+        {
+            int version = -2;
+            // First: Check whether we already have pending changes, these must be higher than other versions.
+            for (int i = 0; i < PendingActions.Count; i++)
+            {
+                if (PendingActions[i].GameObjectID == objectId && (PendingActions[i].NewVersion ?? 0) > version)
+                {
+                    version = (int)PendingActions[i].NewVersion;
+                }
+            }
+            // If there are no pending actions we try to find if this objects was modified since the beginning.
+            if (version < -1 && ObjectVersion.TryGetValue(objectId, out int objectVersion))
+            {
+                return objectVersion;
+            }
+
+            return version == -2 ? 0 : version;
+        }
+
+        /// <summary>
+        /// <c>CLIENT</c><br/>
+        /// The client uses this to set the version according to the NetAction
+        /// received from the server.
+        /// </summary>
+        /// <param name="objectId"> of the versioned object.</param>
+        /// <param name="version"> new version to set.</param>
+        public void SetObjectVersion(string objectId, int version)
+        {
+            ObjectVersion[objectId] = version;
+        }
+
+        /// <summary>
+        /// <c>SERVER</c><br/>
+        /// The object version needs to be incremented for conflict detection.
+        /// Increment iff the NetAction provides an object version.
+        /// </summary>
+        /// <param name="objectId"> The ID of the derserved versioned object.</param>
+        /// <returns>Value of 1 if it is newly versioned, the version otherwise.</returns>
+        private int IncrementObjectVersion(string objectId)
+        {
+            if (ObjectVersion.TryGetValue(objectId, out int objectVersion) && objectVersion > 0)
+            {
+                ObjectVersion[objectId]++;
+                return (objectVersion + 1); // no additional dictionary access
+            }
+            ObjectVersion[objectId] = 1;
+            return 1;
         }
     }
 }

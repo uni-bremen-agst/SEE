@@ -1002,7 +1002,8 @@ namespace SEE.Controls.Actions
                       ("Do you really want to delete the city?\r\nThis action cannot be undone.")))
                 {
                     GameElementDeleter.DeleteRoot(node.GameObject());
-                    new DeleteNetAction(node.ID).Execute();
+                    // If the Server rejects this, we need to resync, because we cannot undo this
+                    new DeleteNetAction(node.ID, () => ConcurrentNetAction.ReSync()).Execute();
                 }
             }
         }

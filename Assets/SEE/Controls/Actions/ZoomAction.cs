@@ -230,9 +230,11 @@ namespace SEE.Controls.Actions
                         Vector3 cityCenterToHitPointUnscaled = cityCenterToHitPoint.DividePairwise(rootTransform.localScale);
                         targetPosition = rootTransform.position + cityCenterToHitPoint - Vector3.Scale(cityCenterToHitPointUnscaled, nodeOperator.TargetScale);
                     }
-
+                    Vector3 oldPosition = nodeOperator.TargetPosition;
+                    Vector3 oldScale = nodeOperator.TargetScale;
+                    // FIXME: This doesn't seem to be a good idea...
                     nodeOperator.ResizeTo(targetScale, targetPosition, AnimationFactor, true, false, true);
-                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, true, false, true, AnimationFactor).Execute();
+                    new ResizeNodeNetAction(rootTransform.name, targetScale, targetPosition, oldScale, oldPosition, true, false, true, AnimationFactor).Execute();
                 }
             }
         }

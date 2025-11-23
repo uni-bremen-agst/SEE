@@ -7,13 +7,14 @@ namespace SEE.Net.Actions
     /// Propagates <see cref="ReflexionMapper.SetParent"/> or <see cref="GameNodeMover.SetParent"/>,
     /// respectively, through the network.
     /// </summary>
-    internal class SetParentNetAction : AbstractNetAction
+    internal class SetParentNetAction : ConcurrentNetAction
     {
+
         /// <summary>
-        /// The unique name of the child gameObject that needs to be put onto a new parent.
+        /// The unique name of the gameObject that is the old parent of the child.
         /// Must be known to <see cref="GraphElementIDMap"/>.
         /// </summary>
-        public string ChildID;
+        public string OldParentID;
 
         /// <summary>
         /// The unique name of the gameObject that becomes the new parent of the child.
@@ -38,11 +39,12 @@ namespace SEE.Net.Actions
         /// must be known to <see cref="GraphElementIDMap"/></param>
         /// <param name="reflexion">if true, <see cref="ReflexionMapper.SetParent"/> will
         /// be called; otherwise <see cref="GameNodeMover.SetParent"/></param>
-        public SetParentNetAction(string childID, string newParentID, bool reflexion)
+        public SetParentNetAction(string childID, string newParentID, string oldParentID, bool reflexion) : base(childID)
         {
-            ChildID = childID;
             NewParentID = newParentID;
+            OldParentID = oldParentID;
             Reflexion = reflexion;
+            UseObjectVersion(GameObjectID);
         }
 
         /// <summary>
@@ -52,12 +54,13 @@ namespace SEE.Net.Actions
         {
             if (Reflexion)
             {
-                ReflexionMapper.SetParent(Find(ChildID), Find(NewParentID));
+                ReflexionMapper.SetParent(Find(GameObjectID), Find(NewParentID));
             }
             else
             {
-                GameNodeMover.SetParent(Find(ChildID), Find(NewParentID));
+                GameNodeMover.SetParent(Find(GameObjectID), Find(NewParentID));
             }
+            SetVersion();
         }
 
         /// <summary>
@@ -66,6 +69,22 @@ namespace SEE.Net.Actions
         public override void ExecuteOnServer()
         {
             // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// Undoes the MoveAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            if (Reflexion)
+            {
+                ReflexionMapper.SetParent(Find(GameObjectID), Find(OldParentID));
+            }
+            else
+            {
+                GameNodeMover.SetParent(Find(GameObjectID), Find(OldParentID));
+            }
+            RollbackNotification();
         }
     }
 }

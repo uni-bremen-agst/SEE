@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using SEE.Controls;
+﻿using SEE.Controls;
+using System.Collections.Generic;
 using UnityEngine.Assertions;
 
 namespace SEE.Net.Actions
@@ -9,7 +8,7 @@ namespace SEE.Net.Actions
     /// !!! IMPORTANT !!!
     ///   See <see cref="AbstractNetAction"/> before modifying this class!
     /// </summary>
-    public class SetSelectNetAction : AbstractNetAction
+    public class SetSelectNetAction : ConcurrentNetAction
     {
         /// <summary>
         /// Every selected object of the end point of every client. This is only used by
@@ -17,11 +16,6 @@ namespace SEE.Net.Actions
         /// </summary>
         internal static readonly Dictionary<ulong, HashSet<InteractableObject>> SelectedObjects
             = new Dictionary<ulong, HashSet<InteractableObject>>();
-
-        /// <summary>
-        /// The id of the interactable.
-        /// </summary>
-        public string ID;
 
         /// <summary>
         /// Whether the interactable should be selected.
@@ -33,11 +27,9 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="interactable">The interactable to be (de)selected.</param>
         /// <param name="select">Whether the interactable should be selected.</param>
-        public SetSelectNetAction(InteractableObject interactable, bool select)
+        public SetSelectNetAction(InteractableObject interactable, bool select) : base(interactable?.name)
         {
             Assert.IsNotNull(interactable);
-
-            ID = interactable.name;
             Select = select;
         }
 
@@ -49,7 +41,7 @@ namespace SEE.Net.Actions
         {
             if (Select)
             {
-                InteractableObject interactable = InteractableObject.Get(ID);
+                InteractableObject interactable = InteractableObject.Get(GameObjectID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -63,7 +55,7 @@ namespace SEE.Net.Actions
             }
             else
             {
-                InteractableObject interactable = InteractableObject.Get(ID);
+                InteractableObject interactable = InteractableObject.Get(GameObjectID);
                 if (interactable)
                 {
                     ulong requester = Requester;
@@ -84,11 +76,24 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            InteractableObject interactable = InteractableObject.Get(ID);
+            InteractableObject interactable = InteractableObject.Get(GameObjectID);
             if (interactable)
             {
                 interactable.SetSelect(Select, false);
             }
+        }
+
+        /// <summary>
+        /// Undoes the SetSelectAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            InteractableObject interactable = InteractableObject.Get(GameObjectID);
+            if (interactable)
+            {
+                interactable.SetSelect(!Select, true);
+            }
+            RollbackNotification();
         }
     }
 }

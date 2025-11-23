@@ -129,8 +129,11 @@ namespace SEE.Controls.Actions
                 zoomState.CurrentTargetZoomSteps = 0;
                 zoomState.ZoomCommands.Clear();
                 NodeOperator nodeOperator = transform.gameObject.NodeOperator();
+                Vector3 oldPosition = nodeOperator.TargetPosition;
+                Vector3 oldScale = nodeOperator.TargetScale;
                 nodeOperator.ResizeTo(zoomState.OriginalLocalScale, zoomState.OriginalPosition, 0, true, false);
-                new ResizeNodeNetAction(transform.name, zoomState.OriginalLocalScale, zoomState.OriginalPosition, true, false, true, 0).Execute();
+                // FIXME: This doesn't seem to be a good idea...
+                new ResizeNodeNetAction(transform.name, zoomState.OriginalLocalScale, zoomState.OriginalPosition, oldScale, oldPosition, true, false, true, 0).Execute();
             }
             return steps > 0;
         }

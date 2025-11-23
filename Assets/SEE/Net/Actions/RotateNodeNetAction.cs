@@ -1,6 +1,5 @@
 ﻿using SEE.Game.Operator;
 using SEE.GO;
-using SEE.Utils;
 using UnityEngine;
 
 namespace SEE.Net.Actions
@@ -8,12 +7,8 @@ namespace SEE.Net.Actions
     /// <summary>
     /// Propagates the rotation of a game node through the network.
     /// </summary>
-    internal class RotateNodeNetAction : AbstractNetAction
+    internal class RotateNodeNetAction : ConcurrentNetAction
     {
-        /// <summary>
-        /// The unique name of the game object that needs to be rotated.
-        /// </summary>
-        public string GameObjectID;
 
         /// <summary>
         /// The rotation of the game object.
@@ -27,10 +22,10 @@ namespace SEE.Net.Actions
         /// </summary>
         /// <param name="id">the unique ID of the game object to be rotated</param>
         /// <param name="rotation">the rotation by which to rotate the game object</param>
-        public RotateNodeNetAction(string id, Quaternion rotation)
+        public RotateNodeNetAction(string gameObjectID, Quaternion rotation) : base(gameObjectID)
         {
-            GameObjectID = id;
             Rotation = rotation;
+            UseObjectVersion(gameObjectID);
         }
 
         /// <summary>
@@ -39,13 +34,28 @@ namespace SEE.Net.Actions
         public override void ExecuteOnClient()
         {
             GameObject gameObject = Find(GameObjectID);
-            NodeOperator nodeOperator = gameObject.NodeOperator ();
+            NodeOperator nodeOperator = gameObject.NodeOperator();
             nodeOperator.RotateTo(Rotation, 0);
+            SetVersion();
         }
 
+        /// <summary>
+        /// Does not do anything.
+        /// </summary>
         public override void ExecuteOnServer()
         {
             // Intentionally left blank.
+        }
+
+        /// <summary>
+        /// Undos the RotateNodeAction locally if the server rejects it.
+        /// </summary>
+        public override void Undo()
+        {
+            GameObject gameObject = Find(GameObjectID);
+            NodeOperator nodeOperator = gameObject.NodeOperator();
+            nodeOperator.RotateTo(Quaternion.Inverse(Rotation), 0);
+            RollbackNotification();
         }
     }
 }

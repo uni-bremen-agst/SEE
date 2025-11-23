@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using SEE.Audio;
+﻿using SEE.Audio;
 using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
@@ -14,6 +10,11 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using SEE.Utils.History;
 using SEE.XR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditorInternal;
+using UnityEngine;
 
 namespace SEE.Controls.Actions
 {
@@ -202,7 +203,7 @@ namespace SEE.Controls.Actions
             {
                 NodeID = addedGameNode.name
             };
-            new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+            // Removed AddNodeNetAction from this point.
 
             progress = ProgressState.WaitingForInput;
             OpenDialog(addedGameNode);
@@ -270,7 +271,7 @@ namespace SEE.Controls.Actions
                     }
                     if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Right) && bounds.Right >= siblingBounds.Left)
                     {
-                        float newVal =  SEEMath.BitDecrement(siblingBounds.Left);
+                        float newVal = SEEMath.BitDecrement(siblingBounds.Left);
                         potentialGrow.Left = bounds.Right - newVal;
                         potentialGrow.Right = 0f;
                         bounds.Right = newVal;
@@ -284,7 +285,7 @@ namespace SEE.Controls.Actions
                     }
                     if (siblingBounds.LineIntersect(new(targetPosition.x, targetPosition.z), Direction2D.Front) && bounds.Front >= siblingBounds.Back)
                     {
-                        float newVal =  SEEMath.BitDecrement(siblingBounds.Back);
+                        float newVal = SEEMath.BitDecrement(siblingBounds.Back);
                         potentialGrow.Back = bounds.Front - newVal;
                         potentialGrow.Front = 0f;
                         bounds.Front = newVal;
@@ -346,34 +347,38 @@ namespace SEE.Controls.Actions
                     // Adapt bounds to prevent overlap with siblings
                     switch (direction)
                     {
-                        case Direction2D.Left: {
-                            float newVal = SEEMath.BitIncrement(siblingBounds.Right);
-                            potentialGrow.Right += newVal - bounds.Left;
-                            potentialGrow.Left = 0f;
-                            bounds.Left = newVal;
-                            break;
-                        }
-                        case Direction2D.Right: {
-                            float newVal = SEEMath.BitDecrement(siblingBounds.Left);
-                            potentialGrow.Left += bounds.Right - newVal;
-                            potentialGrow.Right = 0f;
-                            bounds.Right = newVal;
-                            break;
-                        }
-                        case Direction2D.Back: {
-                            float newVal = SEEMath.BitIncrement(siblingBounds.Front);
-                            potentialGrow.Front += newVal - bounds.Back;
-                            potentialGrow.Back = 0f;
-                            bounds.Back = newVal;
-                            break;
-                        }
-                        case Direction2D.Front: {
-                            float newVal = SEEMath.BitDecrement(siblingBounds.Back);
-                            potentialGrow.Back += bounds.Front - newVal;
-                            potentialGrow.Front = 0f;
-                            bounds.Front = newVal;
-                            break;
-                        }
+                        case Direction2D.Left:
+                            {
+                                float newVal = SEEMath.BitIncrement(siblingBounds.Right);
+                                potentialGrow.Right += newVal - bounds.Left;
+                                potentialGrow.Left = 0f;
+                                bounds.Left = newVal;
+                                break;
+                            }
+                        case Direction2D.Right:
+                            {
+                                float newVal = SEEMath.BitDecrement(siblingBounds.Left);
+                                potentialGrow.Left += bounds.Right - newVal;
+                                potentialGrow.Right = 0f;
+                                bounds.Right = newVal;
+                                break;
+                            }
+                        case Direction2D.Back:
+                            {
+                                float newVal = SEEMath.BitIncrement(siblingBounds.Front);
+                                potentialGrow.Front += newVal - bounds.Back;
+                                potentialGrow.Back = 0f;
+                                bounds.Back = newVal;
+                                break;
+                            }
+                        case Direction2D.Front:
+                            {
+                                float newVal = SEEMath.BitDecrement(siblingBounds.Back);
+                                potentialGrow.Back += bounds.Front - newVal;
+                                potentialGrow.Front = 0f;
+                                bounds.Front = newVal;
+                                break;
+                            }
                     }
                 }
             }
@@ -383,7 +388,7 @@ namespace SEE.Controls.Actions
             /// </summary>
             void FillAvailableSpace()
             {
-                foreach (Direction2D direction in new[] {Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front})
+                foreach (Direction2D direction in new[] { Direction2D.Left, Direction2D.Right, Direction2D.Back, Direction2D.Front })
                 {
                     float oldValue;
                     switch (direction)
@@ -519,9 +524,13 @@ namespace SEE.Controls.Actions
 
             void OnConfirm()
             {
+                // Added AddNodeNetAction from AddNode, because we only tell the server if we keep it
+                new AddNodeNetAction(parentID: memento.Parent.name, newNodeID: memento.NodeID, memento.Position, memento.Scale, () => RejectUndo()).Execute();
+                string oldName = memento.Name;
+                string oldType = memento.Type;
                 memento.Name = node.SourceName;
                 memento.Type = node.Type;
-                new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
+                new EditNodeNetAction(node.ID, node.SourceName, node.Type, oldName, oldType).Execute();
                 InteractableObject.UnselectAll(true);
                 progress = ProgressState.Finish;
                 SEEInput.KeyboardShortcutsEnabled = true;
@@ -533,7 +542,7 @@ namespace SEE.Controls.Actions
                 ShowNotification.Warn("Addition of node aborted",
                     "The temporaily added node will be removed again.");
                 _ = GameElementDeleter.Delete(go);
-                new DeleteNetAction(go.name).Execute();
+                // Remove DeleteNetAction from here, because at this point the server doesn't know about the new node
                 progress = ProgressState.NoNodeSelected;
                 SEEInput.KeyboardShortcutsEnabled = true;
             }
@@ -622,12 +631,28 @@ namespace SEE.Controls.Actions
         public override void Undo()
         {
             base.Undo();
-            addedGameNode = addedGameNode != null?
+            addedGameNode = addedGameNode != null ?
                 addedGameNode : GraphElementIDMap.Find(memento.NodeID);
             if (addedGameNode != null)
             {
                 GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
-                new DeleteNetAction(addedGameNode.name).Execute();
+                new DeleteNetAction(addedGameNode.name, () => RejectRedo()).Execute();
+                Destroyer.Destroy(addedGameNode);
+                addedGameNode = null;
+            }
+        }
+
+        /// <summary>
+        /// Undoes this AddEdgeAction if server rejects AddEdge
+        /// </summary>
+        public void RejectUndo()
+        {
+            base.Undo();
+            addedGameNode = addedGameNode != null ?
+                addedGameNode : GraphElementIDMap.Find(memento.NodeID);
+            if (addedGameNode != null)
+            {
+                GameElementDeleter.RemoveNodeFromGraph(addedGameNode);
                 Destroyer.Destroy(addedGameNode);
                 addedGameNode = null;
             }
@@ -639,21 +664,44 @@ namespace SEE.Controls.Actions
         public override void Redo()
         {
             base.Redo();
-            GameObject parent = memento.Parent != null?
+            GameObject parent = memento.Parent != null ?
                 memento.Parent : GraphElementIDMap.Find(memento.ParentID);
             addedGameNode = GameNodeAdder.AddChild(parent, worldSpacePosition: memento.Position,
                                                    worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
             if (addedGameNode != null)
             {
                 new AddNodeNetAction(parentID: memento.ParentID,
-                    newNodeID: memento.NodeID, memento.Position, memento.Scale).Execute();
+                    newNodeID: memento.NodeID, memento.Position, memento.Scale, () => RejectUndo()).Execute();
 
+                if (!string.IsNullOrEmpty(memento.Type))
+                {
+                    Node node = addedGameNode.GetNode();
+                    string oldName = node.SourceName;
+                    string oldType = node.Type;
+                    GameNodeEditor.ChangeName(node, memento.Name);
+                    GameNodeEditor.ChangeType(node, memento.Type);
+                    new EditNodeNetAction(node.ID, node.SourceName, node.Type, oldName, oldType).Execute();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Redoes this action.
+        /// </summary>
+        public void RejectRedo()
+        {
+            base.Redo();
+            GameObject parent = memento.Parent != null ?
+                memento.Parent : GraphElementIDMap.Find(memento.ParentID);
+            addedGameNode = GameNodeAdder.AddChild(parent, worldSpacePosition: memento.Position,
+                                                   worldSpaceScale: memento.Scale, nodeID: memento.NodeID);
+            if (addedGameNode != null)
+            {
                 if (!string.IsNullOrEmpty(memento.Type))
                 {
                     Node node = addedGameNode.GetNode();
                     GameNodeEditor.ChangeName(node, memento.Name);
                     GameNodeEditor.ChangeType(node, memento.Type);
-                    new EditNodeNetAction(node.ID, node.SourceName, node.Type).Execute();
                 }
             }
         }
