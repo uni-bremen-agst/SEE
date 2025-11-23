@@ -6,7 +6,7 @@ namespace SEE.DataModel.DG.IO
     /// Strategy interface for normalizing code element identifiers from external tools
     /// (like code coverage analyzers) into a format that matches graph node IDs and enables
     /// efficient source range indexing.
-    /// 
+    ///
     /// Different programming languages and tools use different conventions for representing
     /// code elements (packages, classes, methods). This interface abstracts those differences
     /// so that metrics can be correctly attributed to nodes in the graph regardless of the
@@ -52,7 +52,7 @@ namespace SEE.DataModel.DG.IO
         /// - Multiple top-level types can exist in one file, but only one is public (the main type)
         /// - The filename must match the main type name (e.g., MyClass.java contains class MyClass)
         /// - Inner/nested types should resolve to their outermost main type for indexing
-        /// 
+        ///
         /// This ensures that metrics reported at the method or inner class level are correctly
         /// attributed to the primary type that represents the file in the graph.
         /// </remarks>
@@ -80,7 +80,7 @@ namespace SEE.DataModel.DG.IO
         /// 1. For method nodes: Recursively resolves to the parent type's main type
         /// 2. For type nodes: Strips inner class indicators and resolves to the main type
         /// 3. For other nodes: Returns null (not indexable)
-        /// 
+        ///
         /// The implementation should use the node's ID, Type, Filename, and Parent properties
         /// to make the determination.
         /// </remarks>
@@ -111,7 +111,7 @@ namespace SEE.DataModel.DG.IO
         /// - Method indicator conversion (# → .~ in Java)
         /// - Constructor special names (&lt;init&gt; → actual class name)
         /// - Inner class delimiters ($ in Java, + in C#)
-        /// 
+        ///
         /// The result should exactly match the <see cref="GraphElement.ID"/> (Linkage.Name)
         /// of the corresponding node in the graph, enabling direct node lookup.
         /// 

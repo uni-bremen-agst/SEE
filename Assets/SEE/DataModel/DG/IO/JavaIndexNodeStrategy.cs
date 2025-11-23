@@ -165,7 +165,7 @@ namespace SEE.DataModel.DG.IO
         /// <remarks>
         /// Java allows multiple top-level types in one file, but only one can be public (the "main type").
         /// The filename must match the main type name (e.g., MyClass.java contains public class MyClass).
-        /// 
+        ///
         /// Examples:
         /// - "pkg.Main" in Main.java → "pkg.Main" (already main type)
         /// - "pkg.NonMain" in Main.java → "pkg.Main" (non-main top-level type)

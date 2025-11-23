@@ -107,7 +107,6 @@ namespace SEE.DataModel.DG.IO
                     CultureInfo.InvariantCulture,
                     out int intValue))
             {
-              
                 node.SetInt(key, intValue);
             }
             else if (float.TryParse(
@@ -116,12 +115,10 @@ namespace SEE.DataModel.DG.IO
                          CultureInfo.InvariantCulture,
                          out float floatValue))
             {
-               
                 node.SetFloat(key, floatValue);
             }
             else
             {
-               
                 node.SetString(key, stringValue);
             }
         }
