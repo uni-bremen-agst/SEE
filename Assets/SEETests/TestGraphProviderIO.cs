@@ -318,7 +318,6 @@ namespace SEE.GraphProviders
             Assert.AreEqual(expected.GetType(), actual.GetType());
             GitBranchesGraphProvider gitBranchesLoaded = actual as GitBranchesGraphProvider;
             Assert.AreEqual(gitBranchesLoaded.SimplifyGraph, expected.SimplifyGraph);
-            Assert.AreEqual(gitBranchesLoaded.AutoFetch, expected.AutoFetch);
         }
 
         private GitBranchesGraphProvider GetAllBranchGitSingleProvider()
@@ -331,9 +330,6 @@ namespace SEE.GraphProviders
                                                           repositoryPaths: new List<string>() { "path1", "path2" },
                                                           branches: new List<string>() { "^branch1$", "master" })),
                 SimplifyGraph = true,
-                AutoFetch = true,
-                PollingInterval = 60,
-                MarkerTime = 3,
             };
         }
 

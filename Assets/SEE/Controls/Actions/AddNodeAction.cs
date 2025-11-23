@@ -78,14 +78,14 @@ namespace SEE.Controls.Actions
             switch (progress)
             {
                 case ProgressState.NoNodeSelected:
-                    if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && Input.GetMouseButtonDown(0)
+                    if (User.UserSettings.IsDesktop && Input.GetMouseButtonDown(0)
                         && Raycasting.RaycastGraphElement(out RaycastHit raycastHit, out GraphElementRef ger, false) == HitGraphElement.Node
                         && ger.gameObject.TryGetComponent(out InteractableObject io)
                         && io.IsInteractable(raycastHit.point))
                     {
                         CheckAddNode(raycastHit.collider.gameObject, raycastHit.transform.InverseTransformPoint(raycastHit.point));
                     }
-                    else if (SceneSettings.InputType == PlayerInputType.VRPlayer
+                    else if (User.UserSettings.IsVR
                         && XRSEEActions.Selected
                         && InteractableObject.HoveredObjectWithWorldFlag.gameObject != null
                         && InteractableObject.HoveredObjectWithWorldFlag.gameObject.HasNodeRef()

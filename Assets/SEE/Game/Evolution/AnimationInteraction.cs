@@ -560,11 +560,11 @@ namespace SEE.Game.Evolution
             {
                 if (userIsHoveringCity && SEEInput.Previous())
                 {
-                    evolutionRenderer.ShowPreviousGraph();
+                    evolutionRenderer.ShowPreviousGraphAsync();
                 }
                 else if (userIsHoveringCity && SEEInput.Next())
                 {
-                    evolutionRenderer.ShowNextGraph();
+                    evolutionRenderer.ShowNextGraphAsync();
                 }
                 else if (userIsHoveringCity && SEEInput.ToggleAutoPlay())
                 {
@@ -636,7 +636,7 @@ namespace SEE.Game.Evolution
 
             animationCanvas.SetActive(!IsRevisionSelectionOpen);
             revisionSelectionCanvas.SetActive(IsRevisionSelectionOpen);
-            evolutionRenderer.SetAutoPlay(false);
+            evolutionRenderer.SetAutoPlayAsync(false);
             if (IsRevisionSelectionOpen)
             {
                 // if revision-selection mode is enabled, we re-fill the drop-down

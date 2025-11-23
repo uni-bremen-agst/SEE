@@ -161,7 +161,7 @@ namespace SEE.Controls.Actions
             if (nodeOperator.Node != null)
             {
                 LabelAttributes settings = GetLabelSettings(nodeOperator.Node, nodeOperator.City);
-                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                if (User.UserSettings.IsDesktop)
                 {
                     if (settings.Show && pointer.Value.On && nodeOperator.LabelIsNotEmpty())
                     {
@@ -222,7 +222,7 @@ namespace SEE.Controls.Actions
         {
             if ((isHovered || isSelected) && nodeOperator != null && nodeOperator.Node != null)
             {
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit raycasthit);
                     nodeOperator.UpdateLabelLayout(raycasthit.point);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SEE.Controls;
 using SEE.GO;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
@@ -8,7 +7,6 @@ using SEE.UI.PropertyDialog;
 using SEE.Utils;
 using Sirenix.Utilities;
 using UnityEngine;
-using Network = SEE.Net.Network;
 
 namespace SEE.UI
 {
@@ -72,7 +70,14 @@ namespace SEE.UI
                     EntryColor: NextColor(),
                     Icon: Icons.VR),
 #endif
-                new(SelectAction: NetworkSettings,
+                new(
+                    SelectAction: TelemetrySettings,
+                    Title: "Telemetry Mode",
+                    Description: $"Currently: {User.UserSettings.Instance ?.Telemetry.Mode}",
+                    EntryColor: NextColor(),
+                    Icon: Icons.Export),
+
+                new(SelectAction: UserSettings,
                     Title: "Settings",
                     Description: "Allows to set additional network and user settings.",
                     EntryColor: Color.gray,
@@ -88,11 +93,6 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The <see cref="Net.Network"/> component configured by this dialog.
-        /// </summary>
-        private Network network;
-
-        /// <summary>
         /// Starts a host (= server + local client) on this machine.
         /// </summary>
         private void StartHost()
@@ -104,8 +104,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = inputType;
-                network.StartHost(NetworkCallBack);
+                User.UserSettings.Instance.InputType = inputType;
+                User.UserSettings.Instance.Network.StartHost(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -127,8 +127,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = inputType;
-                network.StartClient(NetworkCallBack);
+                User.UserSettings.Instance.InputType = inputType;
+                User.UserSettings.Instance.Network.StartClient(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -150,8 +150,8 @@ namespace SEE.UI
                 // not want the user to start any other network setting until this
                 // process has come to an end.
                 menu.ShowMenu = false;
-                SceneSettings.InputType = PlayerInputType.None;
-                network.StartServer(NetworkCallBack);
+                User.UserSettings.Instance.InputType = PlayerInputType.None;
+                User.UserSettings.Instance.Network.StartServer(NetworkCallBack);
             }
             catch (Exception exception)
             {
@@ -181,14 +181,31 @@ namespace SEE.UI
         /// <summary>
         /// Opens the dialog to configure the network settings.
         /// </summary>
-        private void NetworkSettings()
+        private void UserSettings()
         {
             /// Note: We arrive here because the user pressed one of the buttons of the
             /// menu, which - in turn - will call menu.ShowMenuAsync(false). Thus
             /// at this time, menu is no longer visible. When the following dialog
             /// is finished, <see cref="Reactivate"/> will be called to turn the menu on again.
-            NetworkPropertyDialog dialog = new(network, Reactivate);
+            UserSettingsDialog dialog = new(User.UserSettings.Instance?.Network, Reactivate);
             dialog.Open();
+            menu.ShowMenu = false;
+        }
+
+        /// <summary>
+        /// The telemetry settings dialog currently open, or null if no dialog is open.
+        /// </summary>
+        private TelemetryPropertyDialog telemetryDialog;
+
+        /// <summary>
+        /// Opens the telemetry settings dialog and disables the main menu while the dialog is active.
+        /// When the dialog is closed, the <see cref="Reactivate"/> method will be called to show the menu again.
+        /// </summary>
+        private void TelemetrySettings()
+        {
+            telemetryDialog = new TelemetryPropertyDialog(Reactivate);
+            telemetryDialog.Open();
+            menu.ShowMenu = false;
         }
 
         /// <summary>
@@ -205,9 +222,13 @@ namespace SEE.UI
         /// </summary>
         private void Awake()
         {
-            if (!gameObject.TryGetComponentOrLog(out network))
+            if (User.UserSettings.Instance == null)
             {
+                Debug.LogWarning($"No {typeof(User.UserSettings)} component exists in the scene! "
+                    + $"{typeof(OpeningDialog)} requires a {typeof(User.UserSettings)} component to be present. "
+                    + "Disabling this component.\n");
                 enabled = false;
+                return;
             }
         }
 
@@ -217,17 +238,17 @@ namespace SEE.UI
         private void Start()
         {
             menu = CreateMenu();
-            SceneSettings.Load();
-            inputType = SceneSettings.InputType;
+            User.UserSettings.Instance.Load();
+            inputType = User.UserSettings.Instance.InputType;
             // While this OpeningDialog is open, we want to run in a desktop environment,
             // because our GUI implementation is not yet complete for VR. The NetworkPropertyDialog
             // uses widgets that are not implemented for VR. Neither are ShowNotifications not
             // implemented for VR yet.
-            // We reset SceneSettings.InputType here to a desktop environment.
+            // We reset the InputType here to a desktop environment.
             // The loaded settings for the input type is kept in inputType. This field
             // will be toggled by request of the user and only when the host or client is
-            // actually started, we assign the value of inputType to SceneSettings.InputType.
-            SceneSettings.InputType = PlayerInputType.DesktopPlayer;
+            // actually started, we assign the value of inputType to User.UserSettings.Instance.InputType.
+            User.UserSettings.Instance.InputType = PlayerInputType.DesktopPlayer;
             menu.ShowMenu = true;
             ShowEnvironment();
         }
@@ -252,7 +273,7 @@ namespace SEE.UI
                 inputType = PlayerInputType.DesktopPlayer;
             }
 
-            SceneSettings.Save();
+            User.UserSettings.Instance.Save();
             ShowEnvironment();
         }
 
@@ -275,6 +296,16 @@ namespace SEE.UI
                     _ => throw new NotImplementedException($"Case {inputType} is not handled")
                 };
             }
+        }
+        /// <summary>
+        /// Delegates the Unity frame-based update call to the telemetry dialog,
+        /// so that changes in the dropdown selection can be polled and handled.
+        /// This ensures that the telemetry mode is updated dynamically even
+        /// without event-based support from the underlying UI component.
+        /// </summary>
+        private void Update()
+        {
+            telemetryDialog?.Update();
         }
     }
 }

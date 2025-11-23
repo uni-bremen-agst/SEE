@@ -23,11 +23,13 @@ namespace SEE.GraphProviders
     /// picked up the error messages of another test case.</remarks>
     internal class TestGraphProviders
     {
+        private string TestDataPath => Application.dataPath + "/../Data";
+
         [Test]
         public async Task TestGXLGraphProviderAsync()
         {
             SingleGraphProvider provider = new GXLSingleGraphProvider()
-            { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+            { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
 
             Graph loaded = await provider.ProvideAsync(new Graph(""), NewCity());
             Assert.IsNotNull(loaded);
@@ -46,18 +48,18 @@ namespace SEE.GraphProviders
 
                 {
                     SingleGraphProvider provider = new GXLSingleGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz") };
+                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.gxl.xz") };
                     graphPipeline.Add(provider);
                 }
                 {
                     SingleGraphProvider provider = new JaCoCoGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/jacoco.xml") };
+                    { Path = new DataPath(TestDataPath + "/JLGExample/jacoco.xml") };
                     graphPipeline.Add(provider);
                 }
 
                 {
                     SingleGraphProvider provider = new CSVGraphProvider()
-                    { Path = new DataPath(Application.streamingAssetsPath + "/JLGExample/CodeFacts.csv") };
+                    { Path = new DataPath(TestDataPath + "/JLGExample/CodeFacts.csv") };
                     graphPipeline.Add(provider);
                 }
 

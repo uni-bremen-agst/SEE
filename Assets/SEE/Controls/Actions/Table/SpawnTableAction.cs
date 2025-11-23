@@ -85,10 +85,11 @@ namespace SEE.Controls.Actions.Table
         public override void Stop()
         {
             base.Stop();
-            if (!finish)
+            if (!finish && spawnedTable != null)
             {
+                string name = spawnedTable.name;
                 GameTableManager.Destroy(spawnedTable);
-                new DestroyTableNetAction(spawnedTable.name).Execute();
+                new DestroyTableNetAction(name).Execute();
             }
         }
 
@@ -96,7 +97,7 @@ namespace SEE.Controls.Actions.Table
         /// Moves the table along the raycast until the user clicks the left mouse button.
         /// Ensures that the table does not overlap with any other object.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>true if action is finished</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())

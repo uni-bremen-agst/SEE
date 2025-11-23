@@ -9,6 +9,8 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.UI;
 using SEE.XR;
 using SEE.Game;
+using SEE.UI;
+using SEE.Controls.Interactables;
 
 namespace SEE.Utils
 {
@@ -19,7 +21,9 @@ namespace SEE.Utils
     {
         None, // Neither a node nor an edge was hit.
         Node, // A node was hit.
-        Edge // An edge was hit.
+        Edge, // An edge was hit.
+        Author, // An author of a file for code cities representing repository data was hit.
+        Auxiliary, // An auxiliary object was hit, such as a resize handle or a rotation handle
     }
 
     /// <summary>
@@ -232,18 +236,28 @@ namespace SEE.Utils
         {
             int layer = requireInteractable ? Layers.InteractableGraphObjectsLayerMask : Layers.GraphObjectsLayerMask;
             if (RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase obj, layer, maxDistance)
-                    && obj is InteractableObject)
+                && obj is InteractableObject interactableObject)
             {
                 raycastHit = hit;
-                io = (InteractableObject)obj;
-                HitGraphElement result = io.GraphElemRef.Elem switch
+                io = interactableObject;
+                if (obj is InteractableGraphElement graphElement)
                 {
-                    null => HitGraphElement.None,
-                    Node => HitGraphElement.Node,
-                    Edge => HitGraphElement.Edge,
-                    _ => throw new System.ArgumentOutOfRangeException()
-                };
-                return result;
+                    return graphElement.GraphElemRef.Elem switch
+                    {
+                        null => HitGraphElement.None,
+                        Node => HitGraphElement.Node,
+                        Edge => HitGraphElement.Edge,
+                        _ => throw new System.ArgumentOutOfRangeException()
+                    };
+                }
+                else if (obj is InteractableAuxiliaryObject)
+                {
+                    return HitGraphElement.Auxiliary;
+                }
+                else if (obj is InteractableAuthor)
+                {
+                    return HitGraphElement.Author;
+                }
             }
             raycastHit = hit;
             io = null;
@@ -351,7 +365,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
             }
@@ -365,8 +379,13 @@ namespace SEE.Utils
             {
                 Assert.IsNotNull(Mouse.current);
                 GameObject lastGameObject = inputModule.GetLastRaycastResult(Mouse.current.deviceId).gameObject;
-                return lastGameObject != null && lastGameObject.layer == uiLayer
-                                              && !ignoredUINames.Contains(lastGameObject.name);
+                /// Prevent wrong IsMouseOverGUI() state when a newly created child object (e.g.,
+                /// a ripple from ButtonManagerBasicIcon with useRipple enabled) does not have
+                /// the UI layer. In this case, also check parent objects for the UI layer or UI canvas name.
+                return lastGameObject != null && !ignoredUINames.Contains(lastGameObject.name)
+                    && (lastGameObject.layer == uiLayer
+                        || lastGameObject.HasParentWithLayer(uiLayer)
+                        || lastGameObject.FindParentWithName(UICanvas.Canvas.name) != null);
             }
         }
 
@@ -432,7 +451,7 @@ namespace SEE.Utils
         {
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 screenPoint = mainCamera.WorldToScreenPoint(hit.point);

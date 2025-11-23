@@ -37,6 +37,13 @@ namespace SEE.Game.City
         public MultiGraphPipelineProvider DataProvider = new();
 
         /// <summary>
+        /// The delay in seconds before starting the auto-play transition to the next graph.
+        /// </summary>
+        [Tooltip("The delay in seconds before starting the auto-play transition to the next graph.")]
+        [Range(1f, 60f)]
+        public float AutoPlayDelay = 5f;
+
+        /// <summary>
         /// Error message that will be shown when the graph provider pipeline (<see cref="DataProvider"/>)
         /// didn't yield any graphs.
         /// </summary>
@@ -152,7 +159,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
         public async UniTask LoadDataAsync()
         {
             if (firstGraph != null)
@@ -215,10 +222,10 @@ namespace SEE.Game.City
         /// Is intended to be used in the runtime configuration menu during play mode only,
         /// but not in the Unity Editor. Will call <see cref="LoadDataAsync"/>.
         /// Acts like Load and Draw in the Unity Editor, except that not only the first
-        /// graph will drawn, but the whole series subsequently.
+        /// graph will be drawn, but the whole series subsequently.
         /// </summary>
         [RuntimeButton(DataButtonsGroup, "Load and Draw")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         public async UniTask StartEvolutionAsync()
         {
             Reset();
@@ -241,7 +248,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup)]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -257,7 +264,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup)]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         public void DrawGraph()
         {
             if (firstGraph)
@@ -295,14 +302,13 @@ namespace SEE.Game.City
         /// evolving series of graphs.
         /// </summary>
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Start Evolution")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         private void StartEvolution()
         {
             evolutionRenderer = CreateEvolutionRenderer(LoadedGraphSeries);
             gameObject.AddOrGetComponent<AnimationInteraction>().EvolutionRenderer = evolutionRenderer;
-            evolutionRenderer.ShowGraphEvolution();
+            evolutionRenderer.ShowGraphEvolutionAsync().Forget();
         }
-
 
         /// <summary>
         /// Creates <see cref="evolutionRenderer"/> and shows the nodes having one of the selected
@@ -343,7 +349,7 @@ namespace SEE.Game.City
 
         #region Config I/O
         /// <summary>
-        /// The same as in <see cref="SEECity"/>
+        /// The same as in <see cref="SEECity"/>.
         /// </summary>
         private const string dataProviderPathLabel = "data";
 
@@ -355,6 +361,7 @@ namespace SEE.Game.City
         {
             base.Save(writer);
             DataProvider?.Save(writer, dataProviderPathLabel);
+            writer.Save(AutoPlayDelay, nameof(AutoPlayDelay));
         }
 
         /// <summary>
@@ -366,6 +373,7 @@ namespace SEE.Game.City
             base.Restore(attributes);
             DataProvider =
                 MultiGraphProvider.Restore(attributes, dataProviderPathLabel) as MultiGraphPipelineProvider;
+            ConfigIO.Restore(attributes, nameof(AutoPlayDelay), ref AutoPlayDelay);
         }
         #endregion
     }

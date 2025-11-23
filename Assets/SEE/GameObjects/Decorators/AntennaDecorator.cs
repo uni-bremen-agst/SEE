@@ -77,6 +77,7 @@ namespace SEE.GO.Decorators
         /// will be an immediate child of <paramref name="gameNode"/>. If <paramref name="gameNode"/>
         /// does not have any of the metrics specified in <see cref="antennaAttributes"/>,
         /// nothing happens.
+        /// The resulting antenna will have the same portal as <paramref name="gameNode"/>.
         /// </summary>
         /// <param name="gameNode">the game node to be decorated (must have a graph
         /// node attached)</param>
@@ -88,7 +89,7 @@ namespace SEE.GO.Decorators
 
             // The empty antenna object that will be the parent of all
             // antenna segments. It will be created on demand, that is,
-            // if we have at least on antenna segment.
+            // if we have at least one antenna segment.
             GameObject antenna = null;
             Node node = gameNode.GetNode();
 
@@ -121,6 +122,8 @@ namespace SEE.GO.Decorators
                     segmentPosition.y += extent;
 
                     AddToAntenna(segment);
+
+                    Portal.InheritPortal(gameNode, segment);
                 }
             }
 
@@ -130,8 +133,10 @@ namespace SEE.GO.Decorators
             {
                 if (antenna == null)
                 {
-                    antenna = new GameObject(antennaGameObjectName);
-                    antenna.tag = Tags.Decoration;
+                    antenna = new(antennaGameObjectName)
+                    {
+                        tag = Tags.Decoration
+                    };
                     antenna.transform.localScale = Vector3.one;
                 }
                 segment.transform.SetParent(antenna.transform);
@@ -178,7 +183,7 @@ namespace SEE.GO.Decorators
         /// <returns>mapping of metrics onto factories</returns>
         private static Dictionary<string, CylinderFactory> CreateSegmentFactories(AntennaAttributes antennaAttributes, ColorMap metricToColor)
         {
-            Dictionary<string, CylinderFactory> result = new Dictionary<string, CylinderFactory>(antennaAttributes.AntennaSections.Count);
+            Dictionary<string, CylinderFactory> result = new(antennaAttributes.AntennaSections.Count);
             foreach (string metricName in antennaAttributes.AntennaSections)
             {
                 Color color;
@@ -198,10 +203,8 @@ namespace SEE.GO.Decorators
 
         /// <summary>
         /// Creates a new segment using the given <paramref name="factory"/>.
-        /// This new game object will have the given <paramref name="renderQueueOffset"/>.
         /// </summary>
         /// <param name="factory">the factory to create the beam marker</param>
-        /// <param name="renderQueueOffset">offset in the render queue</param>
         /// <returns>new segment</returns>
         private static GameObject NewSegment(NodeFactory factory)
         {
