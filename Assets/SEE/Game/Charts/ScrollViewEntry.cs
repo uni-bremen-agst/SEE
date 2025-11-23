@@ -358,7 +358,7 @@ namespace SEE.Game.Charts
         /// handled <see cref="Controls.InteractableObject"/>, depending on the value of
         /// <see cref="enter"/>.
         /// </summary>
-        internal void OnPointerEvent(bool enter)
+        internal readonly void OnPointerEvent(bool enter)
         {
             if (InteractableObject != null)
             {

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using SEE.Utils.Config;
+using System.Collections.Generic;
 using System.Linq;
-using SEE.Utils.Config;
+using UnityEngine;
 
 namespace SEE.Game.City
 {
@@ -90,7 +91,10 @@ namespace SEE.Game.City
         /// Label in the configuration file for <see cref="MarkerAttributes"/>.
         /// </summary>
         private const string markerAttributesLabel = "Markers";
-
+        /// <summary>
+        /// Label in the configuration file for <see cref="TableWorldScale"/>.
+        /// </summary>
+        private const string tableWorldScaleLabel = "TableWorldScale";
         #endregion
 
         /// <summary>
@@ -103,6 +107,7 @@ namespace SEE.Game.City
             ConfigurationPath.Save(writer, configurationPathLabel);
             SourceCodeDirectory.Save(writer, sourceCodeDirectoryLabel);
             SolutionPath.Save(writer, solutionPathLabel);
+            writer.Save(TableWorldScale, tableWorldScaleLabel);
             writer.Save(LODCulling, lodCullingLabel);
             writer.Save(HierarchicalEdges.ToList(), hierarchicalEdgesLabel);
             writer.Save(HiddenEdges.ToList(), hiddenEdgesLabel);
@@ -131,6 +136,7 @@ namespace SEE.Game.City
             ConfigurationPath.Restore(attributes, configurationPathLabel);
             SourceCodeDirectory.Restore(attributes, sourceCodeDirectoryLabel);
             SolutionPath.Restore(attributes, solutionPathLabel);
+            ConfigIO.Restore(attributes, tableWorldScaleLabel, value => TableWorldScale = value);
             ConfigIO.Restore(attributes, lodCullingLabel, ref LODCulling);
             ConfigIO.Restore(attributes, hierarchicalEdgesLabel, ref HierarchicalEdges);
             ConfigIO.Restore(attributes, hiddenEdgesLabel, ref HiddenEdges);

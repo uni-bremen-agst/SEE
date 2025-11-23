@@ -13,6 +13,8 @@ using SEE.Game.CityRendering;
 using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
+using SEE.UI.Notification;
+using SEE.Game.Table;
 
 namespace SEE.Game.City
 {
@@ -43,6 +45,14 @@ namespace SEE.Game.City
             // Intentionally left blank
         }
 
+        /// <summary>
+        /// The level of the "sky" above code cities in world-space Unity units.
+        ///
+        /// It is used, for instance, to animate the birth of a node by moving it
+        /// down from the sky and also to position the authors above a branch city.
+        /// </summary>
+        public const float SkyLevel = 2.25f;
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -65,6 +75,21 @@ namespace SEE.Game.City
         /// </summary>
         [Range(0.0f, 1.0f)]
         public float LODCulling = 0.001f;
+
+        /// <summary>
+        /// Gets or sets the table's world-space scale.
+        /// </summary>
+        /// <remarks>
+        /// The associated City GameObject is always a child of a table.
+        /// The getter returns the table's global scale via <c>lossyScale</c>.
+        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// to achieve the desired world-space scale.
+        /// </remarks>
+        public Vector3 TableWorldScale
+        {
+            get { return transform.parent.lossyScale; }
+            set { GameTableManager.Scale(transform.parent.gameObject, value);}
+        }
 
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
@@ -182,7 +207,7 @@ namespace SEE.Game.City
         /// </summary>
         [ProgressBar(0, 1, Height = 20, ColorGetter = nameof(GetProgressBarColor),
                      CustomValueStringGetter = "$" + nameof(ProgressBarValueString))]
-        [PropertyOrder(999)]
+        [PropertyOrder(999), RuntimeGroupOrder(999)]
         [ShowIf(nameof(ShowProgressBar)), RuntimeShowIf(nameof(ShowProgressBar))]
         [HideLabel]
         [ReadOnly]
@@ -330,7 +355,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Save Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupSave)]
+        [PropertyOrder(ConfigurationButtonsGroupSave), RuntimeGroupOrder(ConfigurationButtonsGroupSave)]
         public void SaveConfiguration()
         {
             Save(ConfigurationPath.Path);
@@ -341,7 +366,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupLoad)]
+        [PropertyOrder(ConfigurationButtonsGroupLoad), RuntimeGroupOrder(ConfigurationButtonsGroupLoad)]
         public virtual void LoadConfiguration()
         {
             Load(ConfigurationPath.Path);
@@ -363,8 +388,15 @@ namespace SEE.Game.City
         /// <param name="filename">name of the file from which the settings are restored</param>
         public void Load(string filename)
         {
-            using ConfigReader stream = new(filename);
-            Restore(stream.Read());
+            try
+            {
+                using ConfigReader stream = new(filename);
+                Restore(stream.Read());
+            }
+            catch (Exception e)
+            {
+               ShowNotification.Error("Read error", $"Could not load configuration from {filename}: {e.Message}\n");
+            }
         }
 
         /// <summary>
@@ -384,7 +416,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public virtual void Reset()
         {
             DeleteGraphGameObjects();
@@ -396,8 +428,8 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 1)]
-        public void ResetSelectedNodeTypes()
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
+        public virtual void ResetSelectedNodeTypes()
         {
             NodeTypes.Clear();
         }
@@ -408,7 +440,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Dump Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Dump Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         public void DumpGraphElementIDMap()
         {
             GraphElementIDMap.Dump();
@@ -420,7 +452,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Clear Map")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Clear Map")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 3)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 3), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 3)]
         public void ClearGraphElementIDMap()
         {
             GraphElementIDMap.Clear();
@@ -618,7 +650,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "List Node Metrics")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "List Node Metrics")]
-        [PropertyOrder(ResetButtonsGroupOrderReset + 2)]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 2), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 2)]
         private void ListNodeMetrics()
         {
             DumpNodeMetrics();
@@ -769,9 +801,14 @@ namespace SEE.Game.City
         protected const float ConfigurationButtonsGroupLoad = 0;
 
         /// <summary>
-        /// The order of the Load button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// The order of the save button in the button group <see cref="ConfigurationButtonsGroup"/>.
         /// </summary>
         protected const float ConfigurationButtonsGroupSave = ConfigurationButtonsGroupLoad + 1;
+
+        /// <summary>
+        /// The order of the switch button in the button group <see cref="ConfigurationButtonsGroup"/>.
+        /// </summary>
+        protected const float ConfigurationButtonsGroupSwitch = ConfigurationButtonsGroupSave + 1;
 
         /// <summary>
         /// Name of the Inspector foldout group for the metric setttings.

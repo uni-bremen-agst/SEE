@@ -171,24 +171,28 @@ namespace SEE.Game.City
             async UniTaskVoid LoadAsync()
             {
                 await LoadDataAsync();
-                InitializeAfterDrawn();
+                InitializeAfterDrawn(true);
                 BoardSettings.LoadBoard();
             }
         }
 
         /// <summary>
-        /// Sets the <see cref="NodeRef"/> and <see cref="EdgeRef"/>, respectively, for all
-        /// game objects representing nodes or edges in the <see cref="VisualizedSubGraph"/>.
-        ///
         /// Sets the toggle attribute <see cref="GraphElement.IsVirtualToggle"/> for all
         /// nodes and edges in <see cref="LoadedGraph"/> that are not in the <see cref="VisualizedSubGraph"/>.
         /// This toggle prevents them to be drawn. This is necessary because <see cref="LoadedGraph"/>
         /// and <see cref="VisualizedSubGraph"/> co-exist and the latter may only be a subgraph
         /// of the former.
         ///
+        /// If <paramref name="updateGraphElementRefs"/> is true, this method also sets the
+        /// <see cref="NodeRef"/> or <see cref="EdgeRef"/>, respectively, for all
+        /// game objects representing nodes or edges in the <see cref="VisualizedSubGraph"/>.
+        /// In addition, <see cref="GraphElementIDMap"/> will be updated with all graph elements
+        /// in rendered graph elements using method <see cref="UpdateGraphElementIDMap(GameObject)"/>
+        /// if <paramref name="updateGraphElementRefs"/> is true.
+        ///
         /// Note that this method may only be called after the code city has been drawn.
         /// </summary>
-        protected virtual void InitializeAfterDrawn()
+        protected virtual void InitializeAfterDrawn(bool updateGraphElementRefs)
         {
             Assert.IsTrue(gameObject.IsCodeCityDrawn());
             Graph subGraph = VisualizedSubGraph;
@@ -204,7 +208,10 @@ namespace SEE.Game.City
                     graphElement.SetToggle(GraphElement.IsVirtualToggle);
                 }
 
-                SetNodeEdgeRefs(subGraph, gameObject);
+                if (updateGraphElementRefs)
+                {
+                    SetNodeEdgeRefs(subGraph, gameObject);
+                }
             }
             else
             {
@@ -224,7 +231,11 @@ namespace SEE.Game.City
             // This must be loadedGraph. It must not be LoadedGraph. The latter would reset the graph.
             loadedGraph = subGraph;
 
-            UpdateGraphElementIDMap(gameObject);
+            if (updateGraphElementRefs)
+            {
+                UpdateGraphElementIDMap(gameObject);
+            }
+
             return;
 
             void HideHiddenEdges()
@@ -333,8 +344,8 @@ namespace SEE.Game.City
         /// Required for <see cref="SEEReflexionCity"/>.</returns>
         [Button(ButtonSizes.Small, Name = "Load Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public virtual async UniTask<bool> LoadDataAsync()
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
+        public virtual async UniTask LoadDataAsync()
         {
             if (DataProvider != null)
             {
@@ -374,7 +385,6 @@ namespace SEE.Game.City
             {
                 ShowNotification.Error("No data provider", "You must set a data provider before you can load the data.");
             }
-            return false;
         }
 
         /// <summary>
@@ -382,7 +392,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
-        [PropertyOrder(DataButtonsGroupOrderSave)]
+        [PropertyOrder(DataButtonsGroupOrderSave), RuntimeGroupOrder(DataButtonsGroupOrderSave)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void SaveData()
         {
@@ -401,11 +411,11 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Draws the graph.
-        /// Precondition: The graph and its metrics have been loaded.
+        /// Precondition: The graph data have been loaded.
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
         public virtual void DrawGraph()
         {
@@ -455,7 +465,7 @@ namespace SEE.Game.City
             // game starts. Otherwise, in playmode, we have to call it ourselves.
             if (Application.isPlaying)
             {
-                InitializeAfterDrawn();
+                InitializeAfterDrawn(true);
             }
         }
 
@@ -503,7 +513,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
-        [PropertyOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
@@ -543,7 +553,7 @@ namespace SEE.Game.City
         /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
         [Button(ButtonSizes.Small, Name = "Reset Data")]
         [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
-        [PropertyOrder(ResetButtonsGroupOrderReset)]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
         public override void Reset()
         {
             base.Reset();
@@ -620,8 +630,8 @@ namespace SEE.Game.City
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
-            DataProvider =
-                SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
+            DataProvider = SingleGraphProvider.Restore(attributes, dataProviderPathLabel)
+                            as SingleGraphPipelineProvider;
         }
 
         #endregion

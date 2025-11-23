@@ -54,7 +54,7 @@ namespace SEE.UI.Menu.Table
             InputFieldWithButtons xScaleArea = menuInstance.FindDescendant("XScale").GetComponent<InputFieldWithButtons>();
             InputFieldWithButtons zScaleArea = menuInstance.FindDescendant("ZScale").GetComponent<InputFieldWithButtons>();
             float step = 0.001f;
-            float max = 0.05f;
+            float max = 2f;
 
             xScaleArea.SetMinValue(step);
             xScaleArea.SetMaxValue(max);

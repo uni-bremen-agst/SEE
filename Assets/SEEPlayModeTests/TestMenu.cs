@@ -1,9 +1,7 @@
 ﻿using NUnit.Framework;
 using SEE.Utils;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.TestTools;
 using UnityEngine.UI;
 
 namespace SEE.UI.Menu

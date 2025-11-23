@@ -316,7 +316,7 @@
         /// </summary>
         /// <remarks>Note that this is not actually a numeric metric but a list of
         /// author names seperated by a comma.</remarks>
-        public const string AuthorAttributeName = VCSPrefix + "Authors";
+        public const string AuthorsAttributeName = "Authors";
 
         /// <summary>
         /// Name of node type used for files.

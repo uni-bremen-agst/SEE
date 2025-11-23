@@ -29,7 +29,8 @@ namespace SEE.UI.Menu
         string NoText = "Cancel",
         char YesIcon = Icons.Checkmark,
         char NoIcon = 'X',
-        Color? YesColor = null)
+        Color? YesColor = null,
+        Color? NoColor = null)
     {
         /// <summary>
         /// A pre-made configuration for a delete dialog.
@@ -40,6 +41,13 @@ namespace SEE.UI.Menu
         {
             return new ConfirmConfiguration(description, Title: "Really delete?",
                                             YesText: "Delete", YesIcon: Icons.Trash, YesColor: Color.red.Darker());
+        }
+
+        public static ConfirmConfiguration YesNo(string description)
+        {
+            return new ConfirmConfiguration(description,
+                                            YesText: "Yes", YesIcon: Icons.Checkmark, YesColor: Color.green.Darker(),
+                                            NoText: "No", NoIcon: 'X', NoColor: Color.red.Darker());
         }
     }
 
@@ -61,7 +69,12 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The default color of the confirm button.
         /// </summary>
-        private static readonly Color defaultColor = Color.green.Darker();  // Slightly darker green.
+        private static readonly Color defaultYesColor = Color.green.Darker();  // Slightly darker green.
+
+        /// <summary>
+        /// The default color of the cancel button.
+        /// </summary>
+        private static readonly Color defaultNoColor = new(74, 78, 152); // The default blue.
 
         /// <summary>
         /// Whether the dialog should be destroyed after it is closed (and faded out).
@@ -104,6 +117,11 @@ namespace SEE.UI.Menu
         /// The image component of the <see cref="YesButton"/> controlling its color.
         /// </summary>
         private Image YesButtonImage { get; set; }
+
+        /// <summary>
+        /// The image component of the <see cref="NoButton"/> controlling its color.
+        /// </summary>
+        private Image NoButtonImage { get; set; }
 
         /// <summary>
         /// The TextMeshPro component for the icon of the <see cref="NoButton"/>.
@@ -160,6 +178,7 @@ namespace SEE.UI.Menu
             YesButton = Dialog.transform.Find("Content/Buttons/Confirm").gameObject.MustGetComponent<ButtonManagerBasic>();
             YesIcon = YesButton.transform.Find("Texts/Icon").gameObject.MustGetComponent<TextMeshProUGUI>();
             YesButtonImage = YesButton.gameObject.MustGetComponent<Image>();
+            NoButtonImage = NoButton.gameObject.MustGetComponent<Image>();
             Title = Dialog.transform.Find("Dragger/Text").gameObject.MustGetComponent<TextMeshProUGUI>();
             Description = Dialog.transform.Find("Content/Description").gameObject.MustGetComponent<TextMeshProUGUI>();
             ButtonManagerBasic CloseButton = Dialog.transform.Find("Dragger/CancelDragger").gameObject.MustGetComponent<ButtonManagerBasic>();
@@ -183,7 +202,8 @@ namespace SEE.UI.Menu
             NoButton.buttonText = configuration.NoText;
             NoButton.UpdateUI();
             YesIcon.text = configuration.YesIcon.ToString();
-            YesButtonImage.color = configuration.YesColor ?? defaultColor;
+            YesButtonImage.color = configuration.YesColor ?? defaultYesColor;
+            NoButtonImage.color = configuration.NoColor ?? defaultNoColor;
             NoIcon.text = configuration.NoIcon.ToString();
 
             Dialog.SetActive(true);

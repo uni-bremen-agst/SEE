@@ -1,17 +1,12 @@
-using System.Collections.Generic;
-using System.Linq;
-using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GraphProviders.VCS;
-using SEE.Utils;
-using TinySpline;
-using TMPro;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Assertions;
 
 namespace SEE.Game.CityRendering
 {
@@ -19,7 +14,7 @@ namespace SEE.Game.CityRendering
     /// Implements the methods for rendering author spheres in a branch city.
     ///
     /// This functionality is primarily needed for a <see cref="BranchCity"/> and builds on the precondition that
-    /// nodes have authors which are marked by the <see cref="DataModel.DG.VCS.AuthorAttributeName"/> attribute.
+    /// nodes have authors which are marked by the <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> attribute.
     /// </summary>
     public partial class GraphRenderer
     {
@@ -28,27 +23,129 @@ namespace SEE.Game.CityRendering
         /// This method should be executed after the graph was rendered.
         ///
         /// All nodes specified in the keys of <paramref name="nodeMap"/> will be scanned for the
-        /// <see cref="AuthorAttributeName"/> attribute which sets the author.
+        /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> attribute which sets the author.
         ///
-        /// The collected authors are then rendered as spheres floating over the city.
+        /// The collected authors are then rendered as spheres floating over the rectangular plane
+        /// defined by <paramref name="planeCenterposition"/> and <paramref name="planeRectangle"/>.
         /// </summary>
-        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="parent">Parent <see cref="GameObject"/>. All sphere will be child elements of this object.</param>
+        /// <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
+        /// <param name="parent">Parent <see cref="GameObject"/>. All spheres will become children of this object.</param>
         /// <param name="graph">The graph which was rendered.</param>
-        public void DrawAuthorSpheres(IDictionary<Node, GameObject> nodeMap, GameObject parent, Graph graph)
+        /// <param name="planeCenterposition">The world-space center position of the plane on which the city was rendered.</param>
+        /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
+        private void DrawAuthorSpheres
+            (IDictionary<Node, GameObject> nodeMap,
+            GameObject parent, Graph graph,
+            Vector3 planeCenterposition,
+            Vector2 planeRectangle)
         {
+            IList<GameObject> gameSpheresObjects = RenderAuthors(nodeMap, parent, graph, planeCenterposition, planeRectangle);
+            RenderEdges(nodeMap, gameSpheresObjects, parent);
+        }
+
+        /// <summary>
+        /// This method renders all spheres for the authors specified in <paramref name="authors"/>.
+        /// </summary>
+        ///  <param name="nodeMap">A mapping from each graph node onto its gameobject (game node).</param>
+        /// <param name="parent">The parent <see cref="GameObject"/> to add the author game objects to.</param>
+        /// <param name="graph">The graph which was rendered.</param>
+        /// <param name="planeCenterposition">The world-space center position of the plane on which the city was rendered.</param>
+        /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
+        /// <returns>A list of the generated sphere game objects.</returns>
+        private IList<GameObject> RenderAuthors
+            (IDictionary<Node, GameObject> nodeMap,
+            GameObject parent,
+            Graph graph,
+            Vector3 planeCenterposition,
+            Vector2 planeRectangle)
+        {
+            /// Collecting all authors from the file nodes. The authors reside in the string attribute
+            /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> separated by commas.
             List<FileAuthor> authors =
                 nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
-                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorAttributeName))
+                    .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorsAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
                     .Select(x => new FileAuthor(x))
                     .ToList();
 
-            IList<GameObject> gameSpheresObjects = RenderSpheres(authors, parent, graph);
+            IList<GameObject> result = new List<GameObject>();
+            int authorsCount = authors.Count;
+            Node rootNode = graph.GetRoots().First();
 
-            // Drawing edges
-            RenderEdgesForSpheres(nodeMap, gameSpheresObjects, parent);
+            int currentAuthor = 0;
+            // Define materials for the spheres.
+            Materials materials = new(Materials.ShaderType.PortalFree,
+                new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
+
+            // Position the spheres on the plane above the city at sky level.
+            planeCenterposition.y = AbstractSEECity.SkyLevel;
+            foreach (Vector3 position in GetEvenlyDistributedPositions(authorsCount, planeRectangle.x, 0, planeRectangle.y))
+            {
+                GameObject gameObject = AuthorSphere.CreateAuthor(parent, authors[currentAuthor], materials.Get(0, currentAuthor), planeCenterposition + position);
+                result.Add(gameObject);
+                currentAuthor++;
+            }
+            return result;
+        }
+
+        /// <summary>
+        /// Returns the positions of <paramref name="n"/> objects evenly distributed on the border
+        /// of a rectangle with width <paramref name="x"/> and depth <paramref name="z"/> at
+        /// given <paramref name="height"/>.
+        ///
+        /// The first position will be at the top-left corner of the rectangle. The positions
+        /// will be distributed clockwise. The center of the rectangle is to be interpreted
+        /// as (<paramref name="x"/>, <paramref name="height"/>, <paramref name="z"/>). That
+        /// means, the first position will be at (-<paramref name="x"/>/2, <paramref name="height"/>,
+        /// <paramref name="z"/> / 2).
+        /// </summary>
+        /// <param name="n">Number of objects</param>
+        /// <param name="x">Width of the rectangle</param>
+        /// <param name="height">Height of the rectangle. All positions will have this height.</param>
+        /// <param name="z">Depth of the rectangle</param>
+        /// <returns>Positions on the rectangle</returns>
+        public List<Vector3> GetEvenlyDistributedPositions(int n, float x, float height, float z)
+        {
+            List<Vector3> positions = new(n);
+
+            // Calculate the perimeter and distance between objects
+            float perimeter = 2 * (x + z);
+            float distanceBetweenObjects = perimeter / n;
+
+            // The starting corner of the rectangle (Top-Left)
+            Vector3 startCorner = new(-x / 2, height, z / 2);
+
+            for (int i = 0; i < n; i++)
+            {
+                Vector3 currentPosition;
+                float currentDistance = i * distanceBetweenObjects;
+
+                // Top edge
+                if (currentDistance <= x)
+                {
+                    currentPosition = startCorner + new Vector3(currentDistance, height, 0);
+                }
+                // Right edge
+                else if (currentDistance <= x + z)
+                {
+                    currentPosition = startCorner + new Vector3(x, height, -(currentDistance - x));
+                }
+                // Bottom edge
+                else if (currentDistance <= 2 * x + z)
+                {
+                    currentPosition = startCorner + new Vector3(x - (currentDistance - (x + z)), height, -z);
+                }
+                // Left edge
+                else
+                {
+                    currentPosition = startCorner + new Vector3(0, height, -z + (currentDistance - (2 * x + z)));
+                }
+
+                positions.Add(currentPosition);
+            }
+
+            return positions;
         }
 
         /// <summary>
@@ -56,239 +153,92 @@ namespace SEE.Game.CityRendering
         ///
         /// This method should be called after the sphere where rendered.
         /// </summary>
-        /// <param name="nodeMap">A mapping from the graph nodes to the gameobject.</param>
-        /// <param name="spheresObjects">A list of the previous rendered spheres.</param>
+        /// <param name="nodeMap">A mapping from the graph file nodes to the gameobject.</param>
+        /// <param name="spheresObjects">A list of the previously rendered spheres.</param>
         /// <param name="parent">Parent <see cref="GameObject"/>. All edges will be child elements of this object.</param>
-        private void RenderEdgesForSpheres(IDictionary<Node, GameObject> nodeMap,
-            IEnumerable<GameObject> spheresObjects, GameObject parent)
+        private void RenderEdges
+                       (IDictionary<Node, GameObject> nodeMap,
+                        IEnumerable<GameObject> spheresObjects,
+                        GameObject parent)
         {
-            IEnumerable<Node> nodesWithChurn = nodeMap.Keys
-                .Where(x => x.IntAttributes.ContainsKey(DataModel.DG.VCS.Churn));
-
-            if (!nodesWithChurn.Any())
+            float maximalChurn = MaximalChurn(nodeMap);
+            if (maximalChurn == 0)
             {
-                return;
+                // Avoid division by zero below.
+                maximalChurn = Settings.EdgeLayoutSettings.EdgeWidth;
             }
-
-            int maximalChurn = nodesWithChurn
-                .Max(x => x.IntAttributes[DataModel.DG.VCS.Churn]);
 
             foreach (GameObject sphere in spheresObjects)
             {
                 AuthorSphere authorSphere = sphere.GetComponent<AuthorSphere>();
+                // The author represented by the current sphere.
                 FileAuthor authorName = authorSphere.Author;
 
-                IEnumerable<KeyValuePair<Node, GameObject>> nodesOfAuthor = nodeMap
-                    .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorAttributeName))
-                    .Where(x =>
-                        x.Key.StringAttributes[DataModel.DG.VCS.AuthorAttributeName]
-                            .Split(',')
-                            .Contains(authorName.ToString()));
+                // Collect all (file) nodes the current author has contributed to.
+                // Maps from the graph node (a file) onto the game object representing the (file) node.
+                // Looks like this can be simplified and optimized.
+                IEnumerable<KeyValuePair<Node, GameObject>> filesOfAuthor = nodeMap
+                    .Where(x => x.Key.StringAttributes.ContainsKey(DataModel.DG.VCS.AuthorsAttributeName))
+                    .Where(x => x.Key.StringAttributes[DataModel.DG.VCS.AuthorsAttributeName]
+                                   .Split(',').Contains(authorName.ToString()));
 
-                foreach (KeyValuePair<Node, GameObject> nodeOfAuthor in nodesOfAuthor)
+                // For all files of the given author.
+                foreach (KeyValuePair<Node, GameObject> fileOfAuthor in filesOfAuthor)
                 {
-                    BSpline bSpline = CreateSpline(sphere.transform.position, nodeOfAuthor.Value.GetRoofCenter());
-                    int churn = nodeOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
-
-                    GameObject gameEdge = new()
+                    // The game object representing the edge between the author and the file.
+                    GameObject connectingLine = new()
                     {
-                        tag = Tags.Edge,
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
-                        name = authorName + ":" + nodeOfAuthor.Key.ID
+                        name = authorName + ":" + fileOfAuthor.Key.ID
                     };
-                    gameEdge.transform.parent = parent.transform;
+                    // It will be the child of parent.
+                    connectingLine.transform.parent = parent.transform;
 
-                    LineRenderer line = gameEdge.AddComponent<LineRenderer>();
+                    // Specific churn of the current author for the current sphere.
+                    int churn = fileOfAuthor.Key.IntAttributes[DataModel.DG.VCS.Churn + ":" + authorName];
 
-                    Color edgeColor = sphere.GetComponent<Renderer>().sharedMaterial.color;
-                    Material material = Materials.New(Materials.ShaderType.Opaque, edgeColor);
-                    material.shader = Shader.Find("Standard");
-                    line.sharedMaterial = material;
+                    AddLOD(connectingLine);
 
-                    LineFactory.SetDefaults(line);
-                    float width = Mathf.Clamp((float)churn / maximalChurn, Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
-                        Settings.EdgeLayoutSettings.EdgeWidth);
+                    // The target of the connectingLine is the file node.
+                    // An AuthorRef will be added to a file node. One may exist already
+                    // because a different author may have contributed to the same file.
+                    AuthorRef authorRef = fileOfAuthor.Value.AddOrGetComponent<AuthorRef>();
 
-                    LineFactory.SetWidth(line, width);
+                    AuthorEdge authorEdge = connectingLine.AddComponent<AuthorEdge>();
+                    authorEdge.FileNode = authorRef;
+                    authorEdge.AuthorSphere = authorSphere;
+                    authorEdge.Width = Mathf.Clamp((float)churn / maximalChurn,
+                                                    Settings.EdgeLayoutSettings.EdgeWidth * 0.439f,
+                                                    Settings.EdgeLayoutSettings.EdgeWidth);
+                    authorEdge.Draw();
 
-                    line.useWorldSpace = false;
-
-                    SEESpline spline = gameEdge.AddComponent<SEESpline>();
-                    spline.Spline = bSpline;
-                    spline.GradientColors = (edgeColor, edgeColor);
-
-                    Vector3[] positions = TinySplineInterop.ListToVectors(bSpline.Sample());
-                    line.positionCount = positions.Length; // number of vertices
-                    line.SetPositions(positions);
-
-                    AddLOD(gameEdge);
-
-                    AuthorRef authorRef = nodeOfAuthor.Value.AddOrGetComponent<AuthorRef>();
-                    authorRef.AuthorSpheres.Add(sphere);
-                    authorRef.Edges.Add((gameEdge, churn));
-
-                    AuthorEdge authorEdge = gameEdge.AddComponent<AuthorEdge>();
-                    authorEdge.targetNode = authorRef;
-                    authorEdge.authorSphere = authorSphere;
-
-                    authorSphere.Edges.Add((gameEdge, churn));
-
-                    if (Settings is BranchCity branchCity)
-                    {
-                        switch (branchCity.ShowAuthorEdgesStrategy)
-                        {
-                            case ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-
-                                if (authorRef.AuthorSpheres.Count >= branchCity.AuthorThreshold)
-                                {
-                                    // Show only edges for nodes with multiple authors.
-                                    foreach (GameObject edge in authorRef.Edges.Select(x => x.Item1))
-                                    {
-                                        edge.EdgeOperator().Show(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                                    }
-                                }
-                                break;
-                            case ShowAuthorEdgeStrategy.ShowOnHover:
-                                Assert.AreNotEqual(Settings.EdgeLayoutSettings.AnimationKind, EdgeAnimationKind.None);
-
-                                gameEdge.EdgeOperator().Hide(Settings.EdgeLayoutSettings.AnimationKind, 0f);
-                                break;
-                            case ShowAuthorEdgeStrategy.ShowAlways:
-                                break; // nothing to do here, edges are always shown
-                            default:
-                                throw new System.ArgumentOutOfRangeException(nameof(branchCity.ShowAuthorEdgesStrategy),
-                                    branchCity.ShowAuthorEdgesStrategy,
-                                    $"Unhandled {nameof(ShowAuthorEdgeStrategy)}: {branchCity.ShowAuthorEdgesStrategy}.");
-                        }
-                    }
+                    authorRef.Add(authorEdge);
+                    authorSphere.Edges.Add(authorEdge);
                 }
             }
         }
 
         /// <summary>
-        /// Creates <see cref="BSpline"/> connecting two points.
+        /// Returns the maximal churn value of all nodes in <paramref name="nodeMap"/>.
         /// </summary>
-        /// <param name="start">The start point.</param>
-        /// <param name="end">The end point.</param>
-        /// <returns>A <see cref="BSpline"/> instance connecting two points.</returns>
-        private BSpline CreateSpline(Vector3 start, Vector3 end)
+        /// <param name="nodeMap">the nodes to be queried</param>
+        /// <returns>maximal churn</returns>
+        private float MaximalChurn(IDictionary<Node, GameObject> nodeMap)
         {
-            Vector3[] points = new Vector3[2];
-            points[0] = start;
-            points[1] = end;
-            return new BSpline(2, 3, 1)
+            float max = 0;
+
+            foreach (Node node in nodeMap.Keys)
             {
-                ControlPoints = TinySplineInterop.VectorsToList(points)
-            };
-        }
-
-        /// <summary>
-        /// This method renders all spheres for the authors specified in the list <paramref name="authors"/>.
-        /// </summary>
-        /// <param name="authors">The authors to create the spheres for.</param>
-        /// <param name="parent">The parent <see cref="GameObject"/> to add the to.</param>
-        /// <returns>A list of the generated sphere game objects.</returns>
-        private IList<GameObject> RenderSpheres(IList<FileAuthor> authors, GameObject parent, Graph graph)
-        {
-            IList<GameObject> result = new List<GameObject>();
-            Renderer parentRenderer = parent.GetComponent<Renderer>();
-            int authorsCount = authors.Count;
-            Node rootNode = graph.GetRoots().First();
-
-            // Calculating number of rows and columns needed and the space between the spheres.
-            // The spheres will be distributed in a rectangle around the code city table.
-            int rows = Mathf.FloorToInt(Mathf.Sqrt(authorsCount));
-            int columns = Mathf.CeilToInt((float)authorsCount / rows);
-            float spacingZ = (parentRenderer.bounds.size.z / (columns - 1));
-            float spacingX = (parentRenderer.bounds.size.x / (rows - 1));
-
-            // When we only have one row.
-            if (float.IsInfinity(spacingX) || float.IsNaN(spacingX))
-            {
-                spacingX = parentRenderer.bounds.size.x;
-            }
-            // When we only have one column.
-            if (float.IsInfinity(spacingZ) || float.IsNaN(spacingZ))
-            {
-                spacingZ = parentRenderer.bounds.size.z;
-            }
-
-            int counter = 0;
-            // Define materials for the spheres.
-            Materials materials = new Materials(Materials.ShaderType.PortalFree,
-                new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
-
-            // iterate over all rows.
-            for (int i = 0; i < rows; i++)
-            {
-                // iterate over all columns.
-                for (int j = 0; j < columns; j++)
+                if (node.TryGetInt(DataModel.DG.VCS.Churn, out int churn))
                 {
-                    if (counter >= authorsCount)
+                    if (churn > max)
                     {
-                        return result;
+                        max = churn;
                     }
-
-                    GameObject gameObject = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-                    gameObject.name = "AuthorSphere:" + authors[counter];
-
-                    AuthorSphere author = gameObject.AddComponent<AuthorSphere>();
-                    author.Author = authors[counter];
-
-                    gameObject.AddComponent<NodeRef>().Value = rootNode;
-
-                    gameObject.AddComponent<InteractableObject>();
-                    gameObject.AddComponent<ShowAuthorEdges>();
-
-                    Vector3 startLabelPosition = gameObject.GetTop();
-                    float fontSize = 2f;
-
-                    // Adding a label with the authors email which will float above the sphere.
-                    GameObject nodeLabel = new GameObject("Text " + authors[counter])
-                    {
-                        tag = Tags.Text
-                    };
-                    nodeLabel.transform.position = startLabelPosition;
-
-                    TextMeshPro tm = nodeLabel.AddComponent<TextMeshPro>();
-                    tm.font = Resources.Load<TMP_FontAsset>("Fonts & Materials/LiberationSans SDF");
-                    tm.fontSize = fontSize;
-                    tm.text = authors[counter].ToString();
-                    tm.color = Color.white;
-                    tm.alignment = TextAlignmentOptions.Center;
-
-                    nodeLabel.name = "Label:" + authors[counter];
-                    nodeLabel.AddComponent<FaceCamera>();
-                    nodeLabel.transform.SetParent(gameObject.transform);
-
-                    AddLOD(gameObject);
-
-                    Renderer renderer = gameObject.GetComponent<Renderer>();
-                    Material mat = materials.Get(0, counter);
-                    // Override shader so the spheres don't clip over the code city.
-                    mat.shader = Shader.Find("Standard");
-                    renderer.sharedMaterial = mat;
-                    gameObject.transform.SetParent(parent.transform);
-                    gameObject.transform.transform.localScale *= 0.25f;
-
-                    // Calculate the position of the sphere.
-                    float xPos = (i * spacingX - (parentRenderer.bounds.size.x / 2));
-                    float zPos = (j * spacingZ - (parentRenderer.bounds.size.z / 2));
-
-                    Vector3 spherePosition = new Vector3(xPos, parentRenderer.bounds.size.y + 1.2f, zPos) +
-                                             parent.transform.position;
-                    gameObject.transform.position = spherePosition;
-
-                    result.Add(gameObject);
-                    counter++;
                 }
             }
-
-            return result;
+            return max;
         }
     }
 }

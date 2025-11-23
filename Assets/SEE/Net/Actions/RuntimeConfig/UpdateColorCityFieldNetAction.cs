@@ -20,7 +20,6 @@ namespace SEE.Net.Actions.RuntimeConfig
         /// </summary>
         public override void ExecuteOnClient()
         {
-            base.ExecuteOnClient();
             RuntimeConfigMenu.GetMenuForCity(CityIndex).SyncField?.Invoke(WidgetPath, Value);
         }
     }

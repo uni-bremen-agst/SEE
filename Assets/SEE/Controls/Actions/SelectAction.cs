@@ -40,13 +40,13 @@ namespace SEE.Controls.Actions
             {
                 InteractableObject obj = null;
                 if (Raycasting.RaycastInteractableObjectBase(out RaycastHit hit, out InteractableObjectBase o)
-                        && o is InteractableObject
-                        && ((InteractableObject)o).GraphElemRef.Elem != null
+                        && o is InteractableObject interactableObject
                         && o.IsInteractable(o.PartiallyInteractable ? hit.point : null))
                 {
-                    obj = ((InteractableObject)o);
+                    obj = interactableObject;
                 }
-                if (Input.GetKey(KeyCode.LeftControl) || (SceneSettings.InputType == PlayerInputType.VRPlayer && XRSEEActions.SelectedFlag))
+                if (Input.GetKey(KeyCode.LeftControl)
+                    || (User.UserSettings.IsVR && XRSEEActions.SelectedFlag))
                 {
                     if (obj != null)
                     {
