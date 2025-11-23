@@ -1,18 +1,16 @@
-﻿using Assets.SEE.DataModel.DG.IO;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Provides XPath expressions and normalization helpers tailored to JaCoCo XML reports.
+    /// Preconditions: An instance must be used only with JaCoCo-compatible XML input.
     /// </summary>
-    public class JaCoCoParsingConfig : ParsingConfig
+    internal class JaCoCoParsingConfig : ParsingConfig
     {
-
         /// <summary>
         /// Initializes the XPath mapping that knows how to interpret JaCoCo report nodes.
+        /// Preconditions: Must be called before this instance is used to create parsers.
         /// </summary>
         public JaCoCoParsingConfig()
         {
@@ -20,14 +18,13 @@ namespace SEE.DataModel.DG.IO
 
             XPathMapping = new XPathMapping
             {
-                SearchedNodes = "//report|//package|//class|//method",
+                SearchedNodes = "//package|//class|//method",
 
                 PathBuilders = new Dictionary<string, string>
                 {
-                    ["report"] = "string(@name)",
                     ["package"] = "string(@name)",
                     ["class"] = "string(@name)",
-                    ["method"] = $"concat(string(ancestor::class/@name), '#', string(@name))"
+                    ["method"] = "concat(string(ancestor::class/@name), '#', string(@name))"
                 },
 
                 FileName = new Dictionary<string, string>
@@ -76,7 +73,7 @@ namespace SEE.DataModel.DG.IO
                     ["CLASS_percentage"] =
                         "round(100 * number(counter[@type='CLASS']/@covered) div " +
                         "(number(counter[@type='CLASS']/@covered) + number(counter[@type='CLASS']/@missed)))",
-                        
+
                     ["METHOD_percentage"] =
                         "round(100 * number(counter[@type='METHOD']/@covered) div " +
                         "(number(counter[@type='METHOD']/@covered) + number(counter[@type='METHOD']/@missed)))"
@@ -84,7 +81,6 @@ namespace SEE.DataModel.DG.IO
 
                 MapContext = new Dictionary<string, string>
                 {
-                    ["report"] = "root",
                     ["package"] = "package",
                     ["class"] = "class",
                     ["method"] = "method"
@@ -92,17 +88,24 @@ namespace SEE.DataModel.DG.IO
             };
         }
 
+        /// <summary>
+        /// Creates an <see cref="XmlReportParser"/> configured for JaCoCo input.
+        /// Preconditions: <see cref="XPathMapping"/> and <see cref="ToolId"/> must be initialized.
+        /// </summary>
+        /// <returns>An <see cref="IReportParser"/> instance for JaCoCo XML reports.</returns>
+        internal override IReportParser CreateParser()
+        {
+            return new XmlReportParser(this);
+        }
 
         /// <summary>
-        /// Factory method that returns an <see cref="XmlReportParser"/> configured for JaCoCo input.
+        /// Creates the index node strategy for Java sources associated with JaCoCo reports.
+        /// Preconditions: Must be used only for Java projects whose coverage is reported by JaCoCo.
         /// </summary>
-        public override IReportParser CreateParser() => new XmlReportParser(this);
-
+        /// <returns>An index node strategy for Java files.</returns>
         public override IIndexNodeStrategy CreateIndexNodeStrategy()
         {
             return new JavaIndexNodeStrategy();
         }
     }
-
-
 }

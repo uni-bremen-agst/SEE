@@ -12,29 +12,40 @@ namespace SEE.DataModel.DG.IO
     /// <summary>
     /// Generic XML parser that uses a <see cref="ParsingConfig"/> to translate report files
     /// into <see cref="MetricSchema"/> instances.
+    /// The provided configuration must not be null and must contain a valid <see cref="XPathMapping"/>.
     /// </summary>
     public sealed class XmlReportParser : IReportParser
     {
-        private readonly ParsingConfig _config;
-
         /// <summary>
-        /// Stores the configuration that drives the XPath traversal.
+        /// Configuration that describes how XML reports are interpreted.
+        /// This value must not be null.
         /// </summary>
-        public XmlReportParser(ParsingConfig config) => _config = config;
-
+        private readonly ParsingConfig config;
 
         /// <summary>
         /// Reader settings reused for every parse operation.
         /// </summary>
-        protected XmlReaderSettings settings;
+        private XmlReaderSettings readerSettings;
 
         /// <summary>
-        /// Creates (or recreates) the XML reader settings so that <see cref="ParseAsync"/> can
+        /// Initializes a new instance of the <see cref="XmlReportParser"/> class.
+        /// </summary>
+        /// <param name="config">
+        /// Configuration that describes how reports should be parsed.
+        /// Must not be null.
+        /// </param>
+        public XmlReportParser(ParsingConfig config)
+        {
+            this.config = config;
+        }
+
+        /// <summary>
+        /// Creates or recreates the XML reader settings so that <see cref="ParseAsync"/> can
         /// use consistent, secure defaults.
         /// </summary>
-        public void Prepare() {
-
-            settings = new()
+        public void Prepare()
+        {
+            readerSettings = new XmlReaderSettings
             {
                 CloseInput = true,
                 IgnoreWhitespace = true,
@@ -42,55 +53,76 @@ namespace SEE.DataModel.DG.IO
                 Async = true,
                 DtdProcessing = DtdProcessing.Parse
             };
-
         }
 
         /// <summary>
-        /// Parses the report described by <paramref name="path"/> and returns all captured findings.
+        /// Parses the report described by <paramref name="path"/> and returns all captured Findings.
         /// </summary>
-        /// <param name="path">location of the report (file, bundle, remote, ...)</param>
-        /// <param name="token">optional cancellation token (currently unused)</param>
-        /// <returns>a <see cref="MetricSchema"/> that mirrors the parsed XML</returns>
+        /// <param name="path">
+        /// Location of the report (file, bundle, remote, and so on).
+        /// Must not be null.
+        /// </param>
+        /// <param name="token">
+        /// Optional cancellation token. If cancellation is requested before or during parsing,
+        /// the operation will be canceled.
+        /// </param>
+        /// <returns>
+        /// A <see cref="MetricSchema"/> that mirrors the parsed XML content.
+        /// The returned schema is never null.
+        /// </returns>
         public async UniTask<MetricSchema> ParseAsync(DataPath path, CancellationToken token = default)
         {
+            token.ThrowIfCancellationRequested();
 
             Prepare();
             using Stream stream = await path.LoadAsync();
-            using XmlReader xmlReader = XmlReader.Create(stream, settings);
+            using XmlReader xmlReader = XmlReader.Create(stream, readerSettings);
             await UniTask.SwitchToThreadPool();
-            MetricSchema metricSchema = ParseCore(xmlReader, _config);
+            MetricSchema metricSchema = ParseCore(xmlReader, config);
             return metricSchema;
         }
 
         /// <summary>
         /// Core parsing routine that evaluates all configured XPath expressions.
         /// </summary>
-        /// <param name="xmlReader">reader positioned at the start of the XML report</param>
-        /// <param name="config">parsing configuration that describes how to interpret nodes</param>
-        /// <returns>a schema filled with all findings emitted by the report</returns>
+        /// <param name="xmlReader">
+        /// Reader positioned at the start of the XML report.
+        /// Must not be null.
+        /// </param>
+        /// <param name="config">
+        /// Parsing configuration that describes how to interpret nodes.
+        /// Must not be null and must provide a non-null <see cref="ParsingConfig.XPathMapping"/>.
+        /// </param>
+        /// <returns>
+        /// A schema filled with all Findings emitted by the report.
+        /// The returned schema is never null.
+        /// </returns>
         private static MetricSchema ParseCore(XmlReader xmlReader, ParsingConfig config)
         {
             XPathMapping xPathMapping = config.XPathMapping;
-            var report = new XPathDocument(xmlReader);
-            var nav = report.CreateNavigator();
+            XPathDocument report = new XPathDocument(xmlReader);
+            XPathNavigator navigator = report.CreateNavigator();
 
-            // Optional: Namespaces unterstützen (falls du sie später brauchst)
-            XmlNamespaceManager? nsmgr = null;
+            // Optional: configure namespaces if provided by the mapping.
+            XmlNamespaceManager? namespaceManager = null;
             if (xPathMapping.Namespaces?.Count > 0)
             {
-                nsmgr = new XmlNamespaceManager(nav.NameTable);
+                namespaceManager = new XmlNamespaceManager(navigator.NameTable);
                 foreach (var kv in xPathMapping.Namespaces)
                 {
-                    nsmgr.AddNamespace(kv.Key, kv.Value);
+                    namespaceManager.AddNamespace(kv.Key, kv.Value);
                 }
             }
 
-            MetricSchema metricSchema = new MetricSchema { ToolId = config.ToolId ?? "" };
+            MetricSchema metricSchema = new MetricSchema
+            {
+                ToolId = config.ToolId ?? string.Empty
+            };
 
-            // Alle gesuchten Nodes holen (Union via "|")
-            var iterator = nsmgr is null
-                ? nav.Select(xPathMapping.SearchedNodes)
-                : nav.Select(xPathMapping.SearchedNodes, nsmgr);
+            // Select all nodes of interest (typically a union expression).
+            XPathNodeIterator iterator = namespaceManager is null
+                ? navigator.Select(xPathMapping.SearchedNodes)
+                : navigator.Select(xPathMapping.SearchedNodes, namespaceManager);
 
             int nodeCount = 0;
 
@@ -112,28 +144,28 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
 
-                string fullPath = "";
+                string fullPath = string.Empty;
                 try
                 {
-                    fullPath = current.Evaluate(pathExpression, nsmgr)?.ToString() ?? "";
-
+                    object evaluationResult = current.Evaluate(pathExpression, namespaceManager);
+                    fullPath = evaluationResult?.ToString() ?? string.Empty;
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[Parser] XPath-Fehler bei PathBuilder '{pathExpression}': {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Parser] XPath error in path builder '{pathExpression}': {ex.Message}");
                 }
 
-                Finding finding = CreateFinding(current, fullPath, xPathMapping, nsmgr);
+                Finding finding = CreateFinding(current, fullPath, xPathMapping, namespaceManager);
 
-                if(finding != null)
+                if (finding != null)
                 {
-                    metricSchema.findings.Add(finding);
+                    metricSchema.Findings.Add(finding);
                 }
             }
 
-            // Am Ende von ParseCore:
-            Debug.Log($"[Parser] Parsing beendet. Gefundene Nodes: {nodeCount}, Findings: {metricSchema.findings.Count}");
-
+            Debug.Log(
+                $"[Parser] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.");
 
             return metricSchema;
         }
@@ -141,19 +173,38 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Builds a single <see cref="Finding"/> from the current XPath position.
         /// </summary>
-        /// <param name="current">navigator pointing at the node that should become a finding</param>
-        /// <param name="fullPath">normalized identifier produced by the path builder</param>
-        /// <param name="xPathMapping">mapping that describes metrics and locations</param>
-        /// <param name="nsmgr">optional namespace manager used for XPath evaluation</param>
-        /// <returns>a populated finding or <c>null</c> if no metrics were produced</returns>
-        private static Finding CreateFinding(XPathNavigator current, string fullPath, XPathMapping xPathMapping, XmlNamespaceManager nsmgr )
+        /// <param name="current">
+        /// Navigator pointing at the node that should become a finding.
+        /// Must not be null.
+        /// </param>
+        /// <param name="fullPath">
+        /// Normalized identifier produced by the path builder.
+        /// May be an empty string if no path could be computed.
+        /// </param>
+        /// <param name="xPathMapping">
+        /// Mapping that describes metrics, locations and context.
+        /// Must not be null.
+        /// </param>
+        /// <param name="namespaceManager">
+        /// Optional namespace manager used for XPath evaluation.
+        /// May be null if the report does not use namespaces.
+        /// </param>
+        /// <returns>
+        /// A populated finding or <c>null</c> if no metrics were produced for the current node.
+        /// </returns>
+        private static Finding CreateFinding(
+            XPathNavigator current,
+            string fullPath,
+            XPathMapping xPathMapping,
+            XmlNamespaceManager? namespaceManager)
         {
             string context = xPathMapping.MapContext[current.LocalName];
 
             xPathMapping.FileName.TryGetValue(context, out string fileNameExpression);
 
-            string fileName = string.IsNullOrEmpty(fileNameExpression) ? "" :
-                current.Evaluate(fileNameExpression, nsmgr).ToString() ?? "";
+            string fileName = string.IsNullOrEmpty(fileNameExpression)
+                ? string.Empty
+                : current.Evaluate(fileNameExpression, namespaceManager)?.ToString() ?? string.Empty;
 
             Finding finding = new Finding
             {
@@ -161,61 +212,79 @@ namespace SEE.DataModel.DG.IO
                 FileName = fileName,
                 Context = context,
                 Metrics = new Dictionary<string, string>(),
-                Location = ParseLocation(current, xPathMapping, nsmgr)
+                Location = ParseLocation(current, xPathMapping, namespaceManager)
             };
 
             foreach (var kv in xPathMapping.Metrics)
             {
-                string val = "";
+                string value = string.Empty;
                 try
                 {
-                    object result = current.Evaluate(kv.Value, nsmgr);
+                    object result = current.Evaluate(kv.Value, namespaceManager);
 
-
-                    if (result is double d && double.IsNaN(d))
+                    if (result is double numericResult && double.IsNaN(numericResult))
                     {
-                        continue; // Skip NaN-Values
+                        // Skip NaN values.
+                        continue;
                     }
 
-                    val = result.ToString();
+                    value = result?.ToString() ?? string.Empty;
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[Parser] XPath-Error in Metric '{kv.Key}': {ex.Message}");
+                    Debug.LogWarning($"[Parser] XPath error in metric '{kv.Key}': {ex.Message}");
                 }
 
-                if (!string.IsNullOrEmpty(val) && val != "NaN")
+                if (!string.IsNullOrEmpty(value) && value != "NaN")
                 {
-                    finding.Metrics[kv.Key] = val;
+                    finding.Metrics[kv.Key] = value;
                 }
             }
-            return finding.Metrics.Count > 0 ? finding : null;
 
+            return finding.Metrics.Count > 0 ? finding : null;
         }
 
         /// <summary>
-        /// Reads the configured location fields (start/end line/column) for the current node.
+        /// Reads the configured location fields (start or end line and column) for the current node.
         /// </summary>
-        /// <param name="current">navigator pointing at the node whose location should be read</param>
-        /// <param name="xPathMapping">mapping that specifies which fields to extract</param>
-        /// <param name="nsmgr">optional namespace manager for XPath</param>
-        /// <returns>a populated <see cref="MetricLocation"/> or <c>null</c> if nothing was found</returns>
-        private static MetricLocation ParseLocation(XPathNavigator current, XPathMapping xPathMapping, XmlNamespaceManager nsmgr)
+        /// <param name="current">
+        /// Navigator pointing at the node whose location should be read.
+        /// Must not be null.
+        /// </param>
+        /// <param name="xPathMapping">
+        /// Mapping that specifies which location fields to extract.
+        /// May provide an empty or null <see cref="XPathMapping.LocationMapping"/> if no location is defined.
+        /// </param>
+        /// <param name="namespaceManager">
+        /// Optional namespace manager used for XPath evaluation.
+        /// May be null if the report does not use namespaces.
+        /// </param>
+        /// <returns>
+        /// A populated <see cref="MetricLocation"/> or <c>null</c> if no location information was found.
+        /// </returns>
+        private static MetricLocation ParseLocation(
+            XPathNavigator current,
+            XPathMapping xPathMapping,
+            XmlNamespaceManager? namespaceManager)
         {
             if (xPathMapping.LocationMapping == null || xPathMapping.LocationMapping.Count == 0)
+            {
                 return null;
+            }
 
-            var location = new MetricLocation();
+            MetricLocation location = new MetricLocation();
 
             foreach (var kv in xPathMapping.LocationMapping)
             {
                 if (string.IsNullOrEmpty(kv.Value))
+                {
                     continue;
+                }
 
                 try
                 {
-                    string val = current.Evaluate(kv.Value, nsmgr).ToString() ?? "";
-                    if (int.TryParse(val, out int intValue))
+                    string value = current.Evaluate(kv.Value, namespaceManager)?.ToString() ?? string.Empty;
+                    if (int.TryParse(value, out int intValue))
                     {
                         switch (kv.Key.ToLower())
                         {
@@ -236,12 +305,12 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[Parser] XPath-Fehler bei Location '{kv.Key}': {ex.Message}");
+                    Debug.LogWarning(
+                        $"[Parser] XPath error in location field '{kv.Key}': {ex.Message}");
                 }
             }
 
-            return location.StartLine.HasValue ? location : null; 
+            return location.StartLine.HasValue ? location : null;
         }
-
     }
 }

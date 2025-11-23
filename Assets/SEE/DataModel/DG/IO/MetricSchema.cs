@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace SEE.DataModel.DG.IO
 {
@@ -9,14 +8,14 @@ namespace SEE.DataModel.DG.IO
     public class MetricSchema
     {
         /// <summary>
-        /// Identifier of the originating tool (e.g., JaCoCo, Checkstyle).
+        /// Identifier of the originating tool (for example, JaCoCo, Checkstyle).
         /// </summary>
-        public string ToolId = "";
+        public string ToolId { get; set; } = string.Empty;
 
         /// <summary>
         /// Flat collection of parsed findings, each representing one node/context in the report.
         /// </summary>
-        public List<Finding> findings = new();
+        public List<Finding> Findings { get; } = new List<Finding>();
     }
 
     /// <summary>
@@ -35,7 +34,7 @@ namespace SEE.DataModel.DG.IO
         public string FileName { get; set; }
 
         /// <summary>
-        /// Context or tag name under which the finding was reported (e.g., class, method).
+        /// Context or tag name under which the finding was reported (for example, class, method).
         /// </summary>
         public string Context { get; set; }
 
@@ -47,7 +46,8 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Metric values emitted for this finding, keyed by a descriptive string.
         /// </summary>
-        public Dictionary<string, string?> Metrics { get; set; } = new();
+        public Dictionary<string, string?> Metrics { get; set; } =
+            new Dictionary<string, string?>();
     }
 
     /// <summary>

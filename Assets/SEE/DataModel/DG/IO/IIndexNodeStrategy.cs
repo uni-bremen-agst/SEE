@@ -1,6 +1,6 @@
 ﻿using SEE.DataModel.DG;
 
-namespace Assets.SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Strategy interface for normalizing code element identifiers from external tools

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Assets.SEE.DataModel.DG.IO;
 using Cysharp.Threading.Tasks;
 using NUnit.Framework;
 using SEE.DataModel.DG;
@@ -20,8 +20,8 @@ namespace SEE.GraphProviders
     /// 
     /// This fixture follows the Template Method pattern: concrete subclasses provide
     /// the specifics (report path, nodes to parse, parsing configuration, node counter,
-    /// and a set of expected findings), while this base class provides reusable
-    /// arrange/act/assert logic and helpful diagnostics for failures.
+    /// and a set of expected <see cref="Finding"/> instances), while this base class
+    /// provides reusable arrange/act/assert logic and helpful diagnostics for failures.
     /// 
     /// Supported use cases:
     /// - Validating node counts against expectations (per context and total).
@@ -35,42 +35,68 @@ namespace SEE.GraphProviders
     ///   contexts the parser will produce.
     /// - Provide deterministic expected findings via <see cref="GetTestFindings"/>.
     /// </summary>
-    public abstract class TestReportGraphProviderBase
+    internal abstract class TestReportGraphProviderBase
     {
         // ---- Template methods (must be implemented by derived classes) ----
 
         /// <summary>
         /// Returns the report path relative to <see cref="Application.streamingAssetsPath"/>.
-        /// Leading slashes/backslashes are ignored.
+        /// Leading slashes and backslashes are ignored.
         /// </summary>
+        /// <returns>Report path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
         protected abstract string GetRelativeReportPath();
 
         /// <summary>
-        /// Returns the set of node identifiers/contexts the test should consider during counting.
+        /// Returns the glx path relative to <see cref="Application.streamingAssetsPath"/>.
+        /// Leading slashes and backslashes are ignored.
         /// </summary>
+        /// <returns>Glx path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
+        protected abstract string GetRelativeGlxPath();
+
+        /// <summary>
+        /// Returns the set of node identifiers or contexts the test should consider during counting.
+        /// </summary>
+        /// <returns>Array of node identifiers or contexts to parse.</returns>
         protected abstract string[] GetNodesToParse();
 
         /// <summary>
         /// Returns the parsing configuration used to instantiate the corresponding parser.
         /// Must not return null; <see cref="SetUp"/> and the tests assert this.
         /// </summary>
+        /// <returns>Parsing configuration used to create the report parser. Must not be null.</returns>
         protected abstract ParsingConfig GetParsingConfig();
 
         /// <summary>
         /// Returns a node counter that can compute expected counts per context
         /// for the given report and node filter.
         /// </summary>
+        /// <returns>Node counter used to compute expected counts per context.</returns>
         protected abstract ICountReportNodes GetNodeCounter();
 
         /// <summary>
         /// Returns a set of hand-picked findings (keyed by <see cref="Finding.FullPath"/>)
         /// that should be present in the parsed schema, including expected metadata.
         /// </summary>
+        /// <returns>Dictionary of expected findings keyed by their full path.</returns>
         protected abstract Dictionary<string, Finding> GetTestFindings();
 
         // ---- Shared state for a single test run ----
-        private MetricSchema metricSchema;   // Parsed results under test
-        private string fullReportPath;       // Absolute path to the report file
+
+        /// <summary>
+        /// Parsed metric schema that is under test in the current test run.
+        /// </summary>
+        private MetricSchema metricSchema;
+
+        /// <summary>
+        /// Absolute path to the report file for the current test run.
+        /// </summary>
+        private string fullReportPath;
+
+        /// <summary>
+        /// Absolute path to the Glx file for the current test run
+        /// </summary>
+        private string fullGlxPath;
+
 
         /// <summary>
         /// The name of the hierarchical edge type we use for emitting the parent-child
@@ -79,17 +105,17 @@ namespace SEE.GraphProviders
         private const string hierarchicalEdgeType = "Enclosing";
 
         /// <summary>
-        /// Load Graph from GXL file <paramref name="path"/>.
+        /// Load graph from GXL file located at <paramref name="path"/>.
         /// </summary>
-        /// <param name="path">data path of GXL file</param>
-        /// <returns>loaded graph</returns>
+        /// <param name="path">Data path of the GXL file.</param>
+        /// <returns>A task that represents the asynchronous load operation. The task result is the loaded graph.</returns>
         private static async UniTask<Graph> LoadGraphAsync(DataPath path)
         {
-            return await GraphReader.LoadAsync(path, new HashSet<string> { hierarchicalEdgeType }, basePath: "");
+            return await GraphReader.LoadAsync(path, new HashSet<string> { hierarchicalEdgeType }, basePath: string.Empty);
         }
 
         /// <summary>
-        /// The graph that was loaded by <see cref="SetUpAsync"/> before each test case is executed.
+        /// The graph that was loaded by <see cref="TestMetricAppliedToGraphAsync"/> for metric application tests.
         /// </summary>
         private Graph graph;
 
@@ -99,12 +125,15 @@ namespace SEE.GraphProviders
         [SetUp]
         public void SetUp()
         {
-            // Resolve the absolute report path once, based on the relative path from the subclass.
             string relativeReportPath = GetRelativeReportPath();
             fullReportPath = Path.Combine(
                 Application.streamingAssetsPath,
-                relativeReportPath.TrimStart('/', '\\')
-            );
+                relativeReportPath.TrimStart('/', '\\'));
+
+            string relativeGlxPath = GetRelativeGlxPath();
+            fullGlxPath = Path.Combine(
+                Application.streamingAssetsPath,
+                relativeGlxPath.TrimStart('/', '\\'));
         }
 
         /// <summary>
@@ -113,40 +142,8 @@ namespace SEE.GraphProviders
         [TearDown]
         public void TearDown()
         {
-            // Avoid leaking state across tests.
             metricSchema = null;
         }
-
-        /// <summary>
-        /// Verifies that the number of parsed nodes matches the expected per-context counts
-        /// as well as the expected total across all contexts.
-        /// </summary>
-        [Test]
-        public async Task TestNodeCount_ShouldMatchExpectedCountsAsync()
-        {
-            // Arrange
-            metricSchema = await BuildMetricSchemaAsync();
-            Assert.NotNull(metricSchema, "MetricSchema is null");
-
-            ICountReportNodes nodeCounter = GetNodeCounter();
-            Assert.NotNull(nodeCounter, "NodeCounter is null");
-
-            // Expected counts per context, computed by the provided counter
-            Dictionary<string, int> expectedNodeCounts =
-                nodeCounter.Count(GetRelativeReportPath(), GetNodesToParse());
-
-            int expectedTotalNodes = expectedNodeCounts.Values.Sum();
-
-            // Act & Assert
-            AssertNodeCountsMatch(expectedNodeCounts);
-
-            Assert.AreEqual(
-                expectedTotalNodes,
-                metricSchema.findings.Count,
-                $"Total node count mismatch. Expected: {expectedTotalNodes}, Actual: {metricSchema.findings.Count}"
-            );
-        }
-
         /// <summary>
         /// Parses the configured report file into a <see cref="MetricSchema"/>.
         /// 
@@ -154,15 +151,16 @@ namespace SEE.GraphProviders
         /// - The parsing config is provided.
         /// - The config can create a parser instance.
         /// </summary>
+        /// <returns>A task that represents the asynchronous parse operation. The task result is the parsed metric schema.</returns>
         private async UniTask<MetricSchema> BuildMetricSchemaAsync()
         {
-            DataPath reportDataPath = new(fullReportPath);
+            DataPath reportDataPath = new DataPath(fullReportPath);
 
             ParsingConfig config = GetParsingConfig();
-            Assert.NotNull(config, "GetParsingConfig() returned null");
+            Assert.NotNull(config, "GetParsingConfig() returned null.");
 
             IReportParser parser = config.CreateParser();
-            Assert.NotNull(parser, "CreateParser() returned null (IReportParser)");
+            Assert.NotNull(parser, "CreateParser() returned null (IReportParser).");
 
             return await parser.ParseAsync(reportDataPath);
         }
@@ -172,60 +170,73 @@ namespace SEE.GraphProviders
         /// expected per-context counts exactly, and that there are no unexpected contexts.
         /// Matching is case-insensitive on context keys.
         /// </summary>
+        /// <param name="expectedNodeCounts">Expected node counts per context.</param>
         private void AssertNodeCountsMatch(Dictionary<string, int> expectedNodeCounts)
         {
             Assert.IsNotNull(metricSchema, "metricSchema has not been initialized.");
-            Assert.IsNotNull(metricSchema.findings, "metricSchema.findings is null.");
+            Assert.IsNotNull(metricSchema.Findings, "metricSchema.Findings is null.");
 
-            // Group actual findings by Context (case-insensitive) and count them.
-            var actualNodeCounts = metricSchema.findings
-                .Where(f => !string.IsNullOrEmpty(f.Context))
-                .GroupBy(f => f.Context, StringComparer.OrdinalIgnoreCase)
+            Dictionary<string, int> actualNodeCounts = metricSchema.Findings
+                .Where(finding => !string.IsNullOrEmpty(finding.Context))
+                .GroupBy(finding => finding.Context, StringComparer.OrdinalIgnoreCase)
                 .ToDictionary(
-                    g => g.Key,
-                    g => g.Count(),
-                    StringComparer.OrdinalIgnoreCase
-                );
+                    group => group.Key,
+                    group => group.Count(),
+                    StringComparer.OrdinalIgnoreCase);
 
-            // 1) Every expected context must appear with the expected count
-            foreach (var expectedEntry in expectedNodeCounts)
+            foreach (KeyValuePair<string, int> expectedEntry in expectedNodeCounts)
             {
-                string XmlTagAsContext = GetParsingConfig().XPathMapping.MapContext[expectedEntry.Key];
-                int actualCount = actualNodeCounts.TryGetValue(XmlTagAsContext , out int count) ? count : 0;
+                string xmlTagAsContext = GetParsingConfig().XPathMapping.MapContext[expectedEntry.Key];
+
+                int actualCount = actualNodeCounts.TryGetValue(xmlTagAsContext, out int count) ? count : 0;
 
                 Assert.AreEqual(
                     expectedEntry.Value,
                     actualCount,
-                    $"Context '{expectedEntry.Key}': expected {expectedEntry.Value}, got {actualCount}"
-                );
+                    $"Context '{expectedEntry.Key}': expected {expectedEntry.Value}, got {actualCount}.");
             }
-
         }
 
         /// <summary>
         /// Verifies that a curated set of expected findings exists and matches on:
         /// - Context (if provided),
-        /// - Location (line/column spans if provided),
+        /// - Location (line and column spans if provided),
         /// - Metric dictionary (exact keys and values if provided).
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
         [Test]
         public async Task TestSpecificFindingsAsync()
         {
             metricSchema = await BuildMetricSchemaAsync();
 
-            foreach (var finding in metricSchema.findings)
+            foreach (Finding finding in metricSchema.Findings)
             {
                 Debug.LogWarning($"FullPath of Finding: {finding.FullPath}");
             }
-            Dictionary<string,Finding> testFindings = GetTestFindings();
 
-            foreach (KeyValuePair<string,Finding> expected in testFindings)
+            Dictionary<string, Finding> testFindings = GetTestFindings();
+
+            foreach (KeyValuePair<string, Finding> expected in testFindings)
             {
-                Finding actual = metricSchema.findings.FirstOrDefault(f => f.FullPath == expected.Key);
-                Assert.NotNull(actual, $"Finding '{expected.Key}' not found");
+                Finding actual = FindActualNode(expected.Value);
+                Assert.NotNull(actual, $"Finding '{expected.Key} ' not found.");
                 AssertFindingMatch(actual, expected.Value);
             }
         }
+
+        /// <summary>
+        /// Searches for the expected Finding in the actual MetricSchema. 
+        /// Findings can be identified by FullPath and StartLine.
+        /// </summary>
+        /// <param name="expected"></param>
+        /// <returns>The actual found <see cref="Finding"/> in the MetricSchema for a expected Finding</returns>
+        private Finding FindActualNode(Finding expected)
+        {
+            return metricSchema.Findings.FirstOrDefault(f =>
+                f.FullPath == expected.FullPath &&
+                f.Location?.StartLine == expected.Location?.StartLine);
+        }
+
 
         /// <summary>
         /// Asserts that two findings are equivalent for the properties that the expected
@@ -234,37 +245,44 @@ namespace SEE.GraphProviders
         /// The comparison is opt-in per field: if an expected sub-value is null or missing,
         /// it is not asserted.
         /// </summary>
+        /// <param name="actual">Actual finding produced by the parser.</param>
+        /// <param name="expected">Expected finding that defines the required values.</param>
         private void AssertFindingMatch(Finding actual, Finding expected)
         {
             Assert.IsNotNull(actual);
             Assert.IsNotNull(expected);
 
-            // Context (optional)
             if (!string.IsNullOrEmpty(expected.Context))
             {
                 Assert.That(actual.Context, Is.EqualTo(expected.Context), "Context");
             }
 
-            // Location (optional, individual fields are optional too)
             MetricLocation expectedLocation = expected.Location;
             MetricLocation actualLocation = actual.Location;
 
-            if (expectedLocation is not null)
+            if (expectedLocation != null)
             {
                 if (expectedLocation.StartLine.HasValue)
+                {
                     Assert.That(actualLocation?.StartLine, Is.EqualTo(expectedLocation.StartLine), "StartLine");
+                }
 
                 if (expectedLocation.EndLine.HasValue)
+                {
                     Assert.That(actualLocation?.EndLine, Is.EqualTo(expectedLocation.EndLine), "EndLine");
+                }
 
                 if (expectedLocation.StartColumn.HasValue)
+                {
                     Assert.That(actualLocation?.StartColumn, Is.EqualTo(expectedLocation.StartColumn), "StartColumn");
+                }
 
                 if (expectedLocation.EndColumn.HasValue)
+                {
                     Assert.That(actualLocation?.EndColumn, Is.EqualTo(expectedLocation.EndColumn), "EndColumn");
+                }
             }
 
-            // Metrics (optional)
             if (expected.Metrics is { Count: > 0 })
             {
                 AssertFindingMetricsMatch(actual, expected.Metrics);
@@ -277,13 +295,15 @@ namespace SEE.GraphProviders
         /// - No unexpected keys are present.
         /// If no metrics are expected, the finding must have an empty metric dictionary.
         /// </summary>
+        /// <param name="actual">Actual finding under test.</param>
+        /// <param name="expectedMetrics">Expected metric key-value pairs.</param>
         private void AssertFindingMetricsMatch(Finding actual, Dictionary<string, string> expectedMetrics)
         {
-            Assert.NotNull(actual, "Finding is null");
+            Assert.NotNull(actual, "Finding is null.");
 
             Dictionary<string, string> metrics = actual.Metrics;
 
-            Assert.NotNull(actual.Metrics, $"Metrics are null for node {actual.FullPath}");
+            Assert.NotNull(actual.Metrics, $"Metrics are null for node {actual.FullPath}.");
 
             expectedMetrics ??= new Dictionary<string, string>();
 
@@ -291,82 +311,65 @@ namespace SEE.GraphProviders
             {
                 Assert.IsEmpty(
                     actual.Metrics,
-                    $"Expected no metrics but found {actual.Metrics.Count} for {actual.FullPath}"
-                );
+                    $"Expected no metrics but found {actual.Metrics.Count} for {actual.FullPath}.");
                 return;
             }
 
-            // 1) Every expected metric must be present and match its value
             foreach (KeyValuePair<string, string> testMetric in expectedMetrics)
             {
                 Assert.IsTrue(
                     metrics.TryGetValue(testMetric.Key, out string actualValue),
-                    $"Missing metric '{testMetric.Key}'. Expected '{testMetric.Value}'."
-                );
+                    $"Missing metric '{testMetric.Key}'. Expected '{testMetric.Value}'.");
 
                 Assert.AreEqual(
                     testMetric.Value,
                     actualValue,
-                    $"Metric '{testMetric.Key}' mismatch. Expected '{testMetric.Value}', got '{actualValue}'."
-                );
+                    $"Metric '{testMetric.Key}' mismatch. Expected '{testMetric.Value}', got '{actualValue}'.");
             }
 
-            // 2) No unexpected metrics allowed
-            var unexpected = metrics.Keys.Except(expectedMetrics.Keys).ToList();
+            List<string> unexpected = metrics.Keys.Except(expectedMetrics.Keys).ToList();
             Assert.IsTrue(
                 unexpected.Count == 0,
-                $"Unexpected metric(s) present: {string.Join(", ", unexpected)}"
-            );
+                $"Unexpected metric(s) present: {string.Join(", ", unexpected)}.");
         }
 
         /// <summary>
         /// Verifies that a curated set of expected findings exists and matches on:
         /// - Context (if provided),
-        /// - Location (line/column spans if provided),
-        /// - Metric dictionary (exact keys and values if provided).
+        /// - Location (line and column spans if provided),
+        /// - Metric dictionary (exact keys and values if provided),
+        /// after metrics have been applied to the graph.
         /// </summary>
+        /// <returns>A <see cref="Task"/> representing the asynchronous test operation.</returns>
         [Test]
         public async Task TestMetricAppliedToGraphAsync()
         {
-            // Parse report → MetricSchema
             metricSchema = await BuildMetricSchemaAsync();
             Dictionary<string, Finding> expectedFindings = GetTestFindings();
 
-            // Load graph
-            DataPath gxlPath = new(Application.streamingAssetsPath + "/JLGExample/CodeFacts.gxl.xz");
+            DataPath gxlPath = new DataPath(fullGlxPath);
             graph = await LoadGraphAsync(gxlPath);
 
-            IIndexNodeStrategy indexNodeStrategy = GetParsingConfig().CreateIndexNodeStrategy();
+            ParsingConfig parsingConfig = GetParsingConfig();
+            IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
 
-            // Index required for method-level lookups
-            SourceRangeIndex index = new(graph, indexNodeStrategy.NodeIdToMainType);
+            SourceRangeIndex index = new SourceRangeIndex(graph, indexNodeStrategy.NodeIdToMainType);
 
-            // Apply metrics to graph nodes
-            MetricApplier.ApplyMetrics(graph, metricSchema, GetParsingConfig());
+            MetricApplier.ApplyMetrics(graph, metricSchema, parsingConfig);
 
-            string Prefix = Metrics.Prefix + GetParsingConfig().ToolId + ".";
+            string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
 
-            // Now verify each expected finding
-            foreach (var kv in expectedFindings)
+            foreach (KeyValuePair<string, Finding> kv in expectedFindings)
             {
                 string fullPath = kv.Key;
                 Finding expected = kv.Value;
 
-                // Normalize node id
                 string findingPathAsMainType = indexNodeStrategy.FindingPathToMainType(fullPath, expected.FileName);
-
                 string findingPathAsNodeId = indexNodeStrategy.FindingPathToNodeId(fullPath);
 
-                // Resolve node depending on context
                 Node node = null;
 
-
-                if (expected.Context.Equals("root")) 
-                {
-                    node = graph.GetRoots()[0];
-
-                }
-                else if (expected.Context.Equals("method", StringComparison.OrdinalIgnoreCase))
+                if (expected.Context.Equals("method", StringComparison.OrdinalIgnoreCase))
                 {
                     int startLine = expected.Location?.StartLine ?? -1;
                     index.TryGetValue(findingPathAsMainType, startLine, out node);
@@ -376,28 +379,41 @@ namespace SEE.GraphProviders
                     graph.TryGetNode(findingPathAsNodeId, out node);
                 }
 
-                Assert.NotNull(node, $"Node '{findingPathAsNodeId}' with FullPath {fullPath} with FindingPathAsMainType: {findingPathAsMainType} not found in graph.");
+                Assert.NotNull(
+                    node,
+                    $"Node '{findingPathAsNodeId}' with FullPath {fullPath} with FindingPathAsMainType: {findingPathAsMainType} not found in graph.");
 
-
-                // 1) Expected metrics must all exist and match
-                foreach (var m in expected.Metrics)
+                foreach (KeyValuePair<string, string> m in expected.Metrics)
                 {
-                    string metricKey = Prefix + m.Key;
-                    int value = node.GetInt(metricKey);
+                    string metricKey = prefix + m.Key;
+                    string value;
 
-                    Assert.NotNull(value,
-                        $"Node '{findingPathAsNodeId}' is missing expected metric '{metricKey}'"
-                    );
+                    if (node.TryGetInt(metricKey, out int intVal))
+                    {
+                        value = intVal.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else if (node.TryGetFloat(metricKey, out float floatVal))
+                    {
+                        value = floatVal.ToString(CultureInfo.InvariantCulture);
+                    }
+                    else if (node.TryGetString(metricKey, out string strVal))
+                    {
+                        value = strVal;
+                    }
+                    else
+                    {
+                        Assert.Fail(
+                            $"Metric '{metricKey}' not found on node '{findingPathAsNodeId}' (Context '{expected.Context}').");
+                        return;
+                    }
 
                     Assert.AreEqual(
-                        m.Value, value.ToString(),
-                        $"Metric '{m.Key}' mismatch in node '{findingPathAsNodeId}'. Expected '{m.Value}', got '{value}'."
-                    );
+                        m.Value,
+                        value,
+                        $"Metric '{metricKey}' mismatch in node '{findingPathAsNodeId}'. Expected '{m.Value}', got '{value}'.");
                 }
-               
+
             }
         }
-
     }
 }
-

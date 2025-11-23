@@ -7,47 +7,84 @@ using SEE.GraphProviders.NodeCounting;
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Tests for JaCoCo XML coverage reports with concrete expected metrics.
+    /// Tests for JaCoCo XML coverage report (JaCoCo core) with concrete expected metrics.
     /// </summary>
-    public class TestJaCoCoReport : TestReportGraphProviderBase
+    internal class TestJaCoCoReport : TestReportGraphProviderBase
     {
         /// <inheritdoc/>
         protected override string GetRelativeReportPath()
-            => "/JLGExample/jacoco.xml";
+        {
+            // Adjust this to wherever you place the uploaded jacoco XML in your repo.
+            return "/jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.xml";
+        }
+        
+        /// <inheritdoc/>
+        protected override string GetRelativeGlxPath()
+        {
+            // Adjust this to wherever you place the uploaded jacoco XML in your repo.
+            return "/jacoco/jacoco-2-f5c5b1f831903c9c2f771e467916ce9664aedb1b.gxl.xz";
+        }
 
         /// <inheritdoc/>
         protected override ParsingConfig GetParsingConfig()
-            => new JaCoCoParsingConfig();
+        {
+            return new JaCoCoParsingConfig();
+        }
 
         /// <inheritdoc/>
         protected override ICountReportNodes GetNodeCounter()
-            => new XmlNodeCounter();
+        {
+            return new XmlNodeCounter();
+        }
 
         /// <summary>
         /// All JaCoCo node types that this test verifies.
         /// </summary>
-        private static readonly string[] ParsedNodes = { "report", "package", "class", "method" };
+        private static readonly string[] parsedNodes = { "package", "class", "method" };
 
         /// <inheritdoc/>
-        protected override string[] GetNodesToParse() => ParsedNodes;
+        protected override string[] GetNodesToParse()
+        {
+            return parsedNodes;
+        }
 
         /// <inheritdoc/>
         protected override Dictionary<string, Finding> GetTestFindings()
-            => CreateTestFindings();
+        {
+            return CreateTestFindings();
+        }
+        public record MetricValue(int? Missed, int? Covered);
+
 
         /// <summary>
-        /// Helper to build the same metric set for any node.
+        /// Builds a metric dictionary for a JaCoCo node.
         /// Für jede Metrik werden *_missed, *_covered und *_percentage eingetragen.
+        /// Preconditions: All metric values must be greater than or equal to zero.
         /// </summary>
+        /// <param name="instructionMissed">Number of missed instructions.</param>
+        /// <param name="instructionCovered">Number of covered instructions.</param>
+        /// <param name="branchMissed">Number of missed branches.</param>
+        /// <param name="branchCovered">Number of covered branches.</param>
+        /// <param name="lineMissed">Number of missed lines.</param>
+        /// <param name="lineCovered">Number of covered lines.</param>
+        /// <param name="complexityMissed">Number of missed complexity points.</param>
+        /// <param name="complexityCovered">Number of covered complexity points.</param>
+        /// <param name="methodMissed">Number of missed methods.</param>
+        /// <param name="methodCovered">Number of covered methods.</param>
+        /// <param name="classMissed">Optional number of missed classes.</param>
+        /// <param name="classCovered">Optional number of covered classes.</param>
+        /// <returns>
+        /// Dictionary that contains for each metric name entries for missed, covered and percentage.
+        /// </returns>
         private static Dictionary<string, string> BuildMetrics(
-            int instructionMissed, int instructionCovered,
-            int branchMissed, int branchCovered,
-            int lineMissed, int lineCovered,
-            int complexityMissed, int complexityCovered,
-            int methodMissed, int methodCovered,
+            int? instructionMissed, int? instructionCovered,
+            int? branchMissed, int? branchCovered,
+            int? lineMissed, int? lineCovered,
+            int? complexityMissed, int? complexityCovered,
+            int? methodMissed, int? methodCovered,
             int? classMissed = null, int? classCovered = null)
         {
-            var metrics = new Dictionary<string, string>();
+            Dictionary<string, string> metrics = new Dictionary<string, string>();
 
             void AddMetric(string name, int missed, int covered)
             {
@@ -61,122 +98,141 @@ namespace SEE.GraphProviders
 
                 metrics[$"{name}_percentage"] = percentage;
             }
-
-            AddMetric("INSTRUCTION", instructionMissed, instructionCovered);
-            AddMetric("BRANCH", branchMissed, branchCovered);
-            AddMetric("LINE", lineMissed, lineCovered);
-            AddMetric("COMPLEXITY", complexityMissed, complexityCovered);
-            AddMetric("METHOD", methodMissed, methodCovered);
-
-            // CLASS gibt es nicht auf allen Ebenen (z.B. nicht auf Method-Ebene)
-            if (classMissed.HasValue && classCovered.HasValue)
+            Dictionary<string, MetricValue> jaCoCoMetrics = new Dictionary<string, MetricValue>()
             {
-                AddMetric("CLASS", classMissed.Value, classCovered.Value);
+                ["INSTRUCTION"] = new MetricValue(instructionMissed, instructionCovered),
+                ["BRANCH"] = new MetricValue(branchMissed, branchCovered),
+                ["LINE"] = new MetricValue(lineMissed, lineCovered),
+                ["COMPLEXITY"] = new MetricValue(complexityMissed, complexityCovered),
+                ["METHOD"] = new MetricValue(methodMissed, methodCovered),
+                ["CLASS"] = new MetricValue(classMissed, classCovered)
+            };
+
+
+            foreach (KeyValuePair<string,MetricValue> metricValue in jaCoCoMetrics)
+            {
+                if (metricValue.Value.Missed is int missed && metricValue.Value.Covered is int covered)
+                {
+                    AddMetric(metricValue.Key, missed, covered);
+                }
             }
 
             return metrics;
         }
 
+        
+
         /// <summary>
-        /// One expected Finding per context with concrete metrics from jacoco.xml.
+        /// Creates one expected finding per context with concrete metrics from the uploaded jacoco-2 report.
         /// FullPath strings assume:
-        /// - report: report name
-        /// - package: "counter"
-        /// - class:   "counter/CountVowels"
-        /// - method:  "counter/CountVowels#countVowels"
+        /// - report: "JaCoCo" (report name),
+        /// - package: "org/jacoco/core/tools",
+        /// - class:   "org/jacoco/core/tools/ExecFileLoader",
+        /// - method:  "org/jacoco/core/tools/ExecFileLoader#save(Ljava/io/File;Z)V".
         /// </summary>
+        /// <returns>Dictionary of expected findings keyed by their full path.</returns>
         private static Dictionary<string, Finding> CreateTestFindings()
         {
-            // Werte aus <report> ... </report> (ganz unten in jacoco.xml):
-            // INSTRUCTION {missed=1313, covered=441}
-            // BRANCH      {missed=101,  covered=27}
-            // LINE        {missed=330,  covered=83}
-            // COMPLEXITY  {missed=107,  covered=20}
-            // METHOD      {missed=55,   covered=8}
-            // CLASS       {missed=6,    covered=4}
-            var reportFinding = new Finding
-            {
-                FullPath = "JaCoCo Coverage Report",
-                FileName = "",
-                Context = "root",
-                Metrics = BuildMetrics(
-                    instructionMissed: 1313, instructionCovered: 441,
-                    branchMissed: 101, branchCovered: 27,
-                    lineMissed: 330, lineCovered: 83,
-                    complexityMissed: 107, complexityCovered: 20,
-                    methodMissed: 55, methodCovered: 8,
-                    classMissed: 6, classCovered: 4)
-            };
 
-            // Package "counter":
-            // INSTRUCTION {missed=31,  covered=313}
-            // BRANCH      {missed=1,   covered=17}
-            // LINE        {missed=13,  covered=45}
-            // COMPLEXITY  {missed=9,   covered=14}
-            // METHOD      {missed=8,   covered=6}
-            // CLASS       {missed=0,   covered=3}
-            var packageFinding = new Finding
+            // Package "org/jacoco/core/tools":
+            // INSTRUCTION {missed=7,  covered=210}
+            // BRANCH      {missed=1,  covered=5}
+            // LINE        {missed=3,  covered=73}
+            // COMPLEXITY  {missed=3,  covered=18}
+            // METHOD      {missed=2,  covered=16}
+            // CLASS       {missed=0,  covered=2}
+            Finding packageFinding = new Finding
             {
-                FullPath = "counter",
-                FileName = "",
+                FullPath = "org/jacoco/core/tools",
+                FileName = string.Empty,
                 Context = "package",
                 Metrics = BuildMetrics(
-                    instructionMissed: 31, instructionCovered: 313,
-                    branchMissed: 1, branchCovered: 17,
-                    lineMissed: 13, lineCovered: 45,
-                    complexityMissed: 9, complexityCovered: 14,
-                    methodMissed: 8, methodCovered: 6,
-                    classMissed: 0, classCovered: 3)
+                    instructionMissed: 7, instructionCovered: 210,
+                    branchMissed: 1, branchCovered: 5,
+                    lineMissed: 3, lineCovered: 73,
+                    complexityMissed: 3, complexityCovered: 18,
+                    methodMissed: 2, methodCovered: 16,
+                    classMissed: 0, classCovered: 2)
             };
 
-            // Class "counter/CountVowels":
-            // INSTRUCTION {missed=7, covered=66}
-            // BRANCH      {missed=0, covered=6}
-            // LINE        {missed=3, covered=11}
-            // COMPLEXITY  {missed=2, covered=5}
-            // METHOD      {missed=2, covered=2}
+            // Class "org/jacoco/core/tools/ExecFileLoader":
+            // INSTRUCTION {missed=0, covered=95}
+            // BRANCH      {missed=1, covered=1}
+            // LINE        {missed=0, covered=32}
+            // COMPLEXITY  {missed=1, covered=7}
+            // METHOD      {missed=0, covered=7}
             // CLASS       {missed=0, covered=1}
-            var classFinding = new Finding
+            Finding classFinding = new Finding
             {
-                FullPath = "counter/CountVowels",
-                FileName = "CountVowels.java",
+                FullPath = "org/jacoco/core/tools/ExecFileLoader",
+                FileName = "ExecFileLoader.java",
                 Context = "class",
                 Metrics = BuildMetrics(
-                    instructionMissed: 7, instructionCovered: 66,
-                    branchMissed: 0, branchCovered: 6,
-                    lineMissed: 3, lineCovered: 11,
-                    complexityMissed: 2, complexityCovered: 5,
-                    methodMissed: 2, methodCovered: 2,
+                    instructionMissed: 0, instructionCovered: 95,
+                    branchMissed: 1, branchCovered: 1,
+                    lineMissed: 0, lineCovered: 32,
+                    complexityMissed: 1, complexityCovered: 7,
+                    methodMissed: 0, methodCovered: 7,
                     classMissed: 0, classCovered: 1)
             };
 
-            // Method "countVowels" in dieser Klasse:
-            // INSTRUCTION {missed=0, covered=39}
-            // BRANCH      {missed=0, covered=6}
-            // LINE        {missed=0, covered=8}
-            // COMPLEXITY  {missed=0, covered=4}
+            // Method "save" in dieser Klasse:
+            // INSTRUCTION {missed=0, covered=30}
+            // BRANCH      {missed=1, covered=1}
+            // LINE        {missed=0, covered=11}
+            // COMPLEXITY  {missed=1, covered=1}
             // METHOD      {missed=0, covered=1}
             // (kein CLASS-Counter auf Methodenebene)
-            var methodFinding = new Finding
+            Finding methodFinding = new Finding
             {
-                FullPath = "counter/CountVowels#countVowels",
-                FileName = "CountVowels.java",
+                FullPath = "org/jacoco/core/tools/ExecFileLoader#save",
+                FileName = "ExecFileLoader.java",
                 Context = "method",
-                Location = new MetricLocation { StartLine = 11 },
+                Location = new MetricLocation { StartLine = 108 },
                 Metrics = BuildMetrics(
-                    instructionMissed: 0, instructionCovered: 39,
-                    branchMissed: 0, branchCovered: 6,
-                    lineMissed: 0, lineCovered: 8,
-                    complexityMissed: 0, complexityCovered: 4,
+                    instructionMissed: 0, instructionCovered: 30,
+                    branchMissed: 1, branchCovered: 1,
+                    lineMissed: 0, lineCovered: 11,
+                    complexityMissed: 1, complexityCovered: 1,
                     methodMissed: 0, methodCovered: 1)
+            };
+
+            Finding execDumpClientClassFinding = new Finding
+            {
+                FullPath = "org/jacoco/core/tools/ExecDumpClient",
+                FileName = "ExecDumpClient.java",
+                Context = "class",
+                Metrics = BuildMetrics(
+            instructionMissed: 7, instructionCovered: 115,
+            branchMissed: 0, branchCovered: 4,
+            lineMissed: 3, lineCovered: 41,
+            complexityMissed: 2, complexityCovered: 11,
+            methodMissed: 2, methodCovered: 9,
+            classMissed: 0, classCovered: 1)
+            };
+
+
+            Finding execDumpClientSleepMethodFinding = new Finding
+            {
+                FullPath = "org/jacoco/core/tools/ExecDumpClient#sleep",
+                FileName = "ExecDumpClient.java",
+                Context = "method",
+                Location = new MetricLocation { StartLine = 157 },
+                Metrics = BuildMetrics(
+           instructionMissed: 5, instructionCovered: 5,
+           branchMissed: null, branchCovered: null, // no BRANCH-Counter
+           lineMissed: 1, lineCovered: 3,
+           complexityMissed: 0, complexityCovered: 1,
+           methodMissed: 0, methodCovered: 1)
             };
 
             return new Dictionary<string, Finding>
             {
-                { reportFinding.FullPath,  reportFinding  },
                 { packageFinding.FullPath, packageFinding },
-                { classFinding.FullPath,   classFinding   },
-                { methodFinding.FullPath,  methodFinding  }
+                { classFinding.FullPath,   classFinding },
+                { methodFinding.FullPath,  methodFinding },
+                { execDumpClientClassFinding.FullPath,  execDumpClientClassFinding },
+                { execDumpClientSleepMethodFinding.FullPath, execDumpClientSleepMethodFinding }
             };
         }
     }

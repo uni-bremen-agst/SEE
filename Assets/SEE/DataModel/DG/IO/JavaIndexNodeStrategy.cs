@@ -1,9 +1,8 @@
-﻿using SEE.DataModel.DG;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Assets.SEE.DataModel.DG.IO
+namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Strategy for normalizing Java code element identifiers to main type paths.

@@ -1,92 +1,115 @@
-﻿using Assets.SEE.DataModel.DG.IO;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
+
+/// <summary>
+/// Contains data model types for parsing and interpreting external tool reports in the SEE dependency graph.
+/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Base configuration that describes how a specific tool's report should be interpreted.
+    /// Implementations must provide a non-null tool identifier and a valid XPath mapping before use.
     /// </summary>
     public abstract class ParsingConfig
     {
         /// <summary>
-        /// Identifier that ties parsed metrics to their origin (e.g., "JaCoCo").
+        /// Identifier that ties parsed metrics to their origin (for example, "JaCoCo").
+        /// This value must not be null when a parser uses this configuration.
         /// </summary>
-        public string ToolId = "";
+        public string ToolId = string.Empty;
+
+        /// <summary>
+        /// Describes which XML nodes to visit and how to interpret them.
+        /// This value must not be null when a parser uses this configuration.
+        /// </summary>
+        public XPathMapping XPathMapping;
 
         /// <summary>
         /// Creates the concrete parser that can process this configuration.
+        /// The returned parser instance must not be null.
         /// </summary>
-        public abstract IReportParser CreateParser();
-
+        /// <returns>
+        /// A concrete <see cref="IReportParser"/> that can interpret reports described by this configuration.
+        /// </returns>
+        internal abstract IReportParser CreateParser();
 
         /// <summary>
         /// Helper for callers that only need the textual tool identifier.
         /// </summary>
+        /// <returns>
+        /// The identifier of the tool. The returned string is never null.
+        /// </returns>
         public string GetToolId()
         {
             return ToolId;
         }
 
         /// <summary>
-        /// Describes which XML nodes to visit and how to interpret them.
+        /// Creates the concrete index strategy that is used to find nodes in a <c>SourceRangeIndex</c>.
+        /// The returned strategy instance must not be null.
         /// </summary>
-        public XPathMapping XPathMapping;
-
-        /// <summary>
-        /// Creates the concrete Index strategy to find node in SourceRangeIndex.
-        /// </summary>
+        /// <returns>
+        /// An <see cref="IIndexNodeStrategy"/> used to locate nodes in a <c>SourceRangeIndex</c>.
+        /// </returns>
         public abstract IIndexNodeStrategy CreateIndexNodeStrategy();
-
     }
 
     /// <summary>
     /// Encapsulates the XPath expressions used to traverse and interpret a report.
+    /// All XPath expressions must be valid for the corresponding report format.
     /// </summary>
     public class XPathMapping
     {
         /// <summary>
-        /// XPath union expression that selects every node of interest.
+        /// XPath union expression that selects every XML node of interest.
+        /// This string must not be null when used for report traversal.
         /// </summary>
-        public string SearchedNodes { get; set; } = "";
+        public string SearchedNodes { get; set; } = string.Empty;
 
         /// <summary>
         /// Maps XML element names to XPath expressions that produce the full path identifier.
+        /// Dictionary keys and values must not be null.
         /// </summary>
-        public Dictionary<string, string> PathBuilders { get; set; } = new();
-
+        public Dictionary<string, string> PathBuilders { get; set; } =
+            new Dictionary<string, string>();
 
         /// <summary>
-        /// Searches for the filename of the xml node.
+        /// Maps XML element names to XPath expressions that select the file name of a node.
+        /// Dictionary keys and values must not be null.
         /// </summary>
-        public Dictionary<string, string> FileName { get; set; } = new() ;
+        public Dictionary<string, string> FileName { get; set; } =
+            new Dictionary<string, string>();
 
         /// <summary>
         /// Optional mapping from location field names to XPath expressions.
+        /// May be null if the report format does not provide explicit locations.
         /// </summary>
         public Dictionary<string, string>? LocationMapping { get; set; }
 
         /// <summary>
         /// Metric definitions keyed by their output name, each pointing to an XPath expression.
+        /// Dictionary keys and values must not be null.
         /// </summary>
-        public Dictionary<string, string> Metrics { get; set; } = new();
+        public Dictionary<string, string> Metrics { get; set; } =
+            new Dictionary<string, string>();
 
         /// <summary>
-        /// Optional namespace prefix/URI map for XPath evaluation.
+        /// Optional namespace prefix or URI map for XPath evaluation.
+        /// May be null if the report does not use XML namespaces.
         /// </summary>
-        public Dictionary<string, string>? Namespaces { get; set; }  
+        public Dictionary<string, string>? Namespaces { get; set; }
 
         /// <summary>
-        /// Optional template for location metadata, used by parsers that allocate upfront objects.
+        /// Optional template for location metadata, used by parsers that allocate location objects upfront.
+        /// May be null if no location template is required.
         /// </summary>
         public MetricLocation MetricLocation;
 
         /// <summary>
-        /// Maps a xml tag to a Context (class, package, method, root)
+        /// Maps an XML tag name to a context designation such as class, package, method or root.
+        /// Dictionary keys and values must not be null.
         /// </summary>
-        /// <param name="localName"></param>
-        /// <returns></returns>
-        public Dictionary<string, string> MapContext { get; set; } = new();
+        public Dictionary<string, string> MapContext { get; set; } =
+            new Dictionary<string, string>();
     }
-
 }
