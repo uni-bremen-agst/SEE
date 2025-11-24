@@ -1,7 +1,6 @@
 {
     "#": "Note: The first list entry is evaluated last!",
     "_Layers": [
-        "configuration.py",
         "configuration.json"
     ]
 }
