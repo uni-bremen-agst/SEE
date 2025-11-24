@@ -58,11 +58,6 @@ namespace SEE.Tools.Livekit
         private WebCamTexture webCamTexture = null;
 
         /// <summary>
-        /// A dictionary that maps participant identities to the GameObjects that represent their video streams.
-        /// </summary>
-        private readonly Dictionary<ulong, GameObject> videoObjects = new();
-
-        /// <summary>
         /// A list of video sources created from the local webcam that are currently being published to the room.
         /// </summary>
         private readonly List<RtcVideoSource> rtcVideoSources = new();
