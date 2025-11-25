@@ -181,7 +181,8 @@ namespace SEE.Utils
 
             if (activeIndex != index)
             {
-                if (webcams[activeIndex].isPlaying)
+                if (webcams[activeIndex] != null
+                    && webcams[activeIndex].isPlaying)
                 {
                     StopWebcamAsync(activeIndex).Forget();
                     ShowNotification.Info("Video Systems Disabled",
