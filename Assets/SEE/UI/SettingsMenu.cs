@@ -48,6 +48,16 @@ namespace SEE.UI
         /// was changed by the user.
         /// </summary>
         private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
+
+        /// <summary>
+        /// The key binding that gets updated.
+        /// </summary>
+        private KeyActionDescriptor bindingToRebind;
+
+        /// <summary>
+        /// The notification telling the user to press a key to rebind the key binding.
+        /// </summary>
+        private Notification.Notification bindingNotification;
         #endregion
 
         #region Audio components
@@ -82,17 +92,6 @@ namespace SEE.UI
         private Slider musicVolumeSlider;
         #endregion
 
-        #region Video components
-        /// <summary>
-        /// The dropdown UI component used to select between different available cameras.
-        /// </summary>
-        private Dropdown cameraDropdown;
-        #endregion
-
-        #region LiveKit components
-
-        #endregion
-
         /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
@@ -108,35 +107,7 @@ namespace SEE.UI
 
             InitializeVideoSettings();
             InitializeAudioSettings();
-
-            // Displays all bindings grouped by their category.
-            foreach (var group in KeyBindings.AllBindings())
-            {
-                // Creates a list of keybinding descriptions for the given category.
-                GameObject scrollView = PrefabInstantiator.InstantiatePrefab(scrollPrefab, Canvas.transform, false).transform.gameObject;
-                scrollView.transform.SetParent(settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
-                // set the titles of the scrollViews to the scopes
-                TextMeshProUGUI groupTitle = scrollView.transform.Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
-                groupTitle.text = $"{group.Key}";
-
-                foreach ((_, KeyActionDescriptor descriptor) in group)
-                {
-                    GameObject keyBindingContent = PrefabInstantiator.InstantiatePrefab(SettingsMenu.keyBindingContent, Canvas.transform, false).transform.gameObject;
-                    keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
-
-                    // set the text to the short name of the binding
-                    TextMeshProUGUI bindingText = keyBindingContent.transform.Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    // The short name of the binding.
-                    bindingText.text = descriptor.Name;
-                    // set the label of the key button
-                    TextMeshProUGUI key = keyBindingContent.transform.Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
-                    // The name of the key code bound.
-                    key.text = descriptor.KeyCode.ToString();
-                    shortNameOfBindingToLabel[descriptor.Name] = key;
-                    // add the actionlistener to be able to change the key code of a binding.
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>().onClick.AddListener(() => StartRebindFor(descriptor));
-                }
-            }
+            InitializeKeyBindings();
         }
 
         /// <summary>
@@ -221,16 +192,6 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// The key binding that gets updated.
-        /// </summary>
-        private KeyActionDescriptor bindingToRebind;
-
-        /// <summary>
-        /// The notification telling the user to press a key to rebind the key binding.
-        /// </summary>
-        private Notification.Notification bindingNotification;
-
-        /// <summary>
         /// Sets the <see cref="bindingToRebind"/>.
         /// </summary>
         private void StartRebindFor(KeyActionDescriptor binding)
@@ -267,7 +228,7 @@ namespace SEE.UI
 
         private void InitializeVideoSettings()
         {
-            cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
+            Dropdown cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
             // Load available cameras and populate the dropdown.
             WebCamDevice[] devices = WebCamTexture.devices;
 
@@ -355,6 +316,71 @@ namespace SEE.UI
             {
                 audioManager.RemoteSoundEffectsMuted = !value;
             });
+        }
+
+        /// <summary>
+        /// Initializes the key bindings section of the settings menu.
+        /// This method creates UI elements for each binding group, displays
+        /// their associated actions and current key codes, and registers
+        /// listeners to allow rebinding of keys at runtime.
+        /// </summary>
+        /// <remarks>
+        /// - Key bindings are retrieved from <see cref="KeyBindings.AllBindings"/>.
+        /// - Each binding group is displayed in a scroll view with a group title.
+        /// - For each binding, a content element is instantiated showing the
+        ///   action name and the bound key.
+        /// - Clicking the key button triggers <see cref="StartRebindFor"/> to
+        ///   allow the user to change the binding.
+        /// - The method expects prefabs for scroll views and key binding content
+        ///   to be available via <see cref="PrefabInstantiator"/>.
+        /// </remarks>
+        private void InitializeKeyBindings()
+        {
+            // Displays all bindings grouped by their category.
+            foreach (var group in KeyBindings.AllBindings())
+            {
+                // Creates a list of keybinding descriptions for the given category.
+                GameObject scrollView = PrefabInstantiator
+                    .InstantiatePrefab(scrollPrefab, Canvas.transform, false)
+                    .transform.gameObject;
+
+                scrollView.transform.SetParent(
+                    settingsMenuGameObject.transform.Find("KeybindingsPanel/KeybindingsText/Viewport/Content"));
+
+                // set the titles of the scrollViews to the scopes
+                TextMeshProUGUI groupTitle = scrollView.transform
+                    .Find("Group").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                groupTitle.text = $"{group.Key}";
+
+                foreach ((_, KeyActionDescriptor descriptor) in group)
+                {
+                    GameObject keyBindingContent = PrefabInstantiator
+                        .InstantiatePrefab(SettingsMenu.keyBindingContent, Canvas.transform, false)
+                        .transform.gameObject;
+
+                    keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
+
+                    // set the text to the short name of the binding
+                    TextMeshProUGUI bindingText = keyBindingContent.transform
+                        .Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                    // The short name of the binding.
+                    bindingText.text = descriptor.Name;
+
+                    // set the label of the key button
+                    TextMeshProUGUI key = keyBindingContent.transform
+                        .Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
+
+                    // The name of the key code bound.
+                    key.text = descriptor.KeyCode.ToString();
+                    shortNameOfBindingToLabel[descriptor.Name] = key;
+
+                    // add the actionlistener to be able to change the key code of a binding.
+                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>()
+                        .onClick.AddListener(() => StartRebindFor(descriptor));
+                }
+            }
         }
     }
 }
