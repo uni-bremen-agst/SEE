@@ -41,13 +41,16 @@ namespace SEE.UI
         /// </summary>
         private GameObject settingsMenuGameObject;
 
+        #region Key-Binding
         /// <summary>
         /// A mapping of the short name of the key binding onto the label of the button that allows to
         /// change the binding. This dictionary is used to update the label if the key binding
         /// was changed by the user.
         /// </summary>
         private readonly Dictionary<string, TextMeshProUGUI> shortNameOfBindingToLabel = new();
+        #endregion
 
+        #region Audio components
         /// <summary>
         /// The cached audio manager instance.
         /// </summary>
@@ -77,11 +80,18 @@ namespace SEE.UI
         /// The slider that allows to change the music volume.
         /// </summary>
         private Slider musicVolumeSlider;
+        #endregion
 
+        #region Video components
         /// <summary>
         /// The dropdown UI component used to select between different available cameras.
         /// </summary>
         private Dropdown cameraDropdown;
+        #endregion
+
+        #region LiveKit components
+
+        #endregion
 
         /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
@@ -96,38 +106,8 @@ namespace SEE.UI
             settingsMenuGameObject.transform.Find("ExitPanel/Buttons/Content/Exit").gameObject.MustGetComponent<Button>()
                                   .onClick.AddListener(ExitGame);
 
-            RegisterCameraDropdown();
-
-            musicToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicToggle").gameObject.MustGetComponent<Toggle>();
-            musicVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/MusicVolumeSlider").gameObject.MustGetComponent<Slider>();
-            sfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXToggle").gameObject.MustGetComponent<Toggle>();
-            sfxVolumeSlider = settingsMenuGameObject.transform.Find("AudioSettingsPanel/SFXVolumeSlider").gameObject.MustGetComponent<Slider>();
-            remoteSfxToggle = settingsMenuGameObject.transform.Find("AudioSettingsPanel/RemoteSFXToggle").gameObject.MustGetComponent<Toggle>();
-
-            audioManager = AudioManagerImpl.Instance();
-            musicVolumeSlider.value = audioManager.MusicVolume;
-            musicVolumeSlider.interactable = !audioManager.MusicMuted;
-            musicToggle.isOn = !audioManager.MusicMuted;
-            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
-            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
-            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
-            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
-            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
-
-            sfxVolumeSlider.onValueChanged.AddListener((value) => { audioManager.SoundEffectsVolume = value; });
-            musicVolumeSlider.onValueChanged.AddListener((value) => { audioManager.MusicVolume = value; });
-            musicToggle.onValueChanged.AddListener((value) =>
-            {
-                audioManager.MusicMuted = !value;
-                musicVolumeSlider.interactable = value;
-            });
-            sfxToggle.onValueChanged.AddListener((value) =>
-            {
-                audioManager.SoundEffectsMuted = !value;
-                sfxVolumeSlider.interactable = value;
-                remoteSfxToggle.interactable = value;
-            });
-            remoteSfxToggle.onValueChanged.AddListener((value) => { audioManager.RemoteSoundEffectsMuted = !value; });
+            InitializeVideoSettings();
+            InitializeAudioSettings();
 
             // Displays all bindings grouped by their category.
             foreach (var group in KeyBindings.AllBindings())
@@ -272,18 +252,20 @@ namespace SEE.UI
         }
 
         /// <summary>
-        /// Registers and initializes the camera selection dropdown within the settings menu.
-        /// This method populates the dropdown with all available webcam devices, restores the
-        /// previously selected camera from <see cref="PlayerPrefs"/>, and connects the dropdown's
-        /// selection event to the <see cref="WebcamManager.SwitchCamera(int)"/> handler.
+        /// Initializes the video settings section of the settings menu, specifically the camera selection dropdown.
+        /// This method populates the dropdown with all available webcam devices, restores the previously
+        /// selected camera from <see cref="PlayerPrefs"/>, and connects the dropdown's selection event
+        /// to the <see cref="WebcamManager.SwitchCamera(int)"/> handler.
         /// </summary>
         /// <remarks>
         /// - If no webcam devices are found, the dropdown remains uninitialized.
         /// - The first available device is used as a fallback if no previous selection is stored.
         /// - The dropdown is expected to be a child object named "CameraDropdown" within
         ///   <see cref="settingsMenuGameObject"/>.
+        /// - The currently selected camera is immediately applied to <see cref="WebcamManager"/>.
         /// </remarks>
-        private void RegisterCameraDropdown()
+
+        private void InitializeVideoSettings()
         {
             cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
             // Load available cameras and populate the dropdown.
@@ -310,6 +292,69 @@ namespace SEE.UI
                 // Updates the selected webcam index in the WebcamManager.
                 WebcamManager.SwitchCamera(selectedIndex);
             }
+        }
+
+        /// <summary>
+        /// Initializes the audio settings section of the settings menu.
+        /// This method wires up the UI controls (toggles and sliders) for music,
+        /// sound effects, and remote sound effects, synchronizes them with the
+        /// current <see cref="AudioManagerImpl"/> state, and registers listeners
+        /// to update audio settings when the user interacts with the controls.
+        /// </summary>
+        /// <remarks>
+        /// - The method expects child objects named "MusicToggle", "MusicVolumeSlider",
+        ///   "SFXToggle", "SFXVolumeSlider", and "RemoteSFXToggle" within
+        ///   <see cref="settingsMenuGameObject"/>.
+        /// - Initial values are loaded from <see cref="AudioManagerImpl"/>.
+        /// - Toggles control muting/unmuting, while sliders adjust volume levels.
+        /// - Interactivity of sliders and toggles is updated dynamically based on mute state.
+        /// </remarks>
+
+        private void InitializeAudioSettings()
+        {
+            musicToggle = settingsMenuGameObject.FindDescendant("MusicToggle").MustGetComponent<Toggle>();
+            musicVolumeSlider = settingsMenuGameObject.FindDescendant("MusicVolumeSlider").MustGetComponent<Slider>();
+            sfxToggle = settingsMenuGameObject.FindDescendant("SFXToggle").MustGetComponent<Toggle>();
+            sfxVolumeSlider = settingsMenuGameObject.FindDescendant("SFXVolumeSlider").MustGetComponent<Slider>();
+            remoteSfxToggle = settingsMenuGameObject.FindDescendant("RemoteSFXToggle").MustGetComponent<Toggle>();
+
+            audioManager = AudioManagerImpl.Instance();
+            musicVolumeSlider.value = audioManager.MusicVolume;
+            musicVolumeSlider.interactable = !audioManager.MusicMuted;
+            musicToggle.isOn = !audioManager.MusicMuted;
+            sfxVolumeSlider.value = audioManager.SoundEffectsVolume;
+            sfxVolumeSlider.interactable = !audioManager.SoundEffectsMuted;
+            sfxToggle.isOn = !audioManager.SoundEffectsMuted;
+            remoteSfxToggle.isOn = !audioManager.RemoteSoundEffectsMuted;
+            remoteSfxToggle.interactable = !audioManager.SoundEffectsMuted;
+
+            sfxVolumeSlider.onValueChanged.AddListener((value) =>
+            {
+                audioManager.SoundEffectsVolume = value;
+            });
+
+            musicVolumeSlider.onValueChanged.AddListener((value) =>
+            {
+                audioManager.MusicVolume = value;
+            });
+
+            musicToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.MusicMuted = !value;
+                musicVolumeSlider.interactable = value;
+            });
+
+            sfxToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.SoundEffectsMuted = !value;
+                sfxVolumeSlider.interactable = value;
+                remoteSfxToggle.interactable = value;
+            });
+
+            remoteSfxToggle.onValueChanged.AddListener((value) =>
+            {
+                audioManager.RemoteSoundEffectsMuted = !value;
+            });
         }
     }
 }
