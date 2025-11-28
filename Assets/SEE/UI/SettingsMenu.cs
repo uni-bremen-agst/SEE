@@ -255,6 +255,9 @@ namespace SEE.UI
             InitializeLiveKitSettings();
         }
 
+        /// <summary>
+        ///
+        /// </summary>
         private void InitializeLiveKitSettings()
         {
             // InputFields of the LiveKit settings.
@@ -285,14 +288,31 @@ namespace SEE.UI
                 DisableShortcutsWhileTyping(tokenURLInputField);
                 DisableShortcutsWhileTyping(roomNameInputField);
 
+                // Bind input fields to depending attributes
+                liveKitURLInputField.onValueChanged.AddListener(input =>
+                {
+                    liveKitVideoManager.LiveKitUrl = input;
+                    SaveToPlayerPrefs(PlayerPrefsKeys.LiveKitURL);
+                });
+
+                tokenURLInputField.onValueChanged.AddListener(input =>
+                {
+                    liveKitVideoManager.TokenUrl = input;
+                    SaveToPlayerPrefs(PlayerPrefsKeys.TokenURL);
+                });
+
+                roomNameInputField.onValueChanged.AddListener(input =>
+                {
+                    liveKitVideoManager.RoomName = input;
+                    SaveToPlayerPrefs(PlayerPrefsKeys.RoomName);
+                });
+
                 // TODO BTN addlistener
             }
 
-            //static void BindInputFieldToAttributeAndPlayerPref TODO
-
-            void SaveToPlayerPrefs(string keyWord)
+            void SaveToPlayerPrefs(string keyword)
             {
-                switch (keyWord)
+                switch (keyword)
                 {
                     case PlayerPrefsKeys.LiveKitURL:
                         PlayerPrefs.SetString(PlayerPrefsKeys.LiveKitURL, liveKitVideoManager.LiveKitUrl);
