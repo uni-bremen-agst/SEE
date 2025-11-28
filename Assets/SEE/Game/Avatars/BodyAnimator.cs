@@ -120,9 +120,9 @@ namespace SEE.Game.Avatars
         {
             WebcamManager.OnActiveWebcamChanged += HandleWebcamChanged;
             // Request current state once when enabling
-            if (WebcamManager.WebCamTexture != null)
+            if (WebcamManager.ActiveWebcam != null)
             {
-                HandleWebcamChanged(WebcamManager.WebCamTexture);
+                HandleWebcamChanged(WebcamManager.ActiveWebcam);
             }
         }
 
@@ -143,7 +143,7 @@ namespace SEE.Game.Avatars
             //Use local WebCamTexture.
             if (IsLocallyControlled)
             {
-                webCamTexture = WebcamManager.WebCamTexture;
+                webCamTexture = WebcamManager.ActiveWebcam;
             }
 
             if (!gameObject.TryGetComponentOrLog(out ik))

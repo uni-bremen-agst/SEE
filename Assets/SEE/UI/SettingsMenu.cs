@@ -245,18 +245,10 @@ namespace SEE.UI
                     cameraDropdown.options.Add(new Dropdown.OptionData(string.IsNullOrEmpty(device.name) ? "Unnamed Camera" : device.name));
                 }
 
-                // Get the saved camera or default to the first available camera.
-                string savedCamera = PlayerPrefs.GetString(PlayerPrefsKeys.WebcamDevice, devices[0].name);
-
-                // Set the dropdown value to the saved or default camera.
-                int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
-                cameraDropdown.value = selectedIndex >= 0 ? selectedIndex : 0;
+                cameraDropdown.value = WebcamManager.ActiveIndex;
 
                 // Add a listener for dropdown changes.
                 cameraDropdown.onValueChanged.AddListener(WebcamManager.SwitchCamera);
-
-                // Updates the selected webcam index in the WebcamManager.
-                WebcamManager.SwitchCamera(selectedIndex);
             }
 
             // Initialize LiveKit settings.

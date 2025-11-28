@@ -153,9 +153,9 @@ namespace SEE.Tools.Livekit
         {
             WebcamManager.OnActiveWebcamChanged += HandleWebcamChanged;
             // Request current state once when enabling
-            if (WebcamManager.WebCamTexture != null)
+            if (WebcamManager.ActiveWebcam != null)
             {
-                HandleWebcamChanged(WebcamManager.WebCamTexture);
+                HandleWebcamChanged(WebcamManager.ActiveWebcam);
             }
         }
 

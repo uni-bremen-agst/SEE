@@ -18,7 +18,7 @@ namespace SEE.Utils
     public static class WebcamManager
     {
         /// <summary>
-        /// List of all available <see cref="WebCamTexture"/> instances in the order
+        /// List of all available <see cref="ActiveWebcam"/> instances in the order
         /// they were detected on the system.
         /// </summary>
         private static readonly List<WebCamTexture> webcams = new();
@@ -27,6 +27,20 @@ namespace SEE.Utils
         /// Index of the currently active webcam in the <see cref="webcams"/> list.
         /// </summary>
         private static int activeIndex = 0;
+
+        /// <summary>
+        /// Gets the index of the currently active webcam.
+        /// Initialization is performed automatically if required.
+        /// If the stored index is out of range, it is reset to <c>0</c>.
+        /// </summary>
+        public static int ActiveIndex
+        {
+            get
+            {
+                EnsureInitialized();
+                return activeIndex;
+            }
+        }
 
         /// <summary>
         /// Tracks how many active systems are currently using the active webcam.
@@ -50,29 +64,37 @@ namespace SEE.Utils
         public static event Action<WebCamTexture> OnActiveWebcamChanged;
 
         /// <summary>
-        /// Gets the currently active <see cref="WebCamTexture"/>.
-        /// If no webcam has been initialized yet, this property automatically calls
-        /// <see cref="Initialize"/> to create and start the first available webcam device.
-        /// If initialization fails (e.g., because no camera is available), this property will return null.
+        /// Returns the <see cref="ActiveWebcam"/> of the currently active webcam.
+        /// Initialization is performed automatically if necessary.
+        /// Returns <c>null</c> if no webcam devices are available.
         /// </summary>
-        public static WebCamTexture WebCamTexture
+        public static WebCamTexture ActiveWebcam
         {
             get
             {
-                if (webcams.Count == 0)
-                {
-                    Initialize();
-                }
+                EnsureInitialized();
                 return webcams.Count > 0 ? webcams[activeIndex] : null;
             }
         }
 
         /// <summary>
+        /// Ensures that the webcam system is initialized.
+        /// If no devices have been enumerated yet, <see cref="Initialize"/> is invoked.
+        /// </summary>
+        private static void EnsureInitialized()
+        {
+            if (webcams.Count == 0)
+            {
+                Initialize();
+            }
+        }
+
+        /// <summary>
         /// Initializes the webcam manager and registers all available webcams.
-        /// - If no webcams are found on the system, an error is logged and no <see cref="WebCamTexture"/> is created.
+        /// - If no webcams are found on the system, an error is logged and no <see cref="ActiveWebcam"/> is created.
         /// - The first detected device is selected as the active webcam and started automatically.
         /// - All other webcams are registered in the list but not started, to save resources.
-        /// - Each <see cref="WebCamTexture"/> is created exactly once per device.
+        /// - Each <see cref="ActiveWebcam"/> is created exactly once per device.
         /// </summary>
         private static void Initialize()
         {
@@ -84,36 +106,32 @@ namespace SEE.Utils
                 return;
             }
 
+            // Try to load previous selected webcam device from PlayerPrefs.
+            string savedCamera = PlayerPrefs.GetString(PlayerPrefsKeys.WebcamDevice, devices[0].name);
+
             // Initialize the remaining webcams (not played yet)
             for (int i = 0; i < devices.Length; i++)
             {
                 WebCamDevice device = devices[i];
                 webcams.Add(new(device.name));
-                if (i == 0)
+
+                if (device.name == savedCamera)
                 {
                     activeIndex = i;
-                    Debug.Log($"[WebcamManager] Active webcam initialized: {device.name}\n");
                 }
             }
+
+            Debug.Log($"[WebcamManager] Active webcam initialized: {devices[activeIndex].name}");
         }
 
         /// <summary>
-        /// Indicates that a component or action intends to use the active webcam.
-        ///
-        /// This method increments the internal <see cref="usageCount"/> and ensures the webcam is running:
-        /// - If this is the first user (i.e., usageCount transitions from 0 -> 1),
-        ///   the webcam is automatically started via <see cref="WebCamTexture.Play"/>.
-        /// - If the webcam is already active, the method simply increases the counter without restarting it.
-        ///
-        /// Always call this method before accessing the webcam to guarantee that
-        /// the <see cref="WebCamTexture"/> is initialized and streaming frames.
+        /// Increases the usage count and ensures that the active webcam is playing.
+        /// Automatically initializes the webcam system if needed.
+        /// If no webcams are available, the call has no effect.
         /// </summary>
         public static void Acquire()
         {
-            if (webcams.Count == 0)
-            {
-                Initialize();
-            }
+            EnsureInitialized();
 
             if (webcams.Count == 0)
             {
