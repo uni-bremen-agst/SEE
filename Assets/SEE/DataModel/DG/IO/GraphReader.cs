@@ -228,22 +228,14 @@ namespace SEE.DataModel.DG.IO
                 }
                 else
                 {
-                    // Now the current node should have a linkname and we can
-                    // actually add it to the graph.
-                    if (node.TryGetString(Linkage.Name, out string linkname))
+                    /// Now the current node should have a linkname and we can
+                    /// actually add it to the graph. If the node has a <see cref="Linkage.Name"/>,
+                    /// we will use that as the unique id, otherwise <see cref="Node.SourceNameAttribute"/>.
+                    /// One of them must exist.
+                    if (node.TryGetString(Linkage.Name, out string linkname)
+                        || node.TryGetString(Node.SourceNameAttribute, out linkname))
                     {
-                        // The attribute Linkage.Name is actually not always unique. There are cases where multiple
-                        // nodes may have the same value for Linkage.Name. They will differ in another attribute
-                        // Linkage.PIR_Node. If we have a node with both attributes, we can combine them to
-                        // make a unique ID. The attribute Linkage.PIR_Node is an integer attribute.
-                        if (node.TryGetInt("Linkage.PIR_Node", out int pir))
-                        {
-                            node.ID = $"{linkname}#{pir}";
-                        }
-                        else
-                        {
-                            node.ID = linkname;
-                        }
+                        node.ID = linkname;
 
                         try
                         {
@@ -251,25 +243,15 @@ namespace SEE.DataModel.DG.IO
                         }
                         catch (InvalidOperationException e)
                         {
+                            Debug.LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.\n");
                             LogError($"Node ID {node.ID} is not unique: {e.Message}. This node will be ignored.");
                         }
                     }
                     else
                     {
-                        LogError($"Node has no attribute {Linkage.Name}");
-                        // let's try to use the Source.Name for the linkname instead, hoping it is unique
-                        if (string.IsNullOrEmpty(node.SourceName))
-                        {
-                            LogError($"Node doesn't even have an attribute {Node.SourceNameAttribute}");
-                        }
-                        else
-                        {
-                            node.ID = node.SourceName;
-                            graph.AddNode(node);
-                        }
+                        LogError($"Node has neither attribute {Linkage.Name} nor {Node.SourceNameAttribute}.");
                     }
                 }
-
                 current = null;
             }
         }
