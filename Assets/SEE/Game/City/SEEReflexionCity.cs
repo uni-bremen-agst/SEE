@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -9,6 +11,7 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
@@ -84,6 +87,26 @@ namespace SEE.Game.City
         /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
         private bool IsInitialState() => initialCityStateLoaded;
 
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the architecture graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath ArchitectureSnapshotPath = new();
+
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the mapping graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath MappingSnapshotPath = new();
+
         /// <summary>
         /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
         /// Regular loading of a city from files is not used for the initial reflexion city.
@@ -158,6 +181,83 @@ namespace SEE.Game.City
             {
                 Reset();
             }
+        }
+
+        /// <summary>
+        /// Saves the reflexion city as their individual graphs.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Saves the current city (as GXL).")]
+        public override void SaveData()
+        {
+            (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
+
+            GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
+            Debug.Log($"Saving implementation graph snapshot to {GraphSnapshotPath.Path}");
+
+            GraphWriter.Save(ArchitectureSnapshotPath.Path, architecture, HierarchicalEdges.First());
+            Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
+
+            GraphWriter.Save(MappingSnapshotPath.Path, mapping, HierarchicalEdges.First());
+            Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
+        }
+
+        /// <summary>
+        /// Loads a reflexion city from a snapshot.
+        ///
+        /// This method will load the graph and then apply the saved layout.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
+        public override async UniTask LoadSnapshotAsync()
+        {
+            Reset();
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            // Use a single GXL provider to load the graph.
+
+            if (initialReflexionCity)
+            {
+                ResetToInitial();
+                LoadInitial(gameObject.name);
+                return;
+            }
+            else if (IsInitialState())
+            {
+                LoadConfiguration();
+            }
+
+            // Makes the necessary changes for the initial types of a reflexion city.
+            AddInitialSubrootTypes();
+
+            ReflexionGraphProvider reflexionGraphProvider = new();
+
+            reflexionGraphProvider.Architecture = ArchitectureSnapshotPath;
+            reflexionGraphProvider.Implementation = GraphSnapshotPath;
+            reflexionGraphProvider.Mapping = MappingSnapshotPath;
+
+            LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
+            visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+            visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+
+
+            (Graph impl, _, Graph mapped) = (LoadedGraph as ReflexionGraph).Disassemble();
+            await DrawGraphAsync(LoadedGraph);
+            mapped.Edges().ForEach(edge =>
+            {
+                Node source = ReflexionGraph.GetNode(edge.Source.ID);
+                Node target = ReflexionGraph.GetNode(edge.Target.ID);
+                GameObject sourceGO = source.GameObject();
+                if (sourceGO != null)
+                {
+                    ReflexionMapper.SetParent(sourceGO, target.GameObject());
+                }
+            });
+            LoadLayout();
         }
 
         /// <summary>
@@ -241,6 +341,43 @@ namespace SEE.Game.City
             {
                 menu.PerformTabRebuild(this);
             }
+        }
+
+
+        async UniTask RestoreImplementation(Graph copyCurrentImpl)
+        {
+            // Create a copy of the original implementation graph to restore the current one to its original state.
+            GameObject tempGO = new($"COPY OF {gameObject.name}");
+            SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
+            tempCity.LoadInitial(tempGO.name);
+            Graph implCopy = await tempCity.GetReflexionGraphProvider()
+                .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
+            Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
+            implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
+
+            // Restore to the original parents.
+            foreach (Node copyNode in copyCurrentImpl.Nodes())
+            {
+                if (copyNode == null
+                    || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
+                {
+                    continue;
+                }
+
+                Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
+                Node copyOriginalParent = copyOriginalNode?.Parent;
+                Node copyCurrentParent = copyNode.Parent;
+                bool shouldReparent = copyOriginalParent != null
+                    && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
+
+                if (shouldReparent)
+                {
+                    Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
+                    VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
+
+                }
+            }
+            Destroyer.Destroy(tempGO);
         }
 
         /// <summary>
@@ -343,42 +480,6 @@ namespace SEE.Game.City
                 }
                 LayoutNodes.SetLevels(result);
                 return (result, textValues);
-            }
-
-            async UniTask RestoreImplementation(Graph copyCurrentImpl)
-            {
-                // Create a copy of the original implementation graph to restore the current one to its original state.
-                GameObject tempGO = new($"COPY OF {gameObject.name}");
-                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
-                tempCity.LoadInitial(tempGO.name);
-                Graph implCopy = await tempCity.GetReflexionGraphProvider()
-                    .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
-                Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
-                implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
-
-                // Restore to the original parents.
-                foreach (Node copyNode in copyCurrentImpl.Nodes())
-                {
-                    if (copyNode == null
-                        || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
-                    {
-                        continue;
-                    }
-
-                    Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
-                    Node copyOriginalParent = copyOriginalNode?.Parent;
-                    Node copyCurrentParent = copyNode.Parent;
-                    bool shouldReparent = copyOriginalParent != null
-                        && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
-
-                    if (shouldReparent)
-                    {
-                        Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
-                        VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
-
-                    }
-                }
-                Destroyer.Destroy(tempGO);
             }
 
             void RestoreArchitectureLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
@@ -643,5 +744,41 @@ namespace SEE.Game.City
         }
 
         #endregion SEEReflexionCity creation during in play mode
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="ArchitectureSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string architectureSnapshotPathLabel = "ArchitectureSnapshotPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="MappingSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string mappingSnapshotPathLabel = "MappingSnapshotPath";
+
+        /// <summary>
+        /// Saves the attributes of this instance in a configuration file
+        /// </summary>
+        /// <param name="writer">Writer for the configuration file.</param>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            ArchitectureSnapshotPath.Save(writer, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Save(writer, mappingSnapshotPathLabel);
+        }
+
+        /// <summary>
+        /// Restores the attributes from a given configuration <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The configuration to load the attributes from.</param>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            ArchitectureSnapshotPath.Restore(attributes, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Restore(attributes, mappingSnapshotPathLabel);
+        }
+
+        #endregion
     }
 }
