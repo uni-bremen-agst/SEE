@@ -2,6 +2,7 @@
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GO.Menu;
+using SEE.Tools.Livekit;
 using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;
 
@@ -134,6 +135,30 @@ namespace SEE.Game
             if (zoomActionDesktop == null)
             {
                 Debug.LogError($"Couldn't find component '{nameof(ZoomActionDesktop)}' "
+                               + $"on local player named '{Instance.name}'.\n");
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="LiveKitVideoManager"/> attached to the local player <see cref="Instance"/>
+        /// or any of its descendants (including inactive ones).
+        /// </summary>
+        /// <param name="manager">the resulting <see cref="LiveKitVideoManager"/>; null if none could be found</param>
+        /// <returns>true if a <see cref="LiveKitVideoManager"/> could be found.</returns>
+        internal static bool TryGetLiveKitVideoManager(out LiveKitVideoManager manager)
+        {
+            if (Instance == null)
+            {
+                Debug.LogError($"Local player is null'.\n");
+                manager = null;
+                return false;
+            }
+            manager = Instance.GetComponentInChildren<LiveKitVideoManager>();
+            if (manager == null)
+            {
+                Debug.LogError($"Couldn't find component '{nameof(LiveKitVideoManager)}' "
                                + $"on local player named '{Instance.name}'.\n");
                 return false;
             }

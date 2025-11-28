@@ -193,7 +193,7 @@ namespace SEE.Utils
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
 
                 // Saves the selected camera.
-                PlayerPrefs.SetString("selectedCamera", webcams[activeIndex].deviceName);
+                PlayerPrefs.SetString(PlayerPrefsKeys.WebcamDevice, webcams[activeIndex].deviceName);
             }
 
             static async UniTask StopWebcamAsync(int index)

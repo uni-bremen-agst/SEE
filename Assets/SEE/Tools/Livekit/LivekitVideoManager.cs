@@ -1,4 +1,5 @@
 // Code inspired by https://github.com/livekit-examples/unity-example/blob/main/LivekitUnitySampleApp/Assets/LivekitSamples.cs
+using Dissonance;
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
@@ -28,13 +29,13 @@ namespace SEE.Tools.Livekit
         /// The URL of the LiveKit server to connect to. This is a websocket URL.
         /// </summary>
         [Tooltip("The URL of the LiveKit server to connect to. A websocket URL.")]
-        private string LiveKitUrl = "ws://134.102.222.72:7880";//"ws://localhost:7880";
+        public string LiveKitUrl = "ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
         /// </summary>
         [Tooltip("The URL used to fetch the access token required for authentication.")]
-        private string TokenUrl = "http://134.102.222.72:3000";//"http://localhost:3000";
+        public string TokenUrl = "http://localhost:3000";
 
         /// <summary>
         /// The room name to join in LiveKit.
@@ -76,6 +77,12 @@ namespace SEE.Tools.Livekit
             if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
             {
                 gameObject.SetActive(false);
+            }
+            else
+            {
+                LiveKitUrl = PlayerPrefs.GetString(PlayerPrefsKeys.LiveKitURL, LiveKitUrl);
+                TokenUrl = PlayerPrefs.GetString(PlayerPrefsKeys.TokenURL, TokenUrl);
+                RoomName = PlayerPrefs.GetString(PlayerPrefsKeys.RoomName, RoomName);
             }
         }
 
@@ -194,7 +201,7 @@ namespace SEE.Tools.Livekit
         /// The name of the participant is the local client ID.
         /// </summary>
         /// <returns>Coroutine to handle the asynchronous token request process.</returns>
-        private IEnumerator GetToken()
+        private IEnumerator FetchTokenAndJoinRoom()
         {
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{TokenUrl}/getToken?roomName={RoomName}&participantName={NetworkManager.Singleton.LocalClientId}";
@@ -256,6 +263,17 @@ namespace SEE.Tools.Livekit
                 Debug.Log($"[LiveKit] Connected to \"{room.Name}\" \n");
             }
         }
+
+        /// <summary>
+        /// Indicates whether the current LiveKit room is connected.
+        /// </summary>
+        /// <returns>
+        /// <c>true</c> if the <see cref="room"/> is not <c>null</c> and
+        /// <see cref="room.IsConnected"/> evaluates to <c>true</c>;
+        /// otherwise <c>false</c>.
+        /// </returns>
+
+        public bool IsConnected() => room != null && room.IsConnected;
         #endregion
 
         #region Publish Methods
@@ -344,7 +362,7 @@ namespace SEE.Tools.Livekit
             {
                 if (room == null || !room.IsConnected)
                 {
-                    yield return StartCoroutine(GetToken());
+                    yield return StartCoroutine(FetchTokenAndJoinRoom());
                     // wait one frame to allow room state update.
                     yield return null;
                 }

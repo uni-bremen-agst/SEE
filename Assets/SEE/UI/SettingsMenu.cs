@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
+using Michsky.UI.ModernUIPack;
 using SEE.Audio;
 using SEE.Controls;
 using SEE.Controls.KeyActions;
+using SEE.Game;
 using SEE.GO;
+using SEE.Tools.Livekit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
@@ -216,7 +219,8 @@ namespace SEE.UI
         /// Initializes the video settings section of the settings menu, specifically the camera selection dropdown.
         /// This method populates the dropdown with all available webcam devices, restores the previously
         /// selected camera from <see cref="PlayerPrefs"/>, and connects the dropdown's selection event
-        /// to the <see cref="WebcamManager.SwitchCamera(int)"/> handler.
+        /// to the <see cref="WebcamManager.SwitchCamera(int)"/> handler,
+        /// and invokes <see cref="InitializeLiveKitSettings"/> to configure LiveKit-related options.
         /// </summary>
         /// <remarks>
         /// - If no webcam devices are found, the dropdown remains uninitialized.
@@ -224,6 +228,7 @@ namespace SEE.UI
         /// - The dropdown is expected to be a child object named "CameraDropdown" within
         ///   <see cref="settingsMenuGameObject"/>.
         /// - The currently selected camera is immediately applied to <see cref="WebcamManager"/>.
+        /// - LiveKit settings are initialized afterwards to ensure they are bound to the video settings page.
         /// </remarks>
 
         private void InitializeVideoSettings()
@@ -241,7 +246,7 @@ namespace SEE.UI
                 }
 
                 // Get the saved camera or default to the first available camera.
-                string savedCamera = PlayerPrefs.GetString("selectedCamera", devices[0].name);
+                string savedCamera = PlayerPrefs.GetString(PlayerPrefsKeys.WebcamDevice, devices[0].name);
 
                 // Set the dropdown value to the saved or default camera.
                 int selectedIndex = System.Array.FindIndex(devices, cam => cam.name == savedCamera);
@@ -252,6 +257,67 @@ namespace SEE.UI
 
                 // Updates the selected webcam index in the WebcamManager.
                 WebcamManager.SwitchCamera(selectedIndex);
+            }
+
+            // Initialize LiveKit settings.
+            InitializeLiveKitSettings();
+        }
+
+        private void InitializeLiveKitSettings()
+        {
+            // InputFields of the LiveKit settings.
+            TMP_InputField liveKitURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.LiveKitURL)
+                .GetComponentInChildren<TMP_InputField>();
+            TMP_InputField tokenURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.TokenURL)
+                .GetComponentInChildren<TMP_InputField>();
+            TMP_InputField roomNameInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.RoomName)
+                .GetComponentInChildren<TMP_InputField>();
+
+            // Buttons and importent GameObjects of the LiveKit settings page.
+            ButtonManagerWithIcon share = settingsMenuGameObject.FindDescendant("Share")
+                .MustGetComponent<ButtonManagerWithIcon>();
+            GameObject connectGO = settingsMenuGameObject.FindDescendant("Connect");
+            ButtonManagerWithIcon connect = connectGO.MustGetComponent<ButtonManagerWithIcon>();
+            GameObject disconnectGO = settingsMenuGameObject.FindDescendant("Disconnect");
+            ButtonManagerWithIcon disconnect = disconnectGO.MustGetComponent<ButtonManagerWithIcon>();
+            disconnectGO.SetActive(false);
+
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
+            {
+                liveKitURLInputField.text = liveKitVideoManager.LiveKitUrl;
+                tokenURLInputField.text = liveKitVideoManager.TokenUrl;
+                roomNameInputField.text = liveKitVideoManager.RoomName;
+
+                // Deactivates the shortcuts while typing.
+                DisableShortcutsWhileTyping(liveKitURLInputField);
+                DisableShortcutsWhileTyping(tokenURLInputField);
+                DisableShortcutsWhileTyping(roomNameInputField);
+
+                // TODO BTN addlistener
+            }
+
+            //static void BindInputFieldToAttributeAndPlayerPref TODO
+
+            void SaveToPlayerPrefs(string keyWord)
+            {
+                switch (keyWord)
+                {
+                    case PlayerPrefsKeys.LiveKitURL:
+                        PlayerPrefs.SetString(PlayerPrefsKeys.LiveKitURL, liveKitVideoManager.LiveKitUrl);
+                        break;
+                    case PlayerPrefsKeys.TokenURL:
+                        PlayerPrefs.SetString(PlayerPrefsKeys.TokenURL, liveKitVideoManager.TokenUrl);
+                        break;
+                    case PlayerPrefsKeys.RoomName:
+                        PlayerPrefs.SetString(PlayerPrefsKeys.RoomName, liveKitVideoManager.RoomName);
+                        break;
+                }
+            }
+
+            static void DisableShortcutsWhileTyping(TMP_InputField inputField)
+            {
+                inputField.onSelect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = false);
+                inputField.onDeselect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = true);
             }
         }
 
