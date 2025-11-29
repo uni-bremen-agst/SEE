@@ -396,6 +396,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">game object whose roof has to be determined</param>
         /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
+        /// <remarks>This does not consider the position of descendants if there are any.
+        /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
+        /// take descendants into account, too.</remarks>
         public static float GetRoof(this GameObject gameObject)
         {
             return gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
@@ -406,6 +409,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">game object whose roof has to be determined</param>
         /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
+        /// <remarks>This does not consider the position of descendants if there are any.
+        /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
+        /// take descendants into account, too.</remarks>
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
             Vector3 result;
@@ -442,8 +448,7 @@ namespace SEE.GO
         /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
         /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
-        /// Note: only descendants that are currently active in the scene are
-        /// considered.
+        /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
         /// <param name="gameObject">game object whose height has to be determined</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
@@ -476,20 +481,21 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the maximal world-space center position of hull of
+        /// Returns the maximal world-space center position of the hull of
         /// this <paramref name="gameObject"/>. The hull includes <paramref name="gameObject"/>
         /// and any of its active descendants.
         /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
         /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
-        /// Note: only descendants that are currently active in the scene are
-        /// considered.
+        /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
         /// <param name="gameObject">game object whose center top has to be determined</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
         /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
         /// </returns>
+        /// <remarks>The result is in world space of <see cref="gameObject"/>. If your are interested
+        /// in local space, use <see cref="GetRelativeTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
         public static Vector3 GetTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             Vector3 result = gameObject.transform.position;
@@ -498,7 +504,25 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the maximal local-space center position of the hull of
+        /// this <paramref name="gameObject"/>. The hull includes <paramref name="gameObject"/>
+        /// and any of its active descendants.
+        /// Note: only descendants that are currently active in the scene are considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
+        /// <returns>local-space position of the center top of the hull of this <paramref name="gameObject"/>
+        /// </returns>
+        /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
+        /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
+        public static Vector3 GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
+        {
+            return gameObject.transform.InverseTransformPoint(gameObject.GetTop(filterTransform));
+        }
+        /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This value reflects the actual world-space bounds of the axis-aligned cuboid that contains the rendered
         /// object.
@@ -567,6 +591,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This is a shorthand method for <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
         /// See there for additional documentation.
@@ -587,6 +612,7 @@ namespace SEE.GO
         /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in local space,
         /// i.e., in relation to its parent.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This value should often be used instead of the <see cref="Transform.localScale"/> because the scale only
         /// reflects the size for objects with a standardized size like cube primitives. Similarly, the
