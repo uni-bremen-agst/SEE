@@ -888,6 +888,7 @@ Transform:
   - {fileID: 6101192882420185708}
   - {fileID: 3295143198036375264}
   - {fileID: 7456998643376372860}
+  - {fileID: 689496032606170254}
   m_Father: {fileID: 650069124734804151}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1701325979532258114
@@ -3125,6 +3126,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6306684241103973082}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3039126493702772845
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 689496032606170254}
+  m_Layer: 0
+  m_Name: AimTransform
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &689496032606170254
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3039126493702772845}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.69267136, y: 0.017398626, z: -0.017916827, w: 0.7208209}
+  m_LocalPosition: {x: 0.0153701, y: 0.1400991, z: 0.03830782}
+  m_LocalScale: {x: 0.008820007, y: 0.008820003, z: 0.008820006}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3144230469141071756}
+  m_LocalEulerAnglesHint: {x: -86.34, y: 51.421, z: -51.463}
 --- !u!1 &3042180918238392055
 GameObject:
   m_ObjectHideFlags: 0
@@ -8769,33 +8801,38 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
+      propertyPath: solver.transform
+      value: 
+      objectReference: {fileID: 689496032606170254}
+    - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
       propertyPath: solver.IKPosition.x
-      value: 3.8713613
+      value: 3.8713608
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.IKPosition.y
-      value: 1.4117919
+      value: 1.4117961
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.IKPosition.z
-      value: -0.040815525
+      value: -0.040819816
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.polePosition.x
-      value: 0.8871348
+      value: 0.8871306
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.polePosition.y
-      value: 1.6220787
+      value: 1.6221042
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: solver.polePosition.z
-      value: -3.049168
+      value: -3.0491664
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -22653,7 +22690,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 0
+  inspSalsaLinked: 1
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
