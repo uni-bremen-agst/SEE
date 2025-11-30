@@ -236,6 +236,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
+        ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
@@ -263,6 +264,7 @@ namespace SEE.GraphProviders.VCS
             FileToMetrics fileToMetrics = Prepare(graph, files);
             if (token.IsCancellationRequested)
             {
+                Debug.Log("Cancellation was requested.\n");
                 throw new OperationCanceledException(token);
             }
 
@@ -276,6 +278,7 @@ namespace SEE.GraphProviders.VCS
             {
                 if (token.IsCancellationRequested)
                 {
+                    Debug.Log("Cancellation was requested.\n");
                     throw new OperationCanceledException(token);
                 }
                 GitGraphGenerator.UpdateMetricsForCommit
