@@ -74,6 +74,7 @@ namespace SEE.GraphProviders
         /// <param name="graph">The input graph.</param>
         /// <param name="changePercentage">To report the current status of the process. May be null.</param>
         /// <param name="branchCity">The <see cref="BranchCity"/> from which the provider was called.</param>
+        /// <param name="token">Can be used to cancel the action.</param>
         /// <returns>The generated output graph.</returns>
         private Graph GetGraph(Graph graph, Action<float> changePercentage, BranchCity branchCity, CancellationToken token)
         {
