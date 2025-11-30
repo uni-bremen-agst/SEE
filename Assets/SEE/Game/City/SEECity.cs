@@ -376,15 +376,16 @@ namespace SEE.Game.City
                                                                       cancellationTokenSource.Token);
                         IsPipelineRunning = false;
 
-                        void ReportProgress(float x)
+                        void ReportProgress(float progress)
                         {
-                            ProgressBar = x;
-                            reportProgress(x);
+                            ProgressBar = progress;
+                            reportProgress?.Invoke(progress);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
+                    Debug.LogException(ex);
                     ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
                     throw;
                 }
