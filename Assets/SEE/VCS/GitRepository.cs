@@ -643,6 +643,7 @@ namespace SEE.VCS
                 // We collect all files in the entire tree.
                 if (token.IsCancellationRequested)
                 {
+                    Debug.Log("Cancellation was requested.\n");
                     throw new OperationCanceledException(token);
                 }
                 CollectFiles(tree, VCSFilter.Matcher, paths, token);
@@ -656,6 +657,7 @@ namespace SEE.VCS
                     {
                         if (token.IsCancellationRequested)
                         {
+                            Debug.Log("Cancellation was requested.\n");
                             throw new OperationCanceledException(token);
                         }
                         LibGit2Sharp.Tree subtree = Find(tree, repositoryPath);
