@@ -27,9 +27,10 @@ namespace SEE.Game.Table
         private const string universalTablePrefix = "UniversalTable";
 
         /// <summary>
-        /// The standard height of a table.
+        /// The standard Y position of a spawned table. Our <see cref="universalTablePrefab"/>
+        /// has its center position at its bottom, i.e., on the floor.
         /// </summary>
-        private const float standardTableHeight = 0.4470662f;
+        private const float standardTableYPosition = 0;
 
         /// <summary>
         /// Spawns a new universal table with a randomized name.
@@ -69,7 +70,7 @@ namespace SEE.Game.Table
         /// <param name="position">The position where the table should be placed.</param>
         public static void Move(GameObject table, Vector3 position)
         {
-            table.transform.position = new Vector3(position.x, standardTableHeight, position.z);
+            table.transform.position = new Vector3(position.x, standardTableYPosition, position.z);
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace SEE.Game.Table
         /// <param name="position">The position where the table should be placed.</param>
         public static void MoveIncPortal(GameObject table, Vector3 position)
         {
-            table.transform.position = new Vector3(position.x, standardTableHeight, position.z);
+            table.transform.position = new Vector3(position.x, standardTableYPosition, position.z);
             if (table.GetComponentInChildren<AbstractSEECity>() is { } city
                 && city.gameObject.IsCodeCityDrawn())
             {
@@ -92,7 +93,7 @@ namespace SEE.Game.Table
         /// Scales the specified <paramref name="table"/> to the specified <paramref name="scale"/>.
         /// </summary>
         /// <param name="table">The table to scale.</param>
-        /// <param name="scale">The scale where the table should be scaled.</param>
+        /// <param name="scale">The scale where the table should be scaled to.</param>
         public static void Scale(GameObject table, Vector3 scale)
         {
             GameObject city = table.FindDescendantWithTag(Tags.CodeCity);
@@ -198,7 +199,7 @@ namespace SEE.Game.Table
         /// <param name="table">The table to destroy.</param>
         public static void Destroy(GameObject table)
         {
-            if (!table.HasDescendantWithTag(Tags.CodeCity))
+            if (table == null || !table.HasDescendantWithTag(Tags.CodeCity))
             {
                 return;
             }

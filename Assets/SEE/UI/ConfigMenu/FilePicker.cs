@@ -106,7 +106,7 @@ namespace SEE.UI.ConfigMenu
                 // Find the newly opened file browser and optimize it for VR.
                 GameObject fileBrowser = GameObject.FindWithTag("FileBrowser");
                 fileBrowser.transform.Find("EventSystem").gameObject.SetActive(false);
-                if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+                if (User.UserSettings.IsVR)
                 {
                     Canvas parentCanvas = GetComponentInParent<Canvas>();
                     RectTransform fileBrowserRect = fileBrowser.GetComponent<RectTransform>();

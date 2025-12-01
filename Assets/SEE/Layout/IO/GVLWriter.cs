@@ -14,13 +14,13 @@ namespace SEE.Layout.IO
     public class GVLWriter
     {
         /// <summary>
-        /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// Writes the layout information of all root <paramref name="gameNodes"/> and their descendants
+        /// to a new file named <paramref name="filename"/> in GVL format, where
         /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
         ///
-        /// Note: This method is equivalent to Save(string, string, ICollection<GameObject>)
-        /// but intended for ILayoutNodes rather than GameObjects.
+        /// Note: This method is equivalent to <see cref="Save(string, string, ICollection{GameObject})"/>
+        /// but intended for <see cref="ILayoutNode"/>s rather than <see cref="GameObject"/>s.
         /// </summary>
         /// <param name="filename">name of the GVL file</param>
         /// <param name="graphName">name of the graph</param>
@@ -36,13 +36,13 @@ namespace SEE.Layout.IO
         }
 
         /// <summary>
-        /// Writes the layout information of all <paramref name="graphName"/> and their descendants tagged
-        /// by Tags.Node to a new file named <paramref name="filename"/> in GVL format, where
+        /// Writes the layout information of all root <paramref name="gameNodes"/> and their descendants
+        /// to a new file named <paramref name="filename"/> in GVL format, where
         /// <paramref name="graphName"/> is used as the value for attribute V of the layout (the
         /// graph view).
         ///
-        /// Note: This method is equivalent to Save(string, string, ICollection<ILayoutNode>)
-        /// but intended for GameObjects rather than ILayoutNodes.
+        /// Note: This method is equivalent to <see cref="Save(string, string, ICollection{ILayoutNode})"/>
+        /// but intended for <see cref="GameObject"/>s rather than <see cref="ILayoutNode"/>s.
         /// </summary>
         /// <param name="filename">name of the GVL file</param>
         /// <param name="graphName">name of the graph</param>
@@ -58,6 +58,12 @@ namespace SEE.Layout.IO
             doc.Save(filename);
         }
 
+        /// <summary>
+        /// Writes the XML header of a GVL file.
+        /// </summary>
+        /// <param name="graphName">attribute V of the layout (the graph view)</param>
+        /// <param name="doc">the new XML document where to write</param>
+        /// <param name="layoutElement">the XML element containing the layout information</param>
         private static void Header(string graphName, out XmlDocument doc, out XmlElement layoutElement)
         {
             doc = new XmlDocument();

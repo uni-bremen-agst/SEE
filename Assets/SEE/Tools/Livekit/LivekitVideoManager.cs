@@ -1,5 +1,4 @@
 // Code inspired by https://github.com/livekit-examples/unity-example/blob/main/LivekitUnitySampleApp/Assets/LivekitSamples.cs
-using Dissonance;
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
@@ -75,7 +74,7 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void Start()
         {
-            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
+            if (!User.UserSettings.IsDesktop)
             {
                 gameObject.SetActive(false);
             }

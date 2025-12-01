@@ -57,15 +57,20 @@ namespace SEE.Game.City
         /// </summary>
         public override void Start()
         {
+            if (!Application.isPlaying)
+            {
+                Debug.LogWarning($"{nameof(GitPoller)} works only while the game is playing.\n");
+                return;
+            }
+
             base.Start();
 
-            Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
             if (Repository == null)
             {
                 Debug.Log("No watched repositories.\n");
                 return;
             }
-
+            Debug.Log($"Starting GitPoller on {Repository.RepositoryPath.Path}...\n");
             timer.Elapsed += OnTimedEvent;
         }
 
@@ -113,7 +118,6 @@ namespace SEE.Game.City
         {
             if (!doNotPoll)
             {
-                Debug.Log($"Fetching repository {Repository.RepositoryPath.Path}...\n");
                 doNotPoll = true;
                 bool needsUpdate = await UniTask.RunOnThreadPool(() =>
                 {

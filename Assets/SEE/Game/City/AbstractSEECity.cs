@@ -14,6 +14,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using UnityEngine.Rendering;
 using SEE.UI.Notification;
+using SEE.Game.Table;
 
 namespace SEE.Game.City
 {
@@ -44,6 +45,14 @@ namespace SEE.Game.City
             // Intentionally left blank
         }
 
+        /// <summary>
+        /// The level of the "sky" above code cities in world-space Unity units.
+        ///
+        /// It is used, for instance, to animate the birth of a node by moving it
+        /// down from the sky and also to position the authors above a branch city.
+        /// </summary>
+        public const float SkyLevel = 2.25f;
+
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
         /// <see cref="AbstractSEECity.Save"/> and
@@ -66,6 +75,21 @@ namespace SEE.Game.City
         /// </summary>
         [Range(0.0f, 1.0f)]
         public float LODCulling = 0.001f;
+
+        /// <summary>
+        /// Gets or sets the table's world-space scale.
+        /// </summary>
+        /// <remarks>
+        /// The associated City GameObject is always a child of a table.
+        /// The getter returns the table's global scale via <c>lossyScale</c>.
+        /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
+        /// to achieve the desired world-space scale.
+        /// </remarks>
+        public Vector3 TableWorldScale
+        {
+            get { return transform.parent.lossyScale; }
+            set { GameTableManager.Scale(transform.parent.gameObject, value);}
+        }
 
         /// <summary>
         /// The path where the settings (the attributes of this class) are stored.
@@ -755,6 +779,16 @@ namespace SEE.Game.City
         /// The order of the Load-Layout button in the button group <see cref="DataButtonsGroup"/>.
         /// </summary>
         protected const float DataButtonsGroupOrderLoadLayout = DataButtonsGroupOrderSaveLayout + 1;
+
+        /// <summary>
+        /// The order of the Save-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderSaveSnapshot = DataButtonsGroupOrderLoadLayout + 1;
+
+        /// <summary>
+        /// The order of the Load-Snapshot button in the button group <see cref="DataButtonsGroup"/>.
+        /// </summary>
+        protected const float DataButtonsGroupOrderLoadSnapshot = DataButtonsGroupOrderSaveSnapshot + 1;
 
         /// <summary>
         /// The name of the group for the Inspector buttons resettting the data.

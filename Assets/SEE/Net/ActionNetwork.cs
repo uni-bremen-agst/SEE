@@ -8,6 +8,7 @@ using SEE.Net.Actions;
 using SEE.Net.Actions.City;
 using SEE.Net.Actions.Table;
 using SEE.Net.Util;
+using SEE.User;
 using System.Collections.Generic;
 using System.Linq;
 using Unity.Collections;
@@ -36,19 +37,48 @@ namespace SEE.Net
         private bool blockedForSynchronization = false;
 
         /// <summary>
-        /// Fetches the multiplayer city files from the backend on the server or host.
+        /// Whether the a client has fetched the code cities from the server
+        /// or a server has initialized
         /// </summary>
+        private bool networkIsSetUp = false;
+
         private void Start()
         {
-            if (!IsServer && !IsHost)
-            {
-                Debug.Log("Starting client action network!\n");
-                RequestSynchronizationServerRpc();
-                return;
-            }
-            Debug.Log("Starting server action network!\n");
-            BackendSyncUtil.InitializeCitiesAsync().Forget();
+            FetchCities();
         }
+
+        /// <summary>
+        /// Fetches the multiplayer city files from the backend on the server or host.
+        /// </summary>
+        public override void OnNetworkSpawn()
+        {
+            FetchCities();
+        }
+
+        /// <summary>
+        /// Fetches the multiplayer city files from the backend on the server or host.
+        /// </summary>
+        private void FetchCities()
+        {
+            if (!networkIsSetUp)
+            {
+                if (IsServer || IsHost)
+                {
+                    // We are a server.
+                    Debug.Log("Starting server action network!\n");
+                    BackendSyncUtil.InitializeCitiesAsync().Forget();
+                    networkIsSetUp = true;
+                }
+                if (IsClient)
+                {
+                    // We are a client.
+                    Debug.Log("Starting client action network!\n");
+                    RequestSynchronizationServerRpc();
+                    networkIsSetUp = true;
+                }
+            }
+        }
+
 
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients
@@ -181,7 +211,7 @@ namespace SEE.Net
             }
 
             ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, Network.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+            SyncFilesClientRpc(Network.ServerId, UserSettings.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
@@ -431,7 +461,7 @@ namespace SEE.Net
             }
 
             Network.ServerId = backendServerId;
-            Network.BackendDomain = backendDomain;
+            UserSettings.Instance.Network.BackendServerAPI = backendDomain;
 
             BackendSyncUtil.InitializeClientAsync().Forget();
         }

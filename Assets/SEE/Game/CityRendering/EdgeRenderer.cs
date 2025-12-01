@@ -69,7 +69,7 @@ namespace SEE.Game.CityRendering
             }
 
             // One layout game node for each game node.
-            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, NewLayoutNode);
 
             // Now we have all nodes (game nodes and layout nodes). Next we gather the layout edges.
 
@@ -132,7 +132,7 @@ namespace SEE.Game.CityRendering
             AddAscendants(from, gameNodes);
             AddAscendants(to, gameNodes);
             // The layout nodes corresponding to those game nodes.
-            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, NewLayoutNode);
 
             LayoutGameNode fromLayoutNode = null; // layout node in layoutNodes corresponding to source node
             LayoutGameNode toLayoutNode = null; // layout node in layoutNodes corresponding to target node
@@ -276,7 +276,7 @@ namespace SEE.Game.CityRendering
                                                   GameObject parent,
                                                   bool addToGraphElementIDMap)
         {
-            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes);
+            IDictionary<Node, LayoutGameNode> layoutNodes = ToLayoutNodes(gameNodes, NewLayoutNode);
             ICollection<GameObject> result = EdgeLayout(layoutNodes.Values, ConnectingEdges(layoutNodes.Values), addToGraphElementIDMap);
             AddToParent(result, parent);
             return result;

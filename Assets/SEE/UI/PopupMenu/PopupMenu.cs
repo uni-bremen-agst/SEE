@@ -108,7 +108,7 @@ namespace SEE.UI.PopupMenu
         protected override void StartDesktop()
         {
             // Instantiate the menu.
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 menu = (RectTransform)GameObject.Find(xrMenuPrefabPath).transform;
             }
@@ -120,7 +120,7 @@ namespace SEE.UI.PopupMenu
             menuCanvasGroup = menu.gameObject.MustGetComponent<CanvasGroup>();
             scrollView = (RectTransform)menu.Find("Scroll View");
             actionList = (RectTransform)scrollView.Find("Viewport/Action List");
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 RectTransform background = (RectTransform)menu.Find("Background");
                 RectTransform shadow = (RectTransform)menu.Find("Shadow");
@@ -130,7 +130,7 @@ namespace SEE.UI.PopupMenu
             }
             // The menu should be hidden when the user moves the mouse away from it.
             PointerHelper pointerHelper = menu.gameObject.MustGetComponent<PointerHelper>();
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 pointerHelper.ExitEvent.AddListener(x =>
                 {
@@ -405,7 +405,7 @@ namespace SEE.UI.PopupMenu
             }
             if (position.HasValue)
             {
-                if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+                if (User.UserSettings.IsDesktop)
                 {
                     MoveTo(position.Value);
                 }

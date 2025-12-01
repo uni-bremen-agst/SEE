@@ -365,7 +365,7 @@ namespace SEE.Utils
         /// <returns>Whether the mouse currently hovers over a GUI element.</returns>
         public static bool IsMouseOverGUI()
         {
-            if (SceneSettings.InputType != PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.Instance.InputType != PlayerInputType.DesktopPlayer)
             {
                 return false;
             }
@@ -451,7 +451,7 @@ namespace SEE.Utils
         {
             Camera mainCamera = MainCamera.Camera;
             Vector3 screenPoint;
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 XRSEEActions.RayInteractor.TryGetCurrent3DRaycastHit(out RaycastHit hit);
                 screenPoint = mainCamera.WorldToScreenPoint(hit.point);

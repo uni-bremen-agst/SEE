@@ -784,7 +784,8 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseEnter()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer && !Raycasting.IsMouseOverGUI() && IsInteractable())
+            if (User.UserSettings.IsDesktop
+                && !Raycasting.IsMouseOverGUI() && IsInteractable())
             {
                 SetHoverFlag(HoverFlag.World, true, true);
             }
@@ -799,7 +800,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseOver()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 bool isFlagSet = IsHoverFlagSet(HoverFlag.World);
                 bool isMouseOverGUI = Raycasting.IsMouseOverGUI();
@@ -824,7 +825,7 @@ namespace SEE.Controls
         /// </summary>
         private void OnMouseExit()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer
+            if (User.UserSettings.IsDesktop
                 && IsHoverFlagSet(HoverFlag.World))
             {
                 SetHoverFlag(HoverFlag.World, false, true);

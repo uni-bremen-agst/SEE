@@ -7,7 +7,6 @@ using SEE.Game.Operator;
 using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
-using UnityEngine.Rendering;
 using Frame = TinySpline.Frame;
 
 namespace SEE.GO
@@ -49,7 +48,13 @@ namespace SEE.GO
     public class SEESpline : SerializedMonoBehaviour
     {
         /// <summary>
-        /// What the name says.
+        /// Event that is triggered once a mesh for the spline was created
+        /// by <see cref="CreateMesh"/>.
+        /// </summary>
+        public event Action<SEESpline> OnMeshCreated;
+
+        /// <summary>
+        /// What the name says: two times the value of pi.
         /// </summary>
         [NonSerialized]
         private const float doublePi = Mathf.PI * 2f;
@@ -58,13 +63,31 @@ namespace SEE.GO
         /// Indicates whether the rendering of <see cref="spline"/> must be
         /// updated (as a result of setting one of the public properties).
         /// </summary>
-        private bool needsUpdate;
+        private bool needsCompleteUpdate;
 
         /// <summary>
         /// Indicates whether the color of <see cref="spline"/> must be updated.
-        /// Will not cause an update on its own, use <see cref="needsUpdate"/> for that.
         /// </summary>
         private bool needsColorUpdate;
+
+        /// <summary>
+        /// Indicates whether the collider of <see cref="spline"/> must be updated.
+        /// <para>
+        /// If <see cref="needsCompleteUpdate"/> is not set, <see cref="UpdateCollider"/> will be called for a
+        /// more lightweight update compared to a full regeneration of the procedurally generated mesh:
+        /// </para><para>
+        /// If <see cref="IsSelectable"/> was set to <c>false</c>, this will inactivate any existing collider
+        /// instead of regenerating the spline.
+        /// If <see cref="IsSelectable"/> was set to <c>true</c>, this will activate the collider if available
+        /// or create one using the existing shared mesh without regenerating it.
+        /// </para>
+        /// </summary>
+        private bool needsSelectableUpdate;
+
+        /// <summary>
+        /// Indicates whether the visible segment of the <see cref="spline"/> must be updated.
+        /// </summary>
+        private bool needsVisibleSegmentUpdate;
 
         /// <summary>
         /// The shaping spline.
@@ -73,40 +96,57 @@ namespace SEE.GO
         private BSpline spline;
 
         /// <summary>
-        /// The start position of the subspline for the build-up animation, element of [0,1]
+        /// Backing field for the <see cref="VisibleSegmentStart"/> property.
         /// </summary>
         [SerializeField]
-        private float subsplineStartT;
+        private float visibleSegmentStart;
 
         /// <summary>
-        /// The end position of the subspline for the build-up animation, element of [0,1]
+        /// The start position of the visible subspline, e.g., for a build-up animation (element of [0..1]).
         /// </summary>
-        [SerializeField]
-        private float subsplineEndT = 1.0f;
-
-        /// <summary>
-        /// The event is emitted each time the renderer is updated (see <see cref="needsUpdate"/>).
-        /// </summary>
-        public event Action OnRendererChanged;
-
-        /// <summary>
-        /// Property of <see cref="subsplineEndT"/>.
-        /// </summary>
-        public float SubsplineEndT
+        public float VisibleSegmentStart
         {
-            get => subsplineEndT;
+            get => visibleSegmentStart;
             set
             {
-                subsplineEndT = value;
-                needsUpdate = true;
+                if (value < 0f || value > 1f)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(VisibleSegmentStart), value, "Value must be between 0 and 1.");
+                }
+
+                visibleSegmentStart = value;
+                needsVisibleSegmentUpdate = true;
             }
         }
 
         /// <summary>
-        /// Used to calculate upper and lower knots from <see cref="subsplineEndT"/> and  <see cref="subsplineStartT"/>.
-        /// chordLengths is set in Property <see cref="Spline"/>.
+        /// Backing field for the <see cref="visibleSegmentEnd"/> property.
         /// </summary>
-        private ChordLengths chordLengths;
+        [SerializeField]
+        private float visibleSegmentEnd = 1.0f;
+
+        /// <summary>
+        /// The end position of the visible subspline, e.g., for a build-up animation (element of [0..1]).
+        /// </summary>
+        public float VisibleSegmentEnd
+        {
+            get => visibleSegmentEnd;
+            set
+            {
+                if (value < 0f || value > 1f)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(VisibleSegmentEnd), value, "Value must be between 0 and 1.");
+                }
+
+                visibleSegmentEnd = value;
+                needsVisibleSegmentUpdate = true;
+            }
+        }
+
+        /// <summary>
+        /// The event is emitted each time the renderer is updated (see <see cref="needsCompleteUpdate"/>).
+        /// </summary>
+        public event Action OnRendererChanged;
 
         /// <summary>
         /// Property of <see cref="spline"/>. The returned instance is NOT a
@@ -119,8 +159,7 @@ namespace SEE.GO
             set
             {
                 spline = value;
-                chordLengths = null;
-                needsUpdate = true;
+                needsCompleteUpdate = true;
             }
         }
 
@@ -146,7 +185,7 @@ namespace SEE.GO
             set
             {
                 radius = Math.Max(0.0001f, value);
-                needsUpdate = true;
+                needsCompleteUpdate = true;
             }
         }
 
@@ -170,7 +209,7 @@ namespace SEE.GO
                 if (tubularSegments != max)
                 {
                     tubularSegments = max;
-                    needsUpdate = true;
+                    needsCompleteUpdate = true;
                 }
             }
         }
@@ -195,7 +234,7 @@ namespace SEE.GO
                 if (radialSegments != max)
                 {
                     radialSegments = max;
-                    needsUpdate = true;
+                    needsCompleteUpdate = true;
                 }
             }
         }
@@ -215,7 +254,7 @@ namespace SEE.GO
             set
             {
                 isSelectable = value;
-                needsUpdate = true;
+                needsSelectableUpdate = true;
             }
         }
 
@@ -293,6 +332,16 @@ namespace SEE.GO
         private static readonly int ColorGradientEnabledProperty = Shader.PropertyToID("_ColorGradientEnabled");
 
         /// <summary>
+        /// Shader property that defines the start of the visible segment.
+        /// </summary>
+        private static readonly int VisibleStartProperty = Shader.PropertyToID("_VisibleStart");
+
+        /// <summary>
+        /// Shader property that defines the end of the visible segment.
+        /// </summary>
+        private static readonly int VisibleEndProperty = Shader.PropertyToID("_VisibleEnd");
+
+        /// <summary>
         /// Called by Unity when an instance of this class is being loaded.
         /// </summary>
         private void Awake()
@@ -308,26 +357,35 @@ namespace SEE.GO
         /// </summary>
         private void OnValidate()
         {
-            needsUpdate = true;
+            needsCompleteUpdate = true;
         }
 
         /// <summary>
         /// Updates the rendering of the spline if the internal state is
-        /// marked dirty (i.e., <see cref="needsUpdate"/> is true).
+        /// marked dirty (i.e., <see cref="needsCompleteUpdate"/> is true).
         /// </summary>
         private void Update()
         {
-            if (needsUpdate)
+            if (needsCompleteUpdate)
             {
                 UpdateLineRenderer();
                 UpdateMesh();
-                needsUpdate = needsColorUpdate = false;
+                needsCompleteUpdate = needsColorUpdate = needsSelectableUpdate = false;
                 OnRendererChanged?.Invoke();
             }
             else if (needsColorUpdate)
             {
                 UpdateColor();
                 needsColorUpdate = false;
+            }
+            else if (needsSelectableUpdate)
+            {
+                UpdateCollider();
+                needsSelectableUpdate = false;
+            }
+            else if (needsVisibleSegmentUpdate)
+            {
+                UpdateVisibleSegment();
             }
         }
 
@@ -351,7 +409,7 @@ namespace SEE.GO
         private void UpdateControlPoint(uint index, Vector3 newControlPoint)
         {
             spline.SetControlPointVec3At(index, new Vec3(newControlPoint.x, newControlPoint.y, newControlPoint.z));
-            needsUpdate = true;
+            needsCompleteUpdate = true;
         }
 
         /// <summary>
@@ -372,7 +430,7 @@ namespace SEE.GO
         /// Updates the <see cref="LineRenderer"/> of the
         /// <see cref="GameObject"/> this component is attached to
         /// (<see cref="Component.gameObject"/>) and marks the internal state
-        /// as clean (i.e., <see cref="needsUpdate"/> is set to false) so that
+        /// as clean (i.e., <see cref="needsCompleteUpdate"/> is set to false) so that
         /// <see cref="Update"/> doesn't update the meshRenderer again in the next
         /// frame. Calling this method doesn't fail if
         /// <see cref="Component.gameObject"/> has no
@@ -380,16 +438,17 @@ namespace SEE.GO
         /// </summary>
         private void UpdateLineRenderer()
         {
-            if (gameObject.TryGetComponent(out LineRenderer lr))
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
                 Vector3[] polyLine = GenerateVertices();
 
-                lr.positionCount = polyLine.Length;
-                lr.SetPositions(polyLine);
-                lr.startColor = gradientColors.start;
-                lr.endColor = gradientColors.end;
+                lineRenderer.positionCount = polyLine.Length;
+                lineRenderer.SetPositions(polyLine);
+                lineRenderer.startColor = gradientColors.start;
+                lineRenderer.endColor = gradientColors.end;
             }
-            needsUpdate = false;
+            UpdateVisibleSegment();
+            needsCompleteUpdate = false;
         }
 
         /// <summary>
@@ -398,8 +457,7 @@ namespace SEE.GO
         /// <returns>The vertices that make up this spline.</returns>
         public Vector3[] GenerateVertices()
         {
-            BSpline subSpline = CreateSubSpline();
-            return TinySplineInterop.ListToVectors(subSpline.Sample());
+            return TinySplineInterop.ListToVectors(spline.Sample());
         }
 
         /// <summary>
@@ -411,15 +469,76 @@ namespace SEE.GO
         /// </summary>
         private void UpdateColor()
         {
-            if (gameObject.TryGetComponent(out LineRenderer lr))
+            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
             {
-                lr.startColor = gradientColors.start;
-                lr.endColor = gradientColors.end;
+                lineRenderer.startColor = gradientColors.start;
+                lineRenderer.endColor = gradientColors.end;
             }
             else if (meshRenderer != null)
             {
                 UpdateMaterial();
             }
+        }
+
+        /// <summary>
+        /// Update the collider to reflect <see cref="IsSelectable"/> state.
+        /// <list type="bullet">
+        /// <item><description>
+        /// If available, the collider is either enabled or disabled.
+        /// </description></item><item><description>
+        /// If <see cref="IsSelectable"/> is <c>true</c> and no collider is available and a <see cref="MeshFilter"/> is available,
+        /// a <see cref="MeshCollider"/> will be created using the available shared mesh.
+        /// </description></item>
+        /// </list>
+        /// </summary>
+        private void UpdateCollider()
+        {
+            if (gameObject.TryGetComponent(out Collider collider))
+            {
+                collider.enabled = IsSelectable;
+                return;
+            }
+
+            if (IsSelectable)
+            {
+                if (!gameObject.TryGetComponent(out MeshFilter filter))
+                {
+                    Debug.LogWarning("Trying to update selectability without generating a mesh first!");
+                    return;
+                }
+                Mesh mesh = filter.sharedMesh;
+
+                MeshCollider meshCollider = gameObject.AddOrGetComponent<MeshCollider>();
+                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
+                // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
+                meshCollider.sharedMesh = null; // Do we still need this workaround?
+                meshCollider.sharedMesh = mesh;
+            }
+        }
+
+        /// <summary>
+        /// Update the material properties to reflect the visible segment configuration
+        /// defined by <see cref="visibleSegmentStart"/> and <see cref="visibleSegmentEnd"/>.
+        /// </summary>
+        private void UpdateVisibleSegment()
+        {
+            Material material;
+            if (meshRenderer != null)
+            {
+                material = meshRenderer.sharedMaterial;
+            }
+            else if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
+            {
+                material = lineRenderer.sharedMaterial;
+            }
+            else
+            {
+                return;
+            }
+
+            material.SetFloat(VisibleStartProperty, visibleSegmentStart);
+            material.SetFloat(VisibleEndProperty, visibleSegmentEnd);
+            needsVisibleSegmentUpdate = false;
         }
 
         /// <summary>
@@ -443,9 +562,8 @@ namespace SEE.GO
             // anyway. For the curious among you: With uniform knots, the
             // distance between neighboring frames along the spline is not
             // equal.
-            BSpline subSpline = CreateSubSpline();
-            IList<double> rv = subSpline.UniformKnotSeq((uint)tubularSegments + 1);
-            FrameSeq frames = subSpline.ComputeRMF(rv);
+            IList<double> rv = spline.UniformKnotSeq((uint)tubularSegments + 1);
+            FrameSeq frames = spline.ComputeRMF(rv);
             // Precalculated values for the loops later on.
             float radialSegmentsInv = 1f / radialSegments;
             float tubularSegmentsInv = 1f / tubularSegments;
@@ -566,17 +684,7 @@ namespace SEE.GO
             mesh.uv = uvs;
             mesh.SetIndices(indices, MeshTopology.Triangles, 0);
 
-            if (IsSelectable)
-            {
-                // IMPORTANT: Null the shared mesh of the collider before assigning the updated mesh.
-                MeshCollider splineCollider = gameObject.AddOrGetComponent<MeshCollider>();
-                splineCollider.sharedMesh = null; // https://forum.unity.com/threads/how-to-update-a-mesh-collider.32467/
-                splineCollider.sharedMesh = mesh;
-            }
-            else if (gameObject.TryGetComponent(out MeshCollider splineCollider))
-            {
-                Destroyer.Destroy(splineCollider);
-            }
+            UpdateCollider();
 
             meshRenderer = gameObject.AddOrGetComponent<MeshRenderer>();
             UpdateMaterial();
@@ -643,52 +751,14 @@ namespace SEE.GO
                 // Glow effect depends on materials staying the same. We need to fully refresh it.
                 edgeOperator.RefreshGlowAsync(true).Forget();
             }
-            needsUpdate = false; // apparently
+            needsCompleteUpdate = false;
+            OnMeshCreated?.Invoke(this);
             return mesh;
         }
 
         /// <summary>
-        /// Create the subspline for the build-up animation.
-        /// </summary>
-        /// <returns>The spline to be rendered.</returns>
-        private BSpline CreateSubSpline()
-        {
-            chordLengths ??= spline.ChordLengths();
-
-            double lowerKnot = chordLengths.TToKnot(subsplineStartT);
-            double upperKnot = chordLengths.TToKnot(subsplineEndT);
-
-            bool domainIsEmpty = BSpline.KnotsEqual(lowerKnot, upperKnot);
-
-            // If the domain is empty, then the subspline has a length
-            // of 0, but this subspline cannot be calculated so we
-            // just disable the LineRenderer and MeshRenderer
-            if (gameObject.TryGetComponent(out LineRenderer lineRenderer))
-            {
-                lineRenderer.enabled = !domainIsEmpty;
-            }
-            if (gameObject.TryGetComponent(out MeshRenderer meshRenderer))
-            {
-                meshRenderer.enabled = !domainIsEmpty;
-            }
-
-            // The domain of the spline to be drawn is either
-            // completely empty or complete.
-            if (domainIsEmpty ||
-                (BSpline.KnotsEqual(0.0f, lowerKnot) &&
-                 BSpline.KnotsEqual(upperKnot, 1.0f)))
-            {
-                return spline;
-            }
-            else
-            {
-                return spline.SubSpline(lowerKnot, upperKnot);
-            }
-        }
-
-        /// <summary>
         /// Updates the mesh rendering and marks the internal state as clean
-        /// (i.e., <see cref="needsUpdate"/> is set to false) so that
+        /// (i.e., <see cref="needsCompleteUpdate"/> is set to false) so that
         /// <see cref="Update"/> doesn't update the mesh again in the next
         /// frame. Calling this method doesn't fail if mesh rendering has not
         /// been enabled yet (i.e., there is no <see cref="MeshFilter"/>
@@ -697,11 +767,12 @@ namespace SEE.GO
         /// </summary>
         private void UpdateMesh()
         {
-            if (gameObject.TryGetComponent(out MeshFilter _))
+            if (meshRenderer != null)
             {
                 CreateOrUpdateMesh();
+                UpdateVisibleSegment();
             }
-            needsUpdate = false;
+            needsCompleteUpdate = false;
         }
 
         protected override void OnBeforeSerialize()

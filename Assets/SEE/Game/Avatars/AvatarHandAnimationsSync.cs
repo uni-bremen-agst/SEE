@@ -41,12 +41,14 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<Vector3> rightBendGoalLocalPosition = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// The value for the weight of the left hand, that determines the level of influence of changes in the IK effector of the left hand on other bones in the chain.
+        /// The value for the weight of the left hand, that determines the level of influence of changes
+        /// in the IK effector of the left hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> leftHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// The value for the weight of the right hand, that determines the level of influence of changes in the IK effector of the right hand on other bones in the chain.
+        /// The value for the weight of the right hand, that determines the level of influence of changes
+        /// in the IK effector of the right hand on other bones in the chain.
         /// </summary>
         private readonly NetworkVariable<float> rightHandRotationWeight = new(writePerm: NetworkVariableWritePermission.Owner);
 
@@ -131,11 +133,26 @@ namespace SEE.Game.Avatars
         private readonly NetworkVariable<Quaternion> rightThumb3Rotations = new(writePerm: NetworkVariableWritePermission.Owner);
 
         /// <summary>
-        /// Initializes the BodyAnimator, HandsAnimator, and FullBodyBipedIK components that this avatar uses.
+        /// If true, the owner of the avatar is using hand animations with MediaPipe.
+        /// </summary>
+        private readonly NetworkVariable<bool> isUsingHandAnimations = new(writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// If true, the HandsAnimator of the avatar is initialized.
+        /// </summary>
+        private readonly NetworkVariable<bool> ifHandsAnimatorInitialized = new(false, writePerm: NetworkVariableWritePermission.Owner);
+
+        /// <summary>
+        /// The <see cref="BodyAnimator"/> attached to this <see cref="gameObject"/>.
+        /// </summary>
+        private BodyAnimator bodyAnimator;
+
+        /// <summary>
+        /// Initializes the BodyAnimator, HandsAnimator and FullBodyBipedIK components that this avatar uses.
         /// </summary>
         private void Awake()
         {
-            BodyAnimator bodyAnimator = GetComponent<BodyAnimator>();
+            bodyAnimator = GetComponent<BodyAnimator>();
             handsAnimator = bodyAnimator.HandsAnimator;
             gameObject.TryGetComponentOrLog(out ik);
         }
@@ -146,13 +163,37 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void LateUpdate()
         {
-            if (IsOwner)
+            // The owner of the avatar needs to signal when the HandsAnimator component of the avatar is initialized.
+            if (IsOwner && !ifHandsAnimatorInitialized.Value && handsAnimator.IsHandsAnimatorInitialized)
             {
-                CaptureFromHandsAnimator();
+                handsAnimator = bodyAnimator.HandsAnimator;
+                ifHandsAnimatorInitialized.Value = true;
             }
-            else
+
+            // Animate or store values only if the owner of the avatar has activated hand animations with
+            // MediaPipe and HandsAnimator component of the avatar was already initialized.
+            if (ifHandsAnimatorInitialized.Value)
             {
-                ApplyHandsAnimation();
+                if (IsOwner)
+                {
+                    ToggleHandAnimatios();
+                    if (isUsingHandAnimations.Value)
+                    {
+                        CaptureFromHandsAnimator();
+                    }
+                }
+                else
+                {
+                    if (!isUsingHandAnimations.Value)
+                    {
+                        ik.solver.leftHandEffector.positionWeight = 0f;
+                        ik.solver.rightHandEffector.positionWeight = 0f;
+                        ik.solver.leftHandEffector.rotationWeight = 0f;
+                        ik.solver.rightHandEffector.rotationWeight = 0f;
+                        return;
+                    }
+                    ApplyHandsAnimation();
+                }
             }
         }
 
@@ -161,11 +202,6 @@ namespace SEE.Game.Avatars
         /// </summary>
         private void CaptureFromHandsAnimator()
         {
-            if (handsAnimator == null)
-            {
-                return;
-            }
-
             leftHandPosition.Value = handsAnimator.LeftHandTransformState.HandIKEffectorPosition;
             leftHandRotation.Value = handsAnimator.LeftHandTransformState.HandIKEffectorRotation;
 
@@ -205,10 +241,14 @@ namespace SEE.Game.Avatars
             ik.solver.leftHandEffector.positionWeight = 1f;
             ik.solver.leftHandEffector.rotationWeight = leftHandRotationWeight.Value;
 
-            Transform leftHandBendGoal = transform.Find("LeftElbowBendGoal");
-            leftHandBendGoal.localPosition = leftBendGoalLocalPosition.Value;
-            Transform rightHandBendGoal = transform.Find("RightElbowBendGoal");
-            rightHandBendGoal.localPosition = rightBendGoalLocalPosition.Value;
+            GameObject leftHandBendGoal = new("LeftElbowBendGoal");
+            leftHandBendGoal.transform.SetParent(transform, false);
+            GameObject rightHandBendGoal = new("RightElbowBendGoal");
+            rightHandBendGoal.transform.SetParent(transform, false);
+            leftHandBendGoal.transform.localPosition = leftBendGoalLocalPosition.Value;
+            rightHandBendGoal.transform.localPosition = rightBendGoalLocalPosition.Value;
+            ik.solver.leftArmChain.bendConstraint.bendGoal = leftHandBendGoal.transform;
+            ik.solver.rightArmChain.bendConstraint.bendGoal = rightHandBendGoal.transform;
 
             Transform leftMidFinger3Bone = transform.Find(HandsAnimator.LeftMidFinger3);
             Transform leftMidFinger2Bone = transform.Find(HandsAnimator.LeftMidFinger2);
@@ -284,6 +324,14 @@ namespace SEE.Game.Avatars
             rightThumb1Bone.localRotation = rightThumb1Rotations.Value;
             rightThumb2Bone.localRotation = rightThumb2Rotations.Value;
             rightThumb3Bone.localRotation = rightThumb3Rotations.Value;
+        }
+
+        /// <summary>
+        /// Assigns the value to isUsingHandAnimations-field in accordance to the value of the corresponding field in HandsAnimator component.
+        /// </summary>
+        private void ToggleHandAnimatios()
+        {
+            isUsingHandAnimations.Value = handsAnimator.IsUsingHandAnimations;
         }
     }
 }
