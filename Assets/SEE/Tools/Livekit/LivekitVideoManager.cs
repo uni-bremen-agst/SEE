@@ -3,6 +3,7 @@ using Dissonance;
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
+using SEE.Game;
 using SEE.GO;
 using SEE.UI;
 using SEE.UI.Notification;
@@ -139,6 +140,25 @@ namespace SEE.Tools.Livekit
                 {
                     webCamTexture.Play();
                 }
+            }
+        }
+
+        /// <summary>
+        /// Updates the stored LiveKit setting values and notifies the
+        /// settings menu to refresh its UI representation accordingly.
+        /// </summary>
+        /// <param name="liveKitURL">The LiveKit server URL to apply.</param>
+        /// <param name="tokenURL">The token service URL used to request access tokens.</param>
+        /// <param name="roomName">The name of the LiveKit room to join.</param>
+        public void UpdateSettings(string liveKitURL, string tokenURL, string roomName)
+        {
+            LiveKitUrl = liveKitURL;
+            TokenUrl = tokenURL;
+            RoomName = roomName;
+
+            if (LocalPlayer.TryGetSettingsMenu(out SettingsMenu menu))
+            {
+                menu.UpdateLiveKitSettings();
             }
         }
 

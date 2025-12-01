@@ -8,6 +8,7 @@ using SEE.Controls;
 using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.GO;
+using SEE.Net.Actions;
 using SEE.Tools.Livekit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
@@ -296,7 +297,7 @@ namespace SEE.UI
 
             if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
             {
-                UpdateLiveKitConfiguration();
+                UpdateLiveKitSettings();
 
                 // Deactivates the shortcuts while typing.
                 DisableShortcutsWhileTyping(liveKitURLInputField);
@@ -322,11 +323,21 @@ namespace SEE.UI
                     SaveToPlayerPrefs(PlayerPrefsKeys.RoomName);
                 });
 
-                // TODO BTN addlistener
                 share.clickEvent.AddListener(() =>
                 {
-                    // TODO share configurations over network
-                    Debug.Log($"<color=green>Share LiveKit URL: {liveKitVideoManager.LiveKitUrl}, Token URL: {liveKitVideoManager.TokenUrl} and Room name: {liveKitVideoManager.RoomName}</color>");
+                    new LiveKitSettingsNetAction(liveKitVideoManager.LiveKitUrl,
+                                                 liveKitVideoManager.TokenUrl,
+                                                 liveKitVideoManager.RoomName).Execute();
+                });
+
+                connect.clickEvent.AddListener(() =>
+                {
+                    // TODO
+                });
+
+                disconnect.clickEvent.AddListener(() =>
+                {
+                    // TODO
                 });
             }
 
@@ -359,7 +370,7 @@ namespace SEE.UI
         /// If available, the LiveKit URL, token URL, and room name are copied
         /// into their corresponding input fields.
         /// </summary>
-        public void UpdateLiveKitConfiguration()
+        public void UpdateLiveKitSettings()
         {
             if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
             {
