@@ -95,6 +95,23 @@ namespace SEE.UI
         private Slider musicVolumeSlider;
         #endregion
 
+        #region LiveKit components
+        /// <summary>
+        /// The input field of the LiveKit URL.
+        /// </summary>
+        TMP_InputField liveKitURLInputField;
+
+        /// <summary>
+        /// The input field of the Token URL.
+        /// </summary>
+        TMP_InputField tokenURLInputField;
+
+        /// <summary>
+        /// The input field of the room name.
+        /// </summary>
+        TMP_InputField roomNameInputField;
+        #endregion
+
         /// <summary>
         /// Sets the <see cref="keyBindingContent"/> and adds the onClick event
         /// <see cref="ExitGame"/> to the ExitButton.
@@ -261,11 +278,11 @@ namespace SEE.UI
         private void InitializeLiveKitSettings()
         {
             // InputFields of the LiveKit settings.
-            TMP_InputField liveKitURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.LiveKitURL)
+            liveKitURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.LiveKitURL)
                 .GetComponentInChildren<TMP_InputField>();
-            TMP_InputField tokenURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.TokenURL)
+            tokenURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.TokenURL)
                 .GetComponentInChildren<TMP_InputField>();
-            TMP_InputField roomNameInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.RoomName)
+            roomNameInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.RoomName)
                 .GetComponentInChildren<TMP_InputField>();
 
             // Buttons and importent GameObjects of the LiveKit settings page.
@@ -279,9 +296,7 @@ namespace SEE.UI
 
             if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager liveKitVideoManager))
             {
-                liveKitURLInputField.text = liveKitVideoManager.LiveKitUrl;
-                tokenURLInputField.text = liveKitVideoManager.TokenUrl;
-                roomNameInputField.text = liveKitVideoManager.RoomName;
+                UpdateLiveKitConfiguration();
 
                 // Deactivates the shortcuts while typing.
                 DisableShortcutsWhileTyping(liveKitURLInputField);
@@ -308,6 +323,11 @@ namespace SEE.UI
                 });
 
                 // TODO BTN addlistener
+                share.clickEvent.AddListener(() =>
+                {
+                    // TODO share configurations over network
+                    Debug.Log($"<color=green>Share LiveKit URL: {liveKitVideoManager.LiveKitUrl}, Token URL: {liveKitVideoManager.TokenUrl} and Room name: {liveKitVideoManager.RoomName}</color>");
+                });
             }
 
             void SaveToPlayerPrefs(string keyword)
@@ -330,6 +350,22 @@ namespace SEE.UI
             {
                 inputField.onSelect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = false);
                 inputField.onDeselect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = true);
+            }
+        }
+
+        /// <summary>
+        /// Updates the UI input fields with the current LiveKit configuration
+        /// retrieved from the local player's <see cref="LiveKitVideoManager"/>.
+        /// If available, the LiveKit URL, token URL, and room name are copied
+        /// into their corresponding input fields.
+        /// </summary>
+        public void UpdateLiveKitConfiguration()
+        {
+            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
+            {
+                liveKitURLInputField.text = manager.LiveKitUrl;
+                tokenURLInputField.text = manager.TokenUrl;
+                roomNameInputField.text = manager.RoomName;
             }
         }
 
