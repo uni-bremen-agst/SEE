@@ -1,5 +1,7 @@
-﻿using SEE.Game;
+﻿using Cysharp.Threading.Tasks;
+using SEE.Game;
 using SEE.Tools.Livekit;
+using SEE.UI.Menu;
 
 namespace SEE.Net.Actions
 {
@@ -44,7 +46,22 @@ namespace SEE.Net.Actions
         /// </summary>
         public override void ExecuteOnClient()
         {
-            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
+            ApplyLiveKitUpdateAsync().Forget();
+        }
+
+        /// <summary>
+        /// Ask the user whether the received LiveKit configuration should be applied.
+        /// If confirmed, the local <see cref="LiveKitVideoManager"/> is updated.
+        /// </summary>
+        private async UniTask ApplyLiveKitUpdateAsync()
+        {
+            string message = $"Do you want to apply the LiveKit changes?\n"
+                + $"LiveKit URL: {LiveKitURL}\n"
+                + $"Token URL: {TokenURL}\n"
+                + $"Room Name: {RoomName}";
+
+            if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message))
+                && LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
             {
                 manager.UpdateSettings(LiveKitURL, TokenURL, RoomName);
             }
