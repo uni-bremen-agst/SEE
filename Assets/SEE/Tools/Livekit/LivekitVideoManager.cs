@@ -96,9 +96,10 @@ namespace SEE.Tools.Livekit
             }
             else
             {
-                LiveKitUrl = PlayerPrefs.GetString(PlayerPrefsKeys.LiveKitURL, LiveKitUrl);
-                TokenUrl = PlayerPrefs.GetString(PlayerPrefsKeys.TokenURL, TokenUrl);
-                RoomName = PlayerPrefs.GetString(PlayerPrefsKeys.RoomName, RoomName);
+                UpdateSettings(
+                    liveKitURL: PlayerPrefs.GetString(PlayerPrefsKeys.LiveKitURL, LiveKitUrl),
+                    tokenURL: PlayerPrefs.GetString(PlayerPrefsKeys.TokenURL, TokenUrl),
+                    roomName: PlayerPrefs.GetString(PlayerPrefsKeys.RoomName, RoomName));
             }
         }
 
