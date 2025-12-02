@@ -69,6 +69,22 @@ namespace SEE.Tools.Livekit
         private readonly List<VideoStream> videoStreams = new();
 
         /// <summary>
+        /// Gets the current connection status to the LiveKit room.
+        /// </summary>
+        public ConnectionStatus ConnectionState { get; private set; }
+
+        /// <summary>
+        /// Represents the connection status to the LiveKit room.
+        /// </summary>
+        public enum ConnectionStatus
+        {
+            Disconnected,
+            TokenFailed,
+            RoomConnectionFailed,
+            Connected
+        }
+
+        /// <summary>
         /// If this code is executed in an environment different from <see cref="PlayerInputType.DesktopPlayer"/>,
         /// the object will be disabled.
         /// </summary>
@@ -92,9 +108,7 @@ namespace SEE.Tools.Livekit
         /// </summary>
         private void OnDestroy()
         {
-            room?.Disconnect();
-            CleanUp();
-            room = null;
+            Disconnect();
         }
 
         /// <summary>
@@ -220,8 +234,9 @@ namespace SEE.Tools.Livekit
         /// The name of the participant is the local client ID.
         /// </summary>
         /// <returns>Coroutine to handle the asynchronous token request process.</returns>
-        private IEnumerator FetchTokenAndJoinRoom()
+        public IEnumerator FetchTokenAndJoinRoom()
         {
+            ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
             string uri = $"{TokenUrl}/getToken?roomName={RoomName}&participantName={NetworkManager.Singleton.LocalClientId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
@@ -237,6 +252,7 @@ namespace SEE.Tools.Livekit
             else
             {
                 ShowNotification.Error("LiveKit", $"Failed to get token from {uri}: {www.error}.");
+                ConnectionState = ConnectionStatus.TokenFailed;
             }
         }
 
@@ -266,6 +282,7 @@ namespace SEE.Tools.Livekit
                 if (elapsed >= timeoutSeconds)
                 {
                     ShowNotification.Error("LiveKit", $"Connection to room \"{RoomName}\" timed out after {timeoutSeconds} seconds.");
+                    ConnectionState = ConnectionStatus.RoomConnectionFailed;
                     yield break;
                 }
                 elapsed += Time.deltaTime;
@@ -276,10 +293,12 @@ namespace SEE.Tools.Livekit
             if (connect.IsError)
             {
                 ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{RoomName}\" {connect}.");
+                ConnectionState = ConnectionStatus.RoomConnectionFailed;
             }
             else
             {
                 Debug.Log($"[LiveKit] Connected to \"{room.Name}\" \n");
+                ConnectionState = ConnectionStatus.Connected;
             }
         }
 
@@ -292,7 +311,29 @@ namespace SEE.Tools.Livekit
         /// otherwise <c>false</c>.
         /// </returns>
 
-        public bool IsConnected() => room != null && room.IsConnected;
+        private bool IsConnected() => room != null && room.IsConnected;
+
+        /// <summary>
+        /// Disconnects from the LiveKit room, stops publishing, cleans up resources,
+        /// and updates the connection state.
+        /// </summary>
+        public void Disconnect()
+        {
+            ConnectionState = ConnectionStatus.Disconnected;
+
+            if (publishedTrack != null)
+            {
+                StartCoroutine(UnpublishVideo());
+            }
+
+            CleanUp();
+
+            if (room != null)
+            {
+                room.Disconnect();
+                room = null;
+            }
+        }
         #endregion
 
         #region Publish Methods
@@ -386,7 +427,7 @@ namespace SEE.Tools.Livekit
                     yield return null;
                 }
 
-                if (room != null && room.IsConnected)
+                if (IsConnected())
                 {
                     yield return StartCoroutine(PublishVideo());
                 }

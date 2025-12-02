@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Cysharp.Threading.Tasks;
@@ -332,13 +333,44 @@ namespace SEE.UI
 
                 connect.clickEvent.AddListener(() =>
                 {
-                    // TODO
+                    StartCoroutine(ConnectRoutine());
                 });
 
                 disconnect.clickEvent.AddListener(() =>
                 {
-                    // TODO
+                    liveKitVideoManager.Disconnect();
+                    disconnectGO.SetActive(false);
+                    connectGO.SetActive(true);
                 });
+            }
+
+            IEnumerator ConnectRoutine()
+            {
+                using (LoadingSpinner.ShowIndeterminate("Connecting to LiveKit..."))
+                {
+                    yield return liveKitVideoManager.StartCoroutine(
+                        liveKitVideoManager.FetchTokenAndJoinRoom()
+                    );
+
+                    while (liveKitVideoManager.ConnectionState == LiveKitVideoManager.ConnectionStatus.Disconnected)
+                    {
+                        yield return null;
+                    }
+
+                    switch (liveKitVideoManager.ConnectionState)
+                    {
+                        case LiveKitVideoManager.ConnectionStatus.Connected:
+                            connectGO.SetActive(false);
+                            disconnectGO.SetActive(true);
+                            break;
+                        case LiveKitVideoManager.ConnectionStatus.TokenFailed:
+                            Debug.LogError("TODO: TOKEN FAILED!");
+                            break;
+                        case LiveKitVideoManager.ConnectionStatus.RoomConnectionFailed:
+                            Debug.LogError("TODO: LiveKit Connection FAILED!");
+                            break;
+                    }
+                }
             }
 
             void SaveToPlayerPrefs(string keyword)
