@@ -1155,19 +1155,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   port: 12345
+  discardStalePackets: 1
   skinnedMeshRenderer: {fileID: 0}
   enableFaceAnimation: 1
-  smoothingFactor: 0.5
-  visemeSmoothingFactor: 0.9
+  enableVisemeSynthesis: 1
+  smoothingRate: 0.5
+  visemeSmoothingRate: 0.9
   eyeSquintPower: 12
   enableHeadRotation: 1
   headTransform: {fileID: 0}
-  rotationSmoothingFactor: 0.5
+  rotationSmoothingRate: 0.5
   tiltCorrection: -15
   enableEyeRotation: 1
   leftEyeTransform: {fileID: 0}
   rightEyeTransform: {fileID: 0}
-  eyeRotationSmoothingFactor: 0.5
+  eyeRotationSmoothingRate: 0.5
   eyeLookScale: 30
 --- !u!114 &9006327006082929411
 MonoBehaviour:
@@ -1176,7 +1178,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1906181387538679423}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: bf178efeebf7c34409aa52e5f299c91b, type: 3}
   m_Name: 

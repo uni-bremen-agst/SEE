@@ -7379,12 +7379,12 @@ PrefabInstance:
     - target: {fileID: 3169402365225984986, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4707525409216052258, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -7470,7 +7470,7 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Controller
       value: 
-      objectReference: {fileID: 9100000, guid: 831b46c503d9add42b15044ab2bac737, type: 2}
+      objectReference: {fileID: 9100000, guid: 6e34972e6d04d5040b981261b3f580a8, type: 2}
     - target: {fileID: 5673393830814623364, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: GlobalObjectIdHash
@@ -7479,7 +7479,7 @@ PrefabInstance:
     - target: {fileID: 6589195859847958484, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Enabled
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6831185425261647939, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -7691,10 +7691,15 @@ PrefabInstance:
       propertyPath: emotes.Array.data[7].expData.controllerVars.Array.data[5].smr
       value: 
       objectReference: {fileID: 5919282814599264633}
-    - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
+    - target: {fileID: 9006327006082929411, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
       propertyPath: m_Enabled
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9138735501957216707, guid: 628493a4652d54b47aaee2226a0c0890,
         type: 3}
@@ -14449,7 +14454,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7186232649610525698}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 2069102741, guid: 21fe281538940584e84b6d5eedb3525e, type: 3}
   m_Name: 
