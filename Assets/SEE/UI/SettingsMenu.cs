@@ -363,6 +363,9 @@ namespace SEE.UI
                         case LiveKitVideoManager.ConnectionStatus.Connected:
                             connectGO.SetActive(false);
                             disconnectGO.SetActive(true);
+                            liveKitURLInputField.SetNormalState();
+                            roomNameInputField.SetNormalState();
+                            tokenURLInputField.SetNormalState();
                             break;
                         case LiveKitVideoManager.ConnectionStatus.TokenFailed:
                             tokenURLInputField.SetErrorState();
