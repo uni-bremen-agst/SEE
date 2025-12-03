@@ -14,6 +14,7 @@ using SEE.Tools.Livekit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;
+using SEE.Utils.Extensions;
 using TMPro;
 using UnityEditor;
 using UnityEngine;
@@ -364,10 +365,14 @@ namespace SEE.UI
                             disconnectGO.SetActive(true);
                             break;
                         case LiveKitVideoManager.ConnectionStatus.TokenFailed:
-                            Debug.LogError("TODO: TOKEN FAILED!");
+                            tokenURLInputField.SetErrorState();
+                            liveKitURLInputField.SetNormalState();
+                            roomNameInputField.SetNormalState();
                             break;
                         case LiveKitVideoManager.ConnectionStatus.RoomConnectionFailed:
-                            Debug.LogError("TODO: LiveKit Connection FAILED!");
+                            liveKitURLInputField.SetErrorState();
+                            roomNameInputField.SetErrorState();
+                            tokenURLInputField.SetNormalState();
                             break;
                     }
                 }
