@@ -170,3 +170,6 @@ Recordings.meta
 # Python cache
 __pycache__*
 *.pyc
+
+# Python venv
+venv/
