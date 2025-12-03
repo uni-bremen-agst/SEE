@@ -265,6 +265,10 @@ namespace SEE.Tools.Livekit
         /// <returns>Coroutine that handles the connection to the room.</returns>
         private IEnumerator JoinRoom(string token)
         {
+            if (IsConnected())
+            {
+                Disconnect();
+            }
             // Initialize a new room instance.
             room = new();
 
@@ -284,6 +288,8 @@ namespace SEE.Tools.Livekit
                 {
                     ShowNotification.Error("LiveKit", $"Connection to room \"{RoomName}\" timed out after {timeoutSeconds} seconds.");
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
+                    room.Disconnect();
+                    room = null;
                     yield break;
                 }
                 elapsed += Time.deltaTime;
@@ -295,6 +301,8 @@ namespace SEE.Tools.Livekit
             {
                 ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{RoomName}\" {connect}.");
                 ConnectionState = ConnectionStatus.RoomConnectionFailed;
+                room.Disconnect();
+                room = null;
             }
             else
             {
@@ -331,6 +339,8 @@ namespace SEE.Tools.Livekit
 
             if (room != null)
             {
+                room.TrackSubscribed -= TrackSubscribed;
+                room.TrackUnsubscribed -= UnTrackSubscribed;
                 room.Disconnect();
                 room = null;
             }
