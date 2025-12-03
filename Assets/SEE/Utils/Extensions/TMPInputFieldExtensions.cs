@@ -56,7 +56,7 @@ namespace SEE.Utils.Extensions
         public static void SetNormalState(this TMP_InputField inputField)
         {
             SetAllTransitionColors(inputField, Color.clear);
-            SetLabelColor(inputField, Color.clear);
+            SetLabelColor(inputField, Color.white);
         }
 
         /// <summary>
