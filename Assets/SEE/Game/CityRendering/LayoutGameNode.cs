@@ -40,7 +40,11 @@ namespace SEE.Game.CityRendering
             }
             set
             {
+                // Re-parenting to apply the scale as local.
+                Transform parent = GameObject.transform.parent;
+                GameObject.transform.SetParent(null);
                 GameObject.transform.localScale = value;
+                GameObject.transform.SetParent(parent);
             }
         }
 
