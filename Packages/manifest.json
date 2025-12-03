@@ -29,7 +29,7 @@
     "com.unity.xr.interaction.toolkit": "3.0.8",
     "com.unity.xr.legacyinputhelpers": "2.1.12",
     "com.unity.xr.management": "4.5.1",
-    "com.unity.xr.openxr": "1.14.3",
+    "com.unity.xr.openxr": "1.15.1",
     "io.livekit.livekit-sdk": "https://github.com/livekit/client-sdk-unity.git",
     "judah4.hsvcolorpickerunity": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
     "com.unity.modules.accessibility": "1.0.0",
