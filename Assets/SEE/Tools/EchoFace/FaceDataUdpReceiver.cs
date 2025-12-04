@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine;
 using Newtonsoft.Json;
+using Unity.Netcode;
 
 /// <summary>
 /// Receives raw FaceData frames over UDP on a background thread and forwards
@@ -13,7 +14,7 @@ using Newtonsoft.Json;
 /// This class acts as a lightweight input adapter and performs no animation
 /// itself.
 /// </summary>
-public class FaceDataUdpReceiver : MonoBehaviour
+public class FaceDataUdpReceiver : NetworkBehaviour
 {
     [Header("Network Settings")]
     [SerializeField]
@@ -37,6 +38,13 @@ public class FaceDataUdpReceiver : MonoBehaviour
 
     private void Start()
     {
+        // Never start the UDP listener on a dedicated server
+        if (!IsClient || !IsOwner)
+        {
+            enabled = false;
+            return;
+        }
+
         // Auto-resolve EchoFace if not assigned manually
         if (echoFace == null)
         {
@@ -110,7 +118,7 @@ public class FaceDataUdpReceiver : MonoBehaviour
                 var receivedData = JsonConvert.DeserializeObject<FaceData>(json);
                 if (receivedData != null)
                 {
-                    // Discard outdated or identical packets
+                    // Discard outdated or identical packets based on timestamp
                     if (receivedData.ts <= _lastTimestampMs)
                     {
                         continue;
@@ -121,8 +129,9 @@ public class FaceDataUdpReceiver : MonoBehaviour
                     if (discardStalePackets)
                     {
                         // Clear older queued packets to keep only the latest
-                        _faceDataQueue.Clear();
+                        while (_faceDataQueue.TryDequeue(out _)) { }
                     }
+
                     _faceDataQueue.Enqueue(receivedData);
                 }
             }
