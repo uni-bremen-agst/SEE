@@ -3,7 +3,7 @@ using SEE.Controls.Actions;
 using SEE.GameObjects;
 using SEE.GO;
 using SEE.GO.Menu;
-using SEE.Tools.Livekit;
+using SEE.Tools.LiveKit;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using UnityEngine;

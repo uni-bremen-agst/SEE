@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace SEE.Tools.Livekit
+namespace SEE.Tools.LiveKit
 {
     /// <summary>
     /// Provides a global registry that maps Netcode client IDs to their

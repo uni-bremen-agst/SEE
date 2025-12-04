@@ -3,7 +3,7 @@ using Unity.Netcode;
 using SEE.Controls;
 using SEE.Utils;
 
-namespace SEE.Tools.Livekit
+namespace SEE.Tools.LiveKit
 {
     /// <summary>
     /// Handles the positioning of the LiveKit video stream relative to the player's head.

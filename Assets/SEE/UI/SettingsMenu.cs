@@ -10,7 +10,7 @@ using SEE.Controls.KeyActions;
 using SEE.Game;
 using SEE.GO;
 using SEE.Net.Actions;
-using SEE.Tools.Livekit;
+using SEE.Tools.LiveKit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
 using SEE.Utils;

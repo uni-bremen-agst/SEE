@@ -13,7 +13,7 @@ using Unity.Netcode;
 using UnityEngine;
 using RoomOptions = LiveKit.RoomOptions;
 
-namespace SEE.Tools.Livekit
+namespace SEE.Tools.LiveKit
 {
     /// <summary>
     /// Manages LiveKit video streams and plays them via the LivekitVideo object in the player objects.
