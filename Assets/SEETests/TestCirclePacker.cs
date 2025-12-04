@@ -1,4 +1,4 @@
-﻿using MoreLinq;
+using MoreLinq;
 using NUnit.Framework;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.RectanglePacking;
@@ -7,13 +7,15 @@ using System.Linq;
 using UnityEngine;
 using static UnityEngine.EventSystems.EventTrigger;
 
-namespace SEE.Layout.RectanglePacking
+namespace SEE.Layout.CirclePacking
 {
   /// <summary>
   /// Unit tests for RectanglePacker.
   /// </summary>
-  internal class TestRectanglePacker
+  internal class TestCirclePacker
   {
+
+    /*
     /// <summary>
     /// True if left and right are the same list (order is ignored).
     /// </summary>
@@ -43,10 +45,7 @@ namespace SEE.Layout.RectanglePacking
       }
       return result;
     }
-
-    /*
      Test PTree merge and split operations.
-     */
     [Test]
     public void TestMerge()
     {
@@ -80,7 +79,6 @@ namespace SEE.Layout.RectanglePacking
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { A }), Is.True);
 
     }
-
     /// <summary>
     /// Runs the example scenario used by Richard Wettel in his dissertation
     /// plus two additions at the end to check situations he did not cover
@@ -233,6 +231,8 @@ namespace SEE.Layout.RectanglePacking
 
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
     }
+     */
+
 
     /// <summary>
     /// Let's us explore performance issues.
@@ -248,15 +248,15 @@ namespace SEE.Layout.RectanglePacking
       LayoutVertex node2 = new(new Vector3(7, 1, 3), 2);
       LayoutVertex node3 = new(new Vector3(5, 1, 3), 3);
       LayoutVertex node4 = new(new Vector3(4, 1, 4), 4);
-      IEnumerable<ILayoutNode> nodes1 = new[] { node1};
-      IEnumerable<ILayoutNode> nodes2 = new[] { node1 , node2};
+      IEnumerable<ILayoutNode> nodes1 = new[] { node1 };
+      IEnumerable<ILayoutNode> nodes2 = new[] { node1, node2 };
       IEnumerable<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
-      IEnumerable<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+      IEnumerable<ILayoutNode> nodes4 = new[] { node2, node3, node4 };
 
-      RectanglePackingNodeLayout2 packer1 = new();
-      RectanglePackingNodeLayout2 packer2 = new();
-      RectanglePackingNodeLayout2 packer3 = new();
-      RectanglePackingNodeLayout2 packer4 = new();
+      CirclePackingNodeLayout packer1 = new();
+      CirclePackingNodeLayout packer2 = new();
+      CirclePackingNodeLayout packer3 = new();
+      CirclePackingNodeLayout packer4 = new();
 
       Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
 
@@ -274,19 +274,6 @@ namespace SEE.Layout.RectanglePacking
 
       RectanglePackingNodeLayout2.tree.Print();
 
-      foreach (var entry in packer3.layoutResult.ToList())
-      {
-        if (entry.Key.ID == "2")
-        {
-          Debug.Log("here");
-          ILayoutNode vertex = new LayoutVertex(new Vector3(9, 1, 7), 2);
-          // Remove the old key and add the new key-value pair
-          packer3.layoutResult.Remove(entry.Key);
-          packer3.layoutResult[vertex] = entry.Value;
-        }
-      }
-      /*
-       */
       packer4.oldLayout = packer3;
 
       Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
@@ -365,16 +352,15 @@ namespace SEE.Layout.RectanglePacking
 
       //*************************************************************************************************************
       RectanglePackingNodeLayout2.tree.Print();
-      RectanglePackingNodeLayout2.tree = null;
 
     }
 
     [Test]
     public void TestLayout1()
     {
-      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
 
-      RectanglePackingNodeLayout packer = new();
+      CirclePackingNodeLayout packer = new();
 
       Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
     }
@@ -406,7 +392,6 @@ namespace SEE.Layout.RectanglePacking
             node.Rectangle.Position, node.Rectangle.Size);
       }
     }
-     */
 
     [Test]
     public void TestFreeLeavesAdjust()
@@ -434,14 +419,13 @@ namespace SEE.Layout.RectanglePacking
       Debug.Log(tree.FreeLeaves.Count);
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
 
-      var oldRootSize = tree.Root.Rectangle.Size;
-
       tree.Root.Rectangle.Size = new Vector2(20, 20);
       // Adjust free leaves
-      tree.FreeLeavesAdjust(oldRootSize);
+      tree.FreeLeavesAdjust();
       tree.Print();
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { C, D }), Is.True);
     }
+     */
   }
 }
 

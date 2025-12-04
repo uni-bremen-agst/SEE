@@ -228,8 +228,10 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
      */
 
     //************************************************************************************************************************************
-    public void FreeLeavesAdjust() 
+    public void FreeLeavesAdjust(Vector2 oldWorstCaseSize) 
     {
+      if (oldWorstCaseSize == Vector2.zero)
+        return;
       var maxX = FreeLeaves.Max(leaf => leaf.Rectangle.Position.x + leaf.Rectangle.Size.x);
       var maxY = FreeLeaves.Max(leaf => leaf.Rectangle.Position.y + leaf.Rectangle.Size.y);
       foreach (var pNode in Traverse(Root))
@@ -239,16 +241,18 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         var corner = pNode.Rectangle.Position + pNode.Rectangle.Size;
         if (maxY == corner.y)
         {
-          Debug.Log("before y: " + pNode.Rectangle.Size.y);
-          pNode.Rectangle.Size.y = Root.Rectangle.Size.y;
-          Debug.Log("after y: " + pNode.Rectangle.Size.y);
+          //Debug.Log("before y: " + pNode.Rectangle.Size.y);
+          var diffYDepth = Root.Rectangle.Size.y - oldWorstCaseSize.y;
+          pNode.Rectangle.Size.y += diffYDepth;
+          //Debug.Log("after y: " + pNode.Rectangle.Size.y);
 
         }
         if (maxX == corner.x)
         {
-          Debug.Log("before x: " + pNode.Rectangle.Size.x);
-          pNode.Rectangle.Size.x = Root.Rectangle.Size.x;
-          Debug.Log("after x: " + pNode.Rectangle.Size.x);
+          //Debug.Log("before x: " + pNode.Rectangle.Size.x);
+          var diffXWidth = Root.Rectangle.Size.x - oldWorstCaseSize.x;
+          pNode.Rectangle.Size.x += diffXWidth;
+          //Debug.Log("after x: " + pNode.Rectangle.Size.x);
         }
       }
     }
@@ -267,9 +271,203 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     {
       foreach (var pNode in Traverse(Root))
       {
-        if (!pNode.Occupied)
+        if (!pNode.Occupied && pNode.Parent!=null)
           pNode.Rectangle.Size += factor;
       }
+    }
+
+    //************************************************************************************************************************************
+
+    public void GrowLeaf(PNode leaf, Vector3 newScale)
+    {
+      leaf.Rectangle.Size.x = newScale.x + 0.1f;
+      leaf.Rectangle.Size.y = newScale.z + 0.1f;
+
+      propagateResizeUp(leaf);
+    }
+
+
+    /*
+    public void propagateResizeUp(PNode node)
+    {
+      
+      Debug.Log("Propagate resize up from node: " + node + " with size: " + node.Rectangle.Size);
+      PNode parent = node.Parent;
+      Vector2 leftSize = parent.Left.Rectangle.Size;
+      Vector2 rightSize = parent.Right.Rectangle.Size;
+      if (parent.Left == node)
+      {
+        Debug.Log("Left child resized.");
+        // Left child resized
+        if (leftSize.y > rightSize.y)
+        {
+          Debug.Log("Updating parent y size from " + parent.Rectangle.Size.y + " to " + leftSize.y);
+          parent.Rectangle.Size.y = leftSize.y;
+        }
+        Debug.Log("Updating parent x size from " + parent.Rectangle.Size.x + " to " + (leftSize.x + rightSize.x));
+        parent.Rectangle.Size.x = leftSize.x + rightSize.x;
+      }
+      else
+      {
+        Debug.Log("Right child resized.");
+        // Right child resized
+        if (rightSize.y > leftSize.y)
+        {
+          Debug.Log("Updating parent y size from " + parent.Rectangle.Size.y + " to " + rightSize.y);
+          parent.Rectangle.Size.y = rightSize.y;
+        }
+        Debug.Log("Updating parent x size from " + parent.Rectangle.Size.x + " to " + (leftSize.x + rightSize.x));
+        parent.Rectangle.Size.x = leftSize.x + rightSize.x;
+      }
+
+      parent.RecomputeBounds();
+      
+      if (parent.Parent == null)
+        return;
+      propagateResizeUp(parent);
+    }
+     */
+    /*
+    public void PropagateGrowUp(PNode node)
+    {
+      if (node.Parent == null)
+        return;
+
+      PNode parent = node.Parent;
+      PNode left = parent.Left;
+      PNode right = parent.Right;
+
+      bool isLeft = (left == node);
+      PNode sibling = isLeft ? right : left;
+
+      //
+      // 1. Prüfen, ob das wachsende Kind in den Bereich des Geschwisters hineinragt
+      //
+      if (sibling != null && Overlaps(node, sibling))
+      {
+        // Verschiebe den Geschwister-Subtree passend weg
+        if (isLeft)
+        {
+          // Node wächst nach rechts → rechte Seite verschieben
+          float dx = (node.Rectangle.Position.x + node.Rectangle.Size.x) - sibling.Rectangle.Position.x;
+          ShiftSubtree(sibling, dx, 0f);
+        }
+        else
+        {
+          // Node wächst nach links → linke Seite verschieben
+          float dx = sibling.Rectangle.Position.x + sibling.Rectangle.Size.x - node.Rectangle.Position.x;
+          ShiftSubtree(sibling, -dx, 0f);
+        }
+      }
+
+      //
+      // 2. Eltern neu berechnen
+      //
+      parent.Rectangle.Position = left.Rectangle.Position;
+      parent.Rectangle.Size = new Vector2(
+          left.Rectangle.Size.x + right.Rectangle.Size.x,
+          Mathf.Max(left.Rectangle.Size.y, right.Rectangle.Size.y)
+      );
+
+      //
+      // 3. Weiter nach oben propagieren
+      //
+      PropagateGrowUp(parent);
+    }
+     */
+
+    public void propagateResizeUp(PNode node)
+    {
+      if (node.Parent == null)
+        return;
+
+      PNode parent = node.Parent;
+
+      AdjustSubtreeAfterResize(parent);
+
+      parent.RecomputeBounds();
+
+      // Try shrinking (in case the leaf got smaller!)
+      ShrinkParentIfPossible(parent);
+
+      propagateResizeUp(parent);
+    }
+
+    private void AdjustSubtreeAfterResize(PNode parent)
+    {
+      PNode left = parent.Left;
+      PNode right = parent.Right;
+
+      if (left == null || right == null)
+        return;
+
+      // Right child must always be placed exactly right of left
+      float expectedRightX = left.Rectangle.Position.x + left.Rectangle.Size.x;
+      float deltaX = expectedRightX - right.Rectangle.Position.x;
+
+      if (Mathf.Abs(deltaX) > 0.0001f)
+        ShiftSubtreeX(right, deltaX);
+
+      // Heights are independent; only the parent grows vertically
+    }
+
+
+    private void ShrinkParentIfPossible(PNode parent)
+    {
+      if (parent.Left == null || parent.Right == null)
+        return;
+
+      float minWidth = parent.Left.Rectangle.Size.x + parent.Right.Rectangle.Size.x;
+      float minHeight = Mathf.Max(parent.Left.Rectangle.Size.y, parent.Right.Rectangle.Size.y);
+
+      // Shrink width
+      if (parent.Rectangle.Size.x > minWidth)
+        parent.Rectangle.Size.x = minWidth;
+
+      // Shrink height
+      if (parent.Rectangle.Size.y > minHeight)
+        parent.Rectangle.Size.y = minHeight;
+    }
+
+    private void ShiftSubtreeX(PNode node, float deltaX)
+    {
+      node.Rectangle.Position.x += deltaX;
+
+      if (node.Left != null)
+        ShiftSubtreeX(node.Left, deltaX);
+
+      if (node.Right != null)
+        ShiftSubtreeX(node.Right, deltaX);
+    }
+
+    private void ShiftSubtreeY(PNode node, float deltaY)
+    {
+      node.Rectangle.Position.y += deltaY;
+
+      if (node.Left != null)
+        ShiftSubtreeY(node.Left, deltaY);
+
+      if (node.Right != null)
+        ShiftSubtreeY(node.Right, deltaY);
+    }
+
+
+    private void ShiftSubtree(PNode node, float dx, float dy)
+    {
+      foreach (var n in PTree.Traverse(node))
+      {
+        n.Rectangle.Position.x += dx;
+        n.Rectangle.Position.y += dy;
+      }
+    }
+
+
+    private bool Overlaps(PNode a, PNode b)
+    {
+      return !(a.Rectangle.Position.x + a.Rectangle.Size.x <= b.Rectangle.Position.x ||
+               b.Rectangle.Position.x + b.Rectangle.Size.x <= a.Rectangle.Position.x ||
+               a.Rectangle.Position.y + a.Rectangle.Size.y <= b.Rectangle.Position.y ||
+               b.Rectangle.Position.y + b.Rectangle.Size.y <= a.Rectangle.Position.y);
     }
 
 
@@ -285,14 +483,12 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         yield return n;
     }
 
-
-
     /// <summary>
     /// Returns all free leaves having at least the requested size.
     /// </summary>
     /// <param name="size">requested size of the rectangle</param>
     /// <returns>all free leaves having at least the requested size</returns>
-    public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size)
+    public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size, Vector2 oldWorstCaseSize)
     {
       List<PNode> result = new();
       foreach (PNode leaf in FreeLeaves)
@@ -304,12 +500,16 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       }
       if (result.Count == 0)
       {
-        Root.Rectangle.Size = Root.Rectangle.Size + 1.1f * new Vector2(1.0f, 1.0f);
-        enlargeAllPNodes(1.1f * new Vector2(5.0f, 5.0f));
-        // Fix: Cast the recursive call result to List<PNode>
-        result = (List<PNode>)GetSufficientlyLargeLeaves(size);
+        Debug.Log("No sufficiently large leaves found. Enlarging all PNodes.");
+        Print();
+        Debug.Log("//////////////////////////////////////////////////////////////////////////////enlarged");
+        FreeLeavesAdjust(oldWorstCaseSize);
+        result = (List<PNode>)GetSufficientlyLargeLeaves(size, oldWorstCaseSize);
       }
       /*
+        //Root.Rectangle.Size = Root.Rectangle.Size + 1.1f * new Vector2(1.0f, 1.0f);
+        //enlargeAllPNodes(1.1f * new Vector2(2.0f, 2.0f));
+        // Fix: Cast the recursive call result to List<PNode>
        */
       return result;
     }

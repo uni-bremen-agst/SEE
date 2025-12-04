@@ -523,7 +523,7 @@ namespace SEE.Layout.NodeLayouts
         preservers.Clear();
         expanders.Clear();
 
-        var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
+        var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.one);
         //tree.Print();
 
         if (sufficientLargeLeaves.Count == 0)

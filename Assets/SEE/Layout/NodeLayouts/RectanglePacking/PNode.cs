@@ -56,6 +56,31 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       Parent = parent;
     }
 
+    public void RecomputeBounds()
+    {
+      this.Rectangle.Position.x = Left.Rectangle.Position.x;
+      this.Rectangle.Position.y = Left.Rectangle.Position.y;
+      this.Rectangle.Size.x = Right.Rectangle.Size.x + Left.Rectangle.Size.x;
+      this.Rectangle.Size.y = Mathf.Max(Right.Rectangle.Size.y, Left.Rectangle.Size.y);         
+    }
+    /*
+    public void RecomputeBounds()
+    {
+      if (Left == null || Right == null)
+        return;
+
+      // Parent covers exactly the min bounds of children
+      this.Rectangle.Position = Left.Rectangle.Position;
+
+      // Width is sum of horizontal children
+      this.Rectangle.Size.x = Left.Rectangle.Size.x + Right.Rectangle.Size.x;
+
+      // Height is max of vertical children
+      this.Rectangle.Size.y = Mathf.Max(Left.Rectangle.Size.y, Right.Rectangle.Size.y);
+    }
+     */
+
+
     public override string ToString()
     {
       return "(occupied=" + Occupied + ", rectangle=" + Rectangle.ToString()
