@@ -251,7 +251,9 @@ namespace SEE.Game.City
         /// </summary>
         void RenderTransition()
         {
+            Debug.Log("RenderTransition started\n");
             RenderTransitionAsync().Forget();
+            Debug.Log("RenderTransition ended\n");
         }
 
         /// <summary>
@@ -260,6 +262,8 @@ namespace SEE.Game.City
         /// <returns>task</returns>
         async UniTask RenderTransitionAsync()
         {
+            Debug.Log("RenderTransitionAsync started\n");
+
             if (LoadedGraph == null)
             {
                 return;
@@ -273,6 +277,7 @@ namespace SEE.Game.City
             /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
             /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
             InitializeAfterDrawn(false);
+            Debug.Log("RenderTransitionAsync ended\n");
         }
 
         /// <summary>
