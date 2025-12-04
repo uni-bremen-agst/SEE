@@ -1,13 +1,7 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading;
 using UnityEngine;
-using Newtonsoft.Json;
 
 /// <summary>
 /// A static class to hold named constants for landmark indices.
@@ -20,46 +14,16 @@ public static class Landmarks
 }
 
 /// <summary>
-/// Represents the structure of the incoming JSON data.
-/// </summary>
-[Serializable]
-public class FaceData
-{
-    // A nested class to represent the 'x', 'y', 'z' landmark coordinates
-    [Serializable]
-    public class LandmarkCoordinates
-    {
-        public float x;
-        public float y;
-        public float z;
-    }
-
-    public Dictionary<string, float> blendshapes;
-    public Dictionary<string, LandmarkCoordinates> landmarks;
-
-    public long ts;
-}
-
-/// <summary>
-/// Receives blendshape and landmark data over UDP and applies it to a
-/// SkinnedMeshRenderer. This script handles network communication on a
-/// separate thread, maps MediaPipe ARKit blendshapes to custom
+/// Applies externally provided facial tracking data to a character.
+/// This component maps MediaPipe/ARKit-style blendshapes to custom
 /// blendshapes, synthesizes visemes for speech, and smoothly
-/// interpolates values.
+/// interpolates all values.
 /// </summary>
 public class EchoFace : MonoBehaviour
 {
     //-------------------------------------------------
     // Public Fields
     //-------------------------------------------------
-
-    [Header("Network Settings")]
-    [SerializeField]
-    private int port = 12345;
-
-    [SerializeField]
-    [Tooltip("If enabled, only the latest packet will be processed, discarding any stale packets (improves latency).")]
-    private bool discardStalePackets = true;
 
     [Header("Avatar Settings")]
     [SerializeField]
@@ -132,18 +96,8 @@ public class EchoFace : MonoBehaviour
     // Private Fields
     //-------------------------------------------------
 
-    private UdpClient _udpClient;
-    private Thread _receiveThread;
-    private bool _isRunning = false;
-
-    // A thread-safe queue to pass data from the network thread to the main thread
-    private readonly ConcurrentQueue<FaceData> _faceDataQueue = new();
-
     // Stores the latest face data to be used by LateUpdate
     private FaceData _latestFaceData;
-
-    // Stores the timestamp of the last processed packet to discard outdated packets
-    private long _lastTimestampMs = -1;
 
     // Stores the current blendshape values after smoothing, used for the next frame's smoothing calculation
     private readonly Dictionary<string, float> _currentBlendshapeValues = new();
@@ -385,16 +339,6 @@ public class EchoFace : MonoBehaviour
         }
 
         CacheBlendshapeIndices();
-        StartUDPListener();
-    }
-
-    private void Update()
-    {
-        // Dequeue data in Update. Store the latest data for LateUpdate.
-        if (_faceDataQueue.TryDequeue(out var receivedData))
-        {
-            _latestFaceData = receivedData;
-        }
     }
 
     private void LateUpdate()
@@ -406,29 +350,26 @@ public class EchoFace : MonoBehaviour
         }
 
         // Apply blendshapes
-        if (enableFaceAnimation && skinnedMeshRenderer != null && _latestFaceData.blendshapes != null)
+        if (enableFaceAnimation && skinnedMeshRenderer != null)
         {
             ApplyBlendshapes(_latestFaceData.blendshapes);
         }
 
         // Estimate and apply head pose
-        if (enableHeadRotation && headTransform != null && _latestFaceData.landmarks != null && _latestFaceData.landmarks.Count >= 3)
+        if (enableHeadRotation && headTransform != null)
         {
-            Quaternion targetRotation = EstimateHeadRotation(_latestFaceData.landmarks);
+            var targetRotation = EstimateHeadRotation(_latestFaceData.landmarks);
             ApplyHeadRotation(targetRotation);
         }
 
         // Apply eye rotation
-        if (enableEyeRotation)
+        if (enableEyeRotation && leftEyeTransform != null && rightEyeTransform != null)
         {
             ApplyEyeRotation();
         }
 
         // _latestFaceData = null; // IMPORTANT: Resetting the data will enable other components to manipulate the face causing jitter!
     }
-
-    private void OnApplicationQuit() => Shutdown();
-    private void OnDestroy() => Shutdown();
 
     //-------------------------------------------------
     // Private Methods
@@ -450,6 +391,11 @@ public class EchoFace : MonoBehaviour
     /// </summary>
     private void ApplyBlendshapes(Dictionary<string, float> blendshapes)
     {
+        if (blendshapes == null)
+        {
+            return;
+        }
+
         var targetBlendshapeValues = new Dictionary<string, float>();
 
         // 1. Map MediaPipe to Custom Blendshapes and apply enhancements
@@ -579,9 +525,7 @@ public class EchoFace : MonoBehaviour
     private Quaternion EstimateHeadRotation(Dictionary<string, FaceData.LandmarkCoordinates> landmarks)
     {
         // Ensure the required landmarks exist using named constants.
-        if (!landmarks.ContainsKey(Landmarks.Chin) ||
-            !landmarks.ContainsKey(Landmarks.LeftUpperEyelid) ||
-            !landmarks.ContainsKey(Landmarks.RightUpperEyelid))
+        if (landmarks == null || landmarks.Count < 3)
         {
             Debug.LogWarning("[EchoFace] Required landmarks for head pose not found in the received data.");
             return _currentHeadRotation;
@@ -618,8 +562,10 @@ public class EchoFace : MonoBehaviour
     /// </summary>
     private void ApplyEyeRotation()
     {
-        if (leftEyeTransform == null || rightEyeTransform == null || _latestFaceData?.blendshapes == null)
+        if (_latestFaceData?.blendshapes == null)
+        {
             return;
+        }
 
         var blendshapes = _latestFaceData.blendshapes;
         float pitchLeft = 0f;
@@ -722,80 +668,6 @@ public class EchoFace : MonoBehaviour
     }
 
     /// <summary>
-    /// Initializes the UDP client and starts the receive thread.
-    /// </summary>
-    private void StartUDPListener()
-    {
-        try
-        {
-            _udpClient = new UdpClient(port);
-            _isRunning = true;
-            _receiveThread = new Thread(ReceiveLoop)
-            {
-                IsBackground = true,
-                Name = "UDPEchoFace"
-            };
-            _receiveThread.Start();
-            Debug.Log($"[EchoFace] UDP listener started on port {port}.");
-        }
-        catch (Exception ex)
-        {
-            Debug.LogError($"[EchoFace] UDP listener failed to start on port {port}: {ex.Message}");
-        }
-    }
-
-    /// <summary>
-    /// Threaded loop to receive data from the UDP client.
-    /// </summary>
-    private void ReceiveLoop()
-    {
-        var remoteEP = new IPEndPoint(IPAddress.Any, port);
-        while (_isRunning)
-        {
-            try
-            {
-                byte[] data = _udpClient.Receive(ref remoteEP);
-                string json = Encoding.UTF8.GetString(data);
-
-                // Deserialize the JSON into the new FaceData class
-                var receivedData = JsonConvert.DeserializeObject<FaceData>(json);
-                if (receivedData != null)
-                {
-                    // Discard outdated or identical packets
-                    if (receivedData.ts <= _lastTimestampMs)
-                    {
-                        continue;
-                    }
-
-                    _lastTimestampMs = receivedData.ts;
-
-                    if (discardStalePackets)
-                    {
-                        // Keep only the latest packet in the queue
-                        _faceDataQueue.Clear();
-                    }
-                    _faceDataQueue.Enqueue(receivedData);
-                }
-            }
-            catch (SocketException ex) when (ex.ErrorCode == 10004)
-            {
-                if (_isRunning)
-                    Debug.LogWarning("[EchoFace] UDP socket interrupted (normal shutdown).");
-            }
-            catch (ObjectDisposedException)
-            {
-                if (_isRunning)
-                    Debug.LogWarning("[EchoFace] UDP client disposed (normal shutdown).");
-            }
-            catch (Exception ex)
-            {
-                if (_isRunning)
-                    Debug.LogError($"[EchoFace] UDP receive error: {ex.Message}");
-            }
-        }
-    }
-
-    /// <summary>
     /// Caches blendshape name-to-index mappings for faster lookup.
     /// </summary>
     private void CacheBlendshapeIndices()
@@ -828,26 +700,14 @@ public class EchoFace : MonoBehaviour
     }
 
     /// <summary>
-    /// Shuts down the UDP client and the receiving thread.
+    /// Receives externally provided face-tracking data (e.g., from UDP or other sources)
+    /// and stores it as the latest frame to be applied during <c>LateUpdate</c>.
+    /// This method must be called from the Unity main thread only.
     /// </summary>
-    private void Shutdown()
+    /// <param name="data">A complete FaceData frame containing blendshapes,
+    /// landmarks, and timestamp information.</param>
+    public void SetFaceData(FaceData data)
     {
-        if (!_isRunning)
-            return;
-
-        _isRunning = false;
-        _udpClient?.Close();
-
-        if (_receiveThread != null && _receiveThread.IsAlive)
-        {
-            _receiveThread.Join(500); // Wait up to 500ms for the thread to exit
-            if (_receiveThread.IsAlive)
-            {
-                Debug.LogWarning("[EchoFace] UDP receive thread did not terminate gracefully.");
-            }
-        }
-
-        _udpClient = null;
-        _receiveThread = null;
+        _latestFaceData = data;
     }
 }
