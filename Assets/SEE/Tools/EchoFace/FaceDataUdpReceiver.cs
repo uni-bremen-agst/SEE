@@ -129,7 +129,7 @@ public class FaceDataUdpReceiver : NetworkBehaviour
                     if (discardStalePackets)
                     {
                         // Clear older queued packets to keep only the latest
-                        while (_faceDataQueue.TryDequeue(out _)) { }
+                        _faceDataQueue.Clear();
                     }
 
                     _faceDataQueue.Enqueue(receivedData);
