@@ -100,11 +100,11 @@ public class FaceDataUdpPayload
 }
 
 /// <summary>
-/// Receives raw face-tracking frames over UDP in a compact JSON format and
-/// forwards the latest decoded result to a target <see cref="EchoFace"/>
-/// component. Optionally forwards each processed frame to the server for
-/// synchronization with other clients. This class acts as a lightweight
-/// input adapter and performs no animation itself.
+/// Receives raw face-tracking frames over UDP in a compact JSON format on
+/// the owning client, forwards each packet to the server via ServerRpc, and
+/// applies the data locally only after it has been broadcast back via
+/// ClientRpc. This class acts as a lightweight input adapter and
+/// performs no animation itself.
 /// </summary>
 public class FaceDataUdpReceiver : NetworkBehaviour
 {
@@ -115,11 +115,6 @@ public class FaceDataUdpReceiver : NetworkBehaviour
     [SerializeField]
     [Tooltip("If enabled, only the latest packet will be processed, discarding stale packets to reduce latency.")]
     private bool discardStalePackets = true;
-
-    [Header("Sync Settings")]
-    [Tooltip("If enabled, every locally processed FaceData frame will be sent to the server for synchronization.")]
-    [SerializeField]
-    private bool enableNetworkSync = true;
 
     [Header("Target")]
     [Tooltip("Reference to the local EchoFace component that should receive the incoming FaceData.")]
@@ -133,12 +128,14 @@ public class FaceDataUdpReceiver : NetworkBehaviour
     // We queue the original JSON packets received from UDP.
     private readonly ConcurrentQueue<string> _jsonQueue = new();
 
-    // Used to discard out-of-order or duplicate packets based on timestamp (locally).
+    // Used on each client instance (including the owner) to discard out-of-order
+    // or duplicate packets based on timestamp when applying frames.
     private long _lastTimestampMs = -1;
 
     private void Start()
     {
         // Never start the UDP listener on a dedicated server.
+        // Only the local owning client should read from the local UDP stream.
         if (!(IsClient && IsOwner))
         {
             enabled = false;
@@ -175,52 +172,10 @@ public class FaceDataUdpReceiver : NetworkBehaviour
                 return;
             }
 
-            // 1) Optionally synchronize this frame over Netcode first
-            //    so that other clients get it as early as possible.
-            bool shouldSync =
-                enableNetworkSync &&   // globally enabled
-                IsClient &&            // we are a client
-                HasOtherClients();     // at least one other client connected
-
-            // 1) First, forward this frame to the server so other clients receive it as early as possible
-            if (shouldSync)
-            {
-                SubmitFaceDataServerRpc(json);
-            }
-
-            // 2) Deserialize once on the main thread, just before local use.
-            FaceDataUdpPayload payload = null;
-            try
-            {
-                payload = JsonConvert.DeserializeObject<FaceDataUdpPayload>(json);
-            }
-            catch (Exception ex)
-            {
-                Debug.LogWarning($"[FaceDataUdpReceiver] Failed to deserialize FaceDataUdpPayload: {ex.Message}");
-            }
-
-            if (payload == null)
-            {
-                return;
-            }
-
-            // Discard outdated or identical packets based on timestamp (almost never happens, but just in case).
-            if (payload.ts <= _lastTimestampMs)
-            {
-                return;
-            }
-
-            _lastTimestampMs = payload.ts;
-
-            // 3) Expand into full FaceData and apply locally.
-            if (echoFace != null)
-            {
-                var data = ConvertPayloadToFaceData(payload);
-                if (data != null)
-                {
-                    echoFace.SetFaceData(data);
-                }
-            }
+            // Synchronize this frame over Netcode, so that
+            // all clients (including the owner) receive it
+            // through the same ClientRpc path.
+            SubmitFaceDataServerRpc(json);
         }
     }
 
@@ -228,21 +183,6 @@ public class FaceDataUdpReceiver : NetworkBehaviour
 
     // Hide NetworkBehaviour.OnDestroy to plug in our shutdown logic.
     private new void OnDestroy() => Shutdown();
-
-    /// <summary>
-    /// Checks whether there is at least one other connected client
-    /// besides this one. Used to decide if network sync is necessary.
-    /// </summary>
-    private bool HasOtherClients()
-    {
-        var nm = NetworkManager.Singleton;
-        if (nm == null)
-            return false;
-
-        // ConnectedClientsList always includes the local client/host.
-        // If the count is greater than 1, we know at least one other client is connected.
-        return nm.ConnectedClientsList.Count > 1;
-    }
 
     /// <summary>
     /// Initializes the UDP listener and spawns the receive thread.
@@ -359,9 +299,9 @@ public class FaceDataUdpReceiver : NetworkBehaviour
             }
 
             // Sorted by numeric size: 152, 226, 446.
-            SetLm(0, Landmarks.Chin);              // "152"
-            SetLm(1, Landmarks.RightUpperEyelid);  // "226"
-            SetLm(2, Landmarks.LeftUpperEyelid);   // "446"
+            SetLm(0, Landmarks.Chin);
+            SetLm(1, Landmarks.RightUpperEyelid);
+            SetLm(2, Landmarks.LeftUpperEyelid);
         }
 
         return new FaceData
@@ -408,21 +348,19 @@ public class FaceDataUdpReceiver : NetworkBehaviour
     [ServerRpc(Delivery = RpcDelivery.Unreliable)]
     private void SubmitFaceDataServerRpc(string json)
     {
-        // Just broadcast to all clients. The owner has already applied
-        // the frame locally in Update(), so we do not update EchoFace here.
+        // Broadcast the received JSON to all clients (including the owner).
         BroadcastFaceDataClientRpc(json);
     }
 
     /// <summary>
     /// Broadcasts the latest compact FaceData JSON snapshot to all clients.
-    /// Non-owning clients apply it to their local EchoFace instance.
+    /// Every client (including the owner) applies it to their local EchoFace
+    /// instance so that the animation path is identical everywhere.
     /// </summary>
     [ClientRpc(Delivery = RpcDelivery.Unreliable)]
     private void BroadcastFaceDataClientRpc(string json)
     {
-        // Only non-owning clients should consume the networked data.
-        // The owner already applied the data locally from UDP.
-        if (!IsClient || IsOwner)
+        if (string.IsNullOrEmpty(json))
         {
             return;
         }
@@ -451,6 +389,14 @@ public class FaceDataUdpReceiver : NetworkBehaviour
         {
             return;
         }
+
+        // Timestamp filter per client instance to avoid applying out-of-order frames.
+        if (payload.ts <= _lastTimestampMs)
+        {
+            return;
+        }
+
+        _lastTimestampMs = payload.ts;
 
         var data = ConvertPayloadToFaceData(payload);
 
