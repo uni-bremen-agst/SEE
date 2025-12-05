@@ -63,7 +63,7 @@ BLENDSHAPE_ORDER = (
 
 # Landmark IDs used by EchoFace, sorted by numeric size:
 # 152 (Chin), 226 (RightUpperEyelid), 446 (LeftUpperEyelid)
-LM_ORDER = [152, 226, 446]
+LM_ORDER = (152, 226, 446)
 
 
 class FaceDataSender:
