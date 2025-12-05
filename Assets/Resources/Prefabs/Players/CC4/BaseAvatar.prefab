@@ -591,11 +591,11 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 3813996613035657293}
+      addedObject: {fileID: 6831185425261647939}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
       insertIndex: -1
-      addedObject: {fileID: 6831185425261647939}
+      addedObject: {fileID: 2548584615351735046}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: b93f96cf429b12342ac1893df03cdecb,
         type: 3}
       insertIndex: -1
@@ -1146,21 +1146,6 @@ MonoBehaviour:
   Tongue_Bulge_L_Value: 0
   Neck_Tighten_L_Value: 0
   Neck_Tighten_R_Value: 0
---- !u!114 &3813996613035657293
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1906181387538679423}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fe6a9446b47b20c40b2defff76192d6d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  port: 12345
-  discardStalePackets: 1
-  echoFace: {fileID: 0}
 --- !u!114 &6831185425261647939
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1188,6 +1173,22 @@ MonoBehaviour:
   rightEyeTransform: {fileID: 0}
   eyeRotationSmoothingRate: 0.5
   eyeLookScale: 30
+--- !u!114 &2548584615351735046
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1906181387538679423}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449d4361db2acbb4b9f31e7d61b17cd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ShowTopMostFoldoutHeaderGroup: 1
+  port: 12345
+  discardStalePackets: 1
+  echoFace: {fileID: 0}
 --- !u!114 &9006327006082929411
 MonoBehaviour:
   m_ObjectHideFlags: 0

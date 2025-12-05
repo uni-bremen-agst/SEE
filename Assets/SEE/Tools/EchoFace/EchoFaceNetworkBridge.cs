@@ -106,9 +106,9 @@ public class FaceDataUdpPayload
 /// ClientRpc. This class acts as a lightweight input adapter and
 /// performs no animation itself.
 /// </summary>
-public class FaceDataUdpReceiver : NetworkBehaviour
+public class EchoFaceNetworkBridge : NetworkBehaviour
 {
-    [Header("Network Settings")]
+    [Header("Local UDP Listener Settings")]
     [SerializeField]
     private int port = 12345;
 
@@ -149,7 +149,7 @@ public class FaceDataUdpReceiver : NetworkBehaviour
 
             if (echoFace == null)
             {
-                Debug.LogWarning("[FaceDataUdpReceiver] EchoFace was not found on this GameObject.");
+                Debug.LogWarning("[EchoFaceNetworkBridge] EchoFace was not found on this GameObject.");
             }
         }
 
@@ -201,11 +201,11 @@ public class FaceDataUdpReceiver : NetworkBehaviour
             };
 
             _receiveThread.Start();
-            Debug.Log($"[FaceDataUdpReceiver] UDP listener started on port {port}.");
+            Debug.Log($"[EchoFaceNetworkBridge] UDP listener started on port {port}.");
         }
         catch (Exception ex)
         {
-            Debug.LogError($"[FaceDataUdpReceiver] UDP listener failed to start on port {port}: {ex.Message}");
+            Debug.LogError($"[EchoFaceNetworkBridge] UDP listener failed to start on port {port}: {ex.Message}");
         }
     }
 
@@ -239,17 +239,17 @@ public class FaceDataUdpReceiver : NetworkBehaviour
             catch (SocketException ex) when (ex.ErrorCode == 10004)
             {
                 if (_isRunning)
-                    Debug.LogWarning("[FaceDataUdpReceiver] UDP socket was interrupted (normal shutdown).");
+                    Debug.LogWarning("[EchoFaceNetworkBridge] UDP socket was interrupted (normal shutdown).");
             }
             catch (ObjectDisposedException)
             {
                 if (_isRunning)
-                    Debug.LogWarning("[FaceDataUdpReceiver] UDP client was disposed unexpectedly.");
+                    Debug.LogWarning("[EchoFaceNetworkBridge] UDP client was disposed unexpectedly.");
             }
             catch (Exception ex)
             {
                 if (_isRunning)
-                    Debug.LogError($"[FaceDataUdpReceiver] UDP receive error: {ex.Message}");
+                    Debug.LogError($"[EchoFaceNetworkBridge] UDP receive error: {ex.Message}");
             }
         }
     }
@@ -328,7 +328,7 @@ public class FaceDataUdpReceiver : NetworkBehaviour
             _receiveThread.Join(500); // Wait up to 500ms for the thread to exit.
             if (_receiveThread.IsAlive)
             {
-                Debug.LogWarning("[FaceDataUdpReceiver] UDP receive thread did not terminate gracefully.");
+                Debug.LogWarning("[EchoFaceNetworkBridge] UDP receive thread did not terminate gracefully.");
             }
         }
 
@@ -370,7 +370,7 @@ public class FaceDataUdpReceiver : NetworkBehaviour
             echoFace = GetComponent<EchoFace>();
             if (echoFace == null)
             {
-                Debug.LogWarning("[FaceDataUdpReceiver] EchoFace not found on this client when applying networked FaceData.");
+                Debug.LogWarning("[EchoFaceNetworkBridge] EchoFace not found on this client when applying networked FaceData.");
                 return;
             }
         }
@@ -382,7 +382,7 @@ public class FaceDataUdpReceiver : NetworkBehaviour
         }
         catch (Exception ex)
         {
-            Debug.LogWarning($"[FaceDataUdpReceiver] Failed to deserialize FaceDataUdpPayload on client: {ex.Message}");
+            Debug.LogWarning($"[EchoFaceNetworkBridge] Failed to deserialize FaceDataUdpPayload on client: {ex.Message}");
         }
 
         if (payload == null)
