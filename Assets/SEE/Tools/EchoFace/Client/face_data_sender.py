@@ -6,7 +6,7 @@ from typing import Dict, Optional, List
 logger = logging.getLogger(__name__)
 
 # Blendshape order must match BlendshapeOrder.Names in Unity (alphabetical).
-BLENDSHAPE_ORDER = [
+BLENDSHAPE_ORDER = (
     "_neutral",
     "browDownLeft",
     "browDownRight",
@@ -59,7 +59,7 @@ BLENDSHAPE_ORDER = [
     "mouthUpperUpRight",
     "noseSneerLeft",
     "noseSneerRight",
-]
+)
 
 # Landmark IDs used by EchoFace, sorted by numeric size:
 # 152 (Chin), 226 (RightUpperEyelid), 446 (LeftUpperEyelid)
