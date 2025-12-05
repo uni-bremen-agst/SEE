@@ -1,16 +1,81 @@
 import socket
 import json
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Optional, List
 
 logger = logging.getLogger(__name__)
+
+# Blendshape order must match BlendshapeOrder.Names in Unity (alphabetical).
+BLENDSHAPE_ORDER = [
+    "_neutral",
+    "browDownLeft",
+    "browDownRight",
+    "browInnerUp",
+    "browOuterUpLeft",
+    "browOuterUpRight",
+    "cheekPuff",
+    "cheekSquintLeft",
+    "cheekSquintRight",
+    "eyeBlinkLeft",
+    "eyeBlinkRight",
+    "eyeLookDownLeft",
+    "eyeLookDownRight",
+    "eyeLookInLeft",
+    "eyeLookInRight",
+    "eyeLookOutLeft",
+    "eyeLookOutRight",
+    "eyeLookUpLeft",
+    "eyeLookUpRight",
+    "eyeSquintLeft",
+    "eyeSquintRight",
+    "eyeWideLeft",
+    "eyeWideRight",
+    "jawForward",
+    "jawLeft",
+    "jawOpen",
+    "jawRight",
+    "mouthClose",
+    "mouthDimpleLeft",
+    "mouthDimpleRight",
+    "mouthFrownLeft",
+    "mouthFrownRight",
+    "mouthFunnel",
+    "mouthLeft",
+    "mouthLowerDownLeft",
+    "mouthLowerDownRight",
+    "mouthPressLeft",
+    "mouthPressRight",
+    "mouthPucker",
+    "mouthRight",
+    "mouthRollLower",
+    "mouthRollUpper",
+    "mouthShrugLower",
+    "mouthShrugUpper",
+    "mouthSmileLeft",
+    "mouthSmileRight",
+    "mouthStretchLeft",
+    "mouthStretchRight",
+    "mouthUpperUpLeft",
+    "mouthUpperUpRight",
+    "noseSneerLeft",
+    "noseSneerRight",
+]
+
+# Landmark IDs used by EchoFace, sorted by numeric size:
+# 152 (Chin), 226 (RightUpperEyelid), 446 (LeftUpperEyelid)
+LM_ORDER = [152, 226, 446]
 
 
 class FaceDataSender:
     """
     Handles sending blendshape, landmark, and timestamp data over UDP.
 
-    Data is encoded as a JSON string containing blendshapes, landmarks, and timestamp.
+    Data is encoded as a compact JSON object:
+      {
+        "bs": [ ... ],      # blendshapes in fixed alphabetical order
+        "lm": [[x,y,z],...],# 3 landmark vectors (Chin, RightUpperEyelid, LeftUpperEyelid)
+        "ts": 123456789     # timestamp in ms
+      }
     """
 
     def __init__(self, target_ip: str, target_port: int):
@@ -41,7 +106,7 @@ class FaceDataSender:
         timestamp_ms: int,
     ):
         """
-        Sends blendshape, landmark, and timestamp data as JSON over UDP.
+        Sends blendshape, landmark, and timestamp data as compact JSON over UDP.
 
         Args:
             blendshape_data: Dictionary of blendshape names to float scores.
@@ -56,15 +121,30 @@ class FaceDataSender:
             logger.debug("No data to send; skipping UDP packet.")
             return
 
+        # 1) Build ordered list of blendshape values (alphabetical order)
+        bs_values = [float(blendshape_data.get(name, 0.0)) for name in BLENDSHAPE_ORDER]
+
+        # 2) Build landmark list: [[x,y,z], [x,y,z], [x,y,z]]
+        lm_list = []
+        for lm_id in LM_ORDER:
+            coords = landmarks.get(lm_id)
+            if coords is not None:
+                x = float(coords.get("x", 0.0))
+                y = float(coords.get("y", 0.0))
+                z = float(coords.get("z", 0.0))
+            else:
+                x = y = z = 0.0
+            lm_list.append([x, y, z])
+
         combined_data = {
-            "blendshapes": blendshape_data,
-            "landmarks": landmarks,
-            "ts": timestamp_ms,
+            "bs": bs_values,
+            "lm": lm_list,
+            "ts": int(timestamp_ms),
         }
 
         try:
-            json_data = json.dumps(combined_data, separators=(',', ':'))
-            self.sock.sendto(json_data.encode('utf-8'), (self.target_ip, self.target_port))
+            json_data = json.dumps(combined_data, separators=(",", ":"))
+            self.sock.sendto(json_data.encode("utf-8"), (self.target_ip, self.target_port))
         except Exception as e:
             logger.error(f"Failed to send UDP packet: {e}")
 
