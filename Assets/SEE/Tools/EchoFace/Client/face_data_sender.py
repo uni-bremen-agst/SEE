@@ -122,10 +122,10 @@ class FaceDataSender:
             return
 
         # 1) Build ordered list of blendshape values (alphabetical order)
-        bs_values = [float(blendshape_data.get(name, 0.0)) for name in BLENDSHAPE_ORDER]
+        blendshape_values = [float(blendshape_data.get(name, 0.0)) for name in BLENDSHAPE_ORDER]
 
         # 2) Build landmark list: [[x,y,z], [x,y,z], [x,y,z]]
-        lm_list = []
+        landmark_list = []
         for lm_id in LM_ORDER:
             coords = landmarks.get(lm_id)
             if coords is not None:
@@ -134,12 +134,12 @@ class FaceDataSender:
                 z = float(coords.get("z", 0.0))
             else:
                 x = y = z = 0.0
-            lm_list.append([x, y, z])
+            landmark_list.append([x, y, z])
 
         combined_data = {
-            "bs": bs_values,
-            "lm": lm_list,
-            "ts": int(timestamp_ms),
+            "bs": blendshape_values,
+            "lm": landmark_list,
+            "ts": timestamp_ms,
         }
 
         try:
