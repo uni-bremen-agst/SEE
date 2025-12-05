@@ -99,27 +99,25 @@ class FaceDataSender:
             self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             logger.info(f"UDP socket created for {self.target_ip}:{self.target_port}")
 
-    def send_face_data(
+    def _serialize_face_data(
         self,
         blendshape_data: Dict[str, float],
         landmarks: Dict[int, Dict[str, float]],
         timestamp_ms: int,
-    ):
+    ) -> Optional[bytes]:
         """
-        Sends blendshape, landmark, and timestamp data as compact JSON over UDP.
+        Serializes blendshape, landmark, and timestamp data into a compact JSON byte string.
 
         Args:
             blendshape_data: Dictionary of blendshape names to float scores.
             landmarks: Dictionary mapping landmark indices to their 'x', 'y', 'z' coordinates.
             timestamp_ms: Unix timestamp in milliseconds.
-        """
-        if self.sock is None:
-            logger.warning("UDP socket not started; call start() before sending data.")
-            return
 
+        Returns:
+            UTF-8 encoded JSON bytes, or None if there is no data to send.
+        """
         if not blendshape_data and not landmarks:
-            logger.debug("No data to send; skipping UDP packet.")
-            return
+            return None
 
         # 1) Build ordered list of blendshape values (alphabetical order)
         blendshape_values = [float(blendshape_data.get(name, 0.0)) for name in BLENDSHAPE_ORDER]
@@ -144,7 +142,36 @@ class FaceDataSender:
 
         try:
             json_data = json.dumps(combined_data, separators=(",", ":"))
-            self.sock.sendto(json_data.encode("utf-8"), (self.target_ip, self.target_port))
+            return json_data.encode("utf-8")
+        except Exception as e:
+            logger.error(f"Failed to serialize face data: {e}")
+            return None
+
+    def send_face_data(
+        self,
+        blendshape_data: Dict[str, float],
+        landmarks: Dict[int, Dict[str, float]],
+        timestamp_ms: int,
+    ):
+        """
+        Sends blendshape, landmark, and timestamp data as compact JSON over UDP.
+
+        Args:
+            blendshape_data: Dictionary of blendshape names to float scores.
+            landmarks: Dictionary mapping landmark indices to their 'x', 'y', 'z' coordinates.
+            timestamp_ms: Unix timestamp in milliseconds.
+        """
+        if self.sock is None:
+            logger.warning("UDP socket not started; call start() before sending data.")
+            return
+
+        payload = self._serialize_face_data(blendshape_data, landmarks, timestamp_ms)
+        if payload is None:
+            logger.debug("No data to send; skipping UDP packet.")
+            return
+
+        try:
+            self.sock.sendto(payload, (self.target_ip, self.target_port))
         except Exception as e:
             logger.error(f"Failed to send UDP packet: {e}")
 
