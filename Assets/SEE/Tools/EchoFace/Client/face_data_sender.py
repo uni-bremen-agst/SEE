@@ -88,7 +88,7 @@ class FaceDataSender:
         """
         self.target_ip = target_ip
         self.target_port = target_port
-        self.sock = None
+        self.sock: Optional[socket.socket] = None
         logger.info(f"FaceDataSender configured for {target_ip}:{target_port}")
 
     def start(self):
