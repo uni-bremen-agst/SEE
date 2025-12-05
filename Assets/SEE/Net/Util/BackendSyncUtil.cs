@@ -1,15 +1,19 @@
 ﻿using Cysharp.Threading.Tasks;
 using Newtonsoft.Json;
+using OpenAI.Files;
 using SEE.Game.City;
 using SEE.User;
+using SEE.Utils;
 using SEE.Utils.Paths;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.SocialPlatforms;
 
 namespace SEE.Net.Util
 {
@@ -110,6 +114,24 @@ namespace SEE.Net.Util
             }
         }
 
+
+        internal struct ServerSnapshotResponse
+        {
+            [JsonProperty(PropertyName = "id", Required = Required.Always)]
+            public string id;
+
+            [JsonProperty(PropertyName = "creationTime", Required = Required.Always)]
+            public DateTime creationTime;
+
+            [JsonProperty(PropertyName = "size", Required = Required.Always)]
+            public long size;
+
+            public static ServerSnapshotResponse FromJson(string json)
+            {
+                return JsonConvert.DeserializeObject<ServerSnapshotResponse>(json);
+            }
+        }
+
         /// <summary>
         /// Initializes the client by downloading files, synchronizing with the server and instantiating Code Cities.
         /// </summary>
@@ -117,6 +139,132 @@ namespace SEE.Net.Util
         {
             await InitializeCitiesAsync();
             Network.ActionNetworkInst.Value?.SyncClientServerRpc(NetworkManager.Singleton.LocalClientId);
+        }
+
+
+
+        internal static async UniTask CreateServerSnapshotAsync()
+        {
+            Debug.Log("Start city snapshot creation");
+            IEnumerable<ICodeCityPersistence> cityPersitances = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersistence>();
+
+            IList<SEECitySnapshot> snapshots = new List<SEECitySnapshot>();
+
+            foreach (ICodeCityPersistence city in cityPersitances)
+            {
+                SEECitySnapshot snapshot = city.CreateSnapshot();
+                if (snapshot == null)
+                {
+                    Debug.LogWarning("City snapshot is null, skipping.");
+                    continue;
+                }
+                snapshot.CityName = city.GetCityName();
+                snapshots.Add(snapshot);
+            }
+            if (snapshots.Count == 0)
+            {
+                Debug.LogWarning("No cities found, skip saving snapshot.");
+                // Don't send snapshot to backend of no cities exist.
+                return;
+            }
+
+            await SaveSnapshotsAsync(snapshots);
+        }
+
+        /// <summary>
+        /// Downloads a server snapshot file from the backend.
+        /// </summary>
+        /// <param name="snapshot">The snapshot that should be downloaded.</param>
+        /// <returns></returns>
+        internal static async UniTask DownloadSnapshotAsync(ServerSnapshotResponse snapshot)
+        {
+            if (!await LogInAsync())
+            {
+                Debug.LogError("Unable to download files!\n");
+                return;
+            }
+
+            string targetPath = Path.Combine(Application.streamingAssetsPath, serverContentDirectory, "snapshot.seearchive");
+
+            string url = $"{UserSettings.BackendServerAPI}serversnapshot/{snapshot.id}/download";
+            using UnityWebRequest getRequest = UnityWebRequest.Get(url);
+            getRequest.downloadHandler = new DownloadHandlerFile(targetPath);
+            UnityWebRequestAsyncOperation asyncOp = getRequest.SendWebRequest();
+            await asyncOp.ToUniTask();
+
+            if (getRequest.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError(getRequest.error);
+            }
+        }
+
+        /// <summary>
+        /// Compresses and safes a list of <see cref="SEECitySnapshot"/> to the server.
+        /// </summary>
+        /// <param name="snapshot"></param>
+        /// <returns>An empty task.</returns>
+        public static async UniTask SaveSnapshotsAsync(IEnumerable<SEECitySnapshot> snapshot)
+        {
+            string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
+            Directory.CreateDirectory(snapshotsDir);
+
+            foreach (SEECitySnapshot citySnapshot in snapshot)
+            {
+                // Save each city snapshot as a separate zip archive.
+                Debug.Log($"Snapshot City name: {citySnapshot.CityName}, ConfigPath: {citySnapshot.ConfigPath}, GraphPath: {citySnapshot.GraphPath}, LayoutPath: {citySnapshot.LayoutPath}");
+
+                string citySnapshotPath = Path.Combine(snapshotsDir, citySnapshot.CityName);
+                Directory.CreateDirectory(citySnapshotPath);
+                CopyToDir(citySnapshot.ConfigPath, citySnapshotPath);
+                CopyToDir(citySnapshot.GraphPath, citySnapshotPath);
+                CopyToDir(citySnapshot.LayoutPath, citySnapshotPath);
+
+                string targetZipFile = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName(), ".zip");
+                string targetXZFile = targetZipFile + ".xz";
+            }
+
+            string snapshotZipPath = snapshotsDir + ".zip";
+            Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
+
+            string snapshotZipXZPath = snapshotZipPath + ".xz";
+            Compressor.Save(snapshotZipXZPath, snapshotZipPath);
+
+            if (await LogInAsync())
+            {
+                string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId;
+                List<IMultipartFormSection> formSections = new List<IMultipartFormSection>();
+
+                // Create a MultipartForm section with the snapshot file.
+                var bytes = File.ReadAllBytes(snapshotZipXZPath);
+                MultipartFormFileSection fileFormSection = new MultipartFormFileSection("file", bytes, snapshotZipXZPath, "application/octet-stream");
+                formSections.Add(fileFormSection);
+                byte[] boundary = UnityWebRequest.GenerateBoundary();
+                using (UnityWebRequest request = UnityWebRequest.Post(url, formSections, boundary))
+                {
+                    await request.SendWebRequest().ToUniTask();
+                    if (request.result != UnityWebRequest.Result.Success)
+                    {
+                        Debug.LogError($"Failed to upload snapshot: {request.error}");
+                    }
+                    else
+                    {
+                        Debug.Log("Snapshot uploaded successfully.");
+                        try
+                        {
+                            File.Delete(snapshotZipXZPath);
+                        }
+                        catch (Exception)
+                        {
+                            Debug.LogError($"Failed to delete local snapshot after upload: {request.error}");
+                        }
+                    }
+                }
+            }
+
+            void CopyToDir(string file, string targetDir)
+            {
+                File.Copy(file, Path.Combine(targetDir, Path.GetFileName(file)));
+            }
         }
 
         /// <summary>

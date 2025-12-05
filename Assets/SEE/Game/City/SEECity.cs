@@ -9,6 +9,7 @@ using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;
+using SEE.Net;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -31,7 +32,7 @@ namespace SEE.Game.City
     /// Manages settings of the graph data showing a single version of a software
     /// system needed at runtime.
     /// </summary>
-    public class SEECity : AbstractSEECity
+    public class SEECity : AbstractSEECity, ICodeCityPersistence
     {
         /// IMPORTANT NOTE: If you add any attribute that should be persisted in a
         /// configuration file, make sure you save and restore it in
@@ -402,7 +403,7 @@ namespace SEE.Game.City
         }
 
         /// <summary>
-        /// Saves the graph data to a GXL file.
+        /// Saves the graph data to a GXL file which will be written at <see cref="GraphSnapshotPath"/>.
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
@@ -411,9 +412,17 @@ namespace SEE.Game.City
         [Tooltip("Saves the current city (as GXL).")]
         public virtual void SaveData()
         {
+            SaveData(GraphSnapshotPath.Path);
+        }
+
+        /// <summary>
+        /// Saves the graph to a GXL file written at <paramref name="outputFile"/>.
+        /// </summary>
+        /// <param name="outputFile">The path to which the file will be written.</param>
+        private void SaveData(string outputFile)
+        {
             if (LoadedGraph != null)
             {
-                string outputFile = GraphSnapshotPath.Path;
                 if (string.IsNullOrEmpty(outputFile))
                 {
                     ShowNotification.Error("Save Data", $"{nameof(GraphSnapshotPath)} must be set.");
@@ -423,6 +432,7 @@ namespace SEE.Game.City
                 Debug.Log($"Data was saved to '{outputFile}'.\n");
             }
         }
+
         #endregion Load/Save Data
 
         /// <summary>
@@ -541,15 +551,27 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Layout")]
-	[PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
+        [PropertyOrder(DataButtonsGroupOrderSaveLayout), RuntimeGroupOrder(DataButtonsGroupOrderSaveLayout)]
         [Tooltip("Saves the current layout of the city.")]
         [EnableIf(nameof(IsGraphLoadedAndDrawn)), RuntimeEnableIf(nameof(IsGraphLoadedAndDrawn))]
         public void SaveLayout()
         {
             string path = NodeLayoutSettings.LayoutPath.Path;
             Debug.Log($"Saving layout data to {path}.\n");
-            string graphName = LoadedGraph.Name;
-            Writer.Save(path, graphName, AllNodeDescendants(gameObject));
+            SaveLayout(path);
+        }
+
+
+        /// <summary>
+        /// Saves the current layout of the city in a file at <paramref name="filePath"/>.
+        /// The format of the written file depends upon the file extension. If the extension
+        /// is <see cref="Filenames.GVLExtension"/> it is saved in the GVL format; otherwise
+        /// the file is saved in the SLD format.
+        /// </summary>
+        /// <param name="filePath">To path to which write the file to.</param>
+        public void SaveLayout(string filePath)
+        {
+            Writer.Save(filePath, LoadedGraph.Name, AllNodeDescendants(gameObject));
         }
 
         /// <summary>
@@ -763,6 +785,40 @@ namespace SEE.Game.City
             DataProvider =
                 SingleGraphProvider.Restore(attributes, dataProviderPathLabel) as SingleGraphPipelineProvider;
             GraphSnapshotPath.Restore(attributes, graphSnapshotPathLabel);
+        }
+
+        public void LoadFromSnapshot(SEECitySnapshot snapshot)
+        {
+            throw new NotImplementedException();
+        }
+
+        public SEECitySnapshot CreateSnapshot()
+        {
+            if (!IsGraphDrawn)
+            {
+                return null;
+            }
+
+            string configFile = Path.GetTempFileName() + ".cfg";
+            string graphFile = Path.GetTempFileName() + ".gxl";
+            string layoutFile = Path.GetTempFileName() + ".sld";
+
+            SaveData(graphFile);
+            Save(configFile);
+            SaveLayout(layoutFile);
+
+            return new SEECitySnapshot()
+            {
+                CityName = name,
+                ConfigPath = configFile,
+                GraphPath = graphFile,
+                LayoutPath = layoutFile,
+            };
+        }
+
+        public string GetCityName()
+        {
+            return name;
         }
 
         #endregion

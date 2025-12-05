@@ -77,6 +77,16 @@ namespace SEE.Net
                     networkIsSetUp = true;
                 }
             }
+
+            if (IsServer)
+            {
+                InvokeRepeating(nameof(CreateSnapshot), 0, 60);
+            }
+        }
+
+        private void CreateSnapshot()
+        {
+            BackendSyncUtil.CreateServerSnapshotAsync().Forget();
         }
 
 
