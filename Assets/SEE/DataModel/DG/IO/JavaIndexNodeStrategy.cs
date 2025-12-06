@@ -40,8 +40,6 @@ namespace SEE.DataModel.DG.IO
 
             }
             return fullPath;
-            
-
         }
 
         /// <summary>
