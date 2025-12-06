@@ -221,7 +221,7 @@ namespace SEE.GraphProviders
             foreach (KeyValuePair<string, Finding> expected in testFindings)
             {
                 Finding actual = FindActualNode(expected.Value);
-                Assert.NotNull(actual, $"Finding '{expected.Key} ' not found.");
+                Assert.NotNull(actual, $"Finding '{expected.Key}' not found.");
                 AssertFindingMatch(actual, expected.Value);
             }
         }
