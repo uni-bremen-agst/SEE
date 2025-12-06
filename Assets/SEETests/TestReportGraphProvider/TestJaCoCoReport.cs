@@ -190,7 +190,7 @@ namespace SEE.GraphProviders
             // LINE        {missed=0, covered=11}
             // COMPLEXITY  {missed=1, covered=1}
             // METHOD      {missed=0, covered=1}
-            // (kein CLASS-Counter auf Methodenebene)
+            // (no CLASS-counter at method level)
             Finding methodFinding = new Finding
             {
                 FullPath = "org/jacoco/core/tools/ExecFileLoader#save",
