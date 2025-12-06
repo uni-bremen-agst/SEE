@@ -180,7 +180,7 @@ namespace SEE.GO
                 }
                 if (graphElement.GraphElemRef.Elem == null)
                 {
-                    Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
+                    //Debug.LogError($"{nameof(AnyHoverInAsync)} called with null {nameof(GraphElement)}.\n");
                     return false;
                 }
                 if (graphElement.GraphElemRef.Elem.ItsGraph == null)

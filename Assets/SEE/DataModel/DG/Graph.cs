@@ -335,14 +335,22 @@ namespace SEE.DataModel.DG
             {
                 type = RootType;
             }
-            root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
-            AddNode(root);
-            foreach (Node oldRoot in roots)
+            if (roots.Count > 1)
             {
-                root.AddChild(oldRoot);
+                root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
+                AddNode(root);
+                foreach (Node oldRoot in roots)
+                {
+                    root.AddChild(oldRoot);
+                }
+                NodeHierarchyHasChanged = true;
+                return true;
             }
-            NodeHierarchyHasChanged = true;
-            return true;
+            else
+            {
+                root = roots.First();
+                return false;
+            }
         }
 
         /// <summary>
@@ -1073,7 +1081,7 @@ namespace SEE.DataModel.DG
         /// <param name="edgeIdSuffix">Suffix to append to the new edge IDs</param>
         /// <exception cref="InvalidOperationException">When edge-attached nodes couldn't be found in the target graph.
         /// </exception>
-        private void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
+        public void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
         {
             target.edges ??= new Dictionary<string, Edge>();
             foreach (KeyValuePair<string, Edge> entry in edges)
