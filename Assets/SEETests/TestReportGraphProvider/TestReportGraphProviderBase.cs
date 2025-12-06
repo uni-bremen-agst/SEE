@@ -17,17 +17,17 @@ namespace SEE.GraphProviders
 {
     /// <summary>
     /// Abstract base class for testing report parsers.
-    /// 
+    ///
     /// This fixture follows the Template Method pattern: concrete subclasses provide
     /// the specifics (report path, nodes to parse, parsing configuration, node counter,
     /// and a set of expected <see cref="Finding"/> instances), while this base class
     /// provides reusable arrange/act/assert logic and helpful diagnostics for failures.
-    /// 
+    ///
     /// Supported use cases:
     /// - Validating node counts against expectations (per context and total).
     /// - Verifying selected, representative <see cref="Finding"/> instances including
     ///   their location data and metric dictionaries.
-    /// 
+    ///
     /// Contract for subclasses:
     /// - Return consistent relative paths via <see cref="GetRelativeReportPath"/>.
     /// - Provide a matching <see cref="ParsingConfig"/> that can produce an <see cref="IReportParser"/>.
@@ -47,10 +47,10 @@ namespace SEE.GraphProviders
         protected abstract string GetRelativeReportPath();
 
         /// <summary>
-        /// Returns the glx path relative to <see cref="Application.streamingAssetsPath"/>.
+        /// Returns the GLX path relative to <see cref="Application.streamingAssetsPath"/>.
         /// Leading slashes and backslashes are ignored.
         /// </summary>
-        /// <returns>Glx path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
+        /// <returns>GLX path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
         protected abstract string GetRelativeGlxPath();
 
         /// <summary>
@@ -93,7 +93,7 @@ namespace SEE.GraphProviders
         private string fullReportPath;
 
         /// <summary>
-        /// Absolute path to the Glx file for the current test run
+        /// Absolute path to the GLX file for the current test run.
         /// </summary>
         private string fullGlxPath;
 
@@ -144,17 +144,19 @@ namespace SEE.GraphProviders
         {
             metricSchema = null;
         }
+
         /// <summary>
         /// Parses the configured report file into a <see cref="MetricSchema"/>.
-        /// 
+        ///
         /// Validates that:
         /// - The parsing config is provided.
         /// - The config can create a parser instance.
         /// </summary>
-        /// <returns>A task that represents the asynchronous parse operation. The task result is the parsed metric schema.</returns>
+        /// <returns>A task that represents the asynchronous parse operation.
+        /// The task result is the parsed metric schema.</returns>
         private async UniTask<MetricSchema> BuildMetricSchemaAsync()
         {
-            DataPath reportDataPath = new DataPath(fullReportPath);
+            DataPath reportDataPath = new(fullReportPath);
 
             ParsingConfig config = GetParsingConfig();
             Assert.NotNull(config, "GetParsingConfig() returned null.");
@@ -225,7 +227,7 @@ namespace SEE.GraphProviders
         }
 
         /// <summary>
-        /// Searches for the expected Finding in the actual MetricSchema. 
+        /// Searches for the expected Finding in the actual MetricSchema.
         /// Findings can be identified by FullPath and StartLine.
         /// </summary>
         /// <param name="expected"></param>
@@ -237,11 +239,10 @@ namespace SEE.GraphProviders
                 f.Location?.StartLine == expected.Location?.StartLine);
         }
 
-
         /// <summary>
         /// Asserts that two findings are equivalent for the properties that the expected
         /// instance specifies (context, location members, metrics).
-        /// 
+        ///
         /// The comparison is opt-in per field: if an expected sub-value is null or missing,
         /// it is not asserted.
         /// </summary>
@@ -347,13 +348,12 @@ namespace SEE.GraphProviders
             metricSchema = await BuildMetricSchemaAsync();
             Dictionary<string, Finding> expectedFindings = GetTestFindings();
 
-            DataPath gxlPath = new DataPath(fullGlxPath);
-            graph = await LoadGraphAsync(gxlPath);
+            graph = await LoadGraphAsync(new DataPath(fullGlxPath));
 
             ParsingConfig parsingConfig = GetParsingConfig();
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
 
-            SourceRangeIndex index = new SourceRangeIndex(graph, indexNodeStrategy.NodeIdToMainType);
+            SourceRangeIndex index = new(graph, indexNodeStrategy.NodeIdToMainType);
 
             MetricApplier.ApplyMetrics(graph, metricSchema, parsingConfig);
 
