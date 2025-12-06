@@ -31,17 +31,6 @@ namespace SEE.DataModel.DG.IO
         internal abstract IReportParser CreateParser();
 
         /// <summary>
-        /// Helper for callers that only need the textual tool identifier.
-        /// </summary>
-        /// <returns>
-        /// The identifier of the tool. The returned string is never null.
-        /// </returns>
-        public string GetToolId()
-        {
-            return ToolId;
-        }
-
-        /// <summary>
         /// Creates the concrete index strategy that is used to find nodes in a <c>SourceRangeIndex</c>.
         /// The returned strategy instance must not be null.
         /// </summary>
