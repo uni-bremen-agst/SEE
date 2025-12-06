@@ -365,7 +365,7 @@ namespace SEE.Game.CityRendering
             float i = 0;
             ICollection<GameObject> result = await edgeFactory.DrawEdges(gameNodes, layoutEdges)
                                                               .Pipe(_ => updateProgress?.Invoke(0.5f * ++i / totalEdges))
-                                                              .BatchPerFrame(cancellationToken: token)
+                                                              .BatchPerFrame(token: token)
                                                               .ToListAsync(cancellationToken: token);
             if (addToGraphElementIDMap)
             {

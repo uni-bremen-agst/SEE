@@ -54,10 +54,8 @@ namespace SEE.DataModel.DG.IO
             // Go through all nodes, checking whether any metric in the dashboard matches it.
             await foreach (Node node in nodes.BatchPerFrame())
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
+
                 changePercentage?.Invoke(++i / nodes.Count);
                 string nodePath = $"{node.RelativeDirectory(projectFolder)}{node.Filename ?? string.Empty}";
                 if (metrics.TryGetValue((nodePath, node.SourceName), out List<MetricValueTableRow> metricValues))
@@ -236,10 +234,8 @@ namespace SEE.DataModel.DG.IO
             int lineCount = 1;
 
             await csv.ReadAsync();
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+            token.ThrowIfCancellationRequested();
+
             if (csv.ReadHeader())
             {
                 string[] header = csv.HeaderRecord;
@@ -260,10 +256,8 @@ namespace SEE.DataModel.DG.IO
                 }
                 while (await csv.ReadAsync())
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(token);
-                    }
+                    token.ThrowIfCancellationRequested();
+
                     lineCount++;
                     string id = csv.GetField<string>(IDColumnName);
 

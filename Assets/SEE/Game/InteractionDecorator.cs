@@ -100,7 +100,7 @@ namespace SEE.Game
             // In the editor, requirements for FPS are significantly lower than in-game.
             int batchSize = Application.isPlaying ? 200 : 1000;
             float i = 0;
-            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, cancellationToken: token))
+            await foreach (GameObject go in gameObjects.BatchPerFrame(batchSize, token: token))
             {
                 PrepareGraphElementForInteraction(go);
                 updateProgress(++i / totalGameObjects);
