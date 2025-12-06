@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.GameObjects.BranchCity
 {
     /// <summary>
     /// Attributes of an author sphere.

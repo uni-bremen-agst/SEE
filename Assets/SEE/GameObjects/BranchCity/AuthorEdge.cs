@@ -4,7 +4,7 @@ using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.GameObjects.BranchCity
 {
     /// <summary>
     /// Attribute of an author edge connecting an <see cref="AuthorSphere"/>
@@ -52,7 +52,7 @@ namespace SEE.GameObjects
         /// <param name="isHovered">whether any end of the edge (author or file node) is currently hovered</param>
         internal void ShowOrHide(bool isHovered)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity)
+            if (gameObject.ContainingCity() is Game.City.BranchCity branchCity)
             {
                 bool show = branchCity.ShowAuthorEdges switch
                 {
@@ -95,7 +95,7 @@ namespace SEE.GameObjects
         /// <returns>True if the visibility of the line renderer was changed; otherwise, false.</returns>
         internal bool UpdateVisibility(int numberOfAuthors)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity
+            if (gameObject.ContainingCity() is Game.City.BranchCity branchCity
                 && branchCity.ShowAuthorEdges == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
             {
                 if (TryGetComponent(out LineRenderer lineRenderer))

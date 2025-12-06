@@ -5,7 +5,7 @@ using SEE.GO;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 
-namespace SEE.GameObjects
+namespace SEE.GameObjects.BranchCity
 {
     /// <summary>
     /// Holds the connections of a file to all its authors.
@@ -42,7 +42,7 @@ namespace SEE.GameObjects
         private void UpdateEdges()
         {
             UpdateEdgeVisibility();
-            UpdateConflictVisibility();
+            UpdateConflictVisibility(false); // FIXME
         }
 
         /// <summary>
