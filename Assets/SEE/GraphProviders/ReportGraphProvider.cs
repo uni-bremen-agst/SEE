@@ -59,7 +59,7 @@ namespace SEE.GraphProviders
             CheckArguments(city);
             if (graph == null)
             {
-                throw new NotImplementedException();
+                throw new NotImplementedException("ReportGraphProvider requires an existing graph to apply metrics to. Creating a new graph from a report is not currently supported.");
             }
 
             await UniTask.SwitchToThreadPool();
