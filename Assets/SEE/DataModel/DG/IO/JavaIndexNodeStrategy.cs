@@ -33,7 +33,7 @@ namespace SEE.DataModel.DG.IO
 
             bool isMethod = fullPath.IndexOf(MethodDelimiter) > -1;
 
-            // 2. replacing methodDelimiter
+            // 2. Replacing methodDelimiter
             if (isMethod)
             {
                 fullPath = fullPath.Replace(MethodDelimiter.ToString(), ".~") + "()";
