@@ -48,11 +48,11 @@ namespace SEE.GraphProviders
         /// <exception cref="NotImplementedException">
         /// Thrown if <paramref name="graph"/> is null; this is currently not supported.
         /// </exception>
-        public override async UniTask<Graph> ProvideAsync(
-            Graph graph,
-            AbstractSEECity city,
-            Action<float> _changePercentage = null,
-            CancellationToken token = default)
+        public override async UniTask<Graph> ProvideAsync
+            (Graph graph,
+             AbstractSEECity city,
+             Action<float> _changePercentage = null,
+             CancellationToken token = default)
         {
             token.ThrowIfCancellationRequested();
 
