@@ -220,7 +220,7 @@ namespace SEE.Game.City
             {
                 if (poller != null)
                 {
-                    poller.Stop();
+                    StopPoller();
                 }
                 else
                 {
