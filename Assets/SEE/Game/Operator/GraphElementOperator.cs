@@ -324,6 +324,10 @@ namespace SEE.Game.Operator
             // we also need to set highlighted to true here.
             highlightEffect.highlighted = true;
             highlightEffect.iconFX = true;
+            // From the Highlight documentation: When changing specific script properties
+            // at runtime, call UpdateMaterialProperties() to ensure those changes are
+            // applied immediately.
+            highlightEffect.UpdateMaterialProperties();
         }
 
         /// <summary>
