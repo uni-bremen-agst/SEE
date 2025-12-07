@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using SEE.Game.Operator;
 using SEE.GO;
-using Sirenix.OdinInspector;
 using Sirenix.Serialization;
 
 namespace SEE.GameObjects.BranchCity
@@ -11,7 +10,7 @@ namespace SEE.GameObjects.BranchCity
     /// Holds the connections of a file to all its authors.
     /// This component will be attached to all file game nodes in a <see cref="BranchCity"/>.
     /// </summary>
-    public class AuthorRef : SerializedMonoBehaviour, IEnumerable<AuthorEdge>
+    public class AuthorRef : VCSDecorator, IEnumerable<AuthorEdge>
     {
         /// <summary>
         /// The edges to the authors of this specific file.
@@ -42,16 +41,17 @@ namespace SEE.GameObjects.BranchCity
         private void UpdateEdges()
         {
             UpdateEdgeVisibility();
-            UpdateConflictVisibility(false); // FIXME
+            UpdateConflictVisibility();
         }
 
         /// <summary>
-        /// If there are more than one edge, the highlight effect for a potential
-        /// edit conflict is turned on; otherwise it is turned off.
+        /// If there is more than one edge and conflict markers are enabled,
+        /// the highlight effect for a potential edit conflict is turned on;
+        /// otherwise it is turned off.
         /// </summary>
-        public void UpdateConflictVisibility(bool enableConflictMarkers)
+        public void UpdateConflictVisibility()
         {
-            if (enableConflictMarkers && edges.Count > 1)
+            if (City.EnableConflictMarkers && edges.Count > 1)
             {
                 gameObject.AddOrGetComponent<NodeOperator>().EnableDynamicMark();
             }

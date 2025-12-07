@@ -13,7 +13,7 @@ namespace SEE.GameObjects.BranchCity
     /// Attributes of an author sphere.
     /// </summary>
     /// <remarks>This component will be attached to all author spheres.</remarks>
-    public class AuthorSphere : SerializedMonoBehaviour
+    public class AuthorSphere : VCSDecorator
     {
         /// <summary>
         /// The identity of the author.
