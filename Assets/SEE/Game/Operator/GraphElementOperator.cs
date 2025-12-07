@@ -298,6 +298,26 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
+        /// Name of the file containing the prefab for dynamic markers.
+        /// Used for <see cref="highlightEffect.iconFXPrefab"/>.
+        /// </summary>
+        private const string dynamicMarkerPrefabFile = "Prefabs/DynamicMarker";
+
+        private static GameObject dynamicMarkerPrefab;
+
+        private static GameObject DynamicMarkerPrefab
+        {
+            get
+            {
+                if (dynamicMarkerPrefab == null)
+                {
+                    dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile, null, false);
+                }
+                return dynamicMarkerPrefab;
+            }
+        }
+
+        /// <summary>
         /// Enables an icon floating above the associated graph element this operator is attached to.
         /// </summary>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
@@ -308,6 +328,8 @@ namespace SEE.Game.Operator
         public void EnableDynamicMark(float factor = 0.5f, float duration = float.PositiveInfinity)
         {
             // FIXME: The icon's mesh must respect the portal.
+            highlightEffect.iconFXAssetType = IconAssetType.Prefab;
+            highlightEffect.iconFXPrefab = DynamicMarkerPrefab; // FIXME: Clone this instance. Make it a child. Set Portal.
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
             highlightEffect.iconFXDarkColor = UnityEngine.Color.yellow;
             // The iconFXOffset is relative to the object, that is, not world space.
