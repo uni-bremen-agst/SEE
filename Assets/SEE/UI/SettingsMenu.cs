@@ -277,7 +277,10 @@ namespace SEE.UI
         }
 
         /// <summary>
-        ///
+        /// Initializes the LiveKit settings UI in the SettingsMenu.
+        /// This includes binding input fields to <see cref="UserSettings.Instance.Video"/>,
+        /// setting up connect/disconnect/share buttons, and disabling keyboard shortcuts
+        /// while typing in the fields.
         /// </summary>
         private void InitializeLiveKitSettings()
         {
