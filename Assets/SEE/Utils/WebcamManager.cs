@@ -223,5 +223,38 @@ namespace SEE.Utils
                 usageCount = 0;
             }
         }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Resets all static state of the <see cref="WebcamManager"/> when entering Play Mode
+        /// inside the Unity Editor.
+        ///
+        /// This is required because Unity may keep static fields alive between Play Mode sessions
+        /// when "Enter Play Mode Options" (without Domain Reload) are enabled.
+        /// In such cases, previously created <see cref="WebCamTexture"/> instances
+        /// become destroyed Unity objects, causing <see cref="MissingReferenceException"/>
+        /// when the manager attempts to access them.
+        ///
+        /// By clearing all cached webcam objects before each Play Mode run, the manager
+        /// is forced to perform a clean reinitialization and avoids referencing
+        /// destroyed <see cref="WebCamTexture"/> instances.
+        ///
+        /// This logic runs only inside the Unity Editor and has no effect in builds.
+        /// </summary>
+        [UnityEditor.InitializeOnLoadMethod]
+        private static void ResetEditorStatics()
+        {
+            UnityEditor.EditorApplication.playModeStateChanged += state =>
+            {
+                if (state == UnityEditor.PlayModeStateChange.EnteredPlayMode)
+                {
+                    webcams.Clear();
+                    usageCount = 0;
+                    activeIndex = 0;
+                }
+            };
+        }
+#endif
+
     }
 }
