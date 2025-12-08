@@ -297,6 +297,71 @@ namespace SEE.Game.Operator
             highlightEffect.HitFX();
         }
 
+        /// <summary>
+        /// Name of the file containing the prefab for dynamic markers.
+        /// Used for <see cref="highlightEffect.iconFXPrefab"/>.
+        /// </summary>
+        private const string dynamicMarkerPrefabFile = "Prefabs/DynamicMarker";
+
+        private static GameObject dynamicMarkerPrefab;
+
+        private static GameObject DynamicMarkerPrefab
+        {
+            get
+            {
+                if (dynamicMarkerPrefab == null)
+                {
+                    dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile, null, false);
+                }
+                return dynamicMarkerPrefab;
+            }
+        }
+
+        /// <summary>
+        /// Enables an icon floating above the associated graph element this operator is attached to.
+        /// </summary>
+        /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
+        /// that controls the animation duration.
+        /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
+        /// </param>
+        /// <param name="duration">Duration of the animation.</param>
+        public void EnableDynamicMark(float factor = 0.5f, float duration = float.PositiveInfinity)
+        {
+            // FIXME: The icon's mesh must respect the portal.
+            highlightEffect.iconFXAssetType = IconAssetType.Prefab;
+            highlightEffect.iconFXPrefab = DynamicMarkerPrefab; // FIXME: Clone this instance. Make it a child. Set Portal.
+            highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
+            highlightEffect.iconFXDarkColor = UnityEngine.Color.yellow;
+            // The iconFXOffset is relative to the object, that is, not world space.
+            highlightEffect.iconFXOffset = Vector3.zero;
+            highlightEffect.iconFXRotationSpeed = 0f;
+            highlightEffect.iconFXAnimationOption = IconAnimationOption.VerticalBounce;
+            highlightEffect.iconFXAnimationAmount = 0.1f;
+            highlightEffect.iconFXAnimationSpeed = ToDuration(factor);
+            highlightEffect.iconFXScale = 0.2f;
+            highlightEffect.iconFXStayDuration = duration;
+            // It is not suffient to only activate iconFX. This field means
+            // only that the icon should be used when the object is highlighted;
+            // it doesn't mean that it is actually highlighted. That is why
+            // we also need to set highlighted to true here.
+            highlightEffect.highlighted = true;
+            highlightEffect.iconFX = true;
+            // From the Highlight documentation: When changing specific script properties
+            // at runtime, call UpdateMaterialProperties() to ensure those changes are
+            // applied immediately.
+            highlightEffect.UpdateMaterialProperties();
+        }
+
+        /// <summary>
+        /// Disables the icon floating above the associated graph element this operator is attached to.
+        /// </summary>
+        public void DisableDynamicMark()
+        {
+            // We do not set highlighted to false here because there might be
+            // other reasons why the object is highlighted.
+            highlightEffect.iconFX = false;
+        }
+
         #endregion
 
         /// <summary>

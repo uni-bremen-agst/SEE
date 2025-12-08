@@ -5,6 +5,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;

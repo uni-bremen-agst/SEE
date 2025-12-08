@@ -1,17 +1,16 @@
 using SEE.Game.City;
 using SEE.GO;
-using Sirenix.OdinInspector;
 using System;
 using UnityEngine;
 
-namespace SEE.GameObjects
+namespace SEE.GameObjects.BranchCity
 {
     /// <summary>
     /// Attribute of an author edge connecting an <see cref="AuthorSphere"/>
     /// to <see cref="AuthorRef"/>.
     /// </summary>
     /// <remarks>This component will be attached to connections between authors and their edited files.</remarks>
-    public class AuthorEdge : SerializedMonoBehaviour
+    public class AuthorEdge : VCSDecorator
     {
         /// <summary>
         /// Reference to the target node this edge connects to.
@@ -52,7 +51,7 @@ namespace SEE.GameObjects
         /// <param name="isHovered">whether any end of the edge (author or file node) is currently hovered</param>
         internal void ShowOrHide(bool isHovered)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity)
+            if (gameObject.ContainingCity() is Game.City.BranchCity branchCity)
             {
                 bool show = branchCity.ShowAuthorEdges switch
                 {
@@ -95,13 +94,13 @@ namespace SEE.GameObjects
         /// <returns>True if the visibility of the line renderer was changed; otherwise, false.</returns>
         internal bool UpdateVisibility(int numberOfAuthors)
         {
-            if (gameObject.ContainingCity() is BranchCity branchCity
-                && branchCity.ShowAuthorEdges == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
+            if (City != null
+                && City.ShowAuthorEdges == ShowAuthorEdgeStrategy.ShowOnHoverOrWithMultipleAuthors)
             {
                 if (TryGetComponent(out LineRenderer lineRenderer))
                 {
                     bool isLineVisible = lineRenderer.enabled;
-                    lineRenderer.enabled = numberOfAuthors >= branchCity.AuthorThreshold;
+                    lineRenderer.enabled = numberOfAuthors >= City.AuthorThreshold;
                     return isLineVisible != lineRenderer.enabled;
                 }
             }

@@ -191,7 +191,8 @@ namespace SEE.GO
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
-        /// <param name="tag">tag the descendants must have</param>
+        /// <param name="gameObject">The game object whose children are requested.</param>
+        /// <param name="tag">The tag the descendants must have.</param>
         /// <returns>all transitive children with <paramref name="tag"/></returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
@@ -207,6 +208,26 @@ namespace SEE.GO
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Applies <paramref name="action"/> to all (transitive) descendants of <paramref name="root"/>
+        /// (including <paramref name="root"/>) if they have the given <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object on which to apply the <paramref name="action"/>.</param>
+        /// <param name="tag">The tag the descendants must have.</param>
+        /// <param name="action">The action to be applied.</param>
+        public static void ApplyToAllDescendants(this GameObject root, string tag, Action<GameObject> action)
+        {
+            if (root.CompareTag(tag))
+            {
+                action(root);
+            }
+
+            foreach (Transform child in root.transform)
+            {
+                child.gameObject.ApplyToAllDescendants(tag, action);
+            }
         }
 
         /// <summary>
