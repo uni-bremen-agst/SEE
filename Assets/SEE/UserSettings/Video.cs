@@ -24,19 +24,19 @@ namespace SEE.User
         /// The WebSocket URL of the LiveKit server to connect to.
         /// </summary>
         [Tooltip("The WebSocket URL of the LiveKit server to connect to."), ShowInInspector]
-        public string LiveKitUrl { get; set; } = "ws://localhost:7880";
+        public string LiveKitUrl { get; set; } = string.Empty;
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
         /// </summary>
         [Tooltip("The URL used to fetch the access token required for authentication."), ShowInInspector]
-        public string TokenUrl { get; set; } = "http://localhost:3000";
+        public string TokenUrl { get; set; } = string.Empty;
 
         /// <summary>
         /// The room name to join in LiveKit.
         /// </summary>
         [Tooltip("The room name to join in LiveKit."), ShowInInspector]
-        public string RoomName { get; set; } = "development";
+        public string RoomName { get; set; } = string.Empty;
 
         /// <summary>
         /// Initializes Unity-dependent default values of the video settings.

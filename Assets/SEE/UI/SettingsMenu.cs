@@ -13,6 +13,7 @@ using SEE.Net.Actions;
 using SEE.Tools.LiveKit;
 using SEE.UI.Menu;
 using SEE.UI.Notification;
+using SEE.User;
 using SEE.Utils;
 using SEE.Utils.Extensions;
 using TMPro;
@@ -281,11 +282,11 @@ namespace SEE.UI
         private void InitializeLiveKitSettings()
         {
             // InputFields of the LiveKit settings.
-            liveKitURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.LiveKitURL)
+            liveKitURLInputField = settingsMenuGameObject.FindDescendant("LiveKitURL")
                 .GetComponentInChildren<TMP_InputField>();
-            tokenURLInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.TokenURL)
+            tokenURLInputField = settingsMenuGameObject.FindDescendant("TokenURL")
                 .GetComponentInChildren<TMP_InputField>();
-            roomNameInputField = settingsMenuGameObject.FindDescendant(PlayerPrefsKeys.RoomName)
+            roomNameInputField = settingsMenuGameObject.FindDescendant("RoomName")
                 .GetComponentInChildren<TMP_InputField>();
 
             // Buttons and importent GameObjects of the LiveKit settings page.
@@ -307,29 +308,29 @@ namespace SEE.UI
                 DisableShortcutsWhileTyping(roomNameInputField);
 
                 // Bind input fields to depending attributes
-                liveKitURLInputField.onValueChanged.AddListener(input =>
+                liveKitURLInputField.onEndEdit.AddListener(input =>
                 {
-                    liveKitVideoManager.LiveKitUrl = input;
-                    SaveToPlayerPrefs(PlayerPrefsKeys.LiveKitURL);
+                    UserSettings.Instance.Video.LiveKitUrl = input;
+                    UserSettings.Instance.Save();
                 });
 
-                tokenURLInputField.onValueChanged.AddListener(input =>
+                tokenURLInputField.onEndEdit.AddListener(input =>
                 {
-                    liveKitVideoManager.TokenUrl = input;
-                    SaveToPlayerPrefs(PlayerPrefsKeys.TokenURL);
+                    UserSettings.Instance.Video.TokenUrl = input;
+                    UserSettings.Instance.Save();
                 });
 
-                roomNameInputField.onValueChanged.AddListener(input =>
+                roomNameInputField.onEndEdit.AddListener(input =>
                 {
-                    liveKitVideoManager.RoomName = input;
-                    SaveToPlayerPrefs(PlayerPrefsKeys.RoomName);
+                    UserSettings.Instance.Video.RoomName = input;
+                    UserSettings.Instance.Save();
                 });
 
                 share.clickEvent.AddListener(() =>
                 {
-                    new LiveKitSettingsNetAction(liveKitVideoManager.LiveKitUrl,
-                                                 liveKitVideoManager.TokenUrl,
-                                                 liveKitVideoManager.RoomName).Execute();
+                    new LiveKitSettingsNetAction(UserSettings.Instance.Video.LiveKitUrl,
+                                                 UserSettings.Instance.Video.TokenUrl,
+                                                 UserSettings.Instance.Video.RoomName).Execute();
                 });
 
                 connect.clickEvent.AddListener(() =>
@@ -381,22 +382,6 @@ namespace SEE.UI
                 }
             }
 
-            void SaveToPlayerPrefs(string keyword)
-            {
-                switch (keyword)
-                {
-                    case PlayerPrefsKeys.LiveKitURL:
-                        PlayerPrefs.SetString(PlayerPrefsKeys.LiveKitURL, liveKitVideoManager.LiveKitUrl);
-                        break;
-                    case PlayerPrefsKeys.TokenURL:
-                        PlayerPrefs.SetString(PlayerPrefsKeys.TokenURL, liveKitVideoManager.TokenUrl);
-                        break;
-                    case PlayerPrefsKeys.RoomName:
-                        PlayerPrefs.SetString(PlayerPrefsKeys.RoomName, liveKitVideoManager.RoomName);
-                        break;
-                }
-            }
-
             static void DisableShortcutsWhileTyping(TMP_InputField inputField)
             {
                 inputField.onSelect.AddListener(input => SEEInput.KeyboardShortcutsEnabled = false);
@@ -406,18 +391,13 @@ namespace SEE.UI
 
         /// <summary>
         /// Updates the UI input fields with the current LiveKit configuration
-        /// retrieved from the local player's <see cref="LiveKitVideoManager"/>.
-        /// If available, the LiveKit URL, token URL, and room name are copied
-        /// into their corresponding input fields.
+        /// retrieved from the <see cref="UserSettings"/>.
         /// </summary>
         public void UpdateLiveKitSettings()
         {
-            if (LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
-            {
-                liveKitURLInputField.text = manager.LiveKitUrl;
-                tokenURLInputField.text = manager.TokenUrl;
-                roomNameInputField.text = manager.RoomName;
-            }
+            liveKitURLInputField.text = UserSettings.Instance.Video.LiveKitUrl;
+            tokenURLInputField.text = UserSettings.Instance.Video.TokenUrl;
+            roomNameInputField.text = UserSettings.Instance.Video.RoomName;
         }
 
         /// <summary>

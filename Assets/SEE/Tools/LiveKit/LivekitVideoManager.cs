@@ -6,6 +6,7 @@ using SEE.Game;
 using SEE.GO;
 using SEE.UI;
 using SEE.UI.Notification;
+using SEE.User;
 using SEE.Utils;
 using System.Collections;
 using System.Collections.Generic;
@@ -27,20 +28,23 @@ namespace SEE.Tools.LiveKit
     {
         /// <summary>
         /// The URL of the LiveKit server to connect to. This is a websocket URL.
+        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
         /// </summary>
-        [Tooltip("The URL of the LiveKit server to connect to. A websocket URL.")]
+        [Tooltip("The URL of the LiveKit server to connect to. A websocket URL. Will only be used if no UserSettings Video entry exists.")]
         public string LiveKitUrl = "ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
+        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
         /// </summary>
-        [Tooltip("The URL used to fetch the access token required for authentication.")]
+        [Tooltip("The URL used to fetch the access token required for authentication. Will only be used if no UserSettings Video entry exists.")]
         public string TokenUrl = "http://localhost:3000";
 
         /// <summary>
         /// The room name to join in LiveKit.
+        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
         /// </summary>
-        [Tooltip("The room name to join in LiveKit.")]
+        [Tooltip("The room name to join in LiveKit. Will only be used if no UserSettings Video entry exists.")]
         public string RoomName = "development";
 
         /// <summary>
@@ -90,16 +94,19 @@ namespace SEE.Tools.LiveKit
         /// </summary>
         private void Start()
         {
-            if (!User.UserSettings.IsDesktop)
+            if (!UserSettings.IsDesktop)
             {
                 gameObject.SetActive(false);
             }
             else
             {
                 UpdateSettings(
-                    liveKitURL: PlayerPrefs.GetString(PlayerPrefsKeys.LiveKitURL, LiveKitUrl),
-                    tokenURL: PlayerPrefs.GetString(PlayerPrefsKeys.TokenURL, TokenUrl),
-                    roomName: PlayerPrefs.GetString(PlayerPrefsKeys.RoomName, RoomName));
+                    liveKitURL: UserSettings.Instance.Video.LiveKitUrl != string.Empty?
+                        UserSettings.Instance.Video.LiveKitUrl : LiveKitUrl,
+                    tokenURL: UserSettings.Instance.Video.TokenUrl != string.Empty ?
+                        UserSettings.Instance.Video.TokenUrl : TokenUrl,
+                    roomName: UserSettings.Instance.Video.RoomName != string.Empty ?
+                        UserSettings.Instance.Video.RoomName : RoomName);
             }
         }
 
@@ -166,9 +173,9 @@ namespace SEE.Tools.LiveKit
         /// <param name="roomName">The name of the LiveKit room to join.</param>
         public void UpdateSettings(string liveKitURL, string tokenURL, string roomName)
         {
-            LiveKitUrl = liveKitURL;
-            TokenUrl = tokenURL;
-            RoomName = roomName;
+            UserSettings.Instance.Video.LiveKitUrl = liveKitURL;
+            UserSettings.Instance.Video.TokenUrl = tokenURL;
+            UserSettings.Instance.Video.RoomName = roomName;
 
             if (LocalPlayer.TryGetSettingsMenu(out SettingsMenu menu))
             {
