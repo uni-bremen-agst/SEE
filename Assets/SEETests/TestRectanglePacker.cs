@@ -234,6 +234,14 @@ namespace SEE.Layout.RectanglePacking
       Assert.That(EqualLists(tree.FreeLeaves, new List<PNode>() { K, H, Fright }), Is.True);
     }
 
+    [Test]
+    public void TestObvious()
+    {
+      Assert.True(true);
+      var a = new Vector2(5.0f, 5.0f) - new Vector2(10.0f, 10.0f);
+      Debug.Log(a);
+    }
+
     /// <summary>
     /// Let's us explore performance issues.
     /// </summary>
@@ -276,10 +284,10 @@ namespace SEE.Layout.RectanglePacking
 
       foreach (var entry in packer3.layoutResult.ToList())
       {
-        if (entry.Key.ID == "2")
+        if (entry.Key.ID == "1")
         {
           Debug.Log("here");
-          ILayoutNode vertex = new LayoutVertex(new Vector3(9, 1, 7), 2);
+          ILayoutNode vertex = new LayoutVertex(new Vector3(3, 1, 3), 1);
           // Remove the old key and add the new key-value pair
           packer3.layoutResult.Remove(entry.Key);
           packer3.layoutResult[vertex] = entry.Value;
@@ -361,7 +369,6 @@ namespace SEE.Layout.RectanglePacking
         secondLayout[root] = new NodeTransform(0, 0, new Vector3(area2.x, root.AbsoluteScale.y, area2.y));
       }
        */
-
 
       //*************************************************************************************************************
       RectanglePackingNodeLayout2.tree.Print();

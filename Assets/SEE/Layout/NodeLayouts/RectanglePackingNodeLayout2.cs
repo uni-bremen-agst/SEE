@@ -765,6 +765,8 @@ namespace SEE.Layout.NodeLayouts
               bestRatio = entry.Value;
             }
           }
+
+          
         }
         /*
         // Place el into targetNode.

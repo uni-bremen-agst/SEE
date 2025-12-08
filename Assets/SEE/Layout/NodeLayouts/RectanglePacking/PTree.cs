@@ -278,6 +278,21 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     //************************************************************************************************************************************
 
+
+    public void GrowLeaf(PNode leaf, Vector3 newScale)
+    {
+      var oldSize = leaf.Rectangle.Size;
+      leaf.Rectangle.Size = new Vector2(
+          newScale.x + 0.1f,
+          newScale.z + 0.1f
+      );
+      var deltaSize = leaf.Rectangle.Size - oldSize;
+
+      PropagateGrowUp(leaf, deltaSize);
+    }
+
+
+    /*
     public void GrowLeaf(PNode leaf, Vector3 newScale)
     {
       leaf.Rectangle.Size.x = newScale.x + 0.1f;
@@ -285,9 +300,6 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
       propagateResizeUp(leaf);
     }
-
-
-    /*
     public void propagateResizeUp(PNode node)
     {
       
@@ -328,7 +340,33 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
     }
      */
     /*
-    public void PropagateGrowUp(PNode node)
+    public void PropagateGrowUp(PNode node, Vector2 delta)
+    {
+      // Wenn wir bereits an der Wurzel sind → fertig.
+      if (node.Parent == null)
+        return;
+
+      PNode parent = node.Parent;
+      PNode sibling = parent.Left == node ? parent.Right : parent.Left;
+
+      // ------------------------------------------------------------
+      // 1) Konflikte zwischen node und seinem sibling lösen
+      // ------------------------------------------------------------
+      if (sibling != null)
+        ResolveConflict(node, sibling);
+
+      // ------------------------------------------------------------
+      // 2) Parent vergrößern, sodass beide Kinder hineinpassen
+      // ------------------------------------------------------------
+      ExpandParentToFitChildren(parent);
+
+      // ------------------------------------------------------------
+      // 3) Weiter nach oben propagieren
+      // ------------------------------------------------------------
+      PropagateGrowUp(parent, delta);
+    }
+     */
+    public void PropagateGrowUp(PNode node, Vector2 delta)
     {
       if (node.Parent == null)
         return;
@@ -338,43 +376,303 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       PNode right = parent.Right;
 
       bool isLeft = (left == node);
+      bool isLeftRight = right.Rectangle.Position.x != left.Rectangle.Position.x;
       PNode sibling = isLeft ? right : left;
 
-      //
-      // 1. Prüfen, ob das wachsende Kind in den Bereich des Geschwisters hineinragt
-      //
-      if (sibling != null && Overlaps(node, sibling))
+      if (isLeftRight && delta.y < 0)
       {
-        // Verschiebe den Geschwister-Subtree passend weg
+        delta.y = 0f;
+      }else if (!isLeftRight && delta.x < 0)
+      {
+        delta.x = 0;
+      }
+
+      /*
+      if (isLeft && delta.x < 0 && delta.y < 0)
+      {
+        // left child grew towards x → right child might need to be shifted -> parent might need to grow towards x
+        return;
+      }
+      else if (isLeft && delta.x < 0 && delta.y == 0)
+      {
+        // Right child shrunk → no need to propagate further
+        return;
+      }
+      else if (isLeft && delta.x < 0 && delta.y > 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+
+      else if (isLeft && delta.x == 0 && delta.y < 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+      else if (isLeft && delta.x == 0 && delta.y == 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+      else if (isLeft && delta.x == 0 && delta.y > 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+
+      else if (isLeft && delta.x > 0 && delta.y < 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+      else if (isLeft && delta.x > 0 && delta.y == 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+      else if (isLeft && delta.x > 0 && delta.y > 0)
+      {
+        //left child growing in y → right child might need to be shifted->parent might need to grow towards x
+        return;
+      }
+       */
+
+      /*
+      // case left grows
+
+      // case left is left of right
+      // case 1: left child grew towards x → right child might need to be shifted -> parent might need to grow towards x
+      // case 2: left child grew towards y → right child stay same -> parent might need to grow towards y
+      //          left child growing in y → right child might need to be shifted -> parent might need to grow towards x
+      // case 3: case 1 + case 2
+
+      // case left is above right
+      // case 4: left child grew towards x → right child stay same -> parent might need to grow towards x
+      // case 5: left child grew towards y → right child might need to be shifted-> parent might need to grow towards y
+      // case 6: case 4 + case 5
+
+      // case right grows
+
+      // case right is right of left
+      // case 7: right child grew towards x → left child stay same -> parent might need to grow towards x
+      // case 8: right child grew towards y → left child stay same -> parent might need to grow towards y
+      // case 9: case 7 + case 8
+
+      // case right is below left
+      // case 10: right child grew towards x → left child stay same -> parent might need to grow towards x
+      // case 11: right child grew towards y → left child stay same-> parent might need to grow towards y
+      // case 12: case 10 + case 11
+       */
+
+      if (sibling != null && delta != Vector2.zero)
+      {
         if (isLeft)
         {
-          // Node wächst nach rechts → rechte Seite verschieben
-          float dx = (node.Rectangle.Position.x + node.Rectangle.Size.x) - sibling.Rectangle.Position.x;
-          ShiftSubtree(sibling, dx, 0f);
+          ShiftSubtree(sibling, delta.x, delta.y, isLeftRight);
         }
         else
         {
-          // Node wächst nach links → linke Seite verschieben
-          float dx = sibling.Rectangle.Position.x + sibling.Rectangle.Size.x - node.Rectangle.Position.x;
-          ShiftSubtree(sibling, -dx, 0f);
+          /*
+          //ShiftSubtree(sibling, -dx, 0f);
+           */
         }
       }
-
+      /*
       //
       // 2. Eltern neu berechnen
       //
+       */
       parent.Rectangle.Position = left.Rectangle.Position;
-      parent.Rectangle.Size = new Vector2(
-          left.Rectangle.Size.x + right.Rectangle.Size.x,
-          Mathf.Max(left.Rectangle.Size.y, right.Rectangle.Size.y)
-      );
-
+      if (isLeftRight)
+      {
+        parent.Rectangle.Size.x = left.Rectangle.Size.x + right.Rectangle.Size.x;
+        parent.Rectangle.Size.y = Mathf.Max(left.Rectangle.Size.y, right.Rectangle.Size.y);
+      } else
+      { 
+        Debug.Log("herere: " + right.Rectangle.Position.x + " : " + left.Rectangle.Position.x + left.Rectangle.Size.x);
+        parent.Rectangle.Size.x = Mathf.Max(left.Rectangle.Size.x, right.Rectangle.Size.x);
+        parent.Rectangle.Size.y = left.Rectangle.Size.y + right.Rectangle.Size.y;
+      } 
       //
       // 3. Weiter nach oben propagieren
       //
-      PropagateGrowUp(parent);
+      PropagateGrowUp(parent, delta);
+    }
+    private void ShiftSubtree(PNode node, float dx, float dy, bool isLeftRight)
+    {
+      var parent = node.Parent;
+      var left = parent.Left;
+      var right = parent.Right;
+
+
+      foreach (var n in PTree.Traverse(node))
+      {
+        if (isLeftRight)
+          n.Rectangle.Position.x += dx;
+        else
+          n.Rectangle.Position.y += dy;
+      }
+    }
+
+    /*
+    public void PropagateGrowUp(PNode node, Vector2 delta)
+    {
+      if (node.Parent == null)
+        return;
+
+      PNode parent = node.Parent;
+      PNode sibling = parent.Left == node ? parent.Right : parent.Left;
+
+      // 1. Sibling bei Bedarf verschieben (weiterhin 2D)
+      if (sibling != null)
+        ResolveConflictPositiveGrow(node, sibling);
+
+      // 2. Parent nach +X und +Y vergrößern
+      ExpandParentPositive(parent);
+
+      // 3. Weiter nach oben propagieren
+      PropagateGrowUp(parent, delta);
+    }
+    private void ResolveConflictPositiveGrow(PNode grown, PNode sibling)
+    {
+      var A = grown.Rectangle;
+      var B = sibling.Rectangle;
+
+      if (!Overlaps(A, B))
+        return;
+
+      float shiftX = 0f;
+      float shiftY = 0f;
+
+      // Überlappungen berechnen
+      float overlapX = (A.Position.x + A.Size.x) - B.Position.x;
+      float overlapY = (A.Position.y + A.Size.y) - B.Position.y;
+
+      // Nur positive Verschiebungen
+      if (overlapX > 0)
+        shiftX = overlapX;
+
+      if (overlapY > 0)
+        shiftY = overlapY;
+
+      // Mindestens eine Richtung muss korrigiert werden
+      Vector2 shift = new Vector2(shiftX, shiftY);
+
+      // Rectangle verschieben
+      var rect = sibling.Rectangle;
+      rect.Position += shift;
+      sibling.Rectangle = rect;
     }
      */
+
+    /*
+     */
+    private void ExpandParentToFitChildren(PNode parent)
+    {
+      var rect = parent.Rectangle;
+      var a = parent.Left?.Rectangle;
+      var b = parent.Right?.Rectangle;
+
+      float minX = rect.Position.x;
+      float minY = rect.Position.y;
+      float maxX = rect.Position.x + rect.Size.x;
+      float maxY = rect.Position.y + rect.Size.y;
+
+      if (a != null)
+      {
+        minX = Mathf.Min(minX, a.Position.x);
+        minY = Mathf.Min(minY, a.Position.y);
+        maxX = Mathf.Max(maxX, a.Position.x + a.Size.x);
+        maxY = Mathf.Max(maxY, a.Position.y + a.Size.y);
+      }
+
+      if (b != null)
+      {
+        minX = Mathf.Min(minX, b.Position.x);
+        minY = Mathf.Min(minY, b.Position.y);
+        maxX = Mathf.Max(maxX, b.Position.x + b.Size.x);
+        maxY = Mathf.Max(maxY, b.Position.y + b.Size.y);
+      }
+
+      rect.Position = new Vector2(minX, minY);
+      rect.Size = new Vector2(maxX - minX, maxY - minY);
+
+      parent.Rectangle = rect;
+    }
+
+    private void ExpandParentPositive(PNode parent)
+    {
+      var rect = parent.Rectangle;
+      float maxX = rect.Position.x + rect.Size.x;
+      float maxY = rect.Position.y + rect.Size.y;
+
+      if (parent.Left != null)
+      {
+        var a = parent.Left.Rectangle;
+        maxX = Mathf.Max(maxX, a.Position.x + a.Size.x);
+        maxY = Mathf.Max(maxY, a.Position.y + a.Size.y);
+      }
+
+      if (parent.Right != null)
+      {
+        var b = parent.Right.Rectangle;
+        maxX = Mathf.Max(maxX, b.Position.x + b.Size.x);
+        maxY = Mathf.Max(maxY, b.Position.y + b.Size.y);
+      }
+
+      // Position bleibt unverändert — nur Größe wächst nach rechts und oben
+      rect.Size = new Vector2(
+          maxX - rect.Position.x,
+          maxY - rect.Position.y
+      );
+
+      parent.Rectangle = rect;
+    }
+
+    private void ResolveConflict(PNode grown, PNode sibling)
+    {
+      var A = grown.Rectangle;
+      var B = sibling.Rectangle;
+
+      // Kein Overlap → fertig
+      if (!Overlaps(A, B))
+        return;
+
+      // Wie stark überlappen die Rechtecke in jede Richtung?
+      
+      float overlapLeft = (A.Position.x + A.Size.x) - B.Position.x;               // A drückt B nach rechts
+      float overlapRight = (B.Position.x + B.Size.x) - A.Position.x;               // A drückt B nach links
+      float overlapUp = (A.Position.y + A.Size.y) - B.Position.y;               // A drückt B nach oben
+      float overlapDown = (B.Position.y + B.Size.y) - A.Position.y;               // A drückt B nach unten
+
+      // Wir verschieben minimal → kleinstes positive Overlap finden
+      float minHorizontal = Mathf.Min(overlapLeft, overlapRight);
+      float minVertical = Mathf.Min(overlapUp, overlapDown);
+
+      Vector2 shift = Vector2.zero;
+
+      if (minHorizontal < minVertical)
+      {
+        // Horizontal lösen
+        if (overlapLeft < overlapRight)
+          shift.x = overlapLeft;       // sibling wird nach rechts geschoben
+        else
+          shift.x = -overlapRight;     // sibling wird nach links geschoben
+      }
+      else
+      {
+        // Vertikal lösen
+        if (overlapUp < overlapDown)
+          shift.y = overlapUp;         // sibling nach oben schieben
+        else
+          shift.y = -overlapDown;      // sibling nach unten schieben
+      }
+
+      // Verschieben des sibling
+      var rect = sibling.Rectangle;
+      rect.Position += shift;
+      sibling.Rectangle = rect;
+    }
 
     public void propagateResizeUp(PNode node)
     {
@@ -431,7 +729,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
 
     private void ShiftSubtreeX(PNode node, float deltaX)
     {
-      node.Rectangle.Position.x += deltaX;
+      node.Rectangle.Position.x -= deltaX;
 
       if (node.Left != null)
         ShiftSubtreeX(node.Left, deltaX);
@@ -451,16 +749,13 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         ShiftSubtreeY(node.Right, deltaY);
     }
 
-
-    private void ShiftSubtree(PNode node, float dx, float dy)
+    private bool Overlaps(PRectangle a, PRectangle b)
     {
-      foreach (var n in PTree.Traverse(node))
-      {
-        n.Rectangle.Position.x += dx;
-        n.Rectangle.Position.y += dy;
-      }
+      return !(a.Position.x + a.Size.x <= b.Position.x ||
+               b.Position.x + b.Size.x <= a.Position.x ||
+               a.Position.y + a.Size.y <= b.Position.y ||
+               b.Position.y + b.Size.y <= a.Position.y);
     }
-
 
     private bool Overlaps(PNode a, PNode b)
     {
@@ -469,6 +764,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
                a.Rectangle.Position.y + a.Rectangle.Size.y <= b.Rectangle.Position.y ||
                b.Rectangle.Position.y + b.Rectangle.Size.y <= a.Rectangle.Position.y);
     }
+    /*
+     */
+
 
 
     //************************************************************************************************************************************
