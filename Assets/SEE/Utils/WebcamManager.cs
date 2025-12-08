@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using SEE.UI;
 using SEE.UI.Notification;
+using SEE.User;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -107,7 +108,7 @@ namespace SEE.Utils
             }
 
             // Try to load previous selected webcam device from PlayerPrefs.
-            string savedCamera = PlayerPrefs.GetString(PlayerPrefsKeys.WebcamDevice, devices[0].name);
+            string savedCamera = UserSettings.Instance.Video.WebcamName;
 
             // Initialize the remaining webcams (not played yet)
             for (int i = 0; i < devices.Length; i++)
@@ -211,7 +212,8 @@ namespace SEE.Utils
                 OnActiveWebcamChanged?.Invoke(webcams[activeIndex]);
 
                 // Saves the selected camera.
-                PlayerPrefs.SetString(PlayerPrefsKeys.WebcamDevice, webcams[activeIndex].deviceName);
+                UserSettings.Instance.Video.WebcamName = webcams[activeIndex].deviceName;
+                UserSettings.Instance.Save();
             }
 
             static async UniTask StopWebcamAsync(int index)
