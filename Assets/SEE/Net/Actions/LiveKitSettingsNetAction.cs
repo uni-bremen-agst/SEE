@@ -2,6 +2,7 @@
 using SEE.Game;
 using SEE.Tools.LiveKit;
 using SEE.UI.Menu;
+using SEE.User;
 
 namespace SEE.Net.Actions
 {
@@ -14,12 +15,12 @@ namespace SEE.Net.Actions
         /// <summary>
         /// The LiveKit server URL to be applied on the client.
         /// </summary>
-        public string LiveKitURL;
+        public string LiveKitUrl;
 
         /// <summary>
         /// The URL of the token service used for acquiring LiveKit access tokens.
         /// </summary>
-        public string TokenURL;
+        public string TokenUrl;
 
         /// <summary>
         /// The name of the LiveKit room the client should join.
@@ -30,13 +31,13 @@ namespace SEE.Net.Actions
         /// Creates a new network action containing updated LiveKit
         /// configuration values to be sent to the client.
         /// </summary>
-        /// <param name="liveKitURL">The LiveKit server URL.</param>
-        /// <param name="tokenURL">The token service URL.</param>
+        /// <param name="liveKitUrl">The LiveKit server URL.</param>
+        /// <param name="tokenUrl">The token service URL.</param>
         /// <param name="roomName">The LiveKit room name.</param>
-        public LiveKitSettingsNetAction(string liveKitURL, string tokenURL, string roomName)
+        public LiveKitSettingsNetAction(string liveKitUrl, string tokenUrl, string roomName)
         {
-            LiveKitURL = liveKitURL;
-            TokenURL = tokenURL;
+            LiveKitUrl = liveKitUrl;
+            TokenUrl = tokenUrl;
             RoomName = roomName;
         }
 
@@ -51,19 +52,19 @@ namespace SEE.Net.Actions
 
         /// <summary>
         /// Ask the user whether the received LiveKit configuration should be applied.
-        /// If confirmed, the local <see cref="LiveKitVideoManager"/> is updated.
+        /// If confirmed, the local <see cref="UserSettings.Video"/> is updated.
         /// </summary>
         private async UniTask ApplyLiveKitUpdateAsync()
         {
             string message = $"Do you want to apply the LiveKit changes?\n"
-                + $"LiveKit URL: {LiveKitURL}\n"
-                + $"Token URL: {TokenURL}\n"
+                + $"LiveKit URL: {LiveKitUrl}\n"
+                + $"Token URL: {TokenUrl}\n"
                 + $"Room Name: {RoomName}";
 
-            if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message))
-                && LocalPlayer.TryGetLiveKitVideoManager(out LiveKitVideoManager manager))
+            if (await ConfirmDialog.ConfirmAsync(ConfirmConfiguration.YesNo(message)))
             {
-                manager.UpdateSettings(LiveKitURL, TokenURL, RoomName);
+                UserSettings.Instance.Video.UpdateLiveKitSettings(LiveKitUrl, TokenUrl, RoomName);
+                UserSettings.Instance.Save();
             }
         }
     }

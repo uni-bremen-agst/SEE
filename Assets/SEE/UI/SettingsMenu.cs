@@ -395,9 +395,12 @@ namespace SEE.UI
         /// </summary>
         public void UpdateLiveKitSettings()
         {
-            liveKitURLInputField.text = UserSettings.Instance.Video.LiveKitUrl;
-            tokenURLInputField.text = UserSettings.Instance.Video.TokenUrl;
-            roomNameInputField.text = UserSettings.Instance.Video.RoomName;
+            if (liveKitURLInputField != null && tokenURLInputField != null && roomNameInputField != null)
+            {
+                liveKitURLInputField.text = UserSettings.Instance.Video.LiveKitUrl;
+                tokenURLInputField.text = UserSettings.Instance.Video.TokenUrl;
+                roomNameInputField.text = UserSettings.Instance.Video.RoomName;
+            }
         }
 
         /// <summary>

@@ -27,27 +27,6 @@ namespace SEE.Tools.LiveKit
     public class LiveKitVideoManager : MonoBehaviour
     {
         /// <summary>
-        /// The URL of the LiveKit server to connect to. This is a websocket URL.
-        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
-        /// </summary>
-        [Tooltip("The URL of the LiveKit server to connect to. A websocket URL. Will only be used if no UserSettings Video entry exists.")]
-        public string LiveKitUrl = "ws://localhost:7880";
-
-        /// <summary>
-        /// The URL used to fetch the access token required for authentication.
-        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
-        /// </summary>
-        [Tooltip("The URL used to fetch the access token required for authentication. Will only be used if no UserSettings Video entry exists.")]
-        public string TokenUrl = "http://localhost:3000";
-
-        /// <summary>
-        /// The room name to join in LiveKit.
-        /// Will only be used if no <see cref="UserSettings.Video"/> entry exists.
-        /// </summary>
-        [Tooltip("The room name to join in LiveKit. Will only be used if no UserSettings Video entry exists.")]
-        public string RoomName = "development";
-
-        /// <summary>
         /// The LiveKit room object that manages connection and tracks.
         /// </summary>
         private Room room = null;
@@ -97,16 +76,6 @@ namespace SEE.Tools.LiveKit
             if (!UserSettings.IsDesktop)
             {
                 gameObject.SetActive(false);
-            }
-            else
-            {
-                UpdateSettings(
-                    liveKitURL: UserSettings.Instance.Video.LiveKitUrl != string.Empty?
-                        UserSettings.Instance.Video.LiveKitUrl : LiveKitUrl,
-                    tokenURL: UserSettings.Instance.Video.TokenUrl != string.Empty ?
-                        UserSettings.Instance.Video.TokenUrl : TokenUrl,
-                    roomName: UserSettings.Instance.Video.RoomName != string.Empty ?
-                        UserSettings.Instance.Video.RoomName : RoomName);
             }
         }
 
@@ -161,25 +130,6 @@ namespace SEE.Tools.LiveKit
                 {
                     webCamTexture.Play();
                 }
-            }
-        }
-
-        /// <summary>
-        /// Updates the stored LiveKit setting values and notifies the
-        /// settings menu to refresh its UI representation accordingly.
-        /// </summary>
-        /// <param name="liveKitURL">The LiveKit server URL to apply.</param>
-        /// <param name="tokenURL">The token service URL used to request access tokens.</param>
-        /// <param name="roomName">The name of the LiveKit room to join.</param>
-        public void UpdateSettings(string liveKitURL, string tokenURL, string roomName)
-        {
-            UserSettings.Instance.Video.LiveKitUrl = liveKitURL;
-            UserSettings.Instance.Video.TokenUrl = tokenURL;
-            UserSettings.Instance.Video.RoomName = roomName;
-
-            if (LocalPlayer.TryGetSettingsMenu(out SettingsMenu menu))
-            {
-                menu.UpdateLiveKitSettings();
             }
         }
 
@@ -246,7 +196,9 @@ namespace SEE.Tools.LiveKit
         {
             ConnectionState = ConnectionStatus.Disconnected;
             // Send a GET request to the token server to retrieve the token for this client.
-            string uri = $"{TokenUrl}/getToken?roomName={RoomName}&participantName={NetworkManager.Singleton.LocalClientId}";
+            string uri = $"{UserSettings.Instance.Video.TokenUrl}" +
+                $"/getToken?roomName={UserSettings.Instance.Video.RoomName}" +
+                $"&participantName={NetworkManager.Singleton.LocalClientId}";
             using UnityEngine.Networking.UnityWebRequest www = UnityEngine.Networking.UnityWebRequest.Get(uri);
             // Wait for the request to complete.
             yield return www.SendWebRequest();
@@ -286,14 +238,15 @@ namespace SEE.Tools.LiveKit
             RoomOptions options = new();
 
             // Attempt to connect to the room using the LiveKit server URL and the provided token.;
-            ConnectInstruction connect = room.Connect(LiveKitUrl, token, options);
+            ConnectInstruction connect = room.Connect(UserSettings.Instance.Video.LiveKitUrl, token, options);
             float elapsed = 0f;
             float timeoutSeconds = 10f;
             while (!connect.IsDone)
             {
                 if (elapsed >= timeoutSeconds)
                 {
-                    ShowNotification.Error("LiveKit", $"Connection to room \"{RoomName}\" timed out after {timeoutSeconds} seconds.");
+                    ShowNotification.Error("LiveKit",
+                        $"Connection to room \"{UserSettings.Instance.Video.RoomName}\" timed out after {timeoutSeconds} seconds.");
                     ConnectionState = ConnectionStatus.RoomConnectionFailed;
                     room.Disconnect();
                     room = null;
@@ -306,7 +259,7 @@ namespace SEE.Tools.LiveKit
             // Check if the connection was successful.
             if (connect.IsError)
             {
-                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{RoomName}\" {connect}.");
+                ShowNotification.Error("LiveKit", $"Failed to connect to room: \"{UserSettings.Instance.Video.RoomName}\" {connect}.");
                 ConnectionState = ConnectionStatus.RoomConnectionFailed;
                 room.Disconnect();
                 room = null;

@@ -1,4 +1,5 @@
-﻿using SEE.UI;
+﻿using SEE.Game;
+using SEE.UI;
 using SEE.Utils.Config;
 using Sirenix.OdinInspector;
 using System;
@@ -24,19 +25,19 @@ namespace SEE.User
         /// The WebSocket URL of the LiveKit server to connect to.
         /// </summary>
         [Tooltip("The WebSocket URL of the LiveKit server to connect to."), ShowInInspector]
-        public string LiveKitUrl { get; set; } = string.Empty;
+        public string LiveKitUrl { get; set; } = "ws://localhost:7880";
 
         /// <summary>
         /// The URL used to fetch the access token required for authentication.
         /// </summary>
         [Tooltip("The URL used to fetch the access token required for authentication."), ShowInInspector]
-        public string TokenUrl { get; set; } = string.Empty;
+        public string TokenUrl { get; set; } = "http://localhost:3000";
 
         /// <summary>
         /// The room name to join in LiveKit.
         /// </summary>
         [Tooltip("The room name to join in LiveKit."), ShowInInspector]
-        public string RoomName { get; set; } = string.Empty;
+        public string RoomName { get; set; } = "development";
 
         /// <summary>
         /// Initializes Unity-dependent default values of the video settings.
@@ -52,6 +53,39 @@ namespace SEE.User
                 {
                     WebcamName = devices[0].name;
                 }
+            }
+        }
+
+        /// <summary>
+        /// Updates the LiveKit-related settings stored in this <see cref="Video"/> instance.
+        /// This method sets the server URL, token URL, and room name, which will be used
+        /// when connecting via the <see cref="LiveKitVideoManager"/> or when displaying
+        /// these values in the settings UI.
+        ///
+        /// After updating the values, this method automatically calls <see cref="UpdateSettingsMenu"/>
+        /// to refresh the LiveKit input fields in the settings menu.
+        /// </summary>
+        /// <param name="liveKitUrl">The WebSocket URL of the LiveKit server.</param>
+        /// <param name="tokenUrl">The URL of the token server used to fetch access tokens.</param>
+        /// <param name="roomName">The name of the LiveKit room to join.</param>
+        public void UpdateLiveKitSettings(string liveKitUrl, string tokenUrl, string roomName)
+        {
+            LiveKitUrl = liveKitUrl;
+            TokenUrl = tokenUrl;
+            RoomName = roomName;
+
+            UpdateSettingsMenu();
+        }
+
+        /// <summary>
+        /// Notifies the settings menu to refresh its LiveKit-related input fields
+        /// so that they reflect the current values stored in this <see cref="Video"/> instance.
+        /// </summary>
+        private void UpdateSettingsMenu()
+        {
+            if (LocalPlayer.TryGetSettingsMenu(out SettingsMenu menu))
+            {
+                menu.UpdateLiveKitSettings();
             }
         }
 
