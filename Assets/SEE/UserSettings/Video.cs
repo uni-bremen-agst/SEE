@@ -18,10 +18,7 @@ namespace SEE.User
         /// Name of the last used webcam.
         /// </summary>
         [Tooltip("The name of the last used webcam."), ShowInInspector]
-        public string WebcamName { get; set; } =
-            WebCamTexture.devices.Length > 0 ?
-            WebCamTexture.devices[0].name
-                : string.Empty;
+        public string WebcamName { get; set; } = string.Empty;
 
         /// <summary>
         /// The WebSocket URL of the LiveKit server to connect to.
@@ -40,6 +37,23 @@ namespace SEE.User
         /// </summary>
         [Tooltip("The room name to join in LiveKit."), ShowInInspector]
         public string RoomName { get; set; } = "development";
+
+        /// <summary>
+        /// Initializes Unity-dependent default values of the video settings.
+        /// If <see cref="WebcamName"/> is empty and at least one webcam is available,
+        /// it will automatically be set to the first detected webcam.
+        /// </summary>
+        public void InitializeDefaults()
+        {
+            if (string.IsNullOrEmpty(WebcamName))
+            {
+                WebCamDevice[] devices = WebCamTexture.devices;
+                if (devices.Length > 0)
+                {
+                    WebcamName = devices[0].name;
+                }
+            }
+        }
 
         #region Configuration I/O
 
