@@ -5,7 +5,7 @@ using UnityEngine.UI;
 namespace SEE.Utils.Extensions
 {
     /// <summary>
-    /// Provides extension methods for <see cref="TMP_InputField"/>/> to simplify UI state handling,
+    /// Provides extension methods for <see cref="TMP_InputField"/> to simplify UI state handling,
     /// such as coloring transitions and highlighting validation errors.
     /// </summary>
     public static class TMPInputFieldExtensions
@@ -38,7 +38,7 @@ namespace SEE.Utils.Extensions
         }
 
         /// <summary>
-        /// Applies a visual error state to the input field by coloring all transition states red,
+        /// Applies a visual error state to the input field by coloring all transition states red
         /// and highlighting the associated label (if found) in red as well.
         /// </summary>
         /// <param name="inputField">The input field to visually mark as invalid.</param>
