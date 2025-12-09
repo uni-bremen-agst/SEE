@@ -106,7 +106,7 @@ namespace SEE.Game.Avatars
         private const float handLandmarksErrorCooldown = 5f;
 
         /// <summary>
-        /// Indicates whether the MediaPipe values are setted.
+        /// Indicates whether the MediaPipe values are set.
         /// </summary>
         private bool isMediaPipeInitialized = false;
 
