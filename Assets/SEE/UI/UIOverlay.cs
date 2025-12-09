@@ -131,7 +131,7 @@ namespace SEE.UI
         protected override void StartDesktop()
         {
             overlayGameObject = PrefabInstantiator.InstantiatePrefab(uiOverlayPrefab, Canvas.transform, false);
-            RegisterWebcamOverlay();
+            RegisterWebcamOverlay(overlayGameObject);
         }
 
         #region Webcam Overlay Methods
@@ -142,7 +142,9 @@ namespace SEE.UI
         ///
         /// After initialization, all indicators are set to their inactive visual state.
         /// </summary>
-        private void RegisterWebcamOverlay()
+        /// <param name="overlayGameObject">The object from which to retrieve the WebcamUIOverlay
+        /// descendant.</param>
+        private static void RegisterWebcamOverlay(GameObject overlayGameObject)
         {
             GameObject webcamOverlay = overlayGameObject.FindDescendant("WebcamUIOverlay");
 
