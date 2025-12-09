@@ -9,12 +9,13 @@ namespace SEE.Tools.LiveKit
     public class LiveKitVideoRegistry
     {
         /// <summary>
-        /// Storing the mapping between client IDs and their corresponding <see cref="LiveKitVideo"/> components.
+        /// Stores the mapping between client IDs and their corresponding
+        /// <see cref="LiveKitVideo"/> components.
         /// </summary>
         private static readonly Dictionary<ulong, LiveKitVideo> registry = new();
 
         /// <summary>
-        /// Registers a <see cref="LiveKitVideo"/> instance for the specified client ID.
+        /// Registers a <see cref="LiveKitVideo"/> instance for the specified <paramref name="clientID"/>.
         /// </summary>
         /// <param name="clientID">The Netcode client ID associated with the player.</param>
         /// <param name="instance">The <see cref="LiveKitVideo"/> instance to register.</param>
@@ -39,10 +40,10 @@ namespace SEE.Tools.LiveKit
         /// <param name="clientId">The Netcode client ID to look up.</param>
         /// <param name="instance">
         /// When successful, contains the <see cref="LiveKitVideo"/> instance associated
-        /// with the client ID. Otherwise, <c>null</c>.
+        /// with the client ID; otherwise, <c>null</c>.
         /// </param>
         /// <returns>
-        /// <c>true</c> if a matching instance was found; otherwise, <c>false</c>.
+        /// <c>true</c> if a matching instance was found; otherwise <c>false</c>.
         /// </returns>
         public static bool TryGet(ulong clientId, out LiveKitVideo instance)
         {
