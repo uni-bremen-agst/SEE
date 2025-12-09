@@ -6,8 +6,9 @@ using UnityEngine;
 namespace SEE.UI
 {
     /// <summary>
-    /// A persistent UI overlay that displays status indicators, text labels, and tooltips for any system or component.
-    /// Designed to remain visible independently of other UI elements, providing real-time feedback to the user.
+    /// A persistent UI overlay that displays status indicators, text labels, and tooltips
+    /// for any system or component. Designed to remain visible independently of other
+    /// UI elements, providing real-time feedback to the user.
     /// </summary>
     public class UIOverlay : PlatformDependentComponent
     {
@@ -38,7 +39,7 @@ namespace SEE.UI
         /// - an optional tooltip.
         ///
         /// This struct provides utility logic to update the visual state
-        /// of the indicator and synchronize the tooltip message accordingly.
+        /// of the indicator and to synchronize the tooltip message accordingly.
         /// It is intended for lightweight status representations in persistent UI overlays.
         /// </summary>
         private struct StatusIndicator
@@ -73,7 +74,7 @@ namespace SEE.UI
             /// <param name="active">If true, sets the indicator to the active state; otherwise to inactive.</param>
             /// <param name="activeColor">The color used when the indicator is active.</param>
             /// <param name="inactiveColor">The color used when the indicator is inactive.</param>
-            public void SetActive(bool active, Color activeColor, Color inactiveColor)
+            public readonly void SetActive(bool active, Color activeColor, Color inactiveColor)
             {
                 if (Text != null)
                 {
@@ -87,10 +88,10 @@ namespace SEE.UI
 
             /// <summary>
             /// Shows or hides the entire status indicator.
-            /// This affects the Container root object and therefore all of its child UI elements.
+            /// This affects the container root object and therefore all of its child UI elements.
             /// </summary>
             /// <param name="visible">True to make the indicator visible, false to hide it.</param>
-            public void ShowContainer(bool visible)
+            public readonly void ShowContainer(bool visible)
             {
                 if (Container != null)
                 {
@@ -116,7 +117,7 @@ namespace SEE.UI
         private static TextMeshProUGUI webcamStatus;
 
         /// <summary>
-        /// A slash overlay drawn across the webcam icon. Enabled when the webcam is inactive,
+        /// A slash overlay drawn across the webcam icon. Enabled when the webcam is inactive;
         /// hidden when the webcam is active.
         /// </summary>
         private static GameObject webcamSlashOverlay;
