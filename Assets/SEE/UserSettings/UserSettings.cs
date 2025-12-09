@@ -28,13 +28,13 @@ namespace SEE.User
         /// Settings of the player.
         /// </summary>
         [Tooltip("Settings of the player.")]
-        public Player Player = new();
+        public readonly Player Player = new();
 
         /// <summary>
         /// Settings of the network.
         /// </summary>
         [Tooltip("Settings of the network.")]
-        public Network Network = new();
+        public readonly Network Network = new();
 
         /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
@@ -54,13 +54,13 @@ namespace SEE.User
         /// Settings for telemetry.
         /// </summary>
         [Tooltip("Telemetry settings.")]
-        public Telemetry Telemetry = new();
+        public readonly Telemetry Telemetry = new();
 
         /// <summary>
         /// Settings for video.
         /// </summary>
         [Tooltip("Video settings.")]
-        public Video Video = new();
+        public readonly Video Video = new();
 
         /// <summary>
         /// Default path of the configuration file (path and filename).
