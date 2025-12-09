@@ -633,6 +633,10 @@ namespace SEE.Game.City
         {
             SaveData();
             SaveLayout();
+
+            SEECitySnapshot snapshot = new() { CityName = name, ConfigPath = ConfigurationPath.Path, GraphPath = GraphSnapshotPath.Path, LayoutPath = NodeLayoutSettings.LayoutPath.Path };
+
+            Network.SaveSnapshot(snapshot);
         }
 
         /// <summary>

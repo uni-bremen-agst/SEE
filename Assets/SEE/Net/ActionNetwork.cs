@@ -14,6 +14,7 @@ using System.Linq;
 using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
+using Logger = SEE.Net.Util.Logger;
 
 namespace SEE.Net
 {
@@ -77,18 +78,19 @@ namespace SEE.Net
                     networkIsSetUp = true;
                 }
             }
-
-            if (IsServer)
-            {
-                InvokeRepeating(nameof(CreateSnapshot), 0, 60);
-            }
         }
 
-        private void CreateSnapshot()
+        [Rpc(SendTo.Server)]
+        public void RequestServerSnapshotRpc(SEECitySnapshot snapshot)
         {
-            BackendSyncUtil.CreateServerSnapshotAsync().Forget();
-        }
+            if (!(IsServer || IsHost))
+            {
+                Logger.Log("Send Snapshot to server");
+                return;
+            }
 
+            BackendSyncUtil.TrySaveSnapshotsAsync(snapshot).Forget();
+        }
 
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients

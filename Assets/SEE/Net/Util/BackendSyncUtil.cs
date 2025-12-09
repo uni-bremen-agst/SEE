@@ -126,6 +126,9 @@ namespace SEE.Net.Util
             [JsonProperty(PropertyName = "size", Required = Required.Always)]
             public long size;
 
+            [JsonProperty(PropertyName = "projectType", Required = Required.Always)]
+            public CityTypes projectType;
+
             public static ServerSnapshotResponse FromJson(string json)
             {
                 return JsonConvert.DeserializeObject<ServerSnapshotResponse>(json);
@@ -143,33 +146,33 @@ namespace SEE.Net.Util
 
 
 
-        internal static async UniTask CreateServerSnapshotAsync()
-        {
-            Debug.Log("Start city snapshot creation");
-            IEnumerable<ICodeCityPersistence> cityPersitances = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersistence>();
+        // internal static async UniTask CreateServerSnapshotAsync()
+        // {
+        //     Debug.Log("Start city snapshot creation");
+        //     IEnumerable<ICodeCityPersistence> cityPersitances = GameObject.FindObjectsByType<MonoBehaviour>(FindObjectsSortMode.None).OfType<ICodeCityPersistence>();
 
-            IList<SEECitySnapshot> snapshots = new List<SEECitySnapshot>();
+        //     IList<SEECitySnapshot> snapshots = new List<SEECitySnapshot>();
 
-            foreach (ICodeCityPersistence city in cityPersitances)
-            {
-                SEECitySnapshot snapshot = city.CreateSnapshot();
-                if (snapshot == null)
-                {
-                    Debug.LogWarning("City snapshot is null, skipping.");
-                    continue;
-                }
-                snapshot.CityName = city.GetCityName();
-                snapshots.Add(snapshot);
-            }
-            if (snapshots.Count == 0)
-            {
-                Debug.LogWarning("No cities found, skip saving snapshot.");
-                // Don't send snapshot to backend of no cities exist.
-                return;
-            }
+        //     foreach (ICodeCityPersistence city in cityPersitances)
+        //     {
+        //         SEECitySnapshot snapshot = city.CreateSnapshot();
+        //         if (snapshot == null)
+        //         {
+        //             Debug.LogWarning("City snapshot is null, skipping.");
+        //             continue;
+        //         }
+        //         snapshot.CityName = city.GetCityName();
+        //         snapshots.Add(snapshot);
+        //     }
+        //     if (snapshots.Count == 0)
+        //     {
+        //         Debug.LogWarning("No cities found, skip saving snapshot.");
+        //         // Don't send snapshot to backend of no cities exist.
+        //         return;
+        //     }
 
-            await SaveSnapshotsAsync(snapshots);
-        }
+        //     await SaveSnapshotsAsync(snapshots);
+        // }
 
         /// <summary>
         /// Downloads a server snapshot file from the backend.
@@ -199,44 +202,41 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Compresses and safes a list of <see cref="SEECitySnapshot"/> to the server.
+        /// Compresses and safes a <see cref="SEECitySnapshot"/> to the backend server if possible.
+        ///
         /// </summary>
         /// <param name="snapshot"></param>
         /// <returns>An empty task.</returns>
-        public static async UniTask SaveSnapshotsAsync(IEnumerable<SEECitySnapshot> snapshot)
+        public static async UniTask TrySaveSnapshotsAsync(SEECitySnapshot snapshot)
         {
+            Logger.Log("Try saving snapshot to backend");
+            if (String.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            {
+                return;
+            }
+
             string snapshotsDir = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName());
             Directory.CreateDirectory(snapshotsDir);
 
-            foreach (SEECitySnapshot citySnapshot in snapshot)
-            {
-                // Save each city snapshot as a separate zip archive.
-                Debug.Log($"Snapshot City name: {citySnapshot.CityName}, ConfigPath: {citySnapshot.ConfigPath}, GraphPath: {citySnapshot.GraphPath}, LayoutPath: {citySnapshot.LayoutPath}");
+            // Save each city snapshot as a separate zip archive.
+            Debug.Log($"Snapshot City name: {snapshot.CityName}, ConfigPath: {snapshot.ConfigPath}, GraphPath: {snapshot.GraphPath}, LayoutPath: {snapshot.LayoutPath}");
 
-                string citySnapshotPath = Path.Combine(snapshotsDir, citySnapshot.CityName);
-                Directory.CreateDirectory(citySnapshotPath);
-                CopyToDir(citySnapshot.ConfigPath, citySnapshotPath);
-                CopyToDir(citySnapshot.GraphPath, citySnapshotPath);
-                CopyToDir(citySnapshot.LayoutPath, citySnapshotPath);
-
-                string targetZipFile = Path.Combine(Path.GetTempPath(), "see-snapshot-" + Path.GetRandomFileName(), ".zip");
-                string targetXZFile = targetZipFile + ".xz";
-            }
+            CopyToDir(snapshot.ConfigPath, snapshotsDir);
+            CopyToDir(snapshot.GraphPath, snapshotsDir);
+            CopyToDir(snapshot.LayoutPath, snapshotsDir);
 
             string snapshotZipPath = snapshotsDir + ".zip";
             Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
 
-            string snapshotZipXZPath = snapshotZipPath + ".xz";
-            Compressor.Save(snapshotZipXZPath, snapshotZipPath);
 
             if (await LogInAsync())
             {
-                string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId;
+                string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
                 List<IMultipartFormSection> formSections = new List<IMultipartFormSection>();
 
                 // Create a MultipartForm section with the snapshot file.
-                var bytes = File.ReadAllBytes(snapshotZipXZPath);
-                MultipartFormFileSection fileFormSection = new MultipartFormFileSection("file", bytes, snapshotZipXZPath, "application/octet-stream");
+                var bytes = File.ReadAllBytes(snapshotZipPath);
+                MultipartFormFileSection fileFormSection = new MultipartFormFileSection("file", bytes, snapshotZipPath, "application/octet-stream");
                 formSections.Add(fileFormSection);
                 byte[] boundary = UnityWebRequest.GenerateBoundary();
                 using (UnityWebRequest request = UnityWebRequest.Post(url, formSections, boundary))
@@ -251,7 +251,7 @@ namespace SEE.Net.Util
                         Debug.Log("Snapshot uploaded successfully.");
                         try
                         {
-                            File.Delete(snapshotZipXZPath);
+                            File.Delete(snapshotZipPath);
                         }
                         catch (Exception)
                         {

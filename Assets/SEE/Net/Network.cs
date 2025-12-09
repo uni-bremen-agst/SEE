@@ -427,6 +427,11 @@ namespace SEE.Net
             }
         }
 
+        public static void SaveSnapshot(SEECitySnapshot snapshot)
+        {
+            ActionNetworkInst.Value?.RequestServerSnapshotRpc(snapshot);
+        }
+
         /// <summary>
         /// Broadcasts a serialized action.
         /// </summary>
