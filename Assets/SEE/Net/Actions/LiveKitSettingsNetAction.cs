@@ -6,7 +6,7 @@ using SEE.User;
 namespace SEE.Net.Actions
 {
     /// <summary>
-    /// This class is responsible for the sharing LiveKit settings via network from one
+    /// This class is responsible for the sharing of LiveKit settings via network from one
     /// client to all others and to the server.
     /// </summary>
     public class LiveKitSettingsNetAction : AbstractNetAction
