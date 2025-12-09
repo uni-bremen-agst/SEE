@@ -2,7 +2,6 @@
 using LiveKit;
 using LiveKit.Proto;
 using SEE.Controls;
-using SEE.Game;
 using SEE.GO;
 using SEE.UI;
 using SEE.UI.Notification;
