@@ -4,11 +4,11 @@ using TMPro;
 namespace SEE.UI.InputFields
 {
     /// <summary>
-    /// SmartOverflow automatically toggles a TMP_InputField's text overflow behavior
+    /// <see cref="SmartOverflow"/> automatically toggles a TMP_InputField's text overflow behavior
     /// between <c>Ellipsis</c> and <c>Overflow</c> modes based on focus state:
     ///
-    /// - <b>Ellipsis Mode</b>: When the input field is not focused, long text is truncated with '…'.
-    /// - <b>Overflow Mode</b>: When the input field is focused, text can scroll freely without truncation.
+    /// - <b>Ellipsis Mode</b>: If the input field is not focused, long text is truncated with '…'.
+    /// - <b>Overflow Mode</b>: If the input field is focused, text can scroll freely without truncation.
     ///
     /// This component requires a TMP_InputField and can be attached directly to its GameObject.
     /// No manual event registration is required.
