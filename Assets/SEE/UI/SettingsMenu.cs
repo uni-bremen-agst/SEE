@@ -251,7 +251,6 @@ namespace SEE.UI
         /// - The currently selected camera is immediately applied to <see cref="WebcamManager"/>.
         /// - LiveKit settings are initialized afterwards to ensure they are bound to the video settings page.
         /// </remarks>
-
         private void InitializeVideoSettings()
         {
             Dropdown cameraDropdown = settingsMenuGameObject.FindDescendant("CameraDropdown").MustGetComponent<Dropdown>();
@@ -272,7 +271,6 @@ namespace SEE.UI
                 cameraDropdown.onValueChanged.AddListener(WebcamManager.SwitchCamera);
             }
 
-            // Initialize LiveKit settings.
             InitializeLiveKitSettings();
         }
 
