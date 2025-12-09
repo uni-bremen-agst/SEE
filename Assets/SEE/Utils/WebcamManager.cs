@@ -20,7 +20,7 @@ namespace SEE.Utils
     {
         /// <summary>
         /// List of all available <see cref="ActiveWebcam"/> instances in the order
-        /// they were detected on the system.
+        /// they were detected in the system.
         /// </summary>
         private static readonly List<WebCamTexture> webcams = new();
 
@@ -92,7 +92,7 @@ namespace SEE.Utils
 
         /// <summary>
         /// Initializes the webcam manager and registers all available webcams.
-        /// - If no webcams are found on the system, an error is logged and no <see cref="ActiveWebcam"/> is created.
+        /// - If no webcams are found in the system, an error is logged and no <see cref="ActiveWebcam"/> is created.
         /// - The first detected device is selected as the active webcam and started automatically.
         /// - All other webcams are registered in the list but not started, to save resources.
         /// - Each <see cref="ActiveWebcam"/> is created exactly once per device.
@@ -122,7 +122,7 @@ namespace SEE.Utils
                 }
             }
 
-            Debug.Log($"[WebcamManager] Active webcam initialized: {devices[activeIndex].name}");
+            Debug.Log($"[WebcamManager] Active webcam initialized: {devices[activeIndex].name}\n");
         }
 
         /// <summary>
@@ -176,7 +176,7 @@ namespace SEE.Utils
 
 
         /// <summary>
-        /// Switches the active webcam by index.
+        /// Switches the active webcam by the given <paramref name="index"/>.
         ///
         /// This method stops the currently active webcam (if it is running)
         /// and activates the selected one. If there are active users
@@ -194,7 +194,7 @@ namespace SEE.Utils
         {
             if (index < 0 || index >= webcams.Count)
             {
-                Debug.LogWarning($"[WebcamManager] Webcam index {index} is out of range.");
+                Debug.LogWarning($"[WebcamManager] Webcam index {index} is out of range.\n");
                 return;
             }
 
