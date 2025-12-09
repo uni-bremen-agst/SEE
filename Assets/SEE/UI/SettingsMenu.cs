@@ -504,21 +504,21 @@ namespace SEE.UI
 
                 foreach ((_, KeyActionDescriptor descriptor) in group)
                 {
-                    GameObject keyBindingContent = PrefabInstantiator
+                    GameObject keyBindingContentGO = PrefabInstantiator
                         .InstantiatePrefab(SettingsMenu.keyBindingContent, Canvas.transform, false)
                         .transform.gameObject;
 
-                    keyBindingContent.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
+                    keyBindingContentGO.transform.SetParent(scrollView.transform.Find("Scroll View/Viewport/Content"));
 
                     // set the text to the short name of the binding
-                    TextMeshProUGUI bindingText = keyBindingContent.transform
+                    TextMeshProUGUI bindingText = keyBindingContentGO.transform
                         .Find("Binding").gameObject.MustGetComponent<TextMeshProUGUI>();
 
                     // The short name of the binding.
                     bindingText.text = descriptor.Name;
 
                     // set the label of the key button
-                    TextMeshProUGUI key = keyBindingContent.transform
+                    TextMeshProUGUI key = keyBindingContentGO.transform
                         .Find("Key/Text (TMP)").gameObject.MustGetComponent<TextMeshProUGUI>();
 
                     // The name of the key code bound.
@@ -526,7 +526,7 @@ namespace SEE.UI
                     shortNameOfBindingToLabel[descriptor.Name] = key;
 
                     // add the actionlistener to be able to change the key code of a binding.
-                    keyBindingContent.transform.Find("Key").gameObject.MustGetComponent<Button>()
+                    keyBindingContentGO.transform.Find("Key").gameObject.MustGetComponent<Button>()
                         .onClick.AddListener(() => StartRebindFor(descriptor));
                 }
             }
