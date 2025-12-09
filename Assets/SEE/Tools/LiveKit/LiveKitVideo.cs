@@ -79,7 +79,7 @@ namespace SEE.Tools.LiveKit
 
             if (playerHead == null)
             {
-                Debug.LogError($"Player head not found for client ID {OwnerClientId}. Disabling LiveKitVideo component.");
+                Debug.LogError($"Player head not found for client ID {OwnerClientId}. Disabling {nameof(LiveKitVideo)} component.");
                 enabled = false;
             }
         }
