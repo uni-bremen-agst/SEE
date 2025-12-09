@@ -329,7 +329,8 @@ namespace SEE.Game.Operator
         {
             // FIXME: The icon's mesh must respect the portal.
             highlightEffect.iconFXAssetType = IconAssetType.Prefab;
-            highlightEffect.iconFXPrefab = DynamicMarkerPrefab; // FIXME: Clone this instance. Make it a child. Set Portal.
+            // FIXME: Clone this instance. Make it a child. Set Portal.
+            highlightEffect.iconFXPrefab = UnityEngine.Object.Instantiate(DynamicMarkerPrefab, gameObject.transform);
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
             highlightEffect.iconFXDarkColor = UnityEngine.Color.yellow;
             // The iconFXOffset is relative to the object, that is, not world space.
