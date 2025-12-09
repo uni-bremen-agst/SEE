@@ -23,6 +23,10 @@ namespace SEE.Tools.LiveKit
     /// </summary>
     /// <remarks>
     /// This component is attached to the DesktopPlayer.
+    ///
+    /// The initial LiveKit settings (LiveKit URL, Token URL, Room Name)
+    /// can be edited in the <see cref="UserSettings"/> component in the SEEStart scene,
+    /// where the UserSettings component is attached to the NetworkManager.
     /// /remarks>
     public class LiveKitVideoManager : MonoBehaviour
     {
