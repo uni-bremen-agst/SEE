@@ -1165,7 +1165,7 @@ MonoBehaviour:
   gestureRecognizerModelAsset: {fileID: 4900000, guid: 94802ed857ae0da9f8acbae261909318,
     type: 3}
   IsLocallyControlled: 1
-  IsFirstActivationOfHandHanimations: 1
+  IsFirstActivationOfHandAnimations: 1
 --- !u!114 &2782809671534296890
 MonoBehaviour:
   m_ObjectHideFlags: 0
