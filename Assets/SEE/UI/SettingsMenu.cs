@@ -290,7 +290,7 @@ namespace SEE.UI
             roomNameInputField = settingsMenuGameObject.FindDescendant("RoomName")
                 .GetComponentInChildren<TMP_InputField>();
 
-            // Buttons and importent GameObjects of the LiveKit settings page.
+            // Buttons and important GameObjects of the LiveKit settings page.
             ButtonManagerWithIcon share = settingsMenuGameObject.FindDescendant("Share")
                 .MustGetComponent<ButtonManagerWithIcon>();
             GameObject connectGO = settingsMenuGameObject.FindDescendant("Connect");
