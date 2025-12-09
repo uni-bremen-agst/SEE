@@ -278,37 +278,37 @@ namespace SEE.UI.Menu.Drawable
             GameObject bold = GameFinder.FindChild(Instance.gameObject, "Bold");
             boldBtn = bold.GetComponent<Button>();
             boldBMB = bold.GetComponent<ButtonManagerBasic>();
-            bold.AddComponent<ButtonHoverTooltip>().SetMessage("Bold");
+            bold.AddComponent<UIHoverTooltip>().SetMessage("Bold");
 
             GameObject italic = GameFinder.FindChild(Instance.gameObject, "Italic");
             italicBtn = italic.GetComponent<Button>();
             italicBMB = italic.GetComponent<ButtonManagerBasic>();
-            italic.AddComponent<ButtonHoverTooltip>().SetMessage("Italic");
+            italic.AddComponent<UIHoverTooltip>().SetMessage("Italic");
 
             GameObject underline = GameFinder.FindChild(Instance.gameObject, "Underline");
             underlineBtn = underline.GetComponent<Button>();
             underlineBMB = underline.GetComponent<ButtonManagerBasic>();
-            underline.AddComponent<ButtonHoverTooltip>().SetMessage("Underline");
+            underline.AddComponent<UIHoverTooltip>().SetMessage("Underline");
 
             GameObject strikethrough = GameFinder.FindChild(Instance.gameObject, "Strikethrough");
             strikethroughBtn = strikethrough.GetComponent<Button>();
             strikethroughBMB = strikethrough.GetComponent<ButtonManagerBasic>();
-            strikethrough.AddComponent<ButtonHoverTooltip>().SetMessage("Strikethrough");
+            strikethrough.AddComponent<UIHoverTooltip>().SetMessage("Strikethrough");
 
             GameObject lowerCase = GameFinder.FindChild(Instance.gameObject, "LowerCase");
             lowerCaseBtn = lowerCase.GetComponent<Button>();
             lowerCaseBMB = lowerCase.GetComponent<ButtonManagerBasic>();
-            lowerCase.AddComponent<ButtonHoverTooltip>().SetMessage("Lower Case");
+            lowerCase.AddComponent<UIHoverTooltip>().SetMessage("Lower Case");
 
             GameObject upperCase = GameFinder.FindChild(Instance.gameObject, "UpperCase");
             upperCaseBtn = upperCase.GetComponent<Button>();
             upperCaseBMB = upperCase.GetComponent<ButtonManagerBasic>();
-            upperCase.AddComponent<ButtonHoverTooltip>().SetMessage("Upper Case");
+            upperCase.AddComponent<UIHoverTooltip>().SetMessage("Upper Case");
 
             GameObject smallCaps = GameFinder.FindChild(Instance.gameObject, "SmallCaps");
             smallCapsBtn = smallCaps.GetComponent<Button>();
             smallCapsBMB = smallCaps.GetComponent<ButtonManagerBasic>();
-            smallCaps.AddComponent<ButtonHoverTooltip>().SetMessage("Small Caps");
+            smallCaps.AddComponent<UIHoverTooltip>().SetMessage("Small Caps");
 
             /// Initialize the handler for the buttons
             InitFontStyleButtons();

@@ -3,26 +3,27 @@ using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 
-namespace SEE.UI.Drawable
+namespace SEE.UI
 {
     /// <summary>
-    /// This class allows adding a hover tooltip to a button.
+    /// Adds a hover tooltip to any UI element (e.g., buttons, TextMeshProUGUI labels).
+    /// Shows a message after a short delay when the pointer hovers over the element.
     /// </summary>
-    public class ButtonHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
+    public class UIHoverTooltip : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
     {
         /// <summary>
-        /// The message to be displayed when the button is hovered over.
+        /// The message to be displayed when the element is hovered over.
         /// </summary>
         [FormerlySerializedAs("message")]
         public string Message;
 
         /// <summary>
-        /// The time to wait before displaying the message when hovering over the button.
+        /// The time to wait before displaying the message when hovering over the element.
         /// </summary>
         private float waitTime = 0.3f;
 
         /// <summary>
-        /// Stops all coroutines and starts a new one when the button is hovered over.
+        /// Stops all coroutines and starts a new one when the element is hovered over.
         /// </summary>
         /// <param name="eventData">Will not be used. It's an initial parameter.</param>
         public void OnPointerEnter(PointerEventData eventData)
@@ -32,7 +33,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Stops all coroutines and hides the <see cref="Tooltip.Tooltip"/> when the pointer leaves the button.
+        /// Stops all coroutines and hides the <see cref="Tooltip.Tooltip"/> when the pointer leaves the element.
         /// </summary>
         /// <param name="eventData">Will not be used. It's an initial parameter.</param>
         public void OnPointerExit(PointerEventData eventData)
@@ -42,7 +43,7 @@ namespace SEE.UI.Drawable
         }
 
         /// <summary>
-        /// Stops all coroutines and hides the <see cref="Tooltip.Tooltip"/> when the button will be clicked.
+        /// Stops all coroutines and hides the <see cref="Tooltip.Tooltip"/> when the element will be clicked.
         /// </summary>
         /// <param name="eventData">Will not be used. It's an initial parameter.</param>
         public void OnPointerDown(PointerEventData eventData)

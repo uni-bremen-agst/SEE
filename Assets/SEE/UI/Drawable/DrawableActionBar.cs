@@ -129,7 +129,7 @@ namespace SEE.UI.Drawable
         {
             LocalPlayer.TryGetPlayerMenu(out PlayerMenu menu);
             GameObject drawFreehand = GameFinder.FindChild(barInstance, "DrawFreehand");
-            drawFreehand.AddComponent<ButtonHoverTooltip>().SetMessage("Draw Freehand");
+            drawFreehand.AddComponent<UIHoverTooltip>().SetMessage("Draw Freehand");
             drawFreehand.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawFreehand);
@@ -137,7 +137,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject drawShape = GameFinder.FindChild(barInstance, "DrawShape");
-            drawShape.AddComponent<ButtonHoverTooltip>().SetMessage("Draw Shape");
+            drawShape.AddComponent<UIHoverTooltip>().SetMessage("Draw Shape");
             drawShape.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.DrawShapes);
@@ -145,7 +145,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject writeText = GameFinder.FindChild(barInstance, "WriteText");
-            writeText.AddComponent<ButtonHoverTooltip>().SetMessage("Write Text");
+            writeText.AddComponent<UIHoverTooltip>().SetMessage("Write Text");
             writeText.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.WriteText);
@@ -153,7 +153,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject addImage = GameFinder.FindChild(barInstance, "AddImage");
-            addImage.AddComponent<ButtonHoverTooltip>().SetMessage("Add An Image");
+            addImage.AddComponent<UIHoverTooltip>().SetMessage("Add An Image");
             addImage.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.AddImage);
@@ -161,7 +161,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject mindMap = GameFinder.FindChild(barInstance, "MindMap");
-            mindMap.AddComponent<ButtonHoverTooltip>().SetMessage("Create Mind Map");
+            mindMap.AddComponent<UIHoverTooltip>().SetMessage("Create Mind Map");
             mindMap.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MindMap);
@@ -169,7 +169,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject colorPicker = GameFinder.FindChild(barInstance, "ColorPicker");
-            colorPicker.AddComponent<ButtonHoverTooltip>().SetMessage("Color Picker");
+            colorPicker.AddComponent<UIHoverTooltip>().SetMessage("Color Picker");
             colorPicker.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.ColorPicker);
@@ -177,7 +177,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject edit = GameFinder.FindChild(barInstance, "Edit");
-            edit.AddComponent<ButtonHoverTooltip>().SetMessage("Edit");
+            edit.AddComponent<UIHoverTooltip>().SetMessage("Edit");
             edit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Edit);
@@ -185,7 +185,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject moveRotator = GameFinder.FindChild(barInstance, "MoveRotator");
-            moveRotator.AddComponent<ButtonHoverTooltip>().SetMessage("Move Or Rotate");
+            moveRotator.AddComponent<UIHoverTooltip>().SetMessage("Move Or Rotate");
             moveRotator.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MoveRotator);
@@ -193,7 +193,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject scale = GameFinder.FindChild(barInstance, "Scale");
-            scale.AddComponent<ButtonHoverTooltip>().SetMessage("Scale");
+            scale.AddComponent<UIHoverTooltip>().SetMessage("Scale");
             scale.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Scale);
@@ -201,7 +201,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject layerChanger = GameFinder.FindChild(barInstance, "LayerChanger");
-            layerChanger.AddComponent<ButtonHoverTooltip>().SetMessage("Change The Sorting Layer.");
+            layerChanger.AddComponent<UIHoverTooltip>().SetMessage("Change The Sorting Layer.");
             layerChanger.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LayerChanger);
@@ -209,7 +209,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject cutCopyPaste = GameFinder.FindChild(barInstance, "CutCopyPaste");
-            cutCopyPaste.AddComponent<ButtonHoverTooltip>().SetMessage("Cut, Copy, Paste");
+            cutCopyPaste.AddComponent<UIHoverTooltip>().SetMessage("Cut, Copy, Paste");
             cutCopyPaste.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.CutCopyPaste);
@@ -217,7 +217,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject movePoint = GameFinder.FindChild(barInstance, "MovePoint");
-            movePoint.AddComponent<ButtonHoverTooltip>().SetMessage("Move a Point");
+            movePoint.AddComponent<UIHoverTooltip>().SetMessage("Move a Point");
             movePoint.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.MovePoint);
@@ -225,7 +225,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject lineSplit = GameFinder.FindChild(barInstance, "LineSplit");
-            lineSplit.AddComponent<ButtonHoverTooltip>().SetMessage("Line Split");
+            lineSplit.AddComponent<UIHoverTooltip>().SetMessage("Line Split");
             lineSplit.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineSplit);
@@ -233,7 +233,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject save = GameFinder.FindChild(barInstance, "Save");
-            save.AddComponent<ButtonHoverTooltip>().SetMessage("Save");
+            save.AddComponent<UIHoverTooltip>().SetMessage("Save");
             save.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Save);
@@ -241,7 +241,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject load = GameFinder.FindChild(barInstance, "Load");
-            load.AddComponent<ButtonHoverTooltip>().SetMessage("Load");
+            load.AddComponent<UIHoverTooltip>().SetMessage("Load");
             load.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Load);
@@ -249,7 +249,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject linePointErase = GameFinder.FindChild(barInstance, "LinePointErase");
-            linePointErase.AddComponent<ButtonHoverTooltip>().SetMessage("Line Point Erase");
+            linePointErase.AddComponent<UIHoverTooltip>().SetMessage("Line Point Erase");
             linePointErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LinePointErase);
@@ -257,7 +257,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject lineConnectionErase = GameFinder.FindChild(barInstance, "LineConnectionErase");
-            lineConnectionErase.AddComponent<ButtonHoverTooltip>().SetMessage("Line Connection Erase");
+            lineConnectionErase.AddComponent<UIHoverTooltip>().SetMessage("Line Connection Erase");
             lineConnectionErase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.LineConnectionErase);
@@ -265,7 +265,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject erase = GameFinder.FindChild(barInstance, "Erase");
-            erase.AddComponent<ButtonHoverTooltip>().SetMessage("Erase");
+            erase.AddComponent<UIHoverTooltip>().SetMessage("Erase");
             erase.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Erase);
@@ -273,7 +273,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject cleaner = GameFinder.FindChild(barInstance, "Clear");
-            cleaner.AddComponent<ButtonHoverTooltip>().SetMessage("Clear");
+            cleaner.AddComponent<UIHoverTooltip>().SetMessage("Clear");
             cleaner.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.Clear);
@@ -281,7 +281,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject stickyNote = GameFinder.FindChild(barInstance, "StickyNote");
-            stickyNote.AddComponent<ButtonHoverTooltip>().SetMessage("Sticky Note");
+            stickyNote.AddComponent<UIHoverTooltip>().SetMessage("Sticky Note");
             stickyNote.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 GlobalActionHistory.Execute(ActionStateTypes.StickyNote);
@@ -289,7 +289,7 @@ namespace SEE.UI.Drawable
             });
 
             GameObject manager = GameFinder.FindChild(barInstance, "Manager");
-            manager.AddComponent<ButtonHoverTooltip>().SetMessage("Drawable Surface Manager");
+            manager.AddComponent<UIHoverTooltip>().SetMessage("Drawable Surface Manager");
             manager.GetComponent<ButtonManagerBasic>().clickEvent.AddListener(() =>
             {
                 LocalPlayer.Instance.GetComponentInChildren<ShowDrawableManager>().Toggle();
