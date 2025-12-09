@@ -282,7 +282,6 @@ namespace SEE.Tools.LiveKit
         /// <see cref="room.IsConnected"/> evaluates to <c>true</c>;
         /// otherwise <c>false</c>.
         /// </returns>
-
         private bool IsConnected() => room != null && room.IsConnected;
 
         /// <summary>
@@ -415,7 +414,7 @@ namespace SEE.Tools.LiveKit
         /// <returns>Coroutine to handle the asynchronous unpublishing process.</returns>
         private IEnumerator UnpublishVideo()
         {
-            foreach (var source in rtcVideoSources)
+            foreach (RtcVideoSource source in rtcVideoSources)
             {
                 source.Stop();
             }
@@ -470,7 +469,7 @@ namespace SEE.Tools.LiveKit
                 ulong clientId = ParseIdentity(participant);
                 if (!LiveKitVideoRegistry.TryGet(clientId, out LiveKitVideo liveKitVideo))
                 {
-                    Debug.LogError($"No LiveKitVideo registered for participant {participant.Identity}");
+                    Debug.LogError($"No LiveKitVideo registered for participant {participant.Identity}.\n");
                     return;
                 }
 
