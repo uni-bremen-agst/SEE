@@ -9,7 +9,6 @@ using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 
@@ -537,9 +536,10 @@ namespace SEE.GO
         /// </returns>
         /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
         /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
-        public static Vector3 GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
+        public static float GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
-            return gameObject.transform.InverseTransformPoint(gameObject.GetTop(filterTransform));
+            float top = gameObject.GetMaxY(filterTransform);
+            return top - gameObject.transform.position.y;
         }
         /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
