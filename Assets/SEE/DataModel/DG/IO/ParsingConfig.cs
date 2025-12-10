@@ -43,6 +43,9 @@ namespace SEE.DataModel.DG.IO
 
         #region Config I/O
 
+        /// <summary>
+        /// Label of <see cref="ToolId"/> in the configuration file.
+        /// </summary>
         private const string ToolIdLabel = "ToolId";
 
         /// <summary>
@@ -58,19 +61,18 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Restores the attributes from the configuration file.
         /// </summary>
-        public static void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
+        public void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
         {
             if (attributes.TryGetValue(label, out object groupObj))
             {
-                var groupDict = groupObj as Dictionary<string, object>;
-
-                if (groupDict != null)
+                if (groupObj is Dictionary<string, object> groupDict)
                 {
                     string toolId = "";
                     ConfigIO.Restore(groupDict, ToolIdLabel, ref toolId);
 
                     if (!string.IsNullOrEmpty(toolId))
                     {
+                        ToolId = toolId;
                         parsingConfig = ParsingConfigFactory.Create(toolId);
                         return;
                     }
