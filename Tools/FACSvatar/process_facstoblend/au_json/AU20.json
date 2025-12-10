@@ -1,0 +1,17 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Mouth_Stretch_L" : 0.75,
+    "Mouth_Stretch_R" : 0.75,
+    "Mouth_Frown_L" : 0.40,
+    "Mouth_Frown_R" : 0.40,
+    "Mouth_Roll_In_Lower_L" : 0.30,
+    "Mouth_Roll_In_Lower_R" : 0.30,
+    "Mouth_Lower_L" : 0.50,
+    "Mouth_Lower_R" : 0.50,
+    "Neck_Tighten_L": 0.50,
+    "Neck_Tighten_R": 0.50
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}

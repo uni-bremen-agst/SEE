@@ -3924,6 +3924,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
 --- !u!114 &407024185
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8262,6 +8266,10 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
 --- !u!114 &523857515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10796,6 +10804,135 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Comms: {fileID: 351767374}
+--- !u!1001 &849328021
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 184210, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_Name
+      value: UnityMainThreadDispatcher
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_Pivot.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_Pivot.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchorMin.x
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -50
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 22414968, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 184210, guid: 8a749df5e56f6422ba9fe64d83915a89,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 849328023}
+  m_SourcePrefab: {fileID: 100100000, guid: 8a749df5e56f6422ba9fe64d83915a89, type: 3}
+--- !u!1 &849328022 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 184210, guid: 8a749df5e56f6422ba9fe64d83915a89,
+    type: 3}
+  m_PrefabInstance: {fileID: 849328021}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &849328023
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 849328022}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ec98db2bfd206014aa81790061a50bfb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sub_to_ip: 127.0.0.1
+  sub_to_port: 5572
+  facsvatar_logging: 0
+  participants: 0
+  FACSModel0: {fileID: 0}
+  RiggedModel0: {fileID: 0}
+  FACSModel1: {fileID: 0}
+  RiggedModel1: {fileID: 0}
+  FACSModelDnn: {fileID: 0}
+  RiggedModelDnn: {fileID: 0}
 --- !u!1 &851358624
 GameObject:
   m_ObjectHideFlags: 0
@@ -13980,6 +14117,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   Date: 2025/10/01
 --- !u!114 &1011753829
 MonoBehaviour:
@@ -17760,6 +17901,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -23915,6 +24060,10 @@ MonoBehaviour:
       Root: 2
       RelativePath: 
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
   VCSPath:
     Root: 0
     RelativePath: 
@@ -28149,6 +28298,18 @@ MonoBehaviour:
       Root: 3
       RelativePath: /reflexion/compiler/ReflexionBoard.cfg
       AbsolutePath: 
+  GraphSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
+  ArchitectureSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
+  MappingSnapshotPath:
+    Root: 2
+    RelativePath: 
+    AbsolutePath: 
 --- !u!114 &2147363515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -29004,3 +29165,4 @@ SceneRoots:
   - {fileID: 121763760}
   - {fileID: 870110340}
   - {fileID: 1464036087}
+  - {fileID: 849328021}

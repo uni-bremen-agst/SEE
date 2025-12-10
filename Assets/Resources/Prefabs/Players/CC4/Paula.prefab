@@ -1046,6 +1046,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4058492077140502537}
+  - component: {fileID: 4129981474492454258}
   m_Layer: 0
   m_Name: CC_Base_BoneRoot
   m_TagString: Untagged
@@ -1069,6 +1070,22 @@ Transform:
   - {fileID: 4858929196423624728}
   m_Father: {fileID: 3496049326477354375}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &4129981474492454258
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2377922977729973492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ab04940eec0c14985cb224f8d903cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jointObj_head: {fileID: 3342412146445590289}
+  jointObj_neck: {fileID: 7912807278861089316}
+  headRotCorrection: 0
+  neckRotCorrection: 0
 --- !u!1 &2478284133953331067
 GameObject:
   m_ObjectHideFlags: 0
@@ -1113,6 +1130,7 @@ GameObject:
   - component: {fileID: 6104932042738665644}
   - component: {fileID: 5216004669473979318}
   - component: {fileID: 7095848809919898606}
+  - component: {fileID: 7021212089090022939}
   m_Layer: 0
   m_Name: CC_Base_Body
   m_TagString: Untagged
@@ -2685,6 +2703,18 @@ MonoBehaviour:
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
   - {x: 0, y: 0, z: 0, w: 0}
+--- !u!114 &7021212089090022939
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2509185524272719934}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1baff5d3dbe38494ab39e74a00972710, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &2552919272563205326
 GameObject:
   m_ObjectHideFlags: 0

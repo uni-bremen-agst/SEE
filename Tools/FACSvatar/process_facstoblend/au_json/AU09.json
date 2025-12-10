@@ -1,0 +1,23 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Brow_Raise_Outer_R" : -0.25,
+    "Brow_Raise_Outer_L" : -0.25,
+    "Brow_Drop_L" : 0.20,
+    "Brow_Drop_R" : 0.20,
+    "Cheek_Raise_L" : 0.40,
+    "Cheek_Raise_R" : 0.40,
+    "Mouth_Close" : 0.05,
+    "Mouth_Up_Upper_L" : 0.20,
+    "Mouth_Up_Upper_R" : 0.20,
+    "Nose_Sneer_L" : 0.20,
+    "Nose_Sneer_R" : 0.20,
+    "Nose_Nostril_Raise_L" : 1.15,
+    "Nose_Nostril_Raise_R" : 1.15,
+    "Nose_Tip_Up" : 0.50,
+    "Eye_Squint_L" : 0.20,
+    "Eye_Squint_R" : 0.20
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}
