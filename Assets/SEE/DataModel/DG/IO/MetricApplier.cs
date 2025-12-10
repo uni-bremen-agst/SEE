@@ -62,7 +62,7 @@ namespace SEE.DataModel.DG.IO
                 if (string.IsNullOrWhiteSpace(findingPathAsMainType))
                 {
                     Debug.LogWarning(
-                        $"[MetricApplier] Encountered null nodeId for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
+                        $"[MetricApplier] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
                     continue;
                 }
 
