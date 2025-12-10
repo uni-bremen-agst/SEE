@@ -9,7 +9,7 @@ using UnityEngine;
 using static SEE.GO.Materials.ShaderType;
 using Object = UnityEngine.Object;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory for markers to highlight added, changed, and deleted nodes.
@@ -35,11 +35,11 @@ namespace SEE.GO
 
             if (markerAttributes.MarkerHeight < 0)
             {
-                throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker height.\n");
+                throw new ArgumentException($"{nameof(MarkerFactory)} received a negative marker height.\n");
             }
             if (markerAttributes.MarkerWidth < 0)
             {
-                throw new ArgumentException("SEE.Game.Evolution.Marker received a negative marker width.\n");
+                throw new ArgumentException($"{nameof(MarkerFactory)} received a negative marker width.\n");
             }
             markerScale = new Vector3(markerAttributes.MarkerWidth, markerAttributes.MarkerHeight, markerAttributes.MarkerWidth);
         }

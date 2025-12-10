@@ -6,6 +6,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
+using SEE.GO.Factories;
 using SEE.GO.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
