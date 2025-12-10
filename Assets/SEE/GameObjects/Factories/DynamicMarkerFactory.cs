@@ -59,6 +59,8 @@ namespace SEE.GO.Factories
                 }
                 else
                 {
+                    // We do not want to change the prefab file if we set the portal.
+                    dynamicMarkerPrefab.hideFlags = HideFlags.DontSave;
                     dynamicMarkerPrefab.name = "DynamicMarker_" + codeCity.name;
 
                     Portal.GetDimensions(codeCity.gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
