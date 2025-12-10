@@ -28,13 +28,13 @@ namespace SEE.User
         /// Settings of the player.
         /// </summary>
         [Tooltip("Settings of the player.")]
-        public Player Player = new();
+        public readonly Player Player = new();
 
         /// <summary>
         /// Settings of the network.
         /// </summary>
         [Tooltip("Settings of the network.")]
-        public Network Network = new();
+        public readonly Network Network = new();
 
         /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
@@ -54,7 +54,13 @@ namespace SEE.User
         /// Settings for telemetry.
         /// </summary>
         [Tooltip("Telemetry settings.")]
-        public Telemetry Telemetry = new();
+        public readonly Telemetry Telemetry = new();
+
+        /// <summary>
+        /// Settings for video.
+        /// </summary>
+        [Tooltip("Video settings.")]
+        public readonly Video Video = new();
 
         /// <summary>
         /// Default path of the configuration file (path and filename).
@@ -100,6 +106,9 @@ namespace SEE.User
             /// thread, that is, <see cref="Thread.CurrentThread"/> represents Unity's
             /// main thread here.
             MainThread = Thread.CurrentThread;
+
+            // Sets the Unity-dependent default values.
+            Video.InitializeDefaults();
 
             Load();
         }
@@ -276,6 +285,11 @@ namespace SEE.User
         private const string inputTypeLabel = "InputType";
 
         /// <summary>
+        /// Label of attribute <see cref="Video"/> in the configuration file.
+        /// </summary>
+        private const string videoLabel = "Video";
+
+        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
@@ -286,6 +300,7 @@ namespace SEE.User
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
             writer.Save(InputType.ToString(), inputTypeLabel);
+            Video.Save(writer, videoLabel);
         }
 
         /// <summary>
@@ -299,6 +314,7 @@ namespace SEE.User
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
             ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
+            Video.Restore(attributes, videoLabel);
         }
 
         #endregion Configuration I/O

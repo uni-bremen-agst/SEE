@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 125735865005071757}
   - component: {fileID: 108957911249939627}
   m_Layer: 0
-  m_Name: LivekitVideo
+  m_Name: LiveKitVideo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1165,7 +1165,7 @@ MonoBehaviour:
   gestureRecognizerModelAsset: {fileID: 4900000, guid: 94802ed857ae0da9f8acbae261909318,
     type: 3}
   IsLocallyControlled: 1
-  IsUsingHandAnimations: 0
+  IsFirstActivationOfHandAnimations: 1
 --- !u!114 &2782809671534296890
 MonoBehaviour:
   m_ObjectHideFlags: 0

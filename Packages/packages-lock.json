@@ -472,7 +472,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9f274e1e90bcde869651e9510b4bfeb815b89318"
+      "hash": "fe49cfb1879f18e343251104d3494aad675c01a4"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",
