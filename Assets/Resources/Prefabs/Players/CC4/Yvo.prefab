@@ -4150,6 +4150,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 175324353693213552}
+  - component: {fileID: 3896993207237002335}
   m_Layer: 0
   m_Name: CC_Base_BoneRoot
   m_TagString: Untagged
@@ -4173,6 +4174,22 @@ Transform:
   - {fileID: 8728819749957653351}
   m_Father: {fileID: 4036437234379637653}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &3896993207237002335
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6743175437620371011}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30ab04940eec0c14985cb224f8d903cb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  jointObj_head: {fileID: 2405272713689411698}
+  jointObj_neck: {fileID: 4889117141845395644}
+  headRotCorrection: 0
+  neckRotCorrection: 0
 --- !u!1 &6885518832202995834
 GameObject:
   m_ObjectHideFlags: 0
@@ -14437,7 +14454,7 @@ MonoBehaviour:
   randomHoldDurationMax: 0.5
   configReady: 1
   warnOnNullRefs: 1
-  inspSalsaLinked: 1
+  inspSalsaLinked: 0
   inspStateFoldoutProcessing: 0
   inspStateFoldoutSettings: 0
   inspStateFoldoutEmotes: 0
