@@ -46,9 +46,9 @@ namespace SEE.GraphProviders
         {
             return CreateTestFindings();
         }
+        
         public record MetricValue(int? Missed, int? Covered);
-
-
+        
         /// <summary>
         /// Builds a metric dictionary for a JaCoCo node.
         /// For each metric, *_missed, *_covered und *_percentage are entered.
