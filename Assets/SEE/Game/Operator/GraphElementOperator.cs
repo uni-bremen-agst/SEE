@@ -299,37 +299,6 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// Name of the file containing the prefab for dynamic markers.
-        /// Used for <see cref="highlightEffect.iconFXPrefab"/>.
-        /// </summary>
-        private const string dynamicMarkerPrefabFile = "Prefabs/DynamicMarker";
-
-        private static GameObject dynamicMarkerPrefab;
-
-        private static GameObject DynamicMarkerPrefab
-        {
-            get
-            {
-                if (dynamicMarkerPrefab == null)
-                {
-                    // Instantiation per code city. Each code has its own portal.
-                    dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile, null, false);
-                    if (dynamicMarkerPrefab == null)
-                    {
-                        Debug.LogError($"Cannot load prefab {dynamicMarkerPrefabFile}\n");
-                    }
-                    else
-                    {
-                        dynamicMarkerPrefab.name = "DynamicMarker";
-                        Portal.SetInfinitePortal(dynamicMarkerPrefab);
-                        // Set Portal.
-                    }
-                }
-                return dynamicMarkerPrefab;
-            }
-        }
-
-        /// <summary>
         /// Enables an icon floating above the associated graph element this operator is attached to.
         /// </summary>
         /// <param name="factor">Factor to apply to the <see cref="BaseAnimationDuration"/>
@@ -343,7 +312,7 @@ namespace SEE.Game.Operator
 
             // Use Prefab icon.
             highlightEffect.iconFXAssetType = IconAssetType.Prefab;
-            highlightEffect.iconFXPrefab = DynamicMarkerPrefab;
+            highlightEffect.iconFXPrefab = DynamicMarkerFactory.GetMarker(gameObject);
 
             highlightEffect.iconFXAnimationOption = IconAnimationOption.VerticalBounce;
             // The y range in which the icon bounces vertically.
@@ -352,7 +321,6 @@ namespace SEE.Game.Operator
             // The iconFXOffset is relative to the object in world-space units.
             // We count only the decorations, nodes, and edges, but not labels and the like.
             float top = highlightEffect.gameObject.GetRelativeTop(t => t.CompareTag(Tags.Decoration) || t.CompareTag(Tags.Node) || t.CompareTag(Tags.Edge));
-            Debug.Log($"{gameObject.name} position={gameObject.transform.position} top={top}\n");
             highlightEffect.iconFXOffset = new(0, top, 0);
 
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
