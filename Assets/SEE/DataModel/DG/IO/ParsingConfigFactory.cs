@@ -10,7 +10,7 @@ namespace SEE.DataModel.DG.IO
     /// A factory for creating instances of <see cref="ParsingConfig"/>.
     ///
     /// This factory uses reflection to automatically discover all non-abstract subclasses 
-    /// of <see cref="ParsingConfig"/> within the executing assembly. It allows creating 
+    /// of <see cref="ParsingConfig"/> within the executing assembly. It allows creating
     /// concrete configuration objects based on their unique tool identifier (e.g., "JaCoCo").
     /// </summary>
     public static class ParsingConfigFactory
