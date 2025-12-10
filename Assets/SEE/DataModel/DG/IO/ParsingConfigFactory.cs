@@ -33,7 +33,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Scans the executing assembly for all valid <see cref="ParsingConfig"/> implementations
         /// and registers them in the <see cref="_registry"/>.
-        /// 
+        ///
         /// A type is considered valid if it inherits from <see cref="ParsingConfig"/> and is not abstract.
         /// To determine the key for the registry, a temporary instance of the type is created 
         /// to access its <see cref="ParsingConfig.ToolId"/>.
