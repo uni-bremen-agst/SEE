@@ -16,7 +16,7 @@ namespace SEE.DataModel.DG.IO
     public static class ParsingConfigFactory
     {
         /// <summary>
-        /// A registry mapping the unique tool identifier (e.g., "JaCoCo") to the corresponding 
+        /// A registry mapping the unique tool identifier (e.g., "JaCoCo") to the corresponding
         /// C# <see cref="Type"/> of the configuration class.
         /// </summary>
         private static readonly Dictionary<string, Type> _registry = new Dictionary<string, Type>();
