@@ -177,7 +177,7 @@ namespace SEE.GraphProviders
                                        classCovered: 1)
             };
 
-            // Method "save" in dieser Klasse:
+            // Method "save" in this class:
             // INSTRUCTION {missed=0, covered=30}
             // BRANCH      {missed=1, covered=1}
             // LINE        {missed=0, covered=11}
