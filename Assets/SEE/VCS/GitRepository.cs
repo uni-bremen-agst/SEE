@@ -640,12 +640,8 @@ namespace SEE.VCS
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
+                token.ThrowIfCancellationRequested();
                 // We collect all files in the entire tree.
-                if (token.IsCancellationRequested)
-                {
-                    Debug.Log("Cancellation was requested.\n");
-                    throw new OperationCanceledException(token);
-                }
                 CollectFiles(tree, VCSFilter.Matcher, paths, token);
             }
             else
@@ -655,11 +651,7 @@ namespace SEE.VCS
                 {
                     if (!string.IsNullOrWhiteSpace(repositoryPath))
                     {
-                        if (token.IsCancellationRequested)
-                        {
-                            Debug.Log("Cancellation was requested.\n");
-                            throw new OperationCanceledException(token);
-                        }
+                        token.ThrowIfCancellationRequested();
                         LibGit2Sharp.Tree subtree = Find(tree, repositoryPath);
                         // It can happen that we do not find the subtree, because
                         // it may exist in some branches, but not in others.
