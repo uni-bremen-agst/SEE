@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using DynamicPanels;
-using SEE.Controls;
-using SEE.Controls.Actions;
 using SEE.GO;
 using SEE.Utils;
 using UnityEngine;

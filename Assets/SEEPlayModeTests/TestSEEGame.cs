@@ -119,7 +119,7 @@ namespace SEE.Net
             PressButton(HostButtonPath);
             yield return new WaitForEndOfFrame();
 
-            Assert.NotNull(SEE.Net.Network.Instance);
+            Assert.NotNull(User.UserSettings.Instance);
             Debug.Log($"[SetUp] Finished.\n");
             yield return null;
         }

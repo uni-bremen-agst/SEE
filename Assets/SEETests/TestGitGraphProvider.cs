@@ -1,23 +1,24 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 using Cysharp.Threading.Tasks;
 using LibGit2Sharp;
 using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GraphProviders.Evolution;
+using SEE.Utils;
 using SEE.Utils.Paths;
+using SEE.VCS;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 using UnityEngine.TestTools;
-
 using static SEE.DataModel.DG.VCS;
 
 namespace SEE.GraphProviders
 {
     /// <summary>
-    /// Tests of <see cref="AllGitBranchesSingleGraphProvider"/> and
+    /// Tests of <see cref="GitBranchesGraphProvider"/> and
     /// <see cref="GitEvolutionGraphProvider"/>"/>.
     /// </summary>
     public class TestGitGraphProvider
@@ -89,10 +90,14 @@ namespace SEE.GraphProviders
         {
             GameObject go = new();
             BranchCity city = go.AddComponent<BranchCity>();
-            city.VCSPath = new DataPath(gitDirPath);
-            AllGitBranchesSingleGraphProvider provider = new()
+            GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                 repositoryPaths: null,
+                                                                 branches: null));
+            GitBranchesGraphProvider provider = new()
             {
-                PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
+                GitRepository = gitRepository,
+                SimplifyGraph = true,
             };
             city.Date = date;
 
@@ -116,14 +121,15 @@ namespace SEE.GraphProviders
         /// <returns>The generated Graph</returns>
         private async UniTask<IList<Graph>> ProvidingGraphSeriesAsync(string date = defaultDate)
         {
+
+            GitRepository gitRepository = new(new DataPath(gitDirPath),
+                                              new SEE.VCS.Filter(globbing: new Globbing() { { "**/*.cs", true } },
+                                                                 repositoryPaths: null,
+                                                                 branches: null));
             GitEvolutionGraphProvider provider = new()
             {
                 Date = date,
-                GitRepository = new GitRepository()
-                {
-                    RepositoryPath = new DataPath(gitDirPath),
-                    PathGlobbing = new Dictionary<string, bool>() { { "**/*.cs", true } }
-                }
+                GitRepository = gitRepository
             };
 
             static void ReportProgress(float x)
@@ -153,25 +159,25 @@ namespace SEE.GraphProviders
 
                 Assert.AreEqual(
                     1,
-                    series[0].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[0].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
                 );
 
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[1].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits]
                 );
                 Assert.AreEqual(
                     1,
-                    series[1].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[1].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
                 );
 
                 Assert.AreEqual(
                     2,
-                    series[2].GetNode("AnotherFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[2].GetNode("AnotherFile.cs").IntAttributes[NumberOfCommits]
                 );
                 Assert.AreEqual(
                     1,
-                    series[2].GetNode("firstFile.cs-Evo").IntAttributes[CommitFrequency]
+                    series[2].GetNode("firstFile.cs").IntAttributes[NumberOfCommits]
                 );
             });
         }
@@ -193,12 +199,12 @@ namespace SEE.GraphProviders
                 Graph g = await ProvidingGraphAsync();
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n1 = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n1.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n1.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n1.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("AnotherFile.cs"));
                 Node n2 = g.GetNode("AnotherFile.cs");
-                Assert.AreEqual(2, n2.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n2.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(2, n2.IntAttributes[NumberOfDevelopers]);
 
                 Assert.NotNull(g.GetNode("dir1/dir2/actualFile.cs"));
@@ -215,11 +221,11 @@ namespace SEE.GraphProviders
                 Graph g = await ProvidingGraphAsync(date: "2024/12/01");
                 // This file should be too old by now
                 Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfDevelopers]);
-                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[CommitFrequency]);
+                Assert.AreEqual(0, g.GetNode("firstFile.cs").IntAttributes[NumberOfCommits]);
                 Graph g2 = await ProvidingGraphAsync();
                 Assert.NotNull(g2.GetNode("firstFile.cs"));
                 Node n = g2.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
@@ -237,7 +243,7 @@ namespace SEE.GraphProviders
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(2, n.IntAttributes[NumberOfDevelopers]);
             });
         }
@@ -264,7 +270,7 @@ namespace SEE.GraphProviders
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
@@ -283,7 +289,7 @@ namespace SEE.GraphProviders
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
 
                 Assert.IsNull(g.GetNode("otherfile.notcs"));
@@ -303,7 +309,7 @@ namespace SEE.GraphProviders
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(2, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(2, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }
@@ -332,7 +338,7 @@ namespace SEE.GraphProviders
                 Assert.DoesNotThrow(() => g.GetNode("firstFile.cs"));
                 Assert.NotNull(g.GetNode("firstFile.cs"));
                 Node n = g.GetNode("firstFile.cs");
-                Assert.AreEqual(1, n.IntAttributes[CommitFrequency]);
+                Assert.AreEqual(1, n.IntAttributes[NumberOfCommits]);
                 Assert.AreEqual(1, n.IntAttributes[NumberOfDevelopers]);
             });
         }

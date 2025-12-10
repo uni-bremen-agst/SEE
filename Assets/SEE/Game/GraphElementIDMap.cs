@@ -42,13 +42,17 @@ namespace SEE.Game
 
         /// <summary>
         /// Returns the game object with the given <paramref name="id"/> or null if there is
-        /// no such game object.
+        /// no such game object if <paramref name="mustFindElement"/> is false.
+        /// If <paramref name="mustFindElement"/> is true and no corresponding graph element
+        /// can be found, <see cref="KeyNotFoundException"/> is thrown.
         /// </summary>
         /// <param name="id">the ID of the game object to be looked up</param>
         /// <param name="mustFindElement">If true, an exception will be thrown if the element could not be found.
         /// Otherwise, <c>null</c> will be returned.</param>
         /// <returns>the game object with the given <paramref name="id"/> or null if there is
         /// no such game object</returns>
+        /// <exception cref="KeyNotFoundException">thrown if <paramref name="mustFindElement"/> is
+        /// true and a graph element with the given <paramref name="id"/> cannot be found</exception>
         internal static GameObject Find(string id, bool mustFindElement = false)
         {
             Assert.IsFalse(string.IsNullOrEmpty(id));

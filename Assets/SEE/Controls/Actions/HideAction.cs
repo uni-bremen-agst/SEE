@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         public override void Start()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 base.Stop();
                 OpenDialog();
@@ -131,11 +131,11 @@ namespace SEE.Controls.Actions
         /// <returns>true if completed</returns>
         public override bool Update()
         {
-            if (SceneSettings.InputType == PlayerInputType.DesktopPlayer)
+            if (User.UserSettings.IsDesktop)
             {
                 MakeUnselectedTransparent();
             }
-            if (SceneSettings.InputType == PlayerInputType.VRPlayer)
+            if (User.UserSettings.IsVR)
             {
                 mode = RadialSelection.HideMode;
             }

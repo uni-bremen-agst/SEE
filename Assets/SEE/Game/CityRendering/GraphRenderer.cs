@@ -276,17 +276,24 @@ namespace SEE.Game.CityRendering
         ///
         /// The game objects representing the nodes will be children of <paramref name="parent"/>, while
         /// the game objects drawn for edges will always be children of the unique root game object representing
-        /// the code city as a whole.
+        /// the code city as a whole. The <paramref name="parent"/> will generally be the object holding a
+        /// <see cref="AbstractSEECity"/> component, while the unique root game object is representing the
+        /// root of the graph node hierarchy, i.e., is part of the <paramref name="graph"/>.
         /// </summary>
         /// <param name="graph">the graph to be drawn; it should be one initially passed to the constructor since
         /// the node-type factories and the like are set up by the constructor</param>
-        /// <param name="parent">every game object drawn will be become an immediate child to this parent</param>
+        /// <param name="parent">every game object drawn will become an immediate child to this parent</param>
         /// <param name="updateProgress">action to be called with the progress of the operation</param>
         /// <param name="token">cancellation token with which to cancel the operation</param>
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
-        public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
+        /// <returns>The resulting layout informations of the rendering.</returns>
+        public async UniTask DrawGraphAsync
+            (Graph graph,
+             GameObject parent,
+             Action<float> updateProgress = null,
+             CancellationToken token = default,
+             bool doNotAddUniqueRoot = false)
         {
             if (graph.NodeCount == 0)
             {
@@ -304,48 +311,55 @@ namespace SEE.Game.CityRendering
             }
 
             // The representation of the nodes for the layout.
-            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values);
+            IDictionary<Node, LayoutGameNode> gameNodes = ToLayoutNodes(nodeMap.Values, NewLayoutNode);
 
             // 1) Calculate the layout.
             Performance p = Performance.Begin($"Node layout {Settings.NodeLayoutSettings.Kind} for {gameNodes.Count} nodes");
             /// The layout to be applied. If <see cref="doNotAddUniqueRoot"/> is true, use <see cref="NodeLayoutKind.Treemap"/> as the layout.
-            NodeLayout nodeLayout = !doNotAddUniqueRoot? GetLayout() : GetLayout(NodeLayoutKind.Treemap);
+            NodeLayout nodeLayout = !doNotAddUniqueRoot ? GetLayout() : GetLayout(NodeLayoutKind.Treemap);
             // Equivalent to gameNodes but as an ICollection<ILayoutNode> instead of ICollection<GameNode>
             // (GameNode implements ILayoutNode).
             ICollection<ILayoutNode> layoutNodes = gameNodes.Values.Cast<ILayoutNode>().ToList();
             // 2) Apply the calculated layout to the game objects.
-            {
-                Vector3 position = parent.transform.position;
-                position.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
-                NodeLayout.Apply(nodeLayout.Create(layoutNodes, position, new Vector2(parent.transform.lossyScale.x, parent.transform.lossyScale.z)));
-            }
+            // The center position of the rectangular plane where the nodes should be placed.
+            Vector3 planeCenterposition = parent.transform.position;
+            planeCenterposition.y += parent.transform.lossyScale.y / 2.0f + levelDistance;
+            // The rectangle (width, depth) of the plane in which the nodes should be placed.
+            Vector2 planeRectangle = new(parent.transform.lossyScale.x, parent.transform.lossyScale.z);
+            NodeLayout.Apply(nodeLayout.Create(layoutNodes, planeCenterposition, planeRectangle));
+
             p.End();
             Debug.Log($"Built \"{Settings.NodeLayoutSettings.Kind}\" node layout for {gameNodes.Count} nodes in {p.GetElapsedTime()} [h:m:s:ms].\n");
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
-            // Create the laid out edges; they will be children of the unique root game node
-            // representing the node hierarchy. This way the edges can be moved along with
-            // the nodes.
-            GameObject rootGameNode = RootGameNode(parent);
-            try
-            {
-                await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
-            }
-            catch (OperationCanceledException)
-            {
-                // If the operation gets canceled, we need to clean up the dangling edge game objects.
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
-                {
-                    Destroyer.Destroy(edge);
-                }
-                // Then re-throw.
-                throw;
-            }
-
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             AddDecorations(nodeMap.Values);
+
+            // Create the laid out edges; they will be children of the unique rootGameNode
+            // representing the node hierarchy. This way the edges can be moved along with
+            // the nodes.
+            GameObject rootGameNode = RootGameNode(parent);
+
+            ICollection<GameObject> edgeLayouts = new List<GameObject>();
+            if (Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+            {
+                try
+                {
+                    edgeLayouts = await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+                }
+                catch (OperationCanceledException)
+                {
+                    // If the operation gets canceled, we need to clean up the dangling edge game objects.
+                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
+                    {
+                        Destroyer.Destroy(edge);
+                    }
+                    // Then re-throw.
+                    throw;
+                }
+            }
 
             Portal.SetPortal(parent);
 
@@ -364,12 +378,10 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode);
+                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
-            return;
-
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {
@@ -379,6 +391,17 @@ namespace SEE.Game.CityRendering
                     Debug.Log($"Artificial unique root {artificialRoot.ID} was added.\n");
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns a new <see cref="LayoutGameNode"/> for the given <paramref name="go"/>.
+        /// </summary>
+        /// <param name="node">ignored</param>
+        /// <param name="go">the game object for which to create the <see cref="LayoutGameNode"/></param>
+        /// <returns>new <see cref="LayoutGameNode"/> for the given <paramref name="go"/></returns>
+        private LayoutGameNode NewLayoutNode(Node node, GameObject go)
+        {
+            return new LayoutGameNode(go);
         }
 
         /// <summary>
@@ -478,7 +501,7 @@ namespace SEE.Game.CityRendering
             }
             if (nodeLayoutSettings.Implementation == NodeLayoutKind.Reflexion)
             {
-               throw new Exception("Reflexion layout cannot be used as an implementation layout.");
+                throw new Exception("Reflexion layout cannot be used as an implementation layout.");
             }
             return GetLayout(nodeLayoutSettings.Implementation);
         }
@@ -532,24 +555,28 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="gameNodes">collection of game objects created to represent inner nodes or leaf nodes of a graph</param>
         /// <returns>mapping of graph nodes onto newly created <see cref="LayoutGameNode"/>s</returns>
-        private static IDictionary<Node, LayoutGameNode> ToLayoutNodes
-            (ICollection<GameObject> gameNodes)
+        public static IDictionary<Node, T> ToLayoutNodes<T>
+            (ICollection<GameObject> gameNodes,
+            Func<Node, GameObject, T> newLayoutNode)
+            where T : AbstractLayoutNode
         {
-            Dictionary<Node, LayoutGameNode> result = new();
+            Dictionary<Node, T> result = new(gameNodes.Count);
+            // Map each graph node onto its corresponding game node.
             foreach (GameObject gameNode in gameNodes)
             {
                 if (gameNode.TryGetNode(out Node node))
                 {
-                    result[node] = new LayoutGameNode(gameNode);
+                    result[node] = newLayoutNode(node, gameNode);
                 }
             }
+            // Now set the children of every layout node.
             foreach (var item in result)
             {
                 Node parent = item.Key;
-                LayoutGameNode parentGameNode = item.Value;
+                T parentGameNode = item.Value;
                 foreach (Node child in parent.Children())
                 {
-                    if (result.TryGetValue(child, out LayoutGameNode childGameNode))
+                    if (result.TryGetValue(child, out T childGameNode))
                     {
                         parentGameNode.AddChild(childGameNode);
                     }

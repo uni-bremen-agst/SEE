@@ -2,6 +2,8 @@
 @REM run the Axivion Suite tools and then executes the command line parameters
 @REM passed to this batch file. If there are none, only the variables are
 @REM set.
+@REM
+@REM It should be run in SEE's project directory. 
 
 @REM This is to be able to set the environment variables only for this run of the script.
 @setlocal
@@ -11,7 +13,7 @@
 @REM Because this batch script is called by Jenkins, we apparently need to
 @REM call this first to avoid failing with an error because of the error
 @REM "The system cannot find the path specified.":
-cmd.exe /c
+@REM cmd.exe /c
 
 if not "%AXIVION_LOCAL_BUILD%"=="" (
   @echo "Variable AXIVION_LOCAL_BUILD is set. If axivion_ci is run, it will be a local build."
@@ -47,13 +49,19 @@ if not exist "%AXIVION%\bin%" (
 
 set "PATH=%AXIVION%\bin;%PATH%"
 
-@REM SEE project directory (generally the Jenkins workspace if this job is run
-@REM by Jenkins, in which case WORKSPACE is set, or otherwise the current directory)
-if "%WORKSPACE%" == "" (
-  set "SEEDIRECTORY=%cd%"
-) else (
-  set "SEEDIRECTORY=%WORKSPACE%"
+@REM SEE project directory: SEEDIRECTORY
+if "%SEEDIRECTORY%"=="" (
+  @echo "Variable SEEDIRECTORY not set. I try to figure it out."
+@REM Generally the Jenkins workspace if this job is run by Jenkins,
+@REM in which case WORKSPACE is set, or otherwise the current directory
+  if "%WORKSPACE%" == "" (
+    set "SEEDIRECTORY=%cd%"
+  ) else (
+     set "SEEDIRECTORY=%WORKSPACE%"
+  )
 )
+
+@echo "I am using %SEEDIRECTORY% for SEEDIRECTORY"
 
 if not exist "%SEEDIRECTORY%" (
   @echo "Directory %SEEDIRECTORY% does not exist. You need to set environment variable SEEDIRECTORY to the directory where the SEE project resides."
@@ -107,7 +115,7 @@ if "%AXIVION_DASHBOARD_URL%"=="" (
 )
 
 if "%UNITY%"=="" (
-  set "UNITY=C:\Program Files\Unity\Hub\Editor\6000.0.48f1"
+  set "UNITY=C:\Program Files\Unity\Hub\Editor\6000.0.58f2"
 )
 
 if not exist "%UNITY%" (

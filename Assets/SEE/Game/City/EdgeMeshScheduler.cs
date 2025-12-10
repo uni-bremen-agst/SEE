@@ -190,24 +190,42 @@ namespace SEE.Game.City
 
                 if (hideSplines && edge.HasToggle(Edge.IsHiddenToggle))
                 {
-                    spline.SubsplineEndT = 0;
+                    spline.VisibleSegmentEnd = 0;
                 }
             }
         }
 
+        /// <summary>
+        /// Called by the observed graph when it is being disposed.
+        /// As a consequence, this component destroys itself.
+        /// </summary>
         public void OnCompleted()
         {
             Destroyer.Destroy(this);
         }
 
+        /// <summary>
+        /// Called by the observed graph when an error occurs.
+        /// The error is ignored here, as someone else should handle it.
+        /// </summary>
+        /// <param name="error">not used</param>
         public void OnError(Exception error)
         {
             // We don't care. Someone else should handle the error.
         }
 
-        public void OnNext(ChangeEvent value)
+        /// <summary>
+        /// Called by the observed graph when a change occurs. The change
+        /// is described by <paramref name="changeEvent"/>. If it is an
+        /// <see cref="EdgeEvent"/> describing an addition of an edge, the
+        /// new edge is registered for mesh creation. For all other events,
+        /// nothing happens.
+        /// </summary>
+        /// <param name="changeEvent">a description of the state change; this method
+        /// reacts only on an <see cref="EdgeEvent"/></param>
+        public void OnNext(ChangeEvent changeEvent)
         {
-            if (value is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
+            if (changeEvent is EdgeEvent { Change: ChangeType.Addition } edgeEvent)
             {
                 // If this is an added edge, we are going to need to turn it into a mesh.
                 // TODO (#722): The loading spinner loops forever for edges newly added as

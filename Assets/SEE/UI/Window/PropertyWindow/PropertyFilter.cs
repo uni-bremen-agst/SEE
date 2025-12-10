@@ -1,7 +1,4 @@
-﻿using System.Collections;
-using UnityEngine;
-
-namespace Assets.SEE.UI.Window.PropertyWindow
+﻿namespace SEE.UI.Window.PropertyWindow
 {
     /// <summary>
     /// A configurable filter for properties.

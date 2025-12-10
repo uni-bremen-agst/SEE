@@ -7,6 +7,10 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         _EndColor("End Color", color) = (0,0,1,1)
         [Toggle] _ColorGradientEnabled("Enable Color Gradient?", Range(0, 1)) = 0 // 0 = false, 1 = true
 
+        // Clip Ends
+        _VisibleStart ("Start of Visible Segment", Range(0, 1)) = 0.0
+        _VisibleEnd ("End of Visible Segment", Range(0, 1)) = 1.0
+
         // Data Flow
         [Toggle] _EdgeFlowEnabled("Enable Data Flow Visualization?", Range(0, 1)) = 0 // 0 = false, 1 = true
         _AnimationFactor("Animation Speed Factor", Range(0, 3)) = 0.4
@@ -16,7 +20,7 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
         // Portal
         _Portal ("Portal (x_min, z_min, x_max, z_max) (World Units)", Vector) = (-10, -10, 10, 10)
-        _PortalFade ("Portal Edge Fade (World Units)", Float) = 0.01
+        _PortalFadeWidth ("Portal Edge Fade Width (World Units)", Float) = 0.01
 
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Cull", Float) = 2 // 0: Off, 1: Front, 2: Back
     }
@@ -51,7 +55,9 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         struct v2f
         {
             float4 vertex : SV_POSITION;
-            float4 color : TEXCOORD2;
+            float4 color : COLOR;
+            float2 uv : TEXCOORD0;
+            float3 worldPos : TEXCOORD1;
         };
 
         // Color
@@ -59,6 +65,10 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
         fixed4 _EndColor;
         float _ColorGradientEnabled;
         float _AlphaThreshold;
+
+        // Clip Ends
+        float _VisibleStart;
+        float _VisibleEnd;
 
         // Data Flow
         float _EdgeFlowEnabled;
@@ -69,7 +79,7 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
         // Portal
         float4 _Portal;
-        float _PortalFade;
+        float _PortalFadeWidth;
 
         v2f SharedVertexManipulation(appdata v)
         {
@@ -98,18 +108,13 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
             }
 
             o.vertex = UnityObjectToClipPos(v.vertex);
+            o.uv = v.uv;
+            o.worldPos = mul(unity_ObjectToWorld, v.vertex).xyz;
 
-            // Portal: Calculate overhang in each direction
-            // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
-            float4 worldPos = mul(unity_ObjectToWorld, v.vertex);
-            float overhangLeft   = max(_Portal.x - worldPos.x, 0.0);
-            float overhangBottom = max(_Portal.y - worldPos.z, 0.0);
-            float overhangRight  = max(worldPos.x - _Portal.z, 0.0);
-            float overhangTop    = max(worldPos.z - _Portal.w, 0.0);
-            float fade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom+ overhangTop) / _PortalFade);
-
-            // Color gradient and portal fade
-            o.color = (_ColorGradientEnabled > 0.5 ? lerp(_Color, _EndColor, v.uv.y) : _Color) * fade;
+            // Color Gradient
+            // Note: Even though the color is calculated per vertex, it is automatically linearly interpolated
+            //       by the GPU for the fragment step.
+            o.color = (_ColorGradientEnabled > 0.5 ? lerp(_Color, _EndColor, v.uv.y) : _Color);
 
             return o;
         }
@@ -136,8 +141,21 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
-               // Discard fragment if not completely opaque
-               if (i.color.a < 1.0)
+                // Discard fragment if not completely opaque
+                if (i.color.a < 1.0)
+                {
+                    discard;
+                }
+
+                // Clip Ends
+                if (i.uv.y < _VisibleStart || i.uv.y > _VisibleEnd || _VisibleStart == _VisibleEnd)
+                {
+                    discard;
+                }
+
+                // Portal
+                if (i.worldPos.x < _Portal.x || i.worldPos.z < _Portal.y ||
+                    i.worldPos.x > _Portal.z || i.worldPos.z > _Portal.w)
                 {
                     discard;
                 }
@@ -169,6 +187,30 @@ Shader "Unlit/SEE/TransparentEdgePortalShader"
 
             fixed4 frag (v2f i) : SV_Target
             {
+                // Clip Ends
+                if (i.uv.y < _VisibleStart || i.uv.y > _VisibleEnd || _VisibleStart == _VisibleEnd)
+                {
+                    discard;
+                }
+
+                // Portal: Calculate overhang in each direction
+                // Note: We use a 2D portal that spans over Unity's XZ plane: (x_min, z_min, x_max, z_max)
+                float overhangLeft   = max(_Portal.x - i.worldPos.x, 0.0);
+                float overhangBottom = max(_Portal.y - i.worldPos.z, 0.0);
+                float overhangRight  = max(i.worldPos.x - _Portal.z, 0.0);
+                float overhangTop    = max(i.worldPos.z - _Portal.w, 0.0);
+
+                // Discard coordinates if outside portal
+                if (overhangLeft > _PortalFadeWidth || overhangRight > _PortalFadeWidth ||
+                    overhangBottom > _PortalFadeWidth || overhangTop > _PortalFadeWidth)
+                {
+                    discard;
+                }
+
+                // Fade effect
+                float portalFade = saturate(1.0 - (overhangLeft + overhangRight + overhangBottom + overhangTop) / _PortalFadeWidth);
+                i.color *= portalFade;
+
                 // Discard fragment if completely transparent or opaque
                 if (i.color.a <= 0 || i.color.a >= 1)
                 {

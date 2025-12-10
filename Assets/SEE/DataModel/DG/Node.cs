@@ -18,15 +18,10 @@ namespace SEE.DataModel.DG
         // The clone will appear as a node without parent and children at level 0.
         // Neither will its incoming and outgoing edges be copied.
 
-        /// <summary>
-        /// The attribute name for unique identifiers (within a graph).
-        /// </summary>
-        public const string LinknameAttribute = "Linkage.Name";
-
         private string id = "";
         /// <summary>
         /// The unique identifier of a node (unique within a graph).
-        /// Setting a new id will also set set a new <see cref="LinknameAttribute"/>.
+        /// Setting a new id will also set set a new <see cref="Linkage.Name"/>.
         ///
         /// Important note on setting this property:
         /// This will only set the id attribute, but does not alter the
@@ -44,7 +39,7 @@ namespace SEE.DataModel.DG
                     throw new InvalidOperationException("ID must not be changed once added to graph.");
                 }
                 id = value;
-                SetString(LinknameAttribute, id);
+                SetString(Linkage.Name, id);
             }
         }
 

@@ -49,13 +49,15 @@ namespace SEE.Game.SceneManipulation
         /// </summary>
         /// <param name="deletedObject">the game object that along with its descendants and
         /// their edges should be removed</param>
+        /// <param name="removeNodeTypes">Indicates whether the node types should be removed.
+        /// Only applicable for the clear variant.</param>
         /// <returns>the graph from which <paramref name="deletedObject"/> was removed
         /// along with all descendants of <paramref name="deletedObject"/> and their incoming
         /// and outgoing edges marked as deleted along with <paramref name="deletedObject"/></returns>
         /// <exception cref="InvalidOperationException ">thrown if <paramref name="deletedObject"/> is a root</exception>
         /// <exception cref="ArgumentException">thrown if <paramref name="deletedObject"/> is
         /// neither a node nor an edge</exception>
-        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject)
+        public static (GraphElementsMemento, ISet<GameObject>, Dictionary<string, VisualNodeAttributes>) Delete(GameObject deletedObject, bool removeNodeTypes = false)
         {
             Dictionary<string, VisualNodeAttributes> deletedNodeTypes = new();
             if (deletedObject.CompareTag(Tags.Edge))
@@ -94,24 +96,25 @@ namespace SEE.Game.SceneManipulation
                             ShowNotification.Warn("Can't clear.", "Because the mapping process has already started.");
                             return (null, null, deletedNodeTypes);
                         }
-                        Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
-                        deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
-                            .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        if (removeNodeTypes)
+                        {
+                            Dictionary<string, VisualNodeAttributes> deletedNT = CaptureNodeTypesToRemove(deletedNode);
+                            deletedNodeTypes = deletedNodeTypes.Concat(deletedNT)
+                                .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+                        }
                         ISet<GameObject> deletedGameObjects = new HashSet<GameObject>();
                         SubgraphMemento subgraphMemento = new(deletedNode.ItsGraph);
                         foreach (Node child in deletedNode.Children().ToList())
                         {
-                            (GraphElementsMemento mem, ISet<GameObject> deleted, Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject());
+                            (GraphElementsMemento mem,
+                                ISet<GameObject> deleted,
+                                Dictionary<string, VisualNodeAttributes> deletedNTypes) = Delete(child.GameObject(), removeNodeTypes);
                             deletedGameObjects.UnionWith(deleted);
                             deletedNodeTypes = deletedNodeTypes.Concat(deletedNTypes)
                                 .ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
                             SubgraphMemento subMem = (SubgraphMemento)mem;
                             subMem.Parents.ForEach(pair => subgraphMemento.Parents.Add(pair));
                             subMem.Edges.ForEach(edge => subgraphMemento.Edges.Add(edge));
-                        }
-                        if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                        {
-                            runtimeConfigMenu.BlockOpening();
                         }
                         return (subgraphMemento, deletedGameObjects, deletedNodeTypes);
                     }
@@ -168,16 +171,24 @@ namespace SEE.Game.SceneManipulation
 
             async UniTask RemoveTypesAfterDeletion()
             {
-                GameObject firstChild = root.Children().First()?.GameObject();
-                await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
-                typesDifference.ForEach(type =>
+                await city.GetRedrawLock().WaitAsync();
+                try
                 {
-                    city.NodeTypes.Remove(type);
-                });
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    GameObject firstChild = root.Children().First()?.GameObject();
+                    await UniTask.WaitUntil(() => firstChild.activeInHierarchy == false);
+                    typesDifference.ForEach(type =>
+                    {
+                        city.NodeTypes.Remove(type);
+                    });
+                    /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                    if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                    {
+                        runtimeConfigMenu.PerformUpdate(city);
+                    }
+                }
+                finally
                 {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    city.GetRedrawLock().Release();
                 }
             }
 
@@ -367,8 +378,11 @@ namespace SEE.Game.SceneManipulation
                 .Where(node => node != null)
                 .ToList(),
                 nodeTypes);
-            RestoreGraph(nodesOrEdges);
-            foreach (GameObject nodeOrEdge in nodesOrEdges)
+            ISet<GameObject> filtered = nodesOrEdges
+                .Where(go => go.GetComponent<NodeRef>() != null || go.GetComponent<EdgeRef>() != null)
+                .ToHashSet();
+            RestoreGraph(filtered);
+            foreach (GameObject nodeOrEdge in filtered)
             {
                 SetActive(nodeOrEdge);
                 GameObjectFader.FadingIn(nodeOrEdge);
@@ -498,11 +512,7 @@ namespace SEE.Game.SceneManipulation
         {
             if (nodeTypes != null && nodeTypes.Count > 0)
             {
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
-                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
-                {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
-                }
+                HashSet<SEEReflexionCity> affectedCities = new();
                 nodes.ForEach(node =>
                 {
                     GameObject obj = node.GameObject() != null ? node.GameObject() : TryGetFirstParentGameObject(node);
@@ -511,9 +521,18 @@ namespace SEE.Game.SceneManipulation
                         if (!city.NodeTypes.TryGetValue(node.Type, out VisualNodeAttributes _))
                         {
                             city.NodeTypes[node.Type] = nodeTypes[node.Type];
+                            affectedCities.Add(city);
                         }
                     }
                 });
+                /// Performs a rebuild for the <see cref="RuntimeConfigMenu"/>.
+                if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
+                {
+                    foreach (SEEReflexionCity city in affectedCities)
+                    {
+                        runtimeConfigMenu.PerformUpdate(city);
+                    }
+                }
             }
 
             static GameObject TryGetFirstParentGameObject(Node node)

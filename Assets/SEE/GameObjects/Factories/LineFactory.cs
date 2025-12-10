@@ -85,13 +85,7 @@ namespace SEE.GO
         /// <returns>the existing or newly added <see cref="LineRenderer"/></returns>
         internal static LineRenderer Draw(GameObject gameObject, Vector3[] linePoints, float width, Material material = null)
         {
-            LineRenderer line = gameObject.GetComponent<LineRenderer>();
-            if (line == null)
-            {
-                // edge does not yet have a renderer; we add a new one
-                line = gameObject.AddComponent<LineRenderer>();
-            }
-
+            LineRenderer line = gameObject.AddOrGetComponent<LineRenderer>();
             line.useWorldSpace = true;
             if (material != null)
             {

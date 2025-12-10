@@ -1,6 +1,8 @@
 using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks.Triggers;
 using MoreLinq;
 using SEE.DataModel.DG;
+using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GO;
 using SEE.GraphProviders;
@@ -9,11 +11,13 @@ using SEE.Tools.ReflexionAnalysis;
 using SEE.UI;
 using SEE.UI.RuntimeConfigMenu;
 using SEE.Utils;
+using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using TMPro;
 using UnityEngine;
 
@@ -60,10 +64,48 @@ namespace SEE.Game.City
         private bool initialCityStateLoaded = false;
 
         /// <summary>
+        /// Stores the previous <see cref="DataPath"/>
+        /// when switching the Reflexion city type (Loaded / Initial).
+        /// Used as a backup to restore the original data path if needed.
+        /// </summary>
+        private DataPath backupConfigurationPath;
+
+        /// <summary>
+        /// Lock for <see cref="ReDrawGraph"/>.
+        /// </summary>
+        private readonly SemaphoreSlim redrawLock = new(1, 1);
+
+        /// <summary>
+        /// The lock that synchronizes access to <see cref="ReDrawGraph"/>.
+        /// </summary>
+        /// <returns>The <see cref="SemaphoreSlim"/> instance for this city.</returns>
+        internal SemaphoreSlim GetRedrawLock() => redrawLock;
+
+        /// <summary>
         /// Checks whether the city is in its initial configuration state.
         /// </summary>
         /// <returns><c>true</c> if the configuration should be reloaded. Otherwise, false.</returns>
         private bool IsInitialState() => initialCityStateLoaded;
+
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the architecture graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath ArchitectureSnapshotPath = new();
+
+
+        /// <summary>
+        /// The path where a graph snapshot in GXL format is stored.
+        /// </summary>
+        [TabGroup(DataFoldoutGroup), RuntimeTab(DataFoldoutGroup), ShowInInspector]
+        [RuntimeGroupOrder(SourceCodeDirectoryOrder)]
+        [PropertyTooltip("File path where the mapping graph snapshot will be saved to.")]
+        [HideReferenceObjectPicker]
+        public DataPath MappingSnapshotPath = new();
 
         /// <summary>
         /// Executes the <see cref="SEECity.Start"/> only if the initial city is not supposed to be loaded.
@@ -83,11 +125,12 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small)]
         [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Load Configuration")]
-        [PropertyOrder(ConfigurationButtonsGroupLoad)]
+        [PropertyOrder(ConfigurationButtonsGroupLoad), RuntimeGroupOrder(ConfigurationButtonsGroupLoad)]
         public override void LoadConfiguration()
         {
             base.LoadConfiguration();
-            SwitchLoaded();
+            ResetGraphIfNeeded();
+            initialReflexionCity = false;
             initialCityStateLoaded = false;
         }
 
@@ -101,30 +144,19 @@ namespace SEE.Game.City
         /// <returns>Whether the menus needs adjustment.</returns>
         [Button("Load Data", ButtonSizes.Small)]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Data")]
-        [PropertyOrder(DataButtonsGroupOrderLoad)]
-        public override async UniTask<bool> LoadDataAsync()
+        [PropertyOrder(DataButtonsGroupOrderLoad), RuntimeGroupOrder(DataButtonsGroupOrderLoad)]
+        public override async UniTask LoadDataAsync()
         {
-            bool needMenuAdjustments = false;
             if (initialReflexionCity)
             {
-                needMenuAdjustments = !IsInitialState();
-                ResetToInitial();
                 LoadInitial(gameObject.name);
-                return needMenuAdjustments;
-            }
-            else if (IsInitialState())
-            {
-                LoadConfiguration();
-                needMenuAdjustments = true;
+                return;
             }
 
             // Makes the necessary changes for the initial types of a reflexion city.
             AddInitialSubrootTypes();
 
-            if (LoadedGraph != null)
-            {
-                Reset();
-            }
+            ResetGraphIfNeeded();
             using (LoadingSpinner.ShowDeterminate($"Loading reflexion city \"{gameObject.name}\"...",
                                                   out Action<float> reportProgress))
             {
@@ -138,7 +170,94 @@ namespace SEE.Game.City
             }
             visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
             visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
-            return needMenuAdjustments;
+        }
+
+        /// <summary>
+        /// Resets the current graph state if a <see cref="LoadedGraph"/> exists.
+        /// </summary>
+        private void ResetGraphIfNeeded()
+        {
+            if (LoadedGraph != null)
+            {
+                Reset();
+            }
+        }
+
+        /// <summary>
+        /// Saves the reflexion city as their individual graphs.
+        /// </summary>
+        [Button(ButtonSizes.Small)]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Save Data")]
+        [PropertyOrder(DataButtonsGroupOrderSave)]
+        [EnableIf(nameof(IsGraphLoaded)), RuntimeEnableIf(nameof(IsGraphLoaded))]
+        [Tooltip("Saves the current city (as GXL).")]
+        public override void SaveData()
+        {
+            (Graph implementation, Graph architecture, Graph mapping) = ReflexionGraph.Disassemble();
+
+            GraphWriter.Save(GraphSnapshotPath.Path, implementation, HierarchicalEdges.First());
+            Debug.Log($"Saving implementation graph snapshot to {GraphSnapshotPath.Path}");
+
+            GraphWriter.Save(ArchitectureSnapshotPath.Path, architecture, HierarchicalEdges.First());
+            Debug.Log($"Saving architecture graph snapshot to {ArchitectureSnapshotPath.Path}");
+
+            GraphWriter.Save(MappingSnapshotPath.Path, mapping, HierarchicalEdges.First());
+            Debug.Log($"Saving mapping graph snapshot to {MappingSnapshotPath.Path}");
+        }
+
+        /// <summary>
+        /// Loads a reflexion city from a snapshot.
+        ///
+        /// This method will load the graph and then apply the saved layout.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Load Snapshot")]
+        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Load Snapshot")]
+        [Tooltip("Loads both the data (as GXL) and the layout of the city.")]
+        [PropertyOrder(DataButtonsGroupOrderLoadSnapshot)]
+        public override async UniTask LoadSnapshotAsync()
+        {
+            Reset();
+            Debug.Log($"Loading snapshot graph from {GraphSnapshotPath.Path}.\n");
+            // Use a single GXL provider to load the graph.
+
+            if (initialReflexionCity)
+            {
+                ResetToInitial();
+                LoadInitial(gameObject.name);
+                return;
+            }
+            else if (IsInitialState())
+            {
+                LoadConfiguration();
+            }
+
+            // Makes the necessary changes for the initial types of a reflexion city.
+            AddInitialSubrootTypes();
+
+            ReflexionGraphProvider reflexionGraphProvider = new();
+
+            reflexionGraphProvider.Architecture = ArchitectureSnapshotPath;
+            reflexionGraphProvider.Implementation = GraphSnapshotPath;
+            reflexionGraphProvider.Mapping = MappingSnapshotPath;
+
+            LoadedGraph = await reflexionGraphProvider.ProvideAsync(new Graph(""), this);
+            visualization = gameObject.AddOrGetComponent<ReflexionVisualization>();
+            visualization.StartFromScratch(VisualizedSubGraph as ReflexionGraph, this);
+
+
+            (Graph impl, _, Graph mapped) = (LoadedGraph as ReflexionGraph).Disassemble();
+            await DrawGraphAsync(LoadedGraph);
+            mapped.Edges().ForEach(edge =>
+            {
+                Node source = ReflexionGraph.GetNode(edge.Source.ID);
+                Node target = ReflexionGraph.GetNode(edge.Target.ID);
+                GameObject sourceGO = source.GameObject();
+                if (sourceGO != null)
+                {
+                    ReflexionMapper.SetParent(sourceGO, target.GameObject());
+                }
+            });
+            LoadLayout();
         }
 
         /// <summary>
@@ -146,6 +265,11 @@ namespace SEE.Game.City
         /// </summary>
         private void ResetToInitial()
         {
+            backupConfigurationPath = ConfigurationPath;
+            DataProvider.Pipeline.Clear();
+            ConfigurationPath = new();
+            SolutionPath = new();
+            SourceCodeDirectory = new();
             LODCulling = 0.001f;
             HierarchicalEdges = HierarchicalEdgeTypes();
             HiddenEdges = new();
@@ -166,9 +290,9 @@ namespace SEE.Game.City
             MarkerAttributes = new();
         }
 
-        protected override void InitializeAfterDrawn()
+        protected override void InitializeAfterDrawn(bool updateGraphElementRefs)
         {
-            base.InitializeAfterDrawn();
+            base.InitializeAfterDrawn(updateGraphElementRefs);
 
             // We also need to have the ReflexionVisualization apply the correct edge
             // visualization, but we have to wait until all edges have become meshes.
@@ -180,25 +304,80 @@ namespace SEE.Game.City
 
         /// <summary>
         /// Ensures that the initial Reflexion city is loaded.
+        /// Is used in the Odin and Runtime menu.
         /// </summary>
-        [RuntimeButton(DataButtonsGroup, "Switch to initial Reflexion city")]
-        [RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
-        [RuntimeHideIf(nameof(IsInitialReflexionCity))]
+        [Button("Switch to initial Reflexion city", ButtonSizes.Small)]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Switch to initial Reflexion city")]
+        [PropertyOrder(ConfigurationButtonsGroupSwitch), RuntimeGroupOrder(ConfigurationButtonsGroupSwitch)]
+        [EnableIf(nameof(IsLoadedReflexionCity)), RuntimeEnableIf(nameof(IsLoadedReflexionCity))]
+        [HideIf(nameof(IsInitialReflexionCity)), RuntimeHideIf(nameof(IsInitialReflexionCity))]
         public void SwitchInitial()
         {
             initialReflexionCity = true;
+            ResetGraphIfNeeded();
+            bool doRebuild = !IsInitialState();
+            ResetToInitial();
+            if (doRebuild && LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu menu))
+            {
+                menu.PerformTabRebuild(this);
+            }
         }
 
         /// <summary>
         /// Ensures that the Reflexion city is loaded from a file.
         /// </summary>
         [Button("Switch to loaded Reflexion city", ButtonSizes.Small)]
-        [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Switch to loaded Reflexion city")]
+        [ButtonGroup(ConfigurationButtonsGroup), RuntimeButton(ConfigurationButtonsGroup, "Switch to loaded Reflexion city")]
+        [PropertyOrder(ConfigurationButtonsGroupSwitch), RuntimeGroupOrder(ConfigurationButtonsGroupSwitch)]
         [EnableIf(nameof(IsInitialReflexionCity)), RuntimeEnableIf(nameof(IsInitialReflexionCity))]
         [HideIf(nameof(IsLoadedReflexionCity)), RuntimeHideIf(nameof(IsLoadedReflexionCity))]
         public void SwitchLoaded()
         {
             initialReflexionCity = false;
+            ResetGraphIfNeeded();
+            ConfigurationPath = backupConfigurationPath;
+            LoadConfiguration();
+            if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu menu))
+            {
+                menu.PerformTabRebuild(this);
+            }
+        }
+
+
+        async UniTask RestoreImplementation(Graph copyCurrentImpl)
+        {
+            // Create a copy of the original implementation graph to restore the current one to its original state.
+            GameObject tempGO = new($"COPY OF {gameObject.name}");
+            SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
+            tempCity.LoadInitial(tempGO.name);
+            Graph implCopy = await tempCity.GetReflexionGraphProvider()
+                .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
+            Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
+            implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
+
+            // Restore to the original parents.
+            foreach (Node copyNode in copyCurrentImpl.Nodes())
+            {
+                if (copyNode == null
+                    || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
+                {
+                    continue;
+                }
+
+                Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
+                Node copyOriginalParent = copyOriginalNode?.Parent;
+                Node copyCurrentParent = copyNode.Parent;
+                bool shouldReparent = copyOriginalParent != null
+                    && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
+
+                if (shouldReparent)
+                {
+                    Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
+                    VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
+
+                }
+            }
+            Destroyer.Destroy(tempGO);
         }
 
         /// <summary>
@@ -209,7 +388,7 @@ namespace SEE.Game.City
         /// </summary>
         [Button(ButtonSizes.Small, Name = "Re-Draw Data")]
         [ButtonGroup(DataButtonsGroup), RuntimeButton(DataButtonsGroup, "Re-Draw Data")]
-        [PropertyOrder(DataButtonsGroupOrderDraw)]
+        [PropertyOrder(DataButtonsGroupOrderDraw), RuntimeGroupOrder(DataButtonsGroupOrderDraw)]
         [EnableIf(nameof(IsGraphDrawn)), RuntimeEnableIf(nameof(IsGraphDrawn))]
         public override void ReDrawGraph()
         {
@@ -221,39 +400,46 @@ namespace SEE.Game.City
             else
             {
                 ReDrawGraphAsync().Forget();
-
             }
             return;
             async UniTask ReDrawGraphAsync()
             {
-                // Gather the previous node layouts.
-                (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
-                    = GatherNodeLayouts(AllNodeDescendants(gameObject));
-                // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
-                Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
-                Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
-
-                // Restore the original implementation graph.
-                (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
-                if (mapped.EdgeCount > 0)
+                await redrawLock.WaitAsync();
+                try
                 {
-                    await RestoreImplementation(impl);
-                    mapped.Edges().ForEach(edge =>
-                        ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
-                }
+                    // Gather the previous node layouts.
+                    (ICollection<LayoutGraphNode> layoutGraphNodes, Dictionary<string, (Vector3, Vector2, Vector3)> decorationValues)
+                        = GatherNodeLayouts(AllNodeDescendants(gameObject));
+                    // Remember the previous position and lossy scale to detect whether the layout was rotated and to calculate the scale factor.
+                    Vector3 prevArchPos = ReflexionGraph.ArchitectureRoot.GameObject().transform.position;
+                    Vector3 prevArchLossyScale = ReflexionGraph.ArchitectureRoot.GameObject().transform.lossyScale;
 
-                // Delete the previous city and draw the new one.
-                DeleteGraphGameObjects();
-                await UniTask.DelayFrame(2);
-                DrawGraph();
-                await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
-                    .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
-                // Restores the previous architecture layout.
-                RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
-                // Restores the previous mapping.
-                RestoreMapping(layoutGraphNodes, mapped);
-                visualization.InitializeEdges();
-                graphRenderer = null;
+                    // Restore the original implementation graph.
+                    (Graph impl, _, Graph mapped) = ReflexionGraph.Disassemble();
+                    if (mapped.EdgeCount > 0)
+                    {
+                        await RestoreImplementation(impl);
+                        mapped.Edges().ForEach(edge =>
+                            ReflexionGraph.RemoveFromMapping(VisualizedSubGraph.GetEdge(edge.ID)));
+                    }
+
+                    // Delete the previous city and draw the new one.
+                    DeleteGraphGameObjects();
+                    await UniTask.DelayFrame(2);
+                    DrawGraph();
+                    await UniTask.WaitUntil(() => gameObject.IsCodeCityDrawn())
+                        .ContinueWith(() => UniTask.DelayFrame(2)); // Will be needed for restore the position of the edges.
+                                                                    // Restores the previous architecture layout.
+                    RestoreArchitectureLayout(layoutGraphNodes, decorationValues, prevArchPos, prevArchLossyScale);
+                    // Restores the previous mapping.
+                    RestoreMapping(layoutGraphNodes, mapped);
+                    visualization.InitializeEdges();
+                    graphRenderer = null;
+                }
+                finally
+                {
+                    redrawLock.Release();
+                }
             }
 
             (ICollection<LayoutGraphNode>, Dictionary<string, (Vector3, Vector2, Vector3)>) GatherNodeLayouts(ICollection<GameObject> gameObjects)
@@ -294,42 +480,6 @@ namespace SEE.Game.City
                 }
                 LayoutNodes.SetLevels(result);
                 return (result, textValues);
-            }
-
-            async UniTask RestoreImplementation(Graph copyCurrentImpl)
-            {
-                // Create a copy of the original implementation graph to restore the current one to its original state.
-                GameObject tempGO = new($"COPY OF {gameObject.name}");
-                SEEReflexionCity tempCity = tempGO.AddComponent<SEEReflexionCity>();
-                tempCity.LoadInitial(tempGO.name);
-                Graph implCopy = await tempCity.GetReflexionGraphProvider()
-                    .LoadGraphAsync(GetReflexionGraphProvider().Implementation, tempCity);
-                Node currentImplRoot = copyCurrentImpl.GetRoots().First(node => node.Type == ReflexionGraph.ImplementationType);
-                implCopy.AddSingleRoot(out Node root, currentImplRoot.ID, ReflexionGraph.ImplementationType);
-
-                // Restore to the original parents.
-                foreach (Node copyNode in copyCurrentImpl.Nodes())
-                {
-                    if (copyNode == null
-                        || copyNode.Type.Equals(ReflexionGraph.ImplementationType))
-                    {
-                        continue;
-                    }
-
-                    Node copyOriginalNode = implCopy.GetNode(copyNode.ID);
-                    Node copyOriginalParent = copyOriginalNode?.Parent;
-                    Node copyCurrentParent = copyNode.Parent;
-                    bool shouldReparent = copyOriginalParent != null
-                        && (copyCurrentParent == null || !copyCurrentParent.ID.Equals(copyOriginalParent.ID));
-
-                    if (shouldReparent)
-                    {
-                        Node realParent = VisualizedSubGraph.GetNode(copyOriginalParent.ID);
-                        VisualizedSubGraph.GetNode(copyNode.ID).Reparent(realParent);
-
-                    }
-                }
-                Destroyer.Destroy(tempGO);
             }
 
             void RestoreArchitectureLayout(ICollection<LayoutGraphNode> layoutGraphNodes,
@@ -392,6 +542,17 @@ namespace SEE.Game.City
                     }
                 });
             }
+        }
+
+        /// <summary>
+        /// Resets the selected node types to be visualized.
+        /// </summary>
+        [Button(ButtonSizes.Small, Name = "Reset Node-Type Settings")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Node-Type Settings")]
+        [PropertyOrder(ResetButtonsGroupOrderReset + 1), RuntimeGroupOrder(ResetButtonsGroupOrderReset + 1)]
+        public override void ResetSelectedNodeTypes()
+        {
+            NodeTypes.ClearToInitialReflexion();
         }
 
         #region SEEReflexionCity creation during in play mode
@@ -554,12 +715,19 @@ namespace SEE.Game.City
                     graphProvider.Implementation = path;
                 }
 
-                /// Notify <see cref="RuntimeConfigMenu"/> about changes.
+                UpdateRuntimeMenu().Forget();
+
+                return (graph, (GraphRenderer)Renderer);
+            }
+
+            async UniTask UpdateRuntimeMenu()
+            {
+                // We need to wait for the changes to occur.
+                await UniTask.Yield();
                 if (LocalPlayer.TryGetRuntimeConfigMenu(out RuntimeConfigMenu runtimeConfigMenu))
                 {
-                    runtimeConfigMenu.PerformRebuildOnNextOpening();
+                    runtimeConfigMenu.PerformUpdate(this);
                 }
-                return (graph, (GraphRenderer)Renderer);
             }
 
             void AddMissingNodeTypes(Graph graph, GraphRenderer renderer)
@@ -576,5 +744,41 @@ namespace SEE.Game.City
         }
 
         #endregion SEEReflexionCity creation during in play mode
+
+        #region Config I/O
+
+        /// <summary>
+        /// Label of attribute <see cref="ArchitectureSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string architectureSnapshotPathLabel = "ArchitectureSnapshotPath";
+
+        /// <summary>
+        /// Label of attribute <see cref="MappingSnapshotPath"/> in the configuration file.
+        /// </summary>
+        private const string mappingSnapshotPathLabel = "MappingSnapshotPath";
+
+        /// <summary>
+        /// Saves the attributes of this instance in a configuration file
+        /// </summary>
+        /// <param name="writer">Writer for the configuration file.</param>
+        protected override void Save(ConfigWriter writer)
+        {
+            base.Save(writer);
+            ArchitectureSnapshotPath.Save(writer, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Save(writer, mappingSnapshotPathLabel);
+        }
+
+        /// <summary>
+        /// Restores the attributes from a given configuration <paramref name="attributes"/>.
+        /// </summary>
+        /// <param name="attributes">The configuration to load the attributes from.</param>
+        protected override void Restore(Dictionary<string, object> attributes)
+        {
+            base.Restore(attributes);
+            ArchitectureSnapshotPath.Restore(attributes, architectureSnapshotPathLabel);
+            MappingSnapshotPath.Restore(attributes, mappingSnapshotPathLabel);
+        }
+
+        #endregion
     }
 }
