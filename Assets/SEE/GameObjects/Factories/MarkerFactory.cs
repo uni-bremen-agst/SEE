@@ -3,11 +3,10 @@ using System.Collections.Generic;
 using DG.Tweening;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
 using static SEE.GO.Materials.ShaderType;
-using Object = UnityEngine.Object;
 
 namespace SEE.GO.Factories
 {

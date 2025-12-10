@@ -7,6 +7,7 @@ using HighlightPlus;
 using SEE.DataModel;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using UnityEngine;
@@ -311,7 +312,18 @@ namespace SEE.Game.Operator
             {
                 if (dynamicMarkerPrefab == null)
                 {
+                    // Instantiation per code city. Each code has its own portal.
                     dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile, null, false);
+                    if (dynamicMarkerPrefab == null)
+                    {
+                        Debug.LogError($"Cannot load prefab {dynamicMarkerPrefabFile}\n");
+                    }
+                    else
+                    {
+                        dynamicMarkerPrefab.name = "DynamicMarker";
+                        Portal.SetInfinitePortal(dynamicMarkerPrefab);
+                        // Set Portal.
+                    }
                 }
                 return dynamicMarkerPrefab;
             }
@@ -324,19 +336,30 @@ namespace SEE.Game.Operator
         /// that controls the animation duration.
         /// If set to 0, will execute directly, that is, the value is set before control is returned to the caller.
         /// </param>
-        /// <param name="duration">Duration of the animation.</param>
-        public void EnableDynamicMark(float factor = 0.5f, float duration = float.PositiveInfinity)
+        /// <param name="duration">Duration of the animation; 0 means forever.</param>
+        public void EnableDynamicMark(float factor = 0.5f, float duration = 0)
         {
-            // FIXME: The icon's mesh must respect the portal.
+            // FIXME: The icon's material must respect the portal.
+
+            // Use Prefab icon.
             highlightEffect.iconFXAssetType = IconAssetType.Prefab;
-            highlightEffect.iconFXPrefab = DynamicMarkerPrefab; // FIXME: Clone this instance. Make it a child. Set Portal.
+            highlightEffect.iconFXPrefab = DynamicMarkerPrefab;
+
+            highlightEffect.iconFXAnimationOption = IconAnimationOption.VerticalBounce;
+            // The y range in which the icon bounces vertically.
+            highlightEffect.iconFXAnimationAmount = 0.1f;
+
+            // The iconFXOffset is relative to the object in world-space units.
+            // We count only the decorations, nodes, and edges, but not labels and the like.
+            float top = highlightEffect.gameObject.GetRelativeTop(t => t.CompareTag(Tags.Decoration) || t.CompareTag(Tags.Node) || t.CompareTag(Tags.Edge));
+            Debug.Log($"{gameObject.name} position={gameObject.transform.position} top={top}\n");
+            highlightEffect.iconFXOffset = new(0, top, 0);
+
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
             highlightEffect.iconFXDarkColor = UnityEngine.Color.yellow;
-            // The iconFXOffset is relative to the object, that is, not world space.
-            highlightEffect.iconFXOffset = Vector3.zero;
             highlightEffect.iconFXRotationSpeed = 0f;
-            highlightEffect.iconFXAnimationOption = IconAnimationOption.VerticalBounce;
-            highlightEffect.iconFXAnimationAmount = 0.1f;
+
+
             highlightEffect.iconFXAnimationSpeed = ToDuration(factor);
             highlightEffect.iconFXScale = 0.2f;
             highlightEffect.iconFXStayDuration = duration;
@@ -350,6 +373,9 @@ namespace SEE.Game.Operator
             // at runtime, call UpdateMaterialProperties() to ensure those changes are
             // applied immediately.
             highlightEffect.UpdateMaterialProperties();
+            // The prefab is instantiated by UpdateMaterialProperties().
+            //highlightEffect.iconFXPrefab.transform.name = "Dynamic_Marker_" + gameObject.name;
+            //highlightEffect.iconFXPrefab.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>

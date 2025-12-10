@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-namespace SEE.GO.NodeFactories
+namespace SEE.GO.Factories.NodeFactories
 {
     /// <summary>
     /// A utility class to generate a set of triangles from a list of points

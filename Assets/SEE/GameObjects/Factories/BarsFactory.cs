@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.GO.NodeFactories
+namespace SEE.GO.Factories.NodeFactories
 {
     /// <summary>
     /// A factory for bar charts as visual representations of graph nodes

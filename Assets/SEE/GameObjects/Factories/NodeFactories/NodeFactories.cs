@@ -4,6 +4,6 @@
 /// These factories may be used at design time (in the Unity editor)
 /// as well as run time (during the game).
 /// </summary>
-namespace SEE.GO.NodeFactories
+namespace SEE.GO.Factories.NodeFactories
 {
 }

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace SEE.GO.NodeFactories
+namespace SEE.GO.Factories.NodeFactories
 {
     /// <summary>
     /// A factory for visual representations of graph nodes in the scene.

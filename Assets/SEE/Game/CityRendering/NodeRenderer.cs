@@ -7,7 +7,7 @@ using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
 using SEE.GO.Factories;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
