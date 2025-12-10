@@ -198,7 +198,11 @@ namespace SEE.DataModel.DG.IO
             XPathMapping xPathMapping,
             XmlNamespaceManager? namespaceManager)
         {
-            string context = xPathMapping.MapContext[current.LocalName];
+            if (!xPathMapping.MapContext.TryGetValue(current.LocalName, out string context))
+            {
+                Debug.LogWarning($"[Parser] Unknown context for tag '{current.LocalName}' - skipping.");
+                return null;
+            }
 
             xPathMapping.FileName.TryGetValue(context, out string fileNameExpression);
 
