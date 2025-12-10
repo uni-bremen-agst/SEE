@@ -35,7 +35,7 @@ namespace SEE.DataModel.DG.IO
         /// and registers them in the <see cref="_registry"/>.
         ///
         /// A type is considered valid if it inherits from <see cref="ParsingConfig"/> and is not abstract.
-        /// To determine the key for the registry, a temporary instance of the type is created 
+        /// To determine the key for the registry, a temporary instance of the type is created
         /// to access its <see cref="ParsingConfig.ToolId"/>.
         /// </summary>
         private static void RegisterAllConfigs()
