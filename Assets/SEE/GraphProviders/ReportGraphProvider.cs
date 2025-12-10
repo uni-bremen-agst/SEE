@@ -6,6 +6,8 @@ using Cysharp.Threading.Tasks;
 using Sirenix.OdinInspector;
 using UnityEngine;
 using SEE.DataModel.DG.IO;
+using SEE.Utils.Config;
+using System.Collections.Generic;
 
 namespace SEE.GraphProviders
 {
@@ -82,5 +84,25 @@ namespace SEE.GraphProviders
         {
             return SingleGraphProviderKind.Report;
         }
+
+        #region Config I/O
+
+        private const string parsingConfigLabel = "ParsingConfig";
+        protected override void SaveAttributes(ConfigWriter writer)
+        {
+            base.SaveAttributes(writer);
+            if (ParsingConfig != null)
+            {
+                ParsingConfig.Save(writer, parsingConfigLabel);
+            }
+        }
+        protected override void RestoreAttributes(Dictionary<string, object> attributes)
+        {
+            base.RestoreAttributes(attributes);
+            ParsingConfig.Restore(attributes, parsingConfigLabel, out ParsingConfig);
+        }
+
+        #endregion
+
     }
 }

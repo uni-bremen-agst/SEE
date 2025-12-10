@@ -9,7 +9,6 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.DataModel.DG.IO;
-using SEE.GraphProviders.NodeCounting;
 using SEE.Utils.Paths;
 using UnityEngine;
 
@@ -65,13 +64,6 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <returns>Parsing configuration used to create the report parser. Must not be null.</returns>
         protected abstract ParsingConfig GetParsingConfig();
-
-        /// <summary>
-        /// Returns a node counter that can compute expected counts per context
-        /// for the given report and node filter.
-        /// </summary>
-        /// <returns>Node counter used to compute expected counts per context.</returns>
-        protected abstract ICountReportNodes GetNodeCounter();
 
         /// <summary>
         /// Returns a set of hand-picked findings (keyed by <see cref="Finding.FullPath"/>)
@@ -167,38 +159,7 @@ namespace SEE.GraphProviders
             return await parser.ParseAsync(reportDataPath);
         }
 
-        /// <summary>
-        /// Asserts that actual counts (grouped by <see cref="Finding.Context"/>) match the
-        /// expected per-context counts exactly, and that there are no unexpected contexts.
-        /// Matching is case-insensitive on context keys.
-        /// </summary>
-        /// <param name="expectedNodeCounts">Expected node counts per context.</param>
-        private void AssertNodeCountsMatch(Dictionary<string, int> expectedNodeCounts)
-        {
-            Assert.IsNotNull(metricSchema, "metricSchema has not been initialized.");
-            Assert.IsNotNull(metricSchema.Findings, "metricSchema.Findings is null.");
-
-            Dictionary<string, int> actualNodeCounts = metricSchema.Findings
-                .Where(finding => !string.IsNullOrEmpty(finding.Context))
-                .GroupBy(finding => finding.Context, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Count(),
-                    StringComparer.OrdinalIgnoreCase);
-
-            foreach (KeyValuePair<string, int> expectedEntry in expectedNodeCounts)
-            {
-                string xmlTagAsContext = GetParsingConfig().XPathMapping.MapContext[expectedEntry.Key];
-
-                int actualCount = actualNodeCounts.TryGetValue(xmlTagAsContext, out int count) ? count : 0;
-
-                Assert.AreEqual(
-                    expectedEntry.Value,
-                    actualCount,
-                    $"Context '{expectedEntry.Key}': expected {expectedEntry.Value}, got {actualCount}.");
-            }
-        }
-
+       
         /// <summary>
         /// Verifies that a curated set of expected findings exists and matches on:
         /// - Context (if provided),

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using SEE.DataModel.DG.IO;
-using SEE.GraphProviders.NodeCounting;
 
 namespace SEE.GraphProviders
 {
@@ -29,12 +28,6 @@ namespace SEE.GraphProviders
         protected override ParsingConfig GetParsingConfig()
         {
             return new JaCoCoParsingConfig();
-        }
-
-        /// <inheritdoc/>
-        protected override ICountReportNodes GetNodeCounter()
-        {
-            return new XmlNodeCounter();
         }
 
         /// <summary>
