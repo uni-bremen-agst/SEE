@@ -354,7 +354,7 @@ namespace SEE.UI.Menu.Drawable
             /// Initialize the part undo button. Also only for <see cref="Shape.Line"/>.
             objPartUndo = GameFinder.FindChild(shapeMenu, "PartUndoBtn");
             partUndoBMB = objPartUndo.GetComponent<ButtonManagerBasic>();
-            objPartUndo.AddComponent<ButtonHoverTooltip>().SetMessage("Part Undo");
+            objPartUndo.AddComponent<UIHoverTooltip>().SetMessage("Part Undo");
             objPartUndo.SetActive(false);
 
             /// Initialize the dragger info button.
