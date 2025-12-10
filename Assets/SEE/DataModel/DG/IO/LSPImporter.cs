@@ -303,10 +303,8 @@ namespace SEE.DataModel.DG.IO
                 Handler.OpenDocument(path);
                 foreach (Node node in nodes)
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException();
-                    }
+                    token.ThrowIfCancellationRequested();
+
                     // Depending on capabilities and settings, we connect the nodes with edges.
                     if (IncludeEdgeTypes.HasFlag(EdgeKind.Definition) && Handler.ServerCapabilities.DefinitionProvider.TrueOrValue())
                     {
@@ -493,10 +491,8 @@ namespace SEE.DataModel.DG.IO
             IUniTaskAsyncEnumerable<CallHierarchyItem> results = Handler.OutgoingCalls(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (CallHierarchyItem item in results)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException();
-                }
+                token.ThrowIfCancellationRequested();
+
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
@@ -525,10 +521,8 @@ namespace SEE.DataModel.DG.IO
             IUniTaskAsyncEnumerable<TypeHierarchyItem> results = Handler.Supertypes(SelectItem, node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (TypeHierarchyItem item in results)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException();
-                }
+                token.ThrowIfCancellationRequested();
+
                 Node targetNode = FindNodesByLocation(item.Uri.Path, Range.FromLspRange(item.Range)).FirstOrDefault();
                 if (targetNode == null)
                 {
@@ -566,10 +560,7 @@ namespace SEE.DataModel.DG.IO
         private async UniTask AddSymbolNodeAsync(DocumentSymbol symbol, string path, Graph graph, Node parent,
                                                  CancellationToken token)
         {
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException();
-            }
+            token.ThrowIfCancellationRequested();
 
             Node childParent;
             if (IncludeNodeTypes.HasFlag(symbol.Kind.ToNodeKind()))
@@ -708,10 +699,7 @@ namespace SEE.DataModel.DG.IO
             IUniTaskAsyncEnumerable<LocationOrLocationLink> locations = lspFunction(node.Path(), node.SourceLine - 1 ?? 0, node.SourceColumn - 1 ?? 0);
             await foreach (LocationOrLocationLink location in locations)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException();
-                }
+                token.ThrowIfCancellationRequested();
 
                 if (location.IsLocation)
                 {
