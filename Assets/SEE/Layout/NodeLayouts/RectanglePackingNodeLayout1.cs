@@ -1,4 +1,7 @@
-﻿using SEE.Layout.NodeLayouts.RectanglePacking;
+﻿
+using SEE.Game.CityRendering;
+using SEE.Layout.NodeLayouts.RectanglePacking;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -11,85 +14,231 @@ namespace SEE.Layout.NodeLayouts
   /// "Software Systems as Cities" (2010); see page 35.
   /// https://www.inf.usi.ch/lanza/Downloads/PhD/Wett2010b.pdf
   /// </summary>
-  public class RectanglePackingNodeLayout : NodeLayout
+  public class RectanglePackingNodeLayout1 : NodeLayout, IIncrementalNodeLayout
   {
-    static RectanglePackingNodeLayout()
+    static RectanglePackingNodeLayout1()
     {
       Name = "Rectangle Packing";
     }
 
+    public Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
+
+    public RectanglePackingNodeLayout1 oldLayout;
+
+    public IIncrementalNodeLayout OldLayout
+    {
+      set
+      {
+        if (value is RectanglePackingNodeLayout1 layout)
+        {
+          oldLayout = layout;
+        }
+        else
+        {
+          throw new ArgumentException(
+              $"Predecessor of {nameof(RectanglePackingNodeLayout1)} was not an {nameof(RectanglePackingNodeLayout1)}.");
+        }
+      }
+    }
+    
+    public List<ILayoutNode> sameLeaves = null;
+
+    public Dictionary<ILayoutNode, NodeTransform> toBeDeleted = null;
+
+    public List<ILayoutNode> newNodes = null;
+
+    public static PTree tree = null;
+
+    public static Vector2 covrec = Vector2.zero;
+
+    public static int globalCallCount = 0;
+
+    public List<ILayoutNode> allThisLayoutNodes = null;
+
+    public static ILayoutNode rootLayoutVertex = new LayoutVertex("0");
+
+    //***********************************************************************************
     /// <summary>
     /// See <see cref="NodeLayout.Layout"/>.
     /// </summary>
     /// <exception cref="System.Exception">thrown if there is more than one root in
-    /// <paramref name="layoutNodes"/></exception>
+    /// <paramref name="thisLayoutNodes"/></exception>
     protected override Dictionary<ILayoutNode, NodeTransform> Layout
+    (IEnumerable<ILayoutNode> thisLayoutNodes,
+    Vector3 centerPosition,
+    Vector2 rectangle)
+    {
+      /*
+      newNodes = new List<ILayoutNode>();
+      var layoutNodeIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
+       */
+      globalCallCount++;
+      allThisLayoutNodes = thisLayoutNodes.ToList();
+
+      /*
+       
+      ILayoutNode childLayoutVertex = new LayoutVertex("1");
+      rootLayoutVertex.AddChild(childLayoutVertex);
+      childLayoutVertex.Parent = rootLayoutVertex;
+
+       */
+
+      if (oldLayout == null)
+      {
+        /*
+        ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(allLayoutNodes);
+        foreach (var root in roots)
+        {
+          childLayoutVertex.AddChild(root);
+          root.Parent = childLayoutVertex;
+        }
+         
+         */
+        allThisLayoutNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+
+        CreateLayout(allThisLayoutNodes, centerPosition, rectangle);
+        return layoutResult;
+      }
+      else
+      {
+        var oldIds = new HashSet<string>(oldLayout.layoutResult.Keys.Select(n => n.ID));
+        var newIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
+
+        newNodes = thisLayoutNodes
+          .Where(node => !oldIds.Contains(node.ID))
+          .ToList();
+
+        sameLeaves = oldLayout.allThisLayoutNodes
+          .Where(node => newIds.Contains(node.ID))
+          .ToList();
+        /*
+        sameLeaves.Sort(delegate (ILayoutNode left, ILayoutNode right)
+        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+         */
+
+        newNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+        { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+
+        var productNodes = sameLeaves.Concat(newNodes).ToList();
+
+
+        /*
+      if (newNodes.Count > 0)
+      {
+      }
+        foreach (var newNode in newNodes)
+        {
+          if(newNode.IsLeaf)
+          {
+            childLayoutVertex.AddChild(newNode);
+            newNode.Parent = childLayoutVertex;
+          }
+
+        }
+         */
+        CreateLayout(productNodes, centerPosition, rectangle);
+
+        /*
+        sameNodes = thisLayoutNodes
+          .Where(node => oldIds.Contains(node.ID))
+          .ToDictionary(
+            node => node
+           , node => oldLayout.layoutResult
+              .Where(entry => entry.Key.ID == node.ID).First().Value);
+        layoutResult = sameNodes;
+        sameLeaves = allLayoutNodes.Where(node => oldIds.Contains(node.ID) && node.IsLeaf).ToList();  
+
+        toBeDeleted = oldLayout.layoutResult
+          .Where(entry => !layoutNodeIds.Contains(entry.Key.ID))
+          .ToDictionary(entry => entry.Key, entry => entry.Value);
+
+
+        if (toBeDeleted != null)
+        {
+          foreach (var entry in toBeDeleted)
+          {
+            if (entry.Value.fitNode != null)
+            {
+              tree.MergeFreeLeaves(entry.Value.fitNode);
+            }
+          }
+        }
+        // Create layout for new nodes only and merge; CreateLayout updates layoutResult in place
+        if (newNodes.Count > 0)
+        {
+        }
+         */
+
+
+        return layoutResult;
+      }
+    }
+
+    //***********************************************************************************
+    private void SortNodes()
+    {
+      allThisLayoutNodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
+      { return (right.AbsoluteScale.x * right.AbsoluteScale.z).CompareTo(left.AbsoluteScale.x * left.AbsoluteScale.z); });
+    }
+
+    //***********************************************************************************
+    public void CreateLayout
         (IEnumerable<ILayoutNode> layoutNodes,
         Vector3 centerPosition,
         Vector2 rectangle)
     {
-      Dictionary<ILayoutNode, NodeTransform> layoutResult = new();
 
       IList<ILayoutNode> layoutNodeList = layoutNodes.ToList();
       if (layoutNodeList.Count == 1)
       {
         ILayoutNode layoutNode = layoutNodeList.First();
         layoutResult[layoutNode] = new NodeTransform(0, 0, layoutNode.AbsoluteScale);
-        return layoutResult;
+        
       }
 
-      // Do we have only leaves?
+      int numberOfLeaves = 0;
+      foreach (ILayoutNode node in layoutNodeList)
       {
-        int numberOfLeaves = 0;
-        foreach (ILayoutNode node in layoutNodeList)
+        if (node.IsLeaf)
         {
-          if (node.IsLeaf)
-          {
-            // All leaves maintain their original size. Pack assumes that
-            // their sizes are already set in layoutNodes.
-            // We add the padding upfront. Padding is added on both sides.
-            // The padding will later be removed again.
-            Vector3 scale = node.AbsoluteScale;
-            float padding = Padding(scale.x, scale.z);
-            scale.x += padding;
-            scale.z += padding;
-            layoutResult[node] = new NodeTransform(0, 0, scale);
-            numberOfLeaves++;
-          }
-        }
-        if (numberOfLeaves == layoutNodeList.Count)
-        {
-          // There are only leaves.
-          Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
-          RemovePadding(layoutResult);
-          return layoutResult;
+          Vector3 scale = node.AbsoluteScale;
+          float padding = Padding(scale.x, scale.z);
+          scale.x += padding;
+          scale.z += padding;
+          layoutResult[node] = new NodeTransform(0, 0, scale);
+          numberOfLeaves++;
         }
       }
-      // Not all nodes are leaves.
+      if (numberOfLeaves == layoutNodeList.Count)
+      {
+        Pack(layoutResult, layoutNodeList.Cast<ILayoutNode>().ToList(), groundLevel);
+        RemovePadding(layoutResult);
+        return;
+      }
+
+
       ICollection<ILayoutNode> roots = LayoutNodes.GetRoots(layoutNodeList);
       if (roots.Count == 0)
       {
-        return layoutResult;
+        return;
       }
       else if (roots.Count > 1)
       {
-        throw new System.Exception("Graph has more than one root node.");
+        
+        throw new System.Exception("Graph has more than one root node." + globalCallCount);
       }
       else
       {
         ILayoutNode root = roots.FirstOrDefault();
         Vector2 area = PlaceNodes(layoutResult, root, groundLevel);
-        // Maintain the original height of all inner nodes (and root is an inner node).
         layoutResult[root] = new NodeTransform(0, 0, new Vector3(area.x, root.AbsoluteScale.y, area.y));
         RemovePadding(layoutResult);
-        // Pack() distributes the rectangles starting at the origin (0, 0) in the x/z plane
-        // for each node hierarchy level anew. That is why we need to adjust the layout so
-        // that all rectangles are truly nested.
         MakeContained(layoutResult, root);
-        return layoutResult;
       }
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Adjusts the layout so that all rectangles are truly nested. This is necessary
     /// because the origin of the rectangle packing layout is different from the
@@ -99,7 +248,7 @@ namespace SEE.Layout.NodeLayouts
     /// </summary>
     /// <param name="layout">the layout to be adjusted</param>
     /// <param name="parent">the parent node whose children are to be adjusted</param>
-    private static void MakeContained
+    public static void MakeContained
         (Dictionary<ILayoutNode, NodeTransform> layout,
          ILayoutNode parent)
     {
@@ -117,11 +266,12 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Removes the added padding for all NodeTransforms in <paramref name="layout"/>.
     /// </summary>
     /// <param name="layout">layout containing the NodeTransform.Scale to be adjusted</param>
-    private static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
+    public static void RemovePadding(Dictionary<ILayoutNode, NodeTransform> layout)
     {
       // We use a copy of the keys because we will modify layout during the iteration.
       ICollection<ILayoutNode> layoutNodes = new List<ILayoutNode>(layout.Keys);
@@ -142,6 +292,7 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Recursively places the given node and its descendants in nested packed rectangles.
     ///
@@ -151,13 +302,15 @@ namespace SEE.Layout.NodeLayouts
     /// <param name="node">node to be laid out (includings all its descendants)</param>
     /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
     /// <returns>the width and depth of the area covered by the rectangle for <paramref name="node"/></returns>
-    private Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
+    public Vector2 PlaceNodes(Dictionary<ILayoutNode, NodeTransform> layout, ILayoutNode node, float groundLevel)
     {
       if (node.IsLeaf)
       {
+        /*
         // Leaves maintain their scale, which was already set initially. The position will
         // be adjusted later at a higher level of the node hierarchy when Pack() is
         // applied to this leaf and all its siblings.
+         */
         return new Vector2(node.AbsoluteScale.x, node.AbsoluteScale.z);
       }
       else
@@ -171,6 +324,7 @@ namespace SEE.Layout.NodeLayouts
           if (!child.IsLeaf)
           {
             Vector2 childArea = PlaceNodes(layout, child, groundLevel);
+            /*
             // childArea is the ground area size required for this inner node.
             // The position of this inner node in layout will be below in the call to Pack().
             // The position is relative to the parent of this inner node.
@@ -178,6 +332,7 @@ namespace SEE.Layout.NodeLayouts
             // Note: We have already added padding to leaf nodes, but this one here is an
             // inner node. Nevertheless, we do not add padding here, because padding is already
             // included in the returned childArea.
+             */
             layout[child] = new NodeTransform(0, 0,
                                               new Vector3(childArea.x, child.AbsoluteScale.y, childArea.y));
           }
@@ -186,7 +341,7 @@ namespace SEE.Layout.NodeLayouts
         // let's pack those children.
         if (children.Count > 0)
         {
-          Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel);
+          Vector2 area = Pack(layout, children.Cast<ILayoutNode>().ToList(), groundLevel, allThisLayoutNodes);
           float padding = Padding(area.x, area.y);
           return new Vector2(area.x + padding, area.y + padding);
         }
@@ -199,30 +354,33 @@ namespace SEE.Layout.NodeLayouts
       }
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Returns the area size of given <paramref name="node"/>, i.e., its width (x co-ordinate)
     /// multiplied by its depth (z co-ordinate).
     /// </summary>
     /// <param name="node">node whose size is to be returned</param>
     /// <returns>area size of given layout node</returns>
-    private static float AreaSize(NodeTransform node)
+    public static float AreaSize(NodeTransform node)
     {
       Vector3 size = node.Scale;
       return size.x * size.z;
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Returns the ground area size of the given <paramref name="node"/>:
     /// (x -> width, z -> depth).
     /// </summary>
     /// <param name="node">node whose ground area size is requested</param>
     /// <returns>ground area size of the given <paramref name="node"/></returns>
-    private static Vector2 GetRectangleSize(NodeTransform node)
+    public static Vector2 GetRectangleSize(NodeTransform node)
     {
       Vector3 size = node.Scale;
       return new Vector2(size.x, size.z);
     }
 
+    //***********************************************************************************
     /// <summary>
     /// Returns the sum of the required ground area over all given <paramref name="nodes"/> including
     /// the padding for each. A node's width is mapped onto the x co-ordinate
@@ -233,7 +391,7 @@ namespace SEE.Layout.NodeLayouts
     /// (its scale is required only)</param>
     /// <param name="padding">the padding to be added to a node's ground area size</param>
     /// <returns>sum of the required ground area over all given <paramref name="nodes"/></returns>
-    private static Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layoutResult)
+    public static Vector2 Sum(List<ILayoutNode> nodes, Dictionary<ILayoutNode, NodeTransform> layoutResult)
     {
       Vector2 result = Vector2.zero;
       foreach (ILayoutNode element in nodes)
@@ -245,6 +403,35 @@ namespace SEE.Layout.NodeLayouts
       return result;
     }
 
+    //***********************************************************************************
+    private static Vector2 Sum(List<ILayoutNode> nodes)
+    {
+      Vector2 result = Vector2.zero;
+      foreach (var node in nodes)
+      {
+        result.x += node.AbsoluteScale.x;
+        result.y += node.AbsoluteScale.z;
+      }
+      return result;
+    }
+
+
+    /*
+    private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
+    {
+      if (oldLayout != null)
+      {
+        return Vector2.zero;
+      }
+      else
+      {
+        return CreatePack(layout, nodes, groundLevel);
+      }
+    }
+     
+     */
+
+    //***********************************************************************************
     /// <summary>
     /// Places the given <paramref name="nodes"/> in a minimally sized rectangle without
     /// overlapping.
@@ -267,47 +454,160 @@ namespace SEE.Layout.NodeLayouts
     /// <param name="groundLevel">The y-coordindate of the ground where all nodes will be placed.</param>
     /// <returns>the width (x) and depth (y) of the outer rectangle in which all
     /// <paramref name="nodes"/> were placed</returns>
-    private Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel)
+    public Vector2 Pack(Dictionary<ILayoutNode, NodeTransform> layout, List<ILayoutNode> nodes, float groundLevel, IList<ILayoutNode> allLayoutNodes = null)
     {
+      /*
       // To increase the efficiency of the space usage, we order the elements by one of the sizes.
       // Elements must be sorted by size, descending
       nodes.Sort(delegate (ILayoutNode left, ILayoutNode right)
       { return AreaSize(layout[right]).CompareTo(AreaSize(layout[left])); });
-
+       */
+      /*
       // Since we initially do not know how much space we need, we assign a space of the
       // worst case to the root. Note that we want to add padding in between the nodes,
       // so we need to increase the required size accordingly.
+       */
       Vector2 worstCaseSize = Sum(nodes, layout);
+      /*
       // The worst-case size is increased slightly to circumvent potential
       // imprecisions of floating-point arithmetics.
-      PTree tree = new(Vector2.zero, 1.1f * worstCaseSize);
+       */
 
+      tree = new(Vector2.zero, 1.1f * worstCaseSize);
+      /*
+      if (tree == null)
+      {
+      }else
+      {
+        tree.Root.Rectangle.Position = Vector2.zero;
+        tree.Root.Rectangle.Size = 1.1f * worstCaseSize;
+        tree.FreeLeavesAdjust();
+      }
+       */
+      /*
+      else
+      {
+        tree = new (tree.Root.Rectangle.Position, 1.1f * worstCaseSize);
+      }
+       */
+
+      /*
       // Keeps track of the area currently covered by elements. It is the bounding
       // box containing all rectangles placed so far.
       // Initially, there are no placed elements yet, and therefore the covered
       // area is initialized to (0, 0).
-      Vector2 covrec = Vector2.zero;
-
+       */
+      covrec = Vector2.zero;
+      /*
       // All nodes in pnodes that preserve the size of coverec. The
       // value is the amount of remaining space if the node were split to
       // place el.
+       */
       Dictionary<PNode, float> preservers = new();
+      /*
       // All nodes in pnodes that do not preserve the size of coverec.
       // The value is the absolute difference of the aspect ratio of coverec from 1
       // (1 being the perfect ratio) if the node were used to place el.
+       */
       Dictionary<PNode, float> expanders = new();
 
       foreach (ILayoutNode el in nodes)
       {
+        /*
         // We assume that the scale of all nodes in elements have already been set.
 
         // The size we need to place el plus the padding between nodes.
+         */
         Vector2 requiredSize = GetRectangleSize(layout[el]);
 
         preservers.Clear();
         expanders.Clear();
 
-        foreach (PNode pnode in tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.zero))
+        var sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize, Vector2.one);
+        //tree.Print();
+
+        if (sufficientLargeLeaves.Count == 0)
+        {
+          tree.Print();
+          throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout1.globalCallCount + ": ");
+        }
+
+        /*
+        if (sufficientLargeLeaves.Count == 0)
+        {
+          var currentRootSize = tree.Root.Rectangle.Size;
+          var currentRootPosition = tree.Root.Rectangle.Position; 
+          var currentRootCorner = tree.Root.Rectangle.Position + currentRootSize;
+          Debug.Log("Current root size: " + currentRootSize);
+          Debug.Log("corner down right: " + currentRootCorner);
+          tree.Root.Rectangle.Size = 5.0f * tree.Root.Rectangle.Size;
+          Debug.Log("New root size: " + tree.Root.Rectangle.Size);
+          foreach (var leaf in tree.FreeLeaves)
+          {
+            Debug.Log(leaf.Rectangle.Position + leaf.Rectangle.Size + " : " + leaf.Rectangle.Position + " : " + leaf.Rectangle.Size);
+          }
+          var maxX = tree.FreeLeaves.Max(leaf => leaf.Rectangle.Position.x + leaf.Rectangle.Size.x);
+          var maxY = tree.FreeLeaves.Max(leaf => leaf.Rectangle.Position.y + leaf.Rectangle.Size.y);
+          foreach (var leaf in tree.FreeLeaves)
+          {
+            //right lower corner 
+            
+            var corner = leaf.Rectangle.Position + leaf.Rectangle.Size;
+            if (maxY == corner.y)
+            {
+              Debug.Log("before y: " + leaf.Rectangle.Size.y);
+              leaf.Rectangle.Size.y = tree.Root.Rectangle.Size.y;
+              Debug.Log("after y: " + leaf.Rectangle.Size.y);
+
+            }
+            if (maxX == corner.x)
+            {
+              Debug.Log("before x: " + leaf.Rectangle.Size.x);
+              leaf.Rectangle.Size.x = tree.Root.Rectangle.Size.x;
+              Debug.Log("after x: " + leaf.Rectangle.Size.x);
+            }
+          }
+          tree.Print();
+          
+          sufficientLargeLeaves = tree.GetSufficientlyLargeLeaves(requiredSize);
+
+
+          if (sufficientLargeLeaves.Count == 0)
+          {
+            Debug.Log("kos after");
+            throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout.globalCallCount + ": ");
+
+          }
+        }
+         
+         */
+        /*
+          // No leaf is large enough to host el; we need to expand the root rectangle.
+          // We double the size of the root rectangle in both dimensions.
+          Debug.Log(tree.Root.Rectangle.Size + ": before root enlargement");
+          tree.Print();
+          tree.Root.Rectangle.Size = 100.0f * tree.Root.Rectangle.Size;
+
+            foreach (var leaf in tree.FreeLeaves)
+            {
+              Debug.Log(leaf.Rectangle.Size);
+            }
+            tree.Print();
+          if (sufficientLargeLeaves.Count == 0)
+          {
+            Debug.Log("kos");
+            //throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout.globalCallCount + ": ");
+
+          }
+
+          Debug.Log(tree.Root.Rectangle.Size + ": after root enlargement");
+          tree.Print();
+
+           */
+        /*
+           */
+
+        foreach (PNode pnode in sufficientLargeLeaves)
         {
           // Right lower corner of new rectangle
           Vector2 corner = pnode.Rectangle.Position + requiredSize;
@@ -364,7 +664,13 @@ namespace SEE.Layout.NodeLayouts
 
         // Place el into targetNode.
         // The free leaf node that has the requested size allocated within targetNode.
-        PNode fitNode = tree.Split(targetNode, requiredSize);
+
+        if (targetNode == null) 
+        {
+          Debug.LogError("targetNode is null!");
+          continue;
+        }
+        PNode fitNode = tree.Split(targetNode, requiredSize);//fixME debug
 
         // The size of the node remains unchanged. We set only the position.
         // The x and y co-ordinates of the rectangle denote the left front corner. The layout
@@ -372,7 +678,8 @@ namespace SEE.Layout.NodeLayouts
         Vector3 scale = layout[el].Scale;
         layout[el] = new NodeTransform(fitNode.Rectangle.Position.x + scale.x / 2.0f,
                                        fitNode.Rectangle.Position.y + scale.z / 2.0f,
-                                       scale);
+                                       scale, fitNode);
+        
 
         // If fitNode is a boundary expander, then we need to expand covrec to the
         // newly covered area.
@@ -391,5 +698,60 @@ namespace SEE.Layout.NodeLayouts
       }
       return covrec;
     }
+
+    //***********************************************************************************
+    // Creates a new ILayoutNode instance of the same runtime type as the given node, if possible.
+    // If the type does not have a parameterless constructor, falls back to using MemberwiseClone.
+    public static ILayoutNode CreateNewNodeOfSameType(ILayoutNode node)
+    {
+      var type = node.GetType();
+      Debug.Log($"Creating new node of type {type.Name}.");
+      switch (type.Name)
+      {
+        case "LayoutGraphNode":
+          LayoutGraphNode graphNode = new LayoutGraphNode(((LayoutGraphNode)node).ItsNode)
+          {
+            AbsoluteScale = node.AbsoluteScale,
+            CenterPosition = node.CenterPosition,
+            Rotation = node.Rotation,
+            Level = node.Level
+          };
+          foreach (var child in node.Children())
+          {
+            var manufacturedChild = CreateNewNodeOfSameType(child);
+            graphNode.AddChild(manufacturedChild);
+            manufacturedChild.Parent = graphNode;
+
+          }
+          Debug.Log($"Creating of {type.Name} successful.");
+          return graphNode;
+        case "LayoutVertex":
+          LayoutVertex layoutVertex = new LayoutVertex(node.ID)
+          {
+            AbsoluteScale = node.AbsoluteScale,
+            CenterPosition = node.CenterPosition,
+            Rotation = node.Rotation
+          };
+          Debug.Log($"Creating of {type.Name} successful.");
+          return layoutVertex;
+        default:
+          throw new NotImplementedException($"Creation of new node of type {type.Name} is not implemented.");
+      }
+
+    }
+
+    public bool AllAreLeaves(IEnumerable<ILayoutNode> layoutNodes) 
+    {       
+      foreach (ILayoutNode node in layoutNodes)
+      {
+        if (!node.IsLeaf)
+        {
+          return false;
+        }
+      }
+      return true;
+    }
   }
+
+
 }

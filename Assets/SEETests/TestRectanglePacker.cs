@@ -1,5 +1,7 @@
 ﻿using MoreLinq;
 using NUnit.Framework;
+using SEE.DataModel.DG;
+using SEE.Game.CityRendering;
 using SEE.Layout.NodeLayouts;
 using SEE.Layout.NodeLayouts.RectanglePacking;
 using System.Collections.Generic;
@@ -376,16 +378,106 @@ namespace SEE.Layout.RectanglePacking
 
     }
 
+    //*************************************************************************************************************
     [Test]
     public void TestLayout1()
     {
       ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-      RectanglePackingNodeLayout packer = new();
+      RectanglePackingNodeLayout2 packer = new();
 
       Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+
+      RectanglePackingNodeLayout2.tree.Print();
+
+      RectanglePackingNodeLayout2.tree = null;
+
+      foreach (var entry in layout)
+      {
+        Debug.LogFormat("Node ID: {0}, Position: {1}, Size: {2}\n",
+            entry.Key.ID,
+            entry.Value.CenterPosition,
+            entry.Value.Scale);
+      }
+
+
     }
 
+    [Test]
+    public void TestCpOldLayout1()
+    {
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(10, 2);
+
+      Node node1 = new Node();
+
+      LayoutGraphNode nodeLayout1 = new LayoutGraphNode(node1);
+      RectanglePackingNodeLayout2 packer1 = new();
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(gameObjects, Vector3.zero, Vector2.one);
+      RectanglePackingNodeLayout2 packer2 = new();
+      packer2.oldLayout = packer1;
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
+      //*************************************************************************************************************
+      RectanglePackingNodeLayout2.tree.Print();
+      RectanglePackingNodeLayout2.tree = null;
+    }
+
+      //*************************************************************************************************************
+      [Test]
+    public void TestCpOldLayout()
+    {
+      /*
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(1);
+      RectanglePackingNodeLayout2 packer1 = new();
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(gameObjects, Vector3.zero, Vector2.one);
+      RectanglePackingNodeLayout2 packer2 = new();
+      packer2.oldLayout = packer1;
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
+       */
+
+      LayoutVertex node1 = new(new Vector3(8, 1, 6), 1);
+      LayoutVertex node2 = new(new Vector3(7, 1, 3), 2);
+      LayoutVertex node3 = new(new Vector3(5, 1, 3), 3);
+      LayoutVertex node4 = new(new Vector3(4, 1, 4), 4);
+      ICollection<ILayoutNode> nodes1 = new[] { node1 };
+      ICollection<ILayoutNode> nodes2 = new[] { node1, node2 };
+      ICollection<ILayoutNode> nodes3 = new[] { node1, node2, node3 };
+      ICollection<ILayoutNode> nodes4 = new[] { node1, node2, node3, node4 };
+
+      RectanglePackingNodeLayout2 packer1 = new();
+      RectanglePackingNodeLayout2 packer2 = new();
+      RectanglePackingNodeLayout2 packer3 = new();
+      RectanglePackingNodeLayout2 packer4 = new();
+
+      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(nodes1, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer2.oldLayout = packer1;
+
+      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(nodes2, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer3.oldLayout = packer2;
+
+      Dictionary<ILayoutNode, NodeTransform> thirdLayout = packer3.Create(nodes3, Vector3.zero, Vector2.one);
+
+      //RectanglePackingNodeLayout2.tree.Print();
+
+      packer4.oldLayout = packer3;
+
+      Dictionary<ILayoutNode, NodeTransform> forthLayout = packer4.Create(nodes4, Vector3.zero, Vector2.one);
+      
+
+      //*************************************************************************************************************
+      RectanglePackingNodeLayout2.tree.Print();
+      RectanglePackingNodeLayout2.tree = null;
+
+
+      packer4.CopyOldLayout(thirdLayout);
+    }
+
+    //************************************************************************************************************
     /*
      Test packer 
     [Test]

@@ -104,12 +104,14 @@ namespace SEE.Layout.NodeLayouts
       }
       else
       {
+        var copiedLayout = CopyOldLayout(oldLayout.layoutResult);
         globalCallCount = oldLayout.globalCallCount + 1;
-        layoutResult = oldLayout.layoutResult;
+        layoutResult = copiedLayout;
 
         var oldIds = new HashSet<string>(oldLayout.layoutResult.Keys.Select(n => n.ID));
         var newIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
-        
+
+        //tree.Print();
         UpdateLastNodeSize(layoutResult);
 
         newNodes = thisLayoutNodes
@@ -201,6 +203,8 @@ namespace SEE.Layout.NodeLayouts
         {
         }
          */
+
+        Debug.Log("TestDebugPointer");
 
         return layoutResult;
       }
@@ -818,9 +822,72 @@ namespace SEE.Layout.NodeLayouts
     //***********************************************************************************
     // Creates a new ILayoutNode instance of the same runtime type as the given node, if possible.
     // If the type does not have a parameterless constructor, falls back to using MemberwiseClone.
-    public static ILayoutNode CreateNewNodeOfSameType(ILayoutNode node)
+    public ILayoutNode CreateNewNodeOfSameType(ILayoutNode node)
     {
-      var type = node.GetType();
+      Type type = node.GetType();
+      Debug.Log($"Creating new node of type {type.Name}.");
+      switch (type.Name)
+      {
+        case "LayoutGraphNode":
+          LayoutGraphNode graphNode = new LayoutGraphNode(((LayoutGraphNode)node).ItsNode)
+          {
+            AbsoluteScale = node.AbsoluteScale,
+            CenterPosition = node.CenterPosition,
+            Rotation = node.Rotation,
+            Level = node.Level
+          };
+          if (node.Parent != null) 
+          {
+            foreach (var child in node.Children())
+            {
+              var manufacturedChild = CreateNewNodeOfSameType(child);
+              graphNode.AddChild(manufacturedChild);
+              manufacturedChild.Parent = graphNode;
+
+            }
+          }
+          Debug.Log($"Creating of {type.Name} successful.");
+          return graphNode;
+        case "LayoutVertex":
+          LayoutVertex layoutVertex = new LayoutVertex(node.ID)
+          {
+            AbsoluteScale = node.AbsoluteScale,
+            CenterPosition = node.CenterPosition,
+            Rotation = node.Rotation
+          };
+          Debug.Log($"Creating of {type.Name} successful.");
+          return layoutVertex;
+        default:
+          throw new NotImplementedException($"Creation of new node of type {type.Name} is not implemented.");
+      }
+
+    }
+
+    //***********************************************************************************
+    public Dictionary<ILayoutNode, NodeTransform> CopyOldLayout(Dictionary<ILayoutNode, NodeTransform> layoutRes)
+    {
+      foreach (var entry in layoutRes)
+      {
+        Debug.Log("Old layout node id: " + entry.Key.ID + " with scale: " + entry.Value.Scale);
+      }
+      Dictionary<ILayoutNode, NodeTransform> copiedLayout = new();
+      foreach (var entry in layoutRes)
+      {
+        var oldNode = entry.Key;
+        var oldTransform = entry.Value;
+        var newNode = CreateNewNodeOfSameType(oldNode);
+        var newTransform = new NodeTransform(oldTransform.X, oldTransform.Z, oldTransform.Scale, oldTransform.fitNode);
+        copiedLayout[newNode] = newTransform;
+      }
+      foreach (var entry in copiedLayout)
+      {
+        Debug.Log("Copied layout node id: " + entry.Key.ID + " with scale: " + entry.Value.Scale);
+      }
+      /*
+       */
+      return copiedLayout;
+      /*
+      Type type = node.GetType();
       Debug.Log($"Creating new node of type {type.Name}.");
       switch (type.Name)
       {
@@ -853,9 +920,9 @@ namespace SEE.Layout.NodeLayouts
         default:
           throw new NotImplementedException($"Creation of new node of type {type.Name} is not implemented.");
       }
+       */
 
     }
-
     //***********************************************************************************
 
     public bool AllAreLeaves(IEnumerable<ILayoutNode> layoutNodes)

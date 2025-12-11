@@ -8,6 +8,7 @@
         EvoStreets,
         Balloon,
         RectanglePacking,
+        RectanglePacking1,
         RectanglePacking2,
         Treemap,
         CirclePacking,
