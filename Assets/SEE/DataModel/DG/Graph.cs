@@ -317,11 +317,13 @@ namespace SEE.DataModel.DG
         /// concatenated with "#ROOT" will be used.
         /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> will be used.
         /// </summary>
-        /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
-        /// <param name="name">ID of new root node</param>
-        /// <param name="type">type of new root node</param>
-        /// <returns>true if a new root node was created</returns>
-        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
+        /// <param name="root">The resulting (new or existing) root or null if there is no root.</param>
+        /// <param name="name">ID of new root node.</param>
+        /// <param name="type">Type of new root node.</param>
+        /// <param name="initialGraph">If true, forces the creation of a new root even if multiple roots exists;
+        /// used during initial graph construction to ensure the root is created before children.</param>
+        /// <returns>true if a new root node was created.</returns>
+        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null, bool initialGraph = false)
         {
             List<Node> roots = GetRoots();
             string id = name;
@@ -335,7 +337,7 @@ namespace SEE.DataModel.DG
             {
                 type = RootType;
             }
-            if (roots.Count > 1)
+            if (roots.Count > 1 || initialGraph)
             {
                 root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
                 AddNode(root);
