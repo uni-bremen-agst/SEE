@@ -34,7 +34,7 @@ namespace SEE.Game.SceneManipulation
         /// provides more details why</exception>
         public static GameObject Add(GameObject source, GameObject target, string edgeType)
         {
-            AbstractSEECity city = SceneQueries.City(source);
+            AbstractSEECity city = source.ContainingCity();
             if (city == null)
             {
                 throw new Exception($"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
@@ -50,7 +50,7 @@ namespace SEE.Game.SceneManipulation
         public static GameObject Draw(Edge edge)
         {
             GameObject source = GraphElementIDMap.Find(edge.Source.ID);
-            AbstractSEECity city = SceneQueries.City(source);
+            AbstractSEECity city = source.ContainingCity();
             if (city == null)
             {
                 throw new Exception($"The code city for the edge {edge.Source.ID} cannot be determined.\n");

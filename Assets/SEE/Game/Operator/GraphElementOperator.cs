@@ -47,12 +47,24 @@ namespace SEE.Game.Operator
         protected bool GlowEnabled;
 
         /// <summary>
-        /// The city to which the element belongs.
+        /// Backing field for <see cref="City"/>.
+        /// </summary>
+        private AbstractSEECity city;
+
+        /// <summary>
+        /// The city which the element belongs to.
         /// </summary>
         public AbstractSEECity City
         {
-            get;
-            protected set;
+            get
+            {
+                city ??= gameObject.ContainingCity();
+                return city;
+            }
+            protected set
+            {
+                city = value;
+            }
         }
 
         protected override float BaseAnimationDuration => City.BaseAnimationDuration;
@@ -309,6 +321,10 @@ namespace SEE.Game.Operator
         public void EnableDynamicMark(float factor = 0.5f, float duration = 0)
         {
             // FIXME: The icon's material must respect the portal.
+            if (highlightEffect == null)
+            {
+                SetupHighlightEffect();
+            }
 
             // Use Prefab icon.
             highlightEffect.iconFXAssetType = IconAssetType.Prefab;
@@ -351,9 +367,12 @@ namespace SEE.Game.Operator
         /// </summary>
         public void DisableDynamicMark()
         {
-            // We do not set highlighted to false here because there might be
-            // other reasons why the object is highlighted.
-            highlightEffect.iconFX = false;
+            if (highlightEffect != null)
+            {
+                // We do not set highlighted to false here because there might be
+                // other reasons why the object is highlighted.
+                highlightEffect.iconFX = false;
+            }
         }
 
         #endregion
@@ -415,43 +434,6 @@ namespace SEE.Game.Operator
         }
 
         /// <summary>
-        /// If we can already determine the city this object belongs to, sets the
-        /// <see cref="City"/> property. If not, does nothing.
-        /// </summary>
-        public void SetCityIfPossible()
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject != null && codeCityObject.TryGetComponent(out AbstractSEECity city))
-            {
-                City = city;
-            }
-        }
-
-        /// <summary>
-        /// Determines the <see cref="AbstractSEECity"/> this <paramref name="gameObject"/> belongs to and returns it.
-        /// </summary>
-        /// <param name="gameObject">The object to get the city for</param>
-        /// <returns>The city this object belongs to</returns>
-        /// <exception cref="InvalidOperationException">If the object doesn't belong to a city</exception>
-        private static AbstractSEECity GetCity(GameObject gameObject)
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null || !codeCityObject.TryGetComponent(out AbstractSEECity city))
-            {
-                throw new InvalidOperationException($"GraphElementOperator-operated object {gameObject.FullName()}"
-                                                    + $" in code city {CodeCityName(codeCityObject)}"
-                                                    + $" must have an {nameof(AbstractSEECity)} component!");
-            }
-
-            return city;
-
-            static string CodeCityName(GameObject codeCityObject)
-            {
-                return codeCityObject ? codeCityObject.FullName() : "<null>";
-            }
-        }
-
-        /// <summary>
         /// Handles hierarchy changes by refreshing the glow effect.
         /// </summary>
         /// <param name="value">The event that was triggered</param>
@@ -501,22 +483,13 @@ namespace SEE.Game.Operator
 
         protected virtual void OnEnable()
         {
-            City = GetCity(gameObject);
+            City = gameObject.ContainingCity();
             Color = InitializeColorOperation();
 
             Blinking = new TweenOperation<int>(BlinkAction, 0, equalityComparer: new AlwaysFalseEqualityComparer<int>(),
                                                conflictingOperations: new[] { Color });
 
-            if (TryGetComponent(out highlightEffect))
-            {
-                // If the component already exists, we need to rebuild it to be sure it fits our material.
-                RefreshGlowAsync(true).Forget();
-            }
-            else
-            {
-                highlightEffect = Highlighter.GetHighlightEffect(gameObject);
-                highlightEffect.Refresh();
-            }
+            SetupHighlightEffect();
 
             SetupGlow();
 
@@ -525,6 +498,38 @@ namespace SEE.Game.Operator
                 // When the hierarchy changes, we need to refresh the glow effect properties.
                 elementRef.Elem.Subscribe(this);
             }
+        }
+
+        /// <summary>
+        /// If a <see cref="HighlightEffect"/> component is already attached to this game object,
+        /// <see cref="highlightEffect"/> will be set to this <see cref="HighlightEffect"/>
+        /// object and its glow is refreshed. If no such component is attached to the game
+        /// object, a new one is created, attached to the component and assigned to <see cref="highlightEffect"/>.
+        /// </summary>
+        private void SetupHighlightEffect()
+        {
+            if (TryGetComponent(out highlightEffect))
+            {
+                // If the component already exists, we need to rebuild it to be sure it fits our material.
+                RefreshGlowAsync(true).Forget();
+            }
+            else
+            {
+                highlightEffect = NewHighlightEffect(gameObject);
+            }
+        }
+
+        /// <summary>
+        /// Returns a new, refreshed <see cref="HighlightEffect"/> for this <paramref name="gameObject"/>.
+        /// The result is also attached to the given <paramref name="gameObject"/>.
+        /// </summary>
+        /// <param name="gameObject">Game object for which to return a new <see cref="HighlightEffect"/>.</param>
+        /// <returns>A new, refreshed <see cref="HighlightEffect"/>.</returns>
+        private static HighlightEffect NewHighlightEffect(GameObject gameObject)
+        {
+            HighlightEffect effect = Highlighter.GetHighlightEffect(gameObject);
+            effect.Refresh();
+            return effect;
         }
 
         protected virtual void OnDisable()

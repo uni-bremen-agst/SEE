@@ -5,7 +5,6 @@ using System.Threading;
 using Cysharp.Threading.Tasks;
 using MoreLinq;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.Utils;
@@ -268,7 +267,7 @@ namespace SEE.Controls.Actions
         {
             if (gameObject.TryGetNode(out Node node))
             {
-                codeCity ??= SceneQueries.City(gameObject);
+                codeCity ??= gameObject.ContainingCity();
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();

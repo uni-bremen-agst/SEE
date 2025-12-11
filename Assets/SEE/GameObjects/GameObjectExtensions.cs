@@ -124,7 +124,7 @@ namespace SEE.GO
             else
             {
                 Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
+                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponentOrLog(out T city))
                 {
                     return city;
                 }
@@ -1281,9 +1281,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Node))
             {
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                nodeOperator.SetCityIfPossible();
-                return nodeOperator;
+                return gameObject.AddOrGetComponent<NodeOperator>();
             }
             else
             {

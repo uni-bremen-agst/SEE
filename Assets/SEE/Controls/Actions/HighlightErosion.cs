@@ -1,7 +1,6 @@
 ﻿using System;
 using DG.Tweening;
 using SEE.DataModel.DG;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.GO;
 using TMPro;
@@ -164,7 +163,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
-            city ??= SceneQueries.City(gameObject);
+            city ??= gameObject.ContainingCity();
             float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
             float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
             return baseDuration * factor;

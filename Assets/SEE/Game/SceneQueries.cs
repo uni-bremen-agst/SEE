@@ -201,23 +201,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the <see cref="AbstractSEECity"/> component attached to the code city
-        /// the given <paramref name="gameObject"/> is contained in.
-        /// May be null.
-        /// </summary>
-        /// <returns>The code city this <see cref="gameObject"/> is contained in, or null.</returns>
-        public static AbstractSEECity City(GameObject gameObject)
-        {
-            GameObject codeCityObject = GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null)
-            {
-                return null;
-            }
-            codeCityObject.TryGetComponentOrLog(out AbstractSEECity city);
-            return city;
-        }
-
-        /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///

@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using Cysharp.Threading.Tasks;
-using SEE.Game;
 using SEE.Game.City;
 using SEE.UI.Notification;
 using SEE.GO;
@@ -74,7 +73,7 @@ namespace SEE.UI.Window.CodeWindow
             DebugBreakpointManager.OnBreakpointAdded += OnBreakpointAdded;
             DebugBreakpointManager.OnBreakpointRemoved += OnBreakpointRemoved;
 
-            AbstractSEECity city = SceneQueries.City(transform.gameObject);
+            AbstractSEECity city = transform.gameObject.ContainingCity();
             if (city != null)
             {
                 // Get button for IDE interaction and register events.
