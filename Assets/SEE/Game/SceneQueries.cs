@@ -1,9 +1,10 @@
-﻿using System;
+﻿using SEE.Controls;
+using SEE.DataModel.DG;
+using SEE.Game.City;
+using SEE.GO;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using SEE.Controls;
-using SEE.DataModel.DG;
-using SEE.GO;
 using UnityEngine;
 
 namespace SEE.Game
@@ -197,6 +198,23 @@ namespace SEE.Game
                 result = result.parent;
             }
             return result;
+        }
+
+        /// <summary>
+        /// Returns the <see cref="AbstractSEECity"/> component attached to the code city
+        /// the given <paramref name="gameObject"/> is contained in.
+        /// May be null.
+        /// </summary>
+        /// <returns>The code city this <see cref="gameObject"/> is contained in, or null.</returns>
+        public static AbstractSEECity City(GameObject gameObject)
+        {
+            GameObject codeCityObject = GetCodeCity(gameObject.transform)?.gameObject;
+            if (codeCityObject == null)
+            {
+                return null;
+            }
+            codeCityObject.TryGetComponentOrLog(out AbstractSEECity city);
+            return city;
         }
 
         /// <summary>

@@ -177,23 +177,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the code city holding the settings for the visualization of the node.
-        /// May be null.
-        /// </summary>
-        private AbstractSEECity City()
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null)
-            {
-                Debug.LogError($"Could not retrieve CodeCity for {gameObject.name}!");
-                return null;
-            }
-
-            codeCityObject.TryGetComponent(out AbstractSEECity city);
-            return city;
-        }
-
-        /// <summary>
         /// Returns a list of lists of edges that are relevant (i.e., should be shown/hidden)
         /// for the given <paramref name="node"/>. The second level of the list corresponds to
         /// the depth within the transitive closure of the edges, ordered by the distance to the given node,
@@ -285,7 +268,7 @@ namespace SEE.Controls.Actions
         {
             if (gameObject.TryGetNode(out Node node))
             {
-                codeCity ??= City();
+                codeCity ??= SceneQueries.City(gameObject);
                 if (!isSelected)
                 {
                     edgeToggleToken?.Cancel();

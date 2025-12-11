@@ -152,22 +152,6 @@ namespace SEE.Controls.Actions
         }
 
         /// <summary>
-        /// Returns the code city holding the settings for the visualization of the node.
-        /// May be null.
-        /// </summary>
-        private AbstractSEECity City()
-        {
-            GameObject codeCityObject = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
-            if (codeCityObject == null)
-            {
-                return null;
-            }
-
-            codeCityObject.TryGetComponent(out AbstractSEECity city);
-            return city;
-        }
-
-        /// <summary>
         /// The default animation duration in case we cannot derive a city for the interactable object.
         /// </summary>
         private const float defaultAnimationDuration = 1.0f;
@@ -180,7 +164,7 @@ namespace SEE.Controls.Actions
         /// </summary>
         private float AnimationDuration(Node node, AbstractSEECity city = null)
         {
-            city ??= City();
+            city ??= SceneQueries.City(gameObject);
             float baseDuration = city == null ? defaultAnimationDuration : city.BaseAnimationDuration;
             float factor = city == null ? 1f : city.NodeTypes[node.Type].LabelSettings.AnimationFactor;
             return baseDuration * factor;
