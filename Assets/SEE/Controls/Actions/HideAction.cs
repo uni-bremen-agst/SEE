@@ -456,7 +456,7 @@ namespace SEE.Controls.Actions
         {
             if (selectedObject != null)
             {
-                GameObject city = SceneQueries.GetCodeCity(selectedObject.transform).gameObject;
+                GameObject city = selectedObject.GetCodeCity();
                 List<GameObject> nodesEdges = GetAllChildrenRecursively(city.transform, new List<GameObject>());
 
                 foreach (GameObject g in nodesEdges)
@@ -467,7 +467,6 @@ namespace SEE.Controls.Actions
                         hiddenObjects.Add(g);
                     }
                 }
-
                 return true;
             }
             else

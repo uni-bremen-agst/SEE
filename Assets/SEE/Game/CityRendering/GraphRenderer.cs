@@ -747,12 +747,12 @@ namespace SEE.Game.CityRendering
         /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
         private static GameObject RootGameNode(GameObject gameNode)
         {
-            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            GameObject codeCity = gameNode.GetCodeCity();
             if (codeCity == null)
             {
                 throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
-            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
+            GameObject result = SceneQueries.GetCityRootNode(codeCity);
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");

@@ -176,31 +176,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns the closest ancestor of <paramref name="transform"/> that
-        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
-        /// This ancestor is assumed to carry the settings (layout information etc.).
-        /// If none can be found, null will be returned.
-        /// If <paramref name="transform"/> is tagged by <see cref="Tags.CodeCity"/>,
-        /// it will be returned.
-        /// </summary>
-        /// <param name="transform">transform at which to start the search</param>
-        /// <returns>closest ancestor transform in the game-object hierarchy tagged by
-        /// <see cref="Tags.CodeCity"/> or null</returns>
-        public static Transform GetCodeCity(Transform transform)
-        {
-            Transform result = transform;
-            while (result != null)
-            {
-                if (result.CompareTag(Tags.CodeCity))
-                {
-                    return result;
-                }
-                result = result.parent;
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Returns all game objects in the current scene having a name contained in <paramref name="gameObjectNames"/>.
         /// Will also return inactive game objects.
         ///

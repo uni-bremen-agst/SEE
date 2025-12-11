@@ -40,12 +40,12 @@ namespace SEE.GO.Factories
             {
                 throw new ArgumentNullException(nameof(gameObject));
             }
-            Transform codeCity = SceneQueries.GetCodeCity(gameObject.transform);
+            GameObject codeCity = gameObject.GetCodeCity();
             if (codeCity == null)
             {
                 throw new Exception($"{gameObject.name} is not contained in a code city.");
             }
-            if (dynamicMarkerPrefabs.TryGetValue(codeCity.gameObject, out GameObject dynamicMarkerPrefab))
+            if (dynamicMarkerPrefabs.TryGetValue(codeCity, out GameObject dynamicMarkerPrefab))
             {
                 return dynamicMarkerPrefab;
             }
@@ -62,12 +62,13 @@ namespace SEE.GO.Factories
                     // We do not want to change the prefab file if we set the portal.
                     dynamicMarkerPrefab.hideFlags = HideFlags.DontSave;
                     dynamicMarkerPrefab.name = "DynamicMarker_" + codeCity.name;
+                    dynamicMarkerPrefab.tag = Tags.Decoration;
 
-                    Portal.GetDimensions(codeCity.gameObject, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
+                    Portal.GetDimensions(codeCity, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
                     Portal.SetPortal(dynamicMarkerPrefab, leftFrontCorner, rightBackCorner);
                     // Portal.SetInfinitePortal(dynamicMarkerPrefab);
 
-                    dynamicMarkerPrefabs[codeCity.gameObject] = dynamicMarkerPrefab;
+                    dynamicMarkerPrefabs[codeCity] = dynamicMarkerPrefab;
                     return dynamicMarkerPrefab;
                 }
             }

@@ -123,8 +123,8 @@ namespace SEE.GO
             }
             else
             {
-                Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponentOrLog(out T city))
+                GameObject codeCityObject = gameObject.GetCodeCity();
+                if (codeCityObject != null && codeCityObject.TryGetComponentOrLog(out T city))
                 {
                     return city;
                 }
@@ -133,6 +133,31 @@ namespace SEE.GO
                     return null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the closest ancestor of <paramref name="gameObject"/> that
+        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
+        /// This ancestor is assumed to carry the settings (layout information etc.).
+        /// If none can be found, null will be returned.
+        /// If <paramref name="gameObject"/> is tagged by <see cref="Tags.CodeCity"/>,
+        /// it will be returned.
+        /// </summary>
+        /// <param name="gameObject">Game object at which to start the search.</param>
+        /// <returns>Closest ancestor game object in the game-object hierarchy tagged by
+        /// <see cref="Tags.CodeCity"/> or null.</returns>
+        public static GameObject GetCodeCity(this GameObject gameObject)
+        {
+            Transform result = gameObject.transform;
+            while (result != null)
+            {
+                if (result.CompareTag(Tags.CodeCity))
+                {
+                    return result.gameObject;
+                }
+                result = result.parent;
+            }
+            return result == null ? null : result.gameObject;
         }
 
         /// <summary>
@@ -1239,7 +1264,7 @@ namespace SEE.GO
         public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
                                         Portal.IncludeDescendants includeDescendants = OnlySelf)
         {
-            GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            GameObject rootCity = gameObject.GetCodeCity();
             if (rootCity != null)
             {
                 Portal.SetPortal(rootCity, gameObject, includeDescendants);
