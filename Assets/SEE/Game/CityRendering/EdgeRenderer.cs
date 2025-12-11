@@ -163,7 +163,7 @@ namespace SEE.Game.CityRendering
 
             // The edge becomes a child of the root node of the game-node hierarchy
             GameObject codeCity = from.GetCodeCity();
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity);
+            GameObject rootNode = codeCity.GetCityRootNode();
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);

@@ -752,7 +752,7 @@ namespace SEE.Game.CityRendering
             {
                 throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
-            GameObject result = SceneQueries.GetCityRootNode(codeCity);
+            GameObject result = codeCity.GetCityRootNode();
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");

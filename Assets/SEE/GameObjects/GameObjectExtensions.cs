@@ -148,6 +148,10 @@ namespace SEE.GO
         /// <see cref="Tags.CodeCity"/> or null.</returns>
         public static GameObject GetCodeCity(this GameObject gameObject)
         {
+            if (gameObject == null)
+            {
+                throw new ArgumentNullException(nameof(gameObject));
+            }
             Transform result = gameObject.transform;
             while (result != null)
             {
@@ -158,6 +162,29 @@ namespace SEE.GO
                 result = result.parent;
             }
             return result == null ? null : result.gameObject;
+        }
+
+        /// <summary>
+        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
+        /// </summary>
+        /// <param name="codeCity">Object representing a code city (tagged by <see cref="Tags.CodeCity"/>).</param>
+        /// <returns>Game object representing the root of the graph or null if there is none.</returns>
+        /// <remarks>If <paramref name="codeCity"/> is a node representing a code city,
+        /// the first child tagged as <see cref="Tags.Node"/> is considered the root of the graph.</remarks>
+        public static GameObject GetCityRootNode(this GameObject codeCity)
+        {
+            if (codeCity == null)
+            {
+                throw new ArgumentNullException(nameof(codeCity));
+            }
+            foreach (Transform child in codeCity.transform)
+            {
+                if (child.CompareTag(Tags.Node))
+                {
+                    return child.transform.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>

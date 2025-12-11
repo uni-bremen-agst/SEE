@@ -132,25 +132,6 @@ namespace SEE.Game
         }
 
         /// <summary>
-        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
-        /// If <paramref name="codeCity"/> is a node representing a code city,
-        /// the result is considered the root of the graph.
-        /// </summary>
-        /// <param name="codeCity">object representing a code city (tagged by <see cref="Tags.CodeCity"/>)</param>
-        /// <returns>game object representing the root of the graph or null if there is none</returns>
-        public static GameObject GetCityRootNode(GameObject codeCity)
-        {
-            foreach (Transform child in codeCity.transform)
-            {
-                if (child.CompareTag(Tags.Node))
-                {
-                    return child.transform.gameObject;
-                }
-            }
-            return null;
-        }
-
-        /// <summary>
         /// Returns the farthest ancestor in the game-object hierarchy that is tagged by
         /// <see cref="Tags.Node"/>.
         /// If <paramref name="cityChildTransform"/> has no parent or if its parent is not tagged by
