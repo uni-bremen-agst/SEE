@@ -150,7 +150,10 @@ namespace SEE.User
         }
 
         /// <summary>
-        /// Shuts down the voice-chat system and OpenTelemetry.
+        /// Shuts down the voice-chat system and OpenTelemetry,
+        /// and saves all user settings.
+        /// This ensures that any changes made during the session are persisted
+        /// when the application quits.
         /// </summary>
         private void OnApplicationQuit()
         {
