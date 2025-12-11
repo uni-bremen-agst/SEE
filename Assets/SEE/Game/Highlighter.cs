@@ -41,7 +41,7 @@ namespace SEE.Game
             {
                 highlight = gameObject.AddComponent<HighlightEffect>();
                 highlight.innerGlow = 0;
-                Color inverted = gameObject.GetComponent<Renderer>().material.color.Invert();
+                Color inverted = gameObject.GetComponent<Renderer>().sharedMaterial.color.Invert();
                 highlight.outlineColor = inverted;
                 highlight.SetGlowColor(Color.yellow);
                 highlight.glow = 2;
