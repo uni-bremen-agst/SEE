@@ -378,7 +378,10 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
+                // The authors spheres and author references are created under the code city (parent)
+                // and not under the graph root game node (rootGameNode) because we do not want to
+                // move them if a user shuffles the root game node.
+                DrawAuthorSpheres(nodeMap, parent, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
