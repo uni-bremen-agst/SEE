@@ -52,7 +52,7 @@ namespace SEE.GO.Factories
             else
             {
                 // Instantiation per code city. Each code has its own portal.
-                dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile, null, false);
+                dynamicMarkerPrefab = PrefabInstantiator.LoadPrefab(dynamicMarkerPrefabFile);
                 if (dynamicMarkerPrefab == null)
                 {
                     throw new Exception($"Cannot load prefab from file {dynamicMarkerPrefabFile}\n");
@@ -73,5 +73,38 @@ namespace SEE.GO.Factories
                 }
             }
         }
+
+        /// <summary>
+        /// Removes the marker prefab corresponding to <paramref name="codeCity"/>
+        /// and destroys it.
+        /// </summary>
+        /// <param name="codeCity">The code city for which to remove the prefab.</param>
+        public static void DestroyMarkerPrefab(GameObject codeCity)
+        {
+            if (dynamicMarkerPrefabs != null && dynamicMarkerPrefabs.TryGetValue(codeCity, out GameObject prefab))
+            {
+                dynamicMarkerPrefabs.Remove(codeCity);
+                Destroyer.Destroy(prefab);
+            }
+        }
+
+#if UNITY_EDITOR
+        /// <summary>
+        /// Destroys all entries in <see cref="dynamicMarkerPrefabs"/> and clears it. This might be needed
+        /// if a user has created dynamic markers in the Unity Editor, in which case the initially loaded
+        /// prefab is still lurking around.
+        /// </summary>
+        /// <remarks>Called by Unity. Runs right when play mode is entered.</remarks>
+        [UnityEditor.InitializeOnEnterPlayMode]
+        private static void ClearDynamicMarkerPrefabs()
+        {
+            Debug.Log($"Removing {dynamicMarkerPrefabs.Count} dynamic marker prefabs.\n");
+            foreach (GameObject prefab in dynamicMarkerPrefabs.Values)
+            {
+                Destroyer.Destroy(prefab);
+            }
+            dynamicMarkerPrefabs.Clear();
+        }
+#endif
     }
 }

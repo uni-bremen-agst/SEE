@@ -1,8 +1,10 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
+using SEE.GameObjects;
 using SEE.GameObjects.BranchCity;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -103,6 +105,15 @@ namespace SEE.Game.City
         private bool enableConflictMarkers = false;
 
         /// <summary>
+        /// Unregisters the code city from <see cref="DynamicMarkerFactory"/> to destroy
+        /// the dynamic marker prefab created specifically for this code city.
+        /// </summary>
+        private void OnDestroy()
+        {
+            DynamicMarkerFactory.DestroyMarkerPrefab(gameObject);
+        }
+
+        /// <summary>
         /// Whether the dynamic markers are to be enabled for file nodes with
         /// multiple authors, that is, when there is a chance of an edit conflict.
         /// </summary>
@@ -118,6 +129,21 @@ namespace SEE.Game.City
                 enableConflictMarkers = value;
                 UpdateConflictMarkers();
             }
+        }
+
+        /// <summary>
+        /// Resets everything that is specific to a given graph. Here: the selected node types,
+        /// the underlying and visualized graph, and all game objects visualizing information about it.
+        /// And enables the <see cref="CitySelectionManager"/> to add a new <see cref="AbstractSEECity"/>.
+        /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            DynamicMarkerFactory.DestroyMarkerPrefab(gameObject);
         }
 
         /// <summary>
