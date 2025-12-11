@@ -350,8 +350,6 @@ namespace SEE.Game.Operator
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
             highlightEffect.iconFXDarkColor = UnityEngine.Color.yellow;
             highlightEffect.iconFXRotationSpeed = 0f;
-
-
             highlightEffect.iconFXAnimationSpeed = ToDuration(factor);
             highlightEffect.iconFXScale = 0.2f;
             highlightEffect.iconFXStayDuration = duration;
@@ -365,9 +363,6 @@ namespace SEE.Game.Operator
             // at runtime, call UpdateMaterialProperties() to ensure those changes are
             // applied immediately.
             highlightEffect.UpdateMaterialProperties();
-            // The prefab is instantiated by UpdateMaterialProperties().
-            //highlightEffect.iconFXPrefab.transform.name = "Dynamic_Marker_" + gameObject.name;
-            //highlightEffect.iconFXPrefab.transform.SetParent(gameObject.transform);
         }
 
         /// <summary>
