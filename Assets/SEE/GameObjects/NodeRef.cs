@@ -18,6 +18,18 @@ namespace SEE.GO
         [NonSerialized] private static readonly Dictionary<Node, NodeRef> nodeToNodeRefDict = new();
 
         /// <summary>
+        /// A callback called when a new node value is assigned that differs from null.
+        /// </summary>
+        /// <param name="node">The node that is assigned to this reference.</param>
+        public delegate void ValueIsSet(Node node);
+
+        /// <summary>
+        /// Clients can register here to be informed when a new node value is assigned that
+        /// differs from null.
+        /// </summary>
+        public event ValueIsSet OnValueSet;
+
+        /// <summary>
         /// The graph node this node reference is referring to, that is, is visualized
         /// by this game object.
         ///
@@ -44,22 +56,11 @@ namespace SEE.GO
                     if (Elem != null)
                     {
                         nodeToNodeRefDict[(Node)Elem] = this;
+                        OnValueSet?.Invoke(value);
                     }
                 }
             }
         }
-
-        /// <summary>
-        /// Sets this <see cref="NodeRef"/> to referring to <paramref name="node"/>.
-        ///
-        /// Unlike setting <see cref="Value"/>, this assignment will not alter the
-        /// mapping of <see cref="Node"/>s onto <see cref="NodeRef"/>s, in other words,
-        /// <see cref="nodeToNodeRefDict"/>. That is, the result of <see cref="Get(Node)"/>
-        /// does not depend upon this assignment.
-        /// </summary>
-        /// <param name="node">the graph node this <see cref="NodeRef"/> should be
-        /// referring to</param>
-        public void SetNode(Node node) => Elem = node;
 
         /// <summary>
         /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.
