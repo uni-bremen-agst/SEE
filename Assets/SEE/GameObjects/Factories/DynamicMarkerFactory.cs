@@ -52,7 +52,7 @@ namespace SEE.GO.Factories
             else
             {
                 // Instantiation per code city. Each code has its own portal.
-                dynamicMarkerPrefab = PrefabInstantiator.LoadPrefab(dynamicMarkerPrefabFile);
+                dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile);
                 if (dynamicMarkerPrefab == null)
                 {
                     throw new Exception($"Cannot load prefab from file {dynamicMarkerPrefabFile}\n");
@@ -66,7 +66,6 @@ namespace SEE.GO.Factories
 
                     Portal.GetDimensions(codeCity, out Vector2 leftFrontCorner, out Vector2 rightBackCorner);
                     Portal.SetPortal(dynamicMarkerPrefab, leftFrontCorner, rightBackCorner);
-                    // Portal.SetInfinitePortal(dynamicMarkerPrefab);
 
                     dynamicMarkerPrefabs[codeCity] = dynamicMarkerPrefab;
                     return dynamicMarkerPrefab;
