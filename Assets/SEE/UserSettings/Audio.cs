@@ -86,11 +86,13 @@ namespace SEE.User
         {
             if (attributes.TryGetValue(label, out object dictionary))
             {
-                ConfigIO.Restore(attributes, musicVolumeLabel, ref MusicVolume);
-                ConfigIO.Restore(attributes, soundEffectsVolumeLabel, ref SoundEffectsVolume);
-                ConfigIO.Restore(attributes, musicMutedLabel, ref MusicMuted);
-                ConfigIO.Restore(attributes, soundEffectsMutedLabel, ref SoundEffectsMuted);
-                ConfigIO.Restore(attributes, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
+                Dictionary<string, object> values = dictionary as Dictionary<string, object>;
+
+                ConfigIO.Restore(values, musicVolumeLabel, ref MusicVolume);
+                ConfigIO.Restore(values, soundEffectsVolumeLabel, ref SoundEffectsVolume);
+                ConfigIO.Restore(values, musicMutedLabel, ref MusicMuted);
+                ConfigIO.Restore(values, soundEffectsMutedLabel, ref SoundEffectsMuted);
+                ConfigIO.Restore(values, remoteSoundEffectsMutedLabel, ref RemoteSoundEffectsMuted);
             }
         }
         #endregion

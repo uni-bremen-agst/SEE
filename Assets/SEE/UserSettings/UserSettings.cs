@@ -156,6 +156,7 @@ namespace SEE.User
         {
             TracingHelperService.Shutdown(true);
             User.VoiceChat.EndVoiceChat(VoiceChat);
+            Instance.Save();
         }
 
         /// <summary>
