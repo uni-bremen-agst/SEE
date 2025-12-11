@@ -35,7 +35,8 @@ namespace SEE.Game.CityRendering
         /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
         private void DrawAuthorSpheres
             (IDictionary<Node, GameObject> nodeMap,
-            GameObject parent, Graph graph,
+            GameObject parent,
+            Graph graph,
             Vector3 planeCenterposition,
             Vector2 planeRectangle)
         {
