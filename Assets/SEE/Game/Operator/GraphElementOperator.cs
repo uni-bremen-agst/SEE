@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Cysharp.Threading.Tasks;
 using DG.Tweening;
 using HighlightPlus;
@@ -10,6 +7,10 @@ using SEE.GO;
 using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using UnityEditor;
 using UnityEngine;
 using ArgumentException = System.ArgumentException;
 
@@ -320,10 +321,17 @@ namespace SEE.Game.Operator
         /// <param name="duration">Duration of the animation; 0 means forever.</param>
         public void EnableDynamicMark(float factor = 0.5f, float duration = 0)
         {
-            // FIXME: The icon's material must respect the portal.
             if (highlightEffect == null)
             {
-                SetupHighlightEffect();
+                highlightEffect = NewHighlightEffect(gameObject);
+                // We turn off all other kinds of highlights. By default, they are
+                // enabled. We just created the effect, hence, nobody else wanted
+                // those default highlight effects; so it is safe to turn them off.
+                highlightEffect.innerGlow = 0;
+                highlightEffect.glow = 0;
+                highlightEffect.outline = 0;
+                highlightEffect.overlay = 0;
+                highlightEffect.targetFX = false;
             }
 
             // Use Prefab icon.
@@ -451,7 +459,13 @@ namespace SEE.Game.Operator
         /// Refreshes the glow effect properties.
         ///
         /// Needs to be called whenever the material changes. Hierarchy changes are handled automatically.
+        ///
+        /// If <paramref name="fullRefresh"/> is false, the <see cref="highlightEffect"/> is just refreshed.
+        /// Otherwise the <see cref="Glow"/> is killed, <see cref="highlightEffect"/> is destroyed
+        /// and re-created, and the <see cref="Glow"/> is set up again. The latter is needed
+        /// when edges are turned from lines into meshes with a material, for instance.
         /// </summary>
+        /// <param name="fullRefresh">Whether a full refresh is needed.</param>
         public async UniTaskVoid RefreshGlowAsync(bool fullRefresh = false)
         {
             if (highlightEffect != null && Glow != null)
