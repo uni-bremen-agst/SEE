@@ -116,6 +116,11 @@ namespace SEE.Game.Operator
             {
                 nodeLabel.SetActive(true);
             }
+
+            labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
+            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
+            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
+            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
         }
 
         /// <summary>
