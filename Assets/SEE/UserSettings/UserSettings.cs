@@ -63,6 +63,12 @@ namespace SEE.User
         public readonly Video Video = new();
 
         /// <summary>
+        /// Settings for audio.
+        /// </summary>
+        [Tooltip("Audio settings.")]
+        public readonly Audio Audio = new();
+
+        /// <summary>
         /// Default path of the configuration file (path and filename).
         /// </summary>
         [PropertyTooltip("Path of the file containing the settings.")]
@@ -290,6 +296,11 @@ namespace SEE.User
         private const string videoLabel = "Video";
 
         /// <summary>
+        /// Label of attribute <see cref="Audio"/> in the confiugration file.
+        /// </summary>
+        private const string audioLabel = "Audio";
+
+        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
@@ -301,6 +312,7 @@ namespace SEE.User
             Telemetry.Save(writer, telemetryLabel);
             writer.Save(InputType.ToString(), inputTypeLabel);
             Video.Save(writer, videoLabel);
+            Audio.Save(writer, audioLabel);
         }
 
         /// <summary>
@@ -315,6 +327,7 @@ namespace SEE.User
             Telemetry.Restore(attributes, telemetryLabel);
             ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
             Video.Restore(attributes, videoLabel);
+            Audio.Restore(attributes, audioLabel);
         }
 
         #endregion Configuration I/O
