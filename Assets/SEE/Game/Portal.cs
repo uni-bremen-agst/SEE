@@ -309,11 +309,16 @@ namespace SEE.Game
         /// Sets <c>_Portal</c> property of <paramref name="material"/> to the XZ rectangle defined by
         /// <paramref name="leftFrontCorner"/> and <paramref name="rightBackCorner"/>.
         /// </summary>
-        /// <param name="material">the material whose portal is to be set</param>
+        /// <param name="material">the material whose portal is to be set; must not be null</param>
         /// <param name="leftFrontCorner">left front corner of the portal</param>
         /// <param name="rightBackCorner">right back corner of the portal</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="material"/> is null.</exception>
         private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
+            if (material == null)
+            {
+                throw new ArgumentNullException(nameof(material));
+            }
             material.SetVector(portalProp, new Vector4(leftFrontCorner.x, leftFrontCorner.y, rightBackCorner.x, rightBackCorner.y));
         }
     }
