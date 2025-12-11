@@ -124,12 +124,14 @@ namespace SEE.GO
             else
             {
                 GameObject codeCityObject = gameObject.GetCodeCity();
-                if (codeCityObject != null && codeCityObject.TryGetComponentOrLog(out T city))
+                if (codeCityObject != null && codeCityObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
                 else
                 {
+                    /// We do not log the fact that <see cref="codeCityObject"/> does not have the
+                    /// expected type of city, as some clients are using this method just as a predicate.
                     return null;
                 }
             }
