@@ -312,11 +312,11 @@ MonoBehaviour:
   m_Name: DPadInteraction Standalone
   m_EditorClassIdentifier: Unity.XR.OpenXR:UnityEngine.XR.OpenXR.Features.Interactions:DPadInteraction
   m_enabled: 0
-  nameUi: 
-  version: 
-  featureIdInternal: 
-  openxrExtensionStrings: 
-  company: 
+  nameUi: D-Pad Binding
+  version: 0.0.1
+  featureIdInternal: com.unity.openxr.feature.input.dpadinteraction
+  openxrExtensionStrings: XR_KHR_binding_modification XR_EXT_dpad_binding
+  company: Unity
   priority: 0
   required: 0
   forceThresholdLeft: 0.5
@@ -482,12 +482,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   features:
   - {fileID: 3659132584355106210}
-  - {fileID: 7953223147710442691}
+  - {fileID: -9183767700453206409}
   - {fileID: 8813224991119622085}
   - {fileID: 6352007622941683982}
-  - {fileID: -3509102339466431376}
-  - {fileID: 356982443662187679}
-  - {fileID: 1111993605809285735}
+  - {fileID: -8762091205766609694}
+  - {fileID: 647264116708350306}
+  - {fileID: -768430840992792561}
   - {fileID: 1053848533076859159}
   - {fileID: 2722789916443922232}
   - {fileID: -976767862519565790}
@@ -496,7 +496,7 @@ MonoBehaviour:
   - {fileID: 2035665097814175999}
   - {fileID: 5863123478492171226}
   - {fileID: -7973984030652435389}
-  - {fileID: -6979949788044929919}
+  - {fileID: -4441850959386145291}
   - {fileID: 8139941772144781997}
   - {fileID: 7242976004462796141}
   - {fileID: 3038467894708909782}
