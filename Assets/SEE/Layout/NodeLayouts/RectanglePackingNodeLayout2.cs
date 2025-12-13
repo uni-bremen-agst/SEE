@@ -104,21 +104,22 @@ namespace SEE.Layout.NodeLayouts
       }
       else
       {
-        var copiedLayout = CopyOldLayout(oldLayout.layoutResult);
+        //var copiedLayout = CopyOldLayout(oldLayout.layoutResult);
         globalCallCount = oldLayout.globalCallCount + 1;
-        layoutResult = copiedLayout;
+        //layoutResult = oldLayout.layoutResult;
+        //ManageLayoutResult(thisLayoutNodes);
 
         var oldIds = new HashSet<string>(oldLayout.layoutResult.Keys.Select(n => n.ID));
         var newIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
 
         //tree.Print();
-        UpdateLastNodeSize(layoutResult);
+        //UpdateLastNodeSize(layoutResult);
 
         newNodes = thisLayoutNodes
           .Where(node => !oldIds.Contains(node.ID))
           .ToList();
 
-        toBeDeleted = oldLayout.layoutResult
+        toBeDeleted = layoutResult
           .Where(entry => !newIds.Contains(entry.Key.ID))
           .ToDictionary(entry => entry.Key, entry => entry.Value);
 
@@ -211,6 +212,33 @@ namespace SEE.Layout.NodeLayouts
     }
 
     //***********************************************************************************
+    public void ManageLayoutResult(IEnumerable<ILayoutNode> thisLayoutNodes)
+    {
+      /*
+      see which new nodes are the in the oldlayout 
+      create new nodetransforms and put them where they where before 
+      then go on with adding new nodes into the layoutresult 
+       */
+      var newIds = new HashSet<string>(thisLayoutNodes.Select(n => n.ID));
+
+      sameLeaves = oldLayout.allThisLayoutNodes
+          .Where(node => newIds.Contains(node.ID))
+          .ToList();
+
+      var sameIds = new HashSet<string>(sameLeaves.Select(n => n.ID));
+
+      foreach (var entry in oldLayout.layoutResult)
+      {
+        if (sameIds.Contains(entry.Key.ID))
+        {
+          NodeTransform nodeTransform = new NodeTransform(entry.Value.X, entry.Value.Z, entry.Value.Scale, entry.Value.fitNode);
+          layoutResult[entry.Key] = nodeTransform;
+        }
+      }
+
+    }
+
+    //***********************************************************************************
     public void UpdateLastNodeSize(Dictionary<ILayoutNode, NodeTransform> layout)
     {
       /*
@@ -227,6 +255,7 @@ namespace SEE.Layout.NodeLayouts
           );
        */
       
+      /*
       foreach (var entry in layout)
       {
         var node = entry.Key;
@@ -237,6 +266,7 @@ namespace SEE.Layout.NodeLayouts
       {
         Debug.Log("allThisLayoutNodes node.id: " + node.ID + "absolutescale: " + node.AbsoluteScale);
       }
+       */
 
 
       foreach (var entry in layout)
@@ -261,8 +291,6 @@ namespace SEE.Layout.NodeLayouts
           // No size change
         }
       } 
-      /*
-       */
     }
 
     //***********************************************************************************
@@ -634,7 +662,7 @@ namespace SEE.Layout.NodeLayouts
         if (sufficientLargeLeaves.Count == 0)
         {
           //tree.Print();
-          throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout.globalCallCount + ": ");
+          throw new Exception("No sufficiently large free leaf found for size " + " :" + el.AbsoluteScale + ": " + " :" + RectanglePackingNodeLayout1.globalCallCount + ": ");
         }
 
         /*

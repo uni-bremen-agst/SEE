@@ -248,7 +248,7 @@ namespace SEE.Layout.RectanglePacking
     /// Let's us explore performance issues.
     /// </summary>
     [Test]
-    public void TestLayout()
+    public void TestVertexLayoutRP2()
     {
       /*
       //Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
@@ -380,7 +380,7 @@ namespace SEE.Layout.RectanglePacking
 
     //*************************************************************************************************************
     [Test]
-    public void TestLayout1()
+    public void TestLayoutRP2()
     {
       ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
@@ -402,26 +402,161 @@ namespace SEE.Layout.RectanglePacking
 
 
     }
-
+    //*************************************************************************************************************
     [Test]
-    public void TestCpOldLayout1()
+    public void TestLayoutRP1()
     {
-      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(10, 2);
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
 
-      Node node1 = new Node();
+      RectanglePackingNodeLayout1 packer = new();
 
-      LayoutGraphNode nodeLayout1 = new LayoutGraphNode(node1);
-      RectanglePackingNodeLayout2 packer1 = new();
-      Dictionary<ILayoutNode, NodeTransform> firstLayout = packer1.Create(gameObjects, Vector3.zero, Vector2.one);
-      RectanglePackingNodeLayout2 packer2 = new();
-      packer2.oldLayout = packer1;
-      Dictionary<ILayoutNode, NodeTransform> secondLayout = packer2.Create(gameObjects, Vector3.zero, Vector2.one);
-      //*************************************************************************************************************
-      RectanglePackingNodeLayout2.tree.Print();
-      RectanglePackingNodeLayout2.tree = null;
+      Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+
+      RectanglePackingNodeLayout1.tree.Print();
+
+      RectanglePackingNodeLayout1.tree = null;
+
+      foreach (var entry in layout) 
+      {
+        Debug.LogFormat("Node ID: {0}, Position: {1}, Size: {2}\n",
+            entry.Key.ID,
+            entry.Value.CenterPosition,
+            entry.Value.Scale);
+      }
+
+
+    }
+    //************************************************************************************************************
+    [Test]
+    public void TestLayout1RP1()
+    {
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+
+      RectanglePackingNodeLayout1 packer = new();
+
+      Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
+    }
+    //************************************************************************************************************
+    [Test]
+    public void TestLayout1RP2()
+    {
+      ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes();
+
+      RectanglePackingNodeLayout2 packer = new();
+
+      Dictionary<ILayoutNode, NodeTransform> layout = packer.Create(gameObjects, Vector3.zero, Vector2.one);
     }
 
+    //************************************************************************************************************
+
+    [Test]
+    public void TestCpLayoutRP3()
+    {
+      /*
+      //RectanglePackingNodeLayout3
+      //ICollection<ILayoutNode> gameObjects = NodeCreator.CreateNodes(10, 2);
+       */
+
+      Graph graph = new Graph();
+
+      Node node1 = new Node();
+      Node node2 = new Node();
+      Node node3 = new Node();
+      Node node4 = new Node();
+      Node node5 = new Node();
+      Node node6 = new Node();
+      Node node7 = new Node();
+      
+      node1.ID = "1";
+      node2.ID = "2";
+      node3.ID = "3";
+      node4.ID = "4";
+      node5.ID = "5";
+      node6.ID = "6";
+      node7.ID = "7";
+
+      graph.AddNode(node1);
+      graph.AddNode(node2);
+      graph.AddNode(node3);
+      graph.AddNode(node4);
+      graph.AddNode(node5);
+      graph.AddNode(node6);
+      graph.AddNode(node7);
+
+      node1.ItsGraph = graph;
+      node2.ItsGraph = graph;
+      node3.ItsGraph = graph;
+      node4.ItsGraph = graph;
+      node5.ItsGraph = graph;
+      node6.ItsGraph = graph;
+      node7.ItsGraph = graph;
+
+
+      node1.AddChild(node2);
+      node1.AddChild(node3);
+      
+      node2.AddChild(node4);
+      node2.AddChild(node5);
+
+      node3.AddChild(node6);
+      node3.AddChild(node7);
+
+      LayoutGraphNode nodeLayout1 = new LayoutGraphNode(node1);
+      LayoutGraphNode nodeLayout2 = new LayoutGraphNode(node2);
+      LayoutGraphNode nodeLayout3 = new LayoutGraphNode(node3);
+      LayoutGraphNode nodeLayout4 = new LayoutGraphNode(node4);
+      LayoutGraphNode nodeLayout5 = new LayoutGraphNode(node5);
+      LayoutGraphNode nodeLayout6 = new LayoutGraphNode(node6);
+      LayoutGraphNode nodeLayout7 = new LayoutGraphNode(node7);
+
+      nodeLayout1.Parent = null;
+      nodeLayout1.AddChild(nodeLayout2);
+      nodeLayout1.AddChild(nodeLayout3);
+
+      nodeLayout2.AddChild(nodeLayout4);
+      nodeLayout2.AddChild(nodeLayout5);
+
+      nodeLayout3.AddChild(nodeLayout6);
+      nodeLayout3.AddChild(nodeLayout7);
+
+      nodeLayout1.AbsoluteScale = new Vector3(10, 1, 10);
+      nodeLayout2.AbsoluteScale = new Vector3(6, 1, 6);
+      nodeLayout3.AbsoluteScale = new Vector3(4, 1, 4);
+      nodeLayout4.AbsoluteScale = new Vector3(2, 1, 2);
+      nodeLayout5.AbsoluteScale = new Vector3(2, 1, 2);
+      nodeLayout6.AbsoluteScale = new Vector3(2, 1, 2);
+      nodeLayout7.AbsoluteScale = new Vector3(2, 1, 2);
+
+      NodeTransform nt1 = new NodeTransform(Vector3.zero, nodeLayout1.AbsoluteScale);
+      NodeTransform nt2 = new NodeTransform(Vector3.zero, nodeLayout2.AbsoluteScale);
+      NodeTransform nt3 = new NodeTransform(Vector3.zero, nodeLayout3.AbsoluteScale);
+      NodeTransform nt4 = new NodeTransform(Vector3.zero, nodeLayout4.AbsoluteScale);
+      NodeTransform nt5 = new NodeTransform(Vector3.zero, nodeLayout5.AbsoluteScale);
+      NodeTransform nt6 = new NodeTransform(Vector3.zero, nodeLayout6.AbsoluteScale);
+      NodeTransform nt7 = new NodeTransform(Vector3.zero, nodeLayout7.AbsoluteScale);
+
+
+
+      RectanglePackingNodeLayout3 packer = new();
+
+      Dictionary<ILayoutNode, NodeTransform> layout = new Dictionary<ILayoutNode, NodeTransform>()
+      {
+        { nodeLayout1, nt1 },
+        { nodeLayout2, nt2 },
+        { nodeLayout3, nt3 },
+        { nodeLayout4, nt4 },
+        { nodeLayout5, nt5 },
+        { nodeLayout6, nt6 },
+        { nodeLayout7, nt7 }
+      };
+
+      packer.CopyOldLayout(layout);
+
       //*************************************************************************************************************
+
+    }
+
+    //*************************************************************************************************************
       [Test]
     public void TestCpOldLayout()
     {

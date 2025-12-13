@@ -88,7 +88,7 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
       // so that it is actually not split, but it is not free.
       if (!FreeLeaves.Remove(node))
       { 
-        throw new Exception("Node to be split is not a free leaf." + node + RectanglePackingNodeLayout.globalCallCount);
+        throw new Exception("Node to be split is not a free leaf." + node + RectanglePackingNodeLayout1.globalCallCount);
       }
       else if (size.x > node.Rectangle.Size.x || size.y > node.Rectangle.Size.y)
       {
@@ -493,9 +493,11 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         parent.Rectangle.Size.x = Mathf.Max(left.Rectangle.Size.x, right.Rectangle.Size.x);
         parent.Rectangle.Size.y = left.Rectangle.Size.y + right.Rectangle.Size.y;
       } 
+      /*
       //
       // 3. Weiter nach oben propagieren
       //
+       */
       PropagateGrowUp(parent, delta);
     }
     private void ShiftSubtree(PNode node, float dx, float dy, bool isLeftRight)
