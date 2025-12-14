@@ -13,7 +13,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// </summary>
         /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
-        public CubeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+        public CubeFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
 

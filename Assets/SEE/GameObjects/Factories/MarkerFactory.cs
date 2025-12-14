@@ -6,7 +6,7 @@ using SEE.Game.City;
 using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
-using static SEE.GO.Materials.ShaderType;
+using static SEE.GO.MaterialsFactory.ShaderType;
 
 namespace SEE.GO.Factories
 {

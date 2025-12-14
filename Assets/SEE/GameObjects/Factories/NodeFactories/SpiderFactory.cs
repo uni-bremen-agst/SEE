@@ -15,7 +15,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// </summary>
         /// <param name="shaderType">shader to be used for rendering the materials the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
-        public SpiderFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+        public SpiderFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
 

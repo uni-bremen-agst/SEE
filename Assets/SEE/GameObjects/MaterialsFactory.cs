@@ -12,7 +12,7 @@ namespace SEE.GO
     /// reduce the number of drawing calls. The material does not have
     /// any reflexions to save computation run-time.
     /// </summary>
-    public class Materials
+    public class MaterialsFactory
     {
         /// <summary>
         /// Different types of shaders used to draw the materials.
@@ -119,7 +119,7 @@ namespace SEE.GO
         /// <param name="shaderType">shader type to be used to draw the new materials</param>
         /// <param name="colorRange">the color range for the new materials</param>
         /// <param name="texture">texture to be added; can be null in which case no texture is added</param>
-        public Materials(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
+        public MaterialsFactory(ShaderType shaderType, ColorRange colorRange, Texture texture = null)
         {
             this.shaderType = shaderType;
             Assert.IsTrue(colorRange.NumberOfColors > 0, "At least one color is needed");

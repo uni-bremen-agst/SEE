@@ -25,7 +25,7 @@ namespace SEE.GO
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            DefaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+            DefaultLineMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>

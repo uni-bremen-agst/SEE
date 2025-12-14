@@ -187,7 +187,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType shaderType = Materials.ShaderType.OpaqueMetallic;
+        private const MaterialsFactory.ShaderType shaderType = MaterialsFactory.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).

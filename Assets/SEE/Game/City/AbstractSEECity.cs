@@ -324,7 +324,7 @@ namespace SEE.Game.City
         /// <returns>a new material for the line connecting a node and its label</returns>
         private static Material LineMaterial(Color lineColor)
         {
-            return Materials.New(Materials.ShaderType.TransparentLine, lineColor, texture: null,
+            return MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, lineColor, texture: null,
                                  renderQueueOffset: (int)(RenderQueue.Transparent + 1));
         }
 

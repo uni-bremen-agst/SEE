@@ -34,9 +34,9 @@ namespace SEE.GO.Factories.NodeFactories
         /// <param name="shaderType">shader type to be used for rendering the materials
         /// the created objects consist of</param>
         /// <param name="colorRange">the color range of the created objects</param>
-        public NodeFactory(Materials.ShaderType shaderType, ColorRange colorRange)
+        public NodeFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
         {
-            materials = new Materials(shaderType, colorRange);
+            materials = new MaterialsFactory(shaderType, colorRange);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// The collection of materials to be used as styles by this node factory.
         /// </summary>
-        private readonly Materials materials;
+        private readonly MaterialsFactory materials;
 
         /// <summary>
         /// The default height of an inner node in world space Unity unit.

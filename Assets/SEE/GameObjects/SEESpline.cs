@@ -347,7 +347,7 @@ namespace SEE.GO
         private void Awake()
         {
             // Corresponds to the material of the LineRenderer.
-            defaultMaterial = Materials.New(Materials.ShaderType.TransparentEdge, Color.white);
+            defaultMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, Color.white);
         }
 
         /// <summary>

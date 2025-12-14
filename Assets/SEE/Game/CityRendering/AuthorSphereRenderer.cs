@@ -76,7 +76,7 @@ namespace SEE.Game.CityRendering
 
             int currentAuthor = 0;
             // Define materials for the spheres.
-            Materials materials = new(Materials.ShaderType.PortalFree,
+            MaterialsFactory materials = new(MaterialsFactory.ShaderType.PortalFree,
                 new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
             // Position the spheres on the plane above the city at sky level.
