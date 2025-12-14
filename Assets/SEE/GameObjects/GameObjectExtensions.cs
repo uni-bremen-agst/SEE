@@ -163,7 +163,7 @@ namespace SEE.GO
                 }
                 result = result.parent;
             }
-            return result == null ? null : result.gameObject;
+            return null;
         }
 
         /// <summary>
