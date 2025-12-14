@@ -167,7 +167,8 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>.
+        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>
+        /// or null if none can be found.
         /// </summary>
         /// <param name="codeCity">Object representing a code city (tagged by <see cref="Tags.CodeCity"/>).</param>
         /// <returns>Game object representing the root of the graph or null if there is none.</returns>
