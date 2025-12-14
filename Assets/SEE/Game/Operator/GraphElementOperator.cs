@@ -344,7 +344,9 @@ namespace SEE.Game.Operator
 
             // The iconFXOffset is relative to the object in world-space units.
             // We count only the decorations, nodes, and edges, but not labels and the like.
-            float top = highlightEffect.gameObject.GetRelativeTop(t => t.CompareTag(Tags.Decoration) || t.CompareTag(Tags.Node) || t.CompareTag(Tags.Edge));
+            float top = highlightEffect.gameObject.GetRelativeTop
+                                (t => t.CompareTag(Tags.Decoration) || t.CompareTag(Tags.Node)
+                                      || t.CompareTag(Tags.Edge));
             highlightEffect.iconFXOffset = new(0, top, 0);
 
             highlightEffect.iconFXLightColor = UnityEngine.Color.yellow;
