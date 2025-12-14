@@ -1,8 +1,8 @@
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders.VCS;
-using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;

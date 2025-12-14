@@ -8,6 +8,7 @@ using MoreLinq.Extensions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;

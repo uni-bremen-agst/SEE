@@ -1,5 +1,6 @@
 using DG.Tweening;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Utils;
 using TMPro;
 using UnityEngine;

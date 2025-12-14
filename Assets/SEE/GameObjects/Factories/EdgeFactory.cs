@@ -2,13 +2,12 @@
 using System.Linq;
 using SEE.Game;
 using SEE.Game.CityRendering;
-using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory to create game objects for laid out edges.

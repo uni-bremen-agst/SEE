@@ -3,7 +3,7 @@ using SEE.Game;
 using UnityEngine;
 using UnityEngine.Rendering;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory for planes where blocks can be put on.
