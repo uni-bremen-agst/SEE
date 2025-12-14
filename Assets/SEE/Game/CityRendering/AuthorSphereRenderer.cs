@@ -2,6 +2,7 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GameObjects.BranchCity;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders.VCS;
 using System;
 using System.Collections.Generic;

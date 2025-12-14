@@ -15,6 +15,7 @@ using SEE.Utils.Paths;
 using UnityEngine.Rendering;
 using SEE.UI.Notification;
 using SEE.Game.Table;
+using SEE.GO.Factories;
 
 namespace SEE.Game.City
 {

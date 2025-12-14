@@ -8,6 +8,7 @@ using TinySpline;
 using UnityEngine;
 using Sirenix.OdinInspector;
 using Frame = TinySpline.Frame;
+using SEE.GO.Factories;
 
 namespace SEE.GO
 {

@@ -2,6 +2,7 @@
 using System.Linq;
 using SEE.Game;
 using SEE.Game.CityRendering;
+using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;

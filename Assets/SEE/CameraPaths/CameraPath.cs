@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using SEE.GO.Factories;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -104,7 +105,7 @@ namespace SEE.CameraPaths
         /// <param name="filename">name of the output file</param>
         public void Save(string filename)
         {
-            List<string> outputs = new List<string>();
+            List<string> outputs = new();
 
             foreach (PathData d in data)
             {
