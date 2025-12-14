@@ -44,14 +44,6 @@ namespace SEE.GameObjects.BranchCity
             }
         }
 
-        private Material LineMaterial()
-        {
-            // The edge inherits the material of the AuthorSphere.
-            // FIXME: authorMaterial is portal free.
-            // We want a portal material, but have the colors of the author sphere's material.
-            return AuthorSphere.gameObject.GetComponent<Renderer>().sharedMaterial;
-        }
-
         /// <summary>
         /// Draws the edge between the <see cref="AuthorSphere"/> and the <see cref="FileNode"/>.
         /// </summary>
@@ -61,7 +53,7 @@ namespace SEE.GameObjects.BranchCity
             linePoints[0] = AuthorSphere.gameObject.transform.position;
             linePoints[1] = FileNode.gameObject.GetRoofCenter();
 
-            lineRenderer = LineFactory.Draw(gameObject, linePoints, Width, LineMaterial());
+            lineRenderer = LineFactory.Draw(gameObject, linePoints, Width, AuthorSphere.LineMaterial);
 
             // Initial visibility of the edge must be set according to the current strategy.
             ShowOrHide(isHovered: false);
