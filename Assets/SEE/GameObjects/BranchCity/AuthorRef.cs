@@ -116,18 +116,6 @@ namespace SEE.GameObjects.BranchCity
         }
 
         /// <summary>
-        /// Updates the layout of all edges to authors of this specific file.
-        /// </summary>
-        /// <remarks>This method should be called whenever the position of this file node changed.</remarks>
-        internal void UpdateLayout()
-        {
-            foreach (AuthorEdge edge in edges)
-            {
-                edge.UpdateLayout();
-            }
-        }
-
-        /// <summary>
         /// Allows to iterate over all <see cref="AuthorEdge"/>s of this file node.
         /// </summary>
         /// <returns>iterator for all edges</returns>

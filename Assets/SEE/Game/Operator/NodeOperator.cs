@@ -482,10 +482,6 @@ namespace SEE.Game.Operator
                             // The edge layout needs to be updated only if we actually have an edge layout.
                             UpdateEdgeLayout(duration);
                         }
-                        if (TryGetComponent(out AuthorRef author))
-                        {
-                            author.UpdateLayout();
-                        }
                     }
                 }
             }
