@@ -34,6 +34,11 @@ namespace SEE.GameObjects.BranchCity
         /// </summary>
         private LineRenderer lineRenderer;
 
+        /// <summary>
+        /// Sets <see cref="lineRenderer"/>. If no <see cref="LineRenderer"/> is
+        /// available, the component is disabled. This can hardly ever happen because
+        /// of our <see cref="RequireComponent"/> annotation above.
+        /// </summary>
         private void Start()
         {
             /// We should have a LineRenderer according to the <see cref="RequireComponent"/>
