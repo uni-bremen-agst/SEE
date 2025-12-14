@@ -355,7 +355,7 @@ namespace SEE.Game.Operator
             highlightEffect.iconFXAnimationSpeed = ToDuration(factor);
             highlightEffect.iconFXScale = 0.2f;
             highlightEffect.iconFXStayDuration = duration;
-            // It is not suffient to only activate iconFX. This field means
+            // It is not sufficient to only activate iconFX. This field means
             // only that the icon should be used when the object is highlighted;
             // it doesn't mean that it is actually highlighted. That is why
             // we also need to set highlighted to true here.
