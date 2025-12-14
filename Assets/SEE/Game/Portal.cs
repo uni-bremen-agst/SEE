@@ -313,7 +313,7 @@ namespace SEE.Game
         /// <param name="leftFrontCorner">left front corner of the portal</param>
         /// <param name="rightBackCorner">right back corner of the portal</param>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="material"/> is null.</exception>
-        private static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
+        public static void SetPortal(Material material, Vector2 leftFrontCorner, Vector2 rightBackCorner)
         {
             if (material == null)
             {
