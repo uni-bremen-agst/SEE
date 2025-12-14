@@ -97,6 +97,7 @@ namespace SEE.GameObjects.BranchCity
             result.name = "AuthorSphere:" + author;
             result.layer = Layers.InteractableGraphObjects;
             result.transform.SetParent(parent.transform);
+            result.tag = Tags.Decoration;
 
             InteractionDecorator.PrepareAuthorForInteraction(result);
 

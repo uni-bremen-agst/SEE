@@ -192,7 +192,8 @@ namespace SEE.Game.CityRendering
                     {
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
-                        name = authorName + ":" + fileOfAuthor.Key.ID
+                        name = authorName + ":" + fileOfAuthor.Key.ID,
+                        tag = Tags.Decoration
                     };
                     // It will be the child of parent.
                     connectingLine.transform.parent = parent.transform;

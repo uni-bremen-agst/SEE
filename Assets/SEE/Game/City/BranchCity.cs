@@ -144,6 +144,26 @@ namespace SEE.Game.City
         {
             base.Reset();
             DynamicMarkerFactory.DestroyMarkerPrefab(gameObject);
+            DestroyAuthorSpheresAndEdges();
+        }
+
+        /// <summary>
+        /// <see cref="AuthorSphere"/>s and <see cref="AuthorEdge"/>s are immediate children of
+        /// the game object this component is attached to and not of the graph root node.
+        /// Hence, destroying the graph root node and its descendants will not destroy
+        /// the <see cref="AuthorSphere"/>s and <see cref="AuthorEdge"/>s. We destroy them
+        /// here by search for all game objects tagged as <see cref="Tags.Decoration"/>.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
+        private void DestroyAuthorSpheresAndEdges()
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Decoration))
+                {
+                    Destroyer.Destroy(child);
+                }
+            }
         }
 
         /// <summary>
