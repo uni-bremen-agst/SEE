@@ -147,7 +147,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">Game object at which to start the search.</param>
         /// <returns>Closest ancestor game object in the game-object hierarchy tagged by
-        /// <see cref="Tags.CodeCity"/> or null.</returns>
+/// <see cref="Tags.CodeCity"/> or null.</returns>
+/// <exception cref="ArgumentNullException">
+/// Thrown if <paramref name="gameObject"/> is null.
+/// </exception>
         public static GameObject GetCodeCity(this GameObject gameObject)
         {
             if (gameObject == null)
