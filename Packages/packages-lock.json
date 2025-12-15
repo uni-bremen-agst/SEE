@@ -47,14 +47,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.11",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.13",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "418da38db7660aeace39d62b620a6366ce1a8b15"
+      "hash": "6d739b195401e25df8e7a21f6ed4939febc2e30e"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -472,7 +472,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9f274e1e90bcde869651e9510b4bfeb815b89318"
+      "hash": "fe49cfb1879f18e343251104d3494aad675c01a4"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",

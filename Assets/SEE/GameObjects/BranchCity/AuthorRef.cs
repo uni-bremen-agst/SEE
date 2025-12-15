@@ -1,8 +1,8 @@
-using System.Collections;
-using System.Collections.Generic;
 using SEE.Game.Operator;
 using SEE.GO;
 using Sirenix.Serialization;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace SEE.GameObjects.BranchCity
 {
@@ -27,7 +27,7 @@ namespace SEE.GameObjects.BranchCity
         /// Creates the <see cref="effect"/> used for potential edit conflicts
         /// and updates all <see cref="edges"/> via <see cref="UpdateEdges"/>.
         /// </summary>
-        private void Awake()
+        private void Start()
         {
             // We may already have edges from the serialization and might
             // need to update these.
@@ -49,6 +49,9 @@ namespace SEE.GameObjects.BranchCity
         /// the highlight effect for a potential edit conflict is turned on;
         /// otherwise it is turned off.
         /// </summary>
+        /// <remarks>The update takes place only if we are in play mode.
+        /// Our <see cref="NodeOperator"/>s are not prepared to run in the
+        /// editor mode.</remarks>
         public void UpdateConflictVisibility()
         {
             if (City.EnableConflictMarkers && edges.Count > 1)
@@ -109,18 +112,6 @@ namespace SEE.GameObjects.BranchCity
             if (edges.Remove(authorEdge))
             {
                 UpdateEdges();
-            }
-        }
-
-        /// <summary>
-        /// Updates the layout of all edges to authors of this specific file.
-        /// </summary>
-        /// <remarks>This method should be called whenever the position of this file node changed.</remarks>
-        internal void UpdateLayout()
-        {
-            foreach (AuthorEdge edge in edges)
-            {
-                edge.UpdateLayout();
             }
         }
 

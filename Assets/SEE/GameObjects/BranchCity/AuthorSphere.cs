@@ -1,8 +1,8 @@
 using SEE.Controls.Actions;
 using SEE.Game;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders.VCS;
-using Sirenix.OdinInspector;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
@@ -97,6 +97,7 @@ namespace SEE.GameObjects.BranchCity
             result.name = "AuthorSphere:" + author;
             result.layer = Layers.InteractableGraphObjects;
             result.transform.SetParent(parent.transform);
+            result.tag = Tags.Decoration;
 
             InteractionDecorator.PrepareAuthorForInteraction(result);
 
@@ -122,6 +123,34 @@ namespace SEE.GameObjects.BranchCity
         internal int NumberOfFiles()
         {
             return Edges.Count;
+        }
+
+        /// <summary>
+        /// Backing field of <see cref="LineMaterial"/>.
+        /// </summary>
+        private Material lineMaterial;
+
+        /// <summary>
+        /// Yields the material for all <see cref="AuthorEdge"/>s starting at this <see cref="AuthorSphere"/>.
+        /// The material has the portal of the code city this <see cref="AuthorSphere"/> belongs to
+        /// and has the color of this <see cref="AuthorSphere"/>.
+        /// </summary>
+        internal Material LineMaterial
+        {
+            get
+            {
+                if (lineMaterial == null)
+                {
+                    /// The edge inherits the color of this <see cref="AuthorSphere"/>, but unlike
+                    /// the material of the <see cref="AuthorSphere"/>, the material of an <see cref="AuthorEdge"/>
+                    /// must have a portal belonging to the <see cref="City"/>.
+                    Color color = gameObject.GetComponent<Renderer>().sharedMaterial.color;
+                    lineMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentEdge, color);
+                    Portal.GetDimensions(City.gameObject, out Vector2 leftFront, out Vector2 rightBack);
+                    Portal.SetPortal(lineMaterial, leftFront, rightBack);
+                }
+                return lineMaterial;
+            }
         }
     }
 }

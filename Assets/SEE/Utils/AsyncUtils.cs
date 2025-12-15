@@ -162,20 +162,17 @@ namespace SEE.Utils
         /// </summary>
         /// <param name="items">The items to iterate over.</param>
         /// <param name="batchSize">The size of each batch.</param>
-        /// <param name="cancellationToken">The cancellation token to use.</param>
+        /// <param name="token">The cancellation token to use.</param>
         /// <typeparam name="T">The type of the items.</typeparam>
         /// <returns>An asynchronous enumerable that emits the items in batches.</returns>
         public static IUniTaskAsyncEnumerable<T> BatchPerFrame<T>(this IEnumerable<T> items, int batchSize = 1000,
-                                                                  CancellationToken cancellationToken = default)
+                                                                  CancellationToken token = default)
         {
             return UniTaskAsyncEnumerable.Create<IEnumerable<T>>(async (writer, _) =>
             {
                 foreach (T[] batch in items.Batch(batchSize))
                 {
-                    if (cancellationToken.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(cancellationToken);
-                    }
+                    token.ThrowIfCancellationRequested();
                     await writer.YieldAsync(batch);
                     await UniTask.Yield();
                 }

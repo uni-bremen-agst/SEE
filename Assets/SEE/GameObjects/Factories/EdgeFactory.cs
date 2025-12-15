@@ -7,7 +7,7 @@ using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory to create game objects for laid out edges.
@@ -25,7 +25,7 @@ namespace SEE.GO
         {
             this.layout = layout;
             this.edgeWidth = edgeWidth;
-            DefaultLineMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+            DefaultLineMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
         }
 
         /// <summary>

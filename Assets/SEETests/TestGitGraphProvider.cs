@@ -145,6 +145,7 @@ namespace SEE.GraphProviders
             return g;
         }
 
+        [Ignore("GitEvolutionGraphProvider is not implemented yet.")]
         [UnityTest]
         public IEnumerator TestGitEvolutionProvider()
         {

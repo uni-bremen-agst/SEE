@@ -34,24 +34,12 @@ namespace SEE.Game.SceneManipulation
         /// provides more details why</exception>
         public static GameObject Add(GameObject source, GameObject target, string edgeType)
         {
-            Transform cityObject = SceneQueries.GetCodeCity(source.transform);
-            GameObject result;
-            if (cityObject != null)
+            AbstractSEECity city = source.ContainingCity();
+            if (city == null)
             {
-                if (cityObject.TryGetComponent(out AbstractSEECity city))
-                {
-                    result = city.Renderer.DrawEdge(source, target, edgeType);
-                }
-                else
-                {
-                    throw new Exception($"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
-                }
+                throw new Exception($"The code city for the new edge from {source.name} to {target.name} cannot be determined.\n");
             }
-            else
-            {
-                throw new Exception($"Could not determine the code city for the new edge from {source.name} to {target.name}.\n");
-            }
-            return result;
+            return city.Renderer.DrawEdge(source, target, edgeType);
         }
 
         /// <summary>
@@ -62,18 +50,11 @@ namespace SEE.Game.SceneManipulation
         public static GameObject Draw(Edge edge)
         {
             GameObject source = GraphElementIDMap.Find(edge.Source.ID);
-            Transform cityObject = SceneQueries.GetCodeCity(source.transform);
-
-            if (!cityObject)
+            AbstractSEECity city = source.ContainingCity();
+            if (city == null)
             {
-                throw new Exception($"The code city for the new edge {edge.ToShortString()} cannot be determined.\n");
+                throw new Exception($"The code city for the edge {edge.Source.ID} cannot be determined.\n");
             }
-
-            if (!cityObject.TryGetComponent(out AbstractSEECity city))
-            {
-                throw new Exception($"Could not determine the code city for the new edge {edge.ToShortString()}.\n");
-            }
-
             return city.Renderer.DrawEdge(edge, source: source);
         }
 

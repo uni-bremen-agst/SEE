@@ -9,7 +9,6 @@ using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 
@@ -124,16 +123,71 @@ namespace SEE.GO
             }
             else
             {
-                Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
+                GameObject codeCityObject = gameObject.GetCodeCity();
+                if (codeCityObject != null && codeCityObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
                 else
                 {
+                    /// We do not log the fact that <see cref="codeCityObject"/> does not have the
+                    /// expected type of city, as some clients are using this method just as a predicate.
                     return null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the closest ancestor of <paramref name="gameObject"/> that
+        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
+        /// This ancestor is assumed to carry the settings (layout information etc.).
+        /// If none can be found, null will be returned.
+        /// If <paramref name="gameObject"/> is tagged by <see cref="Tags.CodeCity"/>,
+        /// it will be returned.
+        /// </summary>
+        /// <param name="gameObject">Game object at which to start the search.</param>
+        /// <returns>Closest ancestor game object in the game-object hierarchy tagged by
+        /// <see cref="Tags.CodeCity"/> or null.</returns>
+        public static GameObject GetCodeCity(this GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                throw new ArgumentNullException(nameof(gameObject));
+            }
+            Transform result = gameObject.transform;
+            while (result != null)
+            {
+                if (result.CompareTag(Tags.CodeCity))
+                {
+                    return result.gameObject;
+                }
+                result = result.parent;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>
+        /// or null if none can be found.
+        /// </summary>
+        /// <param name="codeCity">Object representing a code city (tagged by <see cref="Tags.CodeCity"/>).</param>
+        /// <returns>Game object representing the root of the graph or null if there is none.</returns>
+        /// <remarks>If <paramref name="codeCity"/> is a node representing a code city,
+        /// the first child tagged as <see cref="Tags.Node"/> is considered the root of the graph.</remarks>
+        public static GameObject GetCityRootNode(this GameObject codeCity)
+        {
+            if (codeCity == null)
+            {
+                throw new ArgumentNullException(nameof(codeCity));
+            }
+            foreach (Transform child in codeCity.transform)
+            {
+                if (child.CompareTag(Tags.Node))
+                {
+                    return child.transform.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -537,9 +591,10 @@ namespace SEE.GO
         /// </returns>
         /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
         /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
-        public static Vector3 GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
+        public static float GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
-            return gameObject.transform.InverseTransformPoint(gameObject.GetTop(filterTransform));
+            float top = gameObject.GetMaxY(filterTransform);
+            return top - gameObject.transform.position.y;
         }
         /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
@@ -1239,7 +1294,7 @@ namespace SEE.GO
         public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
                                         Portal.IncludeDescendants includeDescendants = OnlySelf)
         {
-            GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            GameObject rootCity = gameObject.GetCodeCity();
             if (rootCity != null)
             {
                 Portal.SetPortal(rootCity, gameObject, includeDescendants);
@@ -1281,9 +1336,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Node))
             {
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                nodeOperator.SetCityIfPossible();
-                return nodeOperator;
+                return gameObject.AddOrGetComponent<NodeOperator>();
             }
             else
             {

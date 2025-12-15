@@ -132,10 +132,7 @@ namespace SEE.GraphProviders.Evolution
             List<Commit> commitsAfterDate = GitRepository.CommitsAfter(SEEDate.ToDate(Date)).Reverse().ToList();
             changePercentage(0.1f);
 
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+            token.ThrowIfCancellationRequested();
 
             // Note from the LibGit2Sharp.Patch documentation:
             // Building a patch is an expensive operation. If you only need to know which files have been added,
@@ -155,10 +152,8 @@ namespace SEE.GraphProviders.Evolution
 
             foreach (KeyValuePair<Commit, Patch> currentCommit in commits)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
+
                 changePercentage?.Invoke(Mathf.Clamp((float)iteration / commitLength, 0.2f, 0.98f));
 
                 // All commits between the first commit in commitList and the current commit

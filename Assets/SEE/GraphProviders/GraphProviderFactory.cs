@@ -31,6 +31,7 @@ namespace SEE.GraphProviders
                 SingleGraphProviderKind.VCS => new BetweenCommitsGraphProvider(),
                 SingleGraphProviderKind.LSP => new LSPGraphProvider(),
                 SingleGraphProviderKind.GitAllBranches => new GitBranchesGraphProvider(),
+                SingleGraphProviderKind.Report => new ReportGraphProvider(),
                 _ => throw new NotImplementedException($"Not implemented for {kind}")
             };
         }

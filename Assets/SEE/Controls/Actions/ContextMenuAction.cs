@@ -868,7 +868,7 @@ namespace SEE.Controls.Actions
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
-                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
+                GameObject city = transform.gameObject.GetCodeCity();
                 openWindow = city.AddComponent<TreeWindow>();
                 openWindow.Graph = graphElement.ItsGraph;
                 if (title != null)
