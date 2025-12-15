@@ -1,7 +1,8 @@
-﻿using System;
-using SEE.Game;
+﻿using SEE.Game;
 using SEE.Utils;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace SEE.GO.Factories
@@ -31,9 +32,11 @@ namespace SEE.GO.Factories
         /// </summary>
         /// <param name="gameObject">The game object for which to obtain a dynamic marker.</param>
         /// <returns>Dynamic marker.</returns>
-        /// <exception cref="Exception">Thrown if <paramref name="gameObject"/> is not contained
+        /// <exception cref="InvalidOperationException ">Thrown if <paramref name="gameObject"/> is not contained
         /// in a code city or if the marker's prefab cannot be loaded.</exception>
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="gameObject"/> is null.</exception>
+        /// <exception cref="FileNotFoundException">Thrown if the prefab file <see cref="dynamicMarkerPrefabFile"/>
+        /// cannot be loaded.</exception>
         public static GameObject GetMarker(GameObject gameObject)
         {
             if (gameObject == null)
@@ -43,7 +46,7 @@ namespace SEE.GO.Factories
             GameObject codeCity = gameObject.GetCodeCity();
             if (codeCity == null)
             {
-                throw new Exception($"{gameObject.name} is not contained in a code city.");
+                throw new InvalidOperationException($"{gameObject.name} is not contained in a code city.");
             }
             if (dynamicMarkerPrefabs.TryGetValue(codeCity, out GameObject dynamicMarkerPrefab))
             {
@@ -55,7 +58,7 @@ namespace SEE.GO.Factories
                 dynamicMarkerPrefab = PrefabInstantiator.InstantiatePrefab(dynamicMarkerPrefabFile);
                 if (dynamicMarkerPrefab == null)
                 {
-                    throw new Exception($"Cannot load prefab from file {dynamicMarkerPrefabFile}\n");
+                    throw new FileNotFoundException($"Cannot load prefab from file {dynamicMarkerPrefabFile}\n");
                 }
                 else
                 {
