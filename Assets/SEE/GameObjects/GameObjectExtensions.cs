@@ -147,7 +147,10 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">Game object at which to start the search.</param>
         /// <returns>Closest ancestor game object in the game-object hierarchy tagged by
-        /// <see cref="Tags.CodeCity"/> or null.</returns>
+/// <see cref="Tags.CodeCity"/> or null.</returns>
+/// <exception cref="ArgumentNullException">
+/// Thrown if <paramref name="gameObject"/> is null.
+/// </exception>
         public static GameObject GetCodeCity(this GameObject gameObject)
         {
             if (gameObject == null)
@@ -173,7 +176,10 @@ namespace SEE.GO
         /// <param name="codeCity">Object representing a code city (tagged by <see cref="Tags.CodeCity"/>).</param>
         /// <returns>Game object representing the root of the graph or null if there is none.</returns>
         /// <remarks>If <paramref name="codeCity"/> is a node representing a code city,
-        /// the first child tagged as <see cref="Tags.Node"/> is considered the root of the graph.</remarks>
+/// the first child tagged as <see cref="Tags.Node"/> is considered the root of the graph.</remarks>
+/// <exception cref="ArgumentNullException">
+/// Thrown if <paramref name="codeCity"/> is null.
+/// </exception>
         public static GameObject GetCityRootNode(this GameObject codeCity)
         {
             if (codeCity == null)
