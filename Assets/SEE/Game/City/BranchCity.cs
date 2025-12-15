@@ -154,7 +154,6 @@ namespace SEE.Game.City
         /// the <see cref="AuthorSphere"/>s and <see cref="AuthorEdge"/>s. We destroy them
         /// here by search for all game objects tagged as <see cref="Tags.Decoration"/>.
         /// </summary>
-        /// <exception cref="NotImplementedException"></exception>
         private void DestroyAuthorSpheresAndEdges()
         {
             foreach (Transform child in transform)
