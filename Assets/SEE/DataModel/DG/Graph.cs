@@ -301,27 +301,30 @@ namespace SEE.DataModel.DG
         }
 
         /// <summary>
-        /// If the graph has no root, false is returned and <paramref name="root"/>
-        /// will be null.
+        /// Ensures that the graph has a single root node.
         ///
-        /// If the graph has exactly one root, nothing happens and false is returned.
-        /// In this case, <paramref name="root"/> refers to the single root.
+        /// - If the graph has no root, <paramref name="root"/> will be null and false is returned.
+        /// - If the graph has exactly one root, nothing changes, <paramref name="root"/> refers to that root, and false is returned.
+        /// - If the graph has multiple roots or <paramref name="initialGraph"/> is true, a new root node is created:
+        ///   all existing roots become immediate children of the new root, and true is returned.
         ///
-        /// Otherwise all current roots become an immediate child of a newly added
-        /// root node with given <paramref name="name"/> and <paramref name="type"/>
-        /// and true is returned. The new root will have toggle attribute
-        /// <see cref="RootToggle"/>. The given <paramref name="name"/> will be used for
-        /// the source name and ID of the new root node.
+        /// The new root node will have the toggle attribute <see cref="RootToggle"/>.
+        /// The <paramref name="name"/> parameter is used for both the source name and ID of the new root node.
+        /// If <paramref name="name"/> is null or empty, the graph's <see cref="Name"/> concatenated with "#ROOT" is used.
+        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> is used.
         ///
-        /// If <paramref name="name"/> is null or empty, the <see cref="Name"/> of the graph
-        /// concatenated with "#ROOT" will be used.
-        /// If <paramref name="type"/> is null or empty, <see cref="Graph.RootType"/> will be used.
+        /// <paramref name="initialGraph"/> indicates that this is an initial graph construction,
+        /// in which a root should be created before adding child nodes.
         /// </summary>
-        /// <param name="root">the resulting (new or existing) root or null if there is no root</param>
-        /// <param name="name">ID of new root node</param>
-        /// <param name="type">type of new root node</param>
-        /// <returns>true if a new root node was created</returns>
-        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null)
+        /// <param name="root">The resulting (new or existing) root node, or null if no root exists.</param>
+        /// <param name="name">ID and source name of the new root node.</param>
+        /// <param name="type">Type of the new root node.</param>
+        /// <param name="initialGraph">
+        /// If true, forces creation of a new root even if multiple roots exist;
+        /// used during initial graph construction to ensure the root is created before children.
+        /// </param>
+        /// <returns>True if a new root node was created; false otherwise.</returns>
+        public virtual bool AddSingleRoot(out Node root, string name = null, string type = null, bool initialGraph = false)
         {
             List<Node> roots = GetRoots();
             string id = name;
@@ -335,14 +338,22 @@ namespace SEE.DataModel.DG
             {
                 type = RootType;
             }
-            root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
-            AddNode(root);
-            foreach (Node oldRoot in roots)
+            if (roots.Count > 1 || initialGraph)
             {
-                root.AddChild(oldRoot);
+                root = new() { SourceName = sourceName, ID = id, Type = type, ToggleAttributes = { RootToggle } };
+                AddNode(root);
+                foreach (Node oldRoot in roots)
+                {
+                    root.AddChild(oldRoot);
+                }
+                NodeHierarchyHasChanged = true;
+                return true;
             }
-            NodeHierarchyHasChanged = true;
-            return true;
+            else
+            {
+                root = roots.First();
+                return false;
+            }
         }
 
         /// <summary>
@@ -1073,7 +1084,7 @@ namespace SEE.DataModel.DG
         /// <param name="edgeIdSuffix">Suffix to append to the new edge IDs</param>
         /// <exception cref="InvalidOperationException">When edge-attached nodes couldn't be found in the target graph.
         /// </exception>
-        private void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
+        public void CopyEdgesTo(Graph target, string nodeIdSuffix = null, string edgeIdSuffix = null)
         {
             target.edges ??= new Dictionary<string, Edge>();
             foreach (KeyValuePair<string, Edge> entry in edges)

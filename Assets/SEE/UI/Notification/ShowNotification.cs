@@ -73,8 +73,11 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The notification object representing the newly created notification.</returns>
-        public static Notification Info(string title, string description, float duration = defaultDuration,
-                                        bool log = true)
+        public static Notification Info
+            (string title,
+            string description,
+            float duration = defaultDuration,
+            bool log = true)
         {
             if (log)
             {
@@ -91,8 +94,12 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The notification object representing the newly created notification.</returns>
-        public static Notification Warn(string title, string description, float duration = defaultDuration,
-                                bool log = true)
+        public static Notification Warn
+            (string title,
+            string description,
+            float duration =
+            defaultDuration,
+            bool log = true)
         {
             if (log)
             {
@@ -109,8 +116,11 @@ namespace SEE.UI.Notification
         /// <param name="duration">Time in seconds the notification should stay on the screen.</param>
         /// <param name="log">Whether to log the given notification in Unity's log as well</param>
         /// <returns>The notification object representing the newly created notification.</returns>
-        public static Notification Error(string title, string description, float duration = defaultDuration,
-                                 bool log = true)
+        public static Notification Error
+            (string title,
+            string description,
+            float duration = defaultDuration,
+            bool log = true)
         {
             if (log)
             {
@@ -128,8 +138,12 @@ namespace SEE.UI.Notification
         /// <param name="color">The color of the notification.</param>
         /// <param name="duration">The duration of the notification.</param>
         /// <returns>The notification object representing the newly created notification.</returns>
-        private static Notification Show(string title, string description, Lazy<Sprite> icon, Color color,
-                                         float duration = defaultDuration)
+        private static Notification Show
+            (string title,
+            string description,
+            Lazy<Sprite> icon,
+            Color color,
+            float duration = defaultDuration)
         {
             // Only show the notification if we are on the main thread.
             if (AsyncUtils.IsRunningOnMainThread)

@@ -155,10 +155,8 @@ namespace SEE.GraphProviders.VCS
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+            token.ThrowIfCancellationRequested();
+
             changePercentage?.Invoke(0.6f);
 
             // Includes all commits between the baseline commit and the commitID
@@ -173,10 +171,7 @@ namespace SEE.GraphProviders.VCS
 
             void UpdateMetricsForCommit(Repository repository, Commit commit)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
             }
         }
@@ -236,6 +231,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
+        ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
@@ -261,10 +257,8 @@ namespace SEE.GraphProviders.VCS
             changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+
+            token.ThrowIfCancellationRequested();
 
             repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
             changePercentage?.Invoke(0.6f);
@@ -274,10 +268,7 @@ namespace SEE.GraphProviders.VCS
 
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
                     (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
             }

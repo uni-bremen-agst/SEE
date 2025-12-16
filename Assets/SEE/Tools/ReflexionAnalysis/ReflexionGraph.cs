@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using SEE.DataModel.DG;
 using UnityEngine;
@@ -147,8 +148,13 @@ namespace SEE.Tools.ReflexionAnalysis
             }
 
             // Add artificial roots if graph has more than one root node, to physically differentiate the two.
-            architectureGraph.AddSingleRoot(out architectureRoot, type: ArchitectureType);
-            implementationGraph.AddSingleRoot(out implementationRoot, type: ImplementationType);
+            architectureGraph.AddSingleRoot(out architectureRoot,
+                type: ArchitectureType,
+                initialGraph: architectureGraph.NodeCount == 0);
+
+            implementationGraph.AddSingleRoot(out implementationRoot,
+                type: ImplementationType,
+                initialGraph: implementationGraph.NodeCount == 0);
 
             // MappingGraph needn't be labeled, as any remaining/new edge (which must be Maps_To)
             // automatically belongs to it
@@ -454,11 +460,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <see cref="Graph.AddSingleRoot(out Node, string, string)"/>.
         /// </summary>
         /// <exception cref="NotSupportedException">thrown in case the </exception>
-        public override bool AddSingleRoot(out Node root, string name = null, string type = null)
+        public override bool AddSingleRoot(out Node root, string name = null, string type = null, bool initialGraph = false)
         {
             if (!AnalysisInitialized)
             {
-                return base.AddSingleRoot(out root, name, type);
+                return base.AddSingleRoot(out root, name, type, initialGraph);
             }
             else
             {

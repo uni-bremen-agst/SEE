@@ -9,7 +9,6 @@ using NUnit.Framework;
 using SEE.DataModel.DG;
 using SEE.DataModel.DG.GraphIndex;
 using SEE.DataModel.DG.IO;
-using SEE.GraphProviders.NodeCounting;
 using SEE.Utils.Paths;
 using UnityEngine;
 
@@ -66,6 +65,7 @@ namespace SEE.GraphProviders
         /// - The returned relative path must be non-null/non-empty and point to a readable GLX file.
         /// </summary>
         /// <returns>GLX path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
+        /// <returns>GLX path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
         protected abstract string GetRelativeGlxPath();
 
         /// <summary>
@@ -91,18 +91,6 @@ namespace SEE.GraphProviders
         /// </summary>
         /// <returns>Parsing configuration used to create the report parser. Must not be null.</returns>
         protected abstract ParsingConfig GetParsingConfig();
-
-        /// <summary>
-        /// Returns a node counter that can compute expected counts per context for the given report and node filter.
-        ///
-        /// The counter is used to establish baseline expectations around how many "parseable" nodes exist per context.
-        ///
-        /// Preconditions:
-        /// - Must not return null.
-        /// - Must be compatible with the report format.
-        /// </summary>
-        /// <returns>Node counter used to compute expected counts per context.</returns>
-        protected abstract ICountReportNodes GetNodeCounter();
 
         /// <summary>
         /// Returns a curated set of expected findings (keyed by a stable identifier, typically <see cref="Finding.FullPath"/>)
@@ -220,7 +208,7 @@ namespace SEE.GraphProviders
         /// </returns>
         private async UniTask<MetricSchema> BuildMetricSchemaAsync()
         {
-            DataPath reportDataPath = new DataPath(fullReportPath);
+            DataPath reportDataPath = new(fullReportPath);
 
             ParsingConfig config = GetParsingConfig();
             Assert.NotNull(config, "GetParsingConfig() returned null.");
@@ -231,51 +219,7 @@ namespace SEE.GraphProviders
             return await parser.ParseAsync(reportDataPath);
         }
 
-        /// <summary>
-        /// Asserts that actual counts (grouped by <see cref="Finding.Context"/>) match the expected counts.
-        ///
-        /// Behavior:
-        /// - Groups all parsed findings by their <see cref="Finding.Context"/> (case-insensitive).
-        /// - For each expected entry, maps from the node key (often an XML tag name) to the parser context
-        ///   using <see cref="XPathMapping.MapContext"/>.
-        /// - Asserts that the actual count for that context equals the expected count.
-        ///
-        /// Notes:
-        /// - This method does not currently assert that *no other* contexts are present; it focuses on matching
-        ///   expected contexts. If you want stricter behavior, you can extend it to compare key sets.
-        ///
-        /// Preconditions:
-        /// - <see cref="metricSchema"/> must have been initialized by parsing.
-        /// - <paramref name="expectedNodeCounts"/> must not be null.
-        /// </summary>
-        /// <param name="expectedNodeCounts">Expected node counts per context key (e.g., per XML tag name).</param>
-        private void AssertNodeCountsMatch(Dictionary<string, int> expectedNodeCounts)
-        {
-            Assert.IsNotNull(metricSchema, "metricSchema has not been initialized.");
-            Assert.IsNotNull(metricSchema.Findings, "metricSchema.Findings is null.");
-
-            Dictionary<string, int> actualNodeCounts = metricSchema.Findings
-                .Where(finding => !string.IsNullOrEmpty(finding.Context))
-                .GroupBy(finding => finding.Context, StringComparer.OrdinalIgnoreCase)
-                .ToDictionary(
-                    group => group.Key,
-                    group => group.Count(),
-                    StringComparer.OrdinalIgnoreCase);
-
-            foreach (KeyValuePair<string, int> expectedEntry in expectedNodeCounts)
-            {
-                // Convert the "node key" used for counting (e.g., "file") into the parser's output context label.
-                string xmlTagAsContext = GetParsingConfig().XPathMapping.MapContext[expectedEntry.Key];
-
-                int actualCount = actualNodeCounts.TryGetValue(xmlTagAsContext, out int count) ? count : 0;
-
-                Assert.AreEqual(
-                    expectedEntry.Value,
-                    actualCount,
-                    $"Context '{expectedEntry.Key}': expected {expectedEntry.Value}, got {actualCount}.");
-            }
-        }
-
+       
         /// <summary>
         /// Parses the report and verifies that a curated set of expected findings exists.
         ///
@@ -303,7 +247,7 @@ namespace SEE.GraphProviders
             foreach (KeyValuePair<string, Finding> expected in testFindings)
             {
                 Finding actual = FindActualNode(expected.Value);
-                Assert.NotNull(actual, $"Finding '{expected.Key} ' not found.");
+                Assert.NotNull(actual, $"Finding '{expected.Key}' not found.");
                 AssertFindingMatch(actual, expected.Value);
             }
         }
@@ -469,8 +413,7 @@ namespace SEE.GraphProviders
             metricSchema = await BuildMetricSchemaAsync();
             Dictionary<string, Finding> expectedFindings = GetTestFindings();
 
-            DataPath gxlPath = new DataPath(fullGlxPath);
-            graph = await LoadGraphAsync(gxlPath);
+            graph = await LoadGraphAsync(new DataPath(fullGlxPath));
 
             ParsingConfig parsingConfig = GetParsingConfig();
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();

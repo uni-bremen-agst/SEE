@@ -1,7 +1,7 @@
 ﻿using SEE.DataModel.DG.GraphIndex;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using UnityEngine;
 
 namespace SEE.DataModel.DG.IO
@@ -30,20 +30,19 @@ namespace SEE.DataModel.DG.IO
         {
             if (graph == null)
             {
-                Debug.LogError("[MetricApplier] Graph is null – cannot apply metrics.");
-                return;
+                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Graph is null – cannot apply metrics.");
             }
-
             if (parsingConfig == null)
             {
-                Debug.LogError("[MetricApplier] Parsing configuration is null – cannot apply metrics.");
-                return;
+                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Parsing configuration is null – cannot apply metrics.");
             }
-
-            if (schema == null || schema.Findings == null)
+            if (schema == null)
             {
-                Debug.LogError("[MetricApplier] Schema or findings is null – nothing to apply.");
-                return;
+                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Schema is null – cannot apply metrics.");
+            }
+            if (schema.Findings == null)
+            {
+                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Schema findings is null – cannot apply metrics.");
             }
 
             prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
@@ -63,7 +62,7 @@ namespace SEE.DataModel.DG.IO
                 if (string.IsNullOrWhiteSpace(findingPathAsMainType))
                 {
                     Debug.LogWarning(
-                        $"[MetricApplier] Encountered null nodeId for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
+                        $"[MetricApplier] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
                     continue;
                 }
 
@@ -107,19 +106,17 @@ namespace SEE.DataModel.DG.IO
 
             string stringValue = metric.Value;
 
-            if (int.TryParse(
-                    stringValue,
-                    NumberStyles.Integer,
-                    CultureInfo.InvariantCulture,
-                    out int intValue))
+            if (int.TryParse(stringValue,
+                             NumberStyles.Integer,
+                             CultureInfo.InvariantCulture,
+                             out int intValue))
             {
                 node.SetInt(key, intValue);
             }
-            else if (float.TryParse(
-                         stringValue,
-                         NumberStyles.Float | NumberStyles.AllowThousands,
-                         CultureInfo.InvariantCulture,
-                         out float floatValue))
+            else if (float.TryParse(stringValue,
+                                    NumberStyles.Float | NumberStyles.AllowThousands,
+                                    CultureInfo.InvariantCulture,
+                                    out float floatValue))
             {
                 node.SetFloat(key, floatValue);
             }

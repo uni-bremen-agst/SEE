@@ -5,7 +5,7 @@ using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
 using SEE.Game.SceneManipulation;
-using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GO.Menu;
 using SEE.Net.Actions;
@@ -868,7 +868,7 @@ namespace SEE.Controls.Actions
             if (openWindow == null)
             {
                 // Window is not open yet, so we create it.
-                GameObject city = SceneQueries.GetCodeCity(transform).gameObject;
+                GameObject city = transform.gameObject.GetCodeCity();
                 openWindow = city.AddComponent<TreeWindow>();
                 openWindow.Graph = graphElement.ItsGraph;
                 if (title != null)

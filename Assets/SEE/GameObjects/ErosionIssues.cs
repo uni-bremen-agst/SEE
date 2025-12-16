@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using SEE.DataModel.DG;
+using SEE.GO.Factories;
 using SEE.Tools;
 using UnityEngine;
 

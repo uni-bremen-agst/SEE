@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory to generate sprites from sprite prefab files for all types of

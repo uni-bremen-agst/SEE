@@ -4,6 +4,7 @@ using SEE.Game.City;
 using SEE.Game.Operator;
 using SEE.GameObjects;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.UI.Notification;

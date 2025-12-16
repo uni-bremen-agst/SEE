@@ -2,6 +2,8 @@
 using NUnit.Framework;
 using SEE.Utils.Paths;
 using System.Collections;
+using System.Text.RegularExpressions;
+using UnityEngine;
 using UnityEngine.TestTools;
 
 namespace SEE.DataModel.DG.IO
@@ -23,6 +25,8 @@ namespace SEE.DataModel.DG.IO
         public IEnumerator TestLoadCsvAsyncMethod() =>
             UniTask.ToCoroutine(async () =>
             {
+                LogAssert.Expect(LogType.Error, new Regex(".*There is no SEE.User.UserSettings component in the current scene!.*"));
+
                 DataPath path = new()
                 {
                     Root = DataPath.RootKind.Url,

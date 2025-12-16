@@ -1,6 +1,17 @@
 ﻿namespace SEE.DataModel.DG
 {
     /// <summary>
+    /// Attribute names for unique identification of nodes.
+    /// </summary>
+    public static class Linkage
+    {
+        /// <summary>
+        /// The attribute name for unique identifiers (within a graph).
+        /// </summary>
+        public const string Name = "Linkage.Name";
+    }
+
+    /// <summary>
     /// Standard names for LSP concepts.
     /// </summary>
     public static class LSP

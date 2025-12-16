@@ -1,15 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using DG.Tweening;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
 using SEE.Utils;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Assertions;
 
@@ -482,10 +482,6 @@ namespace SEE.Game.Operator
                             // The edge layout needs to be updated only if we actually have an edge layout.
                             UpdateEdgeLayout(duration);
                         }
-                        if (TryGetComponent(out AuthorRef author))
-                        {
-                            author.UpdateLayout();
-                        }
                     }
                 }
             }
@@ -496,7 +492,7 @@ namespace SEE.Game.Operator
         /// This involves recalculating the edge layout for each attached edge.
         /// </summary>
         /// <param name="duration">Time in seconds the animation should take.</param>
-        private void UpdateEdgeLayout(float duration)
+        public void UpdateEdgeLayout(float duration)
         {
             // We remember the old position and scale, and move the node to the new position and scale so that
             // edge layouts (dependent on position and scale) can be correctly calculated.
@@ -629,7 +625,7 @@ namespace SEE.Game.Operator
             // because it is used in InitializeColorOperation().
             material = GetRenderer(gameObject).material;
             base.OnEnable();
-            Node = GetNode(gameObject);
+
             Vector3 currentPosition = transform.position;
             Vector3 currentScale = transform.localScale;
             Quaternion currentRotation = transform.rotation;
@@ -640,29 +636,43 @@ namespace SEE.Game.Operator
             rotation = new TweenOperation<Quaternion>(AnimateToRotationAction, currentRotation);
             scale = new TweenOperation<Vector3>(AnimateToScaleAction, currentScale);
 
-            PrepareLabel();
-            labelAlpha = new TweenOperation<float>(AnimateLabelAlphaAction, 0f);
-            labelTextPosition = new TweenOperation<Vector3>(AnimateLabelTextPositionAction, DesiredLabelTextPosition);
-            labelStartLinePosition = new TweenOperation<Vector3>(AnimateLabelStartLinePositionAction, DesiredLabelStartLinePosition);
-            labelEndLinePosition = new TweenOperation<Vector3>(AnimateLabelEndLinePositionAction, DesiredLabelEndLinePosition);
+            // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
+            if (!gameObject.TryGetComponent(out NodeRef nodeRef))
+            {
+                throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
+            }
+
+            // A valid NodeRef is one whose Value differs from null.
+            // For the BranchCity(if created in the Editor) it can happen that we
+            // create a NodeOperator before the graph is actually deserialized and all
+            // NodeRefs properly set, that is, when the NodeRef is not yet valid.
+            // In that case, we postpone the label preparation until it becomes
+            // available. The label preparation needs to know the node to retrieve
+            // the name of the node to be shown.
+            Node = nodeRef.Value;
+            if (Node != null)
+            {
+                PrepareLabel();
+            }
+            else
+            {
+                nodeRef.OnValueSet += DelayedPrepareLabel;
+            }
+
             return;
+
+            void DelayedPrepareLabel(Node node)
+            {
+                nodeRef.OnValueSet -= DelayedPrepareLabel;
+                Node = node;
+                PrepareLabel();
+            }
 
             Tween[] AnimateToXAction(float x, float d) => new Tween[] { transform.DOMoveX(x, d).Play() };
             Tween[] AnimateToYAction(float y, float d) => new Tween[] { transform.DOMoveY(y, d).Play() };
             Tween[] AnimateToZAction(float z, float d) => new Tween[] { transform.DOMoveZ(z, d).Play() };
             Tween[] AnimateToRotationAction(Quaternion r, float d) => new Tween[] { transform.DORotateQuaternion(r, d).Play() };
             Tween[] AnimateToScaleAction(Vector3 s, float d) => new Tween[] { transform.DOScale(s, d).Play() };
-
-            static Node GetNode(GameObject gameObject)
-            {
-                // We allow a null value for artificial nodes, but at least a NodeRef must be attached.
-                if (!gameObject.TryGetComponent(out NodeRef nodeRef))
-                {
-                    throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have {nameof(NodeRef)} attached!");
-                }
-
-                return nodeRef.Value;
-            }
         }
 
         /// <summary>
@@ -679,30 +689,29 @@ namespace SEE.Game.Operator
             {
                 throw new InvalidOperationException($"NodeOperator-operated object {gameObject.FullName()} must have a Renderer component!");
             }
-
             return renderer;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            positionX.KillAnimator();
+            positionX?.KillAnimator();
             positionX = null;
-            positionY.KillAnimator();
+            positionY?.KillAnimator();
             positionY = null;
-            positionZ.KillAnimator();
+            positionZ?.KillAnimator();
             positionZ = null;
-            rotation.KillAnimator();
+            rotation?.KillAnimator();
             rotation = null;
-            scale.KillAnimator();
+            scale?.KillAnimator();
             scale = null;
-            labelAlpha.KillAnimator();
+            labelAlpha?.KillAnimator();
             labelAlpha = null;
-            labelTextPosition.KillAnimator();
+            labelTextPosition?.KillAnimator();
             labelTextPosition = null;
-            labelStartLinePosition.KillAnimator();
+            labelStartLinePosition?.KillAnimator();
             labelStartLinePosition = null;
-            labelEndLinePosition.KillAnimator();
+            labelEndLinePosition?.KillAnimator();
             labelEndLinePosition = null;
             // NOTE: Calling Destroy(nodeLabel) will not lead to the nodeLabel being immediately destroyed.
             //       Instead, it will be destroyed at the end of the frame. Thus, if PrepareLabel() is called

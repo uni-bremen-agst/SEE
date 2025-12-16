@@ -248,15 +248,22 @@ namespace SEE.UI
                 // Not yet initialized or already hidden.
                 return;
             }
-
             determinateProcesses[processMessage] = progress;
             // The update method may be called from outside the main thread, so we need to switch to the main thread.
             await AsyncUtils.RunOnMainThreadAsync(() =>
             {
-                determinateSpinnerProgress.DOFillAmount(determinateProcesses[processMessage], determinateChangeDuration).Play();
-                determinateSpinnerProgress.DOColor(Color.Lerp(initialDeterminateColor, finalDeterminateColor,
-                                                      determinateProcesses[processMessage]), determinateChangeDuration).Play();
-                UpdateLoadingText();
+                if (determinateProcesses.TryGetValue(processMessage, out float endValue))
+                {
+                    determinateSpinnerProgress.DOFillAmount(endValue, determinateChangeDuration).Play();
+                    determinateSpinnerProgress.DOColor
+                       (Color.Lerp(initialDeterminateColor, finalDeterminateColor, endValue),
+                        determinateChangeDuration).Play();
+                    UpdateLoadingText();
+                }
+                else
+                {
+                    Debug.LogError($"[{nameof(LoadingSpinner)}] unknown process message: {processMessage}.\n");
+                }
             });
         }
 

@@ -6,7 +6,8 @@ using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
 using SEE.GO.Decorators;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -544,7 +545,7 @@ namespace SEE.Game.CityRendering
                     float length = Mathf.Min(size.x, size.z);
                     // The text may occupy up to RelativeLabelSize of the length.
                     Vector3 position = node.GetRoofCenter();
-                    codeCity ??= SceneQueries.GetCodeCity(node.transform).gameObject;
+                    codeCity ??= node.GetCodeCity();
                     city ??= codeCity.GetComponent<AbstractSEECity>();
                     GameObject text = TextFactory.GetTextWithWidth(city: city,
                                                                    text: theNode.SourceName,

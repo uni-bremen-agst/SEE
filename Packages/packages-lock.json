@@ -22,11 +22,11 @@
       "hash": "4e4b9eb2a756219cf9632525e0acb00aec30aa92"
     },
     "com.cysharp.unitask": {
-      "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.2.5",
+      "version": "https://github.com/Cysharp/UniTask.git?path=src/UniTask/Assets/Plugins/UniTask#2.5.10",
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "72e620d169841f32bc6110ad0e12ee9eae6f1aaf"
+      "hash": "7c0f199fe0d3fc528024488ccd671e6c7b27745b"
     },
     "com.github-glitchenzo.nugetforunity": {
       "version": "https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity",
@@ -47,14 +47,14 @@
       "url": "https://package.openupm.com"
     },
     "com.singularitygroup.hotreload": {
-      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.11",
+      "version": "git+https://gitlab.hotreload.net/root/hot-reload-releases.git#1.13.13",
       "depth": 0,
       "source": "git",
       "dependencies": {
         "com.unity.ugui": "1.0.0",
         "com.unity.modules.unitywebrequest": "1.0.0"
       },
-      "hash": "418da38db7660aeace39d62b620a6366ce1a8b15"
+      "hash": "6d739b195401e25df8e7a21f6ed4939febc2e30e"
     },
     "com.unity.2d.sprite": {
       "version": "1.0.0",
@@ -472,7 +472,7 @@
       "depth": 0,
       "source": "git",
       "dependencies": {},
-      "hash": "9f274e1e90bcde869651e9510b4bfeb815b89318"
+      "hash": "fe49cfb1879f18e343251104d3494aad675c01a4"
     },
     "judah4.hsvcolorpickerunity": {
       "version": "https://github.com/judah4/HSV-Color-Picker-Unity.git#upm",

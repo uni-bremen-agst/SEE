@@ -1,9 +1,8 @@
-﻿using System;
+using SEE.Utils.Config;
+using System;
 using System.Collections.Generic;
-
-
 /// <summary>
-/// Contains data model types for parsing and interpreting external tool reports in the SEE dependency graph.
+/// Contains data model types for parsing and interpreting external tool reports in a <see cref="Graph"/>.
 /// </summary>
 namespace SEE.DataModel.DG.IO
 {
@@ -49,17 +48,6 @@ namespace SEE.DataModel.DG.IO
         /// </returns>
         internal abstract IReportParser CreateParser();
 
-        /// <summary>
-        /// Helper for callers that only need the textual tool identifier.
-        /// </summary>
-        /// <returns>
-        /// The identifier of the tool. The returned string is never null.
-        /// </returns>
-        public string GetToolId()
-        {
-            return ToolId;
-        }
-
         public string SourceRootRelativePath(string fullPath)
         {
             // 1) Normalize path separators to a single canonical separator.
@@ -96,64 +84,48 @@ namespace SEE.DataModel.DG.IO
         /// An <see cref="IIndexNodeStrategy"/> used to locate nodes in a <c>SourceRangeIndex</c>.
         /// </returns>
         public abstract IIndexNodeStrategy CreateIndexNodeStrategy();
-    }
 
-    /// <summary>
-    /// Encapsulates the XPath expressions used to traverse and interpret a report.
-    /// All XPath expressions must be valid for the corresponding report format.
-    /// </summary>
-    public class XPathMapping
-    {
-        /// <summary>
-        /// XPath union expression that selects every XML node of interest.
-        /// This string must not be null when used for report traversal.
-        /// </summary>
-        public string SearchedNodes { get; set; } = string.Empty;
+        #region Config I/O
 
         /// <summary>
-        /// Maps XML element names to XPath expressions that produce the full path identifier.
-        /// Dictionary keys and values must not be null.
+        /// Label of <see cref="ToolId"/> in the configuration file.
         /// </summary>
-        public Dictionary<string, string> PathBuilders { get; set; } =
-            new Dictionary<string, string>();
+        private const string ToolIdLabel = "ToolId";
 
         /// <summary>
-        /// Maps XML element names to XPath expressions that select the file name of a node.
-        /// Dictionary keys and values must not be null.
+        /// Saves the attributes to the configuration file under the given <paramref name="label"/>.
         /// </summary>
-        public Dictionary<string, string> FileName { get; set; } =
-            new Dictionary<string, string>();
+        public virtual void Save(ConfigWriter writer, string label)
+        {
+            writer.BeginGroup(label);
+            writer.Save(ToolId, ToolIdLabel);
+            writer.EndGroup();
+        }
 
         /// <summary>
-        /// Optional mapping from location field names to XPath expressions.
-        /// May be null if the report format does not provide explicit locations.
+        /// Restores the attributes from the configuration file.
         /// </summary>
-        public Dictionary<string, string>? LocationMapping { get; set; }
+        public void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
+        {
+            if (attributes.TryGetValue(label, out object groupObj))
+            {
+                if (groupObj is Dictionary<string, object> groupDict)
+                {
+                    string toolId = "";
+                    ConfigIO.Restore(groupDict, ToolIdLabel, ref toolId);
 
-        /// <summary>
-        /// Metric definitions keyed by their output name, each pointing to an XPath expression.
-        /// Dictionary keys and values must not be null.
-        /// </summary>
-        public Dictionary<string, string> Metrics { get; set; } =
-            new Dictionary<string, string>();
+                    if (!string.IsNullOrEmpty(toolId))
+                    {
+                        ToolId = toolId;
+                        parsingConfig = ParsingConfigFactory.Create(toolId);
+                        return;
+                    }
+                }
+            }
+            parsingConfig = null;
+            return;
+        }
 
-        /// <summary>
-        /// Optional namespace prefix or URI map for XPath evaluation.
-        /// May be null if the report does not use XML namespaces.
-        /// </summary>
-        public Dictionary<string, string>? Namespaces { get; set; }
-
-        /// <summary>
-        /// Optional template for location metadata, used by parsers that allocate location objects upfront.
-        /// May be null if no location template is required.
-        /// </summary>
-        public MetricLocation MetricLocation;
-
-        /// <summary>
-        /// Maps an XML tag name to a context designation such as class, package, method or root.
-        /// Dictionary keys and values must not be null.
-        /// </summary>
-        public Dictionary<string, string> MapContext { get; set; } =
-            new Dictionary<string, string>();
+        #endregion
     }
 }

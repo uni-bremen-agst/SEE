@@ -36,6 +36,7 @@ def reduce(graph: Graph):
     
     Returns the resulting modified graph.
     """
+    print("Running reduce")
     if graph.is_edge_type_name(BELONGS_TO):
         belongs_to = graph.edge_type(BELONGS_TO)
         for view_name in VIEW_NAMES:

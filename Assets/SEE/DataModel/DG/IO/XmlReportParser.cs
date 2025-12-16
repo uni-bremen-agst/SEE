@@ -114,7 +114,7 @@ namespace SEE.DataModel.DG.IO
                 }
             }
 
-            MetricSchema metricSchema = new MetricSchema
+            MetricSchema metricSchema = new()
             {
                 ToolId = config.ToolId ?? string.Empty
             };
@@ -153,7 +153,7 @@ namespace SEE.DataModel.DG.IO
                 catch (XPathException ex)
                 {
                     Debug.LogWarning(
-                        $"[Parser] XPath error in path builder '{pathExpression}': {ex.Message}");
+                        $"[{nameof(XmlReportParser)}] XPath error in path builder '{pathExpression}': {ex.Message}\n");
                 }
 
                 Finding finding = CreateFinding(current, fullPath, xPathMapping, namespaceManager);
@@ -165,7 +165,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             Debug.Log(
-                $"[Parser] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.");
+                $"[{nameof(XmlReportParser)}] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.\n");
 
             return metricSchema;
         }
@@ -198,7 +198,11 @@ namespace SEE.DataModel.DG.IO
             XPathMapping xPathMapping,
             XmlNamespaceManager? namespaceManager)
         {
-            string context = xPathMapping.MapContext[current.LocalName];
+            if (!xPathMapping.MapContext.TryGetValue(current.LocalName, out string context))
+            {
+                Debug.LogWarning($"[Parser] Unknown context for tag '{current.LocalName}' - skipping.");
+                return null;
+            }
 
             xPathMapping.FileName.TryGetValue(context, out string fileNameExpression);
 
@@ -232,7 +236,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[Parser] XPath error in metric '{kv.Key}': {ex.Message}");
+                    Debug.LogWarning($"[{nameof(XmlReportParser)}] XPath error in metric '{kv.Key}': {ex.Message}\n");
                 }
 
                 if (!string.IsNullOrEmpty(value) && value != "NaN")
@@ -262,10 +266,10 @@ namespace SEE.DataModel.DG.IO
         /// <returns>
         /// A populated <see cref="MetricLocation"/> or <c>null</c> if no location information was found.
         /// </returns>
-        private static MetricLocation ParseLocation(
-            XPathNavigator current,
-            XPathMapping xPathMapping,
-            XmlNamespaceManager? namespaceManager)
+        private static MetricLocation ParseLocation
+            (XPathNavigator current,
+             XPathMapping xPathMapping,
+             XmlNamespaceManager? namespaceManager)
         {
             if (xPathMapping.LocationMapping == null || xPathMapping.LocationMapping.Count == 0)
             {
@@ -306,7 +310,7 @@ namespace SEE.DataModel.DG.IO
                 catch (XPathException ex)
                 {
                     Debug.LogWarning(
-                        $"[Parser] XPath error in location field '{kv.Key}': {ex.Message}");
+                        $"[{nameof(XmlReportParser)}] XPath error in location field '{kv.Key}': {ex.Message}\n");
                 }
             }
 

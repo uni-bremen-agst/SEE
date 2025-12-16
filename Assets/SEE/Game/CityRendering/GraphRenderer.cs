@@ -8,7 +8,8 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
 using SEE.GO;
 using SEE.GO.Decorators;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -187,7 +188,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType shaderType = Materials.ShaderType.OpaqueMetallic;
+        private const MaterialsFactory.ShaderType shaderType = MaterialsFactory.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -287,8 +288,13 @@ namespace SEE.Game.CityRendering
         /// <param name="token">cancellation token with which to cancel the operation</param>
         /// <param name="doNotAddUniqueRoot">if true, no artificial unique root node will be added if there are multiple root
         /// nodes in <paramref name="graph"/></param>
-        public async UniTask DrawGraphAsync(Graph graph, GameObject parent, Action<float> updateProgress = null,
-                                            CancellationToken token = default, bool doNotAddUniqueRoot = false)
+        /// <returns>The resulting layout informations of the rendering.</returns>
+        public async UniTask DrawGraphAsync
+            (Graph graph,
+             GameObject parent,
+             Action<float> updateProgress = null,
+             CancellationToken token = default,
+             bool doNotAddUniqueRoot = false)
         {
             if (graph.NodeCount == 0)
             {
@@ -328,28 +334,33 @@ namespace SEE.Game.CityRendering
 
             CreateGameNodeHierarchy(nodeMap, parent);
 
-            // Create the laid out edges; they will be children of the unique root game node
-            // representing the node hierarchy. This way the edges can be moved along with
-            // the nodes.
-            GameObject rootGameNode = RootGameNode(parent);
-            try
-            {
-                await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
-            }
-            catch (OperationCanceledException)
-            {
-                // If the operation gets canceled, we need to clean up the dangling edge game objects.
-                foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
-                {
-                    Destroyer.Destroy(edge);
-                }
-                // Then re-throw.
-                throw;
-            }
-
             // Decorations must be applied after the blocks have been placed, so that
             // we also know their positions.
             AddDecorations(nodeMap.Values);
+
+            // Create the laid out edges; they will be children of the unique rootGameNode
+            // representing the node hierarchy. This way the edges can be moved along with
+            // the nodes.
+            GameObject rootGameNode = RootGameNode(parent);
+
+            ICollection<GameObject> edgeLayouts = new List<GameObject>();
+            if (Settings.EdgeLayoutSettings.Kind != EdgeLayoutKind.None)
+            {
+                try
+                {
+                    edgeLayouts = await EdgeLayoutAsync(gameNodes.Values, rootGameNode, true, x => updateProgress?.Invoke(0.5f + x * 0.5f), token);
+                }
+                catch (OperationCanceledException)
+                {
+                    // If the operation gets canceled, we need to clean up the dangling edge game objects.
+                    foreach (GameObject edge in GameObject.FindGameObjectsWithTag(Tags.Edge).Where(x => x.transform.parent is null))
+                    {
+                        Destroyer.Destroy(edge);
+                    }
+                    // Then re-throw.
+                    throw;
+                }
+            }
 
             Portal.SetPortal(parent);
 
@@ -368,12 +379,13 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
+                // The authors spheres and author references are created under the code city (parent)
+                // and not under the graph root game node (rootGameNode) because we do not want to
+                // move them if a user shuffles the root game node.
+                DrawAuthorSpheres(nodeMap, parent, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
-            return;
-
 
             void AddGameRootNodeIfNecessary(Graph graph, IDictionary<Node, GameObject> nodeMap)
             {
@@ -739,12 +751,12 @@ namespace SEE.Game.CityRendering
         /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
         private static GameObject RootGameNode(GameObject gameNode)
         {
-            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            GameObject codeCity = gameNode.GetCodeCity();
             if (codeCity == null)
             {
                 throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
-            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
+            GameObject result = codeCity.GetCityRootNode();
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");
