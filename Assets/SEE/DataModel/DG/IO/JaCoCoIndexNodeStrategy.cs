@@ -8,10 +8,11 @@ namespace SEE.DataModel.DG.IO
     /// Strategy for normalizing Java code element identifiers to main type paths.
     /// Handles JaCoCo-specific conventions including package separators, inner classes, and methods.
     /// </summary>
-    public sealed class JavaIndexNodeStrategy : IIndexNodeStrategy
+    public sealed class JaCoCoIndexNodeStrategy : IIndexNodeStrategy
     {
         // JaCoCo and Java conventions
-        private const char JavaPathSeparator = '/';
+        private const char LinuxPathSeparator = '/';
+        private const char WindowsPathSeparator = '\\';
         private const char NodeIdSeparator = '.';
         private const char InnerClassDelimiter = '$';
         private const char MethodDelimiter = '#';
@@ -29,7 +30,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             // 1. replacing path separators
-            fullPath = fullPath.Replace(JavaPathSeparator, NodeIdSeparator);
+            fullPath = fullPath.Replace(LinuxPathSeparator, NodeIdSeparator).Replace(WindowsPathSeparator, NodeIdSeparator);
 
             bool isMethod = fullPath.IndexOf(MethodDelimiter) > -1;
 
@@ -60,7 +61,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             // Step 1: Convert path separators: '/' → '.'
-            string normalized = fullPath.Replace(JavaPathSeparator, NodeIdSeparator);
+            string normalized = fullPath.Replace(LinuxPathSeparator, NodeIdSeparator).Replace(WindowsPathSeparator, NodeIdSeparator);
 
             // Step 2: Remove everything from first inner class or method delimiter onwards
             normalized = RemoveInnerTypesAndMethods(normalized);

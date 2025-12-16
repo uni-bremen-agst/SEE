@@ -19,7 +19,7 @@ namespace SEE.DataModel.DG.IO
     /// 3. <see cref="FindingPathToMainType"/> resolves to the main type for indexing purposes
     /// 4. <see cref="NodeIdToMainType"/> provides consistent main type resolution from graph nodes
     /// 
-    /// Example implementations: JavaIndexNodeStrategy, CSharpIndexNodeStrategy
+    /// Example implementations: JaCoCoIndexNodeStrategy, CSharpIndexNodeStrategy
     /// </remarks>
     public interface IIndexNodeStrategy
     {

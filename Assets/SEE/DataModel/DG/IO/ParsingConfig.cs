@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 
 /// <summary>
@@ -13,10 +14,25 @@ namespace SEE.DataModel.DG.IO
     public abstract class ParsingConfig
     {
         /// <summary>
+        /// Windows path separator (<c>\</c>), used to detect and normalize Windows-style paths.
+        /// </summary>
+        private const char WindowsPathSeparator = '\\';
+
+        /// <summary>
+        /// Linux/Unix path separator (<c>/</c>), used as the normalized internal separator.
+        /// </summary>
+        private const char LinuxPathSeparator = '/';
+
+        /// <summary>
         /// Identifier that ties parsed metrics to their origin (for example, "JaCoCo").
         /// This value must not be null when a parser uses this configuration.
         /// </summary>
         public string ToolId = string.Empty;
+
+        /// <summary>
+        /// Source root marker of the project
+        /// </summary>
+        public string SourceRootMarker = string.Empty;
 
         /// <summary>
         /// Describes which XML nodes to visit and how to interpret them.
@@ -42,6 +58,34 @@ namespace SEE.DataModel.DG.IO
         public string GetToolId()
         {
             return ToolId;
+        }
+
+        public string SourceRootRelativePath(string fullPath)
+        {
+            // 1) Normalize path separators to a single canonical separator.
+            string normalized = fullPath.Replace(WindowsPathSeparator, LinuxPathSeparator);
+
+            // 2) Cut off everything before the configured source root marker, if available.
+            if (!string.IsNullOrWhiteSpace(SourceRootMarker))
+            {
+                // Normalize the marker itself to use '/' and no leading/trailing slashes.
+                string marker = SourceRootMarker.Replace('\\', '/').Trim('/');
+                string needle = "/" + marker + "/";
+
+                // Prefer a clean boundary match ("/marker/") from the end of the path (LastIndexOf).
+                int idx = normalized.LastIndexOf(needle, StringComparison.OrdinalIgnoreCase);
+                if (idx >= 0)
+                    normalized = normalized.Substring(idx + needle.Length);
+                else
+                {
+                    // Fallback: fuzzy match on the marker substring.
+                    // This is less precise but may still yield acceptable results for unusual path layouts.
+                    idx = normalized.LastIndexOf(marker, StringComparison.OrdinalIgnoreCase);
+                    if (idx >= 0)
+                        normalized = normalized.Substring(idx + marker.Length).TrimStart('/');
+                }
+            }
+            return normalized;
         }
 
         /// <summary>

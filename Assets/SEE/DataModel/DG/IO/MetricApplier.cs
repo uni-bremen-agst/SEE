@@ -99,6 +99,12 @@ namespace SEE.DataModel.DG.IO
         private static void SetMetric(Node node, KeyValuePair<string, string> metric)
         {
             string key = prefix + metric.Key;
+
+            if (node.TryGetAny(key, out object existingValue))
+            {
+                key = computeKey(node, key);
+            }
+
             string stringValue = metric.Value;
 
             if (int.TryParse(
@@ -121,6 +127,22 @@ namespace SEE.DataModel.DG.IO
             {
                 node.SetString(key, stringValue);
             }
+        }
+
+        /// <summary>
+        /// Computes a new key with a suffix based on the amount of keys with a specific base key.
+        /// if key "example" exist -> generated key is "example [1]"
+        /// /// </summary>
+        /// <param name="node"></param>
+        /// <param name="key"></param>
+        /// <returns></returns>
+        private static string computeKey(Node node, string key)
+        {
+            int i = 1;
+            while (node.TryGetAny(key + " [" + i.ToString() + "]", out object value)) {
+                i++;
+            }
+            return key + " [" + i.ToString() +"]";
         }
     }
 }

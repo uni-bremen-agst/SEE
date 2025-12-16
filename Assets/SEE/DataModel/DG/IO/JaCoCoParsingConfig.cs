@@ -105,7 +105,7 @@ namespace SEE.DataModel.DG.IO
         /// <returns>An index node strategy for Java files.</returns>
         public override IIndexNodeStrategy CreateIndexNodeStrategy()
         {
-            return new JavaIndexNodeStrategy();
+            return new JaCoCoIndexNodeStrategy();
         }
     }
 }
