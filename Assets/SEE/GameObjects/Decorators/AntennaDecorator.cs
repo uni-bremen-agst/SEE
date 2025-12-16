@@ -1,7 +1,8 @@
 ﻿using SEE.DataModel.DG;
 using SEE.Game;
 using SEE.Game.City;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Utils;
 using System;
 using System.Collections.Generic;
@@ -196,7 +197,7 @@ namespace SEE.GO.Decorators
                 {
                     color = colorRange.Upper;
                 }
-                result[metricName] = new CylinderFactory(Materials.ShaderType.Opaque, new ColorRange(color, color, 1));
+                result[metricName] = new CylinderFactory(MaterialsFactory.ShaderType.Opaque, new ColorRange(color, color, 1));
             }
             return result;
         }

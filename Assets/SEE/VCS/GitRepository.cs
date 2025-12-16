@@ -640,8 +640,8 @@ namespace SEE.VCS
         {
             if (VCSFilter.RepositoryPaths == null || VCSFilter.RepositoryPaths.Length == 0)
             {
-                // We collect all files in the entire tree.
                 token.ThrowIfCancellationRequested();
+                // We collect all files in the entire tree.
                 CollectFiles(tree, VCSFilter.Matcher, paths, token);
             }
             else

@@ -231,6 +231,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
+        ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
@@ -256,6 +257,7 @@ namespace SEE.GraphProviders.VCS
             changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
+
             token.ThrowIfCancellationRequested();
 
             repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
