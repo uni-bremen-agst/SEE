@@ -78,18 +78,37 @@ namespace SEE.Game.City
         public float LODCulling = 0.001f;
 
         /// <summary>
+        /// Backing field for <see cref="TableWorldScale"/>.
+        /// </summary>
+        private Vector3 tableWorldScale;
+
+        /// <summary>
         /// Gets or sets the table's world-space scale.
         /// </summary>
         /// <remarks>
-        /// The associated City GameObject is always a child of a table.
+        /// In a scene, the associated City GameObject is always a child of a table.
         /// The getter returns the table's global scale via <c>lossyScale</c>.
         /// The setter adjusts the table's local scale through <c>GameTableManager.Scale</c>
         /// to achieve the desired world-space scale.
+        /// In our editor tests, however, the city might not actually be nested in a table.
+        /// That is why we need the backing field <see cref="tableWorldScale"/>.
         /// </remarks>
         public Vector3 TableWorldScale
         {
-            get { return transform.parent.lossyScale; }
-            set { GameTableManager.Scale(transform.parent.gameObject, value);}
+            get
+            {
+                Vector3 result = transform.parent == null ? tableWorldScale : transform.parent.lossyScale;
+                tableWorldScale = result;
+                return result;
+            }
+            set
+            {
+                tableWorldScale = value;
+                if (transform.parent != null)
+                {
+                    GameTableManager.Scale(transform.parent.gameObject, value);
+                }
+            }
         }
 
         /// <summary>
