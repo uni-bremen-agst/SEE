@@ -296,11 +296,12 @@ namespace SEE.Utils.Paths
                 Uri uri = new(path);
                 if (uri.IsAbsoluteUri)
                 {
-                    if (path.Contains(UserSettings.BackendServerAPI))
+                    string backendServerAPI = UserSettings.BackendServerAPI;
+                    if (backendServerAPI != null && path.Contains(backendServerAPI))
                     {
                         // The path relates to our server.
                         AbsolutePath = string.Empty;
-                        RelativePath = path.Replace(UserSettings.BackendServerAPI, string.Empty);
+                        RelativePath = path.Replace(backendServerAPI, string.Empty);
                     }
                     else
                     {
