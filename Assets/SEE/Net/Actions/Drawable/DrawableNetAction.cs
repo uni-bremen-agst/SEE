@@ -23,12 +23,12 @@ namespace SEE.Net.Actions.Drawable
         protected GameObject Surface { get; private set; }
 
         /// <summary>
-        /// The id of the drawable on which the object is located
+        /// The ID of the drawable on which the object is located
         /// </summary>
         public string SurfaceID;
 
         /// <summary>
-        /// The id of the drawable surface parent
+        /// The ID of the drawable surface parent
         /// </summary>
         public string SurfaceParentID;
 
@@ -36,8 +36,8 @@ namespace SEE.Net.Actions.Drawable
         /// The constructor of this action. Sets <paramref name="surfaceID"/>, <paramref name="surfaceParentID"/>,
         /// and - based on these -<see cref="Surface"/>.
         /// </summary>
-        /// <param name="surfaceID">The id of the drawable surface on which the object should be placed.</param>
-        /// <param name="surfaceParentID">The id of the drawable surface parent.</param>
+        /// <param name="surfaceID">The ID of the drawable surface on which the object should be placed.</param>
+        /// <param name="surfaceParentID">The ID of the drawable surface parent.</param>
         public DrawableNetAction(string surfaceID, string surfaceParentID)
         {
             SurfaceID = surfaceID;
@@ -45,11 +45,11 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Returns the drawable object with the id <see cref="SurfaceID"/>
-        /// and the parent id <see cref="SurfaceParentID"/>.
+        /// Returns the drawable object with the ID <see cref="SurfaceID"/>
+        /// and the parent ID <see cref="SurfaceParentID"/>.
         /// </summary>
-        /// <param name="surfaceID">The id of the drawable object.</param>
-        /// <param name="surfaceParentID">The id of the parent drawable object.</param>
+        /// <param name="surfaceID">The ID of the drawable object.</param>
+        /// <param name="surfaceParentID">The ID of the parent drawable object.</param>
         /// <returns>The found drawable object (never null).</returns>
         /// <exception cref="System.Exception">Thrown if a drawable object cannot be found.</exception>
         protected static GameObject Find(string surfaceID, string surfaceParentID)
@@ -63,7 +63,7 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Returns the child of <see cref="Surface"/> with the id <paramref name="childID"/>.
+        /// Returns the child of <see cref="Surface"/> with the ID <paramref name="childID"/>.
         /// </summary>
         /// <param name="childID">The ID of the requested child.</param>
         /// <returns>The child (will never be null).</returns>
@@ -79,14 +79,14 @@ namespace SEE.Net.Actions.Drawable
         }
 
         /// <summary>
-        /// Returns true if the child with the id <paramref name="childId"/> exists and
+        /// Returns true if the child with the ID <paramref name="childId"/> exists and
         /// returns this child in output parameter <paramref name="child"/>. Otherwise,
         /// false is returned and <paramref name="child"/> is undefined.
         /// </summary>
-        /// <param name="childId"><the ID of the requested child/param>
-        /// <param name="child">the found child if it exists; otherwise undefined</param>
-        /// <returns>true if the child exists</returns>
-.        protected bool TryFindChild(string childId, out GameObject child)
+        /// <param name="childId">The ID of the requested child.</param>
+        /// <param name="child">The found child if it exists; otherwise undefined</param>
+        /// <returns>True if the child exists.</returns>
+        protected bool TryFindChild(string childId, out GameObject child)
         {
             child = GameFinder.FindChild(Surface, childId);
             return child != null;

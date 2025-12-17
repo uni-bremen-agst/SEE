@@ -8,15 +8,15 @@ namespace SEE.Net.Actions.Drawable
     public class RbAndCCDestroyerNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The id of the selected node which children's rigid bodies and collision controllers should be destroyed.
+        /// The ID of the selected node which children's rigid bodies and collision controllers should be destroyed.
         /// </summary>
         public string NodeID;
 
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         public RbAndCCDestroyerNetAction(string drawableID, string parentDrawableID, string nodeID)
             : base(drawableID, parentDrawableID)
         {

@@ -17,8 +17,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the node is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="child">The node that should be removed.</param>
         public MindMapRemoveChildNetAction(string drawableID, string parentDrawableID, MindMapNodeConf child)
             : base(drawableID, parentDrawableID)

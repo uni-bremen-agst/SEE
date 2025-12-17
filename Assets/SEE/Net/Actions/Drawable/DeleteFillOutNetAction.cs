@@ -9,16 +9,16 @@ namespace SEE.Net.Actions.Drawable
     public class DeleteFillOutNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The id of the line which fill out should be deleted.
+        /// The ID of the line which fill out should be deleted.
         /// </summary>
         public string LineID;
 
         /// <summary>
         /// The constructor of this action. All it does is to assign the values you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="lineName">The line id of the object that should be deleted.</param>
+        /// <param name="drawableID">The ID of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
+        /// <param name="lineName">The line ID of the object that should be deleted.</param>
         public DeleteFillOutNetAction(string drawableID, string parentDrawableID, string lineName)
             : base(drawableID, parentDrawableID)
         {

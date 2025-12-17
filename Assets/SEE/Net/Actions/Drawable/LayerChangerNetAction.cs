@@ -9,7 +9,7 @@ namespace SEE.Net.Actions.Drawable
     public class LayerChangerNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The id of the object that should be changed
+        /// The ID of the object that should be changed
         /// </summary>
         public string ObjectName;
         /// <summary>
@@ -24,9 +24,9 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Creates a new <see cref="LayerChangerNetAction"/>
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="objectName">The id of the object that should be changed.</param>
+        /// <param name="drawableID">The ID of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
+        /// <param name="objectName">The ID of the object that should be changed.</param>
         /// <param name="state">The state of layer change.</param>
         /// <param name="order">The order in layer that should be set.</param>
         public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, int order)

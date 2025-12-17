@@ -10,7 +10,7 @@ namespace SEE.Net.Actions.Drawable
     public class RotatorYNetAction : DrawableNetAction
     {
         /// <summary>
-        /// The id of the object that should be changed.
+        /// The ID of the object that should be changed.
         /// </summary>
         public string ObjectName;
         /// <summary>
@@ -22,9 +22,9 @@ namespace SEE.Net.Actions.Drawable
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// Used for undo / redo of <see cref="MoveRotateAction"/>
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="objectName">The id of the object that should be changed.</param>
+        /// <param name="drawableID">The ID of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
+        /// <param name="objectName">The ID of the object that should be changed.</param>
         /// <param name="localEulerAnlgeY">The value to which the object should be rotated.</param>
         public RotatorYNetAction(string drawableID, string parentDrawableID, string objectName, float localEulerAnlgeY)
             : base(drawableID, parentDrawableID)

@@ -22,8 +22,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the node is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the node is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="node">The node that should be change the node kind.</param>
         /// <param name="nodeKind">The new node kind.</param>
         public MindMapChangeNodeKindNetAction(string drawableID, string parentDrawableID, MindMapNodeConf node, GameMindMap.NodeKind nodeKind)
