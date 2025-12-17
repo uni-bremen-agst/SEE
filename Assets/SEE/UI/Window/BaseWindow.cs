@@ -149,10 +149,10 @@ namespace SEE.UI.Window
         /// Recreates a window from the given <paramref name="valueObject"/> and attaches it to
         /// the GameObject <paramref name="attachTo"/>.
         /// </summary>
-        /// <param name="valueObject">The value object from which the window should be constructed</param>
+        /// <param name="valueObject">The value object from which the window should be constructed.</param>
         /// <param name="attachTo">The game object the window should be attached to. If <c>null</c>,
         /// the game object will be attached to the game object with the name specified in the value object.</param>
-        /// <returns>The newly re-constructed window</returns>
+        /// <returns>The newly re-constructed window.</returns>
         /// <exception cref="InvalidOperationException">If both <paramref name="attachTo"/> is <c>null</c>
         /// and the game object specified in <paramref name="valueObject"/> can't be found.</exception>
         public static BaseWindow FromValueObject<T>(WindowValues valueObject, GameObject attachTo = null)
@@ -176,7 +176,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Generates and returns a value object for this window.
         /// </summary>
-        /// <returns>The newly created window value object, matching this class</returns>
+        /// <returns>The newly created window value object, matching this class.</returns>
         public abstract WindowValues ToValueObject();
     }
 
