@@ -11,7 +11,7 @@ public class UnityProject
     /// be appended. The chosen directory separator is the one of the platform we are
     /// currently executing on.
     /// </summary>
-    /// <returns>path to our Unity project folder</returns>
+    /// <returns>Path to our Unity project folder.</returns>
     public static string GetPath()
     {
         string result = Application.dataPath;

@@ -14,10 +14,10 @@ namespace SEE.Utils
         /// Scrolls this <paramref name="scrollRect"/> to the given <paramref name="item"/>.
         /// If a <paramref name="duration"/> is given, the scrolling will be animated.
         /// </summary>
-        /// <param name="scrollRect">the scroll rect to scroll</param>
-        /// <param name="item">the item to scroll to</param>
-        /// <param name="duration">the duration of the animation, if any</param>
-        /// <returns>a callback which can be used to react to the end of the animation</returns>
+        /// <param name="scrollRect">The scroll rect to scroll.</param>
+        /// <param name="item">The item to scroll to.</param>
+        /// <param name="duration">The duration of the animation, if any.</param>
+        /// <returns>A callback which can be used to react to the end of the animation.</returns>
         public static IOperationCallback<TweenCallback> ScrollTo(this ScrollRect scrollRect, RectTransform item, float? duration = null)
         {
             Canvas.ForceUpdateCanvases();

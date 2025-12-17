@@ -15,9 +15,9 @@ namespace SEE.Utils
         ///
         /// Precondition: All <paramref name="gameObjects"/> have a renderer component attached to them.
         /// </summary>
-        /// <param name="gameObjects">the list of objects that are enclosed in the resulting bounding box</param>
-        /// <param name="leftLowerCorner">the left lower front corner (x axis in 3D space) of the bounding box</param>
-        /// <param name="rightUpperCorner">the right lower back corner (z axis in 3D space) of the bounding box</param>
+        /// <param name="gameObjects">The list of objects that are enclosed in the resulting bounding box.</param>
+        /// <param name="leftLowerCorner">The left lower front corner (x axis in 3D space) of the bounding box.</param>
+        /// <param name="rightUpperCorner">The right lower back corner (z axis in 3D space) of the bounding box.</param>
         public static void Get(ICollection<GameObject> gameObjects, out Vector2 leftLowerCorner, out Vector2 rightUpperCorner)
         {
             if (gameObjects.Count == 0)
@@ -73,8 +73,8 @@ namespace SEE.Utils
         /// <summary>
         /// Returns the maximal y co-ordinate of all given <paramref name="gameObjects"/> in world space.
         /// </summary>
-        /// <param name="gameObjects">the game objects whose maximal y co-ordinate is requested</param>
-        /// <returns>maximal y co-ordinate</returns>
+        /// <param name="gameObjects">The game objects whose maximal y co-ordinate is requested.</param>
+        /// <returns>Maximal y co-ordinate.</returns>
         public static float GetRoof(ICollection<GameObject> gameObjects)
         {
             float result = float.NegativeInfinity;
