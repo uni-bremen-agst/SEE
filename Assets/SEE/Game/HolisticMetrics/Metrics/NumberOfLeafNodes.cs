@@ -12,8 +12,8 @@ namespace SEE.Game.HolisticMetrics.Metrics
         /// <summary>
         /// Counts the number of leaves of a given <paramref name="city"/> and returns it.
         /// </summary>
-        /// <param name="city">The code city of which to get the leaf count</param>
-        /// <returns>The leaf count of the given <paramref name="city"/></returns>
+        /// <param name="city">The code city of which to get the leaf count.</param>
+        /// <returns>The leaf count of the given <paramref name="city"/>.</returns>
         internal override MetricValue Refresh(AbstractSEECity city)
         {
             base.Refresh(city);
