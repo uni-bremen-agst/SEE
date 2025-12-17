@@ -537,7 +537,7 @@ namespace SEE.Utils.History
         /// are popped off.
         /// </summary>
         /// <returns>The last action on the <see cref="UndoHistory"/> that
-        /// has had any effect (preliminary or complete) or null<.</returns>
+        /// has had any effect (preliminary or complete) or null.</returns>
         private IReversibleAction LastActionWithEffect()
         {
             while (UndoHistory.Count > 0)

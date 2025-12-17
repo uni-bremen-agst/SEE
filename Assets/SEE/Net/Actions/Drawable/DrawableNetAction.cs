@@ -84,7 +84,7 @@ namespace SEE.Net.Actions.Drawable
         /// false is returned and <paramref name="child"/> is undefined.
         /// </summary>
         /// <param name="childId">The ID of the requested child.</param>
-        /// <param name="child">The found child if it exists; otherwise undefined</param>
+        /// <param name="child">The found child if it exists; otherwise undefined.</param>
         /// <returns>True if the child exists.</returns>
         protected bool TryFindChild(string childId, out GameObject child)
         {

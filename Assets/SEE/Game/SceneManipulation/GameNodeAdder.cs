@@ -93,7 +93,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="worldSpaceScale">The scale in world space of the new game node.</param>
         /// <param name="nodeID">The unique ID of the new node; if null or empty, a random ID will be used.</param>
         /// <returns>New child game node.</returns>
-        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
+        /// <exception cref="Exception">Thrown if <paramref name="parent"/> has no valid node reference
         /// or is not contained in a code city.</exception>
         public static GameObject AddChild(GameObject parent, Vector3 worldSpacePosition, Vector3 worldSpaceScale, string nodeID = null)
         {
@@ -122,7 +122,7 @@ namespace SEE.Game.SceneManipulation
         /// <param name="parent">Parent of the new node.</param>
         /// <param name="nodeID">The unique ID of the new node; if null or empty, a random ID will be used.</param>
         /// <returns>New child game node.</returns>
-        /// <exception cref="Exception">thrown if <paramref name="parent"/> has no valid node reference
+        /// <exception cref="Exception">Thrown if <paramref name="parent"/> has no valid node reference
         /// or is not contained in a code city.</exception>
         public static GameObject AddChild(GameObject parent, string nodeID = null)
         {

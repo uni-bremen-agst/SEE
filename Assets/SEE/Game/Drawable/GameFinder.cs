@@ -17,11 +17,15 @@ namespace SEE.Game.Drawable
         /// <param name="surfaceID">The drawable surface id.</param>
         /// <param name="surfaceParentID">The parent id of the drawable surface.</param>
         /// <param name="useFindWithTagList">Option to select which list should be searched.
-        /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used.
-        /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
+        /// By default, the <see cref="ValueHolder.DrawableSurfaces"/> is used.
+        /// When this option is set to true, the expensive
+        /// <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.
+        /// </param>
         /// <returns>The sought-after drawable, if found. Otherwise, null.</returns>
-        /// <remarks>This method will iterate over all game objects in the
-        /// scene and, hence, is expensive.</remarks>
+        /// <remarks>
+        /// This method will iterate over all game objects in the
+        /// scene and, hence, is expensive.
+        /// </remarks>
         public static GameObject FindDrawableSurface(string surfaceID, string surfaceParentID, bool useFindWithTagList = false)
         {
             GameObject searchedSurface = null;

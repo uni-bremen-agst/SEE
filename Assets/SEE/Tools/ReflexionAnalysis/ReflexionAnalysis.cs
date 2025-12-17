@@ -382,9 +382,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// A function delegate that can be used to handle changes of the mapping by HandleMappedSubtree.
         /// </summary>
-        /// <param name="edge"></param>
-        /// <param name="from"></param>
-        /// <param name="to"></param>
+        /// <param name="edge">.</param>
+        /// <param name="from">.</param>
+        /// <param name="to">.</param>
         private delegate void HandleMappingChange(Edge edge, Node from, Node to);
 
         // Meaning of "propagate": copy edge from implementation to architecture
