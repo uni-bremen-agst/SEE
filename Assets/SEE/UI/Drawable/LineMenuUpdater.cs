@@ -21,7 +21,7 @@ namespace SEE.UI.Drawable
         /// <summary>
         /// Performs the update.
         /// </summary>
-        /// <returns>waits 100 ms.</returns>
+        /// <returns>Waits 100 ms.</returns>
         private IEnumerator Updater()
         {
             yield return new WaitForSeconds(0.1f);
