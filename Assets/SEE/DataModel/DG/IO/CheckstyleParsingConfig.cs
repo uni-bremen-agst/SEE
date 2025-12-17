@@ -1,22 +1,39 @@
 ﻿using System.Collections.Generic;
 
+/// <summary>
+/// Contains parser configuration and node-indexing helpers for importing external analysis reports.
+/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Parsing configuration for Checkstyle XML reports.
-    ///
+    /// </summary>
+    /// <remarks>
     /// Supported nodes:
-    /// - <file>  : file-level aggregation (counts by severity)
-    /// - <error> : individual violations (line/column + rendered message)
+    /// <list type="bullet">
+    /// <item><description><c>&lt;file&gt;</c>: File-level aggregation (counts by severity).</description></item>
+    /// <item><description><c>&lt;error&gt;</c>: Individual violations (line/column + rendered message).</description></item>
+    /// </list>
     ///
     /// Key idea:
-    /// Metrics are configured per context (see <see cref="XPathMapping.MetricsByContext" />),
-    /// so we do not need XPath hacks that force irrelevant metrics to evaluate to NaN.
-    /// </summary>
+    /// Metrics are configured per context (see <see cref="XPathMapping.MetricsByContext"/>),
+    /// so the parser does not need XPath hacks that force irrelevant metrics to evaluate to NaN.
+    /// </remarks>
     internal sealed class CheckstyleParsingConfig : ParsingConfig
     {
+        /// <summary>
+        /// Context name for individual Checkstyle violations (<c>&lt;error&gt;</c> nodes).
+        /// </summary>
         private const string errorContext = "error";
+
+        /// <summary>
+        /// Context name for file-level aggregation (<c>&lt;file&gt;</c> nodes).
+        /// </summary>
         private const string fileContext = "file";
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CheckstyleParsingConfig"/> class.
+        /// </summary>
         public CheckstyleParsingConfig()
         {
             ToolId = "Checkstyle";
@@ -81,11 +98,19 @@ namespace SEE.DataModel.DG.IO
             };
         }
 
+        /// <summary>
+        /// Creates the parser implementation that can read Checkstyle reports using this configuration.
+        /// </summary>
+        /// <returns>A report parser configured for Checkstyle XML input.</returns>
         internal override IReportParser CreateParser()
         {
             return new XmlReportParser(this);
         }
 
+        /// <summary>
+        /// Creates the index-node strategy that maps findings to the corresponding graph node identifiers.
+        /// </summary>
+        /// <returns>An index node strategy suitable for Checkstyle file paths.</returns>
         public override IIndexNodeStrategy CreateIndexNodeStrategy()
         {
             return new CheckstyleIndexNodeStrategy(this);

@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using SEE.DataModel.DG.IO;
 
+/// <summary>
+/// Contains graph provider implementations and related integration tests.
+/// </summary>
 namespace SEE.GraphProviders
 {
     /// <summary>
@@ -168,7 +171,7 @@ namespace SEE.GraphProviders
 
             // Use OrdinalIgnoreCase because Windows paths are typically case-insensitive
             // and Checkstyle may vary casing depending on environment.
-            var findings = new Dictionary<string, Finding>(StringComparer.OrdinalIgnoreCase);
+            Dictionary<string, Finding> findings = new Dictionary<string, Finding>(StringComparer.OrdinalIgnoreCase);
 
             // 1) CustomUserDetailsService.java – expected: 1 warning, 3 errors
             string customUserDetailsService =

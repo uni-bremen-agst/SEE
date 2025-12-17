@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using UnityEngine;
-
+/// <summary>
+/// Contains parser configuration and node-indexing helpers for importing external analysis reports.
+/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
@@ -30,17 +31,17 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Separator used in Java package/class notation (e.g., <c>com.example.ClassName</c>).
         /// </summary>
-        private const char PackageSeparator = '.';
+        private const char packageSeparator = '.';
 
         /// <summary>
         /// Windows path separator (<c>\</c>), used to detect and normalize Windows-style paths.
         /// </summary>
-        private const char WindowsPathSeparator = '\\';
+        private const char windowsPathSeparator = '\\';
 
         /// <summary>
         /// Linux/Unix path separator (<c>/</c>), used as the normalized internal separator.
         /// </summary>
-        private const char LinuxPathSeparator = '/';
+        private const char linuxPathSeparator = '/';
 
         /// <summary>
         /// Parsing configuration that provides path normalization helpers (most importantly
@@ -52,7 +53,7 @@ namespace SEE.DataModel.DG.IO
         /// Preconditions:
         /// - Must not be null.
         /// </summary>
-        private readonly ParsingConfig config;
+        private readonly ParsingConfig parsingConfig;
 
         /// <summary>
         /// Creates a new Checkstyle index strategy.
@@ -77,7 +78,7 @@ namespace SEE.DataModel.DG.IO
         /// <exception cref="ArgumentNullException">Thrown if <paramref name="config"/> is null.</exception>
         internal CheckstyleIndexNodeStrategy(ParsingConfig config)
         {
-            this.config = config ?? throw new ArgumentNullException(nameof(config));
+            this.parsingConfig = config ?? throw new ArgumentNullException(nameof(config));
         }
 
         /// <summary>
@@ -108,11 +109,11 @@ namespace SEE.DataModel.DG.IO
         /// - <paramref name="fullPath"/> should be a path or identifier that can be converted to an FQCN.
         /// </summary>
         /// <param name="fullPath">Absolute or relative file path (or already normalized FQCN).</param>
-        /// <param name="fileName">File name part; not used for Checkstyle main-type resolution here.</param>
+        /// <param name="_">Unused parameter required by the interface.</param>
         /// <returns>
         /// The fully qualified class name for the file, or null if <paramref name="fullPath"/> is empty/invalid.
         /// </returns>
-        public string FindingPathToMainType(string fullPath, string fileName)
+        public string FindingPathToMainType(string fullPath, string _)
         {
             return ToQualifiedClassName(fullPath);
         }
@@ -160,23 +161,21 @@ namespace SEE.DataModel.DG.IO
             {
                 // For file nodes, we explicitly apply path normalization logic.
                 // In some graphs, File node IDs may be absolute paths.
-                string res = ToQualifiedClassName(node.ID);
-
-                return res;
+                return ToQualifiedClassName(node.ID);
             }
 
             // Other node types are not indexable for Checkstyle.
             return null;
         }
 
-        #region Helper für Typ-Erkennung
+        #region Helpers for type detection
 
         /// <summary>
         /// Set of node types that represent Java type declarations in the GLX graphs.
         ///
         /// This includes concrete and template variants for classes and interfaces.
         /// </summary>
-        private static readonly HashSet<string> TypeNodeTypes = new()
+        private static readonly HashSet<string> typeNodeTypes = new HashSet<string>
         {
             "Class",
             "Interface",
@@ -191,12 +190,12 @@ namespace SEE.DataModel.DG.IO
         /// <returns>True if the node type is considered a type declaration node; otherwise false.</returns>
         private static bool IsTypeNode(string nodeType)
         {
-            return TypeNodeTypes.Contains(nodeType);
+            return typeNodeTypes.Contains(nodeType);
         }
 
         #endregion
 
-        #region Helper für Pfad → FQCN
+        #region Helpers for path → FQCN
 
         /// <summary>
         /// Converts a Checkstyle-reported file path into a fully qualified class name (FQCN).
@@ -225,12 +224,12 @@ namespace SEE.DataModel.DG.IO
             // - no OS path separators found
             // - contains package separator dots
             // This avoids double-normalizing values that are already FQCNs.
-            if (!fullPath.Contains(WindowsPathSeparator) && !fullPath.Contains(LinuxPathSeparator) && fullPath.Contains(PackageSeparator))
+            if (!fullPath.Contains(windowsPathSeparator) && !fullPath.Contains(linuxPathSeparator) && fullPath.Contains(packageSeparator))
             {
                 return fullPath;
             }
 
-            string normalized = config.SourceRootRelativePath(fullPath);
+            string normalized = parsingConfig.SourceRootRelativePath(fullPath);
 
             // Remove ".java" extension (Checkstyle typically refers to Java source files).
             if (normalized.EndsWith(".java", StringComparison.OrdinalIgnoreCase))
@@ -239,14 +238,14 @@ namespace SEE.DataModel.DG.IO
             }
 
             // Convert remaining path separators to package separators to form the FQCN.
-            normalized = normalized.Replace(LinuxPathSeparator, PackageSeparator).Trim('.');
+            normalized = normalized.Replace(linuxPathSeparator, packageSeparator).Trim('.');
 
             return normalized;
         }
 
         #endregion
 
-        #region Helper für Main-Type-Auflösung
+        #region Helpers for main-type resolution
 
         /// <summary>
         /// Removes an inner-class suffix from a qualified type name (e.g., <c>com.example.Outer$Inner</c>).
@@ -283,7 +282,7 @@ namespace SEE.DataModel.DG.IO
         private static string ReplaceWithMainType(string qualifiedName, string fileName)
         {
             string mainClassName = Path.GetFileNameWithoutExtension(fileName);
-            int lastDotIndex = qualifiedName.LastIndexOf(PackageSeparator);
+            int lastDotIndex = qualifiedName.LastIndexOf(packageSeparator);
 
             if (lastDotIndex < 0)
             {
@@ -292,7 +291,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             string packageName = qualifiedName.Substring(0, lastDotIndex);
-            return packageName + PackageSeparator + mainClassName;
+            return packageName + packageSeparator + mainClassName;
         }
 
         /// <summary>
@@ -348,7 +347,7 @@ namespace SEE.DataModel.DG.IO
                 return qualifiedName;
             }
 
-            int lastDotIndex = qualifiedName.LastIndexOf(PackageSeparator);
+            int lastDotIndex = qualifiedName.LastIndexOf(packageSeparator);
             return lastDotIndex < 0
                 ? qualifiedName
                 : qualifiedName.Substring(lastDotIndex + 1);

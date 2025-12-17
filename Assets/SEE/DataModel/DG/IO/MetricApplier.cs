@@ -1,47 +1,63 @@
-﻿using SEE.DataModel.DG.GraphIndex;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 
+/// <summary>
+/// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
+/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
     /// Translates parsed findings into node metrics on a <see cref="Graph"/> instance.
-    /// Preconditions: <see cref="ApplyMetrics"/> must be called with a non-null graph, schema, and parsing configuration.
     /// </summary>
-    internal class MetricApplier
+    /// <remarks>
+    /// Preconditions:
+    /// <list type="bullet">
+    /// <item><description><see cref="ApplyMetrics"/> must be called with non-null arguments.</description></item>
+    /// <item><description>The supplied <see cref="ParsingConfig"/> must be compatible with the schema's findings.</description></item>
+    /// </list>
+    /// </remarks>
+    internal static class MetricApplier
     {
         /// <summary>
         /// Adds all metrics from <paramref name="schema"/> to the provided <paramref name="graph"/>
         /// using the lookup helpers defined in <paramref name="parsingConfig"/>.
-        /// Preconditions: <paramref name="graph"/> and <paramref name="parsingConfig"/> must not be null.
         /// </summary>
-        /// <param name="graph">Target graph that receives the parsed metrics.</param>
-        /// <param name="schema">Parsed findings including node identifiers and metric dictionaries.</param>
-        /// <param name="parsingConfig">Configuration that knows how to normalize node identifiers.</param>
+        /// <param name="graph">Target graph that receives the parsed metrics. Must not be null.</param>
+        /// <param name="schema">Parsed findings including node identifiers and metric dictionaries. Must not be null.</param>
+        /// <param name="parsingConfig">Configuration that knows how to normalize node identifiers. Must not be null.</param>
+        /// <exception cref="ArgumentNullException">Thrown if any argument is null.</exception>
         public static void ApplyMetrics(Graph graph, MetricSchema schema, ParsingConfig parsingConfig)
         {
             if (graph == null)
             {
-                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Graph is null – cannot apply metrics.");
+                throw new ArgumentNullException(nameof(graph),
+                                               $"[{nameof(MetricApplier)}] Graph is null – cannot apply metrics.");
             }
+
             if (parsingConfig == null)
             {
-                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Parsing configuration is null – cannot apply metrics.");
+                throw new ArgumentNullException(nameof(parsingConfig),
+                                               $"[{nameof(MetricApplier)}] Parsing configuration is null – cannot apply metrics.");
             }
+
             if (schema == null)
             {
-                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Schema is null – cannot apply metrics.");
+                throw new ArgumentNullException(nameof(schema),
+                                               $"[{nameof(MetricApplier)}] Schema is null – cannot apply metrics.");
             }
+
             if (schema.Findings == null)
             {
-                throw new ArgumentNullException($"[{nameof(MetricApplier)}] Schema findings is null – cannot apply metrics.");
+                throw new ArgumentNullException(nameof(schema.Findings),
+                                               $"[{nameof(MetricApplier)}] Schema findings is null – cannot apply metrics.");
             }
 
             string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
-            SourceRangeIndex index = new(graph, indexNodeStrategy.NodeIdToMainType);
+            SourceRangeIndex index = new SourceRangeIndex(graph, indexNodeStrategy.NodeIdToMainType);
 
             foreach (Finding finding in schema.Findings)
             {
@@ -50,17 +66,20 @@ namespace SEE.DataModel.DG.IO
                     continue;
                 }
 
-                string findingPathAsMainType = indexNodeStrategy.FindingPathToMainType(finding.FullPath, finding.FileName);
+                string findingPathAsMainType =
+                    indexNodeStrategy.FindingPathToMainType(finding.FullPath, finding.FileName);
+
                 string findingPathAsNodeId = indexNodeStrategy.FindingPathToNodeId(finding.FullPath);
 
                 if (string.IsNullOrWhiteSpace(findingPathAsMainType))
                 {
                     Debug.LogWarning(
-                        $"[MetricApplier] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
+                        $"[{nameof(MetricApplier)}] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
                     continue;
                 }
 
                 int startLine = finding.Location?.StartLine ?? -1;
+
                 if (startLine != -1 && index.TryGetValue(findingPathAsMainType, startLine, out Node node))
                 {
                     foreach (KeyValuePair<string, string> metric in finding.Metrics)
@@ -78,24 +97,24 @@ namespace SEE.DataModel.DG.IO
                 else
                 {
                     Debug.LogWarning(
-                        $"[MetricApplier] Could not resolve node for Path={finding.FullPath}, nodeId={findingPathAsNodeId}, line={startLine}");
+                        $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, nodeId={findingPathAsNodeId}, line={startLine}");
                 }
             }
         }
 
         /// <summary>
         /// Writes a single metric value to the node, trying int, float, and string conversions.
-        /// Preconditions: <paramref name="node"/> must not be null.
         /// </summary>
-        /// <param name="node">Graph node that should receive the metric.</param>
+        /// <param name="node">Graph node that should receive the metric. Must not be null.</param>
         /// <param name="metric">Key/value pair taken from the parsed finding.</param>
+        /// <param name="prefix">Prefix to prepend to <paramref name="metric"/> keys (including tool id and separator).</param>
         private static void SetMetric(Node node, KeyValuePair<string, string> metric, string prefix)
         {
             string key = prefix + metric.Key;
 
-            if (node.TryGetAny(key, out object existingValue))
+            if (node.TryGetAny(key, out _))
             {
-                key = computeKey(node, key);
+                key = ComputeKey(node, key);
             }
 
             string stringValue = metric.Value;
@@ -121,19 +140,21 @@ namespace SEE.DataModel.DG.IO
         }
 
         /// <summary>
-        /// Computes a new key with a suffix based on the amount of keys with a specific base key.
-        /// if key "example" exist -> generated key is "example [1]"
-        /// /// </summary>
-        /// <param name="node"></param>
-        /// <param name="key"></param>
-        /// <returns></returns>
-        private static string computeKey(Node node, string key)
+        /// Computes a unique key by appending a numeric suffix if the base key already exists on <paramref name="node"/>.
+        /// </summary>
+        /// <param name="node">Node whose current keys should be inspected. Must not be null.</param>
+        /// <param name="baseKey">Base key that should be made unique.</param>
+        /// <returns>A unique key derived from <paramref name="baseKey"/>.</returns>
+        private static string ComputeKey(Node node, string baseKey)
         {
             int i = 1;
-            while (node.TryGetAny(key + " [" + i.ToString() + "]", out object value)) {
+
+            while (node.TryGetAny(baseKey + " [" + i.ToString() + "]", out _))
+            {
                 i++;
             }
-            return key + " [" + i.ToString() +"]";
+
+            return baseKey + " [" + i.ToString() + "]";
         }
     }
 }

@@ -236,12 +236,6 @@ namespace SEE.GraphProviders
         {
             metricSchema = await BuildMetricSchemaAsync();
 
-            // Helpful for diagnosing "not found" issues caused by path normalization differences.
-            foreach (Finding finding in metricSchema.Findings)
-            {
-                Debug.LogWarning($"FullPath of Finding: {finding.FullPath}");
-            }
-
             Dictionary<string, Finding> testFindings = GetTestFindings();
 
             foreach (KeyValuePair<string, Finding> expected in testFindings)
