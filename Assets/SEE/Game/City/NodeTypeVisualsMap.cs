@@ -25,8 +25,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Operator [].
         /// </summary>
-        /// <param name="nodeType">name of the node type for which to retrieve the <see cref="VisualNodeAttributes"/></param>
-        /// <returns>retrieved <see cref="VisualNodeAttributes"/> for <paramref name="nodeType"/></returns>
+        /// <param name="nodeType">Name of the node type for which to retrieve the <see cref="VisualNodeAttributes"/>.</param>
+        /// <returns>Retrieved <see cref="VisualNodeAttributes"/> for <paramref name="nodeType"/>.</returns>
         public VisualNodeAttributes this[string nodeType]
         {
             get { return map[nodeType]; }
@@ -39,10 +39,10 @@ namespace SEE.Game.City
         /// the <see cref="VisualNodeAttributes"/> <paramref name="nodeType"/> is mapped onto.
         /// Otherwise <paramref name="attributes"/> is undefined.
         /// </summary>
-        /// <param name="nodeType">the node type's name whose <see cref="VisualNodeAttributes"/> are requested</param>
-        /// <param name="attributes">the <see cref="VisualNodeAttributes"/> <paramref name="nodeType"/> is mapped onto;
-        /// defined only if <c>true</c> is returned</param>
-        /// <returns><c>true</c> if <paramref name="nodeType"/> is contained</returns>
+        /// <param name="nodeType">The node type's name whose <see cref="VisualNodeAttributes"/> are requested.</param>
+        /// <param name="attributes">The <see cref="VisualNodeAttributes"/> <paramref name="nodeType"/> is mapped onto;
+        /// defined only if <c>true</c> is returned.</param>
+        /// <returns><c>true</c> if <paramref name="nodeType"/> is contained.</returns>
         public bool TryGetValue(string nodeType, out VisualNodeAttributes attributes)
         {
             return map.TryGetValue(nodeType, out attributes);
@@ -107,7 +107,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Enumerator for all entries of the map.
         /// </summary>
-        /// <returns>enumerator</returns>
+        /// <returns>Enumerator.</returns>
         public IEnumerator<KeyValuePair<string, VisualNodeAttributes>> GetEnumerator()
         {
             return map.GetEnumerator();
@@ -116,7 +116,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Enumerator for all entries of the map.
         /// </summary>
-        /// <returns>enumerator</returns>
+        /// <returns>Enumerator.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             return this.GetEnumerator();
@@ -129,8 +129,8 @@ namespace SEE.Game.City
         /// using <paramref name="writer"/> under the given <paramref name="label"/>.
         /// Each pair is saved as a list
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        /// <param name="label">the outer label grouping the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
+        /// <param name="label">The outer label grouping the settings.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginList(label);
@@ -147,9 +147,9 @@ namespace SEE.Game.City
         /// <summary>
         /// Restores the values of this <see cref="NodeTypeVisualsMap"/> from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        /// <returns>true if at least one attribute was successfully restored</returns>
+        /// <param name="attributes">Dictionary of attributes from which to retrieve the settings.</param>
+        /// <param name="label">The label for the settings (a key in <paramref name="attributes"/>).</param>
+        /// <returns>True if at least one attribute was successfully restored.</returns>
         public bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object list))

@@ -111,8 +111,8 @@ namespace SEE.Game.City
         /// <summary>
         /// Factory method to create the used <see cref="EvolutionRenderer"/>.
         /// </summary>
-        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created</param>
-        /// <returns>the current or new evolution renderer attached to this city</returns>
+        /// <param name="graphs">The graphs with which the <see cref="EvolutionRenderer"/> is created.</param>
+        /// <returns>The current or new evolution renderer attached to this city.</returns>
         protected EvolutionRenderer CreateEvolutionRenderer(IList<Graph> graphs)
         {
             EvolutionRenderer result = gameObject.AddOrGetComponent<EvolutionRenderer>();
@@ -281,7 +281,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Draws the given <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">graph to be drawn</param>
+        /// <param name="graph">Graph to be drawn.</param>
         public void DrawGraph(Graph graph)
         {
             DrawGraphs(new List<Graph> { graph });
@@ -315,7 +315,7 @@ namespace SEE.Game.City
         /// node types and the edges of these specific nodes of the graph evolution
         /// for given <paramref name="graphs"/> using it.
         /// </summary>
-        /// <param name="graphs">the series of graph to be drawn</param>
+        /// <param name="graphs">The series of graph to be drawn.</param>
         private void DrawGraphs(IList<Graph> graphs)
         {
             // Note: We need this kind of loop because we assign graphs[i] in its body.
@@ -341,7 +341,7 @@ namespace SEE.Game.City
         /// evolution renderer.
         /// If no graph has been loaded yet, the empty list will be returned.
         /// </summary>
-        /// <returns>names of all existing node metrics</returns>
+        /// <returns>Names of all existing node metrics.</returns>
         public override ISet<string> AllExistingMetrics()
         {
             return evolutionRenderer.AllExistingMetrics();
@@ -356,7 +356,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Saves and writes the configuration to <paramref name="writer"/>
         /// </summary>
-        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to</param>
+        /// <param name="writer">The <see cref="ConfigWriter"/> to write the configuration to.</param>
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
@@ -367,7 +367,7 @@ namespace SEE.Game.City
         /// <summary>
         /// Restores the configuration from <paramref name="attributes"/>
         /// </summary>
-        /// <param name="attributes">The attributes to restore the code city from</param>
+        /// <param name="attributes">The attributes to restore the code city from.</param>
         protected override void Restore(Dictionary<string, object> attributes)
         {
             base.Restore(attributes);
