@@ -162,8 +162,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Sets the state of <paramref name="edge"/> to <paramref name="newState"/>.
         /// </summary>
-        /// <param name="edge">edge whose state is to be set</param>
-        /// <param name="newState">the state to be set</param>
+        /// <param name="edge">Edge whose state is to be set.</param>
+        /// <param name="newState">The state to be set.</param>
         private static void SetState(Edge edge, State newState)
         {
             edge.SetInt(stateAttribute, (int)newState);
@@ -175,8 +175,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Note that, if <paramref name="edge"/> is a propagated edge, <see cref="Transition"/> will be recursively
         /// called on each originating edge, and no notification will be sent for the propagated edge.
         /// </summary>
-        /// <param name="edge">edge being changed</param>
-        /// <param name="newState">the new state of the edge after the change</param>
+        /// <param name="edge">Edge being changed.</param>
+        /// <param name="newState">The new state of the edge after the change.</param>
         private void Transition(Edge edge, State newState)
         {
             State state = edge.State();
@@ -206,8 +206,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// following states: specified, convergent, absent, allowed absent).
         /// Precondition: <paramref name="edge"/> must be in the architecture graph.
         /// </summary>
-        /// <param name="edge">architecture dependency</param>
-        /// <returns>true if edge is a specified architecture dependency</returns>
+        /// <param name="edge">Architecture dependency.</param>
+        /// <returns>True if edge is a specified architecture dependency.</returns>
         public static bool IsSpecified(Edge edge)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -221,8 +221,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// the architecture graph).
         /// Precondition: <paramref name="edge"/> must be in the implementation graph.
         /// </summary>
-        /// <param name="edge">architecture dependency</param>
-        /// <returns>true if edge is a divergent architecture dependency</returns>
+        /// <param name="edge">Architecture dependency.</param>
+        /// <returns>True if edge is a divergent architecture dependency.</returns>
         public static bool IsDivergent(Edge edge)
         {
             AssertOrThrow(edge.IsInReflexion(), () => new NotInSubgraphException(Implementation, edge));
@@ -244,8 +244,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Sets counter of given architecture dependency <paramref name="edge"/> to given <paramref name="value"/>.
         /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
-        /// <param name="edge">an architecture dependency whose counter is to be set</param>
-        /// <param name="value">value to be set</param>
+        /// <param name="edge">An architecture dependency whose counter is to be set.</param>
+        /// <param name="value">Value to be set.</param>
         private static void SetCounter(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -257,8 +257,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// The value may be negative.
         /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
-        /// <param name="edge">an architecture dependency whose counter is to be changed</param>
-        /// <param name="value">value to be added</param>
+        /// <param name="edge">An architecture dependency whose counter is to be changed.</param>
+        /// <param name="value">Value to be added.</param>
         private static void AddToCounter(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -276,8 +276,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns the the counter of given architecture dependency <paramref name="edge"/>.
         /// Precondition: <paramref name="edge"/> is in the architecture graph.
         /// </summary>
-        /// <param name="edge">an architecture dependency whose counter is to be retrieved</param>
-        /// <returns>the counter of <paramref name="edge"/></returns>
+        /// <param name="edge">An architecture dependency whose counter is to be retrieved.</param>
+        /// <returns>The counter of <paramref name="edge"/>.</returns>
         private static int GetArchCounter(Edge edge)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -288,8 +288,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns the the counter of given dependency <paramref name="edge"/>.
         /// Precondition: <paramref name="edge"/> is either in the architecture or the implementation graph.
         /// </summary>
-        /// <param name="edge">an architecture or implementation dependency whose counter is to be retrieved</param>
-        /// <returns>the counter of <paramref name="edge"/></returns>
+        /// <param name="edge">An architecture or implementation dependency whose counter is to be retrieved.</param>
+        /// <returns>The counter of <paramref name="edge"/>.</returns>
         private static int GetCounter(Edge edge)
         {
             if (edge.IsInArchitecture())
@@ -314,8 +314,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: <paramref name="edge"/> is a dependency in architecture graph that
         /// was propagated from the implementation graph (i.e., !IsSpecified(<paramref name="edge"/>)).
         /// </summary>
-        /// <param name="edge">propagated dependency in architecture graph</param>
-        /// <param name="value">value to be added</param>
+        /// <param name="edge">Propagated dependency in architecture graph.</param>
+        /// <param name="value">Value to be added.</param>
         private void ChangePropagatedDependency(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -344,8 +344,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Currently, 1 is always returned.
         /// Precondition: <paramref name="edge"/> is in the implementation graph.
         /// </summary>
-        /// <param name="edge">an implementation dependency whose counter is to be retrieved</param>
-        /// <returns>value of the counter attribute of given implementation dependency</returns>
+        /// <param name="edge">An implementation dependency whose counter is to be retrieved.</param>
+        /// <returns>Value of the counter attribute of given implementation dependency.</returns>
         private static int GetImplCounter(Edge edge = null)
         {
             // returns the value of the counter attribute of edge
@@ -416,12 +416,12 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: given <paramref name="archNode"/> is in the architecture graph and
         /// all nodes in <paramref name="subtree"/> are in the implementation graph.
         /// </summary>
-        /// <param name="subtree">implementation nodes whose mapping is to be adjusted</param>
-        /// <param name="archNode">architecture node related to the nodes in subtree (to be mapped or unmapped);
+        /// <param name="subtree">Implementation nodes whose mapping is to be adjusted.</param>
+        /// <param name="archNode">Architecture node related to the nodes in subtree (to be mapped or unmapped);
         /// this may either be the architecture node onto which the nodes in subtree were mapped originally
         /// when this function is called to unmap a subtree or architecture node onto which the nodes in subtree
-        /// are to be mapped as new</param>
-        /// <param name="handler">delegate handling the necessary adjustment</param>
+        /// are to be mapped as new.</param>
+        /// <param name="handler">Delegate handling the necessary adjustment.</param>
         private void HandleMappedSubtree(IEnumerable<Node> subtree, Node archNode, HandleMappingChange handler)
         {
             AssertOrThrow(archNode.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archNode));
@@ -492,10 +492,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// in implementation graph and <paramref name="to"/> and <paramref name="from"/> are
         /// contained in the architecture graph.
         /// </summary>
-        /// <param name="implementationDependency">an implementation dependency whose corresponding
-        /// propagated dependency in the architecture graph is to be decreased and lifted</param>
-        /// <param name="from">architecture node = Maps_To(implementationDependency.Source)</param>
-        /// <param name="to">architecture node = Maps_To(implementationDependency.Target)</param>
+        /// <param name="implementationDependency">An implementation dependency whose corresponding
+        /// propagated dependency in the architecture graph is to be decreased and lifted.</param>
+        /// <param name="from">Architecture node = Maps_To(implementationDependency.Source).</param>
+        /// <param name="to">Architecture node = Maps_To(implementationDependency.Target).</param>
         private void DecreaseAndLift(Edge implementationDependency, Node from, Node to)
         {
             if (from != null && to != null)
@@ -536,10 +536,10 @@ namespace SEE.Tools.ReflexionAnalysis
         /// are contained in the architecture graph.
         ///
         /// </summary>
-        /// <param name="implementationDependency">an implementation dependency whose corresponding propagated
-        /// dependency in the architecture graph is to be increased and lifted</param>
-        /// <param name="from">architecture node = MapsTo(implementationDependency.Source)</param>
-        /// <param name="to">architecture node = MapsTo(implementationDependency.Target)</param>
+        /// <param name="implementationDependency">An implementation dependency whose corresponding propagated
+        /// dependency in the architecture graph is to be increased and lifted.</param>
+        /// <param name="from">Architecture node = MapsTo(implementationDependency.Source).</param>
+        /// <param name="to">Architecture node = MapsTo(implementationDependency.Target).</param>
         /// <remarks>
         /// <paramref name="from"/> and <paramref name="to"/> are actually ignored (intentionally).
         /// </remarks>
@@ -561,7 +561,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// onto the same architecture node as the given node; the given node is included
         /// in the result.
         /// </summary>
-        /// <param name="node">root node of the subtree</param>
+        /// <param name="node">Root node of the subtree.</param>
         private List<Node> MappedSubtree(Node node)
         {
             AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
@@ -591,7 +591,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// State values. When indexed by a State value, it yields the number of edges in the
         /// architecture that are in this state.
         /// </summary>
-        /// <param name="summary">Number of edges in the architecture indexed by state value</param>
+        /// <param name="summary">Number of edges in the architecture indexed by state value.</param>
         public static void PrintSummary(int[] summary)
         {
             string[] stateNames = Enum.GetNames(typeof(State));
@@ -608,7 +608,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// For instance, Summary()[(int)State.divergent] gives the number of architecture edges
         /// that are in state divergent.
         /// </summary>
-        /// <returns>summary of the number of edges in the architecture for each respective state</returns>
+        /// <returns>Summary of the number of edges in the architecture for each respective state.</returns>
         public int[] Summary()
         {
             string[] stateNames = Enum.GetNames(typeof(State));
@@ -637,8 +637,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// are to be ignored.
         /// Precondition: node is a node in the implementation graph.
         /// </summary>
-        /// <param name="node">implementation node</param>
-        /// <returns>true if node should be considered in the reflexion analysis</returns>
+        /// <param name="node">Implementation node.</param>
+        /// <returns>True if node should be considered in the reflexion analysis.</returns>
         private static bool IsRelevant(Node node)
         {
             return true;
@@ -669,8 +669,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// are to be ignored.
         /// Precondition: edge is an edge in the implementation graph.
         /// </summary>
-        /// <param name="edge">implementation dependency</param>
-        /// <returns>true if edge should be considered in the reflexion analysis</returns>
+        /// <param name="edge">Implementation dependency.</param>
+        /// <returns>True if edge should be considered in the reflexion analysis.</returns>
         private static bool IsRelevant(Edge edge)
         {
             return IsRelevant(edge.Source) && IsRelevant(edge.Target);
@@ -746,8 +746,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// contained in <see cref="explicitMapsToTable"/>  as a key.
         /// Precondition: <paramref name="node"/> is a node of the implementation graph
         /// </summary>
-        /// <param name="node">implementation node</param>
-        /// <returns>true if node is explicitly mapped</returns>
+        /// <param name="node">Implementation node.</param>
+        /// <returns>True if node is explicitly mapped.</returns>
         public bool IsExplicitlyMapped(Node node) => explicitMapsToTable.ContainsKey(node.ID);
 
         /// <summary>
@@ -759,8 +759,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// (1) <paramref name="root"/> is a node in implementation
         /// (2) <paramref name="target"/> is a node in architecture
         /// </summary>
-        /// <param name="root">implementation node that is the root of a subtree to be mapped implicitly</param>
-        /// <param name="target">architecture node that is the target of the implicit mapping</param>
+        /// <param name="root">Implementation node that is the root of a subtree to be mapped implicitly.</param>
+        /// <param name="target">Architecture node that is the target of the implicit mapping.</param>
         private void AddSubtreeToImplicitMap(Node root, Node target)
         {
             AssertOrThrow(root.IsInImplementation(), () => new NotInSubgraphException(Implementation, root));
@@ -798,8 +798,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Post-conditions:
         /// - Returned edges are in the implementation graph. Note that the returned list may be empty.
         /// </summary>
-        /// <param name="propagatedEdge">Propagated edge whose originating edges shall be returned</param>
-        /// <returns>Edges from which <paramref name="propagatedEdge"/> was propagated</returns>
+        /// <param name="propagatedEdge">Propagated edge whose originating edges shall be returned.</param>
+        /// <returns>Edges from which <paramref name="propagatedEdge"/> was propagated.</returns>
         public IList<Edge> GetOriginatingEdges(Edge propagatedEdge)
         {
             AssertOrThrow(propagatedEdge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, propagatedEdge));
@@ -811,8 +811,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Notifies if edge state changes.
         /// Precondition: <paramref name="edge"/> is in architecture graph and specified.
         /// </summary>
-        /// <param name="edge">architecture dependency to be changed</param>
-        /// <param name="value">the value to be added to the edge's counter</param>
+        /// <param name="edge">Architecture dependency to be changed.</param>
+        /// <param name="value">The value to be added to the edge's counter.</param>
         private void ChangeSpecifiedDependency(Edge edge, int value)
         {
             AssertOrThrow(edge.IsInArchitecture(), () => new NotInSubgraphException(Architecture, edge));
@@ -967,11 +967,11 @@ namespace SEE.Tools.ReflexionAnalysis
         /// possibly propagated.
         /// Postcondition: resulting edge is in architecture or null
         /// </summary>
-        /// <param name="source">source node of propagated dependency in architecture</param>
-        /// <param name="target">target node of propagated dependency in architecture</param>
-        /// <param name="itsType">the edge type of the propagated dependency</param>
-        /// <returns>the propagated edge in the architecture graph between source and target
-        /// with given type; null if there is no such edge</returns>
+        /// <param name="source">Source node of propagated dependency in architecture.</param>
+        /// <param name="target">Target node of propagated dependency in architecture.</param>
+        /// <param name="itsType">The edge type of the propagated dependency.</param>
+        /// <returns>The propagated edge in the architecture graph between source and target
+        /// with given type; null if there is no such edge.</returns>
         private static Edge GetPropagatedDependency(
             Node source, // source of edge; must be in architecture
             Node target, // target of edge; must be in architecture
@@ -992,7 +992,7 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="implementationDependency"/> is in implementation graph.
         /// </summary>
-        /// <param name="implementationDependency">the implementation edge to be propagated</param>
+        /// <param name="implementationDependency">The implementation edge to be propagated.</param>
         private void PropagateAndLiftDependency(Edge implementationDependency)
         {
             AssertOrThrow(implementationDependency.IsInImplementation(), () => new NotInSubgraphException(Implementation, implementationDependency));
@@ -1048,7 +1048,7 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="node"/> is in implementation graph.
         /// </summary>
-        /// <param name="node">implementation node whose outgoings are to be propagated and lifted</param>
+        /// <param name="node">Implementation node whose outgoings are to be propagated and lifted.</param>
         private void PropagateAndLiftOutgoingDependencies(Node node)
         {
             AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
@@ -1069,8 +1069,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: <paramref name="node"/> is in implementation.
         /// Postcondition: either result is null or result is in architecture
         /// </summary>
-        /// <param name="node"></param>
-        /// <returns>the architecture node upon which node is mapped or null</returns>
+        /// <param name="node">.</param>
+        /// <returns>The architecture node upon which node is mapped or null.</returns>
         public Node MapsTo(Node node)
         {
             AssertOrThrow(node.IsInImplementation(), () => new NotInSubgraphException(Implementation, node));
@@ -1083,8 +1083,8 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="edge"/> is in implementation graph.
         /// </summary>
-        /// <param name="edge">dependency edge to be checked</param>
-        /// <returns>true if this causing edge is a dependency from child to parent</returns>
+        /// <param name="edge">Dependency edge to be checked.</param>
+        /// <returns>True if this causing edge is a dependency from child to parent.</returns>
         private bool IsDependencyToParent(Edge edge)
         {
             AssertOrThrow(edge.IsInImplementation(), () => new NotInSubgraphException(Implementation, edge));
@@ -1107,9 +1107,9 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="descendant"/> and <paramref name="ancestor"/> are in the same graph.
         /// </summary>
-        /// <param name="descendant">source node</param>
-        /// <param name="ancestor">target node</param>
-        /// <returns>true if <paramref name="descendant"/> is a descendant of <paramref name="ancestor"/></returns>
+        /// <param name="descendant">Source node.</param>
+        /// <param name="ancestor">Target node.</param>
+        /// <returns>True if <paramref name="descendant"/> is a descendant of <paramref name="ancestor"/>.</returns>
         private static bool IsDescendantOf(Node descendant, Node ancestor)
         {
             Node cursor = descendant.Parent;
@@ -1131,12 +1131,12 @@ namespace SEE.Tools.ReflexionAnalysis
         ///
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are already in the graph.
         /// </summary>
-        /// <param name="from">the source of the edge</param>
-        /// <param name="to">the target of the edge</param>
-        /// <param name="itsType">the type of the edge</param>
-        /// <param name="isVirtual">whether the new edge should be drawn in the scene</param>
-        /// <param name="addToGraph">whether the newly created edge shall be added to the graph</param>
-        /// <returns>the new edge</returns>
+        /// <param name="from">The source of the edge.</param>
+        /// <param name="to">The target of the edge.</param>
+        /// <param name="itsType">The type of the edge.</param>
+        /// <param name="isVirtual">Whether the new edge should be drawn in the scene.</param>
+        /// <param name="addToGraph">Whether the newly created edge shall be added to the graph.</param>
+        /// <returns>The new edge.</returns>
         private Edge AddEdge(Node from, Node to, string itsType, bool isVirtual, bool addToGraph = true)
         {
             // Note: a propagated edge between the same two architectural entities may be specified as well;
@@ -1191,15 +1191,15 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Postcondition: the newly created and returned dependency is contained in
         /// the architecture graph and marked as propagated.
         /// </summary>
-        /// <param name="archSource">architecture node that is the source of the propagated edge</param>
-        /// <param name="archTarget">architecture node that is the target of the propagated edge</param>
-        /// <param name="edgeType">type of the propagated implementation edge</param>
-        /// <param name="originatingEdge">Implementation edge from which the newly created edge will originate</param>
-        /// <param name="allowingEdgeOut">the specified architecture dependency allowing the implementation
+        /// <param name="archSource">Architecture node that is the source of the propagated edge.</param>
+        /// <param name="archTarget">Architecture node that is the target of the propagated edge.</param>
+        /// <param name="edgeType">Type of the propagated implementation edge.</param>
+        /// <param name="originatingEdge">Implementation edge from which the newly created edge will originate.</param>
+        /// <param name="allowingEdgeOut">The specified architecture dependency allowing the implementation
         /// dependency if there is one; otherwise null; allowingEdgeOut is also null if the implementation
         /// dependency form a self-loop (archSource == archTarget); self-dependencies are implicitly
-        /// allowed, but do not necessarily have a specified architecture dependency</param>
-        /// <returns>a new propagated dependency in the architecture graph</returns>
+        /// allowed, but do not necessarily have a specified architecture dependency.</param>
+        /// <returns>A new propagated dependency in the architecture graph.</returns>
         private Edge NewImplDepInArchitecture(Node archSource, Node archTarget, string edgeType, Edge originatingEdge, out Edge allowingEdgeOut)
         {
             AssertOrThrow(archSource.IsInArchitecture(), () => new NotInSubgraphException(Architecture, archSource));
@@ -1259,14 +1259,14 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Precondition: <paramref name="from"/> and <paramref name="to"/> are in the architecture graph.
         /// Postcondition: <paramref name="allowingEdgeOut"/> is a specified dependency in architecture graph or null.
         /// </summary>
-        /// <param name="from">source of the edge</param>
-        /// <param name="to">target of the edge</param>
-        /// <param name="edgeType">type of the edge</param>
-        /// <param name="counter">the multiplicity of the edge, i.e. the number of other
-        /// edges covered by it</param>
-        /// <param name="allowingEdgeOut">the specified architecture dependency allowing the implementation
-        /// dependency if there is any; otherwise null</param>
-        /// <returns>True if a matching architecture dependency is found</returns>
+        /// <param name="from">Source of the edge.</param>
+        /// <param name="to">Target of the edge.</param>
+        /// <param name="edgeType">Type of the edge.</param>
+        /// <param name="counter">The multiplicity of the edge, i.e. the number of other
+        /// edges covered by it.</param>
+        /// <param name="allowingEdgeOut">The specified architecture dependency allowing the implementation
+        /// dependency if there is any; otherwise null.</param>
+        /// <returns>True if a matching architecture dependency is found.</returns>
         private bool Lift(Node from, Node to, string edgeType, int counter, out Edge allowingEdgeOut)
         {
             AssertOrThrow(from.IsInArchitecture(), () => new NotInSubgraphException(Architecture, from));
@@ -1312,8 +1312,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns the Source.File attribute of the given <paramref name="graphElement"/> if it exists, otherwise
         /// the empty string.
         /// </summary>
-        /// <param name="graphElement">attributable element</param>
-        /// <returns>Source.File attribute or empty string</returns>
+        /// <param name="graphElement">Attributable element.</param>
+        /// <returns>Source.File attribute or empty string.</returns>
         private static string GetFilename(GraphElement graphElement)
         {
             return graphElement.Filename ?? string.Empty;
@@ -1322,8 +1322,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns the Source.Line attribute as a string if it exists; otherwise the empty string.
         /// </summary>
-        /// <param name="graphElement">attributable element</param>
-        /// <returns>Source.Line attribute or empty string</returns>
+        /// <param name="graphElement">Attributable element.</param>
+        /// <returns>Source.Line attribute or empty string.</returns>
         private static string GetSourceLine(GraphElement graphElement)
         {
             int? result = graphElement.SourceLine;
@@ -1334,9 +1334,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// Returns a human-readable identifier for the given node.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
-        /// <param name="node">node whose identifier is required</param>
-        /// <param name="beVerbose">whether to provide verbose output</param>
-        /// <returns>an identifier for the given node</returns>
+        /// <param name="node">Node whose identifier is required.</param>
+        /// <param name="beVerbose">Whether to provide verbose output.</param>
+        /// <returns>An identifier for the given node.</returns>
         private static string NodeName(Node node, bool beVerbose = false)
         {
             string name = node.SourceName;
@@ -1348,9 +1348,9 @@ namespace SEE.Tools.ReflexionAnalysis
         /// its source location if available.
         /// Note: this identifier is not necessarily unique.
         /// </summary>
-        /// <param name="node">node whose identifier is required</param>
-        /// <param name="beVerbose">whether to provide verbose output</param>
-        /// <returns>an identifier for the given node</returns>
+        /// <param name="node">Node whose identifier is required.</param>
+        /// <param name="beVerbose">Whether to provide verbose output.</param>
+        /// <returns>An identifier for the given node.</returns>
         // returns node name
         private static string QualifiedNodeName(Node node, bool beVerbose = false)
         {
@@ -1362,8 +1362,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns the edge as a clause "type(from, to)".
         /// </summary>
-        /// <param name="edge">edge whose clause is expected</param>
-        /// <returns>the edge as a clause</returns>
+        /// <param name="edge">Edge whose clause is expected.</param>
+        /// <returns>The edge as a clause.</returns>
         private static string AsClause(Edge edge)
         {
             return $"{edge.GetType().Name}({NodeName(edge.Source)}, {NodeName(edge.Target)})";
@@ -1372,8 +1372,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Returns the edge as a qualified clause "type(from@loc, to@loc)@loc",
         /// </summary>
-        /// <param name="edge">edge whose qualified clause is expected</param>
-        /// <returns>qualified clause</returns>
+        /// <param name="edge">Edge whose qualified clause is expected.</param>
+        /// <returns>Qualified clause.</returns>
         private static string AsQualifiedClause(Edge edge)
         {
             return $"{edge.GetType().Name}({QualifiedNodeName(edge.Source)}, "
@@ -1383,8 +1383,8 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Dumps given <paramref name="nodeSet"/> after given message was dumped.
         /// </summary>
-        /// <param name="nodeSet">list of nodes whose qualified name is to be dumped</param>
-        /// <param name="message">message to be emitted before the nodes</param>
+        /// <param name="nodeSet">List of nodes whose qualified name is to be dumped.</param>
+        /// <param name="message">Message to be emitted before the nodes.</param>
         private static void DumpNodeSet(List<Node> nodeSet, string message)
         {
             Debug.Log(message + "\n");
@@ -1397,7 +1397,7 @@ namespace SEE.Tools.ReflexionAnalysis
         /// <summary>
         /// Dumps given <paramref name="edgeSet"/> after given message was dumped.
         /// </summary>
-        /// <param name="edgeSet">list of edges whose qualified name is to be dumped</param>
+        /// <param name="edgeSet">List of edges whose qualified name is to be dumped.</param>
         private static void DumpEdgeSet(List<Edge> edgeSet)
         {
             foreach (Edge edge in edgeSet)
