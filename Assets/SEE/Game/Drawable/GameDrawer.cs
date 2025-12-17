@@ -1,6 +1,7 @@
 ﻿using SEE.Game.Drawable.Configurations;
 using SEE.Game.Drawable.ValueHolders;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.UI.Notification;
 using SEE.Utils;
 using System;
@@ -816,20 +817,20 @@ namespace SEE.Game.Drawable
         {
             /// Define the color range.
             ColorRange colorRange = new(color, color, 1);
-            Materials.ShaderType shaderType;
+            MaterialsFactory.ShaderType shaderType;
             /// Select the correct shader type.
             if (kind.Equals(LineKind.Solid))
             {
                 /// Material for the <see cref="LineKind.Solid"/>
-                shaderType = Materials.ShaderType.DrawableLine;
+                shaderType = MaterialsFactory.ShaderType.DrawableLine;
             }
             else
             {
                 /// Material for the dashed kinds.
-                shaderType = Materials.ShaderType.DrawableDashedLine;
+                shaderType = MaterialsFactory.ShaderType.DrawableDashedLine;
             }
             /// Gets the material of the shader type.
-            Materials materials = new (shaderType, colorRange);
+            MaterialsFactory materials = new (shaderType, colorRange);
             Material material = materials.Get(0, 0);
             return material;
         }

@@ -48,10 +48,11 @@ namespace SEE.Net.Dashboard
         /// <summary>
         /// The API token for the Axivion Dashboard.
         /// </summary>
-        /// <remarks>This must be a log-in token to have the necessary rights.</remarks>
+        /// <remarks>This must be a log-in token to have the necessary rights.
+        /// It can be generated in the user's preferences in the Axivion Dashboard.</remarks>
         [EnvironmentVariable("DASHBOARD_TOKEN")]
         [Tooltip("The API token for the Axivion Dashboard.")]
-        public string Token = "0.000000000004C.HlCT4vpiltb5yQP_HNAxYSbtE2Nqgfyeio7sfxNsksc";
+        public string Token = "0.000000000004Q.9LTVzLh8elgiE-bp2dkaTJVe_BDBNLb-Q7BH2EX0AEc";
 
         /// <summary>
         /// When true, receiving Dashboard models which have more fields than the C# models will throw an error

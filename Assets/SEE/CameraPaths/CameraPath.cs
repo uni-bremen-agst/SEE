@@ -1,5 +1,6 @@
 ﻿using SEE.Game;
 using SEE.GO;
+using SEE.GO.Factories;
 using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
@@ -104,7 +105,7 @@ namespace SEE.CameraPaths
         /// <param name="filename">name of the output file</param>
         public void Save(string filename)
         {
-            List<string> outputs = new List<string>();
+            List<string> outputs = new();
 
             foreach (PathData d in data)
             {
@@ -273,7 +274,7 @@ namespace SEE.CameraPaths
                 // All path lines have the same material to reduce the number of drawing calls.
                 if (lookoutMaterial == null)
                 {
-                    lookoutMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                    lookoutMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
                 }
                 line.sharedMaterial = lookoutMaterial;
 
@@ -423,7 +424,7 @@ namespace SEE.CameraPaths
             // All path lines have the same material to reduce the number of drawing calls.
             if (pathMaterial == null)
             {
-                pathMaterial = Materials.New(Materials.ShaderType.TransparentLine, Color.white);
+                pathMaterial = MaterialsFactory.New(MaterialsFactory.ShaderType.TransparentLine, Color.white);
             }
             line.sharedMaterial = pathMaterial;
 

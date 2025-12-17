@@ -9,7 +9,6 @@ using Sirenix.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Xml.Linq;
 using UnityEngine;
 using static SEE.Game.Portal.IncludeDescendants;
 
@@ -124,16 +123,77 @@ namespace SEE.GO
             }
             else
             {
-                Transform codeCityObject = SceneQueries.GetCodeCity(gameObject.transform);
-                if (codeCityObject != null && codeCityObject.gameObject.TryGetComponent(out T city))
+                GameObject codeCityObject = gameObject.GetCodeCity();
+                if (codeCityObject != null && codeCityObject.TryGetComponent(out T city))
                 {
                     return city;
                 }
                 else
                 {
+                    /// We do not log the fact that <see cref="codeCityObject"/> does not have the
+                    /// expected type of city, as some clients are using this method just as a predicate.
                     return null;
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns the closest ancestor of <paramref name="gameObject"/> that
+        /// represents a code city, that is, is tagged by <see cref="Tags.CodeCity"/>.
+        /// This ancestor is assumed to carry the settings (layout information etc.).
+        /// If none can be found, null will be returned.
+        /// If <paramref name="gameObject"/> is tagged by <see cref="Tags.CodeCity"/>,
+        /// it will be returned.
+        /// </summary>
+        /// <param name="gameObject">Game object at which to start the search.</param>
+        /// <returns>Closest ancestor game object in the game-object hierarchy tagged by
+        /// <see cref="Tags.CodeCity"/> or null.</returns>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="gameObject"/> is null.
+        /// </exception>
+        public static GameObject GetCodeCity(this GameObject gameObject)
+        {
+            if (gameObject == null)
+            {
+                throw new ArgumentNullException(nameof(gameObject));
+            }
+            Transform result = gameObject.transform;
+            while (result != null)
+            {
+                if (result.CompareTag(Tags.CodeCity))
+                {
+                    return result.gameObject;
+                }
+                result = result.parent;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Returns first child of <paramref name="codeCity"/> tagged by <see cref="Tags.Node"/>
+        /// or null if none can be found.
+        /// </summary>
+        /// <param name="codeCity">Object representing a code city (tagged by <see cref="Tags.CodeCity"/>).</param>
+        /// <returns>Game object representing the root of the graph or null if there is none.</returns>
+        /// <remarks>If <paramref name="codeCity"/> is a node representing a code city,
+        /// the first child tagged as <see cref="Tags.Node"/> is considered the root of the graph.</remarks>
+        /// <exception cref="ArgumentNullException">
+        /// Thrown if <paramref name="codeCity"/> is null.
+        /// </exception>
+        public static GameObject GetCityRootNode(this GameObject codeCity)
+        {
+            if (codeCity == null)
+            {
+                throw new ArgumentNullException(nameof(codeCity));
+            }
+            foreach (Transform child in codeCity.transform)
+            {
+                if (child.CompareTag(Tags.Node))
+                {
+                    return child.transform.gameObject;
+                }
+            }
+            return null;
         }
 
         /// <summary>
@@ -191,7 +251,8 @@ namespace SEE.GO
         /// Returns all transitive children of <paramref name="gameObject"/> tagged by
         /// given <paramref name="tag"/> (including <paramref name="gameObject"/> itself).
         /// </summary>
-        /// <param name="tag">tag the descendants must have</param>
+        /// <param name="gameObject">The game object whose children are requested.</param>
+        /// <param name="tag">The tag the descendants must have.</param>
         /// <returns>all transitive children with <paramref name="tag"/></returns>
         public static List<GameObject> AllDescendants(this GameObject gameObject, string tag)
         {
@@ -207,6 +268,26 @@ namespace SEE.GO
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Applies <paramref name="action"/> to all (transitive) descendants of <paramref name="root"/>
+        /// (including <paramref name="root"/>) if they have the given <paramref name="tag"/>.
+        /// </summary>
+        /// <param name="gameObject">The game object on which to apply the <paramref name="action"/>.</param>
+        /// <param name="tag">The tag the descendants must have.</param>
+        /// <param name="action">The action to be applied.</param>
+        public static void ApplyToAllDescendants(this GameObject root, string tag, Action<GameObject> action)
+        {
+            if (root.CompareTag(tag))
+            {
+                action(root);
+            }
+
+            foreach (Transform child in root.transform)
+            {
+                child.gameObject.ApplyToAllDescendants(tag, action);
+            }
         }
 
         /// <summary>
@@ -396,6 +477,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">game object whose roof has to be determined</param>
         /// <returns>world-space y position of the roof of this <paramref name="gameObject"/></returns>
+        /// <remarks>This does not consider the position of descendants if there are any.
+        /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
+        /// take descendants into account, too.</remarks>
         public static float GetRoof(this GameObject gameObject)
         {
             return gameObject.transform.position.y + gameObject.WorldSpaceSize().y / 2.0f;
@@ -406,6 +490,9 @@ namespace SEE.GO
         /// </summary>
         /// <param name="gameObject">game object whose roof has to be determined</param>
         /// <returns>world-space center position of the roof of this <paramref name="gameObject"/></returns>
+        /// <remarks>This does not consider the position of descendants if there are any.
+        /// Consider <see cref="GetTop(GameObject, Func{Transform, bool})"/> if you want to
+        /// take descendants into account, too.</remarks>
         public static Vector3 GetRoofCenter(this GameObject gameObject)
         {
             Vector3 result;
@@ -442,8 +529,7 @@ namespace SEE.GO
         /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
         /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
-        /// Note: only descendants that are currently active in the scene are
-        /// considered.
+        /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
         /// <param name="gameObject">game object whose height has to be determined</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
@@ -476,20 +562,21 @@ namespace SEE.GO
         }
 
         /// <summary>
-        /// Returns the maximal world-space center position of hull of
+        /// Returns the maximal world-space center position of the hull of
         /// this <paramref name="gameObject"/>. The hull includes <paramref name="gameObject"/>
         /// and any of its active descendants.
         /// Unlike <see cref="GetRoof(GameObject)"/>, this method recurses into
         /// the game-object hierarchy rooted by <paramref name="gameObject"/>.
         ///
-        /// Note: only descendants that are currently active in the scene are
-        /// considered.
+        /// Note: only descendants that are currently active in the scene are considered.
         /// </summary>
         /// <param name="gameObject">game object whose center top has to be determined</param>
         /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
         /// account. By default, this is a constant function which always returns true.</param>
         /// <returns>world-space position of the center top of the hull of this <paramref name="gameObject"/>
         /// </returns>
+        /// <remarks>The result is in world space of <see cref="gameObject"/>. If your are interested
+        /// in local space, use <see cref="GetRelativeTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
         public static Vector3 GetTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
         {
             Vector3 result = gameObject.transform.position;
@@ -498,7 +585,26 @@ namespace SEE.GO
         }
 
         /// <summary>
+        /// Returns the maximal local-space center position of the hull of
+        /// this <paramref name="gameObject"/>. The hull includes <paramref name="gameObject"/>
+        /// and any of its active descendants.
+        /// Note: only descendants that are currently active in the scene are considered.
+        /// </summary>
+        /// <param name="gameObject">game object whose center top has to be determined</param>
+        /// <param name="filterTransform">Function returning true for descendant transforms that shall be taken into
+        /// account. By default, this is a constant function which always returns true.</param>
+        /// <returns>local-space position of the center top of the hull of this <paramref name="gameObject"/>
+        /// </returns>
+        /// <remarks>The result is in local space of <see cref="gameObject"/>. If your are interested
+        /// in world space, use <see cref="GetTop(GameObject, Func{Transform, bool})"/> instead.</remarks>
+        public static float GetRelativeTop(this GameObject gameObject, Func<Transform, bool> filterTransform = null)
+        {
+            float top = gameObject.GetMaxY(filterTransform);
+            return top - gameObject.transform.position.y;
+        }
+        /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in world space.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This value reflects the actual world-space bounds of the axis-aligned cuboid that contains the rendered
         /// object.
@@ -567,6 +673,7 @@ namespace SEE.GO
 
         /// <summary>
         /// Returns the size of the given <paramref name="gameObject"/> in world space.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This is a shorthand method for <see cref="WorldSpaceSize(GameObject, out Vector3, out Vector3)"/> that only returns the size.
         /// See there for additional documentation.
@@ -587,6 +694,7 @@ namespace SEE.GO
         /// <summary>
         /// Provides the size and the mesh offset of the given <paramref name="gameObject"/> in local space,
         /// i.e., in relation to its parent.
+        /// This does not include the size of descendants if there are any.
         /// <para>
         /// This value should often be used instead of the <see cref="Transform.localScale"/> because the scale only
         /// reflects the size for objects with a standardized size like cube primitives. Similarly, the
@@ -1192,7 +1300,7 @@ namespace SEE.GO
         public static void UpdatePortal(this GameObject gameObject, bool warnOnFailure = false,
                                         Portal.IncludeDescendants includeDescendants = OnlySelf)
         {
-            GameObject rootCity = SceneQueries.GetCodeCity(gameObject.transform)?.gameObject;
+            GameObject rootCity = gameObject.GetCodeCity();
             if (rootCity != null)
             {
                 Portal.SetPortal(rootCity, gameObject, includeDescendants);
@@ -1234,9 +1342,7 @@ namespace SEE.GO
         {
             if (gameObject.CompareTag(Tags.Node))
             {
-                NodeOperator nodeOperator = gameObject.AddOrGetComponent<NodeOperator>();
-                nodeOperator.SetCityIfPossible();
-                return nodeOperator;
+                return gameObject.AddOrGetComponent<NodeOperator>();
             }
             else
             {

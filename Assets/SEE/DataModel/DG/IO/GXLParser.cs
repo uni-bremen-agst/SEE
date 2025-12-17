@@ -204,10 +204,8 @@ namespace SEE.DataModel.DG.IO
                 await UniTask.SwitchToThreadPool();
                 while (await Reader.ReadAsync())
                 {
-                    if (token.IsCancellationRequested)
-                    {
-                        throw new OperationCanceledException(token);
-                    }
+                    token.ThrowIfCancellationRequested();
+
                     // LogDebug("XML processing: name=" + reader.Name + " nodetype=" + reader.NodeType + " value=" + reader.Value + "\n");
 
                     // See https://docs.microsoft.com/de-de/dotnet/api/system.xml.xmlnodetype?view=netframework-4.8
