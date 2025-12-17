@@ -23,11 +23,11 @@ namespace SEE.Layout.IO
         ///
         /// Precondition: <paramref name="filename"/> must exist and its content conform to GVL.
         /// </summary>
-        /// <param name="filename">name of GVL file</param>
-        /// <param name="gameNodes">the game nodes whose position and scale are to be updated</param>
-        /// <param name="groundLevel">the y co-ordinate setting the ground level; all nodes will be
-        /// placed on this level</param>
-        /// <param name="logger">logger used to emit errors, warnings, etc.</param>
+        /// <param name="filename">Name of GVL file.</param>
+        /// <param name="gameNodes">The game nodes whose position and scale are to be updated.</param>
+        /// <param name="groundLevel">The y co-ordinate setting the ground level; all nodes will be
+        /// placed on this level.</param>
+        /// <param name="logger">Logger used to emit errors, warnings, etc.</param>
         public GVLReader(string filename, ICollection<IGameNode> gameNodes, float groundLevel = 0, SEE.Utils.ILogger logger = null)
         {
             Filename = filename;
@@ -63,8 +63,8 @@ namespace SEE.Layout.IO
         /// those <paramref name="gameNodes"/>. This mapping allows us to quickly
         /// identify the nodes by their IDs.
         /// </summary>
-        /// <param name="gameNodes">game nodes that are to be mapped</param>
-        /// <returns>mapping from the IDs onto <paramref name="gameNodes"/></returns>
+        /// <param name="gameNodes">Game nodes that are to be mapped.</param>
+        /// <returns>Mapping from the IDs onto <paramref name="gameNodes"/>.</returns>
         private static Dictionary<string, IGameNode> ToMap(ICollection<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = new();
@@ -97,8 +97,8 @@ namespace SEE.Layout.IO
             /// <summary>
             /// Constructor.
             /// </summary>
-            /// <param name="cs">icon size attribute CS of the parent</param>
-            /// <param name="gameNode">parent game node</param>
+            /// <param name="cs">Icon size attribute CS of the parent.</param>
+            /// <param name="gameNode">Parent game node.</param>
             public ParentNode(float cs, IGameNode gameNode)
             {
                 CS = cs;
@@ -214,8 +214,8 @@ namespace SEE.Layout.IO
         /// Returns the XML element name for the given <paramref name="state"/>.
         /// This value is used in the GVL file.
         /// </summary>
-        /// <param name="state">what kind of GVL element we are currently in</param>
-        /// <returns></returns>
+        /// <param name="state">What kind of GVL element we are currently in.</param>
+        /// <returns>.</returns>
         protected static string ToString(State state)
         {
             switch (state)
@@ -234,8 +234,8 @@ namespace SEE.Layout.IO
         /// Yields the state corresponding to the given GVL element <paramref name="name"/>.
         /// The <paramref name="name"/> is used in the GVL file.
         /// </summary>
-        /// <param name="name">name of a GVL element</param>
-        /// <returns></returns>
+        /// <param name="name">Name of a GVL element.</param>
+        /// <returns>.</returns>
         protected static State ToState(string name)
         {
             if (name == "Gravis2_Layout")
@@ -588,9 +588,9 @@ namespace SEE.Layout.IO
         ///
         /// Precondition: The value of <paramref name="attribute"/> must be a float.
         /// </summary>
-        /// <param name="reader">reader processing the XML data</param>
-        /// <param name="attribute">name of the float attribute</param>
-        /// <returns>float value of the given XML <paramref name="attribute"/></returns>
+        /// <param name="reader">Reader processing the XML data.</param>
+        /// <param name="attribute">Name of the float attribute.</param>
+        /// <returns>Float value of the given XML <paramref name="attribute"/>.</returns>
         private static float GetFloat(XmlTextReader reader, string attribute)
         {
             string value = reader.GetAttribute(attribute);
@@ -606,8 +606,8 @@ namespace SEE.Layout.IO
         /// syntax error is thrown.
         ///
         /// </summary>
-        /// <param name="reader">reader processing the XML data</param>
-        /// <returns>value of the Id attribute</returns>
+        /// <param name="reader">Reader processing the XML data.</param>
+        /// <returns>Value of the Id attribute.</returns>
         private static string GetID(XmlTextReader reader)
         {
             string id = reader.GetAttribute("Id");
@@ -641,8 +641,8 @@ namespace SEE.Layout.IO
         /// Precondition: <paramref name="value"/> must conform to the
         /// CultureInfo.InvariantCulture.NumberFormat for floats.
         /// </summary>
-        /// <param name="value">float value as a string</param>
-        /// <returns>float value</returns>
+        /// <param name="value">Float value as a string.</param>
+        /// <returns>Float value.</returns>
         private static float ToFloat(string value)
         {
             return float.Parse(value, CultureInfo.InvariantCulture.NumberFormat);

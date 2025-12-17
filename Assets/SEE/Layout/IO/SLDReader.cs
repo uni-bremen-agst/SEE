@@ -94,8 +94,8 @@ namespace SEE.Layout.IO
         /// those <paramref name="gameNodes"/>. This mapping allows us to quickly
         /// identify the nodes by their IDs.
         /// </summary>
-        /// <param name="gameNodes">game nodes that are to be mapped</param>
-        /// <returns>mapping from the IDs onto <paramref name="gameNodes"/></returns>
+        /// <param name="gameNodes">Game nodes that are to be mapped.</param>
+        /// <returns>Mapping from the IDs onto <paramref name="gameNodes"/>.</returns>
         private static Dictionary<string, IGameNode> ToMap(IEnumerable<IGameNode> gameNodes)
         {
             Dictionary<string, IGameNode> result = new();

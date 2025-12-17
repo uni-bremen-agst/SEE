@@ -25,9 +25,9 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// <summary>
         /// Creates a new circle for the game object at given center position with given radius.
         /// </summary>
-        /// <param name="gameObject">the game object for which to determine position and radius</param>
-        /// <param name="center">center position of the circle</param>
-        /// <param name="radius">radius of the circle</param>
+        /// <param name="gameObject">The game object for which to determine position and radius.</param>
+        /// <param name="center">Center position of the circle.</param>
+        /// <param name="radius">Radius of the circle.</param>
         public Circle(ILayoutNode gameObject, Vector2 center, float radius)
         {
             this.GameObject = gameObject;
@@ -37,7 +37,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// <summary>
         /// For debugging.
         /// </summary>
-        /// <returns>string representation of the circle</returns>
+        /// <returns>String representation of the circle.</returns>
         public override string ToString()
         {
             return "(center= " + Center.ToString() + ", radius=" + Radius + ")";
@@ -67,7 +67,11 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// </summary>
         /// <param name="c1">First circle.</param>
         /// <param name="c2">Second circle.</param>
-        /// <returns></returns>
+        /// <returns>
+        /// A negative number if <paramref name="c1"/> has a larger radius than <paramref name="c2"/>,
+        /// a positive number if <paramref name="c1"/> has a smaller radius than <paramref name="c2"/>,
+        /// or 0 if they have equal radius.
+        /// </returns>
         private static int DescendingRadiusComparator(Circle c1, Circle c2)
         {
             float r1 = c1.Radius;
@@ -302,7 +306,7 @@ namespace SEE.Layout.NodeLayouts.CirclePacking
         /// <param name="position">Position of containing circle.</param>
         /// <param name="radius">Radius of containing circle.</param>
         /// <param name="circle">Contained circle.</param>
-        /// <returns></returns>
+        /// <returns><c>true</c> if the containing circle fully contains <paramref name="circle"/>; otherwise, <c>false</c>.</returns>
         private static bool CircleContainsCircle(Vector2 position, float radius, Circle circle)
         {
             float xc0 = position.x - circle.Center.x;

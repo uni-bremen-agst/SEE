@@ -22,10 +22,10 @@ namespace SEE.Layout.IO
         ///
         /// If the file already exists, it will be overwritten.
         /// </summary>
-        /// <param name="filename">name of the file</param>
-        /// <param name="graphName">name of the graph</param>
-        /// <param name="gameNodes">the nodes whose layout is to be stored</param>
-        /// <exception cref="Exception">thrown in case the extension is unknown</exception>
+        /// <param name="filename">Name of the file.</param>
+        /// <param name="graphName">Name of the graph.</param>
+        /// <param name="gameNodes">The nodes whose layout is to be stored.</param>
+        /// <exception cref="Exception">Thrown in case the extension is unknown.</exception>
         public static void Save(string filename, string graphName, ICollection<GameObject> gameNodes)
         {
             if (Filenames.HasExtension(filename, Filenames.GVLExtension))
