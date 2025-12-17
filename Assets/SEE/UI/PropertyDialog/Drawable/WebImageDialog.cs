@@ -84,7 +84,7 @@ namespace SEE.UI.PropertyDialog.Drawable
         /// URL the user provided. Otherwise it is empty.</param>
         /// <param name="filename">If <see cref="BasePropertyDialog.gotInput"/>, this will be the
         /// filename the user provided. Otherwise it is empty.</param>
-        /// <returns><see cref="BasePropertyDialog.gotInput"/></returns>
+        /// <returns><see cref="BasePropertyDialog.gotInput"/>.</returns>
         internal bool TryGetUserInput(out string url, out string filename)
         {
             if (GotInput)

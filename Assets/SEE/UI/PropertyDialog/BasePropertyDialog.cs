@@ -50,7 +50,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Whether this dialog was canceled.
         /// </summary>
-        /// <returns>Whether this dialog was canceled</returns>
+        /// <returns>Whether this dialog was canceled.</returns>
         internal bool WasCanceled()
         {
             if (wasCanceled)
