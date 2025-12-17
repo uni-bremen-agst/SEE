@@ -26,9 +26,9 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="index">the index of the entry</param>
-        /// <param name="text">the text of the entry</param>
-        /// <param name="cumulatedTime">the cumulated time for presenting this entry and its previous ones</param>
+        /// <param name="index">The index of the entry.</param>
+        /// <param name="text">The text of the entry.</param>
+        /// <param name="cumulatedTime">The cumulated time for presenting this entry and its previous ones.</param>
         public HelpEntry(int index, string text, int cumulatedTime)
         {
             Text = text;

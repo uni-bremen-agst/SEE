@@ -178,7 +178,7 @@ namespace SEE.UI.HelpSystem
         /// are printed. It is the descendant of <see cref="helpSystemEntry"/> with the
         /// object-name path <see cref="textFieldPath"/>.
         /// </summary>
-        /// <returns>the text field where the instructions are printed</returns>
+        /// <returns>The text field where the instructions are printed.</returns>
         private GameObject GetTextField()
         {
             return helpSystemEntry.transform.Find(textFieldPath).gameObject;
@@ -255,8 +255,8 @@ namespace SEE.UI.HelpSystem
         /// <summary>
         /// Returns the video player where the instruction videos can be played.
         /// </summary>
-        /// <returns>video player for instruction videos</returns>
-        /// <exception cref="Exception">thrown if none can be found</exception>
+        /// <returns>Video player for instruction videos.</returns>
+        /// <exception cref="Exception">Thrown if none can be found.</exception>
         public VideoPlayer GetVideoPlayer()
         {
             Transform videoPlayer = helpSystemEntry.transform.Find(videoPlayerPath);
