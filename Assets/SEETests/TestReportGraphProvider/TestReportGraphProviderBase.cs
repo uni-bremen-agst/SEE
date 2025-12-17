@@ -65,9 +65,7 @@ namespace SEE.GraphProviders
         /// - The returned relative path must be non-null/non-empty and point to a readable GLX file.
         /// </summary>
         /// <returns>GLX path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
-        /// <returns>GLX path relative to <see cref="Application.streamingAssetsPath"/>.</returns>
         protected abstract string GetRelativeGlxPath();
-
         /// <summary>
         /// Returns the set of node identifiers or contexts the test should consider during counting.
         ///
