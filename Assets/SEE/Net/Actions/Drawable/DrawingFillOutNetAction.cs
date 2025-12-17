@@ -21,8 +21,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is to assign the value you pass to its fields.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the line should be drawn.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the line should be drawn.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="lineID">The name of the line.</param>
         /// <param name="fillOutColor">The fill out color of the line; null if the line should not filled out.</param>
         public DrawingFillOutNetAction(string drawableID, string parentDrawableID, string lineID, Color fillOutColor)
