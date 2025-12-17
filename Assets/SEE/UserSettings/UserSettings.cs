@@ -138,8 +138,8 @@ namespace SEE.User
         /// <see cref="SceneManager.sceneLoaded"/>.
         /// Note: This method is assumed to be called when the new scene is fully loaded.
         /// </summary>
-        /// <param name="scene">scene that was loaded</param>
-        /// <param name="mode">the mode in which the scene was loaded</param>
+        /// <param name="scene">Scene that was loaded.</param>
+        /// <param name="mode">The mode in which the scene was loaded.</param>
         private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
         {
             // Now we have loaded the scene that is supposed to contain settings for the voice chat
@@ -243,7 +243,7 @@ namespace SEE.User
         /// <summary>
         /// Saves the settings of this network configuration to <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">name of the file in which the settings are stored</param>
+        /// <param name="filename">Name of the file in which the settings are stored.</param>
         public void Save(string filename)
         {
             using ConfigWriter writer = new(filename);
@@ -253,7 +253,7 @@ namespace SEE.User
         /// <summary>
         /// Reads the settings of this network configuration from <paramref name="filename"/>.
         /// </summary>
-        /// <param name="filename">name of the file from which the settings are restored</param>
+        /// <param name="filename">Name of the file from which the settings are restored.</param>
         private void Load(string filename)
         {
             if (File.Exists(filename))
@@ -307,7 +307,7 @@ namespace SEE.User
         /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
-        /// <param name="writer">the writer to be used to save the settings</param>
+        /// <param name="writer">The writer to be used to save the settings.</param>
         protected virtual void Save(ConfigWriter writer)
         {
             Player.Save(writer, playerLabel);
@@ -322,7 +322,7 @@ namespace SEE.User
         /// <summary>
         /// Restores the settings from <paramref name="attributes"/>.
         /// </summary>
-        /// <param name="attributes">the attributes from which to restore the settings</param>
+        /// <param name="attributes">The attributes from which to restore the settings.</param>
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             Player.Restore(attributes, playerLabel);
