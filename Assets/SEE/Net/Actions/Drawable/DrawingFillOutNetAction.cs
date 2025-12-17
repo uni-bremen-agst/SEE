@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Draws the line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="LineID"/> is empty or
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="LineID"/> is empty or
         /// null or does not exist.</exception>
         public override void ExecuteOnClient()
         {

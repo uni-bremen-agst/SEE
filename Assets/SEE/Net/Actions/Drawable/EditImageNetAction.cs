@@ -30,7 +30,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given image configuration on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the drawable or if image don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the drawable or if image don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

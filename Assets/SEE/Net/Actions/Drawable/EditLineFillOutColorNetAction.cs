@@ -37,7 +37,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the secondary color of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="LineName"/> does not exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="LineName"/> does not exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

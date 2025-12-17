@@ -28,8 +28,8 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <param name="drawableID">The id of the drawable on which the line is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
-        /// <param name="lineName">The id of the line thats line renderer positions should be changed</param>
-        /// <param name="Indices">The selected positions of the line renderer</param>
+        /// <param name="lineName">The id of the line thats line renderer positions should be changed.</param>
+        /// <param name="Indices">The selected positions of the line renderer.</param>
         /// <param name="position">The new position that should be set for the selected positions.</param>
         public MovePointNetAction(string drawableID, string parentDrawableID, string lineName, List<int> indices, Vector3 position)
             : base(drawableID, parentDrawableID)
@@ -42,7 +42,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the position of the selected positions from the line renderer of the given line.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="LineName"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

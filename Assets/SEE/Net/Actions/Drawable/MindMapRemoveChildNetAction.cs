@@ -29,7 +29,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Removes the node from old parent's children list on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ChildNode"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="ChildNode"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

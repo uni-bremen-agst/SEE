@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the primary color of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/>
         /// or <see cref="LineName"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {

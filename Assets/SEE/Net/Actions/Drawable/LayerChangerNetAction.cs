@@ -27,7 +27,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="drawableID">The id of the drawable on which the object is located.</param>
         /// <param name="parentDrawableID">The id of the drawable parent.</param>
         /// <param name="objectName">The id of the object that should be changed.</param>
-        /// <param name="state">The state of layer change</param>
+        /// <param name="state">The state of layer change.</param>
         /// <param name="order">The order in layer that should be set.</param>
         public LayerChangerNetAction(string drawableID, string parentDrawableID, string objectName, GameLayerChanger.LayerChangerStates state, int order)
             : base(drawableID, parentDrawableID)
@@ -40,7 +40,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the order in layer of the given object on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="ObjectName"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

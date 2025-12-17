@@ -50,8 +50,8 @@ namespace SEE.Net.Actions.Drawable
         /// </summary>
         /// <param name="surfaceID">The id of the drawable object.</param>
         /// <param name="surfaceParentID">The id of the parent drawable object.</param>
-        /// <returns>the found drawable object (never null)</returns>
-        /// <exception cref="System.Exception">thrown if a drawable object cannot be found</exception>
+        /// <returns>The found drawable object (never null).</returns>
+        /// <exception cref="System.Exception">Thrown if a drawable object cannot be found.</exception>
         protected static GameObject Find(string surfaceID, string surfaceParentID)
         {
             GameObject surface = GameFinder.FindDrawableSurface(surfaceID, surfaceParentID);
@@ -65,9 +65,9 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Returns the child of <see cref="Surface"/> with the id <paramref name="childID"/>.
         /// </summary>
-        /// <param name="childID">the ID of the requested child</param>
-        /// <returns>the child (will never be null)</returns>
-        /// <exception cref="System.Exception">thrown in case the child does not exist</exception>
+        /// <param name="childID">The ID of the requested child.</param>
+        /// <returns>The child (will never be null).</returns>
+        /// <exception cref="System.Exception">Thrown in case the child does not exist.</exception>
         protected GameObject FindChild(string childID)
         {
             GameObject child = GameFinder.FindChild(Surface, childID);
@@ -86,7 +86,7 @@ namespace SEE.Net.Actions.Drawable
         /// <param name="childId"><the ID of the requested child/param>
         /// <param name="child">the found child if it exists; otherwise undefined</param>
         /// <returns>true if the child exists</returns>
-        protected bool TryFindChild(string childId, out GameObject child)
+.        protected bool TryFindChild(string childId, out GameObject child)
         {
             child = GameFinder.FindChild(Surface, childId);
             return child != null;

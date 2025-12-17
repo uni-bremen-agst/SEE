@@ -26,7 +26,7 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Destroys all rigid bodies and collision controller of all drawable types object of the given drawable on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/> or <see cref="NodeID"/> don't exists.</exception>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/> or <see cref="NodeID"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();

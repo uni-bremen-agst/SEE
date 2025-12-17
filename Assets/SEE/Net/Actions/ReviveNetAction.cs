@@ -39,11 +39,11 @@ namespace SEE.Net.Actions
         ///    game object representing a node or edge, and were previously marked as deleted.
         ///
         /// </summary>
-        /// <param name="gameObjectIDs">the list of unique names of the gameObjects representing
-        /// a node or edge that have to be revived</param>
-        /// <param name="nodeTypes">the map of the node types to be restored.</param>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="gameObjectIDs"/>
-        /// or any of its elements is null</exception>
+        /// <param name="gameObjectIDs">The list of unique names of the gameObjects representing
+        /// a node or edge that have to be revived.</param>
+        /// <param name="nodeTypes">The map of the node types to be restored.</param>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="gameObjectIDs"/>
+        /// or any of its elements is null.</exception>
         public ReviveNetAction(List<string> gameObjectIDs, Dictionary<string, VisualNodeAttributes> nodeTypes)
             : base(nodeTypes)
         {
