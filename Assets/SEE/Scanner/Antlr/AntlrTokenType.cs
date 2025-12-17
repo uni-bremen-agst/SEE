@@ -13,11 +13,11 @@ namespace SEE.Scanner.Antlr
         /// Returns the corresponding <see cref="TokenType"/> for the given <paramref name="symbolicName"/>
         /// in the given <paramref name="language"/>. If it's not recognized, an exception is thrown.
         /// </summary>
-        /// <param name="language">The language the <paramref name="symbolicName"/> is from</param>
-        /// <param name="symbolicName">Symbolic name from an antlr lexer</param>
+        /// <param name="language">The language the <paramref name="symbolicName"/> is from.</param>
+        /// <param name="symbolicName">Symbolic name from an antlr lexer.</param>
         /// <returns>The corresponding token for the given <paramref name="symbolicName"/>.</returns>
-        /// <exception cref="ArgumentNullException">If <paramref name="language"/> or <paramref name="symbolicName"/> is null</exception>
-        /// <exception cref="InvalidOperationException">If the <paramref name="symbolicName"/> is not recognized</exception>
+        /// <exception cref="ArgumentNullException">If <paramref name="language"/> or <paramref name="symbolicName"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">If the <paramref name="symbolicName"/> is not recognized.</exception>
         public static TokenType FromAntlrType(AntlrLanguage language, string symbolicName)
         {
             if (language == null || symbolicName == null)
