@@ -1,0 +1,25 @@
+{
+  "metaproperties": {},
+  "structural":
+  {
+    "Mouth_Stretch_L" : -0.20,
+    "Mouth_Stretch_R" : -0.20,
+    "Mouth_Press_L" : 1.00,
+    "Mouth_Press_R" : 1.00,
+    "Mouth_Dimple_L" : -0.50,
+    "Mouth_Dimple_R" : -0.50,
+    "Mouth_Frown_L" : 0.30,
+    "Mouth_Frown_R" : 0.30,
+    "Mouth_Blow_L" : 0.10,
+    "Mouth_Blow_R" : 0.10,
+    "Mouth_Roll_Out_Upper_L" : 0.80,
+    "Mouth_Roll_Out_Upper_R" : 0.80,
+    "Mouth_Roll_In_Lower_L" : 0.40,
+    "Mouth_Roll_In_Lower_R" : 0.40,
+    "Mouth_Push_Upper_L" : 0.40,
+    "Mouth_Push_Upper_R" : 0.40,
+    "Mouth_Push_Lower_L" : 0.40,
+    "Mouth_Push_Lower_R" : 0.40
+  },
+  "manuellab_vers": [1, 6, 1],
+  "materialproperties": {}}
