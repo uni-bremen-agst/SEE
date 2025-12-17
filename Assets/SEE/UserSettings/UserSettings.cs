@@ -311,12 +311,20 @@ namespace SEE.User
         protected virtual void Save(ConfigWriter writer)
         {
             Player.Save(writer, playerLabel);
-            Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
             writer.Save(InputType.ToString(), inputTypeLabel);
             Video.Save(writer, videoLabel);
             Audio.Save(writer, audioLabel);
+            try
+            {
+                Network.Save(writer, networkLabel);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError("Network settings could not be saved.\n");
+                throw;
+            }
         }
 
         /// <summary>
@@ -326,12 +334,12 @@ namespace SEE.User
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             Player.Restore(attributes, playerLabel);
-            Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
             ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
             Video.Restore(attributes, videoLabel);
             Audio.Restore(attributes, audioLabel);
+            Network.Restore(attributes, networkLabel);
         }
 
         #endregion Configuration I/O
