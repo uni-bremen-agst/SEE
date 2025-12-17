@@ -64,7 +64,9 @@ namespace SEE.UI
         /// The coroutine that is started waits for the specified time and then displays the message
         /// with a <see cref="Tooltip.Tooltip"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        /// An <see cref="IEnumerator"/> used to execute the coroutine over multiple frames.
+        /// </returns>
         private IEnumerator StartTimer()
         {
             yield return new WaitForSeconds(waitTime);
