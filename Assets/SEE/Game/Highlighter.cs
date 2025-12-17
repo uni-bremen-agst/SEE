@@ -19,9 +19,9 @@ namespace SEE.Game
         /// <summary>
         /// Whether or not the <paramref name="gameObject"/> should be highlighted.
         /// </summary>
-        /// <param name="gameObject">the game object whose highlighting is to be set</param>
-        /// <param name="highlight">if <c>true</c>, <paramref name="gameObject"/> will be
-        /// highlighted; otherwise its highlighting will be turned off</param>
+        /// <param name="gameObject">The game object whose highlighting is to be set.</param>
+        /// <param name="highlight">If <c>true</c>, <paramref name="gameObject"/> will be
+        /// highlighted; otherwise its highlighting will be turned off.</param>
         public static void SetHighlight(GameObject gameObject, bool highlight)
         {
             HighlightEffect highlightEffect = GetHighlightEffect(gameObject);
@@ -33,8 +33,8 @@ namespace SEE.Game
         /// attached, one will be attached to it with our default values. That <see cref="HighlightEffect"/>
         /// will be returned.
         /// </summary>
-        /// <param name="gameObject">game objec</param>
-        /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect</returns>
+        /// <param name="gameObject">Game objec.</param>
+        /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect.</returns>
         public static HighlightEffect GetHighlightEffect(GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out HighlightEffect highlight))

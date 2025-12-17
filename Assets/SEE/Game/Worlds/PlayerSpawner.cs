@@ -46,10 +46,10 @@ namespace SEE.Game.Worlds
             /// <summary>
             /// Constructor to create a spawn-information object.
             /// </summary>
-            /// <param name="prefabName">name of the prefab file for the avatar; must be located in <see cref="playerPrefabFolder"/></param>
-            /// <param name="position">world-space position at which to spawn a player</param>
-            /// <param name="rotation">rotation of the avatar in degrees along the y axis when the avatar is spawned</param>
-            /// <exception cref="Exception">thrown in case the <paramref name="prefabName"/> cannot be loaded</exception>
+            /// <param name="prefabName">Name of the prefab file for the avatar; must be located in <see cref="playerPrefabFolder"/>.</param>
+            /// <param name="position">World-space position at which to spawn a player.</param>
+            /// <param name="rotation">Rotation of the avatar in degrees along the y axis when the avatar is spawned.</param>
+            /// <exception cref="Exception">Thrown in case the <paramref name="prefabName"/> cannot be loaded.</exception>
             public SpawnInfo(string prefabName, Vector3 position, int rotation)
             {
                 PlayerPrefab = Resources.Load<GameObject>(Path(prefabName));
@@ -143,8 +143,8 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// RPC method to spawn a player on the server.
         /// </summary>
-        /// <param name="clientId">the network ID of the client who is requesting to spawn a local player</param>
-        /// <param name="avatarIndex">the index of the avatar to spawn</param>
+        /// <param name="clientId">The network ID of the client who is requesting to spawn a local player.</param>
+        /// <param name="avatarIndex">The index of the avatar to spawn.</param>
         /// <remarks>This method is called by clients, but executed on the server.</remarks>
         [Rpc(SendTo.Server)]
         private void SpawnOnServerRpc(ulong clientId, string playerName, uint avatarIndex)
@@ -206,7 +206,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// Logs given <paramref name="message"/> to the console.
         /// </summary>
-        /// <param name="message">message to be logged</param>
+        /// <param name="message">Message to be logged.</param>
         [System.Diagnostics.Conditional("DEBUG")]
         private static void Log(string message)
         {
@@ -216,7 +216,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// Reports that a client with given <paramref name="clientId"/> has connected.
         /// </summary>
-        /// <param name="clientId">the network ID of the connecting client</param>
+        /// <param name="clientId">The network ID of the connecting client.</param>
         /// <remarks>This code is executed only on the server.</remarks>
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
         private void ClientConnects(ulong clientId)
@@ -227,7 +227,7 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// Reports that a client with given <paramref name="clientId"/> has disconnected.
         /// </summary>
-        /// <param name="clientId">the network ID of the disconnecting client</param>
+        /// <param name="clientId">The network ID of the disconnecting client.</param>
         /// <remarks>This code is executed only on the server.</remarks>
         /// <remarks>Do not confuse client IDs with <see cref="NetworkBehaviour.NetworkObjectId"/>.</remarks>
         private static void ClientDisconnects(ulong clientId)
@@ -240,7 +240,7 @@ namespace SEE.Game.Worlds
         /// at <see cref="SpawnPlayer"/>. The player name and avatar index
         /// are retrieved from the local configuration on the client side.
         /// </summary>
-        /// <param name="clientId">the network ID of the connecting client</param>
+        /// <param name="clientId">The network ID of the connecting client.</param>
         /// <remarks>This code is executed on all connecting "pure" clients, i.e., on
         /// a client that is not also a server (i.e., a host).</remarks>
         private void OnClientIsConnected(ulong clientId)
@@ -252,9 +252,9 @@ namespace SEE.Game.Worlds
         /// <summary>
         /// Spawns a player for the client with given <paramref name="clientId"/>.
         /// </summary>
-        /// <param name="clientId">the network ID of the client for which to spawn a player</param>
-        /// <param name="nameOfPlayer">the name of the player to be spawn</param>
-        /// <param name="avatarIndex">the index of the avatar to be spawned relative to <see cref="playerSpawns"/></param>
+        /// <param name="clientId">The network ID of the client for which to spawn a player.</param>
+        /// <param name="nameOfPlayer">The name of the player to be spawn.</param>
+        /// <param name="avatarIndex">The index of the avatar to be spawned relative to <see cref="playerSpawns"/>.</param>
         /// <remarks>This code is executed on a server. Only servers are allowed to spawn players.</remarks>
         private void Spawn(ulong clientId, string nameOfPlayer, uint avatarIndex)
         {
