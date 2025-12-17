@@ -13,12 +13,6 @@ namespace SEE.DataModel.DG.IO
     internal class MetricApplier
     {
         /// <summary>
-        /// Cache for the metric key prefix (for example, <c>Metric.JaCoCo.</c>) used during one application run.
-        /// Preconditions: Must be initialized before metrics are applied via <see cref="ApplyMetrics"/>.
-        /// </summary>
-        private static string prefix;
-
-        /// <summary>
         /// Adds all metrics from <paramref name="schema"/> to the provided <paramref name="graph"/>
         /// using the lookup helpers defined in <paramref name="parsingConfig"/>.
         /// Preconditions: <paramref name="graph"/> and <paramref name="parsingConfig"/> must not be null.
@@ -45,7 +39,7 @@ namespace SEE.DataModel.DG.IO
                 throw new ArgumentNullException($"[{nameof(MetricApplier)}] Schema findings is null – cannot apply metrics.");
             }
 
-            prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
+            string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
             SourceRangeIndex index = new(graph, indexNodeStrategy.NodeIdToMainType);
 
@@ -71,14 +65,14 @@ namespace SEE.DataModel.DG.IO
                 {
                     foreach (KeyValuePair<string, string> metric in finding.Metrics)
                     {
-                        SetMetric(node, metric);
+                        SetMetric(node, metric, prefix);
                     }
                 }
                 else if (startLine == -1 && graph.TryGetNode(findingPathAsNodeId, out Node classOrPackageNode))
                 {
                     foreach (KeyValuePair<string, string> metric in finding.Metrics)
                     {
-                        SetMetric(classOrPackageNode, metric);
+                        SetMetric(classOrPackageNode, metric, prefix);
                     }
                 }
                 else
@@ -95,7 +89,7 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         /// <param name="node">Graph node that should receive the metric.</param>
         /// <param name="metric">Key/value pair taken from the parsed finding.</param>
-        private static void SetMetric(Node node, KeyValuePair<string, string> metric)
+        private static void SetMetric(Node node, KeyValuePair<string, string> metric, string prefix)
         {
             string key = prefix + metric.Key;
 

@@ -162,7 +162,6 @@ namespace SEE.DataModel.DG.IO
                 // In some graphs, File node IDs may be absolute paths.
                 string res = ToQualifiedClassName(node.ID);
 
-                Debug.Log("[CheckstyleIndexNode file id =" + res + "nodeId of file node= " + node.ID);
                 return res;
             }
 

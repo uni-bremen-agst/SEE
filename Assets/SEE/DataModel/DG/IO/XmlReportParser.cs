@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using SEE.Utils.Paths;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading;
 using System.Xml;
@@ -51,7 +52,8 @@ namespace SEE.DataModel.DG.IO
                 IgnoreWhitespace = true,
                 IgnoreComments = true,
                 Async = true,
-                DtdProcessing = DtdProcessing.Parse
+                DtdProcessing = DtdProcessing.Ignore,
+                XmlResolver = null
             };
         }
 
@@ -198,11 +200,7 @@ namespace SEE.DataModel.DG.IO
             XPathMapping xPathMapping,
             XmlNamespaceManager? namespaceManager)
         {
-            if (!xPathMapping.MapContext.TryGetValue(current.LocalName, out string context))
-            {
-                Debug.LogWarning($"[Parser] Unknown context for tag '{current.LocalName}' - skipping.");
-                return null;
-            }
+            string context = current.LocalName;
 
             xPathMapping.FileName.TryGetValue(context, out string fileNameExpression);
 
@@ -219,7 +217,7 @@ namespace SEE.DataModel.DG.IO
                 Location = ParseLocation(current, xPathMapping, namespaceManager)
             };
 
-            foreach (var kv in xPathMapping.Metrics)
+            foreach (var kv in xPathMapping.MetricsByContext[context])
             {
                 string value = string.Empty;
                 try
@@ -232,7 +230,11 @@ namespace SEE.DataModel.DG.IO
                         continue;
                     }
 
-                    value = result?.ToString() ?? string.Empty;
+                    if (result is double d)
+                        value = d.ToString(CultureInfo.InvariantCulture);
+                    else
+                        value = result?.ToString() ?? string.Empty;
+
                 }
                 catch (XPathException ex)
                 {

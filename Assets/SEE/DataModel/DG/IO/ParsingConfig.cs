@@ -1,6 +1,7 @@
 using SEE.Utils.Config;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 /// <summary>
 /// Contains data model types for parsing and interpreting external tool reports in a <see cref="Graph"/>.
 /// </summary>
@@ -50,6 +51,11 @@ namespace SEE.DataModel.DG.IO
 
         public string SourceRootRelativePath(string fullPath)
         {
+            if (string.IsNullOrWhiteSpace(fullPath))
+            {
+                return string.Empty;
+            }
+
             // 1) Normalize path separators to a single canonical separator.
             string normalized = fullPath.Replace(WindowsPathSeparator, LinuxPathSeparator);
 
@@ -93,38 +99,68 @@ namespace SEE.DataModel.DG.IO
         private const string ToolIdLabel = "ToolId";
 
         /// <summary>
+        /// Label of <see cref="SourceRootMarker"/> in the configuration file.
+        /// </summary>
+        private const string SourceRootMarkerLabel = "SourceRootMarker";
+
+        /// <summary>
         /// Saves the attributes to the configuration file under the given <paramref name="label"/>.
         /// </summary>
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
             writer.Save(ToolId, ToolIdLabel);
+            writer.Save(SourceRootMarker, SourceRootMarkerLabel);
+            SaveAdditional(writer);
             writer.EndGroup();
         }
+        /// <summary>
+        /// Derived classes can extend <see cref="Save(ConfigWriter, string)"/>
+        /// </summary>
+        /// <param name="writer"></param>
+        protected virtual void SaveAdditional(ConfigWriter writer) { }
 
         /// <summary>
         /// Restores the attributes from the configuration file.
         /// </summary>
-        public void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
+        public static void Restore(Dictionary<string, object> attributes, string label, out ParsingConfig parsingConfig)
         {
-            if (attributes.TryGetValue(label, out object groupObj))
-            {
-                if (groupObj is Dictionary<string, object> groupDict)
-                {
-                    string toolId = "";
-                    ConfigIO.Restore(groupDict, ToolIdLabel, ref toolId);
-
-                    if (!string.IsNullOrEmpty(toolId))
-                    {
-                        ToolId = toolId;
-                        parsingConfig = ParsingConfigFactory.Create(toolId);
-                        return;
-                    }
-                }
-            }
             parsingConfig = null;
-            return;
+
+            if (!attributes.TryGetValue(label, out object groupObj) || groupObj is not Dictionary<string, object> groupDict)
+            {
+                return;
+            }
+
+            string toolId = string.Empty;
+            ConfigIO.Restore(groupDict, ToolIdLabel, ref toolId);
+
+            string sourceRootMarker = string.Empty;
+            ConfigIO.Restore(groupDict, SourceRootMarkerLabel, ref sourceRootMarker);
+
+            if (string.IsNullOrWhiteSpace(toolId))
+            {
+                return;
+            }
+
+            parsingConfig = ParsingConfigFactory.Create(toolId);
+            if (parsingConfig == null)
+            {
+                return;
+            }
+
+            // Apply restored values to the created instance.
+            parsingConfig.ToolId = toolId;
+            parsingConfig.SourceRootMarker = sourceRootMarker;
+            // Extention for derived classes
+            parsingConfig.RestoreAdditional(groupDict);
         }
+        /// <summary>
+        /// Derived classes can extend <see cref="Restore(Dictionary{string, object}, string, out ParsingConfig)"/>
+        /// </summary>
+        /// <param name="groupDict"></param>
+        protected virtual void RestoreAdditional(Dictionary<string, object> groupDict) { }
+
 
         #endregion
     }

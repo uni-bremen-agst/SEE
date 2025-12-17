@@ -25,7 +25,7 @@ namespace SEE.DataModel.DG.IO
             new Dictionary<string, string>();
 
         /// <summary>
-        /// Maps XML element names to XPath expressions that select the file name of a node.
+        /// Maps XML element names (context) to XPath expressions that select the file name of a node.
         /// Dictionary keys and values must not be null.
         /// </summary>
         public Dictionary<string, string> FileName { get; set; } =
@@ -41,8 +41,8 @@ namespace SEE.DataModel.DG.IO
         /// Metric definitions keyed by their output name, each pointing to an XPath expression.
         /// Dictionary keys and values must not be null.
         /// </summary>
-        public Dictionary<string, string> Metrics { get; set; } =
-            new Dictionary<string, string>();
+        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } =
+            new Dictionary<string, Dictionary<string,string>>();
 
         /// <summary>
         /// Optional namespace prefix or URI map for XPath evaluation.
@@ -55,12 +55,5 @@ namespace SEE.DataModel.DG.IO
         /// May be null if no location template is required.
         /// </summary>
         public MetricLocation MetricLocation;
-
-        /// <summary>
-        /// Maps an XML tag name to a context designation such as class, package, method or root.
-        /// Dictionary keys and values must not be null.
-        /// </summary>
-        public Dictionary<string, string> MapContext { get; set; } =
-            new Dictionary<string, string>();
     }
 }

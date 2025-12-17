@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using SEE.DataModel.DG.IO;
-using SEE.GraphProviders.NodeCounting;
 
 namespace SEE.GraphProviders
 {
@@ -68,18 +67,6 @@ namespace SEE.GraphProviders
         protected override ParsingConfig GetParsingConfig()
         {
             return new CheckstyleParsingConfig();
-        }
-
-        /// <summary>
-        /// Provides the node counter implementation used by the base test infrastructure to count and/or validate
-        /// how many report nodes were processed.
-        ///
-        /// For Checkstyle XML, <see cref="XmlNodeCounter"/> can be used to count occurrences of relevant XML nodes.
-        /// </summary>
-        /// <returns>An <see cref="ICountReportNodes"/> that can count relevant nodes in the report.</returns>
-        protected override ICountReportNodes GetNodeCounter()
-        {
-            return new XmlNodeCounter();
         }
 
         /// <summary>
@@ -299,7 +286,7 @@ namespace SEE.GraphProviders
                 // Minimal per-error metric payload: a human-readable issue summary.
                 Metrics = new Dictionary<string, string>
                 {
-                    ["Context-Level.Issue"] = "Line 60: [error] Parameter token should be final."
+                    ["ContextLevel.Issue"] = "Line 60: [error] Parameter token should be final."
                 }
             };
 

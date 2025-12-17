@@ -30,7 +30,7 @@ namespace SEE.DataModel.DG.IO
         /// <summary>
         /// Metric values emitted for this finding, keyed by a descriptive string.
         /// </summary>
-        public Dictionary<string, string?> Metrics { get; set; }
-            = new Dictionary<string, string?>();
+        public Dictionary<string, string> Metrics { get; set; }
+            = new Dictionary<string, string>();
     }
 }
