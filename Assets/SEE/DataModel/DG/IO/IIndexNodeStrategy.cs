@@ -33,7 +33,7 @@ namespace SEE.DataModel.DG.IO
         /// in a tool-specific format.
         /// Examples:
         /// - Java/JaCoCo: "com/example/MyClass$InnerClass#method"
-        /// - C#/dotCover: "MyNamespace.MyClass+NestedClass.Method"
+        /// - C#/dotCover: "MyNamespace.MyClass+NestedClass.Method".
         /// </param>
         /// <param name="filename">
         /// The source filename where the code element is declared (e.g., "MyClass.java", "MyClass.cs").
@@ -45,7 +45,7 @@ namespace SEE.DataModel.DG.IO
         /// Returns null if the path is invalid or represents a compiler-generated element.
         /// Examples:
         /// - Java: "com.example.MyClass" (even for inner classes or methods)
-        /// - C#: "MyNamespace.MyClass" (even for nested types or methods)
+        /// - C#: "MyNamespace.MyClass" (even for nested types or methods).
         /// </returns>
         /// <remarks>
         /// The "main type" concept is important for languages like Java where:
@@ -73,7 +73,7 @@ namespace SEE.DataModel.DG.IO
         /// Examples:
         /// - Method node "com.example.MyClass.~myMethod()" → "com.example.MyClass"
         /// - Inner class node "com.example.Outer$Inner" → "com.example.Outer"
-        /// - Main class node "com.example.MyClass" → "com.example.MyClass"
+        /// - Main class node "com.example.MyClass" → "com.example.MyClass".
         /// </returns>
         /// <remarks>
         /// This method typically:
@@ -95,7 +95,7 @@ namespace SEE.DataModel.DG.IO
         /// The complete path as reported by the external tool.
         /// Examples:
         /// - Java/JaCoCo: "com/example/MyClass#method"
-        /// - C#/dotCover: "MyNamespace.MyClass.Method"
+        /// - C#/dotCover: "MyNamespace.MyClass.Method".
         /// </param>
         /// <returns>
         /// A normalized identifier that should match a node ID in the graph.
@@ -103,7 +103,7 @@ namespace SEE.DataModel.DG.IO
         /// Examples:
         /// - Java: "com/example/MyClass#method" → "com.example.MyClass.~method()"
         /// - Java constructor: "com/example/MyClass#&lt;init&gt;" → "com.example.MyClass.~MyClass()"
-        /// - C#: "MyNamespace.MyClass.Method" → "MyNamespace.MyClass.Method"
+        /// - C#: "MyNamespace.MyClass.Method" → "MyNamespace.MyClass.Method".
         /// </returns>
         /// <remarks>
         /// This method handles language-specific conventions such as:

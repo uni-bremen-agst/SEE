@@ -46,9 +46,9 @@ namespace SEE.DataModel.DG.IO
         /// Converts JaCoCo's raw path to the main type identifier that matches graph node IDs.
         /// Removes inner classes, methods, and uses filename to identify the main type.
         /// </summary>
-        /// <param name="fullPath">Raw path from JaCoCo (e.g., "package/Class$Inner#method")</param>
-        /// <param name="fileName">Source filename (e.g., "Class.java")</param>
-        /// <returns>Main type identifier (e.g., "package.Class") or null if invalid</returns>
+        /// <param name="fullPath">Raw path from JaCoCo (e.g., "package/Class$Inner#method").</param>
+        /// <param name="fileName">Source filename (e.g., "Class.java").</param>
+        /// <returns>Main type identifier (e.g., "package.Class") or null if invalid.</returns>
         public string FindingPathToMainType(string fullPath, string fileName)
         {
             if (string.IsNullOrWhiteSpace(fullPath) ||

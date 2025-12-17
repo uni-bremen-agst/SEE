@@ -38,10 +38,10 @@ namespace SEE.DataModel.DG.IO
         /// conform to the JaCoCo coverage report syntax.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">graph for which node metrics are to be imported</param>
-        /// <param name="path">path to a data file containing JaCoCo data from which to import node metrics</param>
-        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
-        /// <exception cref="ArgumentException">if <paramref name="path"/> is null or empty</exception>
+        /// <param name="graph">Graph for which node metrics are to be imported.</param>
+        /// <param name="path">Path to a data file containing JaCoCo data from which to import node metrics.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="graph"/> is null.</exception>
+        /// <exception cref="ArgumentException">If <paramref name="path"/> is null or empty.</exception>
         public static async UniTask LoadAsync(Graph graph, DataPath path)
         {
             if (string.IsNullOrEmpty(path.Path))
@@ -56,10 +56,10 @@ namespace SEE.DataModel.DG.IO
         /// Loads a JaCoCo test report from the given <paramref name="stream"/>.
         /// The retrieved coverage metrics will be added to nodes of <paramref name="graph"/>.
         /// </summary>
-        /// <param name="graph">Graph where to add the metrics</param>
-        /// <param name="stream">where to read the JaCoCo input data from</param>
-        /// <param name="jaCoCoFilename">the name of the original JaCoCo file; used only for reporting</param>
-        /// <exception cref="ArgumentNullException">if <paramref name="graph"/> is null</exception>
+        /// <param name="graph">Graph where to add the metrics.</param>
+        /// <param name="stream">Where to read the JaCoCo input data from.</param>
+        /// <param name="jaCoCoFilename">The name of the original JaCoCo file; used only for reporting.</param>
+        /// <exception cref="ArgumentNullException">If <paramref name="graph"/> is null.</exception>
         private static async UniTask LoadAsync(Graph graph, Stream stream, string jaCoCoFilename)
         {
             if (graph == null)
@@ -379,11 +379,11 @@ namespace SEE.DataModel.DG.IO
         /// <paramref name="qualifiedJaCoCoTypeName"/> where each forward slash has
         /// been replaced by a period.
         /// </summary>
-        /// <param name="qualifiedJaCoCoTypeName">qualified name in JaCoCo syntax to be converted</param>
+        /// <param name="qualifiedJaCoCoTypeName">Qualified name in JaCoCo syntax to be converted.</param>
         /// <returns><paramref name="qualifiedJaCoCoTypeName"/> where each forward slash was replaced
-        /// by a period</returns>
-        /// <exception cref="ArgumentException">thrown in case <paramref name="qualifiedJaCoCoTypeName"/>
-        /// is null or empty</exception>
+        /// by a period.</returns>
+        /// <exception cref="ArgumentException">Thrown in case <paramref name="qualifiedJaCoCoTypeName"/>
+        /// is null or empty.</exception>
         private static string AsJavaQualifiedName(string qualifiedJaCoCoTypeName)
         {
             if (string.IsNullOrEmpty(qualifiedJaCoCoTypeName))
@@ -436,8 +436,8 @@ namespace SEE.DataModel.DG.IO
         ///
         /// For all other node types, null is returned.
         /// </summary>
-        /// <param name="node">node whose fully qualified name is to be retrieved</param>
-        /// <returns>fully qualified name of the main type for the given <paramref name="node"/></returns>
+        /// <param name="node">Node whose fully qualified name is to be retrieved.</param>
+        /// <returns>Fully qualified name of the main type for the given <paramref name="node"/>.</returns>
         private static string IndexPath(Node node)
         {
             if (node.Type == "Method")
@@ -461,10 +461,10 @@ namespace SEE.DataModel.DG.IO
         /// Returns a fully qualified Java name for the main type corresponding to the
         /// given <paramref name="qualifiedJavaTypeName"/>.
         /// </summary>
-        /// <param name="qualifiedJavaTypeName">fully qualified Java name of a type</param>
-        /// <param name="filename">the Java filename in which the type is declared</param>
-        /// <returns>fully qualified Java name for main type corresponding to the
-        /// given <paramref name="qualifiedJavaTypeName"/></returns>
+        /// <param name="qualifiedJavaTypeName">Fully qualified Java name of a type.</param>
+        /// <param name="filename">The Java filename in which the type is declared.</param>
+        /// <returns>Fully qualified Java name for main type corresponding to the
+        /// given <paramref name="qualifiedJavaTypeName"/>.</returns>
         private static string MainTypeName(string qualifiedJavaTypeName, string filename)
         {
             // The ID (Linkage.Name) of a main type Y declared in package p
