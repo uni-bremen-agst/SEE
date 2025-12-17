@@ -100,11 +100,11 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="selectedObject">The selected drawable object</param>
-            /// <param name="surface">The drawable surface on which the selected object is displayed</param>
-            /// <param name="id">The ID of the selected object</param>
-            /// <param name="oldScale">The old scale of the selected object</param>
-            /// <param name="newScale">The new scale of the selected object</param>
+            /// <param name="selectedObject">The selected drawable object.</param>
+            /// <param name="surface">The drawable surface on which the selected object is displayed.</param>
+            /// <param name="id">The ID of the selected object.</param>
+            /// <param name="oldScale">The old scale of the selected object.</param>
+            /// <param name="newScale">The new scale of the selected object.</param>
             public Memento(GameObject selectedObject, GameObject surface, string id,
                 Vector3 oldScale, Vector3 newScale)
             {
@@ -148,7 +148,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Scale"/>.
         /// It scales the selected object.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             Cancel();
@@ -406,7 +406,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ScaleAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ScaleAction"/></returns>
+        /// <returns>New instance of <see cref="ScaleAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new ScaleAction();
@@ -416,7 +416,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ScaleAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ScaleAction"/></returns>
+        /// <returns>New instance of <see cref="ScaleAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -425,7 +425,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Scale"/></returns>
+        /// <returns><see cref="ActionStateType.Scale"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Scale;
@@ -435,7 +435,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>an empty set or the object name that was changed.</returns>
+        /// <returns>An empty set or the object name that was changed.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.SelectedObject == null)

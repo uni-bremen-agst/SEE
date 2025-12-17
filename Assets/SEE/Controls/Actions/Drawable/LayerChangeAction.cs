@@ -67,12 +67,12 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="surface">The drawable surface to save into this Memento</param>
-            /// <param name="state">The state to save into this Memento</param>
-            /// <param name="obj">The object to save into this Memento</param>
-            /// <param name="id">The object ID to save into this Memento</param>
-            /// <param name="oldOrder">The old order in layer value to save into this Memento</param>
-            /// <param name="newOrder">The new order in layer value to save into this Memento</param>
+            /// <param name="surface">The drawable surface to save into this Memento.</param>
+            /// <param name="state">The state to save into this Memento.</param>
+            /// <param name="obj">The object to save into this Memento.</param>
+            /// <param name="id">The object ID to save into this Memento.</param>
+            /// <param name="oldOrder">The old order in layer value to save into this Memento.</param>
+            /// <param name="newOrder">The new order in layer value to save into this Memento.</param>
             public Memento(GameObject surface, GameLayerChanger.LayerChangerStates state,
                 GameObject obj, string id, int oldOrder, int newOrder)
             {
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LayerChanger"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -203,7 +203,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LayerChangeAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LayerChangeAction"/></returns>
+        /// <returns>New instance of <see cref="LayerChangeAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LayerChangeAction();
@@ -213,7 +213,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LayerChangeAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LayerChangeAction"/></returns>
+        /// <returns>New instance of <see cref="LayerChangeAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -222,7 +222,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LayerChanger"/></returns>
+        /// <returns><see cref="ActionStateType.LayerChanger"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LayerChanger;
@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>An empty set.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Obj == null)

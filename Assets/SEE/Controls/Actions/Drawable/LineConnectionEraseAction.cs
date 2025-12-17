@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions.Drawable
         /// One action run allows to delete the line connections of one point.
         /// Is intended for shapes.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -103,7 +103,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LineConnectionEraseAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LineConnectionEraseAction();
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineConnectionEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineConnectionEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LineConnectionEraseAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -122,7 +122,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LineConnectorErase"/></returns>
+        /// <returns><see cref="ActionStateType.LineConnectorErase"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LineConnectionErase;
@@ -132,7 +132,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the ID of the line that was split.</returns>
+        /// <returns>The ID of the line that was split.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)

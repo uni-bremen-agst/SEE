@@ -53,7 +53,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
-            /// <param name="surface">The drawable surface on which the drawable type is displayed</param>
+            /// <param name="surface">The drawable surface on which the drawable type is displayed.</param>
             /// <param name="clearType">The type of the clearing action.</param>
             /// <param name="deletePage">Whether the pages should also be deleted.</param>
             public Memento(GameObject surface, ClearMenu.Type clearType, bool deletePage)
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the action <see cref="ActionStateType.Cleaner"/>.
         /// It cleans a complete drawable. In other words: it deletes all drawable types that are on a selected drawable.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -113,7 +113,7 @@ namespace SEE.Controls.Actions.Drawable
         /// And depending on the configuration of the menu the page will deleted.
         /// </summary>
         /// <param name="surface">The surface which current page should be cleared.</param>
-        /// <returns>true if the page was successfully cleared, false if the page was already cleared.</returns>
+        /// <returns>True if the page was successfully cleared, false if the page was already cleared.</returns>
         private bool DeleteCurrentDrawableChilds(GameObject surface)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
@@ -165,8 +165,8 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method finds and deletes all drawable types that are placed on the given drawable.
         /// </summary>
-        /// <param name="surface">is the drawable surface which should be cleaned.</param>
-        /// <returns>true if the drawable was successfully cleaned, false if the drawable was already cleaned.</returns>
+        /// <param name="surface">Is the drawable surface which should be cleaned.</param>
+        /// <returns>True if the drawable was successfully cleaned, false if the drawable was already cleaned.</returns>
         private bool DeleteAllDrawableChilds(GameObject surface)
         {
             DrawableHolder holder = surface.GetComponent<DrawableHolder>();
@@ -274,7 +274,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ClearAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ClearAction"/></returns>
+        /// <returns>New instance of <see cref="ClearAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new ClearAction();
@@ -284,7 +284,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ClearAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ClearAction"/></returns>
+        /// <returns>New instance of <see cref="ClearAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -293,7 +293,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Cleaner"/></returns>
+        /// <returns><see cref="ActionStateType.Cleaner"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Clear;
@@ -303,7 +303,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>IDs of the deletes drawable types</returns>
+        /// <returns>IDs of the deletes drawable types.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)

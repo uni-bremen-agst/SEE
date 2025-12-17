@@ -23,8 +23,8 @@ namespace SEE.Controls.Actions
         /// colors will be used for the outline.
         /// Called when the object is hovered over.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over (not used here)</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over (not used here).</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void On(InteractableObject interactableObject, bool isInitiator)
         {
             if (!Interactable.IsSelected && !Interactable.IsGrabbed)
@@ -38,8 +38,8 @@ namespace SEE.Controls.Actions
         /// this outline will be destroyed.
         /// Called when the object is no longer being hovered over.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over (not used here)</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over (not used here).</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         protected override void Off(InteractableObject interactableObject, bool isInitiator)
         {
             //FIXME: Outline color is not correctly set if we hover off while a node is selected

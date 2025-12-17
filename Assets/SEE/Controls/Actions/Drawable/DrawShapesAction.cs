@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Simply enter the desired values in the Shape Menu.
         /// For the Line shape type, multiple clicks (one for each point) are required.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             /// Offers a preview for a shape representation on a fixed chosen position.
@@ -739,7 +739,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="DrawShapesAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
+        /// <returns>New instance of <see cref="DrawShapesAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new DrawShapesAction();
@@ -749,7 +749,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="DrawShapesAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="DrawShapesAction"/></returns>
+        /// <returns>New instance of <see cref="DrawShapesAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -758,7 +758,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.DrawShapes"/></returns>
+        /// <returns><see cref="ActionStateType.DrawShapes"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.DrawShapes;
@@ -768,7 +768,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>The ID of the created shape</returns>
+        /// <returns>The ID of the created shape.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)

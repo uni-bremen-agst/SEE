@@ -41,8 +41,8 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor setting its fields.
             /// </summary>
-            /// <param name="surface">The drawable surface on which the drawable type is displayed</param>
-            /// <param name="drawableType">The drawable type of the deleted object</param>
+            /// <param name="surface">The drawable surface on which the drawable type is displayed.</param>
+            /// <param name="drawableType">The drawable type of the deleted object.</param>
             public Memento(GameObject surface, DrawableType drawableType)
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
@@ -56,7 +56,7 @@ namespace SEE.Controls.Actions.Drawable
         /// With the mouse button held down, more than one Drawable Type Object can be deleted.
         /// Therefore, a list of mementos is needed.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -190,7 +190,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EraseAction"/></returns>
+        /// <returns>New instance of <see cref="EraseAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new EraseAction();
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="EraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EraseAction"/></returns>
+        /// <returns>New instance of <see cref="EraseAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -209,7 +209,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Erase"/></returns>
+        /// <returns><see cref="ActionStateType.Erase"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Erase;
@@ -219,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the IDs of the deletes objects</returns>
+        /// <returns>The IDs of the deletes objects.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (mementoList.Count == 0)

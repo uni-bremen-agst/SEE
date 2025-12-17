@@ -218,7 +218,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Adds the necessary handler for the cut, copy and paste button.
         /// </summary>
-        /// <param name="menu">The instance of the cut copy paste menu</param>
+        /// <param name="menu">The instance of the cut copy paste menu.</param>
         private void SetupButtons(GameObject menu)
         {
             Transform content = menu.transform.Find("Content");
@@ -242,7 +242,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the action <see cref="ActionStateType.CutCopyPaste"/>.
         /// It allows to cut or copy drawable type objects and paste them on a specific position on a specific drawable.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -457,7 +457,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         ///  Moves the clone of the selected node to the destination (new position).
         /// </summary>
-        /// <param name="newPosition">destination position</param>
+        /// <param name="newPosition">Destination position.</param>
         private void MoveWithWorldPosition(Vector3 newPosition)
         {
             /// Moves the clone of the selected node to the destination (new position).
@@ -712,7 +712,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="CutCopyPasteActyion"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CutCopyPasteAction"/></returns>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new CutCopyPasteAction();
@@ -722,7 +722,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="CutCopyPasteAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="CutCopyPasteAction"/></returns>
+        /// <returns>New instance of <see cref="CutCopyPasteAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -731,7 +731,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.CutCopyPaste"/></returns>
+        /// <returns><see cref="ActionStateType.CutCopyPaste"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.CutCopyPaste;

@@ -25,7 +25,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Specifically: Allows the user to remove one or more points of a line.
         ///               In one action run it can remove multiple points of different lines.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -115,7 +115,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LinePointEraseAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LinePointEraseAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LinePointEraseAction();
@@ -125,7 +125,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LinePointEraseAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LinePointEraseAction"/></returns>
+        /// <returns>New instance of <see cref="LinePointEraseAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -134,7 +134,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LinePointErase"/></returns>
+        /// <returns><see cref="ActionStateType.LinePointErase"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LinePointErase;
@@ -144,7 +144,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>a set of line IDs</returns>
+        /// <returns>A set of line IDs.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento == null || memento.Surface == null)

@@ -64,7 +64,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.ColorPicker"/>.
         /// It picks the chosen color of a drawable type object.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -302,12 +302,12 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor, which simply assigns its only parameter to a field in this class.
             /// </summary>
             /// <param name="oldChosenPrimaryColor">The old chosen
-            ///     <see cref="ValueHolder.CurrentPrimaryColor"/></param>
+            ///     <see cref="ValueHolder.CurrentPrimaryColor"/>.</param>
             /// <param name="oldChosenSecondColor">The old chosen
-            ///     <see cref="ValueHolder.CurrentSecondaryColor"/></param>
-            /// <param name="pickedColor">The picked color</param>
+            ///     <see cref="ValueHolder.CurrentSecondaryColor"/>.</param>
+            /// <param name="pickedColor">The picked color.</param>
             /// <param name="pickForSecondColor">Color was picked for
-            ///     <see cref="ValueHolder.CurrentSecondaryColor"/></param>
+            ///     <see cref="ValueHolder.CurrentSecondaryColor"/>.</param>
             ///
             public Memento(Color oldChosenPrimaryColor, Color oldChosenSecondColor, Color pickedColor,
                 bool pickForSecondColor)
@@ -353,7 +353,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ColorPickerAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ColorPickerAction"/></returns>
+        /// <returns>New instance of <see cref="ColorPickerAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new ColorPickerAction();
@@ -363,7 +363,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="ColorPickerAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="ColorPickerAction"/></returns>
+        /// <returns>New instance of <see cref="ColorPickerAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -372,7 +372,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.ColorPicker"/></returns>
+        /// <returns><see cref="ActionStateType.ColorPicker"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ColorPicker;
@@ -384,7 +384,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>an empty set</returns>
+        /// <returns>An empty set.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>();

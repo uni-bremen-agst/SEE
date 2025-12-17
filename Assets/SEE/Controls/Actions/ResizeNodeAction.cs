@@ -39,19 +39,19 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         internal static IReversibleAction CreateReversibleAction() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns a new instance of <see cref="ResizeNodeAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance() => new ResizeNodeAction();
 
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.ResizeNode"/></returns>
+        /// <returns><see cref="ActionStateType.ResizeNode"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.ResizeNode;
@@ -60,7 +60,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of gameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of gameObjects manipulated by this action</returns>
+        /// <returns>All IDs of gameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return String.IsNullOrEmpty(memento.ID) || CurrentState == IReversibleAction.Progress.NoEffect
@@ -160,7 +160,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Used to execute the <see cref="ResizeNodeAction"/> from the context menu.
         /// </summary>
-        /// <param name="go">The object to be resize</param>
+        /// <param name="go">The object to be resize.</param>
         /// <remarks>
         /// This method does not check if the object's type has
         /// <see cref="VisualNodeAttributes.AllowManualResize"/> flag set.
@@ -227,8 +227,8 @@ namespace SEE.Controls.Actions
         /// <see cref="ResizeNodeAction"/>.
         /// </para>
         /// </summary>
-        /// <param name="newLocalScale">The new local scale after the resize step</param>
-        /// <param name="newPosition">The new world-space position after the resize step</param>
+        /// <param name="newLocalScale">The new local scale after the resize step.</param>
+        /// <param name="newPosition">The new world-space position after the resize step.</param>
         private void OnResizeStep(Vector3 newLocalScale, Vector3 newPosition)
         {
             CurrentState = IReversibleAction.Progress.InProgress;

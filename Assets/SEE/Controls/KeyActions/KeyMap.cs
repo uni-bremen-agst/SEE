@@ -26,7 +26,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns all bindings grouped by their <see cref="KeyActionCategory"/>.
         /// </summary>
-        /// <returns>all bindings</returns>
+        /// <returns>All bindings.</returns>
         internal IEnumerable<IGrouping<KeyActionCategory, KeyValuePair<KeyAction, KeyActionDescriptor>>> AllBindings()
         {
             return keyBindings.GroupBy(binding => binding.Value.Category);
@@ -35,9 +35,9 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Gets the <paramref name="descriptor"/> bound to the specified <paramref name="keyAction"/>.
         /// </summary>
-        /// <param name="keyAction">the <see cref="KeyAction"/> whose <paramref name="descriptor"/> is requested</param>
-        /// <param name="descriptor">the resulting <see cref="KeyActionDescriptor"/> bound
-        /// to <paramref name="keyAction"/; defined only if this method returns <c>true</c></param>
+        /// <param name="keyAction">The <see cref="KeyAction"/> whose <paramref name="descriptor"/> is requested.</param>
+        /// <param name="descriptor">The resulting <see cref="KeyActionDescriptor"/> bound
+        /// to <paramref name="keyAction"/; defined only if this method returns <c>true</c>.</param>
         /// <returns><c>true</c> if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
         /// otherwise, <c>false</c>.</returns>
         internal bool TryGetValue(KeyAction keyAction, out KeyActionDescriptor descriptor)
@@ -49,9 +49,9 @@ namespace SEE.Controls.KeyActions
         /// Gets the <paramref name="keyCode"/> of the <see cref="KeyActionDescriptor"/> bound
         /// to the specified <paramref name="keyAction"/>.
         /// </summary>
-        /// <param name="keyAction">the <see cref="KeyAction"/> whose <paramref name="keyCode"/> is requested</param>
-        /// <param name="keyCode">the resulting <see cref="KeyCode"/> of the descriptor bound
-        /// to <paramref name="keyAction"/>; defined only if this method returns <c>true</c></param>
+        /// <param name="keyAction">The <see cref="KeyAction"/> whose <paramref name="keyCode"/> is requested.</param>
+        /// <param name="keyCode">The resulting <see cref="KeyCode"/> of the descriptor bound
+        /// to <paramref name="keyAction"/>; defined only if this method returns <c>true</c>.</param>
         /// <returns><c>true</c> if this <see cref="KeyMap"/> contains an descriptor bound to <paramref name="keyAction"/>;
         /// otherwise, <c>false</c>.</returns>
         internal bool TryGetValue(KeyAction keyAction, out KeyCode keyCode)
@@ -76,12 +76,12 @@ namespace SEE.Controls.KeyActions
         /// Otherwise <c>false</c> is returned and <paramref name="boundKeyAction"/>
         /// is undefined.
         /// </summary>
-        /// <param name="keyCode">a <see cref="KeyCode"/> for which a binding
-        /// is to be searched</param>
-        /// <param name="boundKeyAction">the <see cref="KeyAction"/> bound
-        /// to <paramref name="keyCode"/> if one exists; otherwise undefined</param>
+        /// <param name="keyCode">A <see cref="KeyCode"/> for which a binding
+        /// is to be searched.</param>
+        /// <param name="boundKeyAction">The <see cref="KeyAction"/> bound
+        /// to <paramref name="keyCode"/> if one exists; otherwise undefined.</param>
         /// <returns><c>true</c> if and only if there is a <see cref="KeyAction"/>
-        /// triggered by <paramref name="keyCode"/></returns>
+        /// triggered by <paramref name="keyCode"/>.</returns>
         internal bool TryGetKeyAction(KeyCode keyCode, out KeyAction boundKeyAction)
         {
             KeyValuePair<KeyAction, KeyActionDescriptor> keyValuePair = keyBindings.FirstOrDefault(kv => kv.Value.KeyCode == keyCode);
@@ -102,9 +102,9 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Binds <paramref name="keyActionDescriptor"/> to <paramref name="keyAction"/>.
         /// </summary>
-        /// <param name="keyAction">where to bind</param>
-        /// <param name="keyActionDescriptor">what to be bound</param>
-        /// <exception cref="System.ArgumentException">if there is already another action
+        /// <param name="keyAction">Where to bind.</param>
+        /// <param name="keyActionDescriptor">What to be bound.</param>
+        /// <exception cref="System.ArgumentException">If there is already another action
         /// <paramref name="keyAction"/> is bound to or if the key code of <paramref name="keyActionDescriptor"/>
         /// is already in use.
         /// </exception>
@@ -127,9 +127,9 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Rebinds <paramref name="descriptor"/> to another <paramref name="keyCode"/>.
         /// </summary>
-        /// <param name="descriptor">the binding that should be triggered by <paramref name="keyCode"/></param>
-        /// <param name="keyCode">the key code that should trigger the action represented by <paramref name="descriptor"/></param>
-        /// <exception cref="Exception">thrown if <paramref name="keyCode"/> is already bound to an action</exception>
+        /// <param name="descriptor">The binding that should be triggered by <paramref name="keyCode"/>.</param>
+        /// <param name="keyCode">The key code that should trigger the action represented by <paramref name="descriptor"/>.</param>
+        /// <exception cref="Exception">Thrown if <paramref name="keyCode"/> is already bound to an action.</exception>
         internal void ResetKeyCode(KeyActionDescriptor descriptor, KeyCode keyCode)
         {
             if (TryGetKeyAction(keyCode, out KeyAction action))
@@ -146,7 +146,7 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// The number of bindings.
         /// </summary>
-        /// <returns>number of bindings</returns>
+        /// <returns>Number of bindings.</returns>
         internal int Count => keyBindings.Count;
 
         #region Persistence
@@ -214,8 +214,8 @@ namespace SEE.Controls.KeyActions
         /// that is, <see cref="keyBindings"/> will be the same as before the call
         /// of this method.
         /// </summary>
-        /// <exception cref="Exception">thrown if there exists at least one
-        /// duplicate key code in the file</exception>
+        /// <exception cref="Exception">Thrown if there exists at least one
+        /// duplicate key code in the file.</exception>
         internal void Load(string keyBindingsPath)
         {
             // If the file exists, we can read from it, otherwise we don't do anything.
@@ -266,12 +266,12 @@ namespace SEE.Controls.KeyActions
         /// Otherwise <c>false</c> is returned and <paramref name="keyActionDescriptor"/>
         /// is undefined.
         /// </summary>
-        /// <param name="keyBindings">the key bindings where to look up <paramref name="actionName"/></param>
-        /// <param name="actionName">a <see cref="KeyActionDescriptor.Name"/> to be searched for</param>
-        /// <param name="keyActionDescriptor">the <see cref="KeyActionDescriptor"/> with
-        /// <paramref name="actionName"/> if one exists; otherwise undefined</param>
+        /// <param name="keyBindings">The key bindings where to look up <paramref name="actionName"/>.</param>
+        /// <param name="actionName">A <see cref="KeyActionDescriptor.Name"/> to be searched for.</param>
+        /// <param name="keyActionDescriptor">The <see cref="KeyActionDescriptor"/> with
+        /// <paramref name="actionName"/> if one exists; otherwise undefined.</param>
         /// <returns><c>true</c> if and only if there is a <see cref="KeyActionDescriptor"/>
-        /// in <paramref name="keyBindings"/> with <paramref name="actionName"/></returns>
+        /// in <paramref name="keyBindings"/> with <paramref name="actionName"/>.</returns>
         private static bool TryGetKeyActionDescriptorByName
             (IDictionary<KeyAction, KeyActionDescriptor> keyBindings,
             String actionName,
@@ -289,11 +289,11 @@ namespace SEE.Controls.KeyActions
         /// Otherwise <c>false</c> is returned and <paramref name="keyActionDescriptor"/>
         /// is undefined.
         /// </summary>
-        /// <param name="actionName">a <see cref="KeyActionDescriptor.Name"/> to be searched for</param>
-        /// <param name="keyActionDescriptor">the <see cref="KeyActionDescriptor"/> with
-        /// <paramref name="actionName"/> if one exists; otherwise undefined</param>
+        /// <param name="actionName">A <see cref="KeyActionDescriptor.Name"/> to be searched for.</param>
+        /// <param name="keyActionDescriptor">The <see cref="KeyActionDescriptor"/> with
+        /// <paramref name="actionName"/> if one exists; otherwise undefined.</param>
         /// <returns><c>true</c> if and only if there is a <see cref="KeyActionDescriptor"/>
-        /// with <paramref name="actionName"/></returns>
+        /// with <paramref name="actionName"/>.</returns>
         internal bool TryGetKeyActionDescriptorByName(String actionName, out KeyActionDescriptor keyActionDescriptor)
         {
             return TryGetKeyActionDescriptorByName(keyBindings, actionName, out keyActionDescriptor);
@@ -302,8 +302,8 @@ namespace SEE.Controls.KeyActions
         /// <summary>
         /// Returns true if and only if there are duplicate key codes in <paramref name="keyBindings"/>.
         /// </summary>
-        /// <param name="keyBindings">the key bindings to be checked for consistency</param>
-        /// <returns>true if there are duplicate key codes in <paramref name="keyBindings"/></returns>
+        /// <param name="keyBindings">The key bindings to be checked for consistency.</param>
+        /// <returns>True if there are duplicate key codes in <paramref name="keyBindings"/>.</returns>
         private static bool HasDuplicateKeyCodes(IDictionary<KeyAction, KeyActionDescriptor> keyBindings)
         {
             return ContainsDuplicates(keyBindings.Select(kv => kv.Value.KeyCode));
@@ -313,8 +313,8 @@ namespace SEE.Controls.KeyActions
         /// Returns true if and only if there are duplicate key codes in <paramref name="enumerable"/>.
         /// </summary>
         /// <typeparam name="T">any type</typeparam>
-        /// <param name="enumerable">to be checked for duplicates</param>
-        /// <returns>true if there are duplicate key codes in <paramref name="enumerable"/></returns>
+        /// <param name="enumerable">To be checked for duplicates.</param>
+        /// <returns>True if there are duplicate key codes in <paramref name="enumerable"/>.</returns>
         public static bool ContainsDuplicates<T>(IEnumerable<T> enumerable)
         {
             HashSet<T> set = new();
@@ -329,7 +329,7 @@ namespace SEE.Controls.KeyActions
         /// Allows to iterate over all bindings in this <see cref="KeyMap"/>.
         /// Implements <see cref="IEnumerable.GetEnumerator"/>.
         /// </summary>
-        /// <returns>iterator for this <see cref="KeyMap"/></returns>
+        /// <returns>Iterator for this <see cref="KeyMap"/>.</returns>
         public IEnumerator<KeyValuePair<KeyAction, KeyActionDescriptor>> GetEnumerator()
         {
             foreach (var binding in keyBindings)
@@ -342,7 +342,7 @@ namespace SEE.Controls.KeyActions
         /// Allows to iterate over all bindings in this <see cref="KeyMap"/>.
         /// Implements <see cref="IEnumerable.GetEnumerator"/>.
         /// </summary>
-        /// <returns>iterator for this <see cref="KeyMap"/></returns>
+        /// <returns>Iterator for this <see cref="KeyMap"/>.</returns>
         IEnumerator IEnumerable.GetEnumerator()
         {
             foreach (var binding in keyBindings)

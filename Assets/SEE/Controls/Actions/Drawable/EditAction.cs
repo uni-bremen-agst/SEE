@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <summary>
             /// The constructor.
             /// </summary>
-            /// <param name="obj">The selected drawable type object that should be edit</param>
+            /// <param name="obj">The selected drawable type object that should be edit.</param>
             /// <param name="oldValueHolder">The old values of the drawable type object.</param>
             /// <param name="newValueHolder">The newly edited values of the drawable type object.</param>
             /// <param name="surface">The drawable surface on which the drawable type object is displayed.</param>
@@ -127,7 +127,7 @@ namespace SEE.Controls.Actions.Drawable
         /// </summary>
         /// <param name="oldHolder">The holder for the old values.</param>
         /// <param name="newHolder">The holder for the new values.</param>
-        /// <returns>true if all is equal</returns>
+        /// <returns>True if all is equal.</returns>
         private bool CheckEquals(DrawableType oldHolder, DrawableType newHolder)
         {
             if (oldHolder is LineConf oldLineHolder && newHolder is LineConf newLineHolder)
@@ -200,7 +200,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.Edit"/>.
         /// It allows editing of the drawable type objects.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             /// Block for canceling the action.
@@ -340,7 +340,7 @@ namespace SEE.Controls.Actions.Drawable
         /// If no changes were made, it resets.
         /// If there are changes the action will be successfull completed.
         /// </summary>
-        /// <returns>whatever the success of the editing is.</returns>
+        /// <returns>Whatever the success of the editing is.</returns>
         private bool Finish()
         {
             mouseWasReleased = false;
@@ -403,7 +403,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditAction"/></returns>
+        /// <returns>New instance of <see cref="EditAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new EditAction();
@@ -413,7 +413,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="EditAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="EditAction"/></returns>
+        /// <returns>New instance of <see cref="EditAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -422,7 +422,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.Edit"/></returns>
+        /// <returns><see cref="ActionStateType.Edit"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.Edit;

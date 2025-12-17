@@ -22,7 +22,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.LineSplit"/>.
         /// Specifically: Allows the user to split a line. One action run allows to split the line one time.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -178,7 +178,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineSplitAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineSplitAction"/></returns>
+        /// <returns>New instance of <see cref="LineSplitAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new LineSplitAction();
@@ -188,7 +188,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="LineSplitAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="LineSplitAction"/></returns>
+        /// <returns>New instance of <see cref="LineSplitAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -197,7 +197,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.LineSplit"/></returns>
+        /// <returns><see cref="ActionStateType.LineSplit"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.LineSplit;
@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the ID of the line that was split.</returns>
+        /// <returns>The ID of the line that was split.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)

@@ -77,7 +77,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="oldObjectPosition">The old position of the selected object.</param>
             /// <param name="newObjectPosition">The new position of the selected object.</param>
             /// <param name="oldObjectLocalEulerAngles">The old local euler angles of the selected object.</param>
-            /// <param name="degree">The degree on that the object was rotated. (Is the z value of the local euler angeles)</param>
+            /// <param name="degree">The degree on that the object was rotated. (Is the z value of the local euler angeles).</param>
             /// <param name="moveOrRotate">The state if was moved or rotated.</param>
             public Memento(GameObject selectedObject, GameObject surface, string id,
                 Vector3 oldObjectPosition, Vector3 newObjectPosition, Vector3 oldObjectLocalEulerAngles,
@@ -205,7 +205,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MoveRotator"/>.
         /// It moves or rotates a chosen drawable type object.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             Cancel();
@@ -439,10 +439,10 @@ namespace SEE.Controls.Actions.Drawable
         /// It locks the moving by mouse and
         /// moves the object in the respective direction based on the chosen speed
         /// </summary>
-        /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu</param>
-        /// <param name="speedUp">The switch manager for the speed up option from the menu</param>
+        /// <param name="moveByMouse">The switch manager for the move by mouse option from the menu.</param>
+        /// <param name="speedUp">The switch manager for the speed up option from the menu.</param>
         /// <param name="surface">The drawable surface on which the object is displayed.</param>
-        /// <param name="surfaceParentName">The parent name of the drawable surface</param>
+        /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
         private void MoveByKey(SwitchManager moveByMouse, SwitchManager speedUp,
             GameObject surface, string surfaceParentName)
         {
@@ -462,7 +462,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Checks if any of the child nodes are involved in a collision.
         /// </summary>
-        /// <returns>true if a child node is involved in a collision; otherwise false</returns>
+        /// <returns>True if a child node is involved in a collision; otherwise false.</returns>
         private bool CheckChildrenCollision()
         {
             bool childInCollision = false;
@@ -486,10 +486,10 @@ namespace SEE.Controls.Actions.Drawable
         /// The children are only necessary for a mind map node with the
         /// include children option.
         /// </summary>
-        /// <param name="moveByMouse">The switch manager for the move-by-mouse option from the menu</param>
-        /// <param name="childInCollision">Identifies whether any of the children are in collision</param>
+        /// <param name="moveByMouse">The switch manager for the move-by-mouse option from the menu.</param>
+        /// <param name="childInCollision">Identifies whether any of the children are in collision.</param>
         /// <param name="surface">The drawable surface on which the object is displayed.</param>
-        /// <param name="surfaceParentName">The parent name of the drawable surface</param>
+        /// <param name="surfaceParentName">The parent name of the drawable surface.</param>
         private void MoveByMouse(SwitchManager moveByMouse, bool childInCollision,
             GameObject surface, string surfaceParentName)
         {
@@ -615,7 +615,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The action is only completed properly if the object is no longer involved in any collision.
         /// The same applies to children when using mind map nodes with the option to include children.
         /// </summary>
-        /// <returns>state of success</returns>
+        /// <returns>State of success.</returns>
         private bool Finish()
         {
             if (oldObjectPosition != newObjectPosition
@@ -781,7 +781,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="MoveRotateAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MoveRotateAction"/></returns>
+        /// <returns>New instance of <see cref="MoveRotateAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new MoveRotateAction();
@@ -791,7 +791,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="MoveRotateAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MoveRotateAction"/></returns>
+        /// <returns>New instance of <see cref="MoveRotateAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -800,7 +800,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.MoveRotator"/></returns>
+        /// <returns><see cref="ActionStateType.MoveRotator"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.MoveRotator;
@@ -810,7 +810,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>The ID of the moved or rotated object</returns>
+        /// <returns>The ID of the moved or rotated object.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.SelectedObject == null)

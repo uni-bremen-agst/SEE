@@ -80,7 +80,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="surface">The drawable surface on which the text should be displayed.</param>
-            /// <param name="text">The written text</param>
+            /// <param name="text">The written text.</param>
             public Memento(GameObject surface, TextConf text)
             {
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
@@ -118,7 +118,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.WriteText"/>.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -236,7 +236,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="WriteTextAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="WriteTextAction"/></returns>
+        /// <returns>New instance of <see cref="WriteTextAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new WriteTextAction();
@@ -246,7 +246,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="WriteTextAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="WriteTextAction"/></returns>
+        /// <returns>New instance of <see cref="WriteTextAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -255,7 +255,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.WriteText"/></returns>
+        /// <returns><see cref="ActionStateType.WriteText"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.WriteText;
@@ -265,7 +265,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>.
         /// </summary>
-        /// <returns>the ID of the created drawable text</returns>
+        /// <returns>The ID of the created drawable text.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new() { memento.Text.ID };

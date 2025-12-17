@@ -101,7 +101,7 @@ namespace SEE.Controls.Actions.Drawable
             /// The constructor.
             /// </summary>
             /// <param name="surface">The drawable surface on which the node should be displayed.</param>
-            /// <param name="conf">The node configuration</param>
+            /// <param name="conf">The node configuration.</param>
             /// <param name="operation">The executed operation.</param>
             public Memento(GameObject surface, MindMapNodeConf conf, Operation operation)
             {
@@ -143,7 +143,7 @@ namespace SEE.Controls.Actions.Drawable
         /// This method manages the player's interaction with the mode <see cref="ActionStateType.MindMap"/>.
         /// It allows the user to set a mind map node.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         public override bool Update()
         {
             if (!Raycasting.IsMouseOverGUI())
@@ -208,7 +208,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// The process of adding a mind map node.
         /// </summary>
-        /// <returns>Whether this action is finished</returns>
+        /// <returns>Whether this action is finished.</returns>
         private bool AdditionProcess()
         {
             switch (progress)
@@ -242,7 +242,7 @@ namespace SEE.Controls.Actions.Drawable
         /// If so, the position is adopted, and it waits for the description for the node.
         /// Otherwise, the action is aborted and reset.
         /// </summary>
-        /// <returns>the success of the selection.</returns>
+        /// <returns>The success of the selection.</returns>
         private bool SelectPosition()
         {
             if (Selector.SelectQueryHasOrIsDrawableSurface(out RaycastHit raycastHit))
@@ -397,7 +397,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Finishes the action.
         /// </summary>
-        /// <returns>true</returns>
+        /// <returns>True.</returns>
         private bool FinishAdd()
         {
             memento = new(Surface, MindMapNodeConf.GetNodeConf(node), chosenOperation);
@@ -412,8 +412,8 @@ namespace SEE.Controls.Actions.Drawable
         /// If not, it provides an appropriate prompt
         /// when attempting to add a node that is not a theme.
         /// </summary>
-        /// <param name="attachedObjects">The attached objects of the drawable</param>
-        /// <returns>the result of the validation</returns>
+        /// <param name="attachedObjects">The attached objects of the drawable.</param>
+        /// <returns>The result of the validation.</returns>
         private bool CheckValid(GameObject attachedObjects)
         {
             if (chosenOperation == Operation.Theme)
@@ -437,7 +437,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Gets the prefix of the chosen <see cref="MindMapMenu.Operation"/>
         /// </summary>
-        /// <returns>The prefix</returns>
+        /// <returns>The prefix.</returns>
         private string GetPrefix()
         {
             string prefix;
@@ -500,7 +500,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="MindMapAction"/>.
         /// See <see cref="ReversibleAction.CreateReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MindMapAction"/></returns>
+        /// <returns>New instance of <see cref="MindMapAction"/>.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new MindMapAction();
@@ -510,7 +510,7 @@ namespace SEE.Controls.Actions.Drawable
         /// A new instance of <see cref="MindMapAction"/>.
         /// See <see cref="ReversibleAction.NewInstance"/>.
         /// </summary>
-        /// <returns>new instance of <see cref="MindMapAction"/></returns>
+        /// <returns>New instance of <see cref="MindMapAction"/>.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -519,7 +519,7 @@ namespace SEE.Controls.Actions.Drawable
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.MindMap"/></returns>
+        /// <returns><see cref="ActionStateType.MindMap"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.MindMap;
@@ -531,7 +531,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>empty set</returns>
+        /// <returns>Empty set.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface != null)
