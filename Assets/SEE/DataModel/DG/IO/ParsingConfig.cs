@@ -152,7 +152,7 @@ namespace SEE.DataModel.DG.IO
             // Apply restored values to the created instance.
             parsingConfig.ToolId = toolId;
             parsingConfig.SourceRootMarker = sourceRootMarker;
-            // Extention for derived classes
+            // Extension for derived classes
             parsingConfig.RestoreAdditional(groupDict);
         }
         /// <summary>
