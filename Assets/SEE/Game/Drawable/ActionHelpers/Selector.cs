@@ -25,7 +25,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <param name="collisionDetection">Check whether the tag of the selected object should be a <see cref="DrawableType"> tag.</param>
         /// <param name="action">The action to be taken if data needs to be reset after an action change.</param>
         /// <param name="setOldObject">Status indicating whether the previously selected object should be set.</param>
-        /// <paramref name="allowSelectViaChild"/>Whether the object can selected via a child object.<paramref name="allowSelectViaChild"/>
+        /// <param name="allowSelectViaChild"/>Whether the object can selected via a child object.</param>
         /// <returns>Status indicating whether the selection was successful or not.</returns>
         public static bool SelectObject(ref GameObject selectedObj, ref GameObject oldSelectedObj, ref bool mouseWasReleased, GameObject Surface,
             bool hasDrawable, bool isDrawableType, bool collisionDetection = false, ActionStateType action = null, bool setOldObject = true,

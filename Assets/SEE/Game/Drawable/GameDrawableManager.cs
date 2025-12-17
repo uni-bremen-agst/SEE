@@ -15,7 +15,7 @@ namespace SEE.Game.Drawable
         /// Changes the color of a drawable surface.
         /// </summary>
         /// <param name="obj">An object of the drawable.</param>
-        /// <param name="color">The new color for the drawable</param>
+        /// <param name="color">The new color for the drawable.</param>
         public static void ChangeColor(GameObject obj, Color color)
         {
             GameObject surfaceObj = GameFinder.GetDrawableSurface(obj);
@@ -141,8 +141,8 @@ namespace SEE.Game.Drawable
         /// The following pages will be renumbered to ensure there are no gaps between the page numbers.
         /// If the currently selected page is deleted, it will switch to the initial page.
         /// </summary>
-        /// <param name="surface"></param>
-        /// <param name="page"></param>
+        /// <param name="surface">The GameObject representing the drawable surface from which the page will be removed.</param>
+        /// <param name="page">The index of the page to remove.</param>
         public static void RemovePage(GameObject surface, int page)
         {
             if (!surface.CompareTag(Tags.Drawable))

@@ -52,8 +52,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Creates a <see cref="TextConf"/> for the given game object.
         /// </summary>
-        /// <param name="textObject">The game object with the <see cref="TextMeshPro"/> component</param>
-        /// <returns>The created <see cref="TextConf"/> object</returns>
+        /// <param name="textObject">The game object with the <see cref="TextMeshPro"/> component.</param>
+        /// <returns>The created <see cref="TextConf"/> object.</returns>
         public static TextConf GetText(GameObject textObject)
         {
             TextConf text = null;

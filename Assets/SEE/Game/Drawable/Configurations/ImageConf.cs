@@ -41,7 +41,7 @@ namespace SEE.Game.Drawable.Configurations
         /// If not, <c>null</c> is returned.
         /// </summary>
         /// <param name="imageObject">The game object which contains the image, the canvas and an image tag.</param>
-        /// <returns>A newly created image configuration</returns>
+        /// <returns>A newly created image configuration.</returns>
         public static ImageConf GetImageConf(GameObject imageObject)
         {
             ImageConf conf = null;

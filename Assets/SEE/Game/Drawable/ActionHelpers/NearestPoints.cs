@@ -13,9 +13,9 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// <summary>
         /// This method calculates the nearest points of a Vector3 array from a given point.
         /// </summary>
-        /// <param name="positions">The Vector3 array that holds the positions</param>
+        /// <param name="positions">The Vector3 array that holds the positions.</param>
         /// <param name="hitPoint">The point from which the nearest points should be determined.</param>
-        /// <returns>the indices of all nearest (same) points from the array</returns>
+        /// <returns>The indices of all nearest (same) points from the array.</returns>
         public static List<int> GetNearestIndices(Vector3[] positions, Vector3 hitPoint)
         {
             List<int> matchedIndices = new();

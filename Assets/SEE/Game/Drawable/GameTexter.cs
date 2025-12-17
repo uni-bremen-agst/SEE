@@ -32,10 +32,10 @@ namespace SEE.Game.Drawable
         /// Method based on the method from Stephan_B's comment in
         /// https://forum.unity.com/threads/calculate-width-of-a-text-before-without-assigning-it-to-a-tmp-object.758867/#post-5057900
         /// </summary>
-        /// <param name="text">the first line of the text.</param>
-        /// <param name="fontAsset">the used font asset.</param>
-        /// <param name="fontSize">the used font size.</param>
-        /// <param name="style">the used font styles.</param>
+        /// <param name="text">The first line of the text.</param>
+        /// <param name="fontAsset">The used font asset.</param>
+        /// <param name="fontSize">The used font size.</param>
+        /// <param name="style">The used font styles.</param>
         /// <returns>The calculated width for the first line of the text.</returns>
         private static float TextWidthApproximation(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles style)
@@ -85,10 +85,10 @@ namespace SEE.Game.Drawable
         /// The height is approximated by the number of lines multiplied by 0.1f and the fontSize.
         /// </summary>
         /// <param name="text">The written text.</param>
-        /// <param name="fontAsset">The font asset of the text</param>
-        /// <param name="fontSize">The font size of the text</param>
-        /// <param name="styles">The font styles of the text</param>
-        /// <returns>calculated width and height</returns>
+        /// <param name="fontAsset">The font asset of the text.</param>
+        /// <param name="fontSize">The font size of the text.</param>
+        /// <param name="styles">The font styles of the text.</param>
+        /// <returns>Calculated width and height.</returns>
         public static Vector2 CalculateWidthAndHeight(string text, TMP_FontAsset fontAsset,
             float fontSize, FontStyles styles)
         {
@@ -101,7 +101,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// This method creates the inital drawable text object.
         /// </summary>
-        /// <param name="surface">The drawable surface on which the text should be displayed</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed.</param>
         /// <param name="name">The name of the text object.</param>
         /// <param name="text">The text that should be displayed.</param>
         /// <param name="position">The inital position of the text object.</param>
@@ -200,16 +200,16 @@ namespace SEE.Game.Drawable
         /// Writes a drawbale text on a drawable.
         /// The name for it is currently empty, because the setup method will create a unique one.
         /// </summary>
-        /// <param name="surface">The drawable surface on which the text should be displayed</param>
-        /// <param name="text">The text that should be displayed</param>
-        /// <param name="position">The inital position of the text object</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed.</param>
+        /// <param name="text">The text that should be displayed.</param>
+        /// <param name="position">The inital position of the text object.</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
         /// <param name="outlineColor">The chosen outline color of the text.</param>
         /// <param name="outlineThickness">The chosen outline thickness of the text.</param>
-        /// <param name="fontSize">The chosen font size of the text</param>
-        /// <param name="order">The current order in layer</param>
-        /// <param name="styles">The chosen font styles for the text</param>
-        /// <returns>The created drawable text object</returns>
+        /// <param name="fontSize">The chosen font size of the text.</param>
+        /// <param name="order">The current order in layer.</param>
+        /// <param name="styles">The chosen font styles for the text.</param>
+        /// <returns>The created drawable text object.</returns>
         public static GameObject WriteText(GameObject surface, string text, Vector3 position,
             Color fontColor, Color outlineColor, bool outlineStatus, float outlineThickness, float fontSize, int order, FontStyles styles)
         {
@@ -227,19 +227,19 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Rewrites a drawbale text on a drawable.
         /// </summary>
-        /// <param name="surface">The drawable surface on which the text should be displayed</param>
-        /// <param name="id">The name of the drawable text</param>
-        /// <param name="text">The text that should be displayed</param>
-        /// <param name="position">The inital position of the text object</param>
-        /// <param name="scale">The scale of the text object</param>
-        /// <param name="eulerAngles">The euler angles of the text object</param>
+        /// <param name="surface">The drawable surface on which the text should be displayed.</param>
+        /// <param name="id">The name of the drawable text.</param>
+        /// <param name="text">The text that should be displayed.</param>
+        /// <param name="position">The inital position of the text object.</param>
+        /// <param name="scale">The scale of the text object.</param>
+        /// <param name="eulerAngles">The euler angles of the text object.</param>
         /// <param name="fontColor">The chosen font color of the text.</param>
         /// <param name="outlineColor">The chosen outline color of the text.</param>
         /// <param name="outlineThickness">The chosen outline thickness of the text.</param>
-        /// <param name="fontSize">The chosen font size of the text</param>
-        /// <param name="order">The current order in layer</param>
-        /// <param name="styles">The chosen font styles for the text</param>
-        /// <returns>The created drawable text object</returns>
+        /// <param name="fontSize">The chosen font size of the text.</param>
+        /// <param name="order">The current order in layer.</param>
+        /// <param name="styles">The chosen font styles for the text.</param>
+        /// <returns>The created drawable text object.</returns>
         private static GameObject ReWriteText(GameObject surface, string id, string text, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, Color fontColor, Color outlineColor, bool outlineStatus,
             float outlineThickness, float fontSize, int order, FontStyles styles, int associatedPage)
@@ -296,7 +296,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="surface">The drawable surface on which the text should be displayed.</param>
         /// <param name="text">The text configuration which contains the necessary values.</param>
-        /// <returns>The created drawable text object</returns>
+        /// <returns>The created drawable text object.</returns>
         public static GameObject ReWriteText(GameObject surface, TextConf text)
         {
             return ReWriteText(surface,

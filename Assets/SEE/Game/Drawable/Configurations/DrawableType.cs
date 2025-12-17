@@ -46,7 +46,7 @@ namespace SEE.Game.Drawable.Configurations
         /// Gets the drawable type of the given object.
         /// </summary>
         /// <param name="obj">The object from which the drawable type is to be determined.</param>
-        /// <returns>The drawable type</returns>
+        /// <returns>The drawable type.</returns>
         public static DrawableType Get(GameObject obj)
         {
             DrawableType type = obj.tag switch
@@ -130,8 +130,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Gets the sorting order for <paramref name="type"/>.
         /// </summary>
-        /// <param name="type">The current drawable type</param>
-        /// <returns>The number of the order</returns>
+        /// <param name="type">The current drawable type.</param>
+        /// <returns>The number of the order.</returns>
         public static int OrderOnType(DrawableType type)
         {
             return type switch
@@ -150,8 +150,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Therefore, the nodes with lower layers must be restored first.
         /// This method will be used in combination with <see cref="OrderOnType(DrawableType)"/>
         /// </summary>
-        /// <param name="type">the drawable type of the chosen object</param>
-        /// <returns>the order.</returns>
+        /// <param name="type">The drawable type of the chosen object.</param>
+        /// <returns>The order.</returns>
         public static int OrderMindMap(DrawableType type)
         {
             return type switch
@@ -272,7 +272,7 @@ namespace SEE.Game.Drawable.Configurations
         /// care only to begin and end the grouping and to emit the key-value pair
         /// for the 'kind'.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
         protected abstract void SaveAttributes(ConfigWriter writer);
 
         /// <summary>

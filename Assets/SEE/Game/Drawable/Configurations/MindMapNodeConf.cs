@@ -61,8 +61,8 @@ namespace SEE.Game.Drawable.Configurations
         /// Creates a <see cref="MindMapNodeConf"/> for the given game object,
         /// if it is a mind map node, otherwise the result is null.
         /// </summary>
-        /// <param name="obj">The game object with the <see cref="Tags.MindMapNode"/></param>
-        /// <returns>The created <see cref="MindMapNodeConf"/> object</returns>
+        /// <param name="obj">The game object with the <see cref="Tags.MindMapNode"/>.</param>
+        /// <returns>The created <see cref="MindMapNodeConf"/> object.</returns>
         public static MindMapNodeConf GetNodeConf(GameObject obj)
         {
             MindMapNodeConf conf = null;

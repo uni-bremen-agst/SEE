@@ -14,8 +14,8 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Searches for the drawable surface in the scene.
         /// </summary>
-        /// <param name="surfaceID">the drawable surface id.</param>
-        /// <param name="surfaceParentID">the parent id of the drawable surface.</param>
+        /// <param name="surfaceID">The drawable surface id.</param>
+        /// <param name="surfaceParentID">The parent id of the drawable surface.</param>
         /// <param name="useFindWithTagList">Option to select which list should be searched.
         /// By default, the <see cref="ValueHolder.DrawableSurfaces"> is used.
         /// When this option is set to true, the expensive <see cref="GameObject.FindGameObjectsWithTag(string)"/> functionality is used.</param>
@@ -75,8 +75,8 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="parent">Must be an object of the drawable holder.</param>
         /// <param name="childName">The id of the searched child.</param>
-        /// <param name="includeInactive">whether the inactive objects should be included.</param>
-        /// <returns>The searched child, if found. Otherwise, null</returns>
+        /// <param name="includeInactive">Whether the inactive objects should be included.</param>
+        /// <returns>The searched child, if found. Otherwise, null.</returns>
         public static GameObject FindChild(GameObject parent, string childName, bool includeInactive = true)
         {
             GameObject attachedObjects = parent.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);
@@ -99,7 +99,7 @@ namespace SEE.Game.Drawable
         /// Query whether the given object is located on a drawable surface.
         /// </summary>
         /// <param name="child">The child to be examined.</param>
-        /// <returns>true, if the child has a drawable. Otherwise false</returns>
+        /// <returns>True, if the child has a drawable. Otherwise false.</returns>
         public static bool HasDrawableSurface(GameObject child)
         {
             if (child.HasParentWithTag(Tags.AttachedObjects))
@@ -117,7 +117,7 @@ namespace SEE.Game.Drawable
         /// is located on one.
         /// </summary>
         /// <param name="obj">The object to be examined.</param>
-        /// <returns>true if the object is a drawable surface or if is located on one.</returns>
+        /// <returns>True if the object is a drawable surface or if is located on one.</returns>
         public static bool IsOrHasDrawableSurface(GameObject obj)
         {
             return obj.CompareTag(Tags.Drawable) || HasDrawableSurface(obj);
@@ -129,7 +129,7 @@ namespace SEE.Game.Drawable
         /// the given game object contains a drawable child object.
         /// </summary>
         /// <param name="component">The game object to be checked.</param>
-        /// <returns>true, if a drawable will be found. Otherwise false</returns>
+        /// <returns>True, if a drawable will be found. Otherwise false.</returns>
         public static bool IsPartOfADrawable(GameObject component)
         {
             return GetDrawableSurface(component) != null;
@@ -151,7 +151,7 @@ namespace SEE.Game.Drawable
         /// Query whether the child has a parent.
         /// </summary>
         /// <param name="child">The child.</param>
-        /// <returns>true, if the child has a parent.</returns>
+        /// <returns>True, if the child has a parent.</returns>
         public static bool HasParent(GameObject child)
         {
             return child.transform.parent != null;
@@ -187,7 +187,7 @@ namespace SEE.Game.Drawable
         /// <summary>
         /// Gets the parent name of the drawable surface.
         /// </summary>
-        /// <param name="surface">The drawable surface</param>
+        /// <param name="surface">The drawable surface.</param>
         /// <returns>The name, empty if no parent exists.</returns>
         public static string GetDrawableSurfaceParentName(GameObject surface)
         {
@@ -255,7 +255,7 @@ namespace SEE.Game.Drawable
         /// Below this game object, the <see cref="DrawableType"/> objects are placed.
         /// </summary>
         /// <param name="obj">An object within a drawable holder.</param>
-        /// <returns>the object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
+        /// <returns>The object which holds the <see cref="DrawableType"/> objects of a drawable.</returns>
         public static GameObject GetAttachedObjectsObject(GameObject obj)
         {
             return obj.GetRootParent().FindDescendantWithTag(Tags.AttachedObjects);

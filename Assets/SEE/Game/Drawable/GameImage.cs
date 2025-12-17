@@ -20,7 +20,7 @@ namespace SEE.Game.Drawable
         /// https://stackoverflow.com/questions/71898310/how-to-change-the-texture-type-of-a-png-image-to-sprite-through-a-script-in-uni
         /// </summary>
         /// <param name="texture">The texture that should be converted.</param>
-        /// <returns>The converted sprite</returns>
+        /// <returns>The converted sprite.</returns>
         public static Sprite TextureToSprite(Texture2D texture) =>
             Sprite.Create(texture, new Rect(0f, 0f, texture.width, texture.height),
                 new Vector2(0.5f, 0.5f), 50f, 0, SpriteMeshType.FullRect);
@@ -30,13 +30,13 @@ namespace SEE.Game.Drawable
         /// Either the file path is empty or the file data.
         /// </summary>
         /// <param name="surface">The drawable surface where the image should be displayed.</param>
-        /// <param name="name">the name of the image game object</param>
-        /// <param name="imageFilePath">the path where the image is located</param>
-        /// <param name="data">the file data of the image.</param>
-        /// <param name="position">the position where the image should be</param>
-        /// <param name="order">the order in layer for the image</param>
+        /// <param name="name">The name of the image game object.</param>
+        /// <param name="imageFilePath">The path where the image is located.</param>
+        /// <param name="data">The file data of the image.</param>
+        /// <param name="position">The position where the image should be.</param>
+        /// <param name="order">The order in layer for the image.</param>
         /// <param name="associatedPage">The assoiated surface page for this object.</param>
-        /// <param name="image">the output image game object.</param>
+        /// <param name="image">The output image game object.</param>
         private static void Setup(GameObject surface, string name, string imageFilePath,
             byte[] data, Vector3 position, int order, int associatedPage,
             out GameObject image)
@@ -136,7 +136,7 @@ namespace SEE.Game.Drawable
         /// <param name="surface">The drawable surface where the image should be displayed.</param>
         /// <param name="imageFilePath">The file path where the image is located.</param>
         /// <param name="position">The position where the image should be placed.</param>
-        /// <param name="order">The order in layer for the image</param>
+        /// <param name="order">The order in layer for the image.</param>
         /// <returns>The created image game object.</returns>
         public static GameObject PlaceImage(GameObject surface, string imageFilePath, Vector3 position, int order)
         {
@@ -150,14 +150,14 @@ namespace SEE.Game.Drawable
         /// Re-adds an image to a drawable.
         /// </summary>
         /// <param name="surface">The drawable surface where the image should be displayed.</param>
-        /// <param name="name">The name of the image game object</param>
-        /// <param name="fileData">The file data that contains the image</param>
+        /// <param name="name">The name of the image game object.</param>
+        /// <param name="fileData">The file data that contains the image.</param>
         /// <param name="position">The position where the image should be placed.</param>
-        /// <param name="scale">The scale of the image</param>
-        /// <param name="eulerAngles">The rotation in euler angles of the image</param>
-        /// <param name="order">The order in layer for the image</param>
-        /// <param name="imageColor">The image color</param>
-        /// <param name="fileName">The file name of the image</param>
+        /// <param name="scale">The scale of the image.</param>
+        /// <param name="eulerAngles">The rotation in euler angles of the image.</param>
+        /// <param name="order">The order in layer for the image.</param>
+        /// <param name="imageColor">The image color.</param>
+        /// <param name="fileName">The file name of the image.</param>
         /// <returns>The created image game object.</returns>
         public static GameObject RePlaceImage(GameObject surface, string name, byte[] fileData, Vector3 position,
             Vector3 scale, Vector3 eulerAngles, int order, Color imageColor, string fileName, int associatedPage)
@@ -209,7 +209,7 @@ namespace SEE.Game.Drawable
         /// It calls the RePlaceImage - Method with all the attributes.
         /// </summary>
         /// <param name="surface">The drawable surface where the image should be displayed.</param>
-        /// <param name="conf">The image configuration to restore the old image</param>
+        /// <param name="conf">The image configuration to restore the old image.</param>
         /// <returns>The created image game object.</returns>
         public static GameObject RePlaceImage(GameObject surface, ImageConf conf)
         {

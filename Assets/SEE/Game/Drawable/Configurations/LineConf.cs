@@ -72,8 +72,8 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Creates a <see cref="LineConf"/> for the given game object.
         /// </summary>
-        /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component</param>
-        /// <returns>The created <see cref="LineConf"/> object</returns>
+        /// <param name="lineGameObject">The game object with the <see cref="LineRenderer"/> component.</param>
+        /// <returns>The created <see cref="LineConf"/> object.</returns>
         public static LineConf GetLine(GameObject lineGameObject)
         {
             LineConf line = null;
@@ -135,7 +135,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// Gets the fill out of the <see cref="LineConf"/>
         /// </summary>
-        /// <param name="conf">The line conf</param>
+        /// <param name="conf">The line conf.</param>
         /// <returns>The fill out color or null.</returns>
         public static Color? GetFillOutColor(LineConf conf)
         {
