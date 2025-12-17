@@ -13,8 +13,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shaderType">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shaderType">Shader to be used for rendering the materials the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public SpiderFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
@@ -22,7 +22,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Adds a <see cref="BoxCollider"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">The game object receiving the collider.</param>
         protected override void AddCollider(GameObject gameObject)
         {
             gameObject.AddComponent<MeshCollider>();
@@ -34,8 +34,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// metric; then this method sets the width and depth to M/2 such that the length
         /// of the axes showing M is M long.
         /// </summary>
-        /// <param name="gameObject">the game object whose dimensions are to be set</param>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        /// <param name="gameObject">The game object whose dimensions are to be set.</param>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
         protected override void SetDimensions(GameObject gameObject, float[] metrics)
         {
             // The height metric is not put on one of the axes and will be set here.
@@ -78,9 +78,9 @@ namespace SEE.GO.Factories.NodeFactories
         /// Returns the end points of the axes of the spider chart for the given
         /// <paramref name="metrics"/> (excluding the height metric at index 1).
         /// </summary>
-        /// <param name="metrics">the metric values determining the lengths of the
-        /// axes of the spider chart</param>
-        /// <returns>end points of the axes of the spider chart</returns>
+        /// <param name="metrics">The metric values determining the lengths of the
+        /// axes of the spider chart.</param>
+        /// <returns>End points of the axes of the spider chart.</returns>
         private static Vector2[] MetricsToVertices(float[] metrics)
         {
             // All metrics except the one used for the height.
@@ -125,7 +125,7 @@ namespace SEE.GO.Factories.NodeFactories
             /// the normalized value of M will be <see cref="radius"/>.
             /// If M = 0, all <paramref name="values"/> will be <see cref="radius"/>.
             /// </summary>
-            /// <param name="values">the values to be normalized</param>
+            /// <param name="values">The values to be normalized.</param>
             static void Normalize(float[] values)
             {
                 float max = Enumerable.Max(values);

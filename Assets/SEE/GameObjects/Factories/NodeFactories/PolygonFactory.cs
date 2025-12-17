@@ -14,8 +14,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shaderType">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shaderType">Shader to be used for rendering the materials the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public PolygonFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
@@ -23,7 +23,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Adds a <see cref="BoxCollider"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">The game object receiving the collider.</param>
         protected override void AddCollider(GameObject gameObject)
         {
             gameObject.AddComponent<MeshCollider>();
@@ -33,8 +33,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Sets the height of <paramref name="gameObject"/> according to the height metric.
         /// FIXME: Continue.
         /// </summary>
-        /// <param name="gameObject">the game object whose dimensions are to be set</param>
-        /// <param name="metrics">the metric values determining the lengths of <paramref name="gameObject"/></param>
+        /// <param name="gameObject">The game object whose dimensions are to be set.</param>
+        /// <param name="metrics">The metric values determining the lengths of <paramref name="gameObject"/>.</param>
         protected override void SetDimensions(GameObject gameObject, float[] metrics)
         {
             // We want to be able to compare the axes across different nodes,
@@ -106,8 +106,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// and all vertices are on the same circle. The first side of the polygon
         /// is at 12 o'clock and all others are allocated clockwise.
         /// </summary>
-        /// <param name="metrics">metrics determining the lengths of the polygon's sides</param>
-        /// <returns>vertices of the polygon</returns>
+        /// <param name="metrics">Metrics determining the lengths of the polygon's sides.</param>
+        /// <returns>Vertices of the polygon.</returns>
         private static Vector2[] MetricsToVertices(float[] metrics)
         {
             Vector2[] result = new Vector2[metrics.Length];
@@ -134,10 +134,10 @@ namespace SEE.GO.Factories.NodeFactories
         /// the distance between P1 and P2. The distances between P3 and P1 is the
         /// radius of the circle and equal to the distance between P3 and P2.
         /// </summary>
-        /// <param name="length">the length of the edge from one point on a circle to another point
-        /// on that circle</param>
-        /// <param name="radius">the radius of the circle of the two points connected by the edge</param>
-        /// <returns>angle between the r-length edges in the isosceles triangles</returns>
+        /// <param name="length">The length of the edge from one point on a circle to another point
+        /// on that circle.</param>
+        /// <param name="radius">The radius of the circle of the two points connected by the edge.</param>
+        /// <returns>Angle between the r-length edges in the isosceles triangles.</returns>
         private static float Theta(float length, float radius)
         {
             return 2.0f * Mathf.Asin(0.5f * length / radius);
@@ -150,10 +150,10 @@ namespace SEE.GO.Factories.NodeFactories
         ///
         /// Note that this circle is found iteratively by interval nesting.
         /// </summary>
-        /// <param name="lengths">the lengths of the sides of the polygon</param>
-        /// <param name="epsilon">the maximum distance between a vertex of the polygon
-        /// and the circle</param>
-        /// <returns>radius of the circle</returns>
+        /// <param name="lengths">The lengths of the sides of the polygon.</param>
+        /// <param name="epsilon">The maximum distance between a vertex of the polygon
+        /// and the circle.</param>
+        /// <returns>Radius of the circle.</returns>
         private static float FindRadius(float[] lengths, float epsilon)
         {
             // Each of the n (n = lengths.Count) line segments (lengths) essentially forms an isosceles

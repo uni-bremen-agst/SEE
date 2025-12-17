@@ -11,8 +11,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="shader">shader to be used for rendering the materials the created objects consist of</param>
-        /// <param name="colorRange">the color range of the created objects</param>
+        /// <param name="shader">Shader to be used for rendering the materials the created objects consist of.</param>
+        /// <param name="colorRange">The color range of the created objects.</param>
         public CubeFactory(MaterialsFactory.ShaderType shaderType, ColorRange colorRange)
             : base(shaderType, colorRange)
         { }
@@ -20,7 +20,7 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Adds a <see cref="BoxCollider"/> to <paramref name="gameObject"/>.
         /// </summary>
-        /// <param name="gameObject">the game object receiving the collider</param>
+        /// <param name="gameObject">The game object receiving the collider.</param>
         protected override void AddCollider(GameObject gameObject)
         {
             gameObject.AddComponent<BoxCollider>();
@@ -36,8 +36,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// Returns a (cached) mesh for a cube.
         /// Sets <see cref="modelMesh"/> if not yet set to cache the newly generated mesh.
         /// </summary>
-        /// <param name="metrics">this parameter will be ignored</param>
-        /// <returns>mesh for a cube</returns>
+        /// <param name="metrics">This parameter will be ignored.</param>
+        /// <returns>Mesh for a cube.</returns>
         protected override Mesh GetMesh(float[] metrics)
         {
             if (modelMesh != null)

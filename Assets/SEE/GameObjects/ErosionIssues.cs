@@ -16,9 +16,9 @@ namespace SEE.GO
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="issueMap">the relevant metrics for the erosion issues</param>
-        /// <param name="scaler">scaling to be applied on the metrics for the erosion issues</param>
-        /// <param name="erosionScalingFactor">the factor by which the erosion icons shall be scaled</param>
+        /// <param name="issueMap">The relevant metrics for the erosion issues.</param>
+        /// <param name="scaler">Scaling to be applied on the metrics for the erosion issues.</param>
+        /// <param name="erosionScalingFactor">The factor by which the erosion icons shall be scaled.</param>
         public ErosionIssues(Dictionary<string, IconFactory.Erosion> issueMap,
                              IScale scaler, float erosionScalingFactor, bool aggregated = false)
         {
@@ -56,7 +56,7 @@ namespace SEE.GO
         /// <summary>
         /// Creates sprites for software-erosion indicators for all given game nodes as children.
         /// </summary>
-        /// <param name="gameNodes">list of game nodes for which to create erosion visualizations</param>
+        /// <param name="gameNodes">List of game nodes for which to create erosion visualizations.</param>
         public void Add(IEnumerable<GameObject> gameNodes)
         {
             foreach (GameObject block in gameNodes)
@@ -69,9 +69,9 @@ namespace SEE.GO
         /// <summary>
         /// Whether the given <paramref name="gameNode"/> already has an icon for the given erosion <paramref name="issue"/>.
         /// </summary>
-        /// <param name="gameNode">The game node to check for the icon</param>
-        /// <param name="issue">The erosion issue to check for</param>
-        /// <returns>Whether the icon is already present</returns>
+        /// <param name="gameNode">The game node to check for the icon.</param>
+        /// <param name="issue">The erosion issue to check for.</param>
+        /// <returns>Whether the icon is already present.</returns>
         private static bool HasIconAlready(NodeRef gameNode, IconFactory.Erosion issue)
         {
             return gameNode.transform.Find(GetIconName(gameNode, issue)) != null;
@@ -81,9 +81,9 @@ namespace SEE.GO
         /// Returns the name of the icon for the given erosion <paramref name="issue"/> and the given <paramref name="gameNode"/>.
         /// This refers to the game object's name, not the filename of the sprite.
         /// </summary>
-        /// <param name="gameNode">The game node to get the icon name for</param>
-        /// <param name="issue">The erosion issue to get the icon name for</param>
-        /// <returns>The name of the icon</returns>
+        /// <param name="gameNode">The game node to get the icon name for.</param>
+        /// <param name="issue">The erosion issue to get the icon name for.</param>
+        /// <returns>The name of the icon.</returns>
         private static string GetIconName(NodeRef gameNode, IconFactory.Erosion issue)
         {
             return $"{ErosionSpritePrefix} {IconFactory.ToString(issue)} {gameNode.Value.SourceName}";
@@ -95,7 +95,7 @@ namespace SEE.GO
         /// to the normalized metric value for the erosion issue. The sprites are added as
         /// children to <paramref name="gameNode"/>.
         /// </summary>
-        /// <param name="gameNode">the game node which the sprites are to be created for</param>
+        /// <param name="gameNode">The game node which the sprites are to be created for.</param>
         protected void AddErosionIssues(NodeRef gameNode)
         {
             Node node = gameNode.Value;
@@ -187,8 +187,8 @@ namespace SEE.GO
         /// and the y co-ordinate is the maximum y co-ordinate of that game object and all its
         /// descendants in the game-object hierarchy.
         /// </summary>
-        /// <param name="gameNode">game node whose roof is to be determined</param>
-        /// <returns>world-space position of the roof of <paramref name="gameNode"/></returns>
+        /// <param name="gameNode">Game node whose roof is to be determined.</param>
+        /// <returns>World-space position of the roof of <paramref name="gameNode"/>.</returns>
         protected static Vector3 GetRoof(NodeRef gameNode)
         {
             Vector3 position = gameNode.gameObject.transform.position;
@@ -200,8 +200,8 @@ namespace SEE.GO
         /// Returns the size of the sprite for given game node that was drawn for
         /// a software-erosion indicator above the roof of the node.
         /// </summary>
-        /// <param name="gameNode"></param>
-        /// <returns>size of the sprite</returns>
+        /// <param name="gameNode">The GameObject representing the node for which the sprite size is retrieved.</param>
+        /// <returns>Size of the sprite.</returns>
         protected static Vector3 GetSizeOfSprite(GameObject gameNode)
         {
             // The game object representing an erosion is a composite of

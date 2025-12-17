@@ -65,9 +65,9 @@ namespace SEE.GO
         /// <summary>
         /// Returns the <see cref="NodeRef"/> referring to <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
-        /// <returns>the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
-        /// if there is none</returns>
+        /// <param name="node">Node whose <see cref="NodeRef"/> is requested.</param>
+        /// <returns>The <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none.</returns>
         public static NodeRef Get(Node node)
         {
             Assert.IsNotNull(node);
@@ -77,12 +77,12 @@ namespace SEE.GO
         /// <summary>
         /// Retrieves the <see cref="nodeRef"/> referring to <paramref name="node"/>.
         /// </summary>
-        /// <param name="node">node whose <see cref="NodeRef"/> is requested</param>
-        /// <param name="nodeRef">the <see cref="NodeRef"/> referring to <paramref name="node"/> or null
-        /// if there is none</param>
-        /// <returns>true if a <paramref name="nodeRef"/> corresponding to <paramref name="node"/>
+        /// <param name="node">Node whose <see cref="NodeRef"/> is requested.</param>
+        /// <param name="nodeRef">The <see cref="NodeRef"/> referring to <paramref name="node"/> or null
+        /// if there is none.</param>
+        /// <returns>True if a <paramref name="nodeRef"/> corresponding to <paramref name="node"/>
         /// could be found (is this returned value is false, <paramref name="nodeRef"/> will
-        /// be null)</returns>
+        /// be null).</returns>
         public static bool TryGet(Node node, out NodeRef nodeRef)
         {
             bool result = false;
@@ -98,7 +98,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns the IDs of all incoming and outgoing edges for this NodeRef.
         /// </summary>
-        /// <returns>IDs of all incoming and outgoing edges</returns>
+        /// <returns>IDs of all incoming and outgoing edges.</returns>
         public ISet<string> GetIdsOfIncomingOutgoingEdges()
         {
             HashSet<string> edgeIDs = new HashSet<string>();

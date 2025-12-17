@@ -17,10 +17,10 @@ namespace SEE.GO.Factories.NodeFactories
         /// the <paramref name="points"/> array. The size of the resulting triangle
         /// array will be 3 * |points|.
         /// </summary>
-        /// <param name="points">the set of points of a closed polygon for
+        /// <param name="points">The set of points of a closed polygon for
         /// which triangles are to be created completely covering the area
-        /// of the polygon</param>
-        /// <returns>list of triangles (indices into <paramref name="points"/>></returns>
+        /// of the polygon.</param>
+        /// <returns>List of triangles (indices into <paramref name="points"/>>.</returns>
         public static int[] Triangulate(Vector2[] points)
         {
             List<int> indices = new List<int>();
@@ -95,8 +95,8 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Returns the area enclosed by <paramref name="points"/>.
         /// </summary>
-        /// <param name="points">points of a closed polygon</param>
-        /// <returns>area of polygon defined by <paramref name="points"/></returns>
+        /// <param name="points">Points of a closed polygon.</param>
+        /// <returns>Area of polygon defined by <paramref name="points"/>.</returns>
         private static float Area(Vector2[] points)
         {
             int n = points.Length;
@@ -113,15 +113,15 @@ namespace SEE.GO.Factories.NodeFactories
         /// <summary>
         /// Return whether the triangle defined by the given vertex indices needs to be snipped.
         /// </summary>
-        /// <param name="points">the set of points of a closed polygon for
+        /// <param name="points">The set of points of a closed polygon for
         /// which triangles are to be created completely covering the area
-        /// of the polygon</param>
-        /// <param name="u">first vertex index of triangle (index for <paramref name="points"/>)</param>
-        /// <param name="v">second vertex index of triangle (index for <paramref name="points"/>)</param>
-        /// <param name="w">third vertex index of triangle (index for <paramref name="points"/>)</param>
-        /// <param name="n">number of points</param>
-        /// <param name="vertices">vertex indices of triangls into <paramref name="points"/></param>
-        /// <returns>true if the triangle defined by the given vertex indices needs to be snipped</returns>
+        /// of the polygon.</param>
+        /// <param name="u">First vertex index of triangle (index for <paramref name="points"/>).</param>
+        /// <param name="v">Second vertex index of triangle (index for <paramref name="points"/>).</param>
+        /// <param name="w">Third vertex index of triangle (index for <paramref name="points"/>).</param>
+        /// <param name="n">Number of points.</param>
+        /// <param name="vertices">Vertex indices of triangls into <paramref name="points"/>.</param>
+        /// <returns>True if the triangle defined by the given vertex indices needs to be snipped.</returns>
         private static bool Snip(Vector2[] points, int u, int v, int w, int n, int[] vertices)
         {
             int p;
@@ -150,11 +150,11 @@ namespace SEE.GO.Factories.NodeFactories
         /// Returns whether <paramref name="point"/> is enclosed in the triangle formed by
         /// <paramref name="a"/>, <paramref name="b"/>, and <paramref name="c"/>.
         /// </summary>
-        /// <param name="a">first point of a triangle</param>
-        /// <param name="b">second point of a triangle</param>
-        /// <param name="c">third point of a triangle</param>
-        /// <param name="point">a point to be checked</param>
-        /// <returns>true if <paramref name="point"/> is enclosed in the triangle</returns>
+        /// <param name="a">First point of a triangle.</param>
+        /// <param name="b">Second point of a triangle.</param>
+        /// <param name="c">Third point of a triangle.</param>
+        /// <param name="point">A point to be checked.</param>
+        /// <returns>True if <paramref name="point"/> is enclosed in the triangle.</returns>
         private static bool InsideTriangle(Vector2 a, Vector2 b, Vector2 c, Vector2 point)
         {
             float ax = c.x - b.x;

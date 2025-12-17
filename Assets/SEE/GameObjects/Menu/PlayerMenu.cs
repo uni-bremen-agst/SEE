@@ -35,7 +35,7 @@ namespace SEE.GO.Menu
         /// </summary>
         /// <param name="attachTo">The game object the menu should be attached to. If <c>null</c>, a
         /// new game object will be created.</param>
-        /// <returns>the newly created mode menu component.</returns>
+        /// <returns>The newly created mode menu component.</returns>
         private static SelectionMenu CreateModeMenu(GameObject attachTo = null)
         {
             // Note: A ?? expression can't be used here, or Unity's overloaded null-check will be overridden.
@@ -231,7 +231,7 @@ namespace SEE.GO.Menu
         /// <summary>
         /// Sets the currently selected menu entry in PlayerMenu to the action with given <paramref name="actionName"/>.
         /// </summary>
-        /// <param name="actionName">name of the menu entry to be set</param>
+        /// <param name="actionName">Name of the menu entry to be set.</param>
         private static void SetPlayerMenu(string actionName)
         {
             if (LocalPlayer.TryGetPlayerMenu(out PlayerMenu playerMenu))

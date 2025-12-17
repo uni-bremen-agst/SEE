@@ -119,7 +119,7 @@ namespace SEE.GameObjects.BranchCity
         /// The number of files this author has contributed to.
         /// More precisely, the number of <see cref="Edges"/>.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The number of files (edges) the author has contributed to.</returns>
         internal int NumberOfFiles()
         {
             return Edges.Count;
