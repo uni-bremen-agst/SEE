@@ -44,8 +44,8 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Creates the menu and registers the needed handler.
         /// </summary>
-        /// <param name="node">The selected node</param>
-        /// <param name="primaryColor">Indicates whether the primary or secondary color should be chosen</param>
+        /// <param name="node">The selected node.</param>
+        /// <param name="primaryColor">Indicates whether the primary or secondary color should be chosen.</param>
         public static void Enable(GameObject node, bool primaryColor)
         {
             if (Instance.gameObject == null)
@@ -170,8 +170,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="gotColor"/> is true, the <paramref name="color"/> will be the chosen color by the
         /// player. Otherwise it will be some dummy value.
         /// </summary>
-        /// <param name="color">The chosen color the player confirmed, if that doesn't exist, some dummy value</param>
-        /// <returns><see cref="gotColor"/></returns>
+        /// <param name="color">The chosen color the player confirmed, if that doesn't exist, some dummy value.</param>
+        /// <returns><see cref="gotColor"/>.</returns>
         public static bool TryGetColor(out Color color)
         {
             if (gotColor)

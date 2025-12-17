@@ -56,7 +56,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Enables the rotation menu. It beginns with the x-rotation menu.
         /// </summary>
-        /// <param name="stickyNoteHolder">the sticky note that should be rotated.</param>
+        /// <param name="stickyNoteHolder">The sticky note that should be rotated.</param>
         /// <param name="hitObject">The object where the sticky note was placed. Only necessary for spawning.</param>
         public static void Enable(GameObject stickyNoteHolder, GameObject hitObject = null,
             UnityAction returnCall = null)
@@ -88,8 +88,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="surface">The drawable surface of the sticky note holder</param>
-        /// <param name="surfaceParentName">The id of the sticky note parent</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The id of the sticky note parent.</param>
         private static void LayingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject surface, string surfaceParentName)
         {
@@ -115,8 +115,8 @@ namespace SEE.UI.Menu.Drawable
         /// </summary>
         /// <param name="stickyNoteHolder">The sticky note holder to be rotated.</param>
         /// <param name="hitObject">The hit object, is only in the spawn mode != null.</param>
-        /// <param name="surface">The drawable surface of the sticky note holder</param>
-        /// <param name="surfaceParentName">The id of the sticky note parent</param>
+        /// <param name="surface">The drawable surface of the sticky note holder.</param>
+        /// <param name="surfaceParentName">The id of the sticky note parent.</param>
         private static void HangingButton(GameObject stickyNoteHolder, GameObject hitObject,
             GameObject surface, string surfaceParentName)
         {
@@ -134,7 +134,7 @@ namespace SEE.UI.Menu.Drawable
         /// Sets up the return button for the xRotation menu if the <paramref name="returnCall"/> is not null.
         /// Otherwise the button will disabled.
         /// </summary>
-        /// <param name="returnCall">The return call action to return to the parent menu</param>
+        /// <param name="returnCall">The return call action to return to the parent menu.</param>
         private static void XReturnButton(UnityAction returnCall)
         {
             if (returnCall != null)
@@ -292,7 +292,7 @@ namespace SEE.UI.Menu.Drawable
         /// Sets up the return button for the yRotation menu if the <paramref name="returnCall"/> is not null.
         /// Otherwise the button will disabled.
         /// </summary>
-        /// <param name="returnCall">The return call action to return to the parent menu</param>
+        /// <param name="returnCall">The return call action to return to the parent menu.</param>
         private static void YReturnButton(UnityAction returnCall)
         {
             if (returnCall != null)
@@ -310,7 +310,7 @@ namespace SEE.UI.Menu.Drawable
         /// Adds the handler for the y-Rotate Slider Controller.
         /// </summary>
         /// <param name="slider">The slider controller where the AddListener should be add.</param>
-        /// <param name="stickyNote">The sticky note to rotate</param>
+        /// <param name="stickyNote">The sticky note to rotate.</param>
         /// <param name="spawnMode">True, if the menu was called from the sticky note spawn action.</param>
         private static void SliderListener(RotationSliderController slider, GameObject stickyNote, bool spawnMode)
         {
@@ -334,8 +334,8 @@ namespace SEE.UI.Menu.Drawable
         /// If <see cref="isFinished"/> is true, the <paramref name="finish"/> will be the state.
         /// Otherwise it will be false.
         /// </summary>
-        /// <param name="finish">The finish state</param>
-        /// <returns><see cref="isFinished"/></returns>
+        /// <param name="finish">The finish state.</param>
+        /// <returns><see cref="isFinished"/>.</returns>
         public static bool TryGetFinish(out bool finish)
         {
             if (isFinished)
@@ -352,7 +352,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns true if the y rotation menu is enabled.
         /// </summary>
-        /// <returns>true if the menu is not null and visible.</returns>
+        /// <returns>True if the menu is not null and visible.</returns>
         public static bool IsYActive()
         {
             return yRotationMenu != null && yRotationMenu.activeInHierarchy;
@@ -361,7 +361,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns a new degree to the <see cref="RotationSliderController"/> of the Y-Rotation Menu.
         /// </summary>
-        /// <param name="degree">The new degree</param>
+        /// <param name="degree">The new degree.</param>
         public static void AssignValueToYSlider(float degree)
         {
             if (yRotationMenu != null)
