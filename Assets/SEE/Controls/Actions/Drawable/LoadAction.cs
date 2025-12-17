@@ -311,22 +311,22 @@ namespace SEE.Controls.Actions.Drawable
         }
 
         /// <summary>
-        /// When the id of the given config already exist on the drawable, the id will be changed.
+        /// When the ID of the given config already exist on the drawable, the id will be changed.
         /// </summary>
         /// <param name="conf">The configuration to restore.</param>
         /// <param name="attachedObjects">The objects that are attached on a drawable</param>
         /// <param name="prefix">The prefix for the drawable type object.</param>
         private void CheckAndChangeID (DrawableType conf, GameObject attachedObjects, string prefix)
         {
-            if (GameFinder.FindChild(attachedObjects, conf.Id) != null
-                && !conf.Id.Contains(ValueHolder.MindMapBranchLine))
+            if (GameFinder.FindChild(attachedObjects, conf.ID) != null
+                && !conf.ID.Contains(ValueHolder.MindMapBranchLine))
             {
                 string newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 while (GameFinder.FindChild(attachedObjects, newName) != null)
                 {
                     newName = prefix + "-" + RandomStrings.GetRandomString(8);
                 }
-                conf.Id = newName;
+                conf.ID = newName;
             }
         }
 
@@ -343,7 +343,7 @@ namespace SEE.Controls.Actions.Drawable
                 string surfaceParentName = GameFinder.GetDrawableSurfaceParentName(surface);
                 foreach (DrawableType type in config.GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.Id);
+                    GameObject typeObj = GameFinder.FindChild(attachedObjects, type.ID);
                     if (typeObj != null)
                     {
                         new EraseNetAction(surface.name, surfaceParentName, typeObj.name).Execute();
@@ -490,7 +490,7 @@ namespace SEE.Controls.Actions.Drawable
                         changedObjects.Add(config.ID);
                         foreach(DrawableType type in config.GetAllDrawableTypes())
                         {
-                            changedObjects.Add(type.Id);
+                            changedObjects.Add(type.ID);
                         }
                     }
                 }
@@ -501,7 +501,7 @@ namespace SEE.Controls.Actions.Drawable
                     {
                         foreach (DrawableType type in config.GetAllDrawableTypes())
                         {
-                            changedObjects.Add(type.Id);
+                            changedObjects.Add(type.ID);
                         }
                     }
                 }

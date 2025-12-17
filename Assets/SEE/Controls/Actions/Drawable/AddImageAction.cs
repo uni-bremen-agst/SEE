@@ -260,9 +260,9 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Undo();
             GameObject obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
-                memento.Image.Id);
+                memento.Image.ID);
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Image.Id).Execute();
+                memento.Image.ID).Execute();
             Destroyer.Destroy(obj);
         }
 
@@ -312,10 +312,10 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>the id of the created drawable text</returns>
+        /// <returns>the ID of the created drawable text</returns>
         public override HashSet<string> GetChangedObjects()
         {
-            return new HashSet<string> { memento.Image.Id };
+            return new HashSet<string> { memento.Image.ID };
         }
     }
 }

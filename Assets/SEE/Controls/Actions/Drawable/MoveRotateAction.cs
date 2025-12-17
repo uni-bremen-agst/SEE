@@ -40,9 +40,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly DrawableConfig Surface;
             /// <summary>
-            /// The id of the selected object.
+            /// The ID of the selected object.
             /// </summary>
-            public readonly string Id;
+            public readonly string ID;
             /// <summary>
             /// The old position of the selected object.
             /// </summary>
@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             /// <param name="selectedObject">Is the selected drawable type object.</param>
             /// <param name="surface">Is the drawable surface where the selected object is displayed.</param>
-            /// <param name="id">Is the id of the selected object.</param>
+            /// <param name="id">Is the ID of the selected object.</param>
             /// <param name="oldObjectPosition">The old position of the selected object.</param>
             /// <param name="newObjectPosition">The new position of the selected object.</param>
             /// <param name="oldObjectLocalEulerAngles">The old local euler angles of the selected object.</param>
@@ -85,7 +85,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 SelectedObject = selectedObject;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Id = id;
+                ID = id;
                 OldObjectPosition = oldObjectPosition;
                 NewObjectPosition = newObjectPosition;
                 OldObjectLocalEulerAngles = oldObjectLocalEulerAngles;
@@ -714,10 +714,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.SelectedObject == null && memento.Id != null)
+            if (memento.SelectedObject == null && memento.ID != null)
             {
                 memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
-                    memento.Id);
+                    memento.ID);
             }
 
             if (memento.SelectedObject != null)
@@ -726,14 +726,14 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetPosition(memento.SelectedObject, memento.OldObjectPosition,
                                             memento.IncludeChildren);
-                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
+                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.OldObjectPosition, memento.IncludeChildren).Execute();
                 }
                 else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
                     GameMoveRotator.SetRotate(memento.SelectedObject, memento.OldObjectLocalEulerAngles.z,
                         memento.IncludeChildren);
-                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
+                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.OldObjectLocalEulerAngles.z, memento.IncludeChildren).Execute();
                 }
 
@@ -750,10 +750,10 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.SelectedObject == null && memento.Id != null)
+            if (memento.SelectedObject == null && memento.ID != null)
             {
                 memento.SelectedObject = GameFinder.FindChild(memento.Surface.GetDrawableSurface(),
-                    memento.Id);
+                    memento.ID);
             }
             if (memento.SelectedObject != null)
             {
@@ -761,13 +761,13 @@ namespace SEE.Controls.Actions.Drawable
                 {
                     GameMoveRotator.SetPosition(memento.SelectedObject, memento.NewObjectPosition,
                         memento.IncludeChildren);
-                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
+                    new MoveNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.NewObjectPosition, memento.IncludeChildren).Execute();
                 }
                 else if (memento.MoveOrRotate == ProgressState.Rotate)
                 {
                     GameMoveRotator.SetRotate(memento.SelectedObject, memento.Degree, memento.IncludeChildren);
-                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Id,
+                    new RotatorNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.ID,
                         memento.Degree, memento.IncludeChildren).Execute();
                 }
                 GameMoveRotator.DestroyRigidBodysAndCollisionControllersOfChildren(
@@ -810,7 +810,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>The id of the moved or rotated object</returns>
+        /// <returns>The ID of the moved or rotated object</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.SelectedObject == null)

@@ -216,7 +216,7 @@ namespace SEE.Game.Drawable
             string fileName = Path.GetFileName(conf.Path);
             return RePlaceImage(
                 surface,
-                conf.Id,
+                conf.ID,
                 conf.FileData,
                 conf.Position,
                 conf.Scale,

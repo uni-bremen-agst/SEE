@@ -204,7 +204,7 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (DrawableType type in allDrawableTypes)
             {
-                GameObject child = GameFinder.FindChild(surface, type.Id);
+                GameObject child = GameFinder.FindChild(surface, type.ID);
                 new EraseNetAction(surface.name, GameFinder.GetDrawableSurfaceParentName(surface),
                     child.name).Execute();
                 Destroyer.Destroy(child);
@@ -303,7 +303,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>ids of the deletes drawable types</returns>
+        /// <returns>IDs of the deletes drawable types</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)
@@ -318,7 +318,7 @@ namespace SEE.Controls.Actions.Drawable
                 };
                 foreach(DrawableType type in memento.Surface.GetAllDrawableTypes())
                 {
-                    changedObjects.Add(type.Id);
+                    changedObjects.Add(type.ID);
                 }
                 return changedObjects;
             }

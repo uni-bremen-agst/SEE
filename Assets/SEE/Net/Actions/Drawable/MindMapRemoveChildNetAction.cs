@@ -33,13 +33,13 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (ChildNode != null && ChildNode.Id != "" && ChildNode.ParentNode != "")
+            if (ChildNode != null && ChildNode.ID != "" && ChildNode.ParentNode != "")
             {
-                FindChild(ChildNode.ParentNode).GetComponent<MMNodeValueHolder>().RemoveChild(FindChild(ChildNode.Id));
+                FindChild(ChildNode.ParentNode).GetComponent<MMNodeValueHolder>().RemoveChild(FindChild(ChildNode.ID));
             }
             else
             {
-                throw new System.Exception($"The node with the ID {ChildNode.Id} or the parent node with the ID {ChildNode.ParentNode} dont exists.");
+                throw new System.Exception($"The node with the ID {ChildNode.ID} or the parent node with the ID {ChildNode.ParentNode} dont exists.");
             }
         }
     }

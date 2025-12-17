@@ -384,7 +384,7 @@ namespace SEE.Controls.Actions.Drawable
         /// Because this action does not actually change any game object,
         /// an empty set is always returned.
         /// </summary>
-        /// <returns>a empty set</returns>
+        /// <returns>an empty set</returns>
         public override HashSet<string> GetChangedObjects()
         {
             return new HashSet<string>();

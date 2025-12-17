@@ -40,14 +40,14 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Node != null && Node.Id != "")
+            if (Node != null && Node.ID != "")
             {
-                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.Id).transform.parent.gameObject,
+                GameMindMap.ChangeNodeKind(FindChild(Node.BorderConf.ID).transform.parent.gameObject,
                     NodeKind, Node.BorderConf);
             }
             else
             {
-                throw new System.Exception($"The node with the ID {Node.Id} or the parent node with the ID {Node.ParentNode} dont exists.");
+                throw new System.Exception($"The node with the ID {Node.ID} or the parent node with the ID {Node.ParentNode} dont exists.");
             }
         }
     }

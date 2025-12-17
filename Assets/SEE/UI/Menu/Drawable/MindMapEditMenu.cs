@@ -59,7 +59,7 @@ namespace SEE.Game.UI.Menu.Drawable
                     conf.BranchLineToParent = confOfReturn.BranchLineToParent;
                     conf.BranchLineConf = confOfReturn.BranchLineConf;
                     conf.NodeKind = confOfReturn.NodeKind;
-                    conf.Id = confOfReturn.Id;
+                    conf.ID = confOfReturn.ID;
                     conf.TextConf = confOfReturn.TextConf;
                     conf.BorderConf = confOfReturn.BorderConf;
                     conf.OrderInLayer = confOfReturn.OrderInLayer;

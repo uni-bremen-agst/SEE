@@ -713,11 +713,11 @@ namespace SEE.Controls.Actions.Drawable
             base.Undo();
             if (Shape == null)
             {
-                Shape = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Shape.Id);
+                Shape = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Shape.ID);
             }
             if (Shape != null)
             {
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Shape.Id).Execute();
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.Shape.ID).Execute();
                 Destroyer.Destroy(Shape);
             }
         }
@@ -768,7 +768,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>The id of the created shape</returns>
+        /// <returns>The ID of the created shape</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)
@@ -779,7 +779,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 return new HashSet<string>
                 {
-                    memento.Shape.Id
+                    memento.Shape.ID
                 };
             }
         }

@@ -57,7 +57,7 @@ namespace SEE.Controls.Actions.Drawable
                         }
                         memento = new Memento(hitObject, GameFinder.GetDrawableSurface(hitObject), lines);
                         new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                            memento.OriginalLine.Id).Execute();
+                            memento.OriginalLine.ID).Execute();
                         Destroyer.Destroy(hitObject);
                     }
                 }
@@ -150,8 +150,8 @@ namespace SEE.Controls.Actions.Drawable
 
             foreach (LineConf line in memento.Lines)
             {
-                GameObject lineObj = GameFinder.FindChild(surface, line.Id);
-                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.Id).Execute();
+                GameObject lineObj = GameFinder.FindChild(surface, line.ID);
+                new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, line.ID).Execute();
                 Destroyer.Destroy(lineObj);
             }
         }
@@ -163,8 +163,8 @@ namespace SEE.Controls.Actions.Drawable
         {
             base.Redo();
             GameObject surface = memento.Surface.GetDrawableSurface();
-            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.Id);
-            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.Id).Execute();
+            GameObject originObj = GameFinder.FindChild(surface, memento.OriginalLine.ID);
+            new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID, memento.OriginalLine.ID).Execute();
             Destroyer.Destroy(originObj);
 
             foreach (LineConf line in memento.Lines)
@@ -207,7 +207,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the id of the line that was split.</returns>
+        /// <returns>the ID of the line that was split.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Surface == null)
@@ -216,7 +216,7 @@ namespace SEE.Controls.Actions.Drawable
             }
             else
             {
-                return new() { memento.OriginalLine.Id };
+                return new() { memento.OriginalLine.ID };
             }
         }
     }

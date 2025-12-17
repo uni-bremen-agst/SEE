@@ -62,7 +62,7 @@ namespace SEE.Game.Drawable.Configurations
                 TextMeshPro tmp = textObject.GetComponent<TextMeshPro>();
                 text = new()
                 {
-                    Id = textObject.name,
+                    ID = textObject.name,
                     AssociatedPage = textObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = textObject.transform.localPosition,
                     EulerAngles = textObject.transform.localEulerAngles,
@@ -89,7 +89,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new TextConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 EulerAngles = this.EulerAngles,

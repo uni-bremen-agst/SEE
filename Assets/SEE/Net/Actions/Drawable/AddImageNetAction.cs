@@ -58,7 +58,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Conf != null && Conf.Id != "")
+            if (Conf != null && Conf.ID != "")
             {
                 if (!Web)
                 {

@@ -449,7 +449,7 @@ namespace SEE.Game.Drawable
         public static GameObject ReDrawLine(GameObject surface, LineConf lineToRedraw)
         {
             GameObject line = ReDrawLine(surface,
-                 lineToRedraw.Id,
+                 lineToRedraw.ID,
                  lineToRedraw.RendererPositions,
                  lineToRedraw.ColorKind,
                  lineToRedraw.PrimaryColor,

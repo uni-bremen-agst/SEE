@@ -15,7 +15,7 @@ namespace SEE.Game.Drawable.Configurations
         /// <summary>
         /// The name of the drawable type object.
         /// </summary>
-        public string Id;
+        public string ID;
 
         /// <summary>
         /// The position of the drawable type object.
@@ -90,7 +90,7 @@ namespace SEE.Game.Drawable.Configurations
                     new EditMMNodeNetAction(surface.name, surfaceParentName, node).Execute();
                     break;
                 default:
-                    Debug.Log($"Can't edit {type.Id}.\n");
+                    Debug.Log($"Can't edit {type.ID}.\n");
                     break;
             }
         }
@@ -111,11 +111,11 @@ namespace SEE.Game.Drawable.Configurations
                 case ImageConf:
                     return ValueHolder.ImagePrefix;
                 case MindMapNodeConf node:
-                    if (node.Id.StartsWith(ValueHolder.MindMapThemePrefix))
+                    if (node.ID.StartsWith(ValueHolder.MindMapThemePrefix))
                     {
                         return ValueHolder.MindMapThemePrefix;
                     }
-                    else if (node.Id.StartsWith(ValueHolder.MindMapSubthemePrefix))
+                    else if (node.ID.StartsWith(ValueHolder.MindMapSubthemePrefix))
                     {
                         return ValueHolder.MindMapSubthemePrefix;
                     }
@@ -164,7 +164,7 @@ namespace SEE.Game.Drawable.Configurations
         #region Config I/O
 
         /// <summary>
-        /// Label in the configuration file for the id.
+        /// Label in the configuration file for the ID.
         /// </summary>
         private const string idLabel = "IDLabel";
 
@@ -229,7 +229,7 @@ namespace SEE.Game.Drawable.Configurations
                         node).Execute();
                     break;
                 default:
-                    Debug.Log($"Can't restore {type.Id}.\n");
+                    Debug.Log($"Can't restore {type.ID}.\n");
                     break;
             }
             return createdObject;
@@ -243,9 +243,9 @@ namespace SEE.Game.Drawable.Configurations
         /// <returns>The modified configuration.</returns>
         private static DrawableType EnsureValidity(DrawableType type, GameObject createdObject)
         {
-            if (type.Id == "")
+            if (type.ID == "")
             {
-                type.Id = createdObject.name;
+                type.ID = createdObject.name;
             }
             return type;
         }
@@ -257,7 +257,7 @@ namespace SEE.Game.Drawable.Configurations
         internal virtual void Save(ConfigWriter writer)
         {
             writer.BeginGroup();
-            writer.Save(Id, idLabel);
+            writer.Save(ID, idLabel);
             writer.Save(AssociatedPage, associatedPageLabel);
             writer.Save(Position, positionLabel);
             writer.Save(EulerAngles, eulerAnglesLabel);
@@ -288,10 +288,10 @@ namespace SEE.Game.Drawable.Configurations
         {
             bool errors = false;
 
-            /// Try to restore the id.
+            /// Try to restore the ID.
             if (attributes.TryGetValue(idLabel, out object name))
             {
-                Id = (string)name;
+                ID = (string)name;
             }
             else
             {

@@ -71,7 +71,7 @@ namespace SEE.Game.Drawable.Configurations
                 MMNodeValueHolder valueHolder = obj.GetComponent<MMNodeValueHolder>();
                 conf = new()
                 {
-                    Id = obj.name,
+                    ID = obj.name,
                     AssociatedPage = obj.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = obj.transform.localPosition,
                     Scale = obj.transform.localScale,
@@ -114,7 +114,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new MindMapNodeConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 Scale = this.Scale,

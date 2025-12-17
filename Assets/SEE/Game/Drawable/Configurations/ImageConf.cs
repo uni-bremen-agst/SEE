@@ -49,7 +49,7 @@ namespace SEE.Game.Drawable.Configurations
             {
                 conf = new()
                 {
-                    Id = imageObject.name,
+                    ID = imageObject.name,
                     AssociatedPage = imageObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = imageObject.transform.localPosition,
                     EulerAngles = imageObject.transform.localEulerAngles,
@@ -72,7 +72,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new ImageConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 EulerAngles = this.EulerAngles,

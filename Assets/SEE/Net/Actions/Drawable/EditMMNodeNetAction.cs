@@ -33,9 +33,9 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (FindChild(Conf.BorderConf.Id).transform.parent.gameObject != null)
+            if (FindChild(Conf.BorderConf.ID).transform.parent.gameObject != null)
             {
-                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.Id).transform.parent.gameObject, Conf);
+                GameEdit.ChangeMindMapNode(FindChild(Conf.BorderConf.ID).transform.parent.gameObject, Conf);
             }
         }
     }

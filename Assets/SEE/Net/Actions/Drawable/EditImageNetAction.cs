@@ -34,7 +34,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeImage(FindChild(Image.Id), Image);
+            GameEdit.ChangeImage(FindChild(Image.ID), Image);
         }
     }
 }

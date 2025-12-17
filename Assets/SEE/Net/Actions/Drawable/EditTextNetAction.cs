@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeText(FindChild(Text.Id), Text);
+            GameEdit.ChangeText(FindChild(Text.ID), Text);
         }
     }
 }

@@ -883,7 +883,7 @@ namespace SEE.Game.Drawable
 
             return ReCreate(surface,
                 parent,
-                conf.Id,
+                conf.ID,
                 conf.TextConf,
                 conf.BorderConf,
                 conf.Position,
@@ -914,7 +914,7 @@ namespace SEE.Game.Drawable
                 /// Block to rename the branch lines.
                 foreach (LineConf branchLine in config.LineConfigs)
                 {
-                    if (branchLine.Id.StartsWith(ValueHolder.MindMapBranchLine))
+                    if (branchLine.ID.StartsWith(ValueHolder.MindMapBranchLine))
                     {
                         RenameBranchLine(branchLine, idDictionary);
                     }
@@ -934,7 +934,7 @@ namespace SEE.Game.Drawable
         {
             string prefix = GetPrefix(conf.NodeKind);
 
-            if (GameFinder.FindChild(attachedObjects, conf.Id) != null)
+            if (GameFinder.FindChild(attachedObjects, conf.ID) != null)
             {
                 /// Gets a new id for the object based on a random string.
                 string id = RandomStrings.GetRandomString(8);
@@ -948,15 +948,15 @@ namespace SEE.Game.Drawable
                 }
 
                 /// Adds the old and the new name to a dictionary.
-                nameDictionary.Add(conf.Id, newName);
+                nameDictionary.Add(conf.ID, newName);
 
                 /// Adds a pair of the old id and the new name in a other dictionary.
-                idDictionary.Add(GetIDofName(conf.Id), newName);
+                idDictionary.Add(GetIDofName(conf.ID), newName);
 
                 /// Change the names to the new name.
-                conf.Id = newName;
-                conf.BorderConf.Id = ValueHolder.LinePrefix + id;
-                conf.TextConf.Id = ValueHolder.TextPrefix + id;
+                conf.ID = newName;
+                conf.BorderConf.ID = ValueHolder.LinePrefix + id;
+                conf.TextConf.ID = ValueHolder.TextPrefix + id;
 
                 /// If the node has a parent, replace the old parent name with the new one.
                 if (conf.ParentNode != "")
@@ -964,10 +964,10 @@ namespace SEE.Game.Drawable
                     conf.ParentNode = nameDictionary[conf.ParentNode];
                     /// Rename the branch line with the new id's of the parent and the node.
                     conf.BranchLineToParent = ValueHolder.MindMapBranchLine + "-"
-                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.Id);
+                        + GetIDofName(conf.ParentNode) + "-" + GetIDofName(conf.ID);
                     if (conf.BranchLineConf != null)
                     {
-                        conf.BranchLineConf.Id = conf.BranchLineToParent;
+                        conf.BranchLineConf.ID = conf.BranchLineToParent;
                     }
                 }
             }
@@ -983,7 +983,7 @@ namespace SEE.Game.Drawable
             string prefix = ValueHolder.MindMapBranchLine;
 
             /// Splits the old name into three parts.
-            string[] splitOfOldName = conf.Id.Split("-");
+            string[] splitOfOldName = conf.ID.Split("-");
 
             /// Get the new parent id.
             string newParentID = splitOfOldName[1];
@@ -1000,7 +1000,7 @@ namespace SEE.Game.Drawable
             }
 
             /// Rename the branch line.
-            conf.Id = prefix + "-" + newParentID + "-" + newChildID;
+            conf.ID = prefix + "-" + newParentID + "-" + newChildID;
         }
 
         /// <summary>

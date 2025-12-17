@@ -37,9 +37,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly DrawableConfig Surface;
             /// <summary>
-            /// The id of the line.
+            /// The ID of the line.
             /// </summary>
-            public readonly string Id;
+            public readonly string ID;
             /// <summary>
             /// The indices of the found nearest position. There can be more then one,
             /// because points can overlap.
@@ -59,7 +59,7 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             /// <param name="line">the selected line</param>
             /// <param name="surface">The drawable surface on which the line is placed.</param>
-            /// <param name="id">the id of the selected line</param>
+            /// <param name="id">the ID of the selected line</param>
             /// <param name="indices">The Indices of the founded nearest position.
             /// It can be more then one, because points can overlap.</param>
             /// <param name="oldPointPosition">The old position of the selected points</param>
@@ -69,7 +69,7 @@ namespace SEE.Controls.Actions.Drawable
             {
                 Line = line;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Id = id;
+                ID = id;
                 Indices = indices;
                 OldPointPosition = oldPointPosition;
                 NewPointPosition = newPointPosition;
@@ -252,9 +252,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.Line == null && memento.Id != null)
+            if (memento.Line == null && memento.ID != null)
             {
-                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
 
             if (memento.Line != null)
@@ -271,9 +271,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.Line == null && memento.Id != null)
+            if (memento.Line == null && memento.ID != null)
             {
-                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.Line = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
             if (memento.Line != null)
             {
@@ -316,7 +316,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the id of the line which point was moved.</returns>
+        /// <returns>the ID of the line which point was moved.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (memento.Line == null)

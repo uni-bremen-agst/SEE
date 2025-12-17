@@ -170,7 +170,7 @@ namespace SEE.Controls.Actions.Drawable
             base.Redo();
             foreach (Memento mem in mementoList)
             {
-                GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawableSurface(), mem.DrawableType.Id);
+                GameObject toDelete = GameFinder.FindChild(mem.Surface.GetDrawableSurface(), mem.DrawableType.ID);
                 if (mem.DrawableType is MindMapNodeConf conf)
                 {
                     MMNodeValueHolder valueHolder = toDelete.GetComponent<MMNodeValueHolder>();
@@ -181,7 +181,7 @@ namespace SEE.Controls.Actions.Drawable
                             MindMapNodeConf.GetNodeConf(toDelete)).Execute();
                     }
                 }
-                new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.DrawableType.Id).Execute();
+                new EraseNetAction(mem.Surface.ID, mem.Surface.ParentID, mem.DrawableType.ID).Execute();
                 Destroyer.Destroy(toDelete);
             }
         }
@@ -219,7 +219,7 @@ namespace SEE.Controls.Actions.Drawable
         /// The set of IDs of all gameObjects changed by this action.
         /// <see cref="ReversibleAction.GetActionStateType"/>
         /// </summary>
-        /// <returns>the id's of the deletes object's</returns>
+        /// <returns>the IDs of the deletes objects</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (mementoList.Count == 0)
@@ -232,7 +232,7 @@ namespace SEE.Controls.Actions.Drawable
                 foreach (Memento mem in mementoList)
                 {
                     changedObjects.Add(mem.Surface.ID);
-                    changedObjects.Add(mem.DrawableType.Id);
+                    changedObjects.Add(mem.DrawableType.ID);
                 }
                 return changedObjects;
             }

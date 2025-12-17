@@ -84,7 +84,7 @@ namespace SEE.Game.Drawable
                 holder.CurrentPage = page;
                 foreach (DrawableType type in DrawableConfigManager.GetDrawableConfig(surface).GetAllDrawableTypes())
                 {
-                    GameObject typeObj = GameFinder.FindChild(surface, type.Id);
+                    GameObject typeObj = GameFinder.FindChild(surface, type.ID);
                     if (typeObj.GetComponent<AssociatedPageHolder>().AssociatedPage == page)
                     {
                         typeObj.SetActive(true);

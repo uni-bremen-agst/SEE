@@ -36,7 +36,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Line != null && Line.Id != "")
+            if (Line != null && Line.ID != "")
             {
                 GameDrawer.ReDrawLine(Surface, Line);
             }

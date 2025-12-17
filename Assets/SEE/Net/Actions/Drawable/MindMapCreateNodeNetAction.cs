@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Node != null && Node.Id != "")
+            if (Node != null && Node.ID != "")
             {
                 GameMindMap.ReCreate(Surface, Node);
             }

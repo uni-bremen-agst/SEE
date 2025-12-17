@@ -83,7 +83,7 @@ namespace SEE.Game.Drawable.Configurations
                 GameObject fillout = GameFinder.FindChild(lineGameObject, ValueHolder.FillOut);
                 line = new()
                 {
-                    Id = lineGameObject.name,
+                    ID = lineGameObject.name,
                     AssociatedPage = lineGameObject.GetComponent<AssociatedPageHolder>().AssociatedPage,
                     Position = lineGameObject.transform.localPosition,
                     Scale = lineGameObject.transform.localScale,
@@ -150,7 +150,7 @@ namespace SEE.Game.Drawable.Configurations
         {
             return new LineConf
             {
-                Id = this.Id,
+                ID = this.ID,
                 AssociatedPage = this.AssociatedPage,
                 Position = this.Position,
                 RendererPositions = this.RendererPositions,

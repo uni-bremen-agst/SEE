@@ -52,9 +52,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public GameObject Obj;
             /// <summary>
-            /// The id of the object to be changed.
+            /// The ID of the object to be changed.
             /// </summary>
-            public readonly string Id;
+            public readonly string ID;
             /// <summary>
             /// The old layer order.
             /// </summary>
@@ -70,7 +70,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="surface">The drawable surface to save into this Memento</param>
             /// <param name="state">The state to save into this Memento</param>
             /// <param name="obj">The object to save into this Memento</param>
-            /// <param name="id">The object id to save into this Memento</param>
+            /// <param name="id">The object ID to save into this Memento</param>
             /// <param name="oldOrder">The old order in layer value to save into this Memento</param>
             /// <param name="newOrder">The new order in layer value to save into this Memento</param>
             public Memento(GameObject surface, GameLayerChanger.LayerChangerStates state,
@@ -79,7 +79,7 @@ namespace SEE.Controls.Actions.Drawable
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
                 State = state;
                 Obj = obj;
-                Id = id;
+                ID = id;
                 OldOrder = oldOrder;
                 NewOrder = newOrder;
             }
@@ -175,9 +175,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.Obj == null && memento.Id != null)
+            if (memento.Obj == null && memento.ID != null)
             {
-                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.OldOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,
@@ -190,9 +190,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.Obj == null && memento.Id != null)
+            if (memento.Obj == null && memento.ID != null)
             {
-                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.Obj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
             GameLayerChanger.ChangeOrderInLayer(memento.Obj, memento.NewOrder, memento.State);
             new LayerChangerNetAction(memento.Surface.ID, memento.Surface.ParentID,

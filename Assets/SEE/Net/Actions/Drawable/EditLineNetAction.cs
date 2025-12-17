@@ -35,7 +35,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeLine(FindChild(Line.Id), Line);
+            GameEdit.ChangeLine(FindChild(Line.ID), Line);
         }
     }
 }

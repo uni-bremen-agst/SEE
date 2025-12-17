@@ -33,7 +33,7 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Text != null && Text.Id != "")
+            if (Text != null && Text.ID != "")
             {
                 GameTexter.ReWriteText(Surface, Text);
             }

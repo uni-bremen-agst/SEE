@@ -467,7 +467,7 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             GameObject attached = GameFinder.GetAttachedObjectsObject(memento.Surface.GetDrawableSurface());
-            GameObject node = GameFinder.FindChild(attached, memento.Conf.Id);
+            GameObject node = GameFinder.FindChild(attached, memento.Conf.ID);
             if (memento.Operation != Operation.Theme)
             {
                 GameObject parent = GameFinder.FindChild(attached, memento.Conf.ParentNode);
@@ -483,7 +483,7 @@ namespace SEE.Controls.Actions.Drawable
                 Destroyer.Destroy(branchToParent);
             }
             new EraseNetAction(memento.Surface.ID, memento.Surface.ParentID,
-                memento.Conf.Id).Execute();
+                memento.Conf.ID).Execute();
             Destroyer.Destroy(node);
         }
 
@@ -539,7 +539,7 @@ namespace SEE.Controls.Actions.Drawable
                 HashSet<string> changedObjects = new()
                 {
                     memento.Surface.ID,
-                    memento.Conf.Id
+                    memento.Conf.ID
                 };
                 if (memento.Operation.Equals(Operation.Subtheme)
                     || memento.Operation.Equals(Operation.Leaf))

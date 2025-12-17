@@ -32,13 +32,13 @@ namespace SEE.Net.Actions.Drawable
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            if (Node != null && Node.Id != "")
+            if (Node != null && Node.ID != "")
             {
-                GameMindMap.ReDrawBranchLines(FindChild(Node.BorderConf.Id).transform.parent.gameObject);
+                GameMindMap.ReDrawBranchLines(FindChild(Node.BorderConf.ID).transform.parent.gameObject);
             }
             else
             {
-                throw new System.Exception($"The node with the ID {Node.Id} dont exists.");
+                throw new System.Exception($"The node with the ID {Node.ID} dont exists.");
             }
         }
     }

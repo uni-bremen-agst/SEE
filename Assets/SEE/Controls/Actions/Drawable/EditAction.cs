@@ -62,9 +62,9 @@ namespace SEE.Controls.Actions.Drawable
             /// </summary>
             public readonly DrawableConfig Surface;
             /// <summary>
-            /// The id of the drawable type object.
+            /// The ID of the drawable type object.
             /// </summary>
-            public readonly string Id;
+            public readonly string ID;
 
             /// <summary>
             /// The constructor.
@@ -73,7 +73,7 @@ namespace SEE.Controls.Actions.Drawable
             /// <param name="oldValueHolder">The old values of the drawable type object.</param>
             /// <param name="newValueHolder">The newly edited values of the drawable type object.</param>
             /// <param name="surface">The drawable surface on which the drawable type object is displayed.</param>
-            /// <param name="id">The id of the drawable type object.</param>
+            /// <param name="id">The ID of the drawable type object.</param>
             public Memento(GameObject obj, DrawableType oldValueHolder,
                 DrawableType newValueHolder, GameObject surface, string id)
             {
@@ -81,7 +81,7 @@ namespace SEE.Controls.Actions.Drawable
                 OldValueHolder = oldValueHolder;
                 NewValueHolder = newValueHolder;
                 Surface = DrawableConfigManager.GetDrawableConfig(surface);
-                Id = id;
+                ID = id;
             }
         }
 
@@ -369,9 +369,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Undo()
         {
             base.Undo();
-            if (memento.SelectedObj == null && memento.Id != null)
+            if (memento.SelectedObj == null && memento.ID != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
 
             if (memento.SelectedObj != null)
@@ -387,9 +387,9 @@ namespace SEE.Controls.Actions.Drawable
         public override void Redo()
         {
             base.Redo();
-            if (memento.SelectedObj == null && memento.Id != null)
+            if (memento.SelectedObj == null && memento.ID != null)
             {
-                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.Id);
+                memento.SelectedObj = GameFinder.FindChild(memento.Surface.GetDrawableSurface(), memento.ID);
             }
 
             if (memento.SelectedObj != null)

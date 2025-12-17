@@ -300,7 +300,7 @@ namespace SEE.Game.Drawable
         public static GameObject ReWriteText(GameObject surface, TextConf text)
         {
             return ReWriteText(surface,
-                text.Id,
+                text.ID,
                 text.Text,
                 text.Position,
                 text.Scale,
