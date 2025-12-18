@@ -149,12 +149,12 @@ namespace SEE.DataModel.DG.IO
         {
             int i = 1;
 
-            while (node.TryGetAny(baseKey + " [" + i.ToString() + "]", out _))
+            while (node.TryGetAny(baseKey + " [" + i + "]", out _))
             {
                 i++;
             }
 
-            return baseKey + " [" + i.ToString() + "]";
+            return baseKey + " [" + i + "]";
         }
     }
 }
