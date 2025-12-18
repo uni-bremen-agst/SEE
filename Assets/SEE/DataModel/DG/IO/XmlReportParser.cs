@@ -245,14 +245,9 @@ namespace SEE.DataModel.DG.IO
                         continue;
                     }
 
-                    if (result is double d)
-                    {
-                        value = d.ToString(CultureInfo.InvariantCulture);
-                    }
-                    else
-                    {
-                        value = result?.ToString() ?? string.Empty;
-                    }
+                    value = result is double d
+                        ? d.ToString(CultureInfo.InvariantCulture)
+                        : result?.ToString() ?? string.Empty;
                 }
                 catch (XPathException ex)
                 {
