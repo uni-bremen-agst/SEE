@@ -202,7 +202,7 @@ namespace SEE.Net.Util
         }
 
         /// <summary>
-        /// Compresses and safes a <see cref="SEECitySnapshot"/> to the backend server if possible.
+        /// Compresses and saves a <see cref="SEECitySnapshot"/> to the backend server if possible.
         ///
         /// </summary>
         /// <param name="snapshot"></param>
@@ -210,7 +210,7 @@ namespace SEE.Net.Util
         public static async UniTask TrySaveSnapshotsAsync(SEECitySnapshot snapshot)
         {
             Logger.Log("Try saving snapshot to backend");
-            if (String.IsNullOrEmpty(UserSettings.BackendServerAPI))
+            if (string.IsNullOrEmpty(UserSettings.BackendServerAPI))
             {
                 return;
             }
@@ -227,39 +227,36 @@ namespace SEE.Net.Util
 
             string snapshotZipPath = snapshotsDir + ".zip";
             Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
-
-
-            if (await LogInAsync())
+            // Clear up zip directory
+            Directory.Delete(snapshotsDir);
+            if (!await LogInAsync())
             {
-                string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
-                List<IMultipartFormSection> formSections = new List<IMultipartFormSection>();
-
-                // Create a MultipartForm section with the snapshot file.
-                var bytes = File.ReadAllBytes(snapshotZipPath);
-                MultipartFormFileSection fileFormSection = new MultipartFormFileSection("file", bytes, snapshotZipPath, "application/octet-stream");
-                formSections.Add(fileFormSection);
-                byte[] boundary = UnityWebRequest.GenerateBoundary();
-                using (UnityWebRequest request = UnityWebRequest.Post(url, formSections, boundary))
-                {
-                    await request.SendWebRequest().ToUniTask();
-                    if (request.result != UnityWebRequest.Result.Success)
-                    {
-                        Debug.LogError($"Failed to upload snapshot: {request.error}");
-                    }
-                    else
-                    {
-                        Debug.Log("Snapshot uploaded successfully.");
-                        try
-                        {
-                            File.Delete(snapshotZipPath);
-                        }
-                        catch (Exception)
-                        {
-                            Debug.LogError($"Failed to delete local snapshot after upload: {request.error}");
-                        }
-                    }
-                }
+                Debug.LogError("Unable to save snapshot");
+                return;
             }
+
+            string url = UserSettings.BackendServerAPI + "server/snapshots?serverId=" + Network.ServerId + "&project_type=" + snapshot.CityName;
+            var bytes = File.ReadAllBytes(snapshotZipPath);
+
+            using UnityWebRequest request = new UnityWebRequest(url, "POST");
+
+            request.uploadHandler = new UploadHandlerRaw(bytes);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/octet-stream");
+            request.SetRequestHeader("X-Filename", Path.GetFileName(snapshotZipPath));
+            await request.SendWebRequest().ToUniTask();
+            if (request.result != UnityWebRequest.Result.Success)
+            {
+                Debug.LogError($"Failed to upload snapshot: {request.error}");
+            }
+            else
+            {
+                Debug.Log("Snapshot uploaded successfully.");
+                // Clean up old zip file
+                File.Delete(snapshotZipPath);
+            }
+
+
 
             void CopyToDir(string file, string targetDir)
             {
