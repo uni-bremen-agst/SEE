@@ -64,7 +64,7 @@ namespace SEE.Game.CityRendering
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
             /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> separated by commas.
             List<FileAuthor> authors =
-                nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
+                nodeMap.Keys.Where(x => x.Type == DataModel.DG.NodeTypes.File)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorsAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()

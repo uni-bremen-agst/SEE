@@ -25,16 +25,16 @@
         /// Node type for classes.
         /// </summary>
         public const string Class = "Class";
+        
+        /// <summary>
+        /// Node type for files.
+        /// </summary>
+        public const string File = "File";
 
         /// <summary>
         /// Node type for interfaces.
         /// </summary>
         public const string Interface = "Interface";
-
-        /// <summary>
-        /// Node type for files
-        /// </summary>
-        public const string File = "File";
 
         /// <summary>
         /// Node type for class templates.
@@ -367,10 +367,6 @@
         /// author names seperated by a comma.</remarks>
         public const string AuthorsAttributeName = "Authors";
 
-        /// <summary>
-        /// Name of node type used for files.
-        /// </summary>
-        public const string FileType = "File";
         /// <summary>
         /// Name of node type used for directories.
         /// </summary>
