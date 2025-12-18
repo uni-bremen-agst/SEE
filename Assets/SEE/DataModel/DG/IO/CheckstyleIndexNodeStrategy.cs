@@ -162,7 +162,7 @@ namespace SEE.DataModel.DG.IO
 
         /// <summary>
         /// Set of node types that represent Java type declarations in the GXL graphs.
-        /// 
+        ///
         /// This includes concrete and template variants for classes and interfaces.
         /// </summary>
         private static readonly HashSet<string> typeNodeTypes = new HashSet<string>
