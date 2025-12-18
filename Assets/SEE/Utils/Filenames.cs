@@ -406,5 +406,47 @@ namespace SEE.Utils
             }
             return path[(lastSeparatorIndex + 1)..]; // Return everything after the last separator.
         }
+
+        /// <summary>
+        /// Replaces all Unix directory separators in <paramref name="path"/> by
+        /// <paramref name="replacement"/> and trims leading and trailing occurrences
+        /// of <paramref name="replacement"/>.
+        /// </summary>
+        /// <param name="path">Path using Unix directory separators.</param>
+        /// <param name="replacement">Character replacing the Unix directory separator.</param>
+        /// <returns>
+        /// Path where Unix directory separators have been replaced and trimmed.
+        /// </returns>
+        public static string ReplaceUnixSeparators(string path, char replacement)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+            return path.Replace(UnixDirectorySeparator, replacement).Trim(replacement);
+        }
+
+        /// <summary>
+        /// Replaces all Windows and Unix directory separators in <paramref name="path"/> by
+        /// <paramref name="replacement"/> and trims leading and trailing occurrences of
+        /// <paramref name="replacement"/>.
+        /// </summary>
+        /// <param name="path">Path whose directory separators are to be replaced.</param>
+        /// <param name="replacement">Character replacing the directory separators.</param>
+        /// <returns>
+        /// <paramref name="path"/> where both '\' and '/' have been replaced by
+        /// <paramref name="replacement"/>, with leading/trailing <paramref name="replacement"/>
+        /// removed. If <paramref name="path"/> is null or whitespace, it is returned unchanged.
+        /// </returns>
+        public static string ReplaceDirectorySeparators(string path, char replacement)
+        {
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                return path;
+            }
+            return path.Replace(WindowsDirectorySeparator, replacement)
+                       .Replace(UnixDirectorySeparator, replacement)
+                       .Trim(replacement);
+        }
     }
 }

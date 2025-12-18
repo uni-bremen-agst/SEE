@@ -50,7 +50,7 @@ namespace SEE.GraphProviders.VCS
         /// Along with the file node, it will also create the necessary directory
         /// containing the file if it does not already exist.
         ///
-        /// The file node will be created with the type <see cref="DataModel.DG.VCS.FileType"/>
+        /// The file node will be created with the type <see cref="DataModel.DG.NodeTypes.File"/>
         /// and directory nodes with the type <see cref="DataModel.DG.VCS.DirectoryType"/>.
         /// </summary>
         /// <param name="graph">Where to look up or add the newly created file node</param>
@@ -76,7 +76,7 @@ namespace SEE.GraphProviders.VCS
             }
             else
             {
-                Node result = NewNode(graph, path, DataModel.DG.VCS.FileType, separator);
+                Node result = NewNode(graph, path, DataModel.DG.NodeTypes.File, separator);
                 Node parent = GetOrAddDirectoryNode(Filenames.GetDirectoryName(path, separator));
                 parent?.AddChild(result);
                 return result;
