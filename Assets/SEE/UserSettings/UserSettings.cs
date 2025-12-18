@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using OpenAI.Realtime;
 using SEE.GO;
 using SEE.Net;
 using SEE.Tools.OpenTelemetry;
@@ -6,6 +7,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -159,7 +161,44 @@ namespace SEE.User
         {
             TracingHelperService.Shutdown(true);
             User.VoiceChat.EndVoiceChat(VoiceChat);
-            Instance.Save();
+        }
+
+        /// <summary>
+        /// Registers the quit callback when the object becomes enabled.
+        /// This ensures that application shutdown can be handled gracefully.
+        /// </summary>
+        private void OnEnable()
+        {
+            Application.wantsToQuit += SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Unregisters the quit callback when the object is disabled.
+        /// This prevents callbacks from being invoked on inactive objects.
+        /// </summary>
+        private void OnDisable()
+        {
+            Application.wantsToQuit -= SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Called when the application is about to quit.
+        /// Attempts to save the current instance state before shutdown.
+        /// </summary>
+        /// <returns>
+        /// Returns <c>true</c> to allow the application to quit.
+        /// </returns>
+        private bool SaveOnQuit()
+        {
+            try
+            {
+                Instance.Save();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error during quit: {e}");
+            }
+            return true;
         }
 
         /// <summary>
