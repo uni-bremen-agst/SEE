@@ -25,7 +25,6 @@
         /// Node type for classes.
         /// </summary>
         public const string Class = "Class";
-        
         /// <summary>
         /// Node type for files.
         /// </summary>
