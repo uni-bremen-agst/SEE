@@ -12,6 +12,43 @@
     }
 
     /// <summary>
+    /// Defines names of node types used in the graph.
+    /// </summary>
+    public static class NodeTypes
+    {
+        /// <summary>
+        /// Node type for methods.
+        /// </summary>
+        public const string Method = "Method";
+
+        /// <summary>
+        /// Node type for classes.
+        /// </summary>
+        public const string Class = "Class";
+        /// <summary>
+        /// Node type for files.
+        /// </summary>
+        public const string File = "File";
+
+        /// <summary>
+        /// Node type for interfaces.
+        /// </summary>
+        public const string Interface = "Interface";
+
+        /// <summary>
+        /// Node type for class templates.
+        /// </summary>
+        public const string ClassTemplate = "Class_Template";
+
+        /// <summary>
+        /// Node type for interface templates.
+        /// </summary>
+        public const string InterfaceTemplate = "Interface_Template";
+
+
+    }
+
+    /// <summary>
     /// Standard names for LSP concepts.
     /// </summary>
     public static class LSP
@@ -329,10 +366,6 @@
         /// author names seperated by a comma.</remarks>
         public const string AuthorsAttributeName = "Authors";
 
-        /// <summary>
-        /// Name of node type used for files.
-        /// </summary>
-        public const string FileType = "File";
         /// <summary>
         /// Name of node type used for directories.
         /// </summary>
