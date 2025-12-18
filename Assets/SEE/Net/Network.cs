@@ -911,12 +911,24 @@ namespace SEE.Net
         public virtual void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
-            writer.Save(GameScene, gameSceneLabel);
-            writer.Save(ServerPort, serverPortLabel);
-            writer.Save(ServerIP4Address, serverIP4AddressLabel);
-            writer.Save(RoomPassword, roomPasswordLabel);
-            writer.Save(BackendServerAPI, backendServerAPILabel);
-            writer.EndGroup();
+            try
+            {
+                writer.Save(GameScene, gameSceneLabel);
+                writer.Save(RoomPassword, roomPasswordLabel);
+                writer.Save(BackendServerAPI, backendServerAPILabel);
+                writer.Save(ServerPort, serverPortLabel);
+                writer.Save(ServerIP4Address, serverIP4AddressLabel);
+            }
+            catch (System.Exception e)
+            {
+                Debug.LogError("An error occurred while saving the user settings.\n");
+                Debug.LogException(e);
+                throw;
+            }
+            finally
+            {
+                writer.EndGroup();
+            }
         }
 
         /// <summary>
@@ -931,7 +943,6 @@ namespace SEE.Net
                 Dictionary<string, object> values = dictionary as Dictionary<string, object>;
 
                 ConfigIO.Restore(values, gameSceneLabel, ref GameScene);
-                ConfigIO.Restore(values, roomPasswordLabel, ref RoomPassword);
                 {
                     int value = ServerPort;
                     ConfigIO.Restore(values, serverPortLabel, ref value);
@@ -942,6 +953,7 @@ namespace SEE.Net
                     ConfigIO.Restore(values, serverIP4AddressLabel, ref value);
                     ServerIP4Address = value;
                 }
+                ConfigIO.Restore(values, roomPasswordLabel, ref RoomPassword);
                 ConfigIO.Restore(values, backendServerAPILabel, ref BackendServerAPI);
             }
         }

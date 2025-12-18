@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using OpenAI.Realtime;
 using SEE.GO;
 using SEE.Net;
 using SEE.Tools.OpenTelemetry;
@@ -6,6 +7,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -159,7 +161,44 @@ namespace SEE.User
         {
             TracingHelperService.Shutdown(true);
             User.VoiceChat.EndVoiceChat(VoiceChat);
-            Instance.Save();
+        }
+
+        /// <summary>
+        /// Registers the quit callback when the object becomes enabled.
+        /// This ensures that application shutdown can be handled gracefully.
+        /// </summary>
+        private void OnEnable()
+        {
+            Application.wantsToQuit += SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Unregisters the quit callback when the object is disabled.
+        /// This prevents callbacks from being invoked on inactive objects.
+        /// </summary>
+        private void OnDisable()
+        {
+            Application.wantsToQuit -= SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Called when the application is about to quit.
+        /// Attempts to save the current instance state before shutdown.
+        /// </summary>
+        /// <returns>
+        /// Returns <c>true</c> to allow the application to quit.
+        /// </returns>
+        private bool SaveOnQuit()
+        {
+            try
+            {
+                Instance.Save();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error during quit: {e}\n");
+            }
+            return true;
         }
 
         /// <summary>
@@ -311,12 +350,20 @@ namespace SEE.User
         protected virtual void Save(ConfigWriter writer)
         {
             Player.Save(writer, playerLabel);
-            Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
             writer.Save(InputType.ToString(), inputTypeLabel);
             Video.Save(writer, videoLabel);
             Audio.Save(writer, audioLabel);
+            try
+            {
+                Network.Save(writer, networkLabel);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError("Network settings could not be saved.\n");
+                throw;
+            }
         }
 
         /// <summary>
@@ -326,12 +373,12 @@ namespace SEE.User
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             Player.Restore(attributes, playerLabel);
-            Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
             ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
             Video.Restore(attributes, videoLabel);
             Audio.Restore(attributes, audioLabel);
+            Network.Restore(attributes, networkLabel);
         }
 
         #endregion Configuration I/O
