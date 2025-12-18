@@ -178,7 +178,7 @@ namespace SEE.DataModel.DG.IO
                 catch (XPathException ex)
                 {
                     Debug.LogWarning(
-                        $"[{nameof(XmlReportParser)}] XPath error in path builder '{pathExpression}': {ex.Message}");
+                        $"[{nameof(XmlReportParser)}] XPath error in path builder '{pathExpression}': {ex.Message}.\n");
                 }
 
                 Finding? finding = CreateFinding(current, fullPath, xpathMapping, namespaceManager);
@@ -190,7 +190,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             Debug.Log(
-                $"[{nameof(XmlReportParser)}] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.");
+                $"[{nameof(XmlReportParser)}] Parsing finished. Nodes visited: {nodeCount}, Findings: {metricSchema.Findings.Count}.\n");
 
             return metricSchema;
         }
@@ -251,7 +251,7 @@ namespace SEE.DataModel.DG.IO
                 }
                 catch (XPathException ex)
                 {
-                    Debug.LogWarning($"[{nameof(XmlReportParser)}] XPath error in metric '{kv.Key}': {ex.Message}");
+                    Debug.LogWarning($"[{nameof(XmlReportParser)}] XPath error in metric '{kv.Key}': {ex.Message}.\n");
                 }
 
                 if (!string.IsNullOrEmpty(value) && value != "NaN")
@@ -321,7 +321,7 @@ namespace SEE.DataModel.DG.IO
                 catch (XPathException ex)
                 {
                     Debug.LogWarning(
-                        $"[{nameof(XmlReportParser)}] XPath error in location field '{kv.Key}': {ex.Message}");
+                        $"[{nameof(XmlReportParser)}] XPath error in location field '{kv.Key}': {ex.Message}.\n");
                 }
             }
 

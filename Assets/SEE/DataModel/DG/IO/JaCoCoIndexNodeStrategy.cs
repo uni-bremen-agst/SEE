@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -11,8 +12,6 @@ namespace SEE.DataModel.DG.IO
     public sealed class JaCoCoIndexNodeStrategy : IIndexNodeStrategy
     {
         // JaCoCo and Java conventions
-        private const char LinuxPathSeparator = '/';
-        private const char WindowsPathSeparator = '\\';
         private const char NodeIdSeparator = '.';
         private const char InnerClassDelimiter = '$';
         private const char MethodDelimiter = '#';
@@ -30,7 +29,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             // 1. replacing path separators
-            fullPath = fullPath.Replace(LinuxPathSeparator, NodeIdSeparator).Replace(WindowsPathSeparator, NodeIdSeparator);
+            fullPath = fullPath.Replace(Filenames.UnixDirectorySeparator, NodeIdSeparator).Replace(Filenames.WindowsDirectorySeparator, NodeIdSeparator);
 
             bool isMethod = fullPath.IndexOf(MethodDelimiter) > -1;
 
@@ -58,8 +57,8 @@ namespace SEE.DataModel.DG.IO
                 return null;
             }
 
-            // Step 1: Convert path separators: '/' → '.'
-            string normalized = fullPath.Replace(LinuxPathSeparator, NodeIdSeparator).Replace(WindowsPathSeparator, NodeIdSeparator);
+            // Step 1: Convert path separators: '/' → '.' and '\\' -> '.'
+            string normalized = Filenames.ReplaceDirectorySeparators(fullPath, NodeIdSeparator);
 
             // Step 2: Remove everything from first inner class or method delimiter onwards
             normalized = RemoveInnerTypesAndMethods(normalized);
@@ -87,7 +86,7 @@ namespace SEE.DataModel.DG.IO
             }
 
             // For methods: recurse to parent type
-            if (node.Type == "Method")
+            if (node.Type == NodeTypes.Method)
             {
                 return node.Parent != null ? NodeIdToMainType(node.Parent) : null;
             }
@@ -109,10 +108,10 @@ namespace SEE.DataModel.DG.IO
         /// </summary>
         private static readonly HashSet<string> TypeNodeTypes = new()
         {
-            "Class",
-            "Interface",
-            "Class_Template",
-            "Interface_Template"
+            NodeTypes.Class,
+            NodeTypes.Interface,
+            NodeTypes.ClassTemplate,
+            NodeTypes.InterfaceTemplate
         };
 
         private static bool IsTypeNode(string nodeType)

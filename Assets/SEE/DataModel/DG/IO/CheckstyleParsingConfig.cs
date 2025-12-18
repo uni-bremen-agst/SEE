@@ -1,11 +1,9 @@
 ﻿using System.Collections.Generic;
 
-/// <summary>
-/// Contains parser configuration and node-indexing helpers for importing external analysis reports.
-/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
+    /// Contains parser configuration and node-indexing helpers for importing external analysis reports.
     /// Parsing configuration for Checkstyle XML reports.
     /// </summary>
     /// <remarks>

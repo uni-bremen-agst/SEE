@@ -1,8 +1,5 @@
 ﻿using System.Collections.Generic;
 
-/// <summary>
-/// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
-/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>

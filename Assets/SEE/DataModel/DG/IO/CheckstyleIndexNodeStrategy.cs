@@ -1,12 +1,12 @@
-﻿using System;
+﻿using SEE.Utils;
+using System;
 using System.Collections.Generic;
 using System.IO;
-/// <summary>
-/// Contains parser configuration and node-indexing helpers for importing external analysis reports.
-/// </summary>
+
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
+    /// Contains parser configuration and node-indexing helpers for importing external analysis reports.
     /// Index strategy for Checkstyle reports.
     ///
     /// This strategy translates file-oriented paths emitted by Checkstyle (often absolute OS paths)
@@ -32,16 +32,6 @@ namespace SEE.DataModel.DG.IO
         /// Separator used in Java package/class notation (e.g., <c>com.example.ClassName</c>).
         /// </summary>
         private const char packageSeparator = '.';
-
-        /// <summary>
-        /// Windows path separator (<c>\</c>), used to detect and normalize Windows-style paths.
-        /// </summary>
-        private const char windowsPathSeparator = '\\';
-
-        /// <summary>
-        /// Linux/Unix path separator (<c>/</c>), used as the normalized internal separator.
-        /// </summary>
-        private const char linuxPathSeparator = '/';
 
         /// <summary>
         /// Parsing configuration that provides path normalization helpers (most importantly
@@ -146,7 +136,7 @@ namespace SEE.DataModel.DG.IO
 
             // Methods -> climb to the parent type.
             // This ensures that a method finding is attributed to the surrounding class/interface.
-            if (node.Type == "Method")
+            if (node.Type == NodeTypes.Method)
             {
                 return node.Parent != null ? NodeIdToMainType(node.Parent) : null;
             }
@@ -157,7 +147,7 @@ namespace SEE.DataModel.DG.IO
                 return ResolveMainType(node.ID, node.Filename);
             }
 
-            if (node.Type == "File")
+            if (node.Type == NodeTypes.File)
             {
                 // For file nodes, we explicitly apply path normalization logic.
                 // In some graphs, File node IDs may be absolute paths.
@@ -171,16 +161,16 @@ namespace SEE.DataModel.DG.IO
         #region Helpers for type detection
 
         /// <summary>
-        /// Set of node types that represent Java type declarations in the GLX graphs.
-        ///
+        /// Set of node types that represent Java type declarations in the GXL graphs.
+        /// 
         /// This includes concrete and template variants for classes and interfaces.
         /// </summary>
         private static readonly HashSet<string> typeNodeTypes = new HashSet<string>
         {
-            "Class",
-            "Interface",
-            "Class_Template",
-            "Interface_Template"
+            NodeTypes.Class,
+            NodeTypes.Interface,
+            NodeTypes.ClassTemplate,
+            NodeTypes.InterfaceTemplate
         };
 
         /// <summary>
@@ -224,21 +214,18 @@ namespace SEE.DataModel.DG.IO
             // - no OS path separators found
             // - contains package separator dots
             // This avoids double-normalizing values that are already FQCNs.
-            if (!fullPath.Contains(windowsPathSeparator) && !fullPath.Contains(linuxPathSeparator) && fullPath.Contains(packageSeparator))
+            if (!fullPath.Contains(Filenames.WindowsDirectorySeparator) && !fullPath.Contains(Filenames.UnixDirectorySeparator) && fullPath.Contains(packageSeparator))
             {
                 return fullPath;
             }
 
             string normalized = parsingConfig.SourceRootRelativePath(fullPath);
 
-            // Remove ".java" extension (Checkstyle typically refers to Java source files).
-            if (normalized.EndsWith(".java", StringComparison.OrdinalIgnoreCase))
-            {
-                normalized = normalized.Substring(0, normalized.Length - 5);
-            }
+            // Removes the Extension: com/example/class.java -> com/example/class
+            normalized = Path.ChangeExtension(normalized, null);
 
             // Convert remaining path separators to package separators to form the FQCN.
-            normalized = normalized.Replace(linuxPathSeparator, packageSeparator).Trim('.');
+            normalized = Filenames.ReplaceDirectorySeparators(normalized, packageSeparator);
 
             return normalized;
         }

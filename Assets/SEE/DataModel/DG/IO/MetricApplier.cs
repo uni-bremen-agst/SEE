@@ -4,9 +4,6 @@ using System.Globalization;
 using SEE.DataModel.DG.GraphIndex;
 using UnityEngine;
 
-/// <summary>
-/// Contains types for parsing external tool reports and applying their metrics to SEE dependency graphs.
-/// </summary>
 namespace SEE.DataModel.DG.IO
 {
     /// <summary>
@@ -57,7 +54,7 @@ namespace SEE.DataModel.DG.IO
 
             string prefix = Metrics.Prefix + parsingConfig.ToolId + ".";
             IIndexNodeStrategy indexNodeStrategy = parsingConfig.CreateIndexNodeStrategy();
-            SourceRangeIndex index = new SourceRangeIndex(graph, indexNodeStrategy.NodeIdToMainType);
+            SourceRangeIndex index = new (graph, indexNodeStrategy.NodeIdToMainType);
 
             foreach (Finding finding in schema.Findings)
             {
@@ -74,7 +71,7 @@ namespace SEE.DataModel.DG.IO
                 if (string.IsNullOrWhiteSpace(findingPathAsMainType))
                 {
                     Debug.LogWarning(
-                        $"[{nameof(MetricApplier)}] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.");
+                        $"[{nameof(MetricApplier)}] Could not resolve main type for finding with path: {finding.FullPath} {finding.FileName} – skipping.\n");
                     continue;
                 }
 
@@ -97,7 +94,7 @@ namespace SEE.DataModel.DG.IO
                 else
                 {
                     Debug.LogWarning(
-                        $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, nodeId={findingPathAsNodeId}, line={startLine}");
+                        $"[{nameof(MetricApplier)}] Could not resolve node for Path={finding.FullPath}, nodeId={findingPathAsNodeId}, line={startLine}.\n");
                 }
             }
         }
