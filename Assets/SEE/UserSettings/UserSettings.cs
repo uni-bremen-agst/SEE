@@ -196,7 +196,7 @@ namespace SEE.User
             }
             catch (Exception e)
             {
-                Debug.LogError($"Error during quit: {e}");
+                Debug.LogError($"Error during quit: {e}\n");
             }
             return true;
         }
