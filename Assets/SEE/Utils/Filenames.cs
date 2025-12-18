@@ -423,9 +423,7 @@ namespace SEE.Utils
             {
                 return path;
             }
-
-            return path.Replace(UnixDirectorySeparator, replacement)
-                       .Trim(replacement);
+            return path.Replace(UnixDirectorySeparator, replacement).Trim(replacement);
         }
 
         /// <summary>
@@ -446,13 +444,9 @@ namespace SEE.Utils
             {
                 return path;
             }
-
             return path.Replace(WindowsDirectorySeparator, replacement)
                        .Replace(UnixDirectorySeparator, replacement)
                        .Trim(replacement);
         }
-
-
-
     }
 }
