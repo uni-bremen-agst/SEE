@@ -80,18 +80,6 @@ namespace SEE.Net
             }
         }
 
-        [Rpc(SendTo.Server)]
-        public void RequestServerSnapshotRpc(SEECitySnapshot snapshot)
-        {
-            if (!(IsServer || IsHost))
-            {
-                Logger.Log("Send Snapshot to server");
-                return;
-            }
-
-            BackendSyncUtil.TrySaveSnapshotsAsync(snapshot).Forget();
-        }
-
         /// <summary>
         /// Sends an action to all clients in the recipients list, or to all connected clients
         /// (except the sender) if <c>recipients</c> is <c>null</c>.

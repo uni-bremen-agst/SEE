@@ -10,6 +10,7 @@ using SEE.GraphProviders;
 using SEE.Layout;
 using SEE.Layout.IO;
 using SEE.Net;
+using SEE.Net.Util;
 using SEE.UI;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -636,7 +637,7 @@ namespace SEE.Game.City
 
             SEECitySnapshot snapshot = new() { CityName = name, ConfigPath = ConfigurationPath.Path, GraphPath = GraphSnapshotPath.Path, LayoutPath = NodeLayoutSettings.LayoutPath.Path };
 
-            Network.SaveSnapshot(snapshot);
+            BackendSyncUtil.TrySaveSnapshotsAsync(snapshot).Forget();
         }
 
         /// <summary>
