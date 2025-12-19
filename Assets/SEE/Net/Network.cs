@@ -242,7 +242,7 @@ namespace SEE.Net
         /// </summary>
         private const string domainArgumentName = "--host";
         /// <summary>
-        /// Name of the environment variable containing the backend api URL (<see cref="BackendDomain"/>).
+        /// Name of the environment variable containing the backend api URL (<see cref="BackendServerAPI"/>).
         /// </summary>
         private const string backendAPIVariableName = "SEE_BACKEND_API";
         /// <summary>
