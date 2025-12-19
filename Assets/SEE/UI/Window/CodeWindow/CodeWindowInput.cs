@@ -391,7 +391,7 @@ namespace SEE.UI.Window.CodeWindow
             // TODO (#250): Maybe disable syntax highlighting for huge files, as it may impact performance badly.
             using (LoadingSpinner.ShowIndeterminate($"Loading {Path.GetFileName(filename)}..."))
             {
-                GameObject go = SceneQueries.GetCodeCity(transform).gameObject;
+                GameObject go = transform.gameObject.GetCodeCity();
                 IEnumerable<SEEToken> tokens;
                 try
                 {

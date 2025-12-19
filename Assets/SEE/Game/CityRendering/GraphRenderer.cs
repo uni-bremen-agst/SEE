@@ -8,7 +8,8 @@ using SEE.Game.City;
 using SEE.Game.HolisticMetrics;
 using SEE.GO;
 using SEE.GO.Decorators;
-using SEE.GO.NodeFactories;
+using SEE.GO.Factories;
+using SEE.GO.Factories.NodeFactories;
 using SEE.Layout;
 using SEE.Layout.NodeLayouts;
 using SEE.Utils;
@@ -187,7 +188,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// The shader to be used for drawing the nodes.
         /// </summary>
-        private const Materials.ShaderType shaderType = Materials.ShaderType.OpaqueMetallic;
+        private const MaterialsFactory.ShaderType shaderType = MaterialsFactory.ShaderType.OpaqueMetallic;
 
         /// <summary>
         /// The distance between two stacked game objects (parent/child).
@@ -378,7 +379,10 @@ namespace SEE.Game.CityRendering
 
             if (Settings is BranchCity)
             {
-                DrawAuthorSpheres(nodeMap, rootGameNode, graph, planeCenterposition, planeRectangle);
+                // The authors spheres and author references are created under the code city (parent)
+                // and not under the graph root game node (rootGameNode) because we do not want to
+                // move them if a user shuffles the root game node.
+                DrawAuthorSpheres(nodeMap, parent, graph, planeCenterposition, planeRectangle);
             }
 
             updateProgress?.Invoke(1.0f);
@@ -747,12 +751,12 @@ namespace SEE.Game.CityRendering
         /// <remarks>The code-city object is obtained via <see cref="SceneQueries.GetCodeCity(Transform)"/></remarks>
         private static GameObject RootGameNode(GameObject gameNode)
         {
-            Transform codeCity = SceneQueries.GetCodeCity(gameNode.transform);
+            GameObject codeCity = gameNode.GetCodeCity();
             if (codeCity == null)
             {
                 throw new Exception($"Game node {gameNode.name} is not contained in a code city.");
             }
-            GameObject result = SceneQueries.GetCityRootNode(codeCity.gameObject);
+            GameObject result = codeCity.GetCityRootNode();
             if (result == null)
             {
                 throw new Exception($"Code city {codeCity.name} has no child tagged by {Tags.Node}.");

@@ -1,7 +1,8 @@
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders.VCS;
 using System;
 using System.Collections.Generic;
@@ -35,7 +36,8 @@ namespace SEE.Game.CityRendering
         /// <param name="planeRectangle">The world-space rectangle of the plane on which the city was rendered.</param>
         private void DrawAuthorSpheres
             (IDictionary<Node, GameObject> nodeMap,
-            GameObject parent, Graph graph,
+            GameObject parent,
+            Graph graph,
             Vector3 planeCenterposition,
             Vector2 planeRectangle)
         {
@@ -62,7 +64,7 @@ namespace SEE.Game.CityRendering
             /// Collecting all authors from the file nodes. The authors reside in the string attribute
             /// <see cref="DataModel.DG.VCS.AuthorsAttributeName"/> separated by commas.
             List<FileAuthor> authors =
-                nodeMap.Keys.Where(x => x.Type == DataModel.DG.VCS.FileType)
+                nodeMap.Keys.Where(x => x.Type == DataModel.DG.NodeTypes.File)
                     .SelectMany(x => x.StringAttributes.Where(y => y.Key == DataModel.DG.VCS.AuthorsAttributeName))
                     .SelectMany(x => x.Value.Split(","))
                     .Distinct()
@@ -75,7 +77,7 @@ namespace SEE.Game.CityRendering
 
             int currentAuthor = 0;
             // Define materials for the spheres.
-            Materials materials = new(Materials.ShaderType.PortalFree,
+            MaterialsFactory materials = new(MaterialsFactory.ShaderType.PortalFree,
                 new ColorRange(Color.red, Color.blue, (uint)authorsCount + 1));
 
             // Position the spheres on the plane above the city at sky level.
@@ -190,7 +192,8 @@ namespace SEE.Game.CityRendering
                     {
                         layer = Layers.InteractableGraphObjects,
                         isStatic = false,
-                        name = authorName + ":" + fileOfAuthor.Key.ID
+                        name = authorName + ":" + fileOfAuthor.Key.ID,
+                        tag = Tags.Decoration
                     };
                     // It will be the child of parent.
                     connectingLine.transform.parent = parent.transform;

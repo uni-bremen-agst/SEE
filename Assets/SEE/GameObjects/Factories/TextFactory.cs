@@ -5,7 +5,7 @@ using SEE.Game.City;
 using TMPro;
 using UnityEngine;
 
-namespace SEE.GO
+namespace SEE.GO.Factories
 {
     /// <summary>
     /// A factory for text objects that rotate towards the camera.

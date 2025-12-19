@@ -5,6 +5,7 @@ using SEE.DataModel.DG;
 using SEE.DataModel.DG.IO;
 using SEE.Game.CityRendering;
 using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.GraphProviders;
 using SEE.Layout;
@@ -376,15 +377,16 @@ namespace SEE.Game.City
                                                                       cancellationTokenSource.Token);
                         IsPipelineRunning = false;
 
-                        void ReportProgress(float x)
+                        void ReportProgress(float progress)
                         {
-                            ProgressBar = x;
-                            reportProgress(x);
+                            ProgressBar = progress;
+                            reportProgress?.Invoke(progress);
                         }
                     }
                 }
-                catch (OperationCanceledException)
+                catch (OperationCanceledException ex)
                 {
+                    Debug.LogException(ex);
                     ShowNotification.Warn("Data loading cancelled", "Data loading was cancelled.\n", log: true);
                     throw;
                 }

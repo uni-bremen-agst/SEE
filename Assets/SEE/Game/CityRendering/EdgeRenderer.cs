@@ -8,6 +8,7 @@ using MoreLinq.Extensions;
 using SEE.DataModel.DG;
 using SEE.Game.City;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.Layout;
 using SEE.Layout.EdgeLayouts;
 using SEE.Utils;
@@ -162,8 +163,8 @@ namespace SEE.Game.CityRendering
             GameObject resultingEdge = EdgeLayout(layoutNodes.Values, layoutEdges, addToGraphElementIDMap).Single();
 
             // The edge becomes a child of the root node of the game-node hierarchy
-            GameObject codeCity = SceneQueries.GetCodeCity(from.transform).gameObject;
-            GameObject rootNode = SceneQueries.GetCityRootNode(codeCity);
+            GameObject codeCity = from.GetCodeCity();
+            GameObject rootNode = codeCity.GetCityRootNode();
             resultingEdge.transform.SetParent(rootNode.transform);
             // The portal of the new edge is inherited from the codeCity.
             Portal.SetPortal(root: codeCity, gameObject: resultingEdge);
@@ -365,7 +366,7 @@ namespace SEE.Game.CityRendering
             float i = 0;
             ICollection<GameObject> result = await edgeFactory.DrawEdges(gameNodes, layoutEdges)
                                                               .Pipe(_ => updateProgress?.Invoke(0.5f * ++i / totalEdges))
-                                                              .BatchPerFrame(cancellationToken: token)
+                                                              .BatchPerFrame(token: token)
                                                               .ToListAsync(cancellationToken: token);
             if (addToGraphElementIDMap)
             {

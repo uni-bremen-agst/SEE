@@ -103,7 +103,7 @@ namespace SEE.GraphProviders.VCS
         #endregion Truck Factor
 
         /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
         /// to the <paramref name="graph"/> for the relevant files in the given <paramref name="repository"/>
         /// present at the given <paramref name="commitID"/>. Metrics are added, too. The <see cref="GitFileMetrics"/>
         /// are calulated relative to <paramref name="baselineCommitID"/>.
@@ -155,10 +155,8 @@ namespace SEE.GraphProviders.VCS
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
 
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+            token.ThrowIfCancellationRequested();
+
             changePercentage?.Invoke(0.6f);
 
             // Includes all commits between the baseline commit and the commitID
@@ -173,10 +171,7 @@ namespace SEE.GraphProviders.VCS
 
             void UpdateMetricsForCommit(Repository repository, Commit commit)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit(fileToMetrics, repository, commit, consultAliasMap, authorAliasMap);
             }
         }
@@ -220,7 +215,7 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
         /// for the relevant files in the given <paramref name="repository"/> present after the given
         /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
         /// <see cref="GitFileMetrics"/> are calculated, too.
@@ -236,6 +231,7 @@ namespace SEE.GraphProviders.VCS
         /// <param name="authorAliasMap">Where to to look up an alias. Can be null if <paramref name="consultAliasMap"/>
         /// is false</param>
         /// <param name="changePercentage">To report the progress.</param>
+        ///  <param name="token">Can be used to cancel the action.</param>
         internal static void AddNodesAfterDate
             (Graph graph,
              bool simplifyGraph,
@@ -261,10 +257,8 @@ namespace SEE.GraphProviders.VCS
             changePercentage?.Invoke(0.3f);
 
             FileToMetrics fileToMetrics = Prepare(graph, files);
-            if (token.IsCancellationRequested)
-            {
-                throw new OperationCanceledException(token);
-            }
+
+            token.ThrowIfCancellationRequested();
 
             repository.ForEachCommitAfter(startDate, UpdateMetricsForCommit);
             changePercentage?.Invoke(0.6f);
@@ -274,10 +268,7 @@ namespace SEE.GraphProviders.VCS
 
             void UpdateMetricsForCommit(Repository repo, Commit commit)
             {
-                if (token.IsCancellationRequested)
-                {
-                    throw new OperationCanceledException(token);
-                }
+                token.ThrowIfCancellationRequested();
                 GitGraphGenerator.UpdateMetricsForCommit
                     (fileToMetrics, repo, commit, consultAliasMap, authorAliasMap);
             }
@@ -469,7 +460,7 @@ namespace SEE.GraphProviders.VCS
         {
             foreach (Node node in graph.Nodes())
             {
-                if (node.Type == DataModel.DG.VCS.FileType)
+                if (node.Type == DataModel.DG.NodeTypes.File)
                 {
                     string repositoryFilePath = node.ID;
                     AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
@@ -596,7 +587,7 @@ namespace SEE.GraphProviders.VCS
         {
             Graph graph = root.ItsGraph;
             IList<Node> children = root.Children();
-            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.VCS.FileType) && children.Any())
+            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.NodeTypes.File) && children.Any())
             {
                 foreach (Node child in children.ToList())
                 {

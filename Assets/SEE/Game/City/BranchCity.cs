@@ -1,7 +1,10 @@
 using Cysharp.Threading.Tasks;
 using SEE.DataModel.DG;
 using SEE.Game.CityRendering;
+using SEE.GameObjects;
+using SEE.GameObjects.BranchCity;
 using SEE.GO;
+using SEE.GO.Factories;
 using SEE.GraphProviders;
 using SEE.UI.Notification;
 using SEE.UI.RuntimeConfigMenu;
@@ -91,6 +94,73 @@ namespace SEE.Game.City
                 {
                     authorThreshold = value;
                     UpdateAuthorEdges();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Backing field for <see cref="EnableConflictMarkers"/>.
+        /// </summary>
+        [SerializeField]
+        private bool enableConflictMarkers = false;
+
+        /// <summary>
+        /// Unregisters the code city from <see cref="DynamicMarkerFactory"/> to destroy
+        /// the dynamic marker prefab created specifically for this code city.
+        /// </summary>
+        private void OnDestroy()
+        {
+            DynamicMarkerFactory.DestroyMarkerPrefab(gameObject);
+        }
+
+        /// <summary>
+        /// Whether the dynamic markers are to be enabled for file nodes with
+        /// multiple authors, that is, when there is a chance of an edit conflict.
+        /// </summary>
+        [ShowInInspector,
+         Tooltip("Enables the markers to show potential edit conflicts."),
+         TabGroup(VCSFoldoutGroup),
+         RuntimeTab(VCSFoldoutGroup)]
+        public bool EnableConflictMarkers
+        {
+            get => enableConflictMarkers;
+            set
+            {
+                enableConflictMarkers = value;
+                UpdateConflictMarkers();
+            }
+        }
+
+        /// <summary>
+        /// Resets everything that is specific to a given graph. Here: the selected node types,
+        /// the underlying and visualized graph, and all game objects visualizing information about it.
+        /// And enables the <see cref="CitySelectionManager"/> to add a new <see cref="AbstractSEECity"/>.
+        /// </summary>
+        /// <remarks>This method should be called whenever <see cref="loadedGraph"/> is re-assigned.</remarks>
+        [Button(ButtonSizes.Small, Name = "Reset Data")]
+        [ButtonGroup(ResetButtonsGroup), RuntimeButton(ResetButtonsGroup, "Reset Data")]
+        [PropertyOrder(ResetButtonsGroupOrderReset), RuntimeGroupOrder(ResetButtonsGroupOrderReset)]
+        public override void Reset()
+        {
+            base.Reset();
+            DynamicMarkerFactory.DestroyMarkerPrefab(gameObject);
+            DestroyAuthorSpheresAndEdges();
+        }
+
+        /// <summary>
+        /// <see cref="AuthorSphere"/>s and <see cref="AuthorEdge"/>s are immediate children of
+        /// the game object this component is attached to and not of the graph root node.
+        /// Hence, destroying the graph root node and its descendants will not destroy
+        /// the <see cref="AuthorSphere"/>s and <see cref="AuthorEdge"/>s. We destroy them
+        /// here by search for all game objects tagged as <see cref="Tags.Decoration"/>.
+        /// </summary>
+        private void DestroyAuthorSpheresAndEdges()
+        {
+            foreach (Transform child in transform)
+            {
+                if (child.CompareTag(Tags.Decoration))
+                {
+                    Destroyer.Destroy(child);
                 }
             }
         }
@@ -220,7 +290,7 @@ namespace SEE.Game.City
             {
                 if (poller != null)
                 {
-                    poller.Stop();
+                    StopPoller();
                 }
                 else
                 {
@@ -251,7 +321,9 @@ namespace SEE.Game.City
         /// </summary>
         void RenderTransition()
         {
+            Debug.Log("RenderTransition started\n");
             RenderTransitionAsync().Forget();
+            Debug.Log("RenderTransition ended\n");
         }
 
         /// <summary>
@@ -260,6 +332,8 @@ namespace SEE.Game.City
         /// <returns>task</returns>
         async UniTask RenderTransitionAsync()
         {
+            Debug.Log("RenderTransitionAsync started\n");
+
             if (LoadedGraph == null)
             {
                 return;
@@ -273,6 +347,7 @@ namespace SEE.Game.City
             /// We updated the graph elements references and <see cref="GraphElementIDMap"/>
             /// ourselves in the transition renderer, so we need to update them again in <see cref="InitializeAfterDrawn(bool)"/>.
             InitializeAfterDrawn(false);
+            Debug.Log("RenderTransitionAsync ended\n");
         }
 
         /// <summary>
@@ -322,10 +397,30 @@ namespace SEE.Game.City
                 // Edges are located under the root node.
                 foreach (Transform child in root.transform)
                 {
-                    if (child.TryGetComponent(out GameObjects.AuthorEdge edge))
+                    if (child.TryGetComponent(out AuthorEdge edge))
                     {
                         edge.ShowOrHide(isHovered: false);
                     }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the merge-conflict dynamic markers of all file nodes.
+        /// </summary>
+        private void UpdateConflictMarkers()
+        {
+            GameObject root = gameObject.FirstChildNode();
+            if (root != null)
+            {
+                root.ApplyToAllDescendants(Tags.Node, go => UpdateConflictMarker(go));
+            }
+
+            static void UpdateConflictMarker(GameObject go)
+            {
+                if (go.TryGetComponent(out AuthorRef authorRef))
+                {
+                    authorRef.UpdateConflictVisibility();
                 }
             }
         }
@@ -370,6 +465,11 @@ namespace SEE.Game.City
         /// </summary>
         private const string pollingIntervalLabel = "PollingInterval";
 
+        /// <summary>
+        /// Label for serializing the <see cref="enableConflictMarkers"/> field.
+        /// </summary>
+        private const string enableConflictMarkersLabel = "EnableConflictMarkers";
+
         protected override void Save(ConfigWriter writer)
         {
             base.Save(writer);
@@ -378,6 +478,7 @@ namespace SEE.Game.City
             writer.Save(AuthorThreshold, authorThresholdLabel);
             writer.Save(AutoFetch, autoFetchLabel);
             writer.Save(PollingInterval, pollingIntervalLabel);
+            writer.Save(enableConflictMarkers, enableConflictMarkersLabel);
         }
 
         protected override void Restore(Dictionary<string, object> attributes)
@@ -412,6 +513,13 @@ namespace SEE.Game.City
                 if (ConfigIO.Restore(attributes, pollingIntervalLabel, ref pollingInterval))
                 {
                     PollingInterval = pollingInterval;
+                }
+            }
+            {
+                bool enable = enableConflictMarkers;
+                if (ConfigIO.Restore(attributes, enableConflictMarkersLabel, ref enable))
+                {
+                    EnableConflictMarkers = enable;
                 }
             }
         }

@@ -1,4 +1,5 @@
 ﻿using DG.Tweening;
+using OpenAI.Realtime;
 using SEE.GO;
 using SEE.Net;
 using SEE.Tools.OpenTelemetry;
@@ -6,6 +7,7 @@ using SEE.Utils.Config;
 using SEE.Utils.Paths;
 using Sirenix.OdinInspector;
 using Sirenix.Serialization;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -28,13 +30,13 @@ namespace SEE.User
         /// Settings of the player.
         /// </summary>
         [Tooltip("Settings of the player.")]
-        public Player Player = new();
+        public readonly Player Player = new();
 
         /// <summary>
         /// Settings of the network.
         /// </summary>
         [Tooltip("Settings of the network.")]
-        public Network Network = new();
+        public readonly Network Network = new();
 
         /// <summary>
         /// The voice chat system as selected by the user. Note: This attribute
@@ -54,7 +56,19 @@ namespace SEE.User
         /// Settings for telemetry.
         /// </summary>
         [Tooltip("Telemetry settings.")]
-        public Telemetry Telemetry = new();
+        public readonly Telemetry Telemetry = new();
+
+        /// <summary>
+        /// Settings for video.
+        /// </summary>
+        [Tooltip("Video settings.")]
+        public readonly Video Video = new();
+
+        /// <summary>
+        /// Settings for audio.
+        /// </summary>
+        [Tooltip("Audio settings.")]
+        public readonly Audio Audio = new();
 
         /// <summary>
         /// Default path of the configuration file (path and filename).
@@ -101,6 +115,9 @@ namespace SEE.User
             /// main thread here.
             MainThread = Thread.CurrentThread;
 
+            // Sets the Unity-dependent default values.
+            Video.InitializeDefaults();
+
             Load();
         }
 
@@ -135,12 +152,53 @@ namespace SEE.User
         }
 
         /// <summary>
-        /// Shuts down the voice-chat system and OpenTelemetry.
+        /// Shuts down the voice-chat system and OpenTelemetry,
+        /// and saves all user settings.
+        /// This ensures that any changes made during the session are persisted
+        /// when the application quits.
         /// </summary>
         private void OnApplicationQuit()
         {
             TracingHelperService.Shutdown(true);
             User.VoiceChat.EndVoiceChat(VoiceChat);
+        }
+
+        /// <summary>
+        /// Registers the quit callback when the object becomes enabled.
+        /// This ensures that application shutdown can be handled gracefully.
+        /// </summary>
+        private void OnEnable()
+        {
+            Application.wantsToQuit += SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Unregisters the quit callback when the object is disabled.
+        /// This prevents callbacks from being invoked on inactive objects.
+        /// </summary>
+        private void OnDisable()
+        {
+            Application.wantsToQuit -= SaveOnQuit;
+        }
+
+        /// <summary>
+        /// Called when the application is about to quit.
+        /// Attempts to save the current instance state before shutdown.
+        /// </summary>
+        /// <returns>
+        /// Returns <c>true</c> to allow the application to quit.
+        /// </returns>
+        private bool SaveOnQuit()
+        {
+            try
+            {
+                Instance.Save();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Error during quit: {e}\n");
+            }
+            return true;
         }
 
         /// <summary>
@@ -184,13 +242,13 @@ namespace SEE.User
         /// <summary>
         /// The backend domain to be used for network connections to the SEE backend.
         /// </summary>
-        public static string BackendDomain => Instance.Network.BackendDomain;
+        public static string BackendDomain => Instance?.Network.BackendDomain;
 
         /// <summary>
         /// The complete backend server API endpoint to be used for network connections to
         /// the SEE backend.
         /// </summary>
-        public static string BackendServerAPI => Instance.Network.BackendServerAPI;
+        public static string BackendServerAPI => Instance?.Network.BackendServerAPI;
 
         /// <summary>
         /// The name of the group for the Inspector buttons loading and saving the configuration file.
@@ -276,16 +334,36 @@ namespace SEE.User
         private const string inputTypeLabel = "InputType";
 
         /// <summary>
+        /// Label of attribute <see cref="Video"/> in the configuration file.
+        /// </summary>
+        private const string videoLabel = "Video";
+
+        /// <summary>
+        /// Label of attribute <see cref="Audio"/> in the confiugration file.
+        /// </summary>
+        private const string audioLabel = "Audio";
+
+        /// <summary>
         /// Saves the settings of this network configuration using <paramref name="writer"/>.
         /// </summary>
         /// <param name="writer">the writer to be used to save the settings</param>
         protected virtual void Save(ConfigWriter writer)
         {
             Player.Save(writer, playerLabel);
-            Network.Save(writer, networkLabel);
             writer.Save(VoiceChat.ToString(), voiceChatLabel);
             Telemetry.Save(writer, telemetryLabel);
             writer.Save(InputType.ToString(), inputTypeLabel);
+            Video.Save(writer, videoLabel);
+            Audio.Save(writer, audioLabel);
+            try
+            {
+                Network.Save(writer, networkLabel);
+            }
+            catch (System.Exception)
+            {
+                Debug.LogError("Network settings could not be saved.\n");
+                throw;
+            }
         }
 
         /// <summary>
@@ -295,10 +373,12 @@ namespace SEE.User
         protected virtual void Restore(Dictionary<string, object> attributes)
         {
             Player.Restore(attributes, playerLabel);
-            Network.Restore(attributes, networkLabel);
             ConfigIO.RestoreEnum(attributes, voiceChatLabel, ref VoiceChat);
             Telemetry.Restore(attributes, telemetryLabel);
             ConfigIO.RestoreEnum(attributes, inputTypeLabel, ref InputType);
+            Video.Restore(attributes, videoLabel);
+            Audio.Restore(attributes, audioLabel);
+            Network.Restore(attributes, networkLabel);
         }
 
         #endregion Configuration I/O
