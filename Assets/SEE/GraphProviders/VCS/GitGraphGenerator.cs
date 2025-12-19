@@ -103,7 +103,7 @@ namespace SEE.GraphProviders.VCS
         #endregion Truck Factor
 
         /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
         /// to the <paramref name="graph"/> for the relevant files in the given <paramref name="repository"/>
         /// present at the given <paramref name="commitID"/>. Metrics are added, too. The <see cref="GitFileMetrics"/>
         /// are calulated relative to <paramref name="baselineCommitID"/>.
@@ -215,7 +215,7 @@ namespace SEE.GraphProviders.VCS
         }
 
         /// <summary>
-        /// Adds nodes of type <see cref="DataModel.DG.VCS.FileType"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
+        /// Adds nodes of type <see cref="DataModel.DG.NodeTypes.File"/> and <see cref="DataModel.DG.VCS.DirectoryType"/>
         /// for the relevant files in the given <paramref name="repository"/> present after the given
         /// <paramref name="startDate"/> to the <paramref name="graph"/>. For each added node, the
         /// <see cref="GitFileMetrics"/> are calculated, too.
@@ -460,7 +460,7 @@ namespace SEE.GraphProviders.VCS
         {
             foreach (Node node in graph.Nodes())
             {
-                if (node.Type == DataModel.DG.VCS.FileType)
+                if (node.Type == DataModel.DG.NodeTypes.File)
                 {
                     string repositoryFilePath = node.ID;
                     AntlrLanguage language = AntlrLanguage.FromFileExtension(Path.GetExtension(repositoryFilePath).TrimStart('.'));
@@ -587,7 +587,7 @@ namespace SEE.GraphProviders.VCS
         {
             Graph graph = root.ItsGraph;
             IList<Node> children = root.Children();
-            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.VCS.FileType) && children.Any())
+            if (children.ToList().TrueForAll(x => x.Type != DataModel.DG.NodeTypes.File) && children.Any())
             {
                 foreach (Node child in children.ToList())
                 {

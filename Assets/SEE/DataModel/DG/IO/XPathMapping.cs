@@ -13,54 +13,45 @@ namespace SEE.DataModel.DG.IO
     {
         /// <summary>
         /// XPath union expression that selects every XML node of interest.
-        /// This string must not be null when used for report traversal.
         /// </summary>
+        /// <remarks>Preconditions: Must not be null when used for report traversal.</remarks>
         public string SearchedNodes { get; set; } = string.Empty;
 
         /// <summary>
         /// Maps XML element names to XPath expressions that produce the full path identifier.
-        /// Dictionary keys and values must not be null.
         /// </summary>
-        public Dictionary<string, string> PathBuilders { get; set; } =
-            new Dictionary<string, string>();
+        /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
+        public Dictionary<string, string> PathBuilders { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
-        /// Maps XML element names to XPath expressions that select the file name of a node.
-        /// Dictionary keys and values must not be null.
+        /// Maps XML element names (context) to XPath expressions that select the file name of a node.
         /// </summary>
-        public Dictionary<string, string> FileName { get; set; } =
-            new Dictionary<string, string>();
+        /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
+        public Dictionary<string, string> FileName { get; set; } = new Dictionary<string, string>();
 
         /// <summary>
         /// Optional mapping from location field names to XPath expressions.
-        /// May be null if the report format does not provide explicit locations.
         /// </summary>
+        /// <remarks>May be null if the report format does not provide explicit locations.</remarks>
         public Dictionary<string, string>? LocationMapping { get; set; }
 
         /// <summary>
-        /// Metric definitions keyed by their output name, each pointing to an XPath expression.
-        /// Dictionary keys and values must not be null.
+        /// Metric definitions keyed by their output name, each pointing to a context-specific XPath expression.
         /// </summary>
-        public Dictionary<string, string> Metrics { get; set; } =
-            new Dictionary<string, string>();
+        /// <remarks>Preconditions: Dictionary keys and values must not be null.</remarks>
+        public Dictionary<string, Dictionary<string, string>> MetricsByContext { get; set; } =
+            new Dictionary<string, Dictionary<string, string>>();
 
         /// <summary>
         /// Optional namespace prefix or URI map for XPath evaluation.
-        /// May be null if the report does not use XML namespaces.
         /// </summary>
+        /// <remarks>May be null if the report does not use XML namespaces.</remarks>
         public Dictionary<string, string>? Namespaces { get; set; }
 
         /// <summary>
         /// Optional template for location metadata, used by parsers that allocate location objects upfront.
-        /// May be null if no location template is required.
         /// </summary>
-        public MetricLocation MetricLocation;
-
-        /// <summary>
-        /// Maps an XML tag name to a context designation such as class, package, method or root.
-        /// Dictionary keys and values must not be null.
-        /// </summary>
-        public Dictionary<string, string> MapContext { get; set; } =
-            new Dictionary<string, string>();
+        /// <remarks>May be null if no location template is required.</remarks>
+        public MetricLocation MetricLocation = null!;
     }
 }

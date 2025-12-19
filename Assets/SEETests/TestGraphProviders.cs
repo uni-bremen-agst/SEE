@@ -189,7 +189,7 @@ namespace SEE.GraphProviders
         public async Task TestExistenceOfTokenMetricsAsync()
         {
             Graph graph = await GetVCSGraphAsync();
-            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.VCS.FileType);
+            Node fileNode = graph.Nodes().First(t => t.Type == DataModel.DG.NodeTypes.File);
             AssertTokenMetricsExist(fileNode);
         }
 
