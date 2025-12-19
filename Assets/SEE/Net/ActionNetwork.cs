@@ -211,7 +211,7 @@ namespace SEE.Net
             }
 
             ulong senderId = rpcParams.Receive.SenderClientId;
-            SyncFilesClientRpc(Network.ServerId, UserSettings.BackendDomain, RpcTarget.Single(senderId, RpcTargetUse.Temp));
+            SyncFilesClientRpc(Network.ServerId, UserSettings.Instance.Network.BackendServerAPI, RpcTarget.Single(senderId, RpcTargetUse.Temp));
         }
 
         /// <summary>
