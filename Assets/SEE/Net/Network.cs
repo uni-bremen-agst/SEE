@@ -242,9 +242,9 @@ namespace SEE.Net
         /// </summary>
         private const string domainArgumentName = "--host";
         /// <summary>
-        /// Name of the environment variable containing the backend domain URL (<see cref="BackendDomain"/>).
+        /// Name of the environment variable containing the backend api URL (<see cref="BackendServerAPI"/>).
         /// </summary>
-        private const string domainVariableName = "SEE_BACKEND_DOMAIN";
+        private const string backendAPIVariableName = "SEE_BACKEND_API";
         /// <summary>
         /// Name of the command-line argument containing the the server id (<see cref="ServerId"/>).
         /// </summary>
@@ -304,7 +304,7 @@ namespace SEE.Net
                 RoomPassword = roomPassword;
             }
 
-            string backendServerAPI = Environment.GetEnvironmentVariable(domainVariableName);
+            string backendServerAPI = Environment.GetEnvironmentVariable(backendAPIVariableName);
             if (!string.IsNullOrWhiteSpace(backendServerAPI))
             {
                 BackendServerAPI = backendServerAPI;
