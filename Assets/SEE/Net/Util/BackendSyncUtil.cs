@@ -228,7 +228,7 @@ namespace SEE.Net.Util
             string snapshotZipPath = snapshotsDir + ".zip";
             Archiver.CreateArchive(snapshotsDir, snapshotZipPath);
             // Clear up zip directory
-            Directory.Delete(snapshotsDir);
+            Directory.Delete(snapshotsDir, true);
             if (!await LogInAsync())
             {
                 Debug.LogError("Unable to save snapshot");
