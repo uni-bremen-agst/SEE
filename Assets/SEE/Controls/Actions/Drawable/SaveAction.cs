@@ -14,6 +14,7 @@ using SEE.Utils.History;
 using SEE.Game.Drawable.ActionHelpers;
 using SEE.UI;
 using System;
+using SEE.Game;
 
 namespace SEE.Controls.Actions.Drawable
 {
@@ -225,7 +226,7 @@ namespace SEE.Controls.Actions.Drawable
                 if (surface.GetComponent<HighlightEffect>() == null)
                 {
                     selectedSurfaces.Add(surface);
-                    GameHighlighter.EnableGlowOverlay(surface);
+                    Highlighter.EnableGlowOverlay(surface);
                 }
                 else
                 {
