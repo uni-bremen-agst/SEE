@@ -2,7 +2,6 @@ using DG.Tweening;
 using SEE.Controls;
 using SEE.DataModel.DG;
 using SEE.Game.City;
-using SEE.GameObjects.BranchCity;
 using SEE.GO;
 using SEE.Layout;
 using SEE.Tools.ReflexionAnalysis;
