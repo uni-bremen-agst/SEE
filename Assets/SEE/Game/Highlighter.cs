@@ -23,7 +23,7 @@ namespace SEE.Game
         /// <param name="gameObject">The game object whose highlighting is to be set.</param>
         /// <param name="highlight">If <c>true</c>, <paramref name="gameObject"/> will be
         /// highlighted; otherwise its highlighting will be turned off.</param>
-        public static void SetHighlight(GameObject gameObject, bool highlight)
+        public static void SetHighlight(this GameObject gameObject, bool highlight)
         {
             HighlightEffect effect = GetHighlightEffect(gameObject);
             effect.highlighted = highlight;
@@ -36,7 +36,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameObject">Game objec.</param>
         /// <returns><see cref="HighlightEffect"/> component responsible for adding the highlight effect.</returns>
-        public static HighlightEffect GetHighlightEffect(GameObject gameObject)
+        public static HighlightEffect GetHighlightEffect(this GameObject gameObject)
         {
             if (!gameObject.TryGetComponent(out HighlightEffect effect))
             {
@@ -61,7 +61,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameObject">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
-        public static HighlightEffect EnableGlowOutline(GameObject gameObject)
+        public static HighlightEffect EnableGlowOutline(this GameObject gameObject)
         {
             HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
@@ -81,7 +81,7 @@ namespace SEE.Game
         /// </summary>
         /// <param name="gameObject">The object that should be highlighted.</param>
         /// <returns>The created highlight effect.</returns>
-        public static HighlightEffect EnableGlowOverlay(GameObject gameObject)
+        public static HighlightEffect EnableGlowOverlay(this GameObject gameObject)
         {
             HighlightEffect effect = gameObject.AddOrGetComponent<HighlightEffect>();
             effect.highlighted = true;
