@@ -33,7 +33,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Adds <paramref name="actionStateType"/> as a member of this group.
         /// </summary>
-        /// <param name="actionStateType">child to be added</param>
+        /// <param name="actionStateType">Child to be added.</param>
         public void Add(AbstractActionStateType actionStateType)
         {
             actionStateType.Parent = this;

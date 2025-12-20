@@ -45,10 +45,10 @@ namespace SEE.DataModel.DG
         ///
         /// Only <paramref name="newGraph"/> can be effected by this method.
         /// </summary>
-        /// <param name="newGraph">the newer graph in which to merge the differences</param>
-        /// <param name="oldGraph">the old graph whose difference to <paramref name="newGraph"/>
-        /// should be merged into <paramref name="newGraph"/></param>
-        /// <exception cref="ArgumentNullException">thrown in case <paramref name="newGraph"/> is null</exception>
+        /// <param name="newGraph">The newer graph in which to merge the differences.</param>
+        /// <param name="oldGraph">The old graph whose difference to <paramref name="newGraph"/>
+        /// should be merged into <paramref name="newGraph"/>.</param>
+        /// <exception cref="ArgumentNullException">Thrown in case <paramref name="newGraph"/> is null.</exception>
         public static void MergeDiff(this Graph newGraph, Graph oldGraph)
         {
             if (newGraph == null)
@@ -70,8 +70,8 @@ namespace SEE.DataModel.DG
         /// Merges the differences between <paramref name="newGraph"/> and <paramref name="oldGraph"/>
         /// with respect to nodes into <paramref name="newGraph"/>.
         /// </summary>
-        /// <param name="newGraph">the newer graph</param>
-        /// <param name="oldGraph">the older graph</param>
+        /// <param name="newGraph">The newer graph.</param>
+        /// <param name="oldGraph">The older graph.</param>
         private static void MergeDiffNodes(Graph newGraph, Graph oldGraph)
         {
             newGraph.Diff(oldGraph,
@@ -91,8 +91,8 @@ namespace SEE.DataModel.DG
         /// Merges the differences between <paramref name="newGraph"/> and <paramref name="oldGraph"/>
         /// with respect to edges into <paramref name="newGraph"/>.
         /// </summary>
-        /// <param name="newGraph">the newer graph</param>
-        /// <param name="oldGraph">the older graph</param>
+        /// <param name="newGraph">The newer graph.</param>
+        /// <param name="oldGraph">The older graph.</param>
         private static void MergeDiffEdges(Graph newGraph, Graph oldGraph)
         {
             newGraph.Diff(oldGraph,
@@ -135,11 +135,11 @@ namespace SEE.DataModel.DG
         /// <paramref name="removed"/> are mutually exclusive.
         /// </summary>
         /// <typeparam name="T">type of <see cref="GraphElement"/></typeparam>
-        /// <param name="added">added graph elements (these are in the newer graph)</param>
-        /// <param name="removed">removed graph elements (these are in <paramref name="baseline"/>)</param>
-        /// <param name="changed">changed graph elements (these are in the newer graph)</param>
-        /// <param name="addToGraph">adds its argument to the newer graph and
-        /// will be called for all elements in <paramref name="removed"/></param>
+        /// <param name="added">Added graph elements (these are in the newer graph).</param>
+        /// <param name="removed">Removed graph elements (these are in <paramref name="baseline"/>).</param>
+        /// <param name="changed">Changed graph elements (these are in the newer graph).</param>
+        /// <param name="addToGraph">Adds its argument to the newer graph and
+        /// will be called for all elements in <paramref name="removed"/>.</param>
         private static void MergeGraphElements<T>(ISet<T> added, ISet<T> removed, ISet<T> changed, Action<T> addToGraph, Graph baseline)
             where T : GraphElement
         {
@@ -206,11 +206,11 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <typeparam name="T">type of graph element</typeparam>
         /// <typeparam name="V">value type of a graph-element attribute</typeparam>
-        /// <param name="graphElement">graph element whose attribute value is requested</param>
-        /// <param name="attributeName">the name of the requested attribute</param>
-        /// <param name="value">the value of the attribute or undefined</param>
-        /// <returns>true if <paramref name="graphElement"/> has an attribute
-        /// with given <paramref name="attributeName"/></returns>
+        /// <param name="graphElement">Graph element whose attribute value is requested.</param>
+        /// <param name="attributeName">The name of the requested attribute.</param>
+        /// <param name="value">The value of the attribute or undefined.</param>
+        /// <returns>True if <paramref name="graphElement"/> has an attribute
+        /// with given <paramref name="attributeName"/>.</returns>
         private delegate bool TryGet<T, V>(T graphElement, string attributeName, out V value);
 
         /// <summary>
@@ -223,12 +223,12 @@ namespace SEE.DataModel.DG
         /// </summary>
         /// <typeparam name="T">type of graph element</typeparam>
         /// <typeparam name="V">value type of a graph-element attribute</typeparam>
-        /// <param name="graphElementInNew">the graph element in the new graph</param>
-        /// <param name="graphElementInOld">the graph element in the old graph corresponding to <paramref name="graphElementInNew"/></param>
-        /// <param name="allAttributeNames">yields the names of the attributes to be merged</param>
-        /// <param name="get">yields the value of an attribute of a given name for a graph element</param>
-        /// <param name="tryGet">see <see cref="TryGet{T, V}"/></param>
-        /// <param name="set">sets the value of an attribute of a given name for a graph element</param>
+        /// <param name="graphElementInNew">The graph element in the new graph.</param>
+        /// <param name="graphElementInOld">The graph element in the old graph corresponding to <paramref name="graphElementInNew"/>.</param>
+        /// <param name="allAttributeNames">Yields the names of the attributes to be merged.</param>
+        /// <param name="get">Yields the value of an attribute of a given name for a graph element.</param>
+        /// <param name="tryGet">See <see cref="TryGet{T, V}"/>.</param>
+        /// <param name="set">Sets the value of an attribute of a given name for a graph element.</param>
         private static void MergeAttributes<T, V>(T graphElementInNew, T graphElementInOld,
             Func<T, ICollection<string>> allAttributeNames,
             Func<T, string, V> get,

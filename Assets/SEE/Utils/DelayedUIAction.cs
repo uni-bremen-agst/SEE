@@ -28,7 +28,7 @@ namespace SEE.Utils
         /// <summary>
         /// Runs the <see cref="action"/> after waiting for one frame.
         /// </summary>
-        /// <returns>enumerator to continue</returns>
+        /// <returns>Enumerator to continue.</returns>
         private IEnumerator ExecuteAfterFrame()
         {
             yield return null; // wait one frame

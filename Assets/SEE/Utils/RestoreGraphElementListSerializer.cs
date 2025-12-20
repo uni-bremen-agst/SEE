@@ -21,10 +21,10 @@ namespace SEE.Utils
         /// Note: <paramref name="elementList"/> may be the empty list and
         /// elements in <paramref name="elementList"/> may be the empty string.
         /// </summary>
-        /// <param name="elementList">list to be serialized</param>
-        /// <returns>serialization of <paramref name="elementList"/></returns>
-        /// <exception cref="ArgumentNullException">thrown if <paramref name="elementList"/>
-        /// or any of its elements is null</exception>
+        /// <param name="elementList">List to be serialized.</param>
+        /// <returns>Serialization of <paramref name="elementList"/>.</returns>
+        /// <exception cref="ArgumentNullException">Thrown if <paramref name="elementList"/>
+        /// or any of its elements is null.</exception>
         public static string Serialize(List<RestoreGraphElement> elementList)
         {
             if (elementList == null || elementList.Contains(null))
@@ -49,8 +49,8 @@ namespace SEE.Utils
         /// Postcondition: Unserialize(Serialize(X)) is equal to X for every X
         /// where X is not null and none of its elements is null.
         /// </summary>
-        /// <param name="serializedList">list of <see cref="RestoreGraphElement"/> to be unserialized</param>
-        /// <returns>original list of <see cref="RestoreGraphElement"/>s that was serialized by <see cref="Serialize(List{RestoreGraphElement})"/></returns>
+        /// <param name="serializedList">List of <see cref="RestoreGraphElement"/> to be unserialized.</param>
+        /// <returns>Original list of <see cref="RestoreGraphElement"/>s that was serialized by <see cref="Serialize(List{RestoreGraphElement})"/>.</returns>
         public static List<RestoreGraphElement> Unserialize(string serializedList)
         {
             return JsonConvert.DeserializeObject<List<RestoreGraphElement>>(serializedList,

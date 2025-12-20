@@ -14,7 +14,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node.
         /// </summary>
-        /// <param name="node">graph node corresponding to this layout node</param>
+        /// <param name="node">Graph node corresponding to this layout node.</param>
         public LayoutGraphNode(Node node)
             : base(node)
         { }

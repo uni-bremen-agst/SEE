@@ -20,7 +20,7 @@ namespace SEE.User
         /// <summary>
         /// Starts the selected voice chat system according to <see cref="VoiceChatSystem"/>.
         /// </summary>
-        /// <param name="voiceChatSystem">the kind of voice chat</param>
+        /// <param name="voiceChatSystem">The kind of voice chat.</param>
         public static void StartVoiceChat(VoiceChatSystems voiceChatSystem)
         {
             switch (voiceChatSystem)
@@ -40,7 +40,7 @@ namespace SEE.User
         /// <summary>
         /// Shuts down the voice chat system.
         /// </summary>
-        /// <param name="voiceChatSystem">the kind of voice chat</param>
+        /// <param name="voiceChatSystem">The kind of voice chat.</param>
         public static void EndVoiceChat(VoiceChatSystems voiceChatSystem)
         {
             switch (voiceChatSystem)
@@ -59,7 +59,7 @@ namespace SEE.User
         /// <summary>
         /// Enables/disables Dissonance as the voice chat system.
         /// </summary>
-        /// <param name="enable">whether to enable Dissonance</param>
+        /// <param name="enable">Whether to enable Dissonance.</param>
         private static void EnableDissonance(bool enable)
         {
             // The DissonanceComms is initially active and the local player is not muted and not deafened.

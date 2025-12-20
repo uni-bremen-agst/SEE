@@ -82,10 +82,10 @@ namespace SEE.Net.Actions
         /// Retrieves and returns the game object registered at <see cref="GraphElementIDMap"/>
         /// under the given <paramref name="id"/>.
         /// </summary>
-        /// <param name="id">the unique ID that is to be used to retrieve the game object</param>
-        /// <returns>the game object registered at <see cref="GraphElementIDMap"/></returns>
-        /// <exception cref="Exception">thrown if <see cref="GraphElementIDMap"/>
-        /// has no game object registered by <paramref name="id"/></exception>
+        /// <param name="id">The unique ID that is to be used to retrieve the game object.</param>
+        /// <returns>The game object registered at <see cref="GraphElementIDMap"/>.</returns>
+        /// <exception cref="Exception">Thrown if <see cref="GraphElementIDMap"/>
+        /// has no game object registered by <paramref name="id"/>.</exception>
         protected static GameObject Find(string id)
         {
             GameObject result = GraphElementIDMap.Find(id);

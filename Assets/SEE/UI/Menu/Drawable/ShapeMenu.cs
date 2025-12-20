@@ -196,7 +196,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the current selected shape type
         /// </summary>
-        /// <returns>the selected shape type</returns>
+        /// <returns>The selected shape type.</returns>
         public static Shape GetSelectedShape()
         {
             return selectedShape;
@@ -205,31 +205,31 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the value of value1
         /// </summary>
-        /// <returns>value1</returns>
+        /// <returns>Value1.</returns>
         public static float GetValue1() { return value1; }
 
         /// <summary>
         /// Gets the value of value2
         /// </summary>
-        /// <returns>value2</returns>
+        /// <returns>Value2.</returns>
         public static float GetValue2() { return value2; }
 
         /// <summary>
         /// Gets the value of value3
         /// </summary>
-        /// <returns>value3</returns>
+        /// <returns>Value3.</returns>
         public static float GetValue3() { return value3; }
 
         /// <summary>
         /// Gets the value of value4
         /// </summary>
-        /// <returns>value4</returns>
+        /// <returns>Value4.</returns>
         public static float GetValue4() { return value4; }
 
         /// <summary>
         /// Gets the value of vertices
         /// </summary>
-        /// <returns>vertices</returns>
+        /// <returns>Vertices.</returns>
         public static int GetVertices() { return vertices; }
         #endregion
 
@@ -401,7 +401,7 @@ namespace SEE.UI.Menu.Drawable
         /// Activates the visibility of the part undo button and
         /// assigns an action to it.
         /// </summary>
-        /// <param name="action">The action that should be assigned</param>
+        /// <param name="action">The action that should be assigned.</param>
         public static void ActivatePartUndo(UnityAction action)
         {
             objPartUndo.SetActive(true);
@@ -681,7 +681,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action to the finish button.
         /// </summary>
-        /// <param name="action">The action that should be assigned</param>
+        /// <param name="action">The action that should be assigned.</param>
         public static void AssignFinishButton(UnityAction action)
         {
             finishBMB.clickEvent.RemoveAllListeners();
@@ -691,7 +691,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Retruns the switch manager for the loop attribut.
         /// </summary>
-        /// <returns>the switch manager for the loop.</returns>
+        /// <returns>The switch manager for the loop.</returns>
         public static SwitchManager GetLoopManager()
         {
             return loopManager;

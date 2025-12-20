@@ -26,9 +26,9 @@ namespace SEE.Layout.NodeLayouts.IncrementalTreeMap
         /// <summary>
         /// Creates a new local move that can be applied to the layout of the node clones.
         /// </summary>
-        /// <param name="cloneMap">dictionary that maps id to node, assuming that the cloneMap represents a clone
+        /// <param name="cloneMap">Dictionary that maps id to node, assuming that the cloneMap represents a clone
         /// of the node layout of <see cref="Node1"/> and <see cref="Node2"/>.</param>
-        /// <returns>a new local move</returns>
+        /// <returns>A new local move.</returns>
         public abstract LocalMove Clone(IDictionary<string, Node> cloneMap);
     }
 }

@@ -265,8 +265,8 @@ namespace SEE.Game.Charts
         ///
         /// Updates the info text.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="_">ignored</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="_">Ignored.</param>
         public void OnHoverIn(InteractableObject interactableObject, bool _ = true)
         {
             if (!interactableObject.IsSelected)
@@ -281,8 +281,8 @@ namespace SEE.Game.Charts
         ///
         /// Updates the info text.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over</param>
-        /// <param name="_">ignored</param>
+        /// <param name="interactableObject">The object being hovered over.</param>
+        /// <param name="_">Ignored.</param>
         public void OnHoverOut(InteractableObject interactableObject, bool _ = true)
         {
             if (!interactableObject.IsSelected)
@@ -297,8 +297,8 @@ namespace SEE.Game.Charts
         ///
         /// Updates the info text and highlights this marker.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="_">ignored</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="_">Ignored.</param>
         public void OnSelectIn(InteractableObject interactableObject, bool _ = true)
         {
             selectedCount++;
@@ -316,8 +316,8 @@ namespace SEE.Game.Charts
         /// Updates the info text and stops highlighting this marker, if no other linked
         /// interactable object is still selected.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="_">ignored</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="_">Ignored.</param>
         public void OnSelectOut(InteractableObject interactableObject, bool _ = true)
         {
             selectedCount--;

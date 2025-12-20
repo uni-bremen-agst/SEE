@@ -176,7 +176,7 @@ namespace SEE.UI.FilePicker
         ///     Handles the file browser success.
         /// </summary>
         /// <param name="paths">The paths.</param>
-        /// <exception cref="Exception">Received no paths from file browser</exception>
+        /// <exception cref="Exception">Received no paths from file browser.</exception>
         protected void HandleFileBrowserSuccess(string[] paths)
         {
             if (paths.Length == 0)

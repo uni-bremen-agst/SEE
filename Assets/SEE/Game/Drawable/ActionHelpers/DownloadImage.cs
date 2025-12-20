@@ -39,7 +39,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Coroutine that handles the download.
         /// Displays a warning if an error occurs during the download.
         /// </summary>
-        /// <returns>enumerator to continue</returns>
+        /// <returns>Enumerator to continue.</returns>
         private IEnumerator DownloadTexture()
         {
             UnityWebRequest request = UnityWebRequestTexture.GetTexture(imageUrl);
@@ -72,7 +72,7 @@ namespace SEE.Game.Drawable.ActionHelpers
         /// Gets the downloaded texture.
         /// Note: Can be null.
         /// </summary>
-        /// <returns>the downloaded texture</returns>
+        /// <returns>The downloaded texture.</returns>
         public Texture2D GetTexture()
         {
             if (texture != null)

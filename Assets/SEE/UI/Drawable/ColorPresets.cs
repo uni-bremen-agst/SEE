@@ -75,7 +75,7 @@ namespace SEE.UI.Drawable
         /// Once the eleventh preset box has been assigned, the Create button will be hidden.
         /// In addition, each time this method is called, the list of color presets is saved to a file.
         /// </summary>
-        /// <param name="colors">are the passed list of colors.</param>
+        /// <param name="colors">Are the passed list of colors.</param>
         private void OnColorsUpdate(List<Color> colors)
         {
             for (int cnt = 0; cnt < Presets.Length; cnt++)

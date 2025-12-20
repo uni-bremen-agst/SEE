@@ -13,25 +13,25 @@ namespace SEE.Utils
         /// <summary>
         /// Returns given <paramref name="color"/> lightened by the given <paramref name="factor"/>.
         /// </summary>
-        /// <param name="color">base color to be lightened</param>
-        /// <param name="factor">lightening factor</param>
-        /// <returns>given <paramref name="color"/> lightened by <paramref name="factor"/></returns>
+        /// <param name="color">Base color to be lightened.</param>
+        /// <param name="factor">Lightening factor.</param>
+        /// <returns>Given <paramref name="color"/> lightened by <paramref name="factor"/>.</returns>
         public static Color Lighter(this Color color, float factor = 0.5f) => Color.Lerp(color, Color.white, factor);
 
         /// <summary>
         /// Returns given <paramref name="color"/> darkened by the given <paramref name="factor"/>.
         /// </summary>
-        /// <param name="color">base color to be darkened</param>
-        /// <param name="factor">darkening factor</param>
-        /// <returns>given <paramref name="color"/> darkened by <paramref name="factor"/></returns>
+        /// <param name="color">Base color to be darkened.</param>
+        /// <param name="factor">Darkening factor.</param>
+        /// <returns>Given <paramref name="color"/> darkened by <paramref name="factor"/>.</returns>
         public static Color Darker(this Color color, float factor = 0.5f) => Color.Lerp(color, Color.black, factor);
 
         /// <summary>
         /// Returns this color with the given <paramref name="alpha"/> value.
         /// </summary>
-        /// <param name="color">The color whose alpha value to modify</param>
-        /// <param name="alpha">The new alpha value</param>
-        /// <returns><paramref name="color"/> with the given <paramref name="alpha"/></returns>
+        /// <param name="color">The color whose alpha value to modify.</param>
+        /// <param name="alpha">The new alpha value.</param>
+        /// <returns><paramref name="color"/> with the given <paramref name="alpha"/>.</returns>
         public static Color WithAlpha(this Color color, float alpha)
         {
             color.a = alpha;
@@ -50,8 +50,8 @@ namespace SEE.Utils
         /// .NET Color</a>) while Unity colors values are floats ranging from 0 to 1
         /// (<a href="https://docs.unity3d.com/ScriptReference/Color-b.html">Unity Color</a>).
         /// This is why the color components are multiplied by 255 here.</p></remarks>
-        /// <param name="backgroundColor">The background color on which the text will be put</param>
-        /// <returns>the optimal text color for the given <paramref name="backgroundColor"/>.</returns>
+        /// <param name="backgroundColor">The background color on which the text will be put.</param>
+        /// <returns>The optimal text color for the given <paramref name="backgroundColor"/>.</returns>
         public static Color IdealTextColor(this Color backgroundColor)
         {
             const int nThreshold = 130;
@@ -63,7 +63,7 @@ namespace SEE.Utils
         /// <summary>
         /// Inverts the given color.
         /// </summary>
-        /// <param name="color">The color to invert</param>
+        /// <param name="color">The color to invert.</param>
         /// <returns>The inverted color.</returns>
         public static Color Invert(this Color color)
         {
@@ -77,7 +77,7 @@ namespace SEE.Utils
         /// <summary>
         /// Converts the given <paramref name="colors"/> to linearly distributed gradient color keys.
         /// </summary>
-        /// <param name="colors">The colors to convert</param>
+        /// <param name="colors">The colors to convert.</param>
         /// <returns>The converted colors as gradient color keys.</returns>
         public static IEnumerable<GradientColorKey> ToGradientColorKeys(this ICollection<Color> colors)
         {
@@ -93,7 +93,7 @@ namespace SEE.Utils
         /// Converts the given <paramref name="keys"/> to a list of colors.
         /// This simply extracts the colors from the keys.
         /// </summary>
-        /// <param name="keys">The keys to convert</param>
+        /// <param name="keys">The keys to convert.</param>
         /// <returns>The converted keys as colors.</returns>
         public static IEnumerable<Color> ToColors(this IEnumerable<GradientColorKey> keys)
         {

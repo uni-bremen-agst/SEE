@@ -12,7 +12,7 @@ namespace SEE.Game.Drawable
         /// </summary>
         /// <param name="objectToScale">The drawable type object that should be scaled.</param>
         /// <param name="scaleFactor">The current chosen scale factor.</param>
-        /// <returns>The new scale of the object</returns>
+        /// <returns>The new scale of the object.</returns>
         public static Vector3 Scale(GameObject objectToScale, float scaleFactor)
         {
             Transform transform = objectToScale.transform;

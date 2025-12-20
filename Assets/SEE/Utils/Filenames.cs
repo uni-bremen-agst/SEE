@@ -108,8 +108,8 @@ namespace SEE.Utils
         ///
         /// Precondition: <paramref name="extension"/> must start with a period.
         /// </summary>
-        /// <param name="extension"></param>
-        /// <returns><paramref name="extension"/> without leading period</returns>
+        /// <param name="extension">The file extension string starting with a period (e.g., ".txt").</param>
+        /// <returns><paramref name="extension"/> without leading period.</returns>
         public static string ExtensionWithoutPeriod(string extension)
         {
             return extension[1..];
@@ -120,9 +120,9 @@ namespace SEE.Utils
         /// If <paramref name="filename"/> is null or if it has no extension
         /// separated by a period, false is returned.
         /// </summary>
-        /// <param name="filename">filename to be checked for the extension</param>
-        /// <param name="extension">the extension the filename should have</param>
-        /// <returns></returns>
+        /// <param name="filename">Filename to be checked for the extension.</param>
+        /// <param name="extension">The extension the filename should have.</param>
+        /// <returns>.</returns>
         public static bool HasExtension(string filename, string extension)
         {
             string extensionOfFilename = Path.GetExtension(filename);
@@ -133,8 +133,8 @@ namespace SEE.Utils
         /// <summary>
         /// Yields string "*" + <paramref name="extension"/>.
         /// </summary>
-        /// <param name="extension">file extension to be appended to "*"</param>
-        /// <returns>"*" + <paramref name="extension"/></returns>
+        /// <param name="extension">File extension to be appended to "*".</param>
+        /// <returns>"*" + <paramref name="extension"/>.</returns>
         private static string Globbing(string extension)
         {
             return "*" + extension;
@@ -144,8 +144,8 @@ namespace SEE.Utils
         /// Returns path where all Unity directory separators have been replaced by
         /// the directory separator of the current operating-system platform.
         /// </summary>
-        /// <param name="path">path to be adjusted</param>
-        /// <returns>path with replaced directory separators</returns>
+        /// <param name="path">Path to be adjusted.</param>
+        /// <returns>Path with replaced directory separators.</returns>
         public static string OnCurrentPlatform(string path)
         {
             if (Path.DirectorySeparatorChar == WindowsDirectorySeparator)
@@ -164,8 +164,8 @@ namespace SEE.Utils
         /// Returns path where all directory separators of the current operating
         /// system platform have been replaced by the Unix (or Unity) directory separator.
         /// </summary>
-        /// <param name="path">path to be adjusted</param>
-        /// <returns>path with Unix directory separators</returns>
+        /// <param name="path">Path to be adjusted.</param>
+        /// <returns>Path with Unix directory separators.</returns>
         public static string ToInternalRepresentation(string path)
         {
             return path.Replace(WindowsDirectorySeparator, UnixDirectorySeparator);
@@ -178,8 +178,8 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for GXL files</param>
-        /// <returns>sorted list of GXL filenames</returns>
+        /// <param name="directory">Name of the directory in which to search for GXL files.</param>
+        /// <returns>Sorted list of GXL filenames.</returns>
         public static IEnumerable<string> GXLFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(GXLExtension))
@@ -192,8 +192,8 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for CSV files</param>
-        /// <returns>sorted list of CSV filenames</returns>
+        /// <param name="directory">Name of the directory in which to search for CSV files.</param>
+        /// <returns>Sorted list of CSV filenames.</returns>
         public static IEnumerable<string> CSVFilenames(string directory)
         {
             return FilenamesInDirectory(directory, Globbing(CSVExtension + CompressedExtension));
@@ -206,10 +206,10 @@ namespace SEE.Utils
         /// Precondition: <paramref name="directory"/> must not be null or empty and must exist
         /// as a directory in the file system.
         /// </summary>
-        /// <param name="directory">name of the directory in which to search for files</param>
-        /// <param name="globbing">globbing parameter that the filenames are to match</param>
-        /// <returns>sorted list of filenames in <paramref name="directory"/> matching the
-        /// <paramref name="globbing"/></returns>
+        /// <param name="directory">Name of the directory in which to search for files.</param>
+        /// <param name="globbing">Globbing parameter that the filenames are to match.</param>
+        /// <returns>Sorted list of filenames in <paramref name="directory"/> matching the
+        /// <paramref name="globbing"/>.</returns>
         public static IEnumerable<string> FilenamesInDirectory(string directory, string globbing)
         {
             if (string.IsNullOrEmpty(directory))
@@ -236,9 +236,9 @@ namespace SEE.Utils
         /// separator. If <paramref name="directory"/> does not end with a <see cref="UnixDirectorySeparator"/>,
         /// one will be added at the end of <paramref name="directory"/> before the concatenation takes place.
         /// </summary>
-        /// <param name="directory">directory path</param>
-        /// <param name="filename">filename</param>
-        /// <returns>path concatenation</returns>
+        /// <param name="directory">Directory path.</param>
+        /// <param name="filename">Filename.</param>
+        /// <returns>Path concatenation.</returns>
         internal static string Join(string directory, string filename)
         {
             if (string.IsNullOrEmpty(directory))
@@ -279,9 +279,9 @@ namespace SEE.Utils
         /// where <paramref name="directoryPath"/> is a (possibly nested) platform-dependent
         /// path to a directory
         /// </summary>
-        /// <param name="directoryPath">platform-dependent directory path</param>
-        /// <returns>innermost directory name</returns>
-        /// <exception cref="ArgumentException">if <paramref name="directoryPath"/> is null or empty</exception>
+        /// <param name="directoryPath">Platform-dependent directory path.</param>
+        /// <returns>Innermost directory name.</returns>
+        /// <exception cref="ArgumentException">If <paramref name="directoryPath"/> is null or empty.</exception>
         /// <example>If <paramref name="directoryPath"/> is C:\Users\someone\develop\SEE\
         /// while running on a Windows computer, then SEE will be returned; likewise if it
         /// is C:\Users\someone\develop\SEE. If <paramref name="directoryPath"/> is

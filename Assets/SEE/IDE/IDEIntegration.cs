@@ -439,7 +439,7 @@ namespace SEE.IDE
         /// Opens the IDE defined in <see cref="Type"/> and returns the new connection.
         /// </summary>
         /// <param name="solutionPath">The solution path.</param>
-        /// <returns>Established connection. Can be null if connection couldn't be established</returns>
+        /// <returns>Established connection. Can be null if connection couldn't be established.</returns>
         private async UniTask<JsonRpcConnection> OpenNewIDEInstanceAsync(string solutionPath)
         {
             string arguments;

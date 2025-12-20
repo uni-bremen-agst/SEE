@@ -102,11 +102,11 @@ namespace SEE.Game.CityRendering
         /// means, the first position will be at (-<paramref name="x"/>/2, <paramref name="height"/>,
         /// <paramref name="z"/> / 2).
         /// </summary>
-        /// <param name="n">Number of objects</param>
-        /// <param name="x">Width of the rectangle</param>
+        /// <param name="n">Number of objects.</param>
+        /// <param name="x">Width of the rectangle.</param>
         /// <param name="height">Height of the rectangle. All positions will have this height.</param>
-        /// <param name="z">Depth of the rectangle</param>
-        /// <returns>Positions on the rectangle</returns>
+        /// <param name="z">Depth of the rectangle.</param>
+        /// <returns>Positions on the rectangle.</returns>
         public List<Vector3> GetEvenlyDistributedPositions(int n, float x, float height, float z)
         {
             List<Vector3> positions = new(n);
@@ -225,8 +225,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Returns the maximal churn value of all nodes in <paramref name="nodeMap"/>.
         /// </summary>
-        /// <param name="nodeMap">the nodes to be queried</param>
-        /// <returns>maximal churn</returns>
+        /// <param name="nodeMap">The nodes to be queried.</param>
+        /// <returns>Maximal churn.</returns>
         private float MaximalChurn(IDictionary<Node, GameObject> nodeMap)
         {
             float max = 0;

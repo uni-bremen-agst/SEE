@@ -150,8 +150,8 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// If <see cref="isFinish"/> is true, the <paramref name="finish"/> will be the state. Otherwise it will be false.
         /// </summary>
-        /// <param name="finish">The finish state</param>
-        /// <returns><see cref="isFinish"/></returns>
+        /// <param name="finish">The finish state.</param>
+        /// <returns><see cref="isFinish"/>.</returns>
         public static bool TryGetFinish(out bool finish)
         {
             if (isFinish)
@@ -168,7 +168,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the move speed.
         /// </summary>
-        /// <returns>The selected move speed</returns>
+        /// <returns>The selected move speed.</returns>
         public static float GetSpeed()
         {
             return GameFinder.FindChild(Instance.gameObject, "SpeedSwitch")

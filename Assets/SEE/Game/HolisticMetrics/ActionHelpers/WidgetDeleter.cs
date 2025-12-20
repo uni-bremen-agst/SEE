@@ -33,7 +33,7 @@ namespace SEE.Game.HolisticMetrics.ActionHelpers
         /// Fetches the player's selection of which widget to delete.
         /// </summary>
         /// <param name="config">The config of the widget to delete.</param>
-        /// <returns>The value of <see cref="hasDeletion"/></returns>
+        /// <returns>The value of <see cref="hasDeletion"/>.</returns>
         internal bool GetDeletion(out WidgetConfig config)
         {
             config = ConfigManager.GetWidgetConfig(GetComponent<WidgetController>(), GetComponent<Metric>());

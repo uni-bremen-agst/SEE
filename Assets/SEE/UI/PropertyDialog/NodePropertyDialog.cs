@@ -23,7 +23,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="node">the graph node to be manipulated</param>
+        /// <param name="node">The graph node to be manipulated.</param>
         public NodePropertyDialog(Node node)
         {
             this.node = node;

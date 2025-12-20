@@ -25,8 +25,8 @@ namespace SEE.Game.City
         ///
         /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
-        /// <param name="writer">to be used for writing the settings</param>
-        /// <param name="label">the outer label grouping the settings</param>
+        /// <param name="writer">To be used for writing the settings.</param>
+        /// <param name="label">The outer label grouping the settings.</param>
         public void Save(ConfigWriter writer, string label)
         {
             writer.BeginGroup(label);
@@ -41,9 +41,9 @@ namespace SEE.Game.City
         ///
         /// Implements <see cref="ConfigIO.IPersistentConfigItem.Save(ConfigWriter, string)"/>.
         /// </summary>
-        /// <param name="attributes">dictionary of attributes from which to retrieve the settings</param>
-        /// <param name="label">the label for the settings (a key in <paramref name="attributes"/>)</param>
-        /// <returns>true if at least one attribute was successfully restored</returns>
+        /// <param name="attributes">Dictionary of attributes from which to retrieve the settings.</param>
+        /// <param name="label">The label for the settings (a key in <paramref name="attributes"/>).</param>
+        /// <returns>True if at least one attribute was successfully restored.</returns>
         public bool Restore(Dictionary<string, object> attributes, string label)
         {
             if (attributes.TryGetValue(label, out object dictionary))

@@ -18,8 +18,8 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// The constructor of this action. All it does is assign the value you pass it to a field.
         /// </summary>
-        /// <param name="drawableID">The id of the drawable on which the object is located.</param>
-        /// <param name="parentDrawableID">The id of the drawable parent.</param>
+        /// <param name="drawableID">The ID of the drawable on which the object is located.</param>
+        /// <param name="parentDrawableID">The ID of the drawable parent.</param>
         /// <param name="line">The line that contains the values to change the associated game object.</param>
         public EditLineNetAction(string drawableID, string parentDrawableID, LineConf line)
             : base(drawableID, parentDrawableID)
@@ -30,12 +30,12 @@ namespace SEE.Net.Actions.Drawable
         /// <summary>
         /// Changes the values of the given line on each client.
         /// </summary>
-        /// <exception cref="System.Exception">will be thrown, if the <see cref="DrawableID"/>
+        /// <exception cref="System.Exception">Will be thrown, if the <see cref="DrawableID"/>
         /// or <see cref="Line"/> don't exists.</exception>
         public override void ExecuteOnClient()
         {
             base.ExecuteOnClient();
-            GameEdit.ChangeLine(FindChild(Line.Id), Line);
+            GameEdit.ChangeLine(FindChild(Line.ID), Line);
         }
     }
 }

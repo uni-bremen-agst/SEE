@@ -20,8 +20,8 @@
         /// <summary>
         /// Constructor for a new pair.
         /// </summary>
-        /// <param name="a">the first element</param>
-        /// <param name="b">the second element</param>
+        /// <param name="a">The first element.</param>
+        /// <param name="b">The second element.</param>
         public Pair(A a, B b)
         {
             First = a;
@@ -31,7 +31,7 @@
         /// <summary>
         /// Yields the first element of the pair.
         /// </summary>
-        /// <returns>the first element of the pair</returns>
+        /// <returns>The first element of the pair.</returns>
         public A GetFirst()
         {
             return First;
@@ -40,7 +40,7 @@
         /// <summary>
         /// Yields the second element of the pair.
         /// </summary>
-        /// <returns>the second element of the pair</returns>
+        /// <returns>The second element of the pair.</returns>
         public B GetSecond()
         {
             return Second;
@@ -49,9 +49,9 @@
         /// <summary>
         /// Creates new pair of elements.
         /// </summary>
-        /// <param name="a">first element</param>
-        /// <param name="b">second element</param>
-        /// <returns>new pair</returns>
+        /// <param name="a">First element.</param>
+        /// <param name="b">Second element.</param>
+        /// <returns>New pair.</returns>
         public static Pair<A, B> Of(A a, B b)
         {
             return new Pair<A, B>(a, b);

@@ -30,7 +30,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Shows or hides all edges of the code city the <paramref name="hoveredGraphElement"/> belongs to.
         /// </summary>
-        /// <param name="hoveredGraphElement">the graph element currently being hovered</param>
+        /// <param name="hoveredGraphElement">The graph element currently being hovered.</param>
         private static void ShowOrHide(GameObject hoveredGraphElement)
         {
             AbstractSEECity codeCity = hoveredGraphElement.ContainingCity();

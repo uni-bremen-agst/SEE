@@ -306,7 +306,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns true if the line menu is in drawing mode.
         /// </summary>
-        /// <returns>true if in drawing mode</returns>
+        /// <returns>True if in drawing mode.</returns>
         public bool IsInDrawingMode()
         {
             return gameObject.activeInHierarchy && mode == Mode.Drawing;
@@ -315,7 +315,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns true if the line menu is in edit mode.
         /// </summary>
-        /// <returns>true if in edit mode</returns>
+        /// <returns>True if in edit mode.</returns>
         public bool IsInEditMode()
         {
             return gameObject.activeInHierarchy && mode == Mode.Edit;
@@ -649,7 +649,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Gets the fill-out color for the drawing mode.
         /// </summary>
-        /// <returns>null or the currently selected fill-out color.</returns>
+        /// <returns>Null or the currently selected fill-out color.</returns>
         public static Color? GetFillOutColorForDrawing()
         {
             if (fillOutManager.isOn)
@@ -1205,7 +1205,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns a fill-out status and color to the edit mode.
         /// </summary>
         /// <param name="fillOut">The status and color.</param>
-        /// <param name="setFillOutAction">fill-out color change action.</param>
+        /// <param name="setFillOutAction">Fill-out color change action.</param>
         /// <param name="clearFillOutAction">Action to clear the value.</param>
         public static void AssignFillOutForEditing(Color? fillOut, UnityAction<Color> setFillOutAction, UnityAction clearFillOutAction)
         {
@@ -1290,7 +1290,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns an action and a color to the HSV Color Picker.
         /// </summary>
-        /// <param name="newColorAction">The color action that should be assigned</param>
+        /// <param name="newColorAction">The color action that should be assigned.</param>
         /// <param name="color">The color that should be assigned.</param>
         public static void AssignColorArea(UnityAction<Color> newColorAction, Color color)
         {
@@ -1308,7 +1308,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the index of the current selected line kind.
         /// </summary>
-        /// <returns>Index of selected line kind</returns>
+        /// <returns>Index of selected line kind.</returns>
         private static int GetIndexOfSelectedLineKind()
         {
             return GetLineKinds().IndexOf(selectedLineKind);
@@ -1317,7 +1317,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns a line kind to the line kind selection.
         /// </summary>
-        /// <param name="kind">The line kind that should be assigned</param>
+        /// <param name="kind">The line kind that should be assigned.</param>
         public void AssignLineKind(LineKind kind)
         {
             selectedLineKind = kind;
@@ -1328,7 +1328,7 @@ namespace SEE.UI.Menu.Drawable
         /// Assigns a line kind and a tiling to the line kind selection and tiling slider controller.
         /// </summary>
         /// <param name="kind">The line kind that should be assigned.</param>
-        /// <param name="tiling">The tiling to be assigned</param>
+        /// <param name="tiling">The tiling to be assigned.</param>
         public void AssignLineKind(LineKind kind, float tiling)
         {
             selectedLineKind = kind;
@@ -1352,7 +1352,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Returns the index of the currently selected color kind.
         /// </summary>
-        /// <returns>Index of selected color kind</returns>
+        /// <returns>Index of selected color kind.</returns>
         private static int GetIndexOfSelectedColorKind()
         {
             return GetColorKinds(true).IndexOf(selectedColorKind);
@@ -1361,7 +1361,7 @@ namespace SEE.UI.Menu.Drawable
         /// <summary>
         /// Assigns a color kind to the color-kind selection.
         /// </summary>
-        /// <param name="kind">The line kind that should be assigned</param>
+        /// <param name="kind">The line kind that should be assigned.</param>
         public void AssignColorKind(ColorKind kind)
         {
             selectedColorKind = kind;

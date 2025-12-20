@@ -25,7 +25,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="markerAttributes">attributes for rendering the node markers</param>
+        /// <param name="markerAttributes">Attributes for rendering the node markers.</param>
         public TransitionRenderer(MarkerAttributes markerAttributes)
         {
             markerFactory = new MarkerFactory(markerAttributes);
@@ -90,8 +90,8 @@ namespace SEE.Game.CityRendering
         /// glow effect requires a mesh. In that case, we postpone the effect until the
         /// <see cref="LineRenderer"/> has been turned into a mesh by the <see cref="EdgeMeshScheduler"/>.
         /// </summary>
-        /// <param name="addedEdges">added edges</param>
-        /// <param name="changedEdges">changed edges</param>
+        /// <param name="addedEdges">Added edges.</param>
+        /// <param name="changedEdges">Changed edges.</param>
         private void MarkEdges(ISet<Edge> addedEdges, ISet<Edge> changedEdges)
         {
             GlowIn(addedEdges);
@@ -144,7 +144,7 @@ namespace SEE.Game.CityRendering
         /// <see cref="highlightedEdgeOperators"/> so that the glow effect
         /// can be stopped when we move to the next graph.
         /// </summary>
-        /// <param name="gameEdge">the game edge to be marked</param>
+        /// <param name="gameEdge">The game edge to be marked.</param>
         private void MarkEdge(GameObject gameEdge)
         {
             EdgeOperator edgeOperator = gameEdge.EdgeOperator();
@@ -164,13 +164,13 @@ namespace SEE.Game.CityRendering
         /// Renders the transition from <paramref name="oldGraph"/> to <paramref name="newGraph"/>.
         /// If <paramref name="edgesAreDrawn"/> is true, edges will be rendered as well.
         /// </summary>
-        /// <param name="oldGraph">the previously rendered graph</param>
-        /// <param name="newGraph">the new graph to be rendered anew</param>
-        /// <param name="edgesAreDrawn">whether edges should be drawn</param>
-        /// <param name="codeCity">the game object under which to place the nodes and edges
-        /// for the new graph</param>
-        /// <param name="renderer">the graph renderer to obtain the layouts from</param>
-        /// <returns>task</returns>
+        /// <param name="oldGraph">The previously rendered graph.</param>
+        /// <param name="newGraph">The new graph to be rendered anew.</param>
+        /// <param name="edgesAreDrawn">Whether edges should be drawn.</param>
+        /// <param name="codeCity">The game object under which to place the nodes and edges
+        /// for the new graph.</param>
+        /// <param name="renderer">The graph renderer to obtain the layouts from.</param>
+        /// <returns>Task.</returns>
         internal async UniTask RenderAsync
             (Graph oldGraph,
              Graph newGraph,
@@ -296,8 +296,8 @@ namespace SEE.Game.CityRendering
             /// Otherwise, a new game node is created and returned with the given <paramref name="node"/>
             /// attached to it.
             /// </summary>
-            /// <param name="node">node for which a game node is requested</param>
-            /// <returns>existing or new game node</returns>
+            /// <param name="node">Node for which a game node is requested.</param>
+            /// <returns>Existing or new game node.</returns>
             GameObject GetGameNode(Node node)
             {
                 GameObject go = GraphElementIDMap.Find(node.ID, false);
@@ -313,9 +313,9 @@ namespace SEE.Game.CityRendering
         /// Animates the death of <paramref name="toBeRemoved"/> and destroys their game objects
         /// after the animation has finished.
         /// </summary>
-        /// <param name="toBeRemoved">nodes to be removed</param>
-        /// <param name="animateDeath">method to animate the death of a game object</param>
-        /// <returns>task</returns>
+        /// <param name="toBeRemoved">Nodes to be removed.</param>
+        /// <param name="animateDeath">Method to animate the death of a game object.</param>
+        /// <returns>Task.</returns>
         private async UniTask AnimateDeathAsync<T>
             (ISet<T> toBeRemoved,
              Func<GameObject, IOperationCallback<Action>> animateDeath)
@@ -347,11 +347,11 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Creates new game objects for <paramref name="addedNodes"/> and renders them.
         /// </summary>
-        /// <param name="addedNodes">nodes to be added</param>
-        /// <param name="newNodelayout">the layout to be applied to the new nodes</param>
-        /// <param name="getGameNode">method to get or create the game node for a given graph node</param>
-        /// <param name="codeCity">the temporary parent object for the new game nodes (should be the code city)</param>
-        /// <returns>task</returns>
+        /// <param name="addedNodes">Nodes to be added.</param>
+        /// <param name="newNodelayout">The layout to be applied to the new nodes.</param>
+        /// <param name="getGameNode">Method to get or create the game node for a given graph node.</param>
+        /// <param name="codeCity">The temporary parent object for the new game nodes (should be the code city).</param>
+        /// <returns>Task.</returns>
         private static async UniTask AnimateNodeBirthAsync
             (ISet<Node> addedNodes,
              Dictionary<string, ILayoutNode> newNodelayout,
@@ -441,9 +441,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Creates and adds new game edges for <paramref name="addedEdges"/>.
         /// </summary>
-        /// <param name="addedEdges">the new graph edges</param>
-        /// <param name="renderer">the graph renderer to draw the new game edges</param>
-        /// <returns>task</returns>
+        /// <param name="addedEdges">The new graph edges.</param>
+        /// <param name="renderer">The graph renderer to draw the new game edges.</param>
+        /// <returns>Task.</returns>
         private void AddNewEdges(ISet<Edge> addedEdges, IGraphRenderer renderer)
         {
             foreach (Edge edge in addedEdges)
@@ -458,8 +458,8 @@ namespace SEE.Game.CityRendering
             /// The new edge will be created according to the current settings
             /// including the edge layout.
             /// </summary>
-            /// <param name="edge">graph edge for which to create a game edge</param>
-            /// <returns>new game edge</returns>
+            /// <param name="edge">Graph edge for which to create a game edge.</param>
+            /// <returns>New game edge.</returns>
             GameObject GetNewEdge(Edge edge)
             {
                 // Source and target game objects of the new edge will be looked up
@@ -474,7 +474,7 @@ namespace SEE.Game.CityRendering
         /// the same graph elements (according to the ID) of the former graph. That is why we
         /// need to reattach them to <paramref name="elements"/>
         /// </summary>
-        /// <param name="elements">graph elements of the new graph to be reattached</param>
+        /// <param name="elements">Graph elements of the new graph to be reattached.</param>
         private void Reattach<T>(ISet<T> elements) where T : GraphElement
         {
             foreach (GraphElement element in elements)
@@ -490,9 +490,9 @@ namespace SEE.Game.CityRendering
         /// Animates the movement of <paramref name="movedNodes"/> to their new positions
         /// according to <paramref name="newNodelayout"/>.
         /// </summary>
-        /// <param name="movedNodes">game nodes to be moved</param>
-        /// <param name="newNodelayout">new positions</param>
-        /// <returns>task</returns>
+        /// <param name="movedNodes">Game nodes to be moved.</param>
+        /// <param name="newNodelayout">New positions.</param>
+        /// <returns>Task.</returns>
         private static async UniTask AnimateNodeMoveByLevelAsync
                                 (ISet<Node> movedNodes,
                                  Dictionary<string, ILayoutNode> newNodelayout)
@@ -524,7 +524,7 @@ namespace SEE.Game.CityRendering
         /// </summary>
         /// <param name="movedNodes">Nodes to be moved.</param>
         /// <param name="newNodelayout">Target position of the nodes to be moved.</param>
-        /// <returns>task</returns>
+        /// <returns>Task.</returns>
         private static async UniTask MoveAsync(IList<Node> movedNodes, Dictionary<string, ILayoutNode> newNodelayout)
         {
             HashSet<GameObject> moved = new();
@@ -574,8 +574,8 @@ namespace SEE.Game.CityRendering
         /// True if the position of the given <paramref name="gameNode"/> has actually changed
         /// by a relevant margin.
         /// </summary>
-        /// <param name="gameNode">game node to be moved</param>
-        /// <param name="layoutNode">the intended new position of <paramref name="gameNode"/></param>
+        /// <param name="gameNode">Game node to be moved.</param>
+        /// <param name="layoutNode">The intended new position of <paramref name="gameNode"/>.</param>
         /// <returns>True if the position of the given <paramref name="gameNode"/> has actually changed
         /// by a relevant margin.</returns>
         private static bool PositionHasChanged(GameObject gameNode, ILayoutNode layoutNode)
@@ -590,14 +590,14 @@ namespace SEE.Game.CityRendering
         /// scale and style. The nodes in <paramref name="changedNodes"/> will
         /// be marked as changed using <paramref name="markerFactory"/>.
         /// </summary>
-        /// <param name="nodesToAdjust">nodes whose dimensions and markers need to be
+        /// <param name="nodesToAdjust">Nodes whose dimensions and markers need to be
         /// adjusted; we assume <paramref name="changedNodes"/>
-        /// is a subset of <paramref name="nodesToAdjust"/></param>
-        /// <param name="changedNodes">nodes to be marked for a change</param>
-        /// <param name="newNodelayout">new layout determining the new scale</param>
-        /// <param name="markerFactory">factory for marking as changed</param>
-        /// <param name="renderer">the graph renderer to adjust node styles and antennas</param>
-        /// <returns>task</returns>
+        /// is a subset of <paramref name="nodesToAdjust"/>.</param>
+        /// <param name="changedNodes">Nodes to be marked for a change.</param>
+        /// <param name="newNodelayout">New layout determining the new scale.</param>
+        /// <param name="markerFactory">Factory for marking as changed.</param>
+        /// <param name="renderer">The graph renderer to adjust node styles and antennas.</param>
+        /// <returns>Task.</returns>
         private static async UniTask AnimateNodeChangeAsync
             (ISet<Node> nodesToAdjust,
              ISet<Node> changedNodes,
@@ -716,9 +716,9 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Notifies the user about added, changed, or removed graph elements.
         /// </summary>
-        /// <param name="elements">the graph elements that have been updated</param>
-        /// <param name="kind">a Relation (edge) or an Entity (node)</param>
-        /// <param name="change">the kind of change</param>
+        /// <param name="elements">The graph elements that have been updated.</param>
+        /// <param name="kind">A Relation (edge) or an Entity (node).</param>
+        /// <param name="change">The kind of change.</param>
         private static void ShowUpdated(IEnumerable<GraphElement> elements, string kind, string change)
         {
             return;

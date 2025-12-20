@@ -175,8 +175,8 @@ namespace SEE.Controls
         /// or <code>null</code>, if it does not exist.
         /// </summary>
         /// <param name="id">The id of the interactable object.</param>
-        /// <returns>the interactable with the given <paramref name="id"/>;
-        /// null if none exists</returns>
+        /// <returns>The interactable with the given <paramref name="id"/>;
+        /// null if none exists.</returns>
         public static InteractableObject Get(string id)
         {
             idToInteractableObjectDict.TryGetValue(id, out InteractableObject result);
@@ -222,7 +222,7 @@ namespace SEE.Controls
         /// <see cref="Net.SetHoverAction"/> will be called with the given <paramref name="hoverFlags"/>
         /// and this <see cref="InteractableObject"/>.
         /// </summary>
-        /// <param name="hoverFlags">New value for <see cref="HoverFlags"./></param>
+        /// <param name="hoverFlags">New value for <see cref="HoverFlags"./>.</param>
         /// <param name="isInitiator">Whether this client is initiating the hovering action.</param>
         public void SetHoverFlags(uint hoverFlags, bool isInitiator)
         {
@@ -545,8 +545,8 @@ namespace SEE.Controls
         /// or hover off the game object) in circumstances where a distinction between
         /// remote or local players must be made.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over (or no longer being hovered over)</param>
-        /// <param name="isInitiator">true if a local player initiated this call</param>
+        /// <param name="interactableObject">The object being hovered over (or no longer being hovered over).</param>
+        /// <param name="isInitiator">True if a local player initiated this call.</param>
         public delegate void MultiPlayerHoverAction(InteractableObject interactableObject, bool isInitiator);
 
         /// <summary>
@@ -555,7 +555,7 @@ namespace SEE.Controls
         /// circumstances where no distinction between remote or local players needs
         /// to be made.
         /// </summary>
-        /// <param name="interactableObject">the object being hovered over (or no longer being hovered over)</param>
+        /// <param name="interactableObject">The object being hovered over (or no longer being hovered over).</param>
         public delegate void LocalPlayerHoverAction(InteractableObject interactableObject);
 
         /// <summary>
@@ -645,8 +645,8 @@ namespace SEE.Controls
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object). Intended for multiplayer actions.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being selected.</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         public delegate void MultiPlayerSelectAction(InteractableObject interactableObject, bool isInitiator);
 
         public delegate void MulitPlayerReplaceSelectAction(List<InteractableObject> replaced,
@@ -656,7 +656,7 @@ namespace SEE.Controls
         /// A delegate to be called when a selection event has happened (selecting
         /// or deselecting the game object). Intended for actions of a local player only.
         /// </summary>
-        /// <param name="interactableObject">the object being selected</param>
+        /// <param name="interactableObject">The object being selected.</param>
         public delegate void LocalPlayerSelectAction(InteractableObject interactableObject);
 
         /// <summary>
@@ -716,15 +716,15 @@ namespace SEE.Controls
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object). Intended for multiplayer actions.
         /// </summary>
-        /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
-        /// <param name="isInitiator">true if a local user initiated this call</param>
+        /// <param name="interactableObject">The object being grabbed (or no longer grabbed).</param>
+        /// <param name="isInitiator">True if a local user initiated this call.</param>
         public delegate void MultiPlayerGrabAction(InteractableObject interactableObject, bool isInitiator);
 
         /// <summary>
         /// A delegate to be called when a grab event has happened (grabbing
         /// or releasing the game object). Intended for actions of the local player only.
         /// </summary>
-        /// <param name="interactableObject">the object being grabbed (or no longer grabbed)</param>
+        /// <param name="interactableObject">The object being grabbed (or no longer grabbed).</param>
         public delegate void LocalPlayerGrabAction(InteractableObject interactableObject);
 
         /// <summary>

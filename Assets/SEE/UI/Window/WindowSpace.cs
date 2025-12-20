@@ -147,7 +147,7 @@ namespace SEE.UI.Window
         /// <summary>
         /// Generates and returns a <see cref="WindowSpaceValues"/> struct for this space.
         /// </summary>
-        /// <returns>The newly created <see cref="WindowSpaceValues"/>, matching this class</returns>
+        /// <returns>The newly created <see cref="WindowSpaceValues"/>, matching this class.</returns>
         public WindowSpaceValues ToValueObject()
         {
             return new WindowSpaceValues(Windows, ActiveWindow);

@@ -14,10 +14,10 @@ namespace SEE.GraphProviders
         ///
         /// Postcondition: NewInstance(k).GetKind() == k.
         /// </summary>
-        /// <param name="kind">the requested kind of <see cref="SingleGraphProvider"/></param>
-        /// <returns>a new instance</returns>
-        /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
-        /// is not yet handled</exception>
+        /// <param name="kind">The requested kind of <see cref="SingleGraphProvider"/>.</param>
+        /// <returns>A new instance.</returns>
+        /// <exception cref="NotImplementedException">Thrown in case the given <paramref name="kind"/>
+        /// is not yet handled.</exception>
         internal static SingleGraphProvider NewSingleGraphProviderInstance(SingleGraphProviderKind kind)
         {
             return kind switch
@@ -40,10 +40,10 @@ namespace SEE.GraphProviders
         /// Returns a new instance of the corresponding <see cref="MultiGraphProvider"/> to the
         /// passed <see cref="MultiGraphPipelineProvider"/> <paramref name="kind"/>
         /// </summary>
-        /// <param name="kind">The requested kind of <see cref="MultiGraphProvider"/></param>
-        /// <returns>a new instance</returns>
-        /// <exception cref="NotImplementedException">thrown in case the given <paramref name="kind"/>
-        /// is not yet handled</exception>
+        /// <param name="kind">The requested kind of <see cref="MultiGraphProvider"/>.</param>
+        /// <returns>A new instance.</returns>
+        /// <exception cref="NotImplementedException">Thrown in case the given <paramref name="kind"/>
+        /// is not yet handled.</exception>
         internal static MultiGraphProvider NewMultiGraphProviderInstance(MultiGraphProviderKind kind)
         {
             return kind switch

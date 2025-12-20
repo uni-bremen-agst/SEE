@@ -20,7 +20,7 @@ namespace SEE.UI.PropertyDialog
         /// <summary>
         /// Sets the parent of this property to <paramref name="parent"/>.
         /// </summary>
-        /// <param name="parent">new parent of the property</param>
+        /// <param name="parent">New parent of the property.</param>
         public abstract void SetParent(GameObject parent);
 
         /// <summary>

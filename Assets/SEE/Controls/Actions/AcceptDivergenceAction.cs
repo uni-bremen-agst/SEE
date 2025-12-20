@@ -26,7 +26,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns a new instance of <see cref="AcceptDivergenceAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public static IReversibleAction CreateReversibleAction()
         {
             return new AcceptDivergenceAction();
@@ -36,7 +36,7 @@ namespace SEE.Controls.Actions
         /// Returns a new instance of <see cref="AcceptDivergenceAction"/> as a <see
         /// cref="IReversibleAction"/>.
         /// </summary>
-        /// <returns>new instance</returns>
+        /// <returns>New instance.</returns>
         public override IReversibleAction NewInstance()
         {
             return CreateReversibleAction();
@@ -62,8 +62,8 @@ namespace SEE.Controls.Actions
             /// <summary>
             /// Construct a new memento.
             /// </summary>
-            /// <param name="source">the source node of the edge in the architecture graph</param>
-            /// <param name="target">the target node of the edge in the architecture grpah</param>
+            /// <param name="source">The source node of the edge in the architecture graph.</param>
+            /// <param name="target">The target node of the edge in the architecture grpah.</param>
             public Memento(Node source, Node target, string type)
             {
                 this.From = source;
@@ -111,7 +111,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// See <see cref="IReversibleAction.Update"/>.
         /// </summary>
-        /// <returns>true if completed</returns>
+        /// <returns>True if completed.</returns>
         public override bool Update()
         {
             if (User.UserSettings.IsVR)
@@ -293,8 +293,8 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates a new edge using the given <paramref name="memento"/>.
         /// </summary>
-        /// <param name="memento">information needed to create the edge</param>
-        /// <returns>the new edge</returns>
+        /// <param name="memento">Information needed to create the edge.</param>
+        /// <returns>The new edge.</returns>
         private static Edge CreateConvergentEdge(Memento memento)
         {
             Edge newEdge = AcceptDivergence.Accept(memento.From, memento.To, memento.Type);
@@ -310,8 +310,8 @@ namespace SEE.Controls.Actions
         /// Creates a new edge in the architecture to allow the given <paramref name="divergence"/>
         /// and ensures that the <see cref="Update"/> method performs the execution via context menu.
         /// </summary>
-        /// <param name="divergence">the edge representing the divergence</param>
-        /// <returns>the new edge</returns>
+        /// <param name="divergence">The edge representing the divergence.</param>
+        /// <returns>The new edge.</returns>
         public void ContextMenuExecution(Edge divergence)
         {
             ExecuteViaContextMenu = true;
@@ -336,7 +336,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Creates the memento for restoring the edge and creates the edge.
         /// </summary>
-        /// <param name="divergence">the edge representing the divergence.</param>
+        /// <param name="divergence">The edge representing the divergence.</param>
         /// <returns>The created memento.</returns>
         private Memento CreateMementoAndConvergentEdge(Edge divergence)
         {
@@ -351,7 +351,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns the <see cref="ActionStateType"/> of this action.
         /// </summary>
-        /// <returns><see cref="ActionStateType.NewNode"/></returns>
+        /// <returns><see cref="ActionStateType.NewNode"/>.</returns>
         public override ActionStateType GetActionStateType()
         {
             return ActionStateTypes.AcceptDivergence;
@@ -360,7 +360,7 @@ namespace SEE.Controls.Actions
         /// <summary>
         /// Returns all IDs of GameObjects manipulated by this action.
         /// </summary>
-        /// <returns>all IDs of GameObjects manipulated by this action</returns>
+        /// <returns>All IDs of GameObjects manipulated by this action.</returns>
         public override HashSet<string> GetChangedObjects()
         {
             if (createdEdgeList.Count == 0)

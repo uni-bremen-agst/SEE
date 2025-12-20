@@ -380,7 +380,7 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Checks whether a method with no parameters has the <see cref="RuntimeButtonAttribute"/>.
         /// </summary>
-        /// <param name="methodInfo">method info</param>
+        /// <param name="methodInfo">Method info.</param>
         /// <see cref="RuntimeButtonAttribute"/>
         private void CreateButton(MethodInfo methodInfo)
         {
@@ -522,8 +522,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Returns the view game object.
         /// Adds an entry if necessary.
         /// </summary>
-        /// <param name="attributes"></param>
-        /// <returns>view game object</returns>
+        /// <param name="attributes">.</param>
+        /// <returns>View game object.</returns>
         private GameObject CreateOrGetViewGameObject(IEnumerable<Attribute> attributes)
         {
             // get the tab attribute
@@ -551,9 +551,9 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// For fields and properties that cannot be changed nothing is done.
         /// </summary>
-        /// <param name="memberInfo">field or property info</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="obj">object which contains the field or property</param>
+        /// <param name="memberInfo">Field or property info.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="obj">Object which contains the field or property.</param>
         private void CreateSetting(MemberInfo memberInfo, GameObject parent, object obj)
         {
             // obsolete members are ignored
@@ -766,15 +766,15 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// If the setting has nested members, the method is called recursively.
         /// </summary>
-        /// <param name="getter">getter of the setting value</param>
-        /// <param name="settingName">setting name; in case of a list element, this would be index of the list
-        /// element; otherwise this would be the name of the field</param>
-        /// <param name="parent">parent game object</param>
-        /// <param name="removable">Enables the remove button to remove this object. Needed for nested settings</param>
-        /// <param name="setter">setter of the setting value</param>
-        /// <param name="attributes">attributes</param>
-        /// <param name="memberInfo">field or property info from <see cref="CreateSetting"/></param>
-        /// <param name="obj">object which contains the field or property from <see cref="CreateSetting"/></param>
+        /// <param name="getter">Getter of the setting value.</param>
+        /// <param name="settingName">Setting name; in case of a list element, this would be index of the list
+        /// element; otherwise this would be the name of the field.</param>
+        /// <param name="parent">Parent game object.</param>
+        /// <param name="removable">Enables the remove button to remove this object. Needed for nested settings.</param>
+        /// <param name="setter">Setter of the setting value.</param>
+        /// <param name="attributes">Attributes.</param>
+        /// <param name="memberInfo">Field or property info from <see cref="CreateSetting"/>.</param>
+        /// <param name="obj">Object which contains the field or property from <see cref="CreateSetting"/>.</param>
         private void CreateSetting
             (Func<object> getter,
             string settingName,
@@ -1124,11 +1124,11 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Uses the <see cref="settingsObjectPrefab"/>.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="parent">container</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="parent">Container.</param>
         /// <param name="expandable">Enables the add button to add new items.</param>
         /// <param name="removable">Enables the remove button to remove this entry from its dictionary.</param>
-        /// <returns>container for child settings</returns>
+        /// <returns>Container for child settings.</returns>
         private GameObject CreateNestedSetting(string settingName, GameObject parent,
             bool removable, bool expandable = false)
         {
@@ -1173,8 +1173,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// Adds functionality for managing dictionary entries.
         /// This includes adding new entries as well as removing existing ones.
         /// </summary>
-        /// <param name="parent">container</param>
-        /// <param name="dict">the dictionary</param>
+        /// <param name="parent">Container.</param>
+        /// <param name="dict">The dictionary.</param>
         private void CreateDictEntryManagement(GameObject parent, IDictionary dict)
         {
             ButtonManagerBasicIcon addBtn = parent.transform.parent.Find("Buttons/AddBtn").GetComponent<ButtonManagerBasicIcon>();
@@ -1320,14 +1320,14 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a slider widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="range">slider range</param>
-        /// <param name="setter">setter of the setting value</param>
-        /// <param name="getter">getter of the setting value</param>
-        /// <param name="useRoundValue">whether to use round or float values</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="recursive">whether it is called recursively (small editor menu)</param>
-        /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="range">Slider range.</param>
+        /// <param name="setter">Setter of the setting value.</param>
+        /// <param name="getter">Getter of the setting value.</param>
+        /// <param name="useRoundValue">Whether to use round or float values.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="recursive">Whether it is called recursively (small editor menu).</param>
+        /// <param name="getWidgetName">Widget name (unique identifier for setting).</param>
         private GameObject CreateSlider(string settingName, RangeAttribute range, UnityAction<float> setter,
             Func<float> getter, bool useRoundValue, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
@@ -1529,12 +1529,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates switch widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="setter">setter of the setting value</param>
-        /// <param name="getter">getter of the setting value</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="recursive">whether it is called recursively (small editor menu)</param>
-        /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="setter">Setter of the setting value.</param>
+        /// <param name="getter">Getter of the setting value.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="recursive">Whether it is called recursively (small editor menu).</param>
+        /// <param name="getWidgetName">Widget name (unique identifier for setting).</param>
         private GameObject CreateSwitch(string settingName, UnityAction<bool> setter, Func<bool> getter, GameObject parent,
             bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -1635,12 +1635,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a string field widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="setter">setter</param>
-        /// <param name="getter">getter</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="recursive">whether it is called recursively (small editor menu)</param>
-        /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="setter">Setter.</param>
+        /// <param name="getter">Getter.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="recursive">Whether it is called recursively (small editor menu).</param>
+        /// <param name="getWidgetName">Widget name (unique identifier for setting).</param>
         private GameObject CreateStringField(string settingName, UnityAction<string> setter, Func<string> getter,
             GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -1798,13 +1798,13 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a dropdown widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="setter">setter of the setting value</param>
-        /// <param name="values">dropdown names</param>
-        /// <param name="getter">getter of the setting value</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="recursive">whether it is called recursively (small editor menu)</param>
-        /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="setter">Setter of the setting value.</param>
+        /// <param name="values">Dropdown names.</param>
+        /// <param name="getter">Getter of the setting value.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="recursive">Whether it is called recursively (small editor menu).</param>
+        /// <param name="getWidgetName">Widget name (unique identifier for setting).</param>
         private GameObject CreateDropDown(string settingName, UnityAction<int> setter, IEnumerable<string> values,
             Func<string> getter, GameObject parent, bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -1892,12 +1892,12 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a color picker widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="setter">setter of the setting value</param>
-        /// <param name="getter">getter of the setting value</param>
-        /// <param name="recursive">whether it is called recursively (small editor menu)</param>
-        /// <param name="getWidgetName">widget name (unique identifier for setting)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="setter">Setter of the setting value.</param>
+        /// <param name="getter">Getter of the setting value.</param>
+        /// <param name="recursive">Whether it is called recursively (small editor menu).</param>
+        /// <param name="getWidgetName">Widget name (unique identifier for setting).</param>
         private void CreateColorPicker(string settingName, GameObject parent, UnityAction<Color> setter,
             Func<Color> getter, bool recursive = false, Func<string> getWidgetName = null)
         {
@@ -2022,9 +2022,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates file picker widget.
         /// </summary>
-        /// <param name="settingName">setting name</param>
-        /// <param name="dataPath">data path (<see cref="FilePath"/> and <see cref="DirectoryPath"/>)</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
+        /// <param name="settingName">Setting name.</param>
+        /// <param name="dataPath">Data path (<see cref="FilePath"/> and <see cref="DirectoryPath"/>).</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
         private void CreateFilePicker(string settingName, DataPath dataPath, GameObject parent)
         {
             // init widget
@@ -2102,9 +2102,9 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Creates a list widget.
         /// </summary>
-        /// <param name="list">list to create a widget for</param>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="newT">creates a new instance of <typeparamref name="T"/></param>
+        /// <param name="list">List to create a widget for.</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="newT">Creates a new instance of <typeparamref name="T"/>.</param>
         /// <typeparam name="T">the type of elements in <paramref name="list"/></typeparam>
         private void CreateList<T>(IList<T> list, GameObject parent, Func<T> newT) where T : class
         {
@@ -2203,8 +2203,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Updates the elements of a list widget.
         /// </summary>
-        /// <param name="list">list elements</param>
-        /// <param name="parent">list widget</param>
+        /// <param name="list">List elements.</param>
+        /// <param name="parent">List widget.</param>
         private void UpdateListChildren<T>(IList<T> list, GameObject parent) where T : class
         {
             // remove children that are no longer part of the list
@@ -2241,8 +2241,8 @@ namespace SEE.UI.RuntimeConfigMenu
         /// <summary>
         /// Updates the elements of a dictionary widget.
         /// </summary>
-        /// <param name="parent">parent (container game object: <see cref="CreateNestedSetting"/>)</param>
-        /// <param name="dict">dictionary</param>
+        /// <param name="parent">Parent (container game object: <see cref="CreateNestedSetting"/>).</param>
+        /// <param name="dict">Dictionary.</param>
         private void UpdateDictChildren(GameObject parent, IDictionary dict)
         {
             // remove children that are no longer part of the dictionary
@@ -2275,7 +2275,7 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Uses the widget size as the minimum layout size.
         /// </summary>
-        /// <param name="widget">widget where the layout element is added</param>
+        /// <param name="widget">Widget where the layout element is added.</param>
         private static void AddLayoutElement(GameObject widget)
         {
             LayoutElement layoutElement = widget.AddComponent<LayoutElement>();
@@ -2341,7 +2341,7 @@ namespace SEE.UI.RuntimeConfigMenu
         ///
         /// Uses a base brightness and alternately makes that color slightly brighter/darker.
         /// </summary>
-        /// <returns>color</returns>
+        /// <returns>Color.</returns>
         private Color GetColorForTab()
         {
             int tabCount = ViewList.transform.childCount;

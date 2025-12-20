@@ -24,7 +24,7 @@ namespace SEE.UI.HolisticMetrics
         /// <summary>
         /// Fetches a click.
         /// </summary>
-        /// <returns>The value of <see cref="gotClick"/></returns>
+        /// <returns>The value of <see cref="gotClick"/>.</returns>
         internal bool IsClicked()
         {
             if (gotClick)

@@ -74,7 +74,7 @@ namespace SEE.GO
         /// A delegate to be called when a camera is available.
         /// Sets <see cref="mainCamera"/> and enables this component.
         /// </summary>
-        /// <param name="camera">the availabe camera</param>
+        /// <param name="camera">The availabe camera.</param>
         private void OnCameraAvailable(Camera camera)
         {
             if (camera == null)

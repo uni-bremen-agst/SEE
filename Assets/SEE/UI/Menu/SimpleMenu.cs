@@ -183,7 +183,7 @@ namespace SEE.UI.Menu
         /// <summary>
         /// The keywords the menu should listen to.
         /// </summary>
-        /// <returns>titles the menu should listen to</returns>
+        /// <returns>Titles the menu should listen to.</returns>
         protected virtual IEnumerable<string> GetKeywords()
         {
             IEnumerable<string> keywords = Enumerable.Empty<string>();

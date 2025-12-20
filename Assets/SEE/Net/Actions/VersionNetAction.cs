@@ -17,8 +17,8 @@ namespace SEE.Net.Actions
         /// <summary>
         /// Constructor.
         /// </summary>
-        /// <param name="gameObjectID">the unique game-object name of the game object representing a node of the
-        /// graph whose version was changed. Must be known to <see cref="GraphElementIDMap"/></param>
+        /// <param name="gameObjectID">The unique game-object name of the game object representing a node of the
+        /// graph whose version was changed. Must be known to <see cref="GraphElementIDMap"/>.</param>
         public VersionNetAction(string gameObjectID)
         {
             GameObjectID = gameObjectID;

@@ -33,7 +33,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Constructor setting the graph <paramref name="node"/> corresponding to this layout node.
         /// </summary>
-        /// <param name="node">graph node corresponding to this layout node</param>
+        /// <param name="node">Graph node corresponding to this layout node.</param>
         protected AbstractLayoutNode(Node node)
         {
             Node = node;
@@ -42,7 +42,7 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Implementation of <see cref="ILayoutNode{T}.HasType(string)"/>.
         /// </summary>
-        /// <param name="typeName">Name of a node type</param>
+        /// <param name="typeName">Name of a node type.</param>
         /// <returns>True if this node has a type with the given <paramref name="typeName"/>.</returns>
         public override bool HasType(string typeName)
         {
@@ -52,8 +52,8 @@ namespace SEE.Game.CityRendering
         /// <summary>
         /// Human-readable representation of this layout node for debugging purposes.
         /// </summary>
-        /// <returns>combination of <see cref="ID"/>, <see cref="ILayoutNode.Level"/>,
-        /// <see cref="ILayoutNode.IsLeaf"/> and <see cref="ILayoutNode.Parent"/></returns>
+        /// <returns>Combination of <see cref="ID"/>, <see cref="ILayoutNode.Level"/>,
+        /// <see cref="ILayoutNode.IsLeaf"/> and <see cref="ILayoutNode.Parent"/>.</returns>
         public override string ToString()
         {
             string result = base.ToString();

@@ -14,9 +14,9 @@ namespace SEE.GO
         /// <summary>
         /// Constructor defining the node metrics to be normalized.
         /// </summary>
-        /// <param name="graphs">the set of graphs whose node metrics are to be scaled</param>
-        /// <param name="metrics">node metrics for scaling</param>
-        /// <param name="leavesOnly">if true, only the leaf nodes are considered</param>
+        /// <param name="graphs">The set of graphs whose node metrics are to be scaled.</param>
+        /// <param name="metrics">Node metrics for scaling.</param>
+        /// <param name="leavesOnly">If true, only the leaf nodes are considered.</param>
         protected IScale(IEnumerable<Graph> graphs, ISet<string> metrics, bool leavesOnly)
         {
             this.Metrics = metrics;
@@ -52,9 +52,9 @@ namespace SEE.GO
         /// subclasses. If the node does not have this <paramref name="metric"/>, 0 will
         /// be returned.
         /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="node">node for which to determine the normalized value</param>
-        /// <returns>normalized value of node metric</returns>
+        /// <param name="metric">Name of the node metric.</param>
+        /// <param name="node">Node for which to determine the normalized value.</param>
+        /// <returns>Normalized value of node metric.</returns>
         public float GetNormalizedValue(string metric, Node node)
         {
             if (node.TryGetNumeric(metric, out float value))
@@ -73,9 +73,9 @@ namespace SEE.GO
         /// normalized value for <paramref name="node"/> is returned if it exists; otherwise 0
         /// is returned.
         /// </summary>
-        /// <param name="node">node whose metric is to be returned</param>
-        /// <param name="metricName">the name of a node metric or a number</param>
-        /// <returns>the value of <paramref name="node"/>'s metric <paramref name="metricName"/></returns>
+        /// <param name="node">Node whose metric is to be returned.</param>
+        /// <param name="metricName">The name of a node metric or a number.</param>
+        /// <returns>The value of <paramref name="node"/>'s metric <paramref name="metricName"/>.</returns>
         public float GetMetricValue(Node node, string metricName)
         {
             if (Utils.FloatUtils.TryGetFloat(metricName, out float value))
@@ -92,18 +92,18 @@ namespace SEE.GO
         /// Yields a normalized value of the given node metric. The type of normalization
         /// is determined by concrete subclasses.
         /// </summary>
-        /// <param name="metric">metric name</param>
-        /// <param name="value">value to be normalized</param>
-        /// <returns>normalized value</returns>
+        /// <param name="metric">Metric name.</param>
+        /// <param name="value">Value to be normalized.</param>
+        /// <returns>Normalized value.</returns>
         public abstract float GetNormalizedValue(string metric, float value);
 
         /// <summary>
         /// Yields a normalized value of the given node metric relative to the level of the node.
         /// The type of normalization is determined by concrete subclasses.
         /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="node">node for which to determine the normalized value relative to its level</param>
-        /// <returns>normalized value of node metric relative to its level</returns>
+        /// <param name="metric">Name of the node metric.</param>
+        /// <param name="node">Node for which to determine the normalized value relative to its level.</param>
+        /// <returns>Normalized value of node metric relative to its level.</returns>
         public abstract float GetNormalizedValueForLevel(string metric, Node node);
 
         /// <summary>
@@ -111,17 +111,17 @@ namespace SEE.GO
         /// given <paramref name="level"/>.
         /// The type of normalization is determined by concrete subclasses.
         /// </summary>
-        /// <param name="metric">metric name</param>
-        /// <param name="value">value to be normalized</param>
-        /// <param name="level">node level to which the value shall be normalized</param>
-        /// <returns>normalized value relative to given node <paramref name="level"/></returns>
+        /// <param name="metric">Metric name.</param>
+        /// <param name="value">Value to be normalized.</param>
+        /// <param name="level">Node level to which the value shall be normalized.</param>
+        /// <returns>Normalized value relative to given node <paramref name="level"/>.</returns>
         public abstract float GetNormalizedValueForLevel(string metric, float value, int level);
 
         /// <summary>
         /// Yields the maximal value of the given <paramref name="metric"/> (not normalized).
         /// </summary>
-        /// <param name="metric">metric for which to return the maximum</param>
-        /// <returns>maximum</returns>
+        /// <param name="metric">Metric for which to return the maximum.</param>
+        /// <returns>Maximum.</returns>
         public float GetMaximum(string metric)
         {
             if (MetricMaxima.TryGetValue(metric, out float max))
@@ -137,8 +137,8 @@ namespace SEE.GO
         /// <summary>
         /// Yields the normalized value of the maximum of the given metric.
         /// </summary>
-        /// <param name="metric">metric for which to return the normalized maximum</param>
-        /// <returns>normalized maximum</returns>
+        /// <param name="metric">Metric for which to return the normalized maximum.</param>
+        /// <returns>Normalized maximum.</returns>
         public float GetNormalizedMaximum(string metric)
         {
             if (MetricMaxima.TryGetValue(metric, out float value))
@@ -157,9 +157,9 @@ namespace SEE.GO
         /// <summary>
         /// Yields the normalized value of the maximum of the given metric within the given <paramref name="level"/>.
         /// </summary>
-        /// <param name="metric">metric for which to return the normalized maximum</param>
-        /// <param name="level">level from which to get the maximum</param>
-        /// <returns>normalized maximum</returns>
+        /// <param name="metric">Metric for which to return the normalized maximum.</param>
+        /// <param name="level">Level from which to get the maximum.</param>
+        /// <returns>Normalized maximum.</returns>
         public float GetNormalizedMaximumForLevel(string metric, int level)
         {
             if (MetricLevelMaxima.TryGetValue(level, out Dictionary<string, float> dictionary)
@@ -184,8 +184,8 @@ namespace SEE.GO
         /// If the maximum normalized value of <paramref name="metric"/> is 0, 0
         /// is returned.
         /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="node">node whose metric is to be queried</param>
+        /// <param name="metric">Name of the node metric.</param>
+        /// <param name="node">Node whose metric is to be queried.</param>
         internal float GetRelativeNormalizedValue(string metric, Node node)
         {
             float maximum = GetNormalizedMaximumForLevel(metric, node.Level);
@@ -199,8 +199,8 @@ namespace SEE.GO
         /// If the maximum normalized value of <paramref name="metric"/> is 0, 0
         /// is returned.
         /// </summary>
-        /// <param name="metric">name of the node metric</param>
-        /// <param name="node">node whose metric is to be queried</param>
+        /// <param name="metric">Name of the node metric.</param>
+        /// <param name="node">Node whose metric is to be queried.</param>
         internal float GetRelativeNormalizedValueInLevel(string metric, Node node)
         {
             float maximum = GetNormalizedMaximum(metric);
@@ -210,7 +210,7 @@ namespace SEE.GO
         /// <summary>
         /// Returns the maximal values of the node metrics in <see cref="Metrics"/>.
         /// </summary>
-        /// <param name="graphs">the set of graphs for which to determine the node metric maxima</param>
+        /// <param name="graphs">The set of graphs for which to determine the node metric maxima.</param>
         private void DetermineMetricMaxima(IEnumerable<Graph> graphs)
         {
             MetricMaxima.Clear();

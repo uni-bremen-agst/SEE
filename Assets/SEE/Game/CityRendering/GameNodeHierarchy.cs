@@ -17,7 +17,7 @@ namespace SEE.Game.CityRendering
         /// Updates the hierarchy of game nodes under <paramref name="codeCity"/> so that it is
         /// isomorphic to the node hierarchy of the underlying graph.
         /// </summary>
-        /// <param name="codeCity">the game object representing the code city</param>
+        /// <param name="codeCity">The game object representing the code city.</param>
         public static void Update(GameObject codeCity)
         {
             Dictionary<Node, GameObject> nodeMap = new();
@@ -29,9 +29,9 @@ namespace SEE.Game.CityRendering
             /// descendants of <paramref name="root"/>. The result is added to <paramref name="nodeMap"/>,
             /// where the <paramref name="root"/> itself will not be added.
             /// </summary>
-            /// <param name="root">root of the game-node hierarchy whose hierarchy members are to be collected</param>
-            /// <param name="nodeMap">the mapping of graph nodes onto their corresponding game nodes</param>
-            /// <exception cref="Exception">thrown if a game node has no valid node reference</exception>
+            /// <param name="root">Root of the game-node hierarchy whose hierarchy members are to be collected.</param>
+            /// <param name="nodeMap">The mapping of graph nodes onto their corresponding game nodes.</param>
+            /// <exception cref="Exception">Thrown if a game node has no valid node reference.</exception>
             static void CollectNodes(GameObject root, IDictionary<Node, GameObject> nodeMap)
             {
                 if (root != null)
@@ -63,7 +63,7 @@ namespace SEE.Game.CityRendering
             /// the same graph.
             /// Used only for debugging.
             /// </summary>
-            /// <param name="nodeMap">mapping of graph nodes onto their corresponding game nodes</param>
+            /// <param name="nodeMap">Mapping of graph nodes onto their corresponding game nodes.</param>
             static void Check(Dictionary<Node, GameObject> nodeMap)
             {
                 HashSet<Graph> graphs = new();

@@ -12,8 +12,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Creates a ptree with a root having the given position and size.
         /// </summary>
-        /// <param name="position">position of the rectangle represented by the root</param>
-        /// <param name="size">size of the rectangle represented by the root</param>
+        /// <param name="position">Position of the rectangle represented by the root.</param>
+        /// <param name="size">Size of the rectangle represented by the root.</param>
         public PTree(Vector2 position, Vector2 size)
         {
             Root = new PNode(position, size);
@@ -168,9 +168,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// True if <paramref name="sub"/> fits into <paramref name="container"/>.
         /// </summary>
-        /// <param name="sub">size of the presumably smaller rectangle</param>
-        /// <param name="container">size of the presumably larger rectangle</param>
-        /// <returns>true if <paramref name="sub"/> fits into <paramref name="container"/></returns>
+        /// <param name="sub">Size of the presumably smaller rectangle.</param>
+        /// <param name="container">Size of the presumably larger rectangle.</param>
+        /// <returns>True if <paramref name="sub"/> fits into <paramref name="container"/>.</returns>
         public static bool FitsInto(Vector2 sub, Vector2 container)
         {
             return sub.x <= container.x && sub.y <= container.y;
@@ -179,8 +179,8 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Returns all free leaves having at least the requested size.
         /// </summary>
-        /// <param name="size">requested size of the rectangle</param>
-        /// <returns>all free leaves having at least the requested size</returns>
+        /// <param name="size">Requested size of the rectangle.</param>
+        /// <returns>All free leaves having at least the requested size.</returns>
         public IList<PNode> GetSufficientlyLargeLeaves(Vector2 size)
         {
             List<PNode> result = new();
@@ -205,9 +205,9 @@ namespace SEE.Layout.NodeLayouts.RectanglePacking
         /// <summary>
         /// Prints the tree rooted by <paramref name="node"/> to the console. Can be used for debugging.
         /// </summary>
-        /// <param name="node">the root of the tree to be printed</param>
-        /// <param name="indent">indentation before the node is printed</param>
-        /// <param name="last">whether this is the last node to be printed</param>
+        /// <param name="node">The root of the tree to be printed.</param>
+        /// <param name="indent">Indentation before the node is printed.</param>
+        /// <param name="last">Whether this is the last node to be printed.</param>
         private void Print(PNode node, string indent, bool last)
         {
             if (node == null)
